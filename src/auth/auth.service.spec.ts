@@ -35,4 +35,16 @@ describe("AuthService", () => {
       await expect(service.signIn("john", "wrongpassword")).rejects.toThrow(UnauthorizedException);
     });
   });
+
+  describe("when signing up with valid credentials", () => {
+    it("should return an access token", async () => {
+      const { accessToken } = await service.signUp("test", "test");
+      expect(accessToken).toBeDefined();
+    });
+  });
+  describe("when signing up with invalid credentials", () => {
+    it("should throw an error", async () => {
+      await expect(service.signUp("", "")).rejects.toThrow();
+    });
+  });
 });

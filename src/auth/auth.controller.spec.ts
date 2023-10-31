@@ -40,4 +40,14 @@ describe("AuthController", () => {
       })).rejects.toThrow(UnauthorizedException);
     });
   });
+
+  describe("when signing up with valid credentials", () => {
+    it("should return an access token", async () => {
+      const { accessToken } = await controller.signUp({
+        username: "test",
+        password: "test"
+      });
+      expect(accessToken).toBeDefined();
+    });
+  });
 });
