@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, Request } from "@nestjs/common";
 import { AuthDto, AuthService } from "./auth.service";
 import { AuthGuard } from "./auth.guard";
+import { Public } from "./public.guard";
 
 type SignInDto = {
   username: string;
@@ -14,6 +15,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post("sign-in")
+  @Public()
   signIn(@Body() signInDto: SignInDto): Promise<AuthDto> {
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
