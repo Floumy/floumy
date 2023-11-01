@@ -14,7 +14,7 @@ export class AuthService {
 
     async signIn(username: string, password: string): Promise<AuthDto> {
         const user = await this.usersService.findOne(username);
-        if (user?.password !== password) {
+        if (!await this.usersService.isPasswordCorrect(password, user?.password)) {
             throw new UnauthorizedException();
         }
         const payload = {sub: user.id, username: username};

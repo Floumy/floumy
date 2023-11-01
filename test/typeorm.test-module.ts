@@ -1,12 +1,13 @@
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import databaseConfig from '../src/config/database.config';
+import encryptionConfig from '../src/config/encryption.config';
 
 // TODO: Fix flaky tests
 const typeOrmModule = TypeOrmModule.forRootAsync({
     imports: [ConfigModule.forRoot({
-        load: [databaseConfig],
-    }),],
+        load: [databaseConfig, encryptionConfig],
+    })],
     useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('database.host'),
