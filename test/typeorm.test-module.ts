@@ -6,7 +6,7 @@ import databaseConfig from '../src/config/database.config';
 const typeOrmModule = TypeOrmModule.forRootAsync({
     imports: [ConfigModule.forRoot({
         load: [databaseConfig],
-    }),],
+    })],
     useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('database.host'),
