@@ -6,30 +6,46 @@ import {UsersModule} from "../src/users/users.module";
 import {AuthService} from "../src/auth/auth.service";
 import {UsersService} from "../src/users/users.service";
 import {Reflector} from "@nestjs/core";
-import {AppController} from "../src/app.controller";
-import {AppService} from "../src/app.service";
 import {AuthController} from "../src/auth/auth.controller";
 import {jwtModule} from "./jwt.test-module";
+import {typeOrmModule} from './typeorm.test-module';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {User} from '../src/users/user.entity';
+import {ConfigModule} from '@nestjs/config';
+import databaseConfig from '../src/config/database.config';
+import encryptionConfig from '../src/config/encryption.config';
 
 describe("AuthController (e2e)", () => {
     let app: INestApplication;
+    let usersService: UsersService;
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [
+                jwtModule,
+                typeOrmModule,
+                TypeOrmModule.forFeature([User]),
                 AuthModule,
                 UsersModule,
-                jwtModule
+                ConfigModule.forRoot({
+                    load: [databaseConfig, encryptionConfig],
+                })
             ],
-            controllers: [AppController, AuthController],
-            providers: [AppService, AuthService, UsersService, Reflector]
+            controllers: [AuthController],
+            providers: [AuthService, UsersService, Reflector]
         }).compile();
 
         app = moduleFixture.createNestApplication();
+        usersService = moduleFixture.get<UsersService>(UsersService);
         await app.init();
     });
 
+    afterEach(async () => {
+        await usersService.clear();
+    });
+
     async function signIn(): Promise<request.Test> {
+        await singUp("john", "changeme");
         return request(app.getHttpServer())
             .post("/auth/sign-in")
             .send({
@@ -42,12 +58,18 @@ describe("AuthController (e2e)", () => {
             });
     }
 
-    it("/ (GET)", () => {
+    async function singUp(username: string, password: string): Promise<request.Test> {
         return request(app.getHttpServer())
-            .get("/")
-            .expect(HttpStatus.OK)
-            .expect("Hello World!");
-    });
+            .post("/auth/sign-up")
+            .send({
+                username,
+                password
+            })
+            .expect(HttpStatus.CREATED)
+            .expect(({body}) => {
+                expect(body.accessToken).toBeDefined();
+            });
+    }
 
     it("/auth/profile (GET)", () => {
         return request(app.getHttpServer())
@@ -75,7 +97,8 @@ describe("AuthController (e2e)", () => {
             .expect(HttpStatus.UNAUTHORIZED);
     });
 
-    it("/auth/sign-in (POST)", () => {
+    it("/auth/sign-in (POST)", async () => {
+        await singUp("john", "changeme");
         return request(app.getHttpServer())
             .post("/auth/sign-in")
             .send({

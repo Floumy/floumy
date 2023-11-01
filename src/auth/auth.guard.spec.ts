@@ -17,7 +17,7 @@ describe("AuthGuard", () => {
             imports: [
                 UsersModule,
                 jwtModule,
-                typeOrmModule,
+                typeOrmModule
             ],
             providers: [AuthService]
         }).compile();

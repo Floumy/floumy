@@ -6,13 +6,14 @@ import {UsersModule} from './users/users.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import databaseConfig from './config/database.config';
+import encryptionConfig from './config/encryption.config';
 
 @Module({
     imports: [
         AuthModule,
         UsersModule,
         ConfigModule.forRoot({
-            load: [databaseConfig],
+            load: [databaseConfig, encryptionConfig],
         }),
         TypeOrmModule.forRootAsync({
             useFactory: (configService: ConfigService) => ({

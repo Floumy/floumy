@@ -36,8 +36,8 @@ describe("AuthController", () => {
 
     describe("when signing in with valid credentials", () => {
         it("should return an access token", async () => {
-            await controller.signUp({username: "john", password: "changeme"});
-            const {accessToken} = await controller.signIn({username: "john", password: "changeme"});
+            await controller.signUp({username: "john@example.com", password: "testtesttest"});
+            const {accessToken} = await controller.signIn({username: "john@example.com", password: "testtesttest"});
             expect(accessToken).toBeDefined();
         });
     });
@@ -54,8 +54,8 @@ describe("AuthController", () => {
     describe("when signing up with valid credentials", () => {
         it("should return an access token", async () => {
             const {accessToken} = await controller.signUp({
-                username: "test",
-                password: "test"
+                username: "test@example.com",
+                password: "testtesttest"
             });
             expect(accessToken).toBeDefined();
         });

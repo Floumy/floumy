@@ -34,8 +34,8 @@ describe("AuthService", () => {
 
     describe("when signing in with valid credentials", () => {
         it("should return an access token", async () => {
-            await service.signUp("john", "changeme");
-            const {accessToken} = await service.signIn("john", "changeme");
+            await service.signUp("john@example.com", "testtesttest");
+            const {accessToken} = await service.signIn("john@example.com", "testtesttest");
             expect(accessToken).toBeDefined();
         });
     });
@@ -48,7 +48,7 @@ describe("AuthService", () => {
 
     describe("when signing up with valid credentials", () => {
         it("should return an access token", async () => {
-            const {accessToken} = await service.signUp("test", "test");
+            const {accessToken} = await service.signUp("test@example.com", "testtesttest");
             expect(accessToken).toBeDefined();
         });
     });
