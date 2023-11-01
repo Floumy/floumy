@@ -1,4 +1,15 @@
-import {Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards, Request, HttpException} from "@nestjs/common";
+import {
+    Body,
+    Controller,
+    Get,
+    HttpCode,
+    HttpException,
+    HttpStatus,
+    Logger,
+    Post,
+    Request,
+    UseGuards
+} from "@nestjs/common";
 import {AuthDto, AuthService} from "./auth.service";
 import {AuthGuard} from "./auth.guard";
 import {Public} from "./public.guard";
@@ -10,6 +21,8 @@ type SignInDto = {
 
 @Controller("auth")
 export class AuthController {
+    private readonly logger = new Logger(AuthController.name);
+
     constructor(private authService: AuthService) {
     }
 
@@ -34,6 +47,7 @@ export class AuthController {
         try {
             return await this.authService.signUp(signUpDto.username, signUpDto.password);
         } catch (e) {
+            this.logger.error(e.message);
             throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
         }
     }

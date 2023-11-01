@@ -1,6 +1,9 @@
 import {Test, TestingModule} from "@nestjs/testing";
 import {jwtModule} from "../../test/jwt.test-module";
 import {UsersService} from './users.service';
+import {typeOrmModule} from '../../test/typeorm.test-module';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {User} from './user.entity';
 
 describe("UsersService", () => {
     let service: UsersService;
@@ -8,12 +11,18 @@ describe("UsersService", () => {
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             imports: [
-                jwtModule
+                jwtModule,
+                typeOrmModule,
+                TypeOrmModule.forFeature([User])
             ],
             providers: [UsersService]
         }).compile();
 
         service = module.get<UsersService>(UsersService);
+    });
+
+    afterEach(async () => {
+        await service.clear();
     });
 
     it("should be defined", () => {
