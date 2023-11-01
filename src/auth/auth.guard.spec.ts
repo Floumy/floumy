@@ -6,6 +6,7 @@ import {AuthGuard} from './auth.guard';
 import {JwtService} from '@nestjs/jwt';
 import {Reflector} from '@nestjs/core';
 import {ExecutionContext} from '@nestjs/common';
+import {typeOrmModule} from '../../test/typeorm.test-module';
 
 describe("AuthGuard", () => {
     let jwtService: JwtService;
@@ -15,7 +16,8 @@ describe("AuthGuard", () => {
         module = await Test.createTestingModule({
             imports: [
                 UsersModule,
-                jwtModule
+                jwtModule,
+                typeOrmModule,
             ],
             providers: [AuthService]
         }).compile();
