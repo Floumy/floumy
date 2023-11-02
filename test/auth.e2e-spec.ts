@@ -11,9 +11,6 @@ import {jwtModule} from "./jwt.test-module";
 import {typeOrmModule} from './typeorm.test-module';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {User} from '../src/users/user.entity';
-import {ConfigModule} from '@nestjs/config';
-import databaseConfig from '../src/config/database.config';
-import encryptionConfig from '../src/config/encryption.config';
 
 describe("AuthController (e2e)", () => {
     let app: INestApplication;
@@ -26,10 +23,7 @@ describe("AuthController (e2e)", () => {
                 typeOrmModule,
                 TypeOrmModule.forFeature([User]),
                 AuthModule,
-                UsersModule,
-                ConfigModule.forRoot({
-                    load: [databaseConfig, encryptionConfig],
-                })
+                UsersModule
             ],
             controllers: [AuthController],
             providers: [AuthService, UsersService, Reflector]
