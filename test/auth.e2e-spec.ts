@@ -11,6 +11,9 @@ import {jwtModule} from "./jwt.test-module";
 import {typeOrmModule} from './typeorm.test-module';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {User} from '../src/users/user.entity';
+import {ConfigModule} from '@nestjs/config';
+import databaseConfig from '../src/config/database.config';
+import encryptionConfig from '../src/config/encryption.config';
 
 describe("AuthController (e2e)", () => {
     let app: INestApplication;
@@ -23,7 +26,10 @@ describe("AuthController (e2e)", () => {
                 typeOrmModule,
                 TypeOrmModule.forFeature([User]),
                 AuthModule,
-                UsersModule
+                UsersModule,
+                ConfigModule.forRoot({
+                    load: [databaseConfig, encryptionConfig],
+                })
             ],
             controllers: [AuthController],
             providers: [AuthService, UsersService, Reflector]
@@ -39,12 +45,12 @@ describe("AuthController (e2e)", () => {
     });
 
     async function signIn(): Promise<request.Test> {
-        await singUp("john", "changeme");
+        await singUp("john@example.com", "testtesttest");
         return request(app.getHttpServer())
             .post("/auth/sign-in")
             .send({
-                username: "john",
-                password: "changeme"
+                username: "john@example.com",
+                password: "testtesttest"
             })
             .expect(HttpStatus.OK)
             .expect(({body}) => {
@@ -80,7 +86,7 @@ describe("AuthController (e2e)", () => {
             .set("Authorization", `Bearer ${signInResponse.body.accessToken}`)
             .expect(HttpStatus.OK)
             .expect(({body}) => {
-                expect(body.username).toBe("john");
+                expect(body.username).toBe("john@example.com");
             });
     });
 
@@ -92,12 +98,12 @@ describe("AuthController (e2e)", () => {
     });
 
     it("/auth/sign-in (POST)", async () => {
-        await singUp("john", "changeme");
+        await singUp("john@example.com", "testtesttest");
         return request(app.getHttpServer())
             .post("/auth/sign-in")
             .send({
-                username: "john",
-                password: "changeme"
+                username: "john@example.com",
+                password: "testtesttest"
             })
             .expect(HttpStatus.OK)
             .expect(({body}) => {
@@ -109,8 +115,8 @@ describe("AuthController (e2e)", () => {
         return request(app.getHttpServer())
             .post("/auth/sign-up")
             .send({
-                username: "test",
-                password: "test"
+                username: "john@example.com",
+                password: "testtesttest"
             })
             .expect(HttpStatus.CREATED)
             .expect(({body}) => {
