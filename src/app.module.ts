@@ -1,12 +1,12 @@
-import {Module} from '@nestjs/common';
-import {AppController} from './app.controller';
-import {AppService} from './app.service';
-import {AuthModule} from './auth/auth.module';
-import {UsersModule} from './users/users.module';
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {ConfigModule, ConfigService} from '@nestjs/config';
-import databaseConfig from './config/database.config';
-import encryptionConfig from './config/encryption.config';
+import { Module } from "@nestjs/common";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
+import { UsersModule } from "./users/users.module";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import databaseConfig from "./config/database.config";
+import encryptionConfig from "./config/encryption.config";
 
 @Module({
     imports: [
@@ -27,6 +27,7 @@ import encryptionConfig from './config/encryption.config';
                 synchronize: true,
             }),
             inject: [ConfigService],
+            imports: [ConfigModule]
         }),
     ],
     controllers: [AppController],
