@@ -60,4 +60,8 @@ export class UsersService {
   async clear() {
     await this.usersRepository.clear();
   }
+
+  async update(user: User) {
+    await this.usersRepository.save(user);
+  }
 }
