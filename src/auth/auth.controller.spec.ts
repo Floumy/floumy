@@ -1,11 +1,11 @@
-import {Test, TestingModule} from "@nestjs/testing";
-import {AuthController} from "./auth.controller";
-import {AuthService} from "./auth.service";
-import {UsersModule} from "../users/users.module";
-import {jwtModule} from "../../test/jwt.test-module";
-import {UnauthorizedException} from "@nestjs/common";
-import {typeOrmModule} from '../../test/typeorm.test-module';
-import {UsersService} from '../users/users.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { AuthController } from "./auth.controller";
+import { AuthService } from "./auth.service";
+import { UsersModule } from "../users/users.module";
+import { jwtModule } from "../../test/jwt.test-module";
+import { UnauthorizedException } from "@nestjs/common";
+import { typeOrmModule } from "../../test/typeorm.test-module";
+import { UsersService } from "../users/users.service";
 
 describe("AuthController", () => {
     let controller: AuthController;
@@ -36,8 +36,8 @@ describe("AuthController", () => {
 
     describe("when signing in with valid credentials", () => {
         it("should return an access token", async () => {
-            await controller.signUp({username: "john@example.com", password: "testtesttest"});
-            const {accessToken} = await controller.signIn({username: "john@example.com", password: "testtesttest"});
+            await controller.signUp({ name: "John Doe", email: "john@example.com", password: "testtesttest" });
+            const { accessToken } = await controller.signIn({ email: "john@example.com", password: "testtesttest" });
             expect(accessToken).toBeDefined();
         });
     });
@@ -45,7 +45,7 @@ describe("AuthController", () => {
     describe("when signing in with invalid credentials", () => {
         it("should throw an error", async () => {
             await expect(controller.signIn({
-                username: "john",
+                email: "john",
                 password: "wrongpassword"
             })).rejects.toThrow(UnauthorizedException);
         });
@@ -54,7 +54,8 @@ describe("AuthController", () => {
     describe("when signing up with valid credentials", () => {
         it("should return an access token", async () => {
             const {accessToken} = await controller.signUp({
-                username: "test@example.com",
+                name: "Test User",
+                email: "test@example.com",
                 password: "testtesttest"
             });
             expect(accessToken).toBeDefined();
