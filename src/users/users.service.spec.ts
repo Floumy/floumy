@@ -111,5 +111,13 @@ describe("UsersService", () => {
       );
       expect(user.password).not.toEqual("test");
     });
+    it("should create an organization for the user", async () => {
+      const user = await service.create(
+        "Test User",
+        "test@example.com",
+        "testtesttest"
+      );
+      expect(user.org).toBeDefined();
+    });
   });
 });
