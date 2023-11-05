@@ -5,6 +5,7 @@ import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { OkrsModule } from "./okrs/okrs.module";
 import databaseConfig from "./config/database.config";
 import encryptionConfig from "./config/encryption.config";
 
@@ -28,7 +29,8 @@ import encryptionConfig from "./config/encryption.config";
       imports: [ConfigModule]
     }),
     AuthModule,
-    UsersModule
+    UsersModule,
+    OkrsModule
   ],
   controllers: [AppController],
   providers: [AppService]
