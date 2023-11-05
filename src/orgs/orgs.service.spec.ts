@@ -1,19 +1,18 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { OkrsService } from "./okrs.service";
+import { OrgsService } from "./orgs.service";
 
-describe("OkrsService", () => {
-  let service: OkrsService;
+describe("OrgsService", () => {
+  let service: OrgsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [OkrsService]
+      providers: [OrgsService]
     }).compile();
 
-    service = module.get<OkrsService>(OkrsService);
+    service = module.get<OrgsService>(OrgsService);
   });
 
   it("should be defined", () => {
     expect(service).toBeDefined();
   });
-
 });

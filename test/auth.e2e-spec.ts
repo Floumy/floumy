@@ -14,6 +14,7 @@ import { User } from "../src/users/user.entity";
 import { ConfigModule } from "@nestjs/config";
 import databaseConfig from "../src/config/database.config";
 import encryptionConfig from "../src/config/encryption.config";
+import { signUp, signUpAndSignIn } from "./auth.service";
 
 describe("AuthController (e2e)", () => {
   let app: INestApplication;
@@ -44,35 +45,6 @@ describe("AuthController (e2e)", () => {
     await usersService.clear();
   });
 
-  async function signIn(): Promise<request.Test> {
-    await singUp("John Doe", "john@example.com", "testtesttest");
-    return request(app.getHttpServer())
-      .post("/auth/sign-in")
-      .send({
-        name: "John Doe",
-        email: "john@example.com",
-        password: "testtesttest"
-      })
-      .expect(HttpStatus.OK)
-      .expect(({ body }) => {
-        expect(body.accessToken).toBeDefined();
-      });
-  }
-
-  async function singUp(name: string, email: string, password: string): Promise<request.Test> {
-    return request(app.getHttpServer())
-      .post("/auth/sign-up")
-      .send({
-        name,
-        email,
-        password
-      })
-      .expect(HttpStatus.CREATED)
-      .expect(({ body }) => {
-        expect(body.accessToken).toBeDefined();
-      });
-  }
-
   it("/auth/profile (GET)", () => {
     return request(app.getHttpServer())
       .get("/auth/profile")
@@ -81,7 +53,7 @@ describe("AuthController (e2e)", () => {
 
   it("/auth/profile (GET) with token", async () => {
     // Given an access token
-    const signInResponse = await signIn();
+    const signInResponse = await signUpAndSignIn(app, "John Doe", "john@example.com", "testtesttest");
 
     return request(app.getHttpServer())
       .get("/auth/profile")
@@ -100,7 +72,7 @@ describe("AuthController (e2e)", () => {
   });
 
   it("/auth/sign-in (POST)", async () => {
-    await singUp("John Doe", "john@example.com", "testtesttest");
+    await signUp(app, "John Doe", "john@example.com", "testtesttest");
     return request(app.getHttpServer())
       .post("/auth/sign-in")
       .send({
