@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../users/user.entity";
 
 @Entity()
@@ -14,6 +14,7 @@ export class RefreshToken {
   expirationDate: Date;
 
   @OneToOne(() => User, user => user.refreshToken)
+  @JoinColumn()
   user: User;
 
   constructor(token: string) {

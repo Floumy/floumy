@@ -1,64 +1,59 @@
-import { Test, TestingModule } from "@nestjs/testing";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { UsersModule } from "../users/users.module";
-import { jwtModule } from "../../test/jwt.test-module";
 import { UnauthorizedException } from "@nestjs/common";
-import { typeOrmModule } from "../../test/typeorm.test-module";
-import { UsersService } from "../users/users.service";
+import { setupTestingModule } from "../../test/test.utils";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { RefreshToken } from "./refresh-token.entity";
 
 describe("AuthController", () => {
-    let controller: AuthController;
-    let usersService: UsersService;
+  let controller: AuthController;
+  let cleanup: () => Promise<void>;
 
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            controllers: [AuthController],
-            imports: [
-                jwtModule,
-                typeOrmModule,
-                UsersModule,
-            ],
-            providers: [AuthService]
-        }).compile();
+  beforeEach(async () => {
+    const { module, cleanup: dbCleanup } = await setupTestingModule(
+      [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
+      [AuthService],
+      [AuthController]
+    );
+    cleanup = dbCleanup;
 
-        controller = module.get<AuthController>(AuthController);
-        usersService = module.get<UsersService>(UsersService);
+    controller = module.get<AuthController>(AuthController);
+  });
+
+  afterEach(async () => {
+    await cleanup();
+  });
+
+  it("should be defined", () => {
+    expect(controller).toBeDefined();
+  });
+
+  describe("when signing in with valid credentials", () => {
+    it("should return an access token", async () => {
+      await controller.signUp({ name: "John Doe", email: "john@example.com", password: "testtesttest" });
+      const { accessToken } = await controller.signIn({ email: "john@example.com", password: "testtesttest" });
+      expect(accessToken).toBeDefined();
     });
+  });
 
-    afterEach(async () => {
-        await usersService.clear();
+  describe("when signing in with invalid credentials", () => {
+    it("should throw an error", async () => {
+      await expect(controller.signIn({
+        email: "john",
+        password: "wrongpassword"
+      })).rejects.toThrow(UnauthorizedException);
     });
+  });
 
-    it("should be defined", () => {
-        expect(controller).toBeDefined();
+  describe("when signing up with valid credentials", () => {
+    it("should return an access token", async () => {
+      const { accessToken } = await controller.signUp({
+        name: "Test User",
+        email: "test@example.com",
+        password: "testtesttest"
+      });
+      expect(accessToken).toBeDefined();
     });
-
-    describe("when signing in with valid credentials", () => {
-        it("should return an access token", async () => {
-            await controller.signUp({ name: "John Doe", email: "john@example.com", password: "testtesttest" });
-            const { accessToken } = await controller.signIn({ email: "john@example.com", password: "testtesttest" });
-            expect(accessToken).toBeDefined();
-        });
-    });
-
-    describe("when signing in with invalid credentials", () => {
-        it("should throw an error", async () => {
-            await expect(controller.signIn({
-                email: "john",
-                password: "wrongpassword"
-            })).rejects.toThrow(UnauthorizedException);
-        });
-    });
-
-    describe("when signing up with valid credentials", () => {
-        it("should return an access token", async () => {
-            const {accessToken} = await controller.signUp({
-                name: "Test User",
-                email: "test@example.com",
-                password: "testtesttest"
-            });
-            expect(accessToken).toBeDefined();
-        });
-    });
+  });
 });

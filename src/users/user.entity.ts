@@ -2,7 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn
@@ -24,10 +24,10 @@ export class User {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @OneToOne(() => RefreshToken, refreshToken => refreshToken.user, { cascade: true })
-  refreshToken: RefreshToken;
-  @OneToMany(() => Org, org => org.users)
-  org: Org;
+  @OneToOne(() => RefreshToken, refreshToken => refreshToken.user, { cascade: true, lazy: true })
+  refreshToken: Promise<RefreshToken>;
+  @ManyToOne(() => Org, org => org.users, { lazy: true })
+  org: Promise<Org>;
 
   constructor(name: string, email: string, password: string) {
     this.name = name;

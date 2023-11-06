@@ -3,6 +3,8 @@ import { UsersService } from "../users/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "../users/user.entity";
 import { RefreshToken } from "./refresh-token.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 export type AuthDto = {
   accessToken: string;
@@ -12,7 +14,9 @@ export type AuthDto = {
 @Injectable()
 export class AuthService {
   constructor(private usersService: UsersService,
-              private jwtService: JwtService) {
+              private jwtService: JwtService,
+              @InjectRepository(RefreshToken)
+              private refreshTokenRepository: Repository<RefreshToken>) {
   }
 
   async signIn(email: string, password: string): Promise<AuthDto> {
@@ -30,7 +34,7 @@ export class AuthService {
 
   private async getOrCreateRefreshToken(user: User) {
     const payload = { sub: user.id, name: user.name, email: user.email };
-    const refreshToken = user.refreshToken;
+    const refreshToken = await user.refreshToken;
 
     if (!refreshToken) {
       return await this.createRefreshToken(payload, user);
@@ -47,14 +51,13 @@ export class AuthService {
     const token = await this.jwtService.signAsync(payload, { expiresIn: "7d" });
     refreshToken.token = token;
     refreshToken.expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    refreshToken.user.refreshToken = refreshToken;
-    await this.usersService.update(refreshToken.user);
+    await this.refreshTokenRepository.save(refreshToken);
     return token;
   }
 
   private async createRefreshToken(payload: { sub: string; name: string; email: string }, user: User) {
     const token = await this.jwtService.signAsync(payload, { expiresIn: "7d" });
-    user.refreshToken = new RefreshToken(token);
+    user.refreshToken = Promise.resolve(new RefreshToken(token));
     await this.usersService.update(user);
     return token;
   }

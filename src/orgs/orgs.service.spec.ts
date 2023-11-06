@@ -1,33 +1,27 @@
-import { Test, TestingModule } from "@nestjs/testing";
 import { OrgsService } from "./orgs.service";
 import { Org } from "./org.entity";
 import { User } from "../users/user.entity";
 import { UsersService } from "../users/users.service";
-import { typeOrmModule } from "../../test/typeorm.test-module";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { ConfigModule } from "@nestjs/config";
+import { setupTestingModule } from "../../test/test.utils";
 
 describe("OrgsService", () => {
   let service: OrgsService;
   let usersService: UsersService;
+  let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        typeOrmModule,
-        TypeOrmModule.forFeature([User, Org]),
-        ConfigModule
-      ],
-      providers: [OrgsService, UsersService]
-    }).compile();
-
+    const { module, cleanup: dbCleanup } = await setupTestingModule(
+      [TypeOrmModule.forFeature([Org, User])],
+      [OrgsService, UsersService]
+    );
     service = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
+    cleanup = dbCleanup;
   });
 
   afterEach(async () => {
-    await service.clear();
-    await usersService.clear();
+    await cleanup();
   });
 
   it("should be defined", () => {

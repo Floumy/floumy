@@ -1,4 +1,3 @@
-import { Test, TestingModule } from "@nestjs/testing";
 import { HttpStatus, INestApplication } from "@nestjs/common";
 import * as request from "supertest";
 import { AuthModule } from "../src/auth/auth.module";
@@ -7,25 +6,27 @@ import { AuthService } from "../src/auth/auth.service";
 import { UsersService } from "../src/users/users.service";
 import { Reflector } from "@nestjs/core";
 import { AuthController } from "../src/auth/auth.controller";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { signUp, signUpAndSignIn } from "./auth.service";
+import { Test } from "@nestjs/testing";
 import { jwtModule } from "./jwt.test-module";
 import { typeOrmModule } from "./typeorm.test-module";
-import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "../src/users/user.entity";
 import { ConfigModule } from "@nestjs/config";
 import databaseConfig from "../src/config/database.config";
 import encryptionConfig from "../src/config/encryption.config";
-import { signUp, signUpAndSignIn } from "./auth.service";
+import { RefreshToken } from "../src/auth/refresh-token.entity";
 
 describe("AuthController (e2e)", () => {
   let app: INestApplication;
   let usersService: UsersService;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    const moduleFixture = await Test.createTestingModule({
       imports: [
         jwtModule,
         typeOrmModule,
-        TypeOrmModule.forFeature([User]),
+        TypeOrmModule.forFeature([User, RefreshToken]),
         AuthModule,
         UsersModule,
         ConfigModule.forRoot({
