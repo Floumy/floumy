@@ -1,37 +1,28 @@
-import { Test, TestingModule } from "@nestjs/testing";
 import { AuthService } from "./auth.service";
 import { UsersModule } from "../users/users.module";
-import { jwtModule } from "../../test/jwt.test-module";
 import { UnauthorizedException } from "@nestjs/common";
-import { typeOrmModule } from "../../test/typeorm.test-module";
-import { UsersService } from "../users/users.service";
 import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { RefreshToken } from "./refresh-token.entity";
 import { Repository } from "typeorm";
+import { setupTestingModule } from "../../test/test.utils";
 
 describe("AuthService", () => {
   let service: AuthService;
-  let usersService: UsersService;
+  let cleanup: () => Promise<void>;
   let refreshTokenRepository: Repository<RefreshToken>;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        UsersModule,
-        jwtModule,
-        typeOrmModule,
-        TypeOrmModule.forFeature([RefreshToken])
-      ],
-      providers: [AuthService]
-    }).compile();
-
+    const { module, cleanup: dbCleanup } = await setupTestingModule(
+      [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
+      [AuthService]
+    );
+    cleanup = dbCleanup;
     service = module.get<AuthService>(AuthService);
-    usersService = module.get<UsersService>(UsersService);
     refreshTokenRepository = module.get<Repository<RefreshToken>>(getRepositoryToken(RefreshToken));
   });
 
   afterEach(async () => {
-    await usersService.clear();
+    await cleanup();
   });
 
   it("should be defined", () => {
@@ -52,7 +43,6 @@ describe("AuthService", () => {
     });
     it("should return a new refresh token if it's expired", async () => {
       const { refreshToken: originalRefreshToken } = await service.signUp("John Doe", "john@example.com", "testtesttest");
-      // sleep for 1 second to make sure the refresh token generated is different
       await new Promise(resolve => setTimeout(resolve, 1000));
       const refreshTokenEntity = await refreshTokenRepository.findOneByOrFail({ token: originalRefreshToken });
       refreshTokenEntity.expirationDate = new Date(Date.now() - 1000);

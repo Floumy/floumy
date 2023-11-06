@@ -1,15 +1,21 @@
-import { Test, TestingModule } from "@nestjs/testing";
 import { OkrsController } from "./okrs.controller";
+import { setupTestingModule } from "../../test/test.utils";
 
 describe("OkrsController", () => {
   let controller: OkrsController;
-
+  let cleanup: () => Promise<void>;
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [OkrsController]
-    }).compile();
-
+    const { module, cleanup: dbCleanup } = await setupTestingModule(
+      [],
+      [],
+      [OkrsController]
+    );
+    cleanup = dbCleanup;
     controller = module.get<OkrsController>(OkrsController);
+  });
+
+  afterEach(async () => {
+    await cleanup();
   });
 
   it("should be defined", () => {
