@@ -4,11 +4,13 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from "bcrypt";
+import { OrgsService } from "../orgs/orgs.service";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    private orgsService: OrgsService,
     private configService: ConfigService
   ) {
   }
@@ -21,7 +23,9 @@ export class UsersService {
     await this.validateUser(name, email, password);
     const hashedPassword = await this.encryptPassword(password);
     const user = new User(name, email, hashedPassword);
-    return this.usersRepository.save(user);
+    const org = await this.orgsService.createForUser(user);
+    user.org = Promise.resolve(org);
+    return await this.usersRepository.save(user);
   }
 
   async encryptPassword(password: string) {

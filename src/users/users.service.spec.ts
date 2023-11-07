@@ -2,6 +2,7 @@ import { UsersService } from "./users.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { setupTestingModule } from "../../test/test.utils";
+import { OrgsModule } from "../orgs/orgs.module";
 
 describe("UsersService", () => {
   let service: UsersService;
@@ -9,7 +10,7 @@ describe("UsersService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([User])],
+      [OrgsModule, TypeOrmModule.forFeature([User])],
       [UsersService]
     );
     cleanup = dbCleanup;
@@ -47,7 +48,10 @@ describe("UsersService", () => {
         "testtesttest"
       );
       const storedUser = await service.findOneByEmail("test@example.com");
-      expect(storedUser).toEqual(user);
+      expect(storedUser.id).toBeDefined();
+      expect(storedUser.name).toEqual(user.name);
+      expect(storedUser.email).toEqual(user.email);
+      expect(storedUser.password).toBeDefined();
     });
     it("should validate the user password", async () => {
       await expect(service.create(
@@ -110,7 +114,9 @@ describe("UsersService", () => {
         "test@example.com",
         "testtesttest"
       );
-      expect(user.org).toBeDefined();
+      const org = await user.org;
+      expect(org).toBeDefined();
+      expect(org.id).toBeDefined();
     });
   });
 });

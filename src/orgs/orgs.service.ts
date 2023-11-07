@@ -13,7 +13,7 @@ export class OrgsService {
   async createForUser(user: User) {
     const org = new Org();
     org.users = [user];
-    return this.orgRepository.save(org);
+    return await this.orgRepository.save(org);
   }
 
   async clear() {
