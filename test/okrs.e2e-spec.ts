@@ -11,6 +11,10 @@ import { Reflector } from "@nestjs/core";
 import { OkrsController } from "../src/okrs/okrs.controller";
 import { setupTestingModule } from "./test.utils";
 import { RefreshToken } from "../src/auth/refresh-token.entity";
+import { Org } from "../src/orgs/org.entity";
+import { OrgsModule } from "../src/orgs/orgs.module";
+import { OkrsService } from "../src/okrs/okrs.service";
+import { Objective } from "../src/okrs/objective.entity";
 
 describe("OKRsController (e2e)", () => {
   let app: INestApplication;
@@ -19,8 +23,8 @@ describe("OKRsController (e2e)", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, TypeOrmModule.forFeature([User, RefreshToken])],
-      [AuthService, UsersService, Reflector],
+      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective])],
+      [AuthService, UsersService, Reflector, OkrsService],
       [AuthController, OkrsController]
     );
     cleanup = dbCleanup;
@@ -40,14 +44,16 @@ describe("OKRsController (e2e)", () => {
         .post("/okrs")
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
-          title: "My OKR",
-          description: "My OKR description"
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
         })
         .expect(HttpStatus.CREATED)
         .expect(({ body }) => {
-          expect(body.id).toBeDefined();
-          expect(body.title).toEqual("My OKR");
-          expect(body.description).toEqual("My OKR description");
+          expect(body.objective.id).toBeDefined();
+          expect(body.objective.objective).toEqual("My OKR");
+          expect(body.objective.description).toEqual("My OKR description");
         });
     });
   });

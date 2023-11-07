@@ -10,6 +10,9 @@ import { signUp, signUpAndSignIn } from "./auth.service";
 import { User } from "../src/users/user.entity";
 import { RefreshToken } from "../src/auth/refresh-token.entity";
 import { setupTestingModule } from "./test.utils";
+import { OrgsModule } from "../src/orgs/orgs.module";
+import { OrgsService } from "../src/orgs/orgs.service";
+import { Org } from "../src/orgs/org.entity";
 
 describe("AuthController (e2e)", () => {
   let app: INestApplication;
@@ -17,8 +20,8 @@ describe("AuthController (e2e)", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, TypeOrmModule.forFeature([User, RefreshToken])],
-      [AuthService, UsersService, Reflector],
+      [OrgsModule, UsersModule, TypeOrmModule.forFeature([User, RefreshToken, Org])],
+      [AuthService, UsersService, Reflector, OrgsService],
       [AuthController]
     );
 
