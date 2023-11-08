@@ -56,4 +56,21 @@ describe("AuthController", () => {
       expect(accessToken).toBeDefined();
     });
   });
+
+  describe("when refreshing an access token", () => {
+    it("should return a new access token and a new refresh token", async () => {
+      const { accessToken, refreshToken } = await controller.signUp({
+        name: "Test User",
+        email: "test@example.com",
+        password: "testtesttest"
+      });
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await controller.refreshToken({
+        refreshToken
+      });
+      expect(newAccessToken).toBeDefined();
+      expect(newRefreshToken).toBeDefined();
+      expect(newAccessToken).not.toEqual(accessToken);
+      expect(newRefreshToken).not.toEqual(refreshToken);
+    });
+  });
 });
