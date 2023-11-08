@@ -25,6 +25,10 @@ interface SignUpDto {
   password: string;
 }
 
+interface RefreshTokenDto {
+  refreshToken: string;
+}
+
 @Controller("auth")
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
@@ -56,5 +60,15 @@ export class AuthController {
       this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  @Public()
+  @Post("refresh-token")
+  @HttpCode(HttpStatus.OK)
+  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
+    return {
+      accessToken: "test",
+      refreshToken: "test"
+    };
   }
 }

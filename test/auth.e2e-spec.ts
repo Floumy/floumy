@@ -98,4 +98,20 @@ describe("AuthController (e2e)", () => {
       })
       .expect(HttpStatus.BAD_REQUEST);
   });
+
+  it("/auth/refresh-token (POST) with valid refresh token", async () => {
+    const signInResponse = await signUpAndSignIn(app, "John Doe", "john@example.com", "testtesttest");
+    const refreshToken = signInResponse.body.refreshToken;
+    return request(app.getHttpServer())
+      .post("/auth/refresh-token")
+      .send({
+        refreshToken
+      })
+      .expect(HttpStatus.OK)
+      .expect(({ body }) => {
+        expect(body.accessToken).toBeDefined();
+        expect(body.refreshToken).toBeDefined();
+        expect(body.refreshToken).not.toEqual(refreshToken);
+      });
+  });
 });
