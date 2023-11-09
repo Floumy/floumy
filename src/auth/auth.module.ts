@@ -8,10 +8,14 @@ import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "./auth.guard";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { RefreshToken } from "./refresh-token.entity";
+import { ConfigService } from "@nestjs/config";
+import { TokensService } from "./tokens.service";
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService,
+    ConfigService,
+    TokensService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard
