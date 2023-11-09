@@ -27,9 +27,9 @@ export class RefreshToken {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => User, user => user.refreshToken)
+  @OneToOne(() => User, user => user.refreshToken, { lazy: true })
   @JoinColumn()
-  user: User;
+  user: Promise<User>;
 
   constructor(token: string) {
     this.token = token;

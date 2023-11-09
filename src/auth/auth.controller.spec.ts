@@ -5,6 +5,7 @@ import { UnauthorizedException } from "@nestjs/common";
 import { setupTestingModule } from "../../test/test.utils";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { RefreshToken } from "./refresh-token.entity";
+import { TokensService } from "./tokens.service";
 
 describe("AuthController", () => {
   let controller: AuthController;
@@ -13,7 +14,7 @@ describe("AuthController", () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
-      [AuthService],
+      [AuthService, TokensService],
       [AuthController]
     );
     cleanup = dbCleanup;
@@ -64,6 +65,8 @@ describe("AuthController", () => {
         email: "test@example.com",
         password: "testtesttest"
       });
+      // Wait for 1 second to make sure the refresh token is regenerated
+      await new Promise(resolve => setTimeout(resolve, 1000));
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await controller.refreshToken({
         refreshToken
       });

@@ -15,6 +15,7 @@ import { Org } from "../src/orgs/org.entity";
 import { OrgsModule } from "../src/orgs/orgs.module";
 import { OkrsService } from "../src/okrs/okrs.service";
 import { Objective } from "../src/okrs/objective.entity";
+import { TokensService } from "../src/auth/tokens.service";
 
 describe("OKRsController (e2e)", () => {
   let app: INestApplication;
@@ -24,7 +25,7 @@ describe("OKRsController (e2e)", () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective])],
-      [AuthService, UsersService, Reflector, OkrsService],
+      [AuthService, UsersService, Reflector, OkrsService, TokensService],
       [AuthController, OkrsController]
     );
     cleanup = dbCleanup;

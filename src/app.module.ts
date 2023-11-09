@@ -9,11 +9,12 @@ import { OkrsModule } from "./okrs/okrs.module";
 import { OrgsModule } from "./orgs/orgs.module";
 import databaseConfig from "./config/database.config";
 import encryptionConfig from "./config/encryption.config";
+import jwtConfig from "./config/jwt.config";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [databaseConfig, encryptionConfig]
+      load: [databaseConfig, encryptionConfig, jwtConfig]
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

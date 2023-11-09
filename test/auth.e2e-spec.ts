@@ -13,6 +13,7 @@ import { setupTestingModule } from "./test.utils";
 import { OrgsModule } from "../src/orgs/orgs.module";
 import { OrgsService } from "../src/orgs/orgs.service";
 import { Org } from "../src/orgs/org.entity";
+import { TokensService } from "../src/auth/tokens.service";
 
 describe("AuthController (e2e)", () => {
   let app: INestApplication;
@@ -21,7 +22,7 @@ describe("AuthController (e2e)", () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [OrgsModule, UsersModule, TypeOrmModule.forFeature([User, RefreshToken, Org])],
-      [AuthService, UsersService, Reflector, OrgsService],
+      [AuthService, UsersService, Reflector, OrgsService, TokensService],
       [AuthController]
     );
 
@@ -101,6 +102,8 @@ describe("AuthController (e2e)", () => {
 
   it("/auth/refresh-token (POST) with valid refresh token", async () => {
     const signInResponse = await signUpAndSignIn(app, "John Doe", "john@example.com", "testtesttest");
+    // Wait for 1 second to make sure the refresh token is regenerated
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const refreshToken = signInResponse.body.refreshToken;
     return request(app.getHttpServer())
       .post("/auth/refresh-token")

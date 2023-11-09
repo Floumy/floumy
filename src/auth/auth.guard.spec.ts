@@ -2,26 +2,26 @@ import { AuthService } from "./auth.service";
 import { TestingModule } from "@nestjs/testing";
 import { UsersModule } from "../users/users.module";
 import { AuthGuard } from "./auth.guard";
-import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
 import { ExecutionContext } from "@nestjs/common";
 import { setupTestingModule } from "../../test/test.utils";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { RefreshToken } from "./refresh-token.entity";
+import { TokensService } from "./tokens.service";
 
 describe("AuthGuard", () => {
-  let jwtService: JwtService;
+  let tokensService: TokensService;
   let module: TestingModule;
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
     const { module: testingModule, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
-      [AuthService, Reflector]
+      [AuthService, Reflector, TokensService]
     );
     module = testingModule;
     cleanup = dbCleanup;
-    jwtService = module.get<JwtService>(JwtService);
+    tokensService = module.get<TokensService>(TokensService);
   });
 
   afterEach(async () => {
@@ -30,7 +30,7 @@ describe("AuthGuard", () => {
 
   it("should be defined", () => {
     const reflector = module.get<Reflector>(Reflector);
-    const guard = new AuthGuard(jwtService, reflector);
+    const guard = new AuthGuard(tokensService, reflector);
     expect(guard).toBeInstanceOf(AuthGuard);
   });
 
@@ -41,7 +41,7 @@ describe("AuthGuard", () => {
         return true;
       }
     } as unknown as Reflector;
-    const guard = new AuthGuard(jwtService, reflector);
+    const guard = new AuthGuard(tokensService, reflector);
     const context = {
       getHandler: () => {
       },
@@ -59,7 +59,7 @@ describe("AuthGuard", () => {
         return false;
       }
     } as unknown as Reflector;
-    const guard = new AuthGuard(jwtService, reflector);
+    const guard = new AuthGuard(tokensService, reflector);
     const context = {
       getHandler: () => {
       },
@@ -77,7 +77,7 @@ describe("AuthGuard", () => {
         return false;
       }
     } as unknown as Reflector;
-    const guard = new AuthGuard(jwtService, reflector);
+    const guard = new AuthGuard(tokensService, reflector);
     const context = {
       switchToHttp: () => {
         return {
@@ -101,7 +101,7 @@ describe("AuthGuard", () => {
         return false;
       }
     } as unknown as Reflector;
-    const guard = new AuthGuard(jwtService, reflector);
+    const guard = new AuthGuard(tokensService, reflector);
     const context = {
       switchToHttp: () => {
         return {
@@ -125,7 +125,8 @@ describe("AuthGuard", () => {
         return false;
       }
     } as unknown as Reflector;
-    const guard = new AuthGuard(jwtService, reflector);
+    const guard = new AuthGuard(tokensService, reflector);
+    const accessToken = await tokensService.generateAccessToken({ sub: "test", username: "test" });
     const context = {
       getHandler: () => {
 
@@ -138,7 +139,7 @@ describe("AuthGuard", () => {
           getRequest: () => {
             return {
               headers: {
-                authorization: "Bearer " + jwtService.sign({ sub: "test", username: "test" })
+                authorization: `Bearer ${accessToken}`
               }
             };
           }
