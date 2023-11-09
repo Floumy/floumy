@@ -24,10 +24,9 @@ export class AuthService {
     if (!await this.usersService.isPasswordCorrect(password, user?.password)) {
       throw new UnauthorizedException();
     }
-    const payload = { sub: user.id, name: user.name, email };
     const refreshToken = await this.getOrCreateRefreshToken(user);
     return {
-      accessToken: await this.tokensService.generateAccessToken(payload),
+      accessToken: await this.tokensService.generateAccessToken(user),
       refreshToken
     };
   }
@@ -35,28 +34,27 @@ export class AuthService {
   private async getOrCreateRefreshToken(user: User) {
     const refreshToken = await user.refreshToken;
 
-    const payload = { sub: user.id, name: user.name, email: user.email };
     if (!refreshToken) {
-      return await this.createRefreshToken(payload, user);
+      return await this.createRefreshToken(user);
     }
 
     if (refreshToken.expirationDate.getTime() < Date.now()) {
-      return await this.updateRefreshToken(payload, refreshToken);
+      return await this.updateRefreshToken(user, refreshToken);
     }
 
     return refreshToken.token;
   }
 
-  private async updateRefreshToken(payload: object | Buffer, refreshToken: RefreshToken) {
-    const token = await this.tokensService.generateRefreshToken(payload);
+  private async updateRefreshToken(user: User, refreshToken: RefreshToken) {
+    const token = await this.tokensService.generateRefreshToken(user);
     refreshToken.token = token;
     refreshToken.expirationDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     await this.refreshTokenRepository.save(refreshToken);
     return token;
   }
 
-  private async createRefreshToken(payload: object | Buffer, user: User) {
-    const token = await this.tokensService.generateRefreshToken(payload);
+  private async createRefreshToken(user: User) {
+    const token = await this.tokensService.generateRefreshToken(user);
     user.refreshToken = Promise.resolve(new RefreshToken(token));
     await this.usersService.update(user);
     return token;
@@ -64,9 +62,8 @@ export class AuthService {
 
   async signUp(name: string, email: string, password: string) {
     const user = await this.usersService.create(name, email, password);
-    const payload = { sub: user.id, name, email };
-    const accessToken = await this.tokensService.generateAccessToken(payload);
-    const refreshToken = await this.createRefreshToken(payload, user);
+    const accessToken = await this.tokensService.generateAccessToken(user);
+    const refreshToken = await this.createRefreshToken(user);
     return {
       accessToken: accessToken,
       refreshToken: refreshToken
@@ -91,10 +88,9 @@ export class AuthService {
     }
 
     const user = await refreshTokenEntity.user;
-    const payload = { sub: user.id, name: user.name, email: user.email };
     return {
-      accessToken: await this.tokensService.generateAccessToken(payload),
-      refreshToken: await this.updateRefreshToken(payload, refreshTokenEntity)
+      accessToken: await this.tokensService.generateAccessToken(user),
+      refreshToken: await this.updateRefreshToken(user, refreshTokenEntity)
     };
   }
 }

@@ -1,5 +1,6 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, Request, UseGuards } from "@nestjs/common";
 import { OkrsService } from "./okrs.service";
+import { AuthGuard } from "../auth/auth.guard";
 
 interface ObjectiveDto {
   objective: string;
@@ -11,6 +12,7 @@ interface OKRDto {
 }
 
 @Controller("okrs")
+@UseGuards(AuthGuard)
 export class OkrsController {
 
   constructor(private okrsService: OkrsService) {
@@ -18,8 +20,10 @@ export class OkrsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() okrDto: OKRDto) {
+  async create(@Request() request, @Body() okrDto: OKRDto) {
+    const { org: orgId } = request.user;
     const objective = await this.okrsService.createObjective(
+      orgId,
       okrDto.objective.objective,
       okrDto.objective.description
     );

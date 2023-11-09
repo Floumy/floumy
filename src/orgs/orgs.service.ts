@@ -12,11 +12,15 @@ export class OrgsService {
 
   async createForUser(user: User) {
     const org = new Org();
-    org.users = [user];
+    org.users = Promise.resolve([user]);
     return await this.orgRepository.save(org);
   }
 
   async clear() {
     await this.orgRepository.clear();
+  }
+
+  findOneById(orgId: string) {
+    return this.orgRepository.findOneBy({ id: orgId });
   }
 }

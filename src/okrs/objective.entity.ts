@@ -13,6 +13,6 @@ export class Objective {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @ManyToOne(() => Org, org => org.objectives)
+  @ManyToOne(() => Org, org => org.objectives, { lazy: true })
   org: Promise<Org>;
 }

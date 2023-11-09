@@ -6,12 +6,12 @@ import { Objective } from "../okrs/objective.entity";
 export class Org {
   @PrimaryGeneratedColumn("uuid")
   id: string;
-  @OneToMany(() => User, user => user.org)
-  users: User[];
+  @OneToMany(() => User, user => user.org, { lazy: true })
+  users: Promise<User[]>;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @OneToMany(() => Objective, objective => objective.org)
+  @OneToMany(() => Objective, objective => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
 }
