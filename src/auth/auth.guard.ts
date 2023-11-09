@@ -1,14 +1,13 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { jwtConstants } from "./constants";
 import { Request } from "express";
 import { Reflector } from "@nestjs/core";
 import { IS_PUBLIC_KEY } from "./public.guard";
+import { TokensService } from "./tokens.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
 
-  constructor(private jwtService: JwtService, private reflector: Reflector) {
+  constructor(private tokenService: TokensService, private reflector: Reflector) {
   }
 
   private async isPublic(context: ExecutionContext): Promise<boolean> {
@@ -20,13 +19,8 @@ export class AuthGuard implements CanActivate {
 
   private async verifyAccessToken(request: Request, token: string) {
     try {
-      request["user"] = await this.jwtService.verifyAsync(
-        token,
-        {
-          secret: jwtConstants.secret
-        }
-      );
-    } catch {
+      request["user"] = await this.tokenService.verifyAccessToken(token);
+    } catch (error) {
       throw new UnauthorizedException();
     }
   }

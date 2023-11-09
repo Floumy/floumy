@@ -3,6 +3,9 @@ import { jwtModule } from "./jwt.test-module";
 import { typeOrmModule } from "./typeorm.test-module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DataSource } from "typeorm";
+import databaseConfig from "../src/config/database.config";
+import encryptionConfig from "../src/config/encryption.config";
+import jwtConfig from "../src/config/jwt.config";
 
 
 export async function clearDatabase(dataSource: DataSource) {
@@ -36,7 +39,9 @@ export async function setupTestingModule(
     imports: [
       jwtModule,
       typeOrmModule,
-      ConfigModule,
+      ConfigModule.forRoot({
+        load: [databaseConfig, encryptionConfig, jwtConfig]
+      }),
       ...imports
     ],
     providers: [ConfigService, ...providers]

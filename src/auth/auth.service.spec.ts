@@ -5,6 +5,7 @@ import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { RefreshToken } from "./refresh-token.entity";
 import { Repository } from "typeorm";
 import { setupTestingModule } from "../../test/test.utils";
+import { TokensService } from "./tokens.service";
 
 describe("AuthService", () => {
   let service: AuthService;
@@ -14,7 +15,7 @@ describe("AuthService", () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
-      [AuthService]
+      [AuthService, TokensService]
     );
     cleanup = dbCleanup;
     service = module.get<AuthService>(AuthService);
@@ -61,6 +62,31 @@ describe("AuthService", () => {
   describe("when signing up with invalid credentials", () => {
     it("should throw an error", async () => {
       await expect(service.signUp("", "", "")).rejects.toThrow();
+    });
+  });
+
+  describe("when refreshing an access token", () => {
+    it("should return a new access token and a new refresh token", async () => {
+      const { accessToken, refreshToken } = await service.signUp("Test User", "test@example.com", "testtesttest");
+      // sleep 1 second to make sure the generate refresh token is different
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await service.refreshToken(refreshToken);
+      expect(accessToken).not.toEqual(newAccessToken);
+      expect(refreshToken).not.toEqual(newRefreshToken);
+    });
+    it("should store the new refresh token in the database", async () => {
+      const { refreshToken } = await service.signUp("Test User", "test@example.com", "testtesttest");
+      // sleep 1 second to make sure the generate refresh token is different
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { refreshToken: newRefreshToken } = await service.refreshToken(refreshToken);
+      const refreshTokenEntity = await refreshTokenRepository.findOneByOrFail({ token: newRefreshToken });
+      expect(refreshTokenEntity).toBeDefined();
+      expect(refreshTokenEntity.token).toEqual(newRefreshToken);
+      expect(refreshTokenEntity.expirationDate.getTime()).toBeGreaterThan(Date.now());
+      expect(newRefreshToken).not.toEqual(refreshToken);
+    });
+    it("should throw an error if the refresh token is invalid", async () => {
+      await expect(service.refreshToken("invalid")).rejects.toThrow(UnauthorizedException);
     });
   });
 });

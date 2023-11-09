@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
-import { JwtService } from "@nestjs/jwt";
 import { User } from "../users/user.entity";
 import { RefreshToken } from "./refresh-token.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { TokensService } from "./tokens.service";
 
 export type AuthDto = {
   accessToken: string;
@@ -14,9 +14,9 @@ export type AuthDto = {
 @Injectable()
 export class AuthService {
   constructor(private usersService: UsersService,
-              private jwtService: JwtService,
               @InjectRepository(RefreshToken)
-              private refreshTokenRepository: Repository<RefreshToken>) {
+              private refreshTokenRepository: Repository<RefreshToken>,
+              private tokensService: TokensService) {
   }
 
   async signIn(email: string, password: string): Promise<AuthDto> {
@@ -27,15 +27,15 @@ export class AuthService {
     const payload = { sub: user.id, name: user.name, email };
     const refreshToken = await this.getOrCreateRefreshToken(user);
     return {
-      accessToken: await this.jwtService.signAsync(payload),
+      accessToken: await this.tokensService.generateAccessToken(payload),
       refreshToken
     };
   }
 
   private async getOrCreateRefreshToken(user: User) {
-    const payload = { sub: user.id, name: user.name, email: user.email };
     const refreshToken = await user.refreshToken;
 
+    const payload = { sub: user.id, name: user.name, email: user.email };
     if (!refreshToken) {
       return await this.createRefreshToken(payload, user);
     }
@@ -47,16 +47,16 @@ export class AuthService {
     return refreshToken.token;
   }
 
-  private async updateRefreshToken(payload: { sub: string; name: string; email: string }, refreshToken: RefreshToken) {
-    const token = await this.jwtService.signAsync(payload, { expiresIn: "7d" });
+  private async updateRefreshToken(payload: object | Buffer, refreshToken: RefreshToken) {
+    const token = await this.tokensService.generateRefreshToken(payload);
     refreshToken.token = token;
-    refreshToken.expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    refreshToken.expirationDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     await this.refreshTokenRepository.save(refreshToken);
     return token;
   }
 
-  private async createRefreshToken(payload: { sub: string; name: string; email: string }, user: User) {
-    const token = await this.jwtService.signAsync(payload, { expiresIn: "7d" });
+  private async createRefreshToken(payload: object | Buffer, user: User) {
+    const token = await this.tokensService.generateRefreshToken(payload);
     user.refreshToken = Promise.resolve(new RefreshToken(token));
     await this.usersService.update(user);
     return token;
@@ -65,11 +65,36 @@ export class AuthService {
   async signUp(name: string, email: string, password: string) {
     const user = await this.usersService.create(name, email, password);
     const payload = { sub: user.id, name, email };
-    const accessToken = await this.jwtService.signAsync(payload);
+    const accessToken = await this.tokensService.generateAccessToken(payload);
     const refreshToken = await this.createRefreshToken(payload, user);
     return {
       accessToken: accessToken,
       refreshToken: refreshToken
+    };
+  }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      await this.tokensService.verifyRefreshToken(refreshToken);
+    } catch (e) {
+      throw new UnauthorizedException();
+    }
+
+    const refreshTokenEntity = await this.refreshTokenRepository.findOneBy({ token: refreshToken });
+
+    if (!refreshTokenEntity) {
+      throw new UnauthorizedException();
+    }
+
+    if (refreshTokenEntity.expirationDate.getTime() < Date.now()) {
+      throw new UnauthorizedException();
+    }
+
+    const user = await refreshTokenEntity.user;
+    const payload = { sub: user.id, name: user.name, email: user.email };
+    return {
+      accessToken: await this.tokensService.generateAccessToken(payload),
+      refreshToken: await this.updateRefreshToken(payload, refreshTokenEntity)
     };
   }
 }
