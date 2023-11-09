@@ -3,18 +3,25 @@ import { setupTestingModule } from "../../test/test.utils";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Objective } from "./objective.entity";
 import { OkrsService } from "./okrs.service";
+import { User } from "../users/user.entity";
+import { OrgsService } from "../orgs/orgs.service";
+import { Org } from "../orgs/org.entity";
+import { TokensService } from "../auth/tokens.service";
 
 describe("OkrsController", () => {
   let controller: OkrsController;
+  let orgsService: OrgsService;
   let cleanup: () => Promise<void>;
+
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective])],
-      [OkrsService],
+      [TypeOrmModule.forFeature([Objective, Org])],
+      [OkrsService, OrgsService, TokensService],
       [OkrsController]
     );
     cleanup = dbCleanup;
     controller = module.get<OkrsController>(OkrsController);
+    orgsService = module.get<OrgsService>(OrgsService);
   });
 
   afterEach(async () => {
@@ -25,24 +32,41 @@ describe("OkrsController", () => {
     expect(controller).toBeDefined();
   });
 
+  async function createTestOrg() {
+    const user = new User("Test User", "test@example.com", "testtesttest");
+    return await orgsService.createForUser(user);
+  }
+
   describe("when creating an OKR", () => {
     it("should return the created OKR", async () => {
+      const org = await createTestOrg();
       const okr = await controller.create({
-        objective: {
-          objective: "My OKR",
-          description: "My OKR description"
-        }
-      });
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
+        });
       expect(okr.objective.objective).toEqual("My OKR");
       expect(okr.objective.description).toEqual("My OKR description");
     });
     it("should validate the OKR", async () => {
+      const org = await createTestOrg();
       await expect(controller.create({
-        objective: {
-          objective: "",
-          description: "My OKR description"
-        }
-      })).rejects.toThrow();
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            objective: "",
+            description: "My OKR description"
+          }
+        })).rejects.toThrow();
     });
   });
 });

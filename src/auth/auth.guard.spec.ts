@@ -8,6 +8,8 @@ import { setupTestingModule } from "../../test/test.utils";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { RefreshToken } from "./refresh-token.entity";
 import { TokensService } from "./tokens.service";
+import { User } from "../users/user.entity";
+import { Org } from "../orgs/org.entity";
 
 describe("AuthGuard", () => {
   let tokensService: TokensService;
@@ -126,7 +128,14 @@ describe("AuthGuard", () => {
       }
     } as unknown as Reflector;
     const guard = new AuthGuard(tokensService, reflector);
-    const accessToken = await tokensService.generateAccessToken({ sub: "test", username: "test" });
+    const user = new User(
+      "John Doe",
+      "test@example.com",
+      "password"
+    );
+    user.id = "1234";
+    user.org = Promise.resolve({ id: "1234" } as Org);
+    const accessToken = await tokensService.generateAccessToken(user);
     const context = {
       getHandler: () => {
 

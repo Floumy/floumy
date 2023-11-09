@@ -1,5 +1,7 @@
 import { setupTestingModule } from "../../test/test.utils";
 import { TokensService } from "./tokens.service";
+import { User } from "../users/user.entity";
+import { Org } from "../orgs/org.entity";
 
 describe("TokenService", () => {
   let service: TokensService;
@@ -23,24 +25,52 @@ describe("TokenService", () => {
   });
 
   it("should generate an access token", async () => {
-    const accessToken = await service.generateAccessToken({ sub: "1234", name: "John Doe", email: "test@example.com" });
+    const user = new User(
+      "John Doe",
+      "test@example.com",
+      "password"
+    );
+    user.id = "1234";
+    user.org = Promise.resolve({ id: "1234" } as Org);
+    const accessToken = await service.generateAccessToken(user);
     expect(accessToken).toBeDefined();
   });
 
   it("should verify an access token", async () => {
-    const accessToken = await service.generateAccessToken({ sub: "1234", name: "John Doe", email: "test@example.com" });
+    const user = new User(
+      "John Doe",
+      "test@example.com",
+      "password"
+    );
+    user.id = "1234";
+    user.org = Promise.resolve({ id: "1234" } as Org);
+    const accessToken = await service.generateAccessToken(user);
     const payload = await service.verifyAccessToken(accessToken);
     expect(payload).toBeDefined();
     expect(payload.sub).toEqual("1234");
   });
 
   it("should generate a refresh token", async () => {
-    const refreshToken = await service.generateRefreshToken({ sub: "1234", name: "John Doe", email: "test@example.com" });
+    const user = new User(
+      "John Doe",
+      "test@example.com",
+      "password"
+    );
+    user.id = "1234";
+    user.org = Promise.resolve({ id: "1234" } as Org);
+    const refreshToken = await service.generateRefreshToken(user);
     expect(refreshToken).toBeDefined();
   });
 
   it("should verify a refresh token", async () => {
-    const refreshToken = await service.generateRefreshToken({ sub: "1234", name: "John Doe", email: "test@example.com" });
+    const user = new User(
+      "John Doe",
+      "test@example.com",
+      "password"
+    );
+    user.id = "1234";
+    user.org = Promise.resolve({ id: "1234" } as Org);
+    const refreshToken = await service.generateRefreshToken(user);
     expect(refreshToken).toBeDefined();
   });
 });

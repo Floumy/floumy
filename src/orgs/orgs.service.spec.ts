@@ -33,5 +33,14 @@ describe("OrgsService", () => {
     const org = await service.createForUser(user);
     expect(org).toBeInstanceOf(Org);
     expect(org.id).toBeDefined();
+    expect(await org.users).toHaveLength(1);
+  });
+
+  it("should fetch an org by id", async () => {
+    const user = new User("Test User", "test@example.com", "testtesttest");
+    const org = await service.createForUser(user);
+    const fetchedOrg = await service.findOneById(org.id);
+    expect(fetchedOrg).not.toBeNull();
+    expect(fetchedOrg.id).toEqual(org.id);
   });
 });

@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
+import { User } from "../users/user.entity";
 
 @Injectable()
 export class TokensService {
@@ -9,12 +10,32 @@ export class TokensService {
   }
 
 
-  async generateAccessToken(payload: object | Buffer) {
-    return await this.jwtService.signAsync(payload, { expiresIn: this.configService.get("jwt.accessToken.expiresIn"), secret: this.configService.get("jwt.accessToken.secret") });
+  async generateAccessToken(user: User) {
+    return await this.jwtService.signAsync({
+        sub: user.id,
+        name: user.name,
+        email: user.email,
+        org: (await user.org).id
+      },
+      {
+        expiresIn: this.configService.get("jwt.accessToken.expiresIn"),
+        secret: this.configService.get("jwt.accessToken.secret")
+      }
+    );
   }
 
-  async generateRefreshToken(payload: object | Buffer) {
-    return await this.jwtService.signAsync(payload, { expiresIn: this.configService.get("jwt.refreshToken.expiresIn"), secret: this.configService.get("jwt.refreshToken.secret") });
+  async generateRefreshToken(user: User) {
+    return await this.jwtService.signAsync({
+        sub: user.id,
+        name: user.name,
+        email: user.email,
+        org: (await user.org).id
+      },
+      {
+        expiresIn: this.configService.get("jwt.refreshToken.expiresIn"),
+        secret: this.configService.get("jwt.refreshToken.secret")
+      }
+    );
   }
 
   async verifyAccessToken(accessToken: string) {
