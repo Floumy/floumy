@@ -6,6 +6,7 @@ import { DataSource } from "typeorm";
 import databaseConfig from "../src/config/database.config";
 import encryptionConfig from "../src/config/encryption.config";
 import jwtConfig from "../src/config/jwt.config";
+import { testDbOptions } from "./test-db.options";
 
 
 export async function clearDatabase(dataSource: DataSource) {
@@ -47,17 +48,7 @@ export async function setupTestingModule(
     providers: [ConfigService, ...providers]
   }).compile();
 
-  const configService = module.get(ConfigService);
-  const dataSource = new DataSource({
-    type: "postgres",
-    host: configService.get("database.host"),
-    port: +configService.get("database.port"),
-    username: configService.get("database.username"),
-    password: configService.get("database.password"),
-    database: configService.get("database.name"),
-    entities: [__dirname + "/../**/*.entity{.ts,.js}"],
-    synchronize: true
-  });
+  const dataSource = new DataSource(testDbOptions);
 
   await dataSource.initialize();
 

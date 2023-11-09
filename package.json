@@ -13,11 +13,13 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest --runInBand",
+    "test": "npm run test-db:up && jest --runInBand && npm run test-db:down",
     "test:watch": "jest --watch --runInBand",
-    "test:cov": "jest --coverage --runInBand",
+    "test:cov": "npm run test-db:up && jest --coverage --runInBand && npm run test-db:down",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json --runInBand"
+    "test:e2e": "npm run test-db:up && jest --config ./test/jest-e2e.json --runInBand && npm run test-db:down",
+    "test-db:up": "podman container exists test-db || podman run --name test-db -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -e POSTGRES_DB=testdb -p 5455:5432 -d postgres",
+    "test-db:down": "podman stop test-db && podman rm test-db"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
