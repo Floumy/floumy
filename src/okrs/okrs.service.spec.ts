@@ -112,4 +112,24 @@ describe("OkrsService", () => {
       expect(org.id).toEqual(testOrg.id);
     });
   });
+
+  describe("when listing objectives", () => {
+    it("should return an empty array", async () => {
+      const org = await createTestOrg();
+      const objectives = await service.list(org.id);
+      expect(objectives).toEqual([]);
+    });
+    it("should return an array of objectives", async () => {
+      const org = await createTestOrg();
+      await service.createObjective(
+        org.id,
+        "Test Objective",
+        "Test Objective Description"
+      );
+      const objectives = await service.list(org.id);
+      expect(objectives).toHaveLength(1);
+      expect(objectives[0].objective).toEqual("Test Objective");
+      expect(objectives[0].description).toEqual("Test Objective Description");
+    });
+  });
 });

@@ -69,4 +69,38 @@ describe("OkrsController", () => {
         })).rejects.toThrow();
     });
   });
+
+  describe("when listing OKRs", () => {
+    it("should return an empty array", async () => {
+      const org = await createTestOrg();
+      const okrs = await controller.list({
+        user: {
+          org: org.id
+        }
+      });
+      expect(okrs).toEqual([]);
+    });
+    it("should return an array of OKRs", async () => {
+      const org = await createTestOrg();
+      await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
+        });
+      const okrs = await controller.list({
+        user: {
+          org: org.id
+        }
+      });
+      expect(okrs.length).toEqual(1);
+      expect(okrs[0].objective).toEqual("My OKR");
+      expect(okrs[0].description).toEqual("My OKR description");
+    });
+  });
 });

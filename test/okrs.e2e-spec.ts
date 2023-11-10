@@ -58,4 +58,41 @@ describe("OKRsController (e2e)", () => {
         });
     });
   });
+
+  describe("/okrs (GET)", () => {
+    it("should return 200", async () => {
+      return request(app.getHttpServer())
+        .get("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body).toEqual([]);
+        });
+    });
+
+    it("should return 200 with OKRs", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
+        });
+
+      return request(app.getHttpServer())
+        .get("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body).toHaveLength(1);
+          expect(body[0].id).toEqual(okrResponse.body.objective.id);
+          expect(body[0].objective).toEqual("My OKR");
+          expect(body[0].description).toEqual("My OKR description");
+          expect(body[0].createdAt).toBeDefined();
+          expect(body[0].updatedAt).toBeDefined();
+        });
+    });
+  });
 });
