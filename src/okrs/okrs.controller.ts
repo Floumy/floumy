@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from "@nestjs/common";
 import { OkrsService } from "./okrs.service";
 import { AuthGuard } from "../auth/auth.guard";
 
@@ -28,5 +28,12 @@ export class OkrsController {
       okrDto.objective.description
     );
     return { objective };
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async list(@Request() request) {
+    const { org: orgId } = request.user;
+    return this.okrsService.list(orgId);
   }
 }

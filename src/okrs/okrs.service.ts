@@ -26,4 +26,8 @@ export class OkrsService {
   async findObjectiveById(id: string) {
     return await this.objectiveRepository.findOneBy({ id });
   }
+
+  async list(orgId: string) {
+    return await this.objectiveRepository.findBy({ org: { id: orgId } });
+  }
 }
