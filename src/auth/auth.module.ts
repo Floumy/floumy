@@ -28,7 +28,8 @@ import { TokensService } from "./tokens.service";
       signOptions: { expiresIn: "60s" }
     }),
     TypeOrmModule.forFeature([RefreshToken])
-  ]
+  ],
+  exports: [AuthService, TokensService]
 })
 export class AuthModule {
 }
