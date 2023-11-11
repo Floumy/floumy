@@ -132,4 +132,37 @@ describe("OkrsService", () => {
       expect(objectives[0].description).toEqual("Test Objective Description");
     });
   });
+
+  describe("when getting an objective", () => {
+    it("should return the objective", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        "Test Objective",
+        "Test Objective Description"
+      );
+      const storedObjective = await service.get(org.id, objective.id);
+      expect(storedObjective).toBeDefined();
+      expect(storedObjective.objective).toEqual(objective.objective);
+      expect(storedObjective.description).toEqual(objective.description);
+      expect(storedObjective.createdAt).toEqual(objective.createdAt);
+      expect(storedObjective.updatedAt).toEqual(objective.updatedAt);
+    });
+  });
+
+  describe("when updating an objective", () => {
+    it("should update the values in db", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        "Test Objective",
+        "Test Objective Description"
+      );
+      await service.update(org.id, objective.id, "Updated Objective", "Updated Objective Description");
+      const storedObjective = await service.get(org.id, objective.id);
+      expect(storedObjective).toBeDefined();
+      expect(storedObjective.objective).toEqual("Updated Objective");
+      expect(storedObjective.description).toEqual("Updated Objective Description");
+    });
+  });
 });

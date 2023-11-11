@@ -95,4 +95,62 @@ describe("OKRsController (e2e)", () => {
         });
     });
   });
+
+  describe("OKR (GET)", () => {
+    it("should return 200", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
+        });
+
+      return request(app.getHttpServer())
+        .get(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.id).toEqual(okrResponse.body.objective.id);
+          expect(body.objective).toEqual("My OKR");
+          expect(body.description).toEqual("My OKR description");
+          expect(body.createdAt).toBeDefined();
+          expect(body.updatedAt).toBeDefined();
+        });
+    });
+
+    it("should return 404", async () => {
+      return request(app.getHttpServer())
+        .get(`/okrs/123`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.NOT_FOUND);
+    });
+  });
+
+  describe("OKR (PUT)", () => {
+    it("should return 200", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
+        });
+
+      return request(app.getHttpServer())
+        .put(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            objective: "My Other OKR",
+            description: "My Other OKR description"
+          }
+        })
+        .expect(HttpStatus.OK);
+    });
+  });
 });
