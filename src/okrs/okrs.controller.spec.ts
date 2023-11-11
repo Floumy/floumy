@@ -103,4 +103,64 @@ describe("OkrsController", () => {
       expect(okrs[0].description).toEqual("My OKR description");
     });
   });
+
+  describe("when getting an OKR", () => {
+    it("should return the OKR", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
+        });
+      const okr2 = await controller.get({
+        user: {
+          org: org.id
+        }
+      }, okr.objective.id);
+      expect(okr2.objective).toEqual("My OKR");
+      expect(okr2.description).toEqual("My OKR description");
+    });
+  });
+
+  describe("when updating an OKR", () => {
+    it("should update the OKR", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
+        });
+      await controller.update({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            objective: "My OKR 2",
+            description: "My OKR description 2"
+          }
+        },
+        okr.objective.id);
+      const okr2 = await controller.get({
+        user: {
+          org: org.id
+        }
+      }, okr.objective.id);
+      expect(okr2.objective).toEqual("My OKR 2");
+      expect(okr2.description).toEqual("My OKR description 2");
+    });
+  });
 });

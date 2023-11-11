@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Request,
+  UseGuards
+} from "@nestjs/common";
 import { OkrsService } from "./okrs.service";
 import { AuthGuard } from "../auth/auth.guard";
 
@@ -34,6 +46,24 @@ export class OkrsController {
   @HttpCode(HttpStatus.OK)
   async list(@Request() request) {
     const { org: orgId } = request.user;
-    return this.okrsService.list(orgId);
+    return await this.okrsService.list(orgId);
+  }
+
+  @Get(":id")
+  @HttpCode(HttpStatus.OK)
+  async get(@Param("id") id: string, @Request() request) {
+    const { org: orgId } = request.user;
+    try {
+      return await this.okrsService.get(orgId, id);
+    } catch (e) {
+      throw new NotFoundException();
+    }
+  }
+
+  @Put(":id")
+  @HttpCode(HttpStatus.OK)
+  async update(@Param("id") id: string, @Request() request, @Body() okrDto: OKRDto) {
+    const { org: orgId } = request.user;
+    return await this.okrsService.update(orgId, id, okrDto.objective.objective, okrDto.objective.description);
   }
 }

@@ -30,4 +30,12 @@ export class OkrsService {
   async list(orgId: string) {
     return await this.objectiveRepository.findBy({ org: { id: orgId } });
   }
+
+  async get(orgId: any, id: string) {
+    return await this.objectiveRepository.findOneByOrFail({ id, org: { id: orgId } });
+  }
+
+  async update(orgId: any, id: string, objective: string, description: string) {
+    return await this.objectiveRepository.update({ id, org: { id: orgId } }, { objective, description });
+  }
 }
