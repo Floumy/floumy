@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -65,5 +66,12 @@ export class OkrsController {
   async update(@Param("id") id: string, @Request() request, @Body() okrDto: OKRDto) {
     const { org: orgId } = request.user;
     return await this.okrsService.update(orgId, id, okrDto.objective.objective, okrDto.objective.description);
+  }
+
+  @Delete(":id")
+  @HttpCode(HttpStatus.OK)
+  async delete(@Param("id") id: string, @Request() request) {
+    const { org: orgId } = request.user;
+    return await this.okrsService.delete(orgId, id);
   }
 }

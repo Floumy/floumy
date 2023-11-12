@@ -167,4 +167,36 @@ describe("OkrsController", () => {
       expect(okr2.description).toEqual("My OKR description 2");
     });
   });
+
+  describe("when deleting an OKR", () => {
+    it("should delete the OKR", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
+        });
+      await controller.delete(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        }
+      );
+      await expect(controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        })).rejects.toThrow();
+    });
+  });
 });
