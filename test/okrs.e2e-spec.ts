@@ -153,4 +153,23 @@ describe("OKRsController (e2e)", () => {
         .expect(HttpStatus.OK);
     });
   });
+
+  describe("OKR (DELETE)", () => {
+    it("should return 200", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            objective: "My OKR",
+            description: "My OKR description"
+          }
+        });
+
+      return request(app.getHttpServer())
+        .delete(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK);
+    });
+  });
 });

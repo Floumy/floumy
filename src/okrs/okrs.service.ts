@@ -38,4 +38,8 @@ export class OkrsService {
   async update(orgId: any, id: string, objective: string, description: string) {
     return await this.objectiveRepository.update({ id, org: { id: orgId } }, { objective, description });
   }
+
+  async delete(orgId: string, id: string) {
+    return await this.objectiveRepository.delete({ id, org: { id: orgId } });
+  }
 }

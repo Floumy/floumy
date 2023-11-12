@@ -165,4 +165,17 @@ describe("OkrsService", () => {
       expect(storedObjective.description).toEqual("Updated Objective Description");
     });
   });
+
+  describe("when deleting an objective", () => {
+    it("should delete the objective", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        "Test Objective",
+        "Test Objective Description"
+      );
+      await service.delete(org.id, objective.id);
+      await expect(service.get(org.id, objective.id)).rejects.toThrow();
+    });
+  });
 });
