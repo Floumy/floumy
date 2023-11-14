@@ -5,6 +5,7 @@ import { Objective } from "./objective.entity";
 import { OrgsService } from "../orgs/orgs.service";
 import { User } from "../users/user.entity";
 import { Org } from "../orgs/org.entity";
+import { KeyResult } from "./key-result.entity";
 
 describe("OkrsService", () => {
   let service: OkrsService;
@@ -13,7 +14,7 @@ describe("OkrsService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult])],
       [OkrsService, OrgsService]
     );
     cleanup = dbCleanup;
@@ -56,7 +57,7 @@ describe("OkrsService", () => {
       );
       const storedObjective = await service.findObjectiveById(objective.id);
       expect(storedObjective).toBeDefined();
-      expect(storedObjective.objective).toEqual(objective.objective);
+      expect(storedObjective.title).toEqual(objective.title);
       expect(storedObjective.description).toEqual(objective.description);
       expect(storedObjective.createdAt).toEqual(objective.createdAt);
       expect(storedObjective.updatedAt).toEqual(objective.updatedAt);
@@ -93,7 +94,7 @@ describe("OkrsService", () => {
       );
       const storedObjective = await service.findObjectiveById(objective.id);
       expect(storedObjective).toBeDefined();
-      expect(storedObjective.objective).toEqual(objective.objective);
+      expect(storedObjective.title).toEqual(objective.title);
       expect(storedObjective.description).toEqual(objective.description);
       expect(storedObjective.createdAt).toEqual(objective.createdAt);
       expect(storedObjective.updatedAt).toEqual(objective.updatedAt);
@@ -128,7 +129,7 @@ describe("OkrsService", () => {
       );
       const objectives = await service.list(org.id);
       expect(objectives).toHaveLength(1);
-      expect(objectives[0].objective).toEqual("Test Objective");
+      expect(objectives[0].title).toEqual("Test Objective");
       expect(objectives[0].description).toEqual("Test Objective Description");
     });
   });
@@ -143,7 +144,7 @@ describe("OkrsService", () => {
       );
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
-      expect(storedObjective.objective).toEqual(objective.objective);
+      expect(storedObjective.title).toEqual(objective.title);
       expect(storedObjective.description).toEqual(objective.description);
       expect(storedObjective.createdAt).toEqual(objective.createdAt);
       expect(storedObjective.updatedAt).toEqual(objective.updatedAt);
@@ -161,7 +162,7 @@ describe("OkrsService", () => {
       await service.update(org.id, objective.id, "Updated Objective", "Updated Objective Description");
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
-      expect(storedObjective.objective).toEqual("Updated Objective");
+      expect(storedObjective.title).toEqual("Updated Objective");
       expect(storedObjective.description).toEqual("Updated Objective Description");
     });
   });
@@ -176,6 +177,64 @@ describe("OkrsService", () => {
       );
       await service.delete(org.id, objective.id);
       await expect(service.get(org.id, objective.id)).rejects.toThrow();
+    });
+  });
+
+  describe("when creating an OKR", () => {
+    it("should return the OKR", async () => {
+      const org = await createTestOrg();
+      const okr = await service.create(org.id, {
+        objective: {
+          title: "My OKR",
+          description: "My OKR description"
+        },
+        keyResults: [
+          "My KR 1",
+          "My KR 2",
+          "My KR 3"
+        ]
+      });
+      expect(okr).toBeDefined();
+      expect(okr.objective.id).toBeDefined();
+      expect(okr.objective.createdAt).toBeDefined();
+      expect(okr.objective.updatedAt).toBeDefined();
+      expect(okr.objective.title).toEqual("My OKR");
+      expect(okr.objective.description).toEqual("My OKR description");
+      expect(okr.keyResults).toHaveLength(3);
+    });
+
+    it("should store the OKR", async () => {
+      const org = await createTestOrg();
+      const okr = await service.create(org.id, {
+        objective: {
+          title: "My OKR",
+          description: "My OKR description"
+        },
+        keyResults: [
+          "My KR 1",
+          "My KR 2",
+          "My KR 3"
+        ]
+      });
+      const storedObjective = await service.get(org.id, okr.objective.id);
+      expect(storedObjective).toBeDefined();
+      expect(storedObjective.title).toEqual(okr.objective.title);
+      expect(storedObjective.description).toEqual(okr.objective.description);
+      expect(storedObjective.createdAt).toEqual(okr.objective.createdAt);
+      expect(storedObjective.updatedAt).toEqual(okr.objective.updatedAt);
+      expect(okr.keyResults).toHaveLength(3);
+      expect(okr.keyResults[0].id).toBeDefined();
+      expect(okr.keyResults[0].createdAt).toBeDefined();
+      expect(okr.keyResults[0].updatedAt).toBeDefined();
+      expect(okr.keyResults[0].title).toEqual("My KR 1");
+      expect(okr.keyResults[1].id).toBeDefined();
+      expect(okr.keyResults[1].createdAt).toBeDefined();
+      expect(okr.keyResults[1].updatedAt).toBeDefined();
+      expect(okr.keyResults[1].title).toEqual("My KR 2");
+      expect(okr.keyResults[2].id).toBeDefined();
+      expect(okr.keyResults[2].createdAt).toBeDefined();
+      expect(okr.keyResults[2].updatedAt).toBeDefined();
+      expect(okr.keyResults[2].title).toEqual("My KR 3");
     });
   });
 });

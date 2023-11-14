@@ -1,12 +1,21 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import { Org } from "../orgs/org.entity";
+import { KeyResult } from "./key-result.entity";
 
 @Entity()
 export class Objective {
   @PrimaryGeneratedColumn("uuid")
   id: string;
   @Column()
-  objective: string;
+  title: string;
   @Column()
   description: string;
   @CreateDateColumn()
@@ -15,4 +24,6 @@ export class Objective {
   updatedAt: Date;
   @ManyToOne(() => Org, org => org.objectives, { lazy: true })
   org: Promise<Org>;
+  @OneToMany(() => KeyResult, keyResult => keyResult.objective, { lazy: true })
+  keyResults: Promise<KeyResult[]>;
 }
