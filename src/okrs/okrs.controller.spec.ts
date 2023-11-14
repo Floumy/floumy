@@ -7,6 +7,7 @@ import { User } from "../users/user.entity";
 import { OrgsService } from "../orgs/orgs.service";
 import { Org } from "../orgs/org.entity";
 import { TokensService } from "../auth/tokens.service";
+import { KeyResult } from "./key-result.entity";
 
 describe("OkrsController", () => {
   let controller: OkrsController;
@@ -15,7 +16,7 @@ describe("OkrsController", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult])],
       [OkrsService, OrgsService, TokensService],
       [OkrsController]
     );
@@ -47,11 +48,11 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            objective: "My OKR",
+            title: "My OKR",
             description: "My OKR description"
           }
         });
-      expect(okr.objective.objective).toEqual("My OKR");
+      expect(okr.objective.title).toEqual("My OKR");
       expect(okr.objective.description).toEqual("My OKR description");
     });
     it("should validate the OKR", async () => {
@@ -63,7 +64,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            objective: "",
+            title: "",
             description: "My OKR description"
           }
         })).rejects.toThrow();
@@ -89,7 +90,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            objective: "My OKR",
+            title: "My OKR",
             description: "My OKR description"
           }
         });
@@ -99,7 +100,7 @@ describe("OkrsController", () => {
         }
       });
       expect(okrs.length).toEqual(1);
-      expect(okrs[0].objective).toEqual("My OKR");
+      expect(okrs[0].title).toEqual("My OKR");
       expect(okrs[0].description).toEqual("My OKR description");
     });
   });
@@ -114,7 +115,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            objective: "My OKR",
+            title: "My OKR",
             description: "My OKR description"
           }
         });
@@ -124,7 +125,7 @@ describe("OkrsController", () => {
             org: org.id
           }
         });
-      expect(okr2.objective).toEqual("My OKR");
+      expect(okr2.title).toEqual("My OKR");
       expect(okr2.description).toEqual("My OKR description");
     });
   });
@@ -139,7 +140,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            objective: "My OKR",
+            title: "My OKR",
             description: "My OKR description"
           }
         });
@@ -152,7 +153,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            objective: "My OKR 2",
+            title: "My OKR 2",
             description: "My OKR description 2"
           }
         });
@@ -163,7 +164,7 @@ describe("OkrsController", () => {
             org: org.id
           }
         });
-      expect(okr2.objective).toEqual("My OKR 2");
+      expect(okr2.title).toEqual("My OKR 2");
       expect(okr2.description).toEqual("My OKR description 2");
     });
   });
@@ -178,7 +179,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            objective: "My OKR",
+            title: "My OKR",
             description: "My OKR description"
           }
         });
@@ -197,6 +198,32 @@ describe("OkrsController", () => {
             org: org.id
           }
         })).rejects.toThrow();
+    });
+  });
+
+  describe("when creating an OKR with key results", () => {
+    it("should return the created OKR with key results", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            "My key result",
+            "My key result 2",
+            "My key result 3"
+          ]
+        });
+      expect(okr.keyResults.length).toEqual(3);
+      expect(okr.keyResults[0].title).toEqual("My key result");
+      expect(okr.keyResults[1].title).toEqual("My key result 2");
+      expect(okr.keyResults[2].title).toEqual("My key result 3");
     });
   });
 });
