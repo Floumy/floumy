@@ -8,6 +8,7 @@ import { OrgsService } from "../orgs/orgs.service";
 import { Org } from "../orgs/org.entity";
 import { TokensService } from "../auth/tokens.service";
 import { KeyResult } from "./key-result.entity";
+import { NotFoundException } from "@nestjs/common";
 
 describe("OkrsController", () => {
   let controller: OkrsController;
@@ -199,6 +200,40 @@ describe("OkrsController", () => {
             org: org.id
           }
         })).rejects.toThrow();
+    });
+    it("should delete the OKR and its key results", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            "My key result",
+            "My key result 2",
+            "My key result 3"
+          ]
+        });
+      await controller.delete(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        }
+      );
+      await expect(controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        })).rejects.toThrow(NotFoundException);
     });
   });
 
