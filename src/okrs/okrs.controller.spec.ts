@@ -169,6 +169,57 @@ describe("OkrsController", () => {
       expect(okr2.objective.title).toEqual("My OKR 2");
       expect(okr2.objective.description).toEqual("My OKR description 2");
     });
+
+    it("should update the OKR and its key results", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            { title: "My key result" },
+            { title: "My key result 2" },
+            { title: "My key result 3" }
+          ]
+        });
+      await controller.update(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR 2",
+            description: "My OKR description 2"
+          },
+          keyResults: [
+            { title: "My key result 4" },
+            { title: "My key result 5" },
+            { title: "My key result 6" }
+          ]
+        });
+      const okr2 = await controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(okr2.objective.title).toEqual("My OKR 2");
+      expect(okr2.objective.description).toEqual("My OKR description 2");
+      expect(okr2.keyResults.length).toEqual(3);
+      expect(okr2.keyResults[0].title).toEqual("My key result 4");
+      expect(okr2.keyResults[1].title).toEqual("My key result 5");
+      expect(okr2.keyResults[2].title).toEqual("My key result 6");
+    });
   });
 
   describe("when deleting an OKR", () => {
@@ -214,9 +265,9 @@ describe("OkrsController", () => {
             description: "My OKR description"
           },
           keyResults: [
-            "My key result",
-            "My key result 2",
-            "My key result 3"
+            { title: "My key result" },
+            { title: "My key result 2" },
+            { title: "My key result 3" }
           ]
         });
       await controller.delete(
@@ -251,9 +302,9 @@ describe("OkrsController", () => {
             description: "My OKR description"
           },
           keyResults: [
-            "My key result",
-            "My key result 2",
-            "My key result 3"
+            { title: "My key result" },
+            { title: "My key result 2" },
+            { title: "My key result 3" }
           ]
         });
       expect(okr.keyResults.length).toEqual(3);

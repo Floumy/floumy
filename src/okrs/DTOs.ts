@@ -3,7 +3,7 @@ interface ObjectiveDto {
   description: string;
 }
 
-interface OKRDto {
+interface CreateOrUpdateOKRDto {
   objective: ObjectiveDto;
-  keyResults?: string[];
+  keyResults?: { title: string }[];
 }

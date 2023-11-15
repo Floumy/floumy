@@ -24,7 +24,7 @@ export class OkrsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Request() request, @Body() okrDto: OKRDto) {
+  async create(@Request() request, @Body() okrDto: CreateOrUpdateOKRDto) {
     const { org: orgId } = request.user;
     return await this.okrsService.create(orgId, okrDto);
   }
@@ -49,15 +49,15 @@ export class OkrsController {
 
   @Put(":id")
   @HttpCode(HttpStatus.OK)
-  async update(@Param("id") id: string, @Request() request, @Body() okrDto: OKRDto) {
+  async update(@Param("id") id: string, @Request() request, @Body() okrDto: CreateOrUpdateOKRDto) {
     const { org: orgId } = request.user;
-    return await this.okrsService.update(orgId, id, okrDto.objective.title, okrDto.objective.description);
+    await this.okrsService.update(orgId, id, okrDto);
   }
 
   @Delete(":id")
   @HttpCode(HttpStatus.OK)
   async delete(@Param("id") id: string, @Request() request) {
     const { org: orgId } = request.user;
-    return await this.okrsService.delete(orgId, id);
+    await this.okrsService.delete(orgId, id);
   }
 }
