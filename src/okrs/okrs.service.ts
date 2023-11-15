@@ -50,8 +50,13 @@ export class OkrsService {
     return OKRMapper.toDTO(objective, keyResults);
   }
 
-  async update(orgId: any, id: string, title: string, description: string) {
-    return await this.objectiveRepository.update({ id, org: { id: orgId } }, { title, description });
+  async update(orgId: string, id: string, okrDto: CreateOrUpdateOKRDto) {
+    await this.objectiveRepository.update(
+      { id, org: { id: orgId } },
+      { title: okrDto.objective.title, description: okrDto.objective.description }
+    );
+    if (!okrDto.keyResults || okrDto.keyResults.length === 0) return;
+    await this.updateKeyResults(id, okrDto.keyResults);
   }
 
   async delete(orgId: string, id: string) {
@@ -59,12 +64,40 @@ export class OkrsService {
     await this.objectiveRepository.delete({ id, org: { id: orgId } });
   }
 
-  async create(orgId: string, okrDto: OKRDto) {
+  async create(orgId: string, okrDto: CreateOrUpdateOKRDto) {
     const objective = await this.createObjective(orgId, okrDto.objective.title, okrDto.objective.description);
     if (!okrDto.keyResults || okrDto.keyResults.length === 0) return { objective, keyResults: [] };
 
-    const keyResults = await Promise.all(okrDto.keyResults.map(keyResult => this.createKeyResult(objective, keyResult)));
+    const keyResults = await Promise.all(okrDto.keyResults.map(keyResult => this.createKeyResult(objective, keyResult.title)));
 
     return { objective, keyResults };
+  }
+
+  private async updateKeyResults(id: string, keyResults: { id?: string, title: string }[]) {
+    const objective = await this.objectiveRepository.findOneByOrFail({ id });
+    const notEmptyKeyResults = keyResults
+      .filter(keyResult =>
+        keyResult.title.replace(/\s+/g, "").length > 0);
+    const existingKeyResults = await objective.keyResults;
+    await this.deleteKeyResultsThatAreNotInTheList(existingKeyResults, notEmptyKeyResults);
+    await this.updateOrCreateKeyResults(objective, notEmptyKeyResults);
+  }
+
+  private async updateOrCreateKeyResults(objective: Objective, keyResults: { id?: string; title: string }[]) {
+    for (const keyResult of keyResults) {
+      if (keyResult.id) {
+        await this.keyResultRepository.update({ id: keyResult.id }, { title: keyResult.title });
+      } else {
+        await this.createKeyResult(objective, keyResult.title);
+      }
+    }
+  }
+
+  private async deleteKeyResultsThatAreNotInTheList(existingKeyResults: KeyResult[], keyResults: { id?: string; title: string }[]) {
+    for (const existingKeyResult of existingKeyResults) {
+      if (!keyResults.find(keyResult => keyResult.id === existingKeyResult.id)) {
+        await this.keyResultRepository.delete({ id: existingKeyResult.id });
+      }
+    }
   }
 }

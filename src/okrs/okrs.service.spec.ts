@@ -158,11 +158,48 @@ describe("OkrsService", () => {
         "Test Objective",
         "Test Objective Description"
       );
-      await service.update(org.id, objective.id, "Updated Objective", "Updated Objective Description");
+      const okrDto = {
+        objective: {
+          title: "Updated Objective",
+          description: "Updated Objective Description"
+        }
+      };
+      await service.update(org.id, objective.id, okrDto);
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual("Updated Objective");
       expect(storedObjective.objective.description).toEqual("Updated Objective Description");
+    });
+  });
+
+  describe("when updating an objective with key results", () => {
+    it("should update the values in db", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        "Test Objective",
+        "Test Objective Description"
+      );
+      const okrDto = {
+        objective: {
+          title: "Updated Objective",
+          description: "Updated Objective Description"
+        },
+        keyResults: [
+          { title: "Updated KR 1" },
+          { title: "Updated KR 2" },
+          { title: "Updated KR 3" }
+        ]
+      };
+      await service.update(org.id, objective.id, okrDto);
+      const storedObjective = await service.get(org.id, objective.id);
+      expect(storedObjective).toBeDefined();
+      expect(storedObjective.objective.title).toEqual("Updated Objective");
+      expect(storedObjective.objective.description).toEqual("Updated Objective Description");
+      expect(storedObjective.keyResults).toHaveLength(3);
+      expect(storedObjective.keyResults[0].title).toEqual("Updated KR 1");
+      expect(storedObjective.keyResults[1].title).toEqual("Updated KR 2");
+      expect(storedObjective.keyResults[2].title).toEqual("Updated KR 3");
     });
   });
 
@@ -199,9 +236,9 @@ describe("OkrsService", () => {
           description: "My OKR description"
         },
         keyResults: [
-          "My KR 1",
-          "My KR 2",
-          "My KR 3"
+          { title: "My KR 1" },
+          { title: "My KR 2" },
+          { title: "My KR 3" }
         ]
       });
       expect(okr).toBeDefined();
@@ -221,9 +258,9 @@ describe("OkrsService", () => {
           description: "My OKR description"
         },
         keyResults: [
-          "My KR 1",
-          "My KR 2",
-          "My KR 3"
+          { title: "My KR 1" },
+          { title: "My KR 2" },
+          { title: "My KR 3" }
         ]
       });
       const storedObjective = await service.get(org.id, okr.objective.id);
