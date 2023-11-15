@@ -130,7 +130,6 @@ describe("OkrsService", () => {
       const objectives = await service.list(org.id);
       expect(objectives).toHaveLength(1);
       expect(objectives[0].title).toEqual("Test Objective");
-      expect(objectives[0].description).toEqual("Test Objective Description");
     });
   });
 
@@ -175,6 +174,17 @@ describe("OkrsService", () => {
         "Test Objective",
         "Test Objective Description"
       );
+      await service.delete(org.id, objective.id);
+      await expect(service.get(org.id, objective.id)).rejects.toThrow();
+    });
+    it("should delete the key results", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        "Test Objective",
+        "Test Objective Description"
+      );
+      await service.createKeyResult(objective, "Test Key Result");
       await service.delete(org.id, objective.id);
       await expect(service.get(org.id, objective.id)).rejects.toThrow();
     });

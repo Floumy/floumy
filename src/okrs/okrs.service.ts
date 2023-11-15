@@ -55,7 +55,8 @@ export class OkrsService {
   }
 
   async delete(orgId: string, id: string) {
-    return await this.objectiveRepository.delete({ id, org: { id: orgId } });
+    await this.keyResultRepository.delete({ objective: { id, org: { id: orgId } } });
+    await this.objectiveRepository.delete({ id, org: { id: orgId } });
   }
 
   async create(orgId: string, okrDto: OKRDto) {
