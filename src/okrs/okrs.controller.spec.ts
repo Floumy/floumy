@@ -101,7 +101,8 @@ describe("OkrsController", () => {
       });
       expect(okrs.length).toEqual(1);
       expect(okrs[0].title).toEqual("My OKR");
-      expect(okrs[0].description).toEqual("My OKR description");
+      expect(okrs[0].createdAt).toBeDefined();
+      expect(okrs[0].updatedAt).toBeDefined();
     });
   });
 
@@ -125,8 +126,8 @@ describe("OkrsController", () => {
             org: org.id
           }
         });
-      expect(okr2.title).toEqual("My OKR");
-      expect(okr2.description).toEqual("My OKR description");
+      expect(okr2.objective.title).toEqual("My OKR");
+      expect(okr2.objective.description).toEqual("My OKR description");
     });
   });
 
@@ -164,8 +165,8 @@ describe("OkrsController", () => {
             org: org.id
           }
         });
-      expect(okr2.title).toEqual("My OKR 2");
-      expect(okr2.description).toEqual("My OKR description 2");
+      expect(okr2.objective.title).toEqual("My OKR 2");
+      expect(okr2.objective.description).toEqual("My OKR description 2");
     });
   });
 

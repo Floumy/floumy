@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { OrgsService } from "../orgs/orgs.service";
 import { KeyResult } from "./key-result.entity";
+import { OKRMapper } from "./mappers";
 
 @Injectable()
 export class OkrsService {
@@ -39,11 +40,14 @@ export class OkrsService {
   }
 
   async list(orgId: string) {
-    return await this.objectiveRepository.findBy({ org: { id: orgId } });
+    const objectives = await this.objectiveRepository.findBy({ org: { id: orgId } });
+    return OKRMapper.toListDTO(objectives);
   }
 
   async get(orgId: any, id: string) {
-    return await this.objectiveRepository.findOneByOrFail({ id, org: { id: orgId } });
+    const objective = await this.objectiveRepository.findOneByOrFail({ id, org: { id: orgId } });
+    const keyResults = await objective.keyResults;
+    return OKRMapper.toDTO(objective, keyResults);
   }
 
   async update(orgId: any, id: string, title: string, description: string) {

@@ -140,11 +140,11 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .expect(HttpStatus.OK)
         .expect(({ body }) => {
-          expect(body.id).toEqual(okrResponse.body.objective.id);
-          expect(body.title).toEqual("My OKR");
-          expect(body.description).toEqual("My OKR description");
-          expect(body.createdAt).toBeDefined();
-          expect(body.updatedAt).toBeDefined();
+          expect(body.objective.id).toEqual(okrResponse.body.objective.id);
+          expect(body.objective.title).toEqual("My OKR");
+          expect(body.objective.description).toEqual("My OKR description");
+          expect(body.objective.createdAt).toBeDefined();
+          expect(body.objective.updatedAt).toBeDefined();
         });
     });
 
@@ -153,6 +153,39 @@ describe("OKRsController (e2e)", () => {
         .get(`/okrs/123`)
         .set("Authorization", `Bearer ${accessToken}`)
         .expect(HttpStatus.NOT_FOUND);
+    });
+
+    it("should return 200 with objectives and key results", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            "My Key Result 1",
+            "My Key Result 2"
+          ]
+        });
+
+      return request(app.getHttpServer())
+        .get(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.objective.id).toEqual(okrResponse.body.objective.id);
+          expect(body.objective.title).toEqual("My OKR");
+          expect(body.objective.description).toEqual("My OKR description");
+          expect(body.objective.createdAt).toBeDefined();
+          expect(body.objective.updatedAt).toBeDefined();
+          expect(body.keyResults).toHaveLength(2);
+          expect(body.keyResults[0].id).toBeDefined();
+          expect(body.keyResults[0].title).toEqual("My Key Result 1");
+          expect(body.keyResults[1].id).toBeDefined();
+          expect(body.keyResults[1].title).toEqual("My Key Result 2");
+        });
     });
   });
 
