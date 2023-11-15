@@ -144,10 +144,10 @@ describe("OkrsService", () => {
       );
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
-      expect(storedObjective.title).toEqual(objective.title);
-      expect(storedObjective.description).toEqual(objective.description);
-      expect(storedObjective.createdAt).toEqual(objective.createdAt);
-      expect(storedObjective.updatedAt).toEqual(objective.updatedAt);
+      expect(storedObjective.objective.title).toEqual(objective.title);
+      expect(storedObjective.objective.description).toEqual(objective.description);
+      expect(storedObjective.objective.createdAt).toEqual(objective.createdAt);
+      expect(storedObjective.objective.updatedAt).toEqual(objective.updatedAt);
     });
   });
 
@@ -162,8 +162,8 @@ describe("OkrsService", () => {
       await service.update(org.id, objective.id, "Updated Objective", "Updated Objective Description");
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
-      expect(storedObjective.title).toEqual("Updated Objective");
-      expect(storedObjective.description).toEqual("Updated Objective Description");
+      expect(storedObjective.objective.title).toEqual("Updated Objective");
+      expect(storedObjective.objective.description).toEqual("Updated Objective Description");
     });
   });
 
@@ -218,10 +218,10 @@ describe("OkrsService", () => {
       });
       const storedObjective = await service.get(org.id, okr.objective.id);
       expect(storedObjective).toBeDefined();
-      expect(storedObjective.title).toEqual(okr.objective.title);
-      expect(storedObjective.description).toEqual(okr.objective.description);
-      expect(storedObjective.createdAt).toEqual(okr.objective.createdAt);
-      expect(storedObjective.updatedAt).toEqual(okr.objective.updatedAt);
+      expect(storedObjective.objective.title).toEqual(okr.objective.title);
+      expect(storedObjective.objective.description).toEqual(okr.objective.description);
+      expect(storedObjective.objective.createdAt).toEqual(okr.objective.createdAt);
+      expect(storedObjective.objective.updatedAt).toEqual(okr.objective.updatedAt);
       expect(okr.keyResults).toHaveLength(3);
       expect(okr.keyResults[0].id).toBeDefined();
       expect(okr.keyResults[0].createdAt).toBeDefined();
