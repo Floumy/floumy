@@ -228,7 +228,7 @@ describe("OKRsController (e2e)", () => {
           ]
         });
 
-      request(app.getHttpServer())
+      await request(app.getHttpServer())
         .put(`/okrs/${okrResponse.body.objective.id}`)
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
