@@ -8,15 +8,11 @@ export class OKRMapper {
         id: objective.id,
         title: objective.title,
         description: objective.description,
+        progress: parseFloat(objective.progress?.toFixed(2)),
         createdAt: objective.createdAt,
         updatedAt: objective.updatedAt
       },
-      keyResults: keyResults.map(keyResult => ({
-        id: keyResult.id,
-        title: keyResult.title,
-        createdAt: keyResult.createdAt,
-        updatedAt: keyResult.updatedAt
-      }))
+      keyResults: keyResults.map(KeyResultMapper.toDTO)
     };
   }
 
@@ -24,8 +20,21 @@ export class OKRMapper {
     return objectives.map(objective => ({
       id: objective.id,
       title: objective.title,
+      progress: parseFloat(objective.progress?.toFixed(2)),
       createdAt: objective.createdAt,
       updatedAt: objective.updatedAt
     }));
+  }
+}
+
+export class KeyResultMapper {
+  static toDTO(keyResult: KeyResult) {
+    return {
+      id: keyResult.id,
+      title: keyResult.title,
+      progress: parseFloat(keyResult.progress?.toFixed(2)),
+      createdAt: keyResult.createdAt,
+      updatedAt: keyResult.updatedAt
+    };
   }
 }

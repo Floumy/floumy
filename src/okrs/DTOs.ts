@@ -7,3 +7,7 @@ interface CreateOrUpdateOKRDto {
   objective: ObjectiveDto;
   keyResults?: { title: string }[];
 }
+
+interface UpdateKeyResultDto {
+  progress?: number;
+}

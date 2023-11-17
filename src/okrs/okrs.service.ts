@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { OrgsService } from "../orgs/orgs.service";
 import { KeyResult } from "./key-result.entity";
-import { OKRMapper } from "./mappers";
+import { KeyResultMapper, OKRMapper } from "./mappers";
 
 @Injectable()
 export class OkrsService {
@@ -47,7 +47,7 @@ export class OkrsService {
   async get(orgId: any, id: string) {
     const objective = await this.objectiveRepository.findOneByOrFail({ id, org: { id: orgId } });
     const keyResults = await objective.keyResults;
-    return OKRMapper.toDTO(objective, keyResults);
+    return OKRMapper.toDTO(objective, keyResults.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()));
   }
 
   async update(orgId: string, id: string, okrDto: CreateOrUpdateOKRDto) {
@@ -99,5 +99,29 @@ export class OkrsService {
         await this.keyResultRepository.delete({ id: existingKeyResult.id });
       }
     }
+  }
+
+  private async updateObjectiveProgress(objective: Objective) {
+    const keyResults = await objective.keyResults;
+    objective.progress = keyResults.reduce((acc, keyResult) => acc + keyResult.progress, 0) / keyResults.length;
+    await this.objectiveRepository.save(objective);
+  }
+
+  async updateKeyResult(orgId: any, objectiveId: string, keyResultId: string, updateKeyResultDto: UpdateKeyResultDto) {
+    const keyResult = await this.keyResultRepository.findOneByOrFail({ id: keyResultId, objective: { id: objectiveId, org: { id: orgId } } });
+    if (updateKeyResultDto.progress) {
+      keyResult.progress = updateKeyResultDto.progress;
+    }
+    const savedKeyResult = await this.keyResultRepository.save(keyResult);
+    await this.updateObjectiveProgress(await keyResult.objective);
+    return KeyResultMapper.toDTO(savedKeyResult);
+  }
+
+  async getKeyResult(id: string) {
+    return await this.keyResultRepository.findOneByOrFail({ id });
+  }
+
+  async getObjective(id: string) {
+    return await this.objectiveRepository.findOneByOrFail({ id });
   }
 }

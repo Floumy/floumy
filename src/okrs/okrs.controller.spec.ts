@@ -313,4 +313,114 @@ describe("OkrsController", () => {
       expect(okr.keyResults[2].title).toEqual("My key result 3");
     });
   });
+
+  describe("when updating Key Results Progress", () => {
+    it("should update the Key Result Progress", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            { title: "My key result" },
+            { title: "My key result 2" },
+            { title: "My key result 3" }
+          ]
+        });
+      await controller.updateKeyResult(
+        okr.objective.id,
+        okr.keyResults[0].id,
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          progress: 0.5
+        });
+      const okr2 = await controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(okr2.keyResults[0].progress).toEqual(0.5);
+    });
+    it("should not update the Key Result Progress if the Key Result does not belong to the OKR", async () => {
+      const org = await createTestOrg();
+      const org2 = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            { title: "My key result" },
+            { title: "My key result 2" },
+            { title: "My key result 3" }
+          ]
+        });
+      await expect(controller.updateKeyResult(
+        okr.objective.id,
+        okr.keyResults[0].id,
+        {
+          user: {
+            org: org2.id
+          }
+        },
+        {
+          progress: 0.5
+        })).rejects.toThrow();
+    });
+    it("should update the Objective Progress", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            { title: "My key result" },
+            { title: "My key result 2" },
+            { title: "My key result 3" }
+          ]
+        });
+      await controller.updateKeyResult(
+        okr.objective.id,
+        okr.keyResults[0].id,
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          progress: 0.5
+        });
+      const okr2 = await controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(okr2.objective.progress).toEqual(0.17);
+    });
+  });
 });

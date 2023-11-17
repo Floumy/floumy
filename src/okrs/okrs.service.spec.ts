@@ -284,4 +284,42 @@ describe("OkrsService", () => {
       expect(okr.keyResults[2].title).toEqual("My KR 3");
     });
   });
+  describe("when updating a KR progress", () => {
+    it("should update the KR progress", async () => {
+      const org = await createTestOrg();
+      const okr = await service.create(org.id, {
+        objective: {
+          title: "My OKR",
+          description: "My OKR description"
+        },
+        keyResults: [
+          { title: "My KR 1" },
+          { title: "My KR 2" },
+          { title: "My KR 3" }
+        ]
+      });
+      await service.updateKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { progress: 0.5 });
+      const updatedKR = await service.getKeyResult(okr.keyResults[0].id);
+      expect(updatedKR.progress).toEqual(0.5);
+    });
+    it("should update the objective progress", async () => {
+      const org = await createTestOrg();
+      const okr = await service.create(org.id, {
+        objective: {
+          title: "My OKR",
+          description: "My OKR description"
+        },
+        keyResults: [
+          { title: "My KR 1" },
+          { title: "My KR 2" },
+          { title: "My KR 3" }
+        ]
+      });
+      await service.updateKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { progress: 0.5 });
+      await service.updateKeyResult(org.id, okr.objective.id, okr.keyResults[1].id, { progress: 0.5 });
+      await service.updateKeyResult(org.id, okr.objective.id, okr.keyResults[2].id, { progress: 0.5 });
+      const updatedObjective = await service.getObjective(okr.objective.id);
+      expect(updatedObjective.progress).toEqual(0.5);
+    });
+  });
 });
