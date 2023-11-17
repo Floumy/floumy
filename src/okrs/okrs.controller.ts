@@ -7,6 +7,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Put,
   Request,
@@ -59,5 +60,22 @@ export class OkrsController {
   async delete(@Param("id") id: string, @Request() request) {
     const { org: orgId } = request.user;
     await this.okrsService.delete(orgId, id);
+  }
+
+  @Patch(":objectiveId/key-results/:keyResultId")
+  @HttpCode(HttpStatus.OK)
+  async updateKeyResult(
+    @Param("objectiveId") objectiveId: string,
+    @Param("keyResultId") keyResultId: string,
+    @Request() request,
+    @Body() updateKeyResultDto: UpdateKeyResultDto
+  ) {
+    const { org: orgId } = request.user;
+    return await this.okrsService.updateKeyResult(
+      orgId,
+      objectiveId,
+      keyResultId,
+      updateKeyResultDto
+    );
   }
 }

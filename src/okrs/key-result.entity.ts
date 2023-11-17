@@ -7,6 +7,8 @@ export class KeyResult {
   id: string;
   @Column()
   title: string;
+  @Column({ default: 0, type: "float" })
+  progress: number;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

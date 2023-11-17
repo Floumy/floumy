@@ -283,4 +283,57 @@ describe("OKRsController (e2e)", () => {
         .expect(HttpStatus.OK);
     });
   });
+
+  describe("OKR (PATCH)", () => {
+    it("should update the progress of a key result and the objective progress", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            { title: "My Key Result 1" },
+            { title: "My Key Result 2" },
+            { title: "My Key Result 3" }
+          ]
+        });
+
+      await request(app.getHttpServer())
+        .patch(`/okrs/${okrResponse.body.objective.id}/key-results/${okrResponse.body.keyResults[0].id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          progress: 0.5
+        })
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
+        .patch(`/okrs/${okrResponse.body.objective.id}/key-results/${okrResponse.body.keyResults[1].id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          progress: 0.5
+        })
+        .expect(HttpStatus.OK);
+
+      return request(app.getHttpServer())
+        .get(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.keyResults).toHaveLength(3);
+          expect(body.keyResults[0].id).toEqual(okrResponse.body.keyResults[0].id);
+          expect(body.keyResults[0].title).toEqual("My Key Result 1");
+          expect(body.keyResults[0].progress).toEqual(0.5);
+          expect(body.keyResults[1].id).toEqual(okrResponse.body.keyResults[1].id);
+          expect(body.keyResults[1].title).toEqual("My Key Result 2");
+          expect(body.keyResults[1].progress).toEqual(0.5);
+          expect(body.keyResults[2].id).toEqual(okrResponse.body.keyResults[2].id);
+          expect(body.keyResults[2].title).toEqual("My Key Result 3");
+          expect(body.keyResults[2].progress).toEqual(0);
+          expect(body.objective.progress).toEqual(0.33);
+        });
+    });
+  });
 });
