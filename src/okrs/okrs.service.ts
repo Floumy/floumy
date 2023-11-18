@@ -57,6 +57,7 @@ export class OkrsService {
     );
     if (!okrDto.keyResults || okrDto.keyResults.length === 0) return;
     await this.updateKeyResults(id, okrDto.keyResults);
+
   }
 
   async delete(orgId: string, id: string) {
@@ -81,6 +82,7 @@ export class OkrsService {
     const existingKeyResults = await objective.keyResults;
     await this.deleteKeyResultsThatAreNotInTheList(existingKeyResults, notEmptyKeyResults);
     await this.updateOrCreateKeyResults(objective, notEmptyKeyResults);
+    await this.updateObjectiveProgress(await this.objectiveRepository.findOneByOrFail({ id }));
   }
 
   private async updateOrCreateKeyResults(objective: Objective, keyResults: { id?: string; title: string }[]) {

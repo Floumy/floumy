@@ -5,7 +5,7 @@ interface ObjectiveDto {
 
 interface CreateOrUpdateOKRDto {
   objective: ObjectiveDto;
-  keyResults?: { title: string }[];
+  keyResults?: { id?: string, title: string }[];
 }
 
 interface UpdateKeyResultDto {

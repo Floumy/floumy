@@ -201,6 +201,40 @@ describe("OkrsService", () => {
       expect(storedObjective.keyResults[1].title).toEqual("Updated KR 2");
       expect(storedObjective.keyResults[2].title).toEqual("Updated KR 3");
     });
+    it("should update objective progress", async () => {
+      const org = await createTestOrg();
+      const okr = await service.create(
+        org.id,
+        {
+          objective: {
+            title: "Test Objective",
+            description: "Test Objective Description"
+          },
+          keyResults: [
+            { title: "KR 1" },
+            { title: "KR 2" },
+            { title: "KR 3" }
+          ]
+        }
+      );
+      await service.updateKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { progress: 0.5 });
+      await service.updateKeyResult(org.id, okr.objective.id, okr.keyResults[1].id, { progress: 0.5 });
+      await service.updateKeyResult(org.id, okr.objective.id, okr.keyResults[2].id, { progress: 0.5 });
+      await service.update(org.id, okr.objective.id, {
+        objective: {
+          title: "Updated Objective",
+          description: "Updated Objective Description"
+        },
+        keyResults: [
+          { id: okr.keyResults[0].id, title: "Updated KR 1" },
+          { id: okr.keyResults[1].id, title: "Updated KR 2" },
+          { title: "New KR 4" },
+          { title: "New KR 5" }
+        ]
+      });
+      const storedOkr = await service.get(org.id, okr.objective.id);
+      expect(storedOkr.objective.progress).toEqual(0.25);
+    });
   });
 
   describe("when deleting an objective", () => {
