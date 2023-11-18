@@ -325,5 +325,73 @@ describe("OKRsController (e2e)", () => {
           expect(body.objective.progress).toEqual(0.33);
         });
     });
+    it("should update the status of a key result", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            { title: "My Key Result 1" },
+            { title: "My Key Result 2" },
+            { title: "My Key Result 3" }
+          ]
+        });
+
+      await request(app.getHttpServer())
+        .patch(`/okrs/${okrResponse.body.objective.id}/key-results/${okrResponse.body.keyResults[0].id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          status: "off-track"
+        })
+        .expect(HttpStatus.OK);
+
+      return request(app.getHttpServer())
+        .get(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          body.keyResults
+            .filter(keyResult => keyResult.id === okrResponse.body.keyResults[0].id)
+            .forEach(keyResult => {
+              expect(keyResult.status).toEqual("off-track");
+            });
+        });
+    });
+    it("should update the status of the objective", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            { title: "My Key Result 1" },
+            { title: "My Key Result 2" },
+            { title: "My Key Result 3" }
+          ]
+        });
+
+      await request(app.getHttpServer())
+        .patch(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          status: "off-track"
+        })
+        .expect(HttpStatus.OK);
+
+      return request(app.getHttpServer())
+        .get(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.objective.status).toEqual("off-track");
+        });
+    });
   });
 });

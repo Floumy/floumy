@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Objective } from "./objective.entity";
+import { OKRStatus } from "./OKRStatus.enum";
 
 @Entity()
 export class KeyResult {
@@ -9,6 +10,12 @@ export class KeyResult {
   title: string;
   @Column({ default: 0, type: "float" })
   progress: number;
+  @Column({
+    type: "enum",
+    enum: OKRStatus,
+    default: OKRStatus.ON_TRACK
+  })
+  status: OKRStatus;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

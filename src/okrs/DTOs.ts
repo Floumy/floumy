@@ -8,6 +8,11 @@ interface CreateOrUpdateOKRDto {
   keyResults?: { id?: string, title: string }[];
 }
 
-interface UpdateKeyResultDto {
+interface PatchKeyResultDto {
   progress?: number;
+  status?: string;
+}
+
+interface PatchObjectiveDto {
+  status?: string;
 }
