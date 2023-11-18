@@ -34,8 +34,7 @@ export class UsersService {
 
   async isPasswordCorrect(password: string, hash: string) {
     try {
-      await bcrypt.compare(password, hash);
-      return true;
+      return await bcrypt.compare(password, hash);
     } catch (e) {
       return false;
     }
