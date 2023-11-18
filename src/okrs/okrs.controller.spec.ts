@@ -102,6 +102,7 @@ describe("OkrsController", () => {
       });
       expect(okrs.length).toEqual(1);
       expect(okrs[0].title).toEqual("My OKR");
+      expect(okrs[0].status).toEqual("on-track");
       expect(okrs[0].createdAt).toBeDefined();
       expect(okrs[0].updatedAt).toBeDefined();
     });
@@ -333,7 +334,7 @@ describe("OkrsController", () => {
             { title: "My key result 3" }
           ]
         });
-      await controller.updateKeyResult(
+      await controller.patchKeyResult(
         okr.objective.id,
         okr.keyResults[0].id,
         {
@@ -372,7 +373,7 @@ describe("OkrsController", () => {
             { title: "My key result 3" }
           ]
         });
-      await expect(controller.updateKeyResult(
+      await expect(controller.patchKeyResult(
         okr.objective.id,
         okr.keyResults[0].id,
         {
@@ -402,7 +403,7 @@ describe("OkrsController", () => {
             { title: "My key result 3" }
           ]
         });
-      await controller.updateKeyResult(
+      await controller.patchKeyResult(
         okr.objective.id,
         okr.keyResults[0].id,
         {
@@ -421,6 +422,84 @@ describe("OkrsController", () => {
           }
         });
       expect(okr2.objective.progress).toEqual(0.17);
+    });
+    it("should update the key result status", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            { title: "My key result" },
+            { title: "My key result 2" },
+            { title: "My key result 3" }
+          ]
+        });
+      await controller.patchKeyResult(
+        okr.objective.id,
+        okr.keyResults[0].id,
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          status: "off-track"
+        });
+      const okr2 = await controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(okr2.keyResults[0].status).toEqual("off-track");
+    });
+  });
+
+  describe("when updating the Objective Progress", () => {
+    it("should update the Objective Progress", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            description: "My OKR description"
+          },
+          keyResults: [
+            { title: "My key result" },
+            { title: "My key result 2" },
+            { title: "My key result 3" }
+          ]
+        });
+      await controller.patchObjective(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          status: "off-track"
+        });
+      const okr2 = await controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(okr2.objective.status).toEqual("off-track");
     });
   });
 });

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -64,18 +65,37 @@ export class OkrsController {
 
   @Patch(":objectiveId/key-results/:keyResultId")
   @HttpCode(HttpStatus.OK)
-  async updateKeyResult(
+  async patchKeyResult(
     @Param("objectiveId") objectiveId: string,
     @Param("keyResultId") keyResultId: string,
     @Request() request,
-    @Body() updateKeyResultDto: UpdateKeyResultDto
+    @Body() updateKeyResultDto: PatchKeyResultDto
   ) {
     const { org: orgId } = request.user;
-    return await this.okrsService.updateKeyResult(
+    try {
+      return await this.okrsService.patchKeyResult(
+        orgId,
+        objectiveId,
+        keyResultId,
+        updateKeyResultDto
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Patch(":objectiveId")
+  @HttpCode(HttpStatus.OK)
+  async patchObjective(
+    @Param("objectiveId") objectiveId: string,
+    @Request() request,
+    @Body() updateObjectiveDto: PatchObjectiveDto
+  ) {
+    const { org: orgId } = request.user;
+    return await this.okrsService.patchObjective(
       orgId,
       objectiveId,
-      keyResultId,
-      updateKeyResultDto
+      updateObjectiveDto
     );
   }
 }

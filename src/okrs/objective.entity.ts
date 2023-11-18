@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Org } from "../orgs/org.entity";
 import { KeyResult } from "./key-result.entity";
+import { OKRStatus } from "./OKRStatus.enum";
 
 @Entity()
 export class Objective {
@@ -20,6 +21,12 @@ export class Objective {
   description: string;
   @Column({ default: 0, type: "float" })
   progress: number;
+  @Column({
+    type: "enum",
+    enum: OKRStatus,
+    default: OKRStatus.ON_TRACK
+  })
+  status: OKRStatus;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

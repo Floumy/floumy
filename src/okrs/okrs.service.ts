@@ -5,6 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { OrgsService } from "../orgs/orgs.service";
 import { KeyResult } from "./key-result.entity";
 import { KeyResultMapper, OKRMapper } from "./mappers";
+import { OKRStatus } from "./OKRStatus.enum";
 
 @Injectable()
 export class OkrsService {
@@ -109,14 +110,22 @@ export class OkrsService {
     await this.objectiveRepository.save(objective);
   }
 
-  async updateKeyResult(orgId: any, objectiveId: string, keyResultId: string, updateKeyResultDto: UpdateKeyResultDto) {
+  async patchKeyResult(orgId: any, objectiveId: string, keyResultId: string, updateKeyResultDto: PatchKeyResultDto) {
     const keyResult = await this.keyResultRepository.findOneByOrFail({ id: keyResultId, objective: { id: objectiveId, org: { id: orgId } } });
     if (updateKeyResultDto.progress) {
       keyResult.progress = updateKeyResultDto.progress;
+      const savedKeyResult = await this.keyResultRepository.save(keyResult);
+      await this.updateObjectiveProgress(await keyResult.objective);
+      return KeyResultMapper.toDTO(savedKeyResult);
     }
-    const savedKeyResult = await this.keyResultRepository.save(keyResult);
-    await this.updateObjectiveProgress(await keyResult.objective);
-    return KeyResultMapper.toDTO(savedKeyResult);
+
+    if (updateKeyResultDto.status) {
+      keyResult.status = Object.values(OKRStatus).find(status => status === updateKeyResultDto.status);
+      const savedKeyResult = await this.keyResultRepository.save(keyResult);
+      return KeyResultMapper.toDTO(savedKeyResult);
+    }
+
+    throw new Error("Invalid patch key result dto");
   }
 
   async getKeyResult(id: string) {
@@ -125,5 +134,13 @@ export class OkrsService {
 
   async getObjective(id: string) {
     return await this.objectiveRepository.findOneByOrFail({ id });
+  }
+
+  async patchObjective(orgId: any, objectiveId: string, updateObjectiveDto: PatchObjectiveDto) {
+    const status = Object.values(OKRStatus).find(status => status === updateObjectiveDto.status);
+    return await this.objectiveRepository.update(
+      { id: objectiveId, org: { id: orgId } },
+      { status }
+    );
   }
 }
