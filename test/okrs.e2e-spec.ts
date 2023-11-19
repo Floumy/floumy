@@ -48,14 +48,12 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           }
         })
         .expect(HttpStatus.CREATED)
         .expect(({ body }) => {
           expect(body.objective.id).toBeDefined();
           expect(body.objective.title).toEqual("My OKR");
-          expect(body.objective.description).toEqual("My OKR description");
         });
     });
     it("should allow creating multiple key results", async () => {
@@ -65,7 +63,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -76,7 +73,6 @@ describe("OKRsController (e2e)", () => {
         .expect(({ body }) => {
           expect(body.objective.id).toBeDefined();
           expect(body.objective.title).toEqual("My OKR");
-          expect(body.objective.description).toEqual("My OKR description");
           expect(body.keyResults).toHaveLength(2);
           expect(body.keyResults[0].id).toBeDefined();
           expect(body.keyResults[0].title).toEqual("My Key Result 1");
@@ -104,7 +100,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           }
         });
 
@@ -130,7 +125,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           }
         });
 
@@ -141,7 +135,6 @@ describe("OKRsController (e2e)", () => {
         .expect(({ body }) => {
           expect(body.objective.id).toEqual(okrResponse.body.objective.id);
           expect(body.objective.title).toEqual("My OKR");
-          expect(body.objective.description).toEqual("My OKR description");
           expect(body.objective.createdAt).toBeDefined();
           expect(body.objective.updatedAt).toBeDefined();
         });
@@ -161,7 +154,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -176,7 +168,6 @@ describe("OKRsController (e2e)", () => {
         .expect(({ body }) => {
           expect(body.objective.id).toEqual(okrResponse.body.objective.id);
           expect(body.objective.title).toEqual("My OKR");
-          expect(body.objective.description).toEqual("My OKR description");
           expect(body.objective.createdAt).toBeDefined();
           expect(body.objective.updatedAt).toBeDefined();
           expect(body.keyResults).toHaveLength(2);
@@ -196,7 +187,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           }
         });
 
@@ -206,7 +196,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My Other OKR",
-            description: "My Other OKR description"
           }
         })
         .expect(HttpStatus.OK);
@@ -219,7 +208,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -234,7 +222,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My Other OKR",
-            description: "My Other OKR description"
           },
           keyResults: [
             { id: okrResponse.body.keyResults[0].id, title: "My Other Key Result 1" },
@@ -251,7 +238,6 @@ describe("OKRsController (e2e)", () => {
         .expect(({ body }) => {
           expect(body.objective.id).toEqual(okrResponse.body.objective.id);
           expect(body.objective.title).toEqual("My Other OKR");
-          expect(body.objective.description).toEqual("My Other OKR description");
           expect(body.objective.createdAt).toBeDefined();
           expect(body.objective.updatedAt).toBeDefined();
           expect(body.keyResults).toHaveLength(3);
@@ -273,7 +259,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           }
         });
 
@@ -292,7 +277,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -332,7 +316,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -368,7 +351,6 @@ describe("OKRsController (e2e)", () => {
         .send({
           objective: {
             title: "My OKR",
-            description: "My OKR description"
           },
           keyResults: [
             { title: "My Key Result 1" },

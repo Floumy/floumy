@@ -7,7 +7,6 @@ export class OKRMapper {
       objective: {
         id: objective.id,
         title: objective.title,
-        description: objective.description,
         progress: parseFloat(objective.progress?.toFixed(2)),
         createdAt: objective.createdAt,
         updatedAt: objective.updatedAt,

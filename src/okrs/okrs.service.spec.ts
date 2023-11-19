@@ -40,8 +40,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective",
-        "Test Objective Description"
+        "Test Objective"
       );
       expect(objective).toBeDefined();
       expect(objective.id).toBeDefined();
@@ -52,13 +51,11 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective",
-        "Test Objective Description"
+        "Test Objective"
       );
       const storedObjective = await service.findObjectiveById(objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.title).toEqual(objective.title);
-      expect(storedObjective.description).toEqual(objective.description);
       expect(storedObjective.createdAt).toEqual(objective.createdAt);
       expect(storedObjective.updatedAt).toEqual(objective.updatedAt);
     });
@@ -67,8 +64,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       await expect(service.createObjective(
         org.id,
-        "",
-        "Test Objective Description"
+        ""
       )).rejects.toThrow();
     });
 
@@ -89,13 +85,11 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective",
-        bigHtmlDescription
+        "Test Objective"
       );
       const storedObjective = await service.findObjectiveById(objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.title).toEqual(objective.title);
-      expect(storedObjective.description).toEqual(objective.description);
       expect(storedObjective.createdAt).toEqual(objective.createdAt);
       expect(storedObjective.updatedAt).toEqual(objective.updatedAt);
     });
@@ -104,8 +98,7 @@ describe("OkrsService", () => {
       const testOrg = await createTestOrg();
       const objective = await service.createObjective(
         testOrg.id,
-        "Test Objective",
-        "Test Objective Description"
+        "Test Objective"
       );
       const storedObjective = await service.findObjectiveById(objective.id);
       const org = await storedObjective.org;
@@ -124,8 +117,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       await service.createObjective(
         org.id,
-        "Test Objective",
-        "Test Objective Description"
+        "Test Objective"
       );
       const objectives = await service.list(org.id);
       expect(objectives).toHaveLength(1);
@@ -138,13 +130,11 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective",
-        "Test Objective Description"
+        "Test Objective"
       );
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual(objective.title);
-      expect(storedObjective.objective.description).toEqual(objective.description);
       expect(storedObjective.objective.createdAt).toEqual(objective.createdAt);
       expect(storedObjective.objective.updatedAt).toEqual(objective.updatedAt);
     });
@@ -155,8 +145,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective",
-        "Test Objective Description"
+        "Test Objective"
       );
       const okrDto = {
         objective: {
@@ -168,7 +157,6 @@ describe("OkrsService", () => {
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual("Updated Objective");
-      expect(storedObjective.objective.description).toEqual("Updated Objective Description");
     });
   });
 
@@ -178,7 +166,6 @@ describe("OkrsService", () => {
       const objective = await service.createObjective(
         org.id,
         "Test Objective",
-        "Test Objective Description"
       );
       const okrDto = {
         objective: {
@@ -195,7 +182,6 @@ describe("OkrsService", () => {
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual("Updated Objective");
-      expect(storedObjective.objective.description).toEqual("Updated Objective Description");
       expect(storedObjective.keyResults).toHaveLength(3);
       expect(storedObjective.keyResults[0].title).toEqual("Updated KR 1");
       expect(storedObjective.keyResults[1].title).toEqual("Updated KR 2");
@@ -207,8 +193,7 @@ describe("OkrsService", () => {
         org.id,
         {
           objective: {
-            title: "Test Objective",
-            description: "Test Objective Description"
+            title: "Test Objective"
           },
           keyResults: [
             { title: "KR 1" },
@@ -222,8 +207,7 @@ describe("OkrsService", () => {
       await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[2].id, { progress: 0.5 });
       await service.update(org.id, okr.objective.id, {
         objective: {
-          title: "Updated Objective",
-          description: "Updated Objective Description"
+          title: "Updated Objective"
         },
         keyResults: [
           { id: okr.keyResults[0].id, title: "Updated KR 1" },
@@ -242,8 +226,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective",
-        "Test Objective Description"
+        "Test Objective"
       );
       await service.delete(org.id, objective.id);
       await expect(service.get(org.id, objective.id)).rejects.toThrow();
@@ -252,8 +235,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective",
-        "Test Objective Description"
+        "Test Objective"
       );
       await service.createKeyResult(objective, "Test Key Result");
       await service.delete(org.id, objective.id);
@@ -266,8 +248,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const okr = await service.create(org.id, {
         objective: {
-          title: "My OKR",
-          description: "My OKR description"
+          title: "My OKR"
         },
         keyResults: [
           { title: "My KR 1" },
@@ -280,7 +261,6 @@ describe("OkrsService", () => {
       expect(okr.objective.createdAt).toBeDefined();
       expect(okr.objective.updatedAt).toBeDefined();
       expect(okr.objective.title).toEqual("My OKR");
-      expect(okr.objective.description).toEqual("My OKR description");
       expect(okr.keyResults).toHaveLength(3);
     });
 
@@ -288,8 +268,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const okr = await service.create(org.id, {
         objective: {
-          title: "My OKR",
-          description: "My OKR description"
+          title: "My OKR"
         },
         keyResults: [
           { title: "My KR 1" },
@@ -300,7 +279,6 @@ describe("OkrsService", () => {
       const storedObjective = await service.get(org.id, okr.objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual(okr.objective.title);
-      expect(storedObjective.objective.description).toEqual(okr.objective.description);
       expect(storedObjective.objective.createdAt).toEqual(okr.objective.createdAt);
       expect(storedObjective.objective.updatedAt).toEqual(okr.objective.updatedAt);
       expect(okr.keyResults).toHaveLength(3);
@@ -323,8 +301,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const okr = await service.create(org.id, {
         objective: {
-          title: "My OKR",
-          description: "My OKR description"
+          title: "My OKR"
         },
         keyResults: [
           { title: "My KR 1" },
@@ -340,8 +317,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const okr = await service.create(org.id, {
         objective: {
-          title: "My OKR",
-          description: "My OKR description"
+          title: "My OKR"
         },
         keyResults: [
           { title: "My KR 1" },
@@ -361,8 +337,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const okr = await service.create(org.id, {
         objective: {
-          title: "My OKR",
-          description: "My OKR description"
+          title: "My OKR"
         },
         keyResults: [
           { title: "My KR 1" },
@@ -380,8 +355,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const okr = await service.create(org.id, {
         objective: {
-          title: "My OKR",
-          description: "My OKR description"
+          title: "My OKR"
         },
         keyResults: [
           { title: "My KR 1" },
