@@ -17,8 +17,6 @@ export class Objective {
   id: string;
   @Column()
   title: string;
-  @Column()
-  description: string;
   @Column({ default: 0, type: "float" })
   progress: number;
   @Column({

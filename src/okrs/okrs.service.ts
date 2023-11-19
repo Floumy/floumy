@@ -17,13 +17,12 @@ export class OkrsService {
               private orgsService: OrgsService) {
   }
 
-  async createObjective(orgId: string, title: string, description: string) {
+  async createObjective(orgId: string, title: string) {
     if (!title) throw new Error("Objective title is required");
     const org = await this.orgsService.findOneById(orgId);
     if (!org) throw new Error("Organization not found");
     const objectiveEntity = new Objective();
     objectiveEntity.title = title;
-    objectiveEntity.description = description;
     objectiveEntity.org = Promise.resolve(org);
     return await this.objectiveRepository.save(objectiveEntity);
   }
@@ -54,7 +53,7 @@ export class OkrsService {
   async update(orgId: string, id: string, okrDto: CreateOrUpdateOKRDto) {
     await this.objectiveRepository.update(
       { id, org: { id: orgId } },
-      { title: okrDto.objective.title, description: okrDto.objective.description }
+      { title: okrDto.objective.title }
     );
     if (okrDto.keyResults && okrDto.keyResults.length > 0) {
       await this.updateKeyResults(id, okrDto.keyResults);
@@ -68,7 +67,7 @@ export class OkrsService {
   }
 
   async create(orgId: string, okrDto: CreateOrUpdateOKRDto) {
-    const objective = await this.createObjective(orgId, okrDto.objective.title, okrDto.objective.description);
+    const objective = await this.createObjective(orgId, okrDto.objective.title);
     if (!okrDto.keyResults || okrDto.keyResults.length === 0) return { objective, keyResults: [] };
 
     const keyResults = await Promise.all(okrDto.keyResults.map(keyResult => this.createKeyResult(objective, keyResult.title)));

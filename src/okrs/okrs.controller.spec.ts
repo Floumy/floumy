@@ -49,12 +49,10 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           }
         });
       expect(okr.objective.title).toEqual("My OKR");
-      expect(okr.objective.description).toEqual("My OKR description");
     });
     it("should validate the OKR", async () => {
       const org = await createTestOrg();
@@ -65,8 +63,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "",
-            description: "My OKR description"
+            title: ""
           }
         })).rejects.toThrow();
     });
@@ -91,8 +88,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           }
         });
       const okrs = await controller.list({
@@ -118,8 +114,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           }
         });
       const okr2 = await controller.get(okr.objective.id,
@@ -129,7 +124,6 @@ describe("OkrsController", () => {
           }
         });
       expect(okr2.objective.title).toEqual("My OKR");
-      expect(okr2.objective.description).toEqual("My OKR description");
     });
   });
 
@@ -143,8 +137,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           }
         });
       await controller.update(
@@ -156,8 +149,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR 2",
-            description: "My OKR description 2"
+            title: "My OKR 2"
           }
         });
       const okr2 = await controller.get(
@@ -168,7 +160,6 @@ describe("OkrsController", () => {
           }
         });
       expect(okr2.objective.title).toEqual("My OKR 2");
-      expect(okr2.objective.description).toEqual("My OKR description 2");
     });
 
     it("should update the OKR and its key results", async () => {
@@ -180,8 +171,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           },
           keyResults: [
             { title: "My key result" },
@@ -198,8 +188,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR 2",
-            description: "My OKR description 2"
+            title: "My OKR 2"
           },
           keyResults: [
             { title: "My key result 4" },
@@ -215,7 +204,6 @@ describe("OkrsController", () => {
           }
         });
       expect(okr2.objective.title).toEqual("My OKR 2");
-      expect(okr2.objective.description).toEqual("My OKR description 2");
       expect(okr2.keyResults.length).toEqual(3);
       expect(okr2.keyResults[0].title).toEqual("My key result 4");
       expect(okr2.keyResults[1].title).toEqual("My key result 5");
@@ -233,8 +221,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           }
         });
       await controller.delete(
@@ -262,8 +249,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           },
           keyResults: [
             { title: "My key result" },
@@ -299,8 +285,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           },
           keyResults: [
             { title: "My key result" },
@@ -325,8 +310,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           },
           keyResults: [
             { title: "My key result" },
@@ -364,8 +348,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           },
           keyResults: [
             { title: "My key result" },
@@ -394,8 +377,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           },
           keyResults: [
             { title: "My key result" },
@@ -432,8 +414,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           },
           keyResults: [
             { title: "My key result" },
@@ -473,8 +454,7 @@ describe("OkrsController", () => {
         },
         {
           objective: {
-            title: "My OKR",
-            description: "My OKR description"
+            title: "My OKR"
           },
           keyResults: [
             { title: "My key result" },

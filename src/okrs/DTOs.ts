@@ -1,6 +1,5 @@
 interface ObjectiveDto {
   title: string;
-  description: string;
 }
 
 interface CreateOrUpdateOKRDto {
