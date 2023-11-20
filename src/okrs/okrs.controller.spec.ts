@@ -67,6 +67,35 @@ describe("OkrsController", () => {
           }
         })).rejects.toThrow();
     });
+    it("should validate the timeline when it exists", async () => {
+      const org = await createTestOrg();
+      await expect(controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            timeline: "invalid"
+          }
+        })).rejects.toThrow();
+    });
+    it("should store the timeline when it exists", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR",
+            timeline: "this-quarter"
+          }
+        });
+      expect(okr.objective.timeline).toEqual("this-quarter");
+    });
   });
 
   describe("when listing OKRs", () => {

@@ -25,6 +25,10 @@ export class Objective {
     default: OKRStatus.ON_TRACK
   })
   status: OKRStatus;
+  @Column({ nullable: true })
+  startDate: Date;
+  @Column({ nullable: true })
+  endDate: Date;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

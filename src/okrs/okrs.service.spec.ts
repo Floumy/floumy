@@ -40,7 +40,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective"
+        { title: "Test Objective" }
       );
       expect(objective).toBeDefined();
       expect(objective.id).toBeDefined();
@@ -51,7 +51,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective"
+        { title: "Test Objective" }
       );
       const storedObjective = await service.findObjectiveById(objective.id);
       expect(storedObjective).toBeDefined();
@@ -64,46 +64,28 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       await expect(service.createObjective(
         org.id,
-        ""
+        { title: "" }
       )).rejects.toThrow();
-    });
-
-    it("should be able to store a big html description", async () => {
-      const bigHtmlDescription = "<h1>Test Objective Description</h1>" +
-        "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-        "Suspendisse in ipsum ut neque rutrum aliquet. " +
-        "Donec auctor, dolor vitae facilisis lacinia, " +
-        "nunc libero ultricies velit, id lacinia elit mi sed ipsum. " +
-        "Aliquam erat volutpat. Duis sed ipsum eget enim " +
-        "tincidunt aliquam. Nulla facilisi. " +
-        "Sed sit amet diam sit amet lorem ultricies vestibulum. " +
-        "Nulla facilisi. In hac habitasse platea dictumst. " +
-        "Nullam aliquam, eros vitae aliquet ultricies, " +
-        "nisl massa tincidunt velit, eu viverra ipsum nisi " +
-        "et quam. Donec auctor, dolor vitae facilisis lacinia, " +
-        "nunc libero ultricies velit, id lacinia elit mi sed ipsum. ";
-      const org = await createTestOrg();
-      const objective = await service.createObjective(
-        org.id,
-        "Test Objective"
-      );
-      const storedObjective = await service.findObjectiveById(objective.id);
-      expect(storedObjective).toBeDefined();
-      expect(storedObjective.title).toEqual(objective.title);
-      expect(storedObjective.createdAt).toEqual(objective.createdAt);
-      expect(storedObjective.updatedAt).toEqual(objective.updatedAt);
     });
 
     it("should assign the objective to the org", async () => {
       const testOrg = await createTestOrg();
       const objective = await service.createObjective(
         testOrg.id,
-        "Test Objective"
+        { title: "Test Objective" }
       );
       const storedObjective = await service.findObjectiveById(objective.id);
       const org = await storedObjective.org;
       expect(org).not.toBeNull();
       expect(org.id).toEqual(testOrg.id);
+    });
+
+    it("should validate the timeline", async () => {
+      const org = await createTestOrg();
+      await expect(service.createObjective(
+        org.id,
+        { title: "Test Objective", timeline: "invalid" }
+      )).rejects.toThrow();
     });
   });
 
@@ -117,7 +99,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       await service.createObjective(
         org.id,
-        "Test Objective"
+        { title: "Test Objective" }
       );
       const objectives = await service.list(org.id);
       expect(objectives).toHaveLength(1);
@@ -130,7 +112,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective"
+        { title: "Test Objective" }
       );
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
@@ -145,7 +127,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective"
+        { title: "Test Objective" }
       );
       const okrDto = {
         objective: {
@@ -165,7 +147,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective",
+        { title: "Test Objective" }
       );
       const okrDto = {
         objective: {
@@ -226,7 +208,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective"
+        { title: "Test Objective" }
       );
       await service.delete(org.id, objective.id);
       await expect(service.get(org.id, objective.id)).rejects.toThrow();
@@ -235,7 +217,7 @@ describe("OkrsService", () => {
       const org = await createTestOrg();
       const objective = await service.createObjective(
         org.id,
-        "Test Objective"
+        { title: "Test Objective" }
       );
       await service.createKeyResult(objective, "Test Key Result");
       await service.delete(org.id, objective.id);

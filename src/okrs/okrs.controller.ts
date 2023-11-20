@@ -28,7 +28,11 @@ export class OkrsController {
   @HttpCode(HttpStatus.CREATED)
   async create(@Request() request, @Body() okrDto: CreateOrUpdateOKRDto) {
     const { org: orgId } = request.user;
-    return await this.okrsService.create(orgId, okrDto);
+    try {
+      return await this.okrsService.create(orgId, okrDto);
+    } catch (e) {
+      throw new BadRequestException();
+    }
   }
 
   @Get()
