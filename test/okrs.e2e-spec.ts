@@ -47,7 +47,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           }
         })
         .expect(HttpStatus.CREATED)
@@ -62,7 +62,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -78,6 +78,23 @@ describe("OKRsController (e2e)", () => {
           expect(body.keyResults[0].title).toEqual("My Key Result 1");
           expect(body.keyResults[1].id).toBeDefined();
           expect(body.keyResults[1].title).toEqual("My Key Result 2");
+        });
+    });
+    it("should allow creating an objective with a timeline", async () => {
+      return request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR",
+            timeline: "this-quarter"
+          }
+        })
+        .expect(HttpStatus.CREATED)
+        .expect(({ body }) => {
+          expect(body.objective.id).toBeDefined();
+          expect(body.objective.title).toEqual("My OKR");
+          expect(body.objective.timeline).toEqual("this-quarter");
         });
     });
   });
@@ -99,7 +116,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           }
         });
 
@@ -124,7 +141,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           }
         });
 
@@ -153,7 +170,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -186,7 +203,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           }
         });
 
@@ -195,7 +212,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My Other OKR",
+            title: "My Other OKR"
           }
         })
         .expect(HttpStatus.OK);
@@ -207,7 +224,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -221,7 +238,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My Other OKR",
+            title: "My Other OKR"
           },
           keyResults: [
             { id: okrResponse.body.keyResults[0].id, title: "My Other Key Result 1" },
@@ -258,7 +275,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           }
         });
 
@@ -276,7 +293,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -315,7 +332,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           },
           keyResults: [
             { title: "My Key Result 1" },
@@ -350,7 +367,7 @@ describe("OKRsController (e2e)", () => {
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           objective: {
-            title: "My OKR",
+            title: "My OKR"
           },
           keyResults: [
             { title: "My Key Result 1" },

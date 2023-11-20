@@ -6,6 +6,7 @@ import { OrgsService } from "../orgs/orgs.service";
 import { KeyResult } from "./key-result.entity";
 import { KeyResultMapper, OKRMapper } from "./mappers";
 import { OKRStatus } from "./OKRStatus.enum";
+import { Timeline } from "./OKRTimeline.enum";
 
 @Injectable()
 export class OkrsService {
@@ -17,14 +18,45 @@ export class OkrsService {
               private orgsService: OrgsService) {
   }
 
-  async createObjective(orgId: string, title: string) {
-    if (!title) throw new Error("Objective title is required");
+  async createObjective(orgId: string, objective: ObjectiveDto) {
+    if (!objective.title) throw new Error("Objective title is required");
     const org = await this.orgsService.findOneById(orgId);
     if (!org) throw new Error("Organization not found");
     const objectiveEntity = new Objective();
-    objectiveEntity.title = title;
+    objectiveEntity.title = objective.title;
     objectiveEntity.org = Promise.resolve(org);
+    if (objective.timeline) {
+      const { startDate, endDate } = this.getObjectiveDatesByTimeline(objective.timeline);
+      objectiveEntity.startDate = startDate;
+      objectiveEntity.endDate = endDate;
+    }
     return await this.objectiveRepository.save(objectiveEntity);
+  }
+
+  private getObjectiveDatesByTimeline(timeline: string) {
+    this.validateTimeline(timeline);
+    const currentQuarter = this.getCurrentQuarter();
+    if (timeline === Timeline.THIS_QUARTER.valueOf()) {
+      return this.calculateQuarterDates(currentQuarter);
+    }
+    if (timeline === Timeline.NEXT_QUARTER.valueOf()) {
+      return this.calculateQuarterDates(currentQuarter + 1);
+    }
+    return {
+      startDate: null,
+      endDate: null
+    };
+  }
+
+  private getCurrentQuarter() {
+    return Math.floor((new Date().getMonth() + 3) / 3);
+  }
+
+  private calculateQuarterDates(quarter: number) {
+    return {
+      startDate: new Date(new Date().getFullYear(), 3 * quarter - 3, 1),
+      endDate: new Date(new Date().getFullYear(), 3 * quarter, 0)
+    };
   }
 
   async createKeyResult(objective: Objective, title: string) {
@@ -67,15 +99,21 @@ export class OkrsService {
   }
 
   async create(orgId: string, okrDto: CreateOrUpdateOKRDto) {
-    const objective = await this.createObjective(orgId, okrDto.objective.title);
-    if (!okrDto.keyResults || okrDto.keyResults.length === 0) return { objective, keyResults: [] };
+    if (okrDto.objective.timeline) {
+      this.validateTimeline(okrDto.objective.timeline);
+    }
+    const objective = await this.createObjective(orgId, okrDto.objective);
+    if (!okrDto.keyResults || okrDto.keyResults.length === 0) return OKRMapper.toDTO(objective, []);
 
     const keyResults = await Promise.all(okrDto.keyResults.map(keyResult => this.createKeyResult(objective, keyResult.title)));
 
-    return { objective, keyResults };
+    return OKRMapper.toDTO(objective, keyResults);
   }
 
-  private async updateKeyResults(id: string, keyResults: { id?: string, title: string }[]) {
+  private async updateKeyResults(id: string, keyResults: {
+    id?: string,
+    title: string
+  }[]) {
     const objective = await this.objectiveRepository.findOneByOrFail({ id });
     const notEmptyKeyResults = keyResults
       .filter(keyResult =>
@@ -85,7 +123,10 @@ export class OkrsService {
     await this.updateOrCreateKeyResults(objective, notEmptyKeyResults);
   }
 
-  private async updateOrCreateKeyResults(objective: Objective, keyResults: { id?: string; title: string }[]) {
+  private async updateOrCreateKeyResults(objective: Objective, keyResults: {
+    id?: string;
+    title: string
+  }[]) {
     for (const keyResult of keyResults) {
       if (keyResult.id) {
         await this.keyResultRepository.update({ id: keyResult.id }, { title: keyResult.title });
@@ -95,7 +136,10 @@ export class OkrsService {
     }
   }
 
-  private async deleteKeyResultsThatAreNotInTheList(existingKeyResults: KeyResult[], keyResults: { id?: string; title: string }[]) {
+  private async deleteKeyResultsThatAreNotInTheList(existingKeyResults: KeyResult[], keyResults: {
+    id?: string;
+    title: string
+  }[]) {
     for (const existingKeyResult of existingKeyResults) {
       if (!keyResults.find(keyResult => keyResult.id === existingKeyResult.id)) {
         await this.keyResultRepository.delete({ id: existingKeyResult.id });
@@ -141,5 +185,11 @@ export class OkrsService {
       { id: objectiveId, org: { id: orgId } },
       { status }
     );
+  }
+
+  private validateTimeline(timeline: string) {
+    if (!Object.values(Timeline).find(t => t === timeline)) {
+      throw new Error("Invalid timeline");
+    }
   }
 }
