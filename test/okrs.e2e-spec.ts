@@ -266,6 +266,40 @@ describe("OKRsController (e2e)", () => {
           expect(body.keyResults[2].title).toEqual("My Other Key Result 3");
         });
     });
+
+    it("should update the objective with a timeline", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR"
+          }
+        });
+
+      await request(app.getHttpServer())
+        .put(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My Other OKR",
+            timeline: "next-quarter"
+          }
+        })
+        .expect(HttpStatus.OK);
+
+      return request(app.getHttpServer())
+        .get(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.objective.id).toEqual(okrResponse.body.objective.id);
+          expect(body.objective.title).toEqual("My Other OKR");
+          expect(body.objective.timeline).toEqual("next-quarter");
+          expect(body.objective.createdAt).toBeDefined();
+          expect(body.objective.updatedAt).toBeDefined();
+        });
+    });
   });
 
   describe("OKR (DELETE)", () => {
