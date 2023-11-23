@@ -238,6 +238,41 @@ describe("OkrsController", () => {
       expect(okr2.keyResults[1].title).toEqual("My key result 5");
       expect(okr2.keyResults[2].title).toEqual("My key result 6");
     });
+
+    it("should update the timeline when it exists", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR"
+          }
+        });
+      await controller.update(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR 2",
+            timeline: "this-quarter"
+          }
+        });
+      const okr2 = await controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(okr2.objective.timeline).toEqual("this-quarter");
+    });
   });
 
   describe("when deleting an OKR", () => {

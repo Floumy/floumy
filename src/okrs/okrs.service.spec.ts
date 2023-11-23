@@ -140,6 +140,24 @@ describe("OkrsService", () => {
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual("Updated Objective");
     });
+    it("should update objective timeline", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        { title: "Test Objective" }
+      );
+      const okrDto = {
+        objective: {
+          title: "Updated Objective",
+          description: "Updated Objective Description",
+          timeline: "this-quarter"
+        }
+      };
+      await service.update(org.id, objective.id, okrDto);
+      const storedObjective = await service.get(org.id, objective.id);
+      expect(storedObjective).toBeDefined();
+      expect(storedObjective.objective.timeline).toEqual("this-quarter");
+    });
   });
 
   describe("when updating an objective with key results", () => {

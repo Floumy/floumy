@@ -22,19 +22,18 @@ export class OkrsService {
     if (!objective.title) throw new Error("Objective title is required");
     const org = await this.orgsService.findOneById(orgId);
     if (!org) throw new Error("Organization not found");
-    const objectiveEntity = new Objective();
-    objectiveEntity.title = objective.title;
-    objectiveEntity.org = Promise.resolve(org);
+    const newObjective = new Objective();
+    newObjective.title = objective.title;
+    newObjective.org = Promise.resolve(org);
     if (objective.timeline) {
       const { startDate, endDate } = this.getObjectiveDatesByTimeline(objective.timeline);
-      objectiveEntity.startDate = startDate;
-      objectiveEntity.endDate = endDate;
+      newObjective.startDate = startDate;
+      newObjective.endDate = endDate;
     }
-    return await this.objectiveRepository.save(objectiveEntity);
+    return await this.objectiveRepository.save(newObjective);
   }
 
   private getObjectiveDatesByTimeline(timeline: string) {
-    this.validateTimeline(timeline);
     const currentQuarter = this.getCurrentQuarter();
     if (timeline === Timeline.THIS_QUARTER.valueOf()) {
       return this.calculateQuarterDates(currentQuarter);
@@ -83,9 +82,17 @@ export class OkrsService {
   }
 
   async update(orgId: string, id: string, okrDto: CreateOrUpdateOKRDto) {
+    if (okrDto.objective.timeline) {
+      this.validateTimeline(okrDto.objective.timeline);
+    }
+    const objectiveDates = this.getObjectiveDatesByTimeline(okrDto.objective.timeline);
     await this.objectiveRepository.update(
       { id, org: { id: orgId } },
-      { title: okrDto.objective.title }
+      {
+        title: okrDto.objective.title,
+        startDate: objectiveDates.startDate,
+        endDate: objectiveDates.endDate
+      }
     );
     if (okrDto.keyResults && okrDto.keyResults.length > 0) {
       await this.updateKeyResults(id, okrDto.keyResults);
