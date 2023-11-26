@@ -368,4 +368,22 @@ describe("OkrsService", () => {
       expect(updatedKR.status).toEqual("off-track");
     });
   });
+  describe("when listing key results", () => {
+    it("should return an empty array", async () => {
+      const org = await createTestOrg();
+      const keyResults = await service.listKeyResults(org.id);
+      expect(keyResults).toEqual([]);
+    });
+    it("should return an array of key results", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        { title: "Test Objective" }
+      );
+      await service.createKeyResult(objective, "Test Key Result");
+      const keyResults = await service.listKeyResults(org.id);
+      expect(keyResults).toHaveLength(1);
+      expect(keyResults[0].title).toEqual("Test Key Result");
+    });
+  });
 });

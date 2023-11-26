@@ -427,4 +427,45 @@ describe("OKRsController (e2e)", () => {
         });
     });
   });
+  describe("OKR (GET) /okrs/key-results", () => {
+    it("should return 200", async () => {
+      return request(app.getHttpServer())
+        .get(`/okrs/key-results`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body).toEqual([]);
+        });
+    });
+    it("should return 200 with key results", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR"
+          },
+          keyResults: [
+            { title: "My Key Result 1" },
+            { title: "My Key Result 2" }
+          ]
+        });
+
+      return request(app.getHttpServer())
+        .get(`/okrs/key-results`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body).toHaveLength(2);
+          expect(body[0].id).toEqual(okrResponse.body.keyResults[0].id);
+          expect(body[0].title).toEqual("My Key Result 1");
+          expect(body[0].createdAt).toBeDefined();
+          expect(body[0].updatedAt).toBeDefined();
+          expect(body[1].id).toEqual(okrResponse.body.keyResults[1].id);
+          expect(body[1].title).toEqual("My Key Result 2");
+          expect(body[1].createdAt).toBeDefined();
+          expect(body[1].updatedAt).toBeDefined();
+        });
+    });
+  });
 });

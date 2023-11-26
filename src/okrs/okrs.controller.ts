@@ -42,6 +42,13 @@ export class OkrsController {
     return await this.okrsService.list(orgId);
   }
 
+  @Get("key-results")
+  @HttpCode(HttpStatus.OK)
+  async listKeyResults(@Request() request) {
+    const { org: orgId } = request.user;
+    return await this.okrsService.listKeyResults(orgId);
+  }
+
   @Get(":id")
   @HttpCode(HttpStatus.OK)
   async get(@Param("id") id: string, @Request() request) {
