@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Objective } from "./objective.entity";
 import { OKRStatus } from "./OKRStatus.enum";
+import { Org } from "../orgs/org.entity";
 
 @Entity()
 export class KeyResult {
@@ -20,6 +21,8 @@ export class KeyResult {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @ManyToOne(() => Org, org => org.keyResults, { lazy: true })
+  org: Promise<Org>;
   @ManyToOne(() => Objective, objective => objective.keyResults, { lazy: true })
   objective: Promise<Objective>;
 }

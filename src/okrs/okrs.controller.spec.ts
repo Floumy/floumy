@@ -546,4 +546,34 @@ describe("OkrsController", () => {
       expect(okr2.objective.status).toEqual("off-track");
     });
   });
+  describe("when getting the key results list", () => {
+    it("should return the key results list", async () => {
+      const org = await createTestOrg();
+      await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR"
+          },
+          keyResults: [
+            { title: "My key result" },
+            { title: "My key result 2" },
+            { title: "My key result 3" }
+          ]
+        });
+      const keyResults = await controller.listKeyResults(
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(keyResults.length).toEqual(3);
+      expect(keyResults[0].title).toEqual("My key result");
+      expect(keyResults[1].title).toEqual("My key result 2");
+      expect(keyResults[2].title).toEqual("My key result 3");
+    });
+  });
 });

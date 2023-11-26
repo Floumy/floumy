@@ -20,12 +20,14 @@ export class OkrsService {
 
   async createObjective(orgId: string, objective: ObjectiveDto) {
     if (!objective.title) throw new Error("Objective title is required");
+
     const org = await this.orgsService.findOneById(orgId);
     if (!org) throw new Error("Organization not found");
     const newObjective = new Objective();
     newObjective.title = objective.title;
     newObjective.org = Promise.resolve(org);
     if (objective.timeline) {
+      this.validateTimeline(objective.timeline);
       const { startDate, endDate } = this.getObjectiveDatesByTimeline(objective.timeline);
       newObjective.startDate = startDate;
       newObjective.endDate = endDate;
@@ -63,6 +65,7 @@ export class OkrsService {
     const keyResultEntity = new KeyResult();
     keyResultEntity.title = title;
     keyResultEntity.objective = Promise.resolve(objective);
+    keyResultEntity.org = objective.org;
     return await this.keyResultRepository.save(keyResultEntity);
   }
 
@@ -198,5 +201,9 @@ export class OkrsService {
     if (!Object.values(Timeline).find(t => t === timeline)) {
       throw new Error("Invalid timeline");
     }
+  }
+
+  async listKeyResults(orgId: string) {
+    return await this.keyResultRepository.findBy({ org: { id: orgId } });
   }
 }
