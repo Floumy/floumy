@@ -65,7 +65,7 @@ export class OkrsService {
     const keyResultEntity = new KeyResult();
     keyResultEntity.title = title;
     keyResultEntity.objective = Promise.resolve(objective);
-    keyResultEntity.org = objective.org;
+    keyResultEntity.org = Promise.resolve(await objective.org);
     return await this.keyResultRepository.save(keyResultEntity);
   }
 
