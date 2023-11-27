@@ -7,6 +7,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { OkrsModule } from "./okrs/okrs.module";
 import { OrgsModule } from "./orgs/orgs.module";
+import { RoadmapModule } from "./roadmap/roadmap.module";
 import databaseConfig from "./config/database.config";
 import encryptionConfig from "./config/encryption.config";
 import jwtConfig from "./config/jwt.config";
@@ -33,7 +34,8 @@ import jwtConfig from "./config/jwt.config";
     AuthModule,
     UsersModule,
     OkrsModule,
-    OrgsModule
+    OrgsModule,
+    RoadmapModule
   ],
   controllers: [AppController],
   providers: [AppService]

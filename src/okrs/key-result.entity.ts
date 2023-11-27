@@ -1,7 +1,16 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import { Objective } from "./objective.entity";
 import { OKRStatus } from "./OKRStatus.enum";
 import { Org } from "../orgs/org.entity";
+import { Feature } from "../roadmap/features/feature.entity";
 
 @Entity()
 export class KeyResult {
@@ -25,4 +34,6 @@ export class KeyResult {
   org: Promise<Org>;
   @ManyToOne(() => Objective, objective => objective.keyResults, { lazy: true })
   objective: Promise<Objective>;
+  @OneToMany(() => Feature, feature => feature.keyResult, { lazy: true })
+  features: Promise<Feature[]>;
 }

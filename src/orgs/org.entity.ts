@@ -2,6 +2,7 @@ import { CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDate
 import { User } from "../users/user.entity";
 import { Objective } from "../okrs/objective.entity";
 import { KeyResult } from "../okrs/key-result.entity";
+import { Feature } from "../roadmap/features/feature.entity";
 
 @Entity()
 export class Org {
@@ -17,4 +18,6 @@ export class Org {
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, keyResult => keyResult.org, { lazy: true })
   keyResults: Promise<KeyResult[]>;
+  @OneToMany(() => Feature, feature => feature.org, { lazy: true })
+  features: Promise<Feature[]>;
 }

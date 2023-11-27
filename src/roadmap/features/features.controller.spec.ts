@@ -1,0 +1,74 @@
+import { FeaturesController } from "./features.controller";
+import { OrgsService } from "../../orgs/orgs.service";
+import { setupTestingModule } from "../../../test/test.utils";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Org } from "../../orgs/org.entity";
+import { KeyResult } from "../../okrs/key-result.entity";
+import { OkrsService } from "../../okrs/okrs.service";
+import { TokensService } from "../../auth/tokens.service";
+import { Feature } from "./feature.entity";
+import { Objective } from "../../okrs/objective.entity";
+import { Priority } from "../../common/priority.enum";
+import { Timeline } from "../../common/timeline.enum";
+import { FeaturesService } from "./features.service";
+
+describe("FeaturesController", () => {
+  let controller: FeaturesController;
+  let cleanup: () => Promise<void>;
+
+  beforeEach(async () => {
+    const { module, cleanup: dbCleanup } = await setupTestingModule(
+      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature])],
+      [OkrsService, OrgsService, TokensService, FeaturesService],
+      [FeaturesController]
+    );
+    cleanup = dbCleanup;
+    controller = module.get<FeaturesController>(FeaturesController);
+  });
+
+  afterEach(async () => {
+    await cleanup();
+  });
+
+  it("should be defined", () => {
+    expect(controller).toBeDefined();
+  });
+
+  describe("when creating a feature", () => {
+    it("should return 201", async () => {
+      const okrResponse = await controller.create(
+        {
+          user: {
+            org: "orgId"
+          }
+        },
+        {
+          title: "my feature",
+          description: "my feature description",
+          timeline: Timeline.THIS_QUARTER,
+          priority: Priority.HIGH
+        });
+      expect(okrResponse).toEqual({
+        title: "my feature"
+      });
+    });
+    it("should return 400 if title is missing", async () => {
+      try {
+        await controller.create(
+          {
+            user: {
+              org: "orgId"
+            }
+          },
+          {
+            title: null,
+            description: "my feature description",
+            timeline: Timeline.THIS_QUARTER,
+            priority: Priority.HIGH
+          });
+      } catch (e) {
+        expect(e.message).toEqual("Bad Request");
+      }
+    });
+  });
+});
