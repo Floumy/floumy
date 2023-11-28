@@ -1,9 +1,9 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Priority } from "../../common/Priority.enum";
 import { Org } from "../../orgs/org.entity";
 import { FeatureStatus } from "./featurestatus.enum";
 import { KeyResult } from "../../okrs/key-result.entity";
 import { Timeline } from "../../common/timeline.enum";
+import { Priority } from "../../common/priority.enum";
 
 @Entity()
 export class Feature {

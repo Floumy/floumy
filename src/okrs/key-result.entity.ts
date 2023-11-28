@@ -8,9 +8,9 @@ import {
   UpdateDateColumn
 } from "typeorm";
 import { Objective } from "./objective.entity";
-import { OKRStatus } from "./OKRStatus.enum";
 import { Org } from "../orgs/org.entity";
 import { Feature } from "../roadmap/features/feature.entity";
+import { OKRStatus } from "./okrstatus.enum";
 
 @Entity()
 export class KeyResult {
