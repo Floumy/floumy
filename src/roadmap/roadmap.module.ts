@@ -1,10 +1,19 @@
 import { Module } from "@nestjs/common";
 import { FeaturesController } from "./features/features.controller";
 import { FeaturesService } from "./features/features.service";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { OrgsModule } from "../orgs/orgs.module";
+import { Feature } from "./features/feature.entity";
+import { OkrsModule } from "../okrs/okrs.module";
+import { OrgsService } from "../orgs/orgs.service";
+import { Org } from "../orgs/org.entity";
+import { KeyResult } from "../okrs/key-result.entity";
+import { Objective } from "../okrs/objective.entity";
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Feature, Org, KeyResult, Objective]), OrgsModule, OkrsModule],
   controllers: [FeaturesController],
-  providers: [FeaturesService]
+  providers: [FeaturesService, OrgsService, OkrsModule]
 })
 export class RoadmapModule {
 }

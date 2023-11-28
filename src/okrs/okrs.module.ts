@@ -10,7 +10,8 @@ import { KeyResult } from "./key-result.entity";
 @Module({
   imports: [TypeOrmModule.forFeature([Objective, KeyResult]), OrgsModule, AuthModule],
   providers: [OkrsService],
-  controllers: [OkrsController]
+  controllers: [OkrsController],
+  exports: [OkrsService]
 })
 export class OkrsModule {
 }

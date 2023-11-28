@@ -21,6 +21,6 @@ export class OrgsService {
   }
 
   findOneById(orgId: string) {
-    return this.orgRepository.findOneBy({ id: orgId });
+    return this.orgRepository.findOneByOrFail({ id: orgId });
   }
 }
