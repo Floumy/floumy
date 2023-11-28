@@ -1,8 +1,10 @@
-import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post, Request } from "@nestjs/common";
+import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post, Request, UseGuards } from "@nestjs/common";
 import { FeaturesService } from "./features.service";
 import { CreateFeatureDto } from "./dtos";
+import { AuthGuard } from "../../auth/auth.guard";
 
 @Controller("features")
+@UseGuards(AuthGuard)
 export class FeaturesController {
 
   constructor(private featuresService: FeaturesService) {
