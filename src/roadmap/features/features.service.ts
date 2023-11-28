@@ -3,25 +3,25 @@ import { CreateFeatureDto } from "./dtos";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Feature } from "./feature.entity";
-import { Org } from "../../orgs/org.entity";
 import { FeatureMapper } from "./feature.mapper";
 import { Timeline } from "../../common/timeline.enum";
 import { Priority } from "../../common/priority.enum";
-import { KeyResult } from "../../okrs/key-result.entity";
+import { OrgsService } from "../../orgs/orgs.service";
+import { OkrsService } from "../../okrs/okrs.service";
 
 @Injectable()
 export class FeaturesService {
 
   constructor(
     @InjectRepository(Feature) private featureRepository: Repository<Feature>,
-    @InjectRepository(Org) private orgRepository: Repository<Org>,
-    @InjectRepository(KeyResult) private keyResultRepository: Repository<KeyResult>
+    private orgsService: OrgsService,
+    private okrsService: OkrsService
   ) {
   }
 
   async createFeature(orgId: any, featureDto: CreateFeatureDto) {
     this.validateFeature(featureDto);
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    const org = await this.orgsService.findOneById(orgId);
     const feature = new Feature();
     feature.title = featureDto.title;
     feature.description = featureDto.description;
@@ -29,7 +29,7 @@ export class FeaturesService {
     feature.priority = featureDto.priority;
     feature.org = Promise.resolve(org);
     if (featureDto.keyResult) {
-      const keyResult = await this.keyResultRepository.findOneByOrFail({ id: featureDto.keyResult, org: { id: orgId } });
+      const keyResult = await this.okrsService.getKeyResultByOrgId(orgId, featureDto.keyResult);
       feature.keyResult = Promise.resolve(keyResult);
     }
     const savedFeature = await this.featureRepository.save(feature);

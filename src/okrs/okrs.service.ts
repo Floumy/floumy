@@ -185,6 +185,10 @@ export class OkrsService {
     return await this.keyResultRepository.findOneByOrFail({ id });
   }
 
+  async getKeyResultByOrgId(orgId: string, id: string) {
+    return await this.keyResultRepository.findOneByOrFail({ id, org: { id: orgId } });
+  }
+
   async getObjective(id: string) {
     return await this.objectiveRepository.findOneByOrFail({ id });
   }
