@@ -83,4 +83,30 @@ describe("FeaturesController", () => {
       }
     });
   });
+  describe("when getting features", () => {
+    it("should return 200", async () => {
+      await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my feature",
+          description: "my feature description",
+          timeline: Timeline.THIS_QUARTER,
+          priority: Priority.HIGH
+        });
+      const features = await controller.list({
+        user: {
+          org: org.id
+        }
+      });
+      expect(features[0].title).toEqual("my feature");
+      expect(features[0].timeline).toEqual(Timeline.THIS_QUARTER);
+      expect(features[0].priority).toEqual(Priority.HIGH);
+      expect(features[0].createdAt).toBeDefined();
+      expect(features[0].updatedAt).toBeDefined();
+    });
+  });
 });

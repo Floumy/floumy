@@ -38,10 +38,14 @@ export class FeaturesService {
 
   private validateFeature(featureDto: CreateFeatureDto) {
     if (!featureDto.title) throw new Error("Feature title is required");
-    if (!featureDto.description) throw new Error("Feature description is required");
     if (!featureDto.timeline) throw new Error("Feature timeline is required");
     if (!featureDto.priority) throw new Error("Feature priority is required");
     if (!Object.values(Timeline).includes(featureDto.timeline)) throw new Error("Invalid timeline");
     if (!Object.values(Priority).includes(featureDto.priority)) throw new Error("Invalid priority");
+  }
+
+  async listFeatures(orgId: string) {
+    const features = await this.featureRepository.findBy({ org: { id: orgId } });
+    return FeatureMapper.toListDto(features);
   }
 }

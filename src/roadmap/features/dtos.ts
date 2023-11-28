@@ -22,3 +22,13 @@ export interface FeatureDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface FeaturesListDto {
+  id: string;
+  title: string;
+  timeline: Timeline;
+  priority: Priority;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
