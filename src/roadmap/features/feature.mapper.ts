@@ -1,5 +1,5 @@
 import { Feature } from "./feature.entity";
-import { FeatureDto } from "./dtos";
+import { FeatureDto, FeaturesListDto } from "./dtos";
 
 export class FeatureMapper {
   static async toDto(feature: Feature): Promise<FeatureDto> {
@@ -21,5 +21,17 @@ export class FeatureMapper {
       };
     }
     return featureDto;
+  }
+
+  static toListDto(features: Feature[]): FeaturesListDto[] {
+    return features.map(feature => ({
+      id: feature.id,
+      title: feature.title,
+      priority: feature.priority,
+      status: feature.status,
+      timeline: feature.timeline,
+      createdAt: feature.createdAt,
+      updatedAt: feature.updatedAt
+    }));
   }
 }

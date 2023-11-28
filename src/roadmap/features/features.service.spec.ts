@@ -164,4 +164,32 @@ describe("FeaturesService", () => {
       ).rejects.toThrowError();
     });
   });
+  describe("when listing features", () => {
+    it("should return a list of features", async () => {
+      const objective = await okrsService.create(org.id, {
+        objective: {
+          title: "my objective"
+        },
+        keyResults: [
+          {
+            title: "my key result"
+          }
+        ]
+      });
+      await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        timeline: Timeline.THIS_QUARTER,
+        priority: Priority.HIGH,
+        keyResult: objective.keyResults[0].id
+      });
+      const features = await service.listFeatures(org.id);
+      expect(features.length).toEqual(1);
+      expect(features[0].title).toEqual("my feature");
+      expect(features[0].timeline).toEqual(Timeline.THIS_QUARTER);
+      expect(features[0].priority).toEqual(Priority.HIGH);
+      expect(features[0].createdAt).toBeDefined();
+      expect(features[0].updatedAt).toBeDefined();
+    });
+  });
 });
