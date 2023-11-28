@@ -9,9 +9,10 @@ import { OrgsService } from "../orgs/orgs.service";
 import { Org } from "../orgs/org.entity";
 import { KeyResult } from "../okrs/key-result.entity";
 import { Objective } from "../okrs/objective.entity";
+import { AuthModule } from "src/auth/auth.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Feature, Org, KeyResult, Objective]), OrgsModule, OkrsModule],
+  imports: [TypeOrmModule.forFeature([Feature, Org, KeyResult, Objective]), OrgsModule, OkrsModule, AuthModule],
   controllers: [FeaturesController],
   providers: [FeaturesService, OrgsService, OkrsModule]
 })
