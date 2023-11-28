@@ -5,8 +5,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { OrgsService } from "../orgs/orgs.service";
 import { KeyResult } from "./key-result.entity";
 import { KeyResultMapper, OKRMapper } from "./mappers";
-import { OKRStatus } from "./OKRStatus.enum";
 import { Timeline } from "../common/timeline.enum";
+import { OKRStatus } from "./okrstatus.enum";
 
 @Injectable()
 export class OkrsService {

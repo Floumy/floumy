@@ -9,7 +9,7 @@ import {
 } from "typeorm";
 import { Org } from "../orgs/org.entity";
 import { KeyResult } from "./key-result.entity";
-import { OKRStatus } from "./OKRStatus.enum";
+import { OKRStatus } from "./okrstatus.enum";
 
 @Entity()
 export class Objective {
