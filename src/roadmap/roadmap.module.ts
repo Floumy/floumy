@@ -10,11 +10,14 @@ import { Org } from "../orgs/org.entity";
 import { KeyResult } from "../okrs/key-result.entity";
 import { Objective } from "../okrs/objective.entity";
 import { AuthModule } from "src/auth/auth.module";
+import { MilestonesController } from "./milestones/milestones.controller";
+import { MilestonesService } from "./milestones/milestones.service";
+import { Milestone } from "./milestones/milestone.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Feature, Org, KeyResult, Objective]), OrgsModule, OkrsModule, AuthModule],
-  controllers: [FeaturesController],
-  providers: [FeaturesService, OrgsService, OkrsModule]
+  imports: [TypeOrmModule.forFeature([Feature, Org, KeyResult, Objective, Milestone]), OrgsModule, OkrsModule, AuthModule],
+  controllers: [FeaturesController, MilestonesController],
+  providers: [FeaturesService, OrgsService, OkrsModule, MilestonesService]
 })
 export class RoadmapModule {
 }

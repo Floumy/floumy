@@ -20,6 +20,9 @@ import { FeaturesController } from "../src/roadmap/features/features.controller"
 import { Feature } from "../src/roadmap/features/feature.entity";
 import { OkrsController } from "../src/okrs/okrs.controller";
 import { Objective } from "../src/okrs/objective.entity";
+import { MilestonesController } from "../src/roadmap/milestones/milestones.controller";
+import { Milestone } from "../src/roadmap/milestones/milestone.entity";
+import { MilestonesService } from "../src/roadmap/milestones/milestones.service";
 
 describe("FeaturesController (e2e)", () => {
   let app: INestApplication;
@@ -28,9 +31,9 @@ describe("FeaturesController (e2e)", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective, KeyResult, Feature])],
-      [AuthService, UsersService, Reflector, OkrsService, TokensService, FeaturesService],
-      [AuthController, FeaturesController, OkrsController]
+      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective, KeyResult, Feature, Milestone])],
+      [AuthService, UsersService, Reflector, OkrsService, TokensService, FeaturesService, MilestonesService],
+      [AuthController, FeaturesController, OkrsController, MilestonesController]
     );
     cleanup = dbCleanup;
     app = module.createNestApplication();
@@ -118,6 +121,26 @@ describe("FeaturesController (e2e)", () => {
           expect(body[0].timeline).toEqual("this-quarter");
           expect(body[0].createdAt).toBeDefined();
           expect(body[0].updatedAt).toBeDefined();
+        });
+    });
+  });
+  describe("/milestones (POST)", () => {
+    it("should return 201", async () => {
+      return request(app.getHttpServer())
+        .post("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my milestone",
+          description: "my milestone description",
+          dueDate: "2020-01-01"
+        })
+        .expect(HttpStatus.CREATED)
+        .expect(({ body }) => {
+          expect(body.id).toBeDefined();
+          expect(body.title).toEqual("my milestone");
+          expect(body.description).toEqual("my milestone description");
+          expect(body.dueDate).toEqual("2020-01-01");
+          expect(body.timeline).toEqual("past");
         });
     });
   });

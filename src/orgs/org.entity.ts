@@ -3,6 +3,7 @@ import { User } from "../users/user.entity";
 import { Objective } from "../okrs/objective.entity";
 import { KeyResult } from "../okrs/key-result.entity";
 import { Feature } from "../roadmap/features/feature.entity";
+import { Milestone } from "../roadmap/milestones/milestone.entity";
 
 @Entity()
 export class Org {
@@ -20,4 +21,6 @@ export class Org {
   keyResults: Promise<KeyResult[]>;
   @OneToMany(() => Feature, feature => feature.org, { lazy: true })
   features: Promise<Feature[]>;
+  @OneToMany(() => Milestone, milestone => milestone.org, { lazy: true })
+  milestones: Promise<Milestone[]>;
 }

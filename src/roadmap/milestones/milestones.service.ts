@@ -1,0 +1,36 @@
+import { Injectable } from "@nestjs/common";
+import { CreateMilestoneDto } from "./dtos";
+import { Milestone } from "./milestone.entity";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { OrgsService } from "../../orgs/orgs.service";
+import { MilestoneMapper } from "./milestone.mapper";
+
+@Injectable()
+export class MilestonesService {
+
+  constructor(
+    @InjectRepository(Milestone) private milestoneRepository: Repository<Milestone>,
+    private orgsService: OrgsService
+  ) {
+  }
+
+  async createMilestone(orgId: string, createMilestoneDto: CreateMilestoneDto) {
+    this.validateMilestone(createMilestoneDto);
+    const org = await this.orgsService.findOneById(orgId);
+    const milestone = new Milestone();
+    milestone.title = createMilestoneDto.title;
+    milestone.description = createMilestoneDto.description;
+    milestone.dueDate = new Date(createMilestoneDto.dueDate);
+    milestone.org = Promise.resolve(org);
+    const savedMilestone = await this.milestoneRepository.save(milestone);
+    return MilestoneMapper.toDto(savedMilestone);
+  }
+
+  private validateMilestone(createMilestoneDto: CreateMilestoneDto) {
+    if (!createMilestoneDto.title) throw new Error("Milestone title is required");
+    if (!createMilestoneDto.description) throw new Error("Milestone description is required");
+    if (!createMilestoneDto.dueDate) throw new Error("Milestone due date is required");
+    if (!createMilestoneDto.dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) throw new Error("Invalid due date");
+  }
+}
