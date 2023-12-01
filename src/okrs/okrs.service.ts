@@ -7,6 +7,7 @@ import { KeyResult } from "./key-result.entity";
 import { KeyResultMapper, OKRMapper } from "./mappers";
 import { Timeline } from "../common/timeline.enum";
 import { OKRStatus } from "./okrstatus.enum";
+import { TimelineService } from "../common/timeline.service";
 
 @Injectable()
 export class OkrsService {
@@ -28,36 +29,11 @@ export class OkrsService {
     newObjective.org = Promise.resolve(org);
     if (objective.timeline) {
       this.validateTimeline(objective.timeline);
-      const { startDate, endDate } = this.getObjectiveDatesByTimeline(objective.timeline);
+      const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(objective.timeline);
       newObjective.startDate = startDate;
       newObjective.endDate = endDate;
     }
     return await this.objectiveRepository.save(newObjective);
-  }
-
-  private getObjectiveDatesByTimeline(timeline: string) {
-    const currentQuarter = this.getCurrentQuarter();
-    if (timeline === Timeline.THIS_QUARTER.valueOf()) {
-      return this.calculateQuarterDates(currentQuarter);
-    }
-    if (timeline === Timeline.NEXT_QUARTER.valueOf()) {
-      return this.calculateQuarterDates(currentQuarter + 1);
-    }
-    return {
-      startDate: null,
-      endDate: null
-    };
-  }
-
-  private getCurrentQuarter() {
-    return Math.floor((new Date().getMonth() + 3) / 3);
-  }
-
-  private calculateQuarterDates(quarter: number) {
-    return {
-      startDate: new Date(new Date().getFullYear(), 3 * quarter - 3, 1),
-      endDate: new Date(new Date().getFullYear(), 3 * quarter, 0)
-    };
   }
 
   async createKeyResult(objective: Objective, title: string) {
@@ -88,7 +64,7 @@ export class OkrsService {
     if (okrDto.objective.timeline) {
       this.validateTimeline(okrDto.objective.timeline);
     }
-    const objectiveDates = this.getObjectiveDatesByTimeline(okrDto.objective.timeline);
+    const objectiveDates = TimelineService.getStartAndEndDatesByTimelineValue(okrDto.objective.timeline);
     await this.objectiveRepository.update(
       { id, org: { id: orgId } },
       {
