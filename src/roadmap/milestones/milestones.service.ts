@@ -29,12 +29,15 @@ export class MilestonesService {
 
   private validateMilestone(createMilestoneDto: CreateMilestoneDto) {
     if (!createMilestoneDto.title) throw new Error("Milestone title is required");
-    if (!createMilestoneDto.description) throw new Error("Milestone description is required");
     if (!createMilestoneDto.dueDate) throw new Error("Milestone due date is required");
     if (!createMilestoneDto.dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) throw new Error("Invalid due date");
   }
 
   async findOneById(orgId: string, id: string) {
     return await this.milestoneRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+  }
+
+  async listMilestones(orgId: string) {
+    return MilestoneMapper.toListDto(await this.milestoneRepository.findBy({ org: { id: orgId } }));
   }
 }
