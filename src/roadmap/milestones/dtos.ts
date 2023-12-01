@@ -13,3 +13,9 @@ export interface MilestoneDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface MilestoneListItemDto {
+  id: string;
+  title: string;
+  dueDate: string;
+}

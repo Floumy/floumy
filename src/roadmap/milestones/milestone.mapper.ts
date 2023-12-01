@@ -1,5 +1,5 @@
 import { Milestone } from "./milestone.entity";
-import { MilestoneDto } from "./dtos";
+import { MilestoneDto, MilestoneListItemDto } from "./dtos";
 import { TimelineService } from "../../common/timeline.service";
 
 export class MilestoneMapper {
@@ -13,6 +13,14 @@ export class MilestoneMapper {
       createdAt: milestone.createdAt,
       updatedAt: milestone.updatedAt
     };
+  }
+
+  static toListDto(milestones: Milestone[]): MilestoneListItemDto[] {
+    return milestones.map(milestone => ({
+      id: milestone.id,
+      title: milestone.title,
+      dueDate: MilestoneMapper.formatDate(milestone.dueDate)
+    }));
   }
 
   private static formatDate(date: Date): string {

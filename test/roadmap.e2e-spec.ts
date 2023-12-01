@@ -140,4 +140,27 @@ describe("FeaturesController (e2e)", () => {
         });
     });
   });
+  describe("/milestones/list (GET)", () => {
+    it("should return 200", async () => {
+      await request(app.getHttpServer())
+        .post("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my milestone",
+          description: "my milestone description",
+          dueDate: "2020-01-01"
+        })
+        .expect(HttpStatus.CREATED);
+      return request(app.getHttpServer())
+        .get("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.length).toEqual(1);
+          expect(body[0].id).toBeDefined();
+          expect(body[0].title).toEqual("my milestone");
+          expect(body[0].dueDate).toEqual("2020-01-01");
+        });
+    });
+  });
 });

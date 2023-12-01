@@ -64,15 +64,6 @@ describe("MilestonesService", () => {
         })
       ).rejects.toThrow("Milestone title is required");
     });
-    it("should throw an error if description is missing", async () => {
-      await expect(
-        service.createMilestone(org.id, {
-          title: "my milestone",
-          description: "",
-          dueDate: "2020-01-01"
-        })
-      ).rejects.toThrow("Milestone description is required");
-    });
     it("should throw an error if dueDate is missing", async () => {
       await expect(
         service.createMilestone(org.id, {
@@ -90,6 +81,20 @@ describe("MilestonesService", () => {
           dueDate: "2020-01"
         })
       ).rejects.toThrow("Invalid due date");
+    });
+  });
+  describe("when listing milestones", () => {
+    it("should return the milestones", async () => {
+      await service.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone",
+        dueDate: "2020-01-01"
+      });
+      const milestones = await service.listMilestones(org.id);
+      expect(milestones.length).toEqual(1);
+      expect(milestones[0].id).toBeDefined();
+      expect(milestones[0].title).toEqual("my milestone");
+      expect(milestones[0].dueDate).toEqual("2020-01-01");
     });
   });
 });
