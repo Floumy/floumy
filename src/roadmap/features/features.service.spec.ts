@@ -8,13 +8,15 @@ import { Org } from "../../orgs/org.entity";
 import { KeyResult } from "../../okrs/key-result.entity";
 import { Feature } from "./feature.entity";
 import { UsersService } from "../../users/users.service";
-import { Timeline } from "../../common/timeline.enum";
 import { Priority } from "../../common/priority.enum";
 import { User } from "../../users/user.entity";
+import { MilestonesService } from "../milestones/milestones.service";
+import { Milestone } from "../milestones/milestone.entity";
 
 describe("FeaturesService", () => {
   let usersService: UsersService;
   let service: FeaturesService;
+  let milestonesService: MilestonesService;
   let okrsService: OkrsService;
   let orgsService: OrgsService;
 
@@ -24,14 +26,15 @@ describe("FeaturesService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User])],
-      [OkrsService, OrgsService, FeaturesService, UsersService]
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone])],
+      [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService]
     );
     cleanup = dbCleanup;
     service = module.get<FeaturesService>(FeaturesService);
     usersService = module.get<UsersService>(UsersService);
     okrsService = module.get<OkrsService>(OkrsService);
     orgsService = module.get<OrgsService>(OrgsService);
+    milestonesService = module.get<MilestonesService>(MilestonesService);
     const user = await usersService.create(
       "Test User",
       "test@example.com",
@@ -53,13 +56,11 @@ describe("FeaturesService", () => {
       const feature = await service.createFeature(org.id, {
         title: "my feature",
         description: "my feature description",
-        timeline: Timeline.THIS_QUARTER,
         priority: Priority.HIGH
       });
       expect(feature.id).toBeDefined();
       expect(feature.title).toEqual("my feature");
       expect(feature.description).toEqual("my feature description");
-      expect(feature.timeline).toEqual(Timeline.THIS_QUARTER);
       expect(feature.priority).toEqual(Priority.HIGH);
     });
     it("should throw an error if the org does not exist", async () => {
@@ -67,7 +68,6 @@ describe("FeaturesService", () => {
         service.createFeature("non-existent-org", {
           title: "my feature",
           description: "my feature description",
-          timeline: Timeline.THIS_QUARTER,
           priority: Priority.HIGH
         })
       ).rejects.toThrowError();
@@ -77,17 +77,6 @@ describe("FeaturesService", () => {
         service.createFeature(org.id, {
           title: "",
           description: "my feature description",
-          timeline: Timeline.THIS_QUARTER,
-          priority: Priority.HIGH
-        })
-      ).rejects.toThrowError();
-    });
-    it("should throw an error if the timeline is not provided", async () => {
-      await expect(
-        service.createFeature(org.id, {
-          title: "my feature",
-          description: "my feature description",
-          timeline: null,
           priority: Priority.HIGH
         })
       ).rejects.toThrowError();
@@ -97,7 +86,6 @@ describe("FeaturesService", () => {
         service.createFeature(org.id, {
           title: "my feature",
           description: "my feature description",
-          timeline: Timeline.THIS_QUARTER,
           priority: null
         })
       ).rejects.toThrowError();
@@ -116,7 +104,6 @@ describe("FeaturesService", () => {
       const feature = await service.createFeature(org.id, {
         title: "my feature",
         description: "my feature description",
-        timeline: Timeline.THIS_QUARTER,
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id
       });
@@ -129,7 +116,6 @@ describe("FeaturesService", () => {
         service.createFeature(org.id, {
           title: "my feature",
           description: "my feature description",
-          timeline: Timeline.THIS_QUARTER,
           priority: Priority.HIGH,
           keyResult: "non-existent-key-result"
         })
@@ -157,11 +143,26 @@ describe("FeaturesService", () => {
         service.createFeature(otherOrg.id, {
           title: "my feature",
           description: "my feature description",
-          timeline: Timeline.THIS_QUARTER,
           priority: Priority.HIGH,
           keyResult: objective.keyResults[0].id
         })
       ).rejects.toThrowError();
+    });
+    it("should create a feature with a milestone", async () => {
+      const milestone = await milestonesService.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone description",
+        dueDate: "2020-01-01"
+      });
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        milestone: milestone.id
+      });
+      expect(feature.milestone).toBeDefined();
+      expect(feature.milestone.id).toEqual(milestone.id);
+      expect(feature.milestone.title).toEqual(milestone.title);
     });
   });
   describe("when listing features", () => {
@@ -179,17 +180,16 @@ describe("FeaturesService", () => {
       await service.createFeature(org.id, {
         title: "my feature",
         description: "my feature description",
-        timeline: Timeline.THIS_QUARTER,
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id
       });
       const features = await service.listFeatures(org.id);
       expect(features.length).toEqual(1);
       expect(features[0].title).toEqual("my feature");
-      expect(features[0].timeline).toEqual(Timeline.THIS_QUARTER);
       expect(features[0].priority).toEqual(Priority.HIGH);
       expect(features[0].createdAt).toBeDefined();
       expect(features[0].updatedAt).toBeDefined();
     });
   });
+
 });

@@ -9,10 +9,11 @@ import { TokensService } from "../../auth/tokens.service";
 import { Feature } from "./feature.entity";
 import { Objective } from "../../okrs/objective.entity";
 import { Priority } from "../../common/priority.enum";
-import { Timeline } from "../../common/timeline.enum";
 import { FeaturesService } from "./features.service";
 import { UsersService } from "../../users/users.service";
 import { UsersModule } from "../../users/users.module";
+import { MilestonesService } from "../milestones/milestones.service";
+import { Milestone } from "../milestones/milestone.entity";
 
 describe("FeaturesController", () => {
   let controller: FeaturesController;
@@ -21,8 +22,8 @@ describe("FeaturesController", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature]), UsersModule],
-      [OkrsService, OrgsService, TokensService, FeaturesService],
+      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, Milestone]), UsersModule],
+      [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService],
       [FeaturesController]
     );
     cleanup = dbCleanup;
@@ -56,12 +57,10 @@ describe("FeaturesController", () => {
         {
           title: "my feature",
           description: "my feature description",
-          timeline: Timeline.THIS_QUARTER,
           priority: Priority.HIGH
         });
       expect(okrResponse.title).toEqual("my feature");
       expect(okrResponse.description).toEqual("my feature description");
-      expect(okrResponse.timeline).toEqual(Timeline.THIS_QUARTER);
       expect(okrResponse.priority).toEqual(Priority.HIGH);
     });
     it("should return 400 if title is missing", async () => {
@@ -75,7 +74,6 @@ describe("FeaturesController", () => {
           {
             title: null,
             description: "my feature description",
-            timeline: Timeline.THIS_QUARTER,
             priority: Priority.HIGH
           });
       } catch (e) {
@@ -94,7 +92,6 @@ describe("FeaturesController", () => {
         {
           title: "my feature",
           description: "my feature description",
-          timeline: Timeline.THIS_QUARTER,
           priority: Priority.HIGH
         });
       const features = await controller.list({
@@ -103,7 +100,6 @@ describe("FeaturesController", () => {
         }
       });
       expect(features[0].title).toEqual("my feature");
-      expect(features[0].timeline).toEqual(Timeline.THIS_QUARTER);
       expect(features[0].priority).toEqual(Priority.HIGH);
       expect(features[0].createdAt).toBeDefined();
       expect(features[0].updatedAt).toBeDefined();

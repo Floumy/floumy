@@ -68,7 +68,6 @@ describe("FeaturesController (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
-          timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[0].id
         })
         .expect(HttpStatus.CREATED)
@@ -77,7 +76,6 @@ describe("FeaturesController (e2e)", () => {
           expect(body.title).toEqual("my feature");
           expect(body.description).toEqual("my feature description");
           expect(body.priority).toEqual("medium");
-          expect(body.timeline).toEqual("this-quarter");
           expect(body.keyResult.id).toEqual(okrResponse.body.keyResults[0].id);
           expect(body.keyResult.title).toEqual("My Key Result 1");
         });
@@ -105,7 +103,6 @@ describe("FeaturesController (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
-          timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[0].id
         })
         .expect(HttpStatus.CREATED);
@@ -118,7 +115,6 @@ describe("FeaturesController (e2e)", () => {
           expect(body[0].id).toBeDefined();
           expect(body[0].title).toEqual("my feature");
           expect(body[0].priority).toEqual("medium");
-          expect(body[0].timeline).toEqual("this-quarter");
           expect(body[0].createdAt).toBeDefined();
           expect(body[0].updatedAt).toBeDefined();
         });
