@@ -1,5 +1,14 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import { Org } from "../../orgs/org.entity";
+import { Feature } from "../features/feature.entity";
 
 @Entity()
 export class Milestone {
@@ -17,4 +26,6 @@ export class Milestone {
   updatedAt: Date;
   @ManyToOne(() => Org, org => org.milestones, { lazy: true })
   org: Promise<Org>;
+  @OneToMany(() => Feature, feature => feature.milestone, { lazy: true })
+  features: Promise<Feature[]>;
 }

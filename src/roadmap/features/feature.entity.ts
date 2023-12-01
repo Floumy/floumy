@@ -2,8 +2,8 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Up
 import { Org } from "../../orgs/org.entity";
 import { FeatureStatus } from "./featurestatus.enum";
 import { KeyResult } from "../../okrs/key-result.entity";
-import { Timeline } from "../../common/timeline.enum";
 import { Priority } from "../../common/priority.enum";
+import { Milestone } from "../milestones/milestone.entity";
 
 @Entity()
 export class Feature {
@@ -25,12 +25,6 @@ export class Feature {
     default: FeatureStatus.PLANNED
   })
   status: FeatureStatus;
-  @Column({
-    type: "enum",
-    enum: Timeline,
-    default: Timeline.THIS_QUARTER
-  })
-  timeline: Timeline;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
@@ -39,4 +33,6 @@ export class Feature {
   org: Promise<Org>;
   @ManyToOne(() => KeyResult, keyResult => keyResult.features, { lazy: true })
   keyResult: Promise<KeyResult>;
+  @ManyToOne(() => Milestone, milestone => milestone.features, { lazy: true })
+  milestone: Promise<Milestone>;
 }

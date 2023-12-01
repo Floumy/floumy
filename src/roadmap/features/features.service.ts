@@ -4,10 +4,10 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Feature } from "./feature.entity";
 import { FeatureMapper } from "./feature.mapper";
-import { Timeline } from "../../common/timeline.enum";
 import { Priority } from "../../common/priority.enum";
 import { OrgsService } from "../../orgs/orgs.service";
 import { OkrsService } from "../../okrs/okrs.service";
+import { MilestonesService } from "../milestones/milestones.service";
 
 @Injectable()
 export class FeaturesService {
@@ -15,7 +15,8 @@ export class FeaturesService {
   constructor(
     @InjectRepository(Feature) private featureRepository: Repository<Feature>,
     private orgsService: OrgsService,
-    private okrsService: OkrsService
+    private okrsService: OkrsService,
+    private milestonesService: MilestonesService
   ) {
   }
 
@@ -25,12 +26,17 @@ export class FeaturesService {
     const feature = new Feature();
     feature.title = featureDto.title;
     feature.description = featureDto.description;
-    feature.timeline = featureDto.timeline;
     feature.priority = featureDto.priority;
     feature.org = Promise.resolve(org);
+
     if (featureDto.keyResult) {
       const keyResult = await this.okrsService.getKeyResultByOrgId(orgId, featureDto.keyResult);
       feature.keyResult = Promise.resolve(keyResult);
+    }
+
+    if (featureDto.milestone) {
+      const milestone = await this.milestonesService.findOneById(orgId, featureDto.milestone);
+      feature.milestone = Promise.resolve(milestone);
     }
     const savedFeature = await this.featureRepository.save(feature);
     return await FeatureMapper.toDto(savedFeature);
@@ -38,9 +44,7 @@ export class FeaturesService {
 
   private validateFeature(featureDto: CreateFeatureDto) {
     if (!featureDto.title) throw new Error("Feature title is required");
-    if (!featureDto.timeline) throw new Error("Feature timeline is required");
     if (!featureDto.priority) throw new Error("Feature priority is required");
-    if (!Object.values(Timeline).includes(featureDto.timeline)) throw new Error("Invalid timeline");
     if (!Object.values(Priority).includes(featureDto.priority)) throw new Error("Invalid priority");
   }
 

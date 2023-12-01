@@ -9,7 +9,6 @@ export class FeatureMapper {
       description: feature.description,
       priority: feature.priority,
       status: feature.status,
-      timeline: feature.timeline,
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
     };
@@ -18,6 +17,13 @@ export class FeatureMapper {
       featureDto["keyResult"] = {
         id: featureKeyResult.id,
         title: featureKeyResult.title
+      };
+    }
+    const featureMilestone = await feature.milestone;
+    if (featureMilestone) {
+      featureDto["milestone"] = {
+        id: featureMilestone.id,
+        title: featureMilestone.title
       };
     }
     return featureDto;
@@ -29,7 +35,6 @@ export class FeatureMapper {
       title: feature.title,
       priority: feature.priority,
       status: feature.status,
-      timeline: feature.timeline,
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
     }));

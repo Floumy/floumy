@@ -33,4 +33,8 @@ export class MilestonesService {
     if (!createMilestoneDto.dueDate) throw new Error("Milestone due date is required");
     if (!createMilestoneDto.dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) throw new Error("Invalid due date");
   }
+
+  async findOneById(orgId: string, id: string) {
+    return await this.milestoneRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+  }
 }
