@@ -40,4 +40,9 @@ export class MilestonesService {
   async listMilestones(orgId: string) {
     return MilestoneMapper.toListDto(await this.milestoneRepository.findBy({ org: { id: orgId } }));
   }
+
+  async listMilestonesWithFeatures(orgId: string) {
+    const milestones = await this.milestoneRepository.findBy({ org: { id: orgId } });
+    return await MilestoneMapper.toListWithFeaturesDto(milestones);
+  }
 }

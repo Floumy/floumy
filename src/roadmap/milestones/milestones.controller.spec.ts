@@ -90,4 +90,30 @@ describe("MilestonesController", () => {
       expect(milestones[0].dueDate).toEqual("2020-01-01");
     });
   });
+
+  describe("when listing milestones with features", () => {
+    it("should return the milestones", async () => {
+      await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my milestone",
+          description: "my milestone",
+          dueDate: "2020-01-01"
+        }
+      );
+      const milestones = await controller.listMilestonesWithFeatures({
+        user: {
+          org: org.id
+        }
+      });
+      expect(milestones.length).toEqual(1);
+      expect(milestones[0].id).toBeDefined();
+      expect(milestones[0].title).toEqual("my milestone");
+      expect(milestones[0].dueDate).toEqual("2020-01-01");
+    });
+  });
 });

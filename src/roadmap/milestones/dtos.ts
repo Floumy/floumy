@@ -19,3 +19,19 @@ export interface MilestoneListItemDto {
   title: string;
   dueDate: string;
 }
+
+export interface MilestoneListWithFeaturesItemDto {
+  id: string;
+  title: string;
+  dueDate: string;
+  timeline: string;
+  features: FeatureListItemDto[];
+}
+
+export interface FeatureListItemDto {
+  id: string;
+  title: string;
+  priority: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
