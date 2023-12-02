@@ -105,4 +105,28 @@ describe("FeaturesController", () => {
       expect(features[0].updatedAt).toBeDefined();
     });
   });
+  describe("when getting features without milestone", () => {
+    it("should return 200", async () => {
+      await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH
+        });
+      const features = await controller.listWithoutMilestone({
+        user: {
+          org: org.id
+        }
+      });
+      expect(features[0].title).toEqual("my feature");
+      expect(features[0].priority).toEqual(Priority.HIGH);
+      expect(features[0].createdAt).toBeDefined();
+      expect(features[0].updatedAt).toBeDefined();
+    });
+  });
 });

@@ -120,6 +120,31 @@ describe("FeaturesController (e2e)", () => {
         });
     });
   });
+  describe("/features/without-milestone (GET)", () => {
+    it("should return 200", async () => {
+      await request(app.getHttpServer())
+        .post("/features")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my feature",
+          description: "my feature description",
+          priority: "medium"
+        })
+        .expect(HttpStatus.CREATED);
+      return request(app.getHttpServer())
+        .get("/features/without-milestone")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.length).toEqual(1);
+          expect(body[0].id).toBeDefined();
+          expect(body[0].title).toEqual("my feature");
+          expect(body[0].priority).toEqual("medium");
+          expect(body[0].createdAt).toBeDefined();
+          expect(body[0].updatedAt).toBeDefined();
+        });
+    });
+  });
   describe("/milestones (POST)", () => {
     it("should return 201", async () => {
       return request(app.getHttpServer())

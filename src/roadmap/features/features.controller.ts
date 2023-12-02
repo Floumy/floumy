@@ -41,4 +41,15 @@ export class FeaturesController {
       throw new BadRequestException();
     }
   }
+
+  @Get("/without-milestone")
+  @HttpCode(HttpStatus.OK)
+  async listWithoutMilestone(@Request() request) {
+    try {
+      const { org: orgId } = request.user;
+      return await this.featuresService.listFeaturesWithoutMilestone(orgId);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
 }
