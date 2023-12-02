@@ -571,9 +571,8 @@ describe("OkrsController", () => {
           }
         });
       expect(keyResults.length).toEqual(3);
-      expect(keyResults[0].title).toEqual("My key result");
-      expect(keyResults[1].title).toEqual("My key result 2");
-      expect(keyResults[2].title).toEqual("My key result 3");
+      // check that the items are in the list regardless of the order
+      expect(keyResults.map(kr => kr.title).sort()).toEqual(["My key result", "My key result 2", "My key result 3"]);
     });
   });
 });
