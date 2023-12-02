@@ -33,6 +33,7 @@ export class MilestoneMapper {
         id: feature.id,
         title: feature.title,
         priority: feature.priority.valueOf(),
+        status: feature.status.valueOf(),
         createdAt: feature.createdAt,
         updatedAt: feature.updatedAt
       }))

@@ -52,4 +52,9 @@ export class FeaturesService {
     const features = await this.featureRepository.findBy({ org: { id: orgId } });
     return FeatureMapper.toListDto(features);
   }
+
+  async listFeaturesWithoutMilestone(orgId: string) {
+    const features = await this.featureRepository.findBy({ org: { id: orgId }, milestone: null });
+    return FeatureMapper.toListDto(features);
+  }
 }

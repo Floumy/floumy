@@ -191,5 +191,19 @@ describe("FeaturesService", () => {
       expect(features[0].updatedAt).toBeDefined();
     });
   });
-
+  describe("when listing features without milestone", () => {
+    it("should return a list of features", async () => {
+      await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH
+      });
+      const features = await service.listFeaturesWithoutMilestone(org.id);
+      expect(features.length).toEqual(1);
+      expect(features[0].title).toEqual("my feature");
+      expect(features[0].priority).toEqual(Priority.HIGH);
+      expect(features[0].createdAt).toBeDefined();
+      expect(features[0].updatedAt).toBeDefined();
+    });
+  });
 });
