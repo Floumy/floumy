@@ -163,4 +163,43 @@ describe("FeaturesController (e2e)", () => {
         });
     });
   });
+  describe("/milestones (GET)", () => {
+    it("should return 200", async () => {
+      const milestoneResponse = await request(app.getHttpServer())
+        .post("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my milestone",
+          description: "my milestone description",
+          dueDate: "2020-01-01"
+        })
+        .expect(HttpStatus.CREATED);
+      await request(app.getHttpServer())
+        .post("/features")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my feature",
+          description: "my feature description",
+          priority: "medium",
+          milestone: milestoneResponse.body.id
+        })
+        .expect(HttpStatus.CREATED);
+      return request(app.getHttpServer())
+        .get("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.length).toEqual(1);
+          expect(body[0].id).toBeDefined();
+          expect(body[0].title).toEqual("my milestone");
+          expect(body[0].dueDate).toEqual("2020-01-01");
+          expect(body[0].features.length).toEqual(1);
+          expect(body[0].features[0].id).toBeDefined();
+          expect(body[0].features[0].title).toEqual("my feature");
+          expect(body[0].features[0].priority).toEqual("medium");
+          expect(body[0].features[0].createdAt).toBeDefined();
+          expect(body[0].features[0].updatedAt).toBeDefined();
+        });
+    });
+  });
 });

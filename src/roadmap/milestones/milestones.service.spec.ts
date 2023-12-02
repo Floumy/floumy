@@ -8,11 +8,16 @@ import { Objective } from "../../okrs/objective.entity";
 import { KeyResult } from "../../okrs/key-result.entity";
 import { User } from "../../users/user.entity";
 import { Milestone } from "./milestone.entity";
+import { FeaturesService } from "../features/features.service";
+import { Feature } from "../features/feature.entity";
+import { Priority } from "../../common/priority.enum";
+import { OkrsService } from "../../okrs/okrs.service";
 
 describe("MilestonesService", () => {
   let usersService: UsersService;
   let service: MilestonesService;
   let orgsService: OrgsService;
+  let featuresService: FeaturesService;
 
   let org: Org;
 
@@ -20,13 +25,14 @@ describe("MilestonesService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Milestone, User])],
-      [OrgsService, MilestonesService, UsersService]
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Milestone, Feature, User, Objective, KeyResult])],
+      [OrgsService, MilestonesService, UsersService, FeaturesService, OkrsService]
     );
     cleanup = dbCleanup;
     service = module.get<MilestonesService>(MilestonesService);
     usersService = module.get<UsersService>(UsersService);
     orgsService = module.get<OrgsService>(OrgsService);
+    featuresService = module.get<FeaturesService>(FeaturesService);
     const user = await usersService.create(
       "Test User",
       "test@example.com",
@@ -95,6 +101,55 @@ describe("MilestonesService", () => {
       expect(milestones[0].id).toBeDefined();
       expect(milestones[0].title).toEqual("my milestone");
       expect(milestones[0].dueDate).toEqual("2020-01-01");
+    });
+  });
+  describe("when listing milestones with features", () => {
+    it("should return the milestones", async () => {
+      await service.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone",
+        dueDate: "2020-01-01"
+      });
+      const milestones = await service.listMilestonesWithFeatures(org.id);
+      expect(milestones.length).toEqual(1);
+      expect(milestones[0].id).toBeDefined();
+      expect(milestones[0].title).toEqual("my milestone");
+      expect(milestones[0].dueDate).toEqual("2020-01-01");
+      expect(milestones[0].features.length).toEqual(0);
+      expect(milestones[0].timeline).toEqual("past");
+    });
+    it("should return the milestones with features", async () => {
+      const milestone = await service.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone",
+        dueDate: "2020-01-01"
+      });
+      await service.createMilestone(org.id, {
+        title: "my milestone 2",
+        description: "my milestone 2",
+        dueDate: "2020-01-01"
+      });
+      await featuresService.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        milestone: milestone.id
+      });
+      const milestones = await service.listMilestonesWithFeatures(org.id);
+      expect(milestones.length).toEqual(2);
+      expect(milestones[0].id).toBeDefined();
+      expect(milestones[0].title).toEqual("my milestone");
+      expect(milestones[0].dueDate).toEqual("2020-01-01");
+      expect(milestones[0].features.length).toEqual(1);
+      expect(milestones[0].features[0].id).toBeDefined();
+      expect(milestones[0].features[0].title).toEqual("my feature");
+      expect(milestones[0].features[0].priority).toEqual(Priority.HIGH.valueOf());
+      expect(milestones[0].features[0].createdAt).toBeDefined();
+      expect(milestones[0].features[0].updatedAt).toBeDefined();
+      expect(milestones[1].id).toBeDefined();
+      expect(milestones[1].title).toEqual("my milestone 2");
+      expect(milestones[1].dueDate).toEqual("2020-01-01");
+      expect(milestones[1].features.length).toEqual(0);
     });
   });
 });

@@ -31,6 +31,13 @@ export class MilestonesController {
     }
   }
 
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async listMilestonesWithFeatures(@Request() request) {
+    const { org: orgId } = request.user;
+    return await this.milestonesService.listMilestonesWithFeatures(orgId);
+  }
+
   @Get("/list")
   @HttpCode(HttpStatus.OK)
   async list(@Request() request) {
