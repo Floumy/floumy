@@ -5,7 +5,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { OrgsService } from "../orgs/orgs.service";
 import { KeyResult } from "./key-result.entity";
 import { KeyResultMapper, OKRMapper } from "./mappers";
-import { Timeline } from "../common/timeline.enum";
 import { OKRStatus } from "./okrstatus.enum";
 import { TimelineService } from "../common/timeline.service";
 
@@ -28,7 +27,7 @@ export class OkrsService {
     newObjective.title = objective.title;
     newObjective.org = Promise.resolve(org);
     if (objective.timeline) {
-      this.validateTimeline(objective.timeline);
+      TimelineService.validateTimeline(objective.timeline);
       const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(objective.timeline);
       newObjective.startDate = startDate;
       newObjective.endDate = endDate;
@@ -57,12 +56,12 @@ export class OkrsService {
   async get(orgId: any, id: string) {
     const objective = await this.objectiveRepository.findOneByOrFail({ id, org: { id: orgId } });
     const keyResults = await objective.keyResults;
-    return OKRMapper.toDTO(objective, keyResults.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()));
+    return await OKRMapper.toDTO(objective, keyResults.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()));
   }
 
   async update(orgId: string, id: string, okrDto: CreateOrUpdateOKRDto) {
     if (okrDto.objective.timeline) {
-      this.validateTimeline(okrDto.objective.timeline);
+      TimelineService.validateTimeline(okrDto.objective.timeline);
     }
     const objectiveDates = TimelineService.getStartAndEndDatesByTimelineValue(okrDto.objective.timeline);
     await this.objectiveRepository.update(
@@ -86,14 +85,14 @@ export class OkrsService {
 
   async create(orgId: string, okrDto: CreateOrUpdateOKRDto) {
     if (okrDto.objective.timeline) {
-      this.validateTimeline(okrDto.objective.timeline);
+      TimelineService.validateTimeline(okrDto.objective.timeline);
     }
     const objective = await this.createObjective(orgId, okrDto.objective);
-    if (!okrDto.keyResults || okrDto.keyResults.length === 0) return OKRMapper.toDTO(objective, []);
+    if (!okrDto.keyResults || okrDto.keyResults.length === 0) return await OKRMapper.toDTO(objective, []);
 
     const keyResults = await Promise.all(okrDto.keyResults.map(keyResult => this.createKeyResult(objective, keyResult.title)));
 
-    return OKRMapper.toDTO(objective, keyResults);
+    return await OKRMapper.toDTO(objective, keyResults);
   }
 
   private async updateKeyResults(id: string, keyResults: {
@@ -145,13 +144,13 @@ export class OkrsService {
       keyResult.progress = updateKeyResultDto.progress;
       const savedKeyResult = await this.keyResultRepository.save(keyResult);
       await this.updateObjectiveProgress(await keyResult.objective);
-      return KeyResultMapper.toDTO(savedKeyResult);
+      return await KeyResultMapper.toDTO(savedKeyResult);
     }
 
     if (updateKeyResultDto.status) {
       keyResult.status = Object.values(OKRStatus).find(status => status === updateKeyResultDto.status);
       const savedKeyResult = await this.keyResultRepository.save(keyResult);
-      return KeyResultMapper.toDTO(savedKeyResult);
+      return await KeyResultMapper.toDTO(savedKeyResult);
     }
 
     throw new Error("Invalid patch key result dto");
@@ -176,14 +175,8 @@ export class OkrsService {
       { status }
     );
   }
-
-  private validateTimeline(timeline: string) {
-    if (!Object.values(Timeline).find(t => t === timeline)) {
-      throw new Error("Invalid timeline");
-    }
-  }
-
   async listKeyResults(orgId: string) {
-    return await this.keyResultRepository.findBy({ org: { id: orgId } });
+    const keyResults = await this.keyResultRepository.findBy({ org: { id: orgId } });
+    return await KeyResultMapper.toListDTO(keyResults);
   }
 }

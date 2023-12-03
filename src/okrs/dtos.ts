@@ -24,3 +24,13 @@ interface PatchKeyResultDto {
 interface PatchObjectiveDto {
   status?: string;
 }
+
+interface KeyResultDto {
+  id: string;
+  title: string;
+  progress: number;
+  timeline: string;
+  createdAt: Date;
+  updatedAt: Date;
+  status: string;
+}

@@ -19,6 +19,7 @@ export class MilestoneMapper {
     return milestones.map(milestone => ({
       id: milestone.id,
       title: milestone.title,
+      timeline: TimelineService.convertDateToTimeline(milestone.dueDate).valueOf(),
       dueDate: MilestoneMapper.formatDate(milestone.dueDate)
     }));
   }
