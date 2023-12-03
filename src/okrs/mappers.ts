@@ -1,30 +1,10 @@
 import { KeyResult } from "./key-result.entity";
 import { Objective } from "./objective.entity";
+import { TimelineService } from "../common/timeline.service";
 
 export class OKRMapper {
 
-  static startAndEndDatesToTimeline(startDate: Date, endDate: Date) {
-    const now = new Date();
-    if (!startDate && !endDate) {
-      return "later";
-    }
-
-    if (endDate.getTime() < now.getTime()) {
-      return "past";
-    }
-
-    if (startDate.getTime() <= now.getTime() && endDate.getTime() >= now.getTime()) {
-      return "this-quarter";
-    }
-
-    if (startDate.getTime() > now.getTime()) {
-      return "next-quarter";
-    }
-
-    return "later";
-  }
-
-  static toDTO(objective: Objective, keyResults: KeyResult[]) {
+  static async toDTO(objective: Objective, keyResults: KeyResult[]) {
     return {
       objective: {
         id: objective.id,
@@ -33,9 +13,9 @@ export class OKRMapper {
         createdAt: objective.createdAt,
         updatedAt: objective.updatedAt,
         status: objective.status,
-        timeline: OKRMapper.startAndEndDatesToTimeline(objective.startDate, objective.endDate)
+        timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate)
       },
-      keyResults: keyResults.map(KeyResultMapper.toDTO)
+      keyResults: await KeyResultMapper.toListDTO(keyResults)
     };
   }
 
@@ -44,7 +24,7 @@ export class OKRMapper {
       id: objective.id,
       title: objective.title,
       status: objective.status,
-      timeline: OKRMapper.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
+      timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
       progress: parseFloat(objective.progress?.toFixed(2)),
       createdAt: objective.createdAt,
       updatedAt: objective.updatedAt
@@ -53,14 +33,20 @@ export class OKRMapper {
 }
 
 export class KeyResultMapper {
-  static toDTO(keyResult: KeyResult) {
+  static async toDTO(keyResult: KeyResult): Promise<KeyResultDto> {
+    const objective = await keyResult.objective;
     return {
       id: keyResult.id,
       title: keyResult.title,
       progress: parseFloat(keyResult.progress?.toFixed(2)),
+      timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
       createdAt: keyResult.createdAt,
       updatedAt: keyResult.updatedAt,
       status: keyResult.status
     };
+  }
+
+  static toListDTO(keyResults: KeyResult[]): Promise<KeyResultDto[]> {
+    return Promise.all(keyResults.map(KeyResultMapper.toDTO));
   }
 }

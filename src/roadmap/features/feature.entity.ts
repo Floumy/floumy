@@ -25,6 +25,10 @@ export class Feature {
     default: FeatureStatus.PLANNED
   })
   status: FeatureStatus;
+  @Column({ nullable: true })
+  startDate: Date;
+  @Column({ nullable: true })
+  endDate: Date;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

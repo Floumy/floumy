@@ -1,8 +1,10 @@
 import { Priority } from "../../common/priority.enum";
+import { Timeline } from "../../common/timeline.enum";
 
 export interface CreateFeatureDto {
   title: string;
   priority: Priority;
+  timeline: Timeline;
   description?: string;
   milestone?: string;
   keyResult?: string;
@@ -13,6 +15,7 @@ export interface FeatureDto {
   title: string;
   description?: string;
   priority: Priority;
+  timeline: string;
   keyResult?: {
     id: string;
     title: string;

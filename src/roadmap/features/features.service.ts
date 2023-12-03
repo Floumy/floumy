@@ -8,6 +8,7 @@ import { Priority } from "../../common/priority.enum";
 import { OrgsService } from "../../orgs/orgs.service";
 import { OkrsService } from "../../okrs/okrs.service";
 import { MilestonesService } from "../milestones/milestones.service";
+import { TimelineService } from "../../common/timeline.service";
 
 @Injectable()
 export class FeaturesService {
@@ -28,6 +29,13 @@ export class FeaturesService {
     feature.description = featureDto.description;
     feature.priority = featureDto.priority;
     feature.org = Promise.resolve(org);
+
+    if (featureDto.timeline) {
+      TimelineService.validateTimeline(featureDto.timeline);
+      const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(featureDto.timeline);
+      feature.startDate = startDate;
+      feature.endDate = endDate;
+    }
 
     if (featureDto.keyResult) {
       const keyResult = await this.okrsService.getKeyResultByOrgId(orgId, featureDto.keyResult);

@@ -28,13 +28,45 @@ export class TimelineService {
 
   static convertDateToTimeline(date: Date): Timeline {
     const today = new Date();
+
+    const quarter = Math.floor((date.getMonth() + 3) / 3);
+    const currentQuarter = TimelineService.getCurrentQuarter();
+
     if (date < today) return Timeline.PAST;
     if (date.getFullYear() === today.getFullYear()) {
-      const quarter = Math.floor((date.getMonth() + 3) / 3);
-      const currentQuarter = Math.floor((today.getMonth() + 3) / 3);
       if (quarter === currentQuarter) return Timeline.THIS_QUARTER;
       if (quarter === currentQuarter + 1) return Timeline.NEXT_QUARTER;
     }
+    if (date.getFullYear() > today.getFullYear()) {
+      if (quarter === 1 && currentQuarter === 4) return Timeline.NEXT_QUARTER;
+    }
     return Timeline.LATER;
+  }
+
+  static startAndEndDatesToTimeline(startDate: Date, endDate: Date) {
+    const now = new Date();
+    if (!startDate && !endDate) {
+      return "later";
+    }
+
+    if (endDate.getTime() < now.getTime()) {
+      return "past";
+    }
+
+    if (startDate.getTime() <= now.getTime() && endDate.getTime() >= now.getTime()) {
+      return "this-quarter";
+    }
+
+    if (startDate.getTime() > now.getTime()) {
+      return "next-quarter";
+    }
+
+    return "later";
+  }
+
+  static validateTimeline(timeline: string) {
+    if (!Object.values(Timeline).find(t => t === timeline)) {
+      throw new Error("Invalid timeline");
+    }
   }
 }

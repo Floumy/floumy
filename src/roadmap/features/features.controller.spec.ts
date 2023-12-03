@@ -14,6 +14,7 @@ import { UsersService } from "../../users/users.service";
 import { UsersModule } from "../../users/users.module";
 import { MilestonesService } from "../milestones/milestones.service";
 import { Milestone } from "../milestones/milestone.entity";
+import { Timeline } from "../../common/timeline.enum";
 
 describe("FeaturesController", () => {
   let controller: FeaturesController;
@@ -48,7 +49,7 @@ describe("FeaturesController", () => {
 
   describe("when creating a feature", () => {
     it("should return 201", async () => {
-      const okrResponse = await controller.create(
+      const featureResponse = await controller.create(
         {
           user: {
             org: org.id
@@ -57,11 +58,14 @@ describe("FeaturesController", () => {
         {
           title: "my feature",
           description: "my feature description",
-          priority: Priority.HIGH
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER
         });
-      expect(okrResponse.title).toEqual("my feature");
-      expect(okrResponse.description).toEqual("my feature description");
-      expect(okrResponse.priority).toEqual(Priority.HIGH);
+      expect(featureResponse.title).toEqual("my feature");
+      expect(featureResponse.description).toEqual("my feature description");
+      expect(featureResponse.priority).toEqual(Priority.HIGH);
+      expect(featureResponse.timeline).toEqual(Timeline.NEXT_QUARTER);
+      expect(featureResponse.createdAt).toBeDefined();
     });
     it("should return 400 if title is missing", async () => {
       try {
@@ -74,7 +78,8 @@ describe("FeaturesController", () => {
           {
             title: null,
             description: "my feature description",
-            priority: Priority.HIGH
+            priority: Priority.HIGH,
+            timeline: Timeline.THIS_QUARTER
           });
       } catch (e) {
         expect(e.message).toEqual("Bad Request");
@@ -92,7 +97,8 @@ describe("FeaturesController", () => {
         {
           title: "my feature",
           description: "my feature description",
-          priority: Priority.HIGH
+          priority: Priority.HIGH,
+          timeline: Timeline.THIS_QUARTER
         });
       const features = await controller.list({
         user: {
@@ -116,7 +122,8 @@ describe("FeaturesController", () => {
         {
           title: "my feature",
           description: "my feature description",
-          priority: Priority.HIGH
+          priority: Priority.HIGH,
+          timeline: Timeline.THIS_QUARTER
         });
       const features = await controller.listWithoutMilestone({
         user: {
