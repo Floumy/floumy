@@ -12,6 +12,7 @@ import { FeaturesService } from "../features/features.service";
 import { Feature } from "../features/feature.entity";
 import { Priority } from "../../common/priority.enum";
 import { OkrsService } from "../../okrs/okrs.service";
+import { Timeline } from "../../common/timeline.enum";
 
 describe("MilestonesService", () => {
   let usersService: UsersService;
@@ -133,7 +134,8 @@ describe("MilestonesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        milestone: milestone.id
+        milestone: milestone.id,
+        timeline: Timeline.NEXT_QUARTER
       });
       const milestones = await service.listMilestonesWithFeatures(org.id);
       expect(milestones.length).toEqual(2);
