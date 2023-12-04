@@ -19,6 +19,7 @@ export class MilestoneMapper {
     return milestones.map(milestone => ({
       id: milestone.id,
       title: milestone.title,
+      description: milestone.description,
       timeline: TimelineService.convertDateToTimeline(milestone.dueDate).valueOf(),
       dueDate: MilestoneMapper.formatDate(milestone.dueDate)
     }));
@@ -28,6 +29,7 @@ export class MilestoneMapper {
     return await Promise.all(milestones.map(async milestone => ({
       id: milestone.id,
       title: milestone.title,
+      description: milestone.description,
       dueDate: MilestoneMapper.formatDate(milestone.dueDate),
       timeline: TimelineService.convertDateToTimeline(milestone.dueDate).valueOf(),
       features: (await milestone.features).map(feature => ({
