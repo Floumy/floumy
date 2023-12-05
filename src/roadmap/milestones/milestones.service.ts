@@ -38,11 +38,11 @@ export class MilestonesService {
   }
 
   async listMilestones(orgId: string) {
-    return MilestoneMapper.toListDto(await this.milestoneRepository.findBy({ org: { id: orgId } }));
+    return MilestoneMapper.toListDto(await this.milestoneRepository.find({ where: { org: { id: orgId } }, order: { dueDate: "ASC" } }));
   }
 
   async listMilestonesWithFeatures(orgId: string) {
-    const milestones = await this.milestoneRepository.findBy({ org: { id: orgId } });
+    const milestones = await this.milestoneRepository.find({ where: { org: { id: orgId } }, order: { dueDate: "ASC" }, relations: ["features"] });
     return await MilestoneMapper.toListWithFeaturesDto(milestones);
   }
 
