@@ -1,7 +1,7 @@
 import { Priority } from "../../common/priority.enum";
 import { Timeline } from "../../common/timeline.enum";
 
-export interface CreateFeatureDto {
+export interface CreateUpdateFeatureDto {
   title: string;
   priority: Priority;
   timeline: Timeline;

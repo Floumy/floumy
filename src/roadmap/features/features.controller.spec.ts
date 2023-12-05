@@ -136,4 +136,59 @@ describe("FeaturesController", () => {
       expect(features[0].updatedAt).toBeDefined();
     });
   });
+  describe("when getting a feature", () => {
+    it("should return 200", async () => {
+      const featureResponse = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.THIS_QUARTER
+        });
+      const feature = await controller.get({
+        user: {
+          org: org.id
+        }
+      }, featureResponse.id);
+      expect(feature.title).toEqual("my feature");
+      expect(feature.priority).toEqual(Priority.HIGH);
+      expect(feature.createdAt).toBeDefined();
+      expect(feature.updatedAt).toBeDefined();
+    });
+  });
+  describe("when updating a feature", () => {
+    it("should return 200", async () => {
+      const featureResponse = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.THIS_QUARTER
+        });
+      const feature = await controller.update({
+        user: {
+          org: org.id
+        }
+      }, featureResponse.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        timeline: Timeline.THIS_QUARTER
+      });
+      expect(feature.title).toEqual("my feature");
+      expect(feature.priority).toEqual(Priority.HIGH);
+      expect(feature.createdAt).toBeDefined();
+      expect(feature.updatedAt).toBeDefined();
+    });
+  });
 });

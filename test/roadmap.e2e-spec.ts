@@ -304,4 +304,112 @@ describe("FeaturesController (e2e)", () => {
         .expect(HttpStatus.OK);
     });
   });
+  describe("/features/:id (GET)", () => {
+    it("should return 200", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR"
+          },
+          keyResults: [
+            { title: "My Key Result 1" },
+            { title: "My Key Result 2" }
+          ]
+        })
+        .expect(HttpStatus.CREATED);
+      const milestoneResponse = await request(app.getHttpServer())
+        .post("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my milestone",
+          description: "my milestone description",
+          dueDate: "2020-01-01"
+        })
+        .expect(HttpStatus.CREATED);
+      const featureResponse = await request(app.getHttpServer())
+        .post("/features")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my feature",
+          description: "my feature description",
+          priority: "medium",
+          keyResult: okrResponse.body.keyResults[0].id,
+          milestone: milestoneResponse.body.id
+        })
+        .expect(HttpStatus.CREATED);
+      return request(app.getHttpServer())
+        .get(`/features/${featureResponse.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.id).toBeDefined();
+          expect(body.title).toEqual("my feature");
+          expect(body.description).toEqual("my feature description");
+          expect(body.priority).toEqual("medium");
+          expect(body.keyResult.id).toEqual(okrResponse.body.keyResults[0].id);
+          expect(body.keyResult.title).toEqual("My Key Result 1");
+          expect(body.milestone.id).toEqual(milestoneResponse.body.id);
+          expect(body.milestone.title).toEqual("my milestone");
+        });
+    });
+  });
+  describe("/features/:id (PUT)", () => {
+    it("should return 200", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR"
+          },
+          keyResults: [
+            { title: "My Key Result 1" },
+            { title: "My Key Result 2" }
+          ]
+        })
+        .expect(HttpStatus.CREATED);
+      const milestoneResponse = await request(app.getHttpServer())
+        .post("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my milestone",
+          description: "my milestone description",
+          dueDate: "2020-01-01"
+        })
+        .expect(HttpStatus.CREATED);
+      const featureResponse = await request(app.getHttpServer())
+        .post("/features")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my feature",
+          description: "my feature description",
+          priority: "medium",
+          keyResult: okrResponse.body.keyResults[0].id,
+          milestone: milestoneResponse.body.id
+        })
+        .expect(HttpStatus.CREATED);
+      return request(app.getHttpServer())
+        .put(`/features/${featureResponse.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my feature updated",
+          description: "my feature description updated",
+          priority: "high",
+          keyResult: okrResponse.body.keyResults[1].id,
+          milestone: null
+        })
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.id).toBeDefined();
+          expect(body.title).toEqual("my feature updated");
+          expect(body.description).toEqual("my feature description updated");
+          expect(body.priority).toEqual("high");
+          expect(body.keyResult.id).toEqual(okrResponse.body.keyResults[1].id);
+          expect(body.keyResult.title).toEqual("My Key Result 2");
+          expect(body.milestone).toBeNull();
+        });
+    });
+  });
 });
