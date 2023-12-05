@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CreateMilestoneDto } from "./dtos";
+import { CreateUpdateMilestoneDto } from "./dtos";
 import { Milestone } from "./milestone.entity";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -15,7 +15,7 @@ export class MilestonesService {
   ) {
   }
 
-  async createMilestone(orgId: string, createMilestoneDto: CreateMilestoneDto) {
+  async createMilestone(orgId: string, createMilestoneDto: CreateUpdateMilestoneDto) {
     this.validateMilestone(createMilestoneDto);
     const org = await this.orgsService.findOneById(orgId);
     const milestone = new Milestone();
@@ -27,7 +27,7 @@ export class MilestonesService {
     return MilestoneMapper.toDto(savedMilestone);
   }
 
-  private validateMilestone(createMilestoneDto: CreateMilestoneDto) {
+  private validateMilestone(createMilestoneDto: CreateUpdateMilestoneDto) {
     if (!createMilestoneDto.title) throw new Error("Milestone title is required");
     if (!createMilestoneDto.dueDate) throw new Error("Milestone due date is required");
     if (!createMilestoneDto.dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) throw new Error("Invalid due date");
@@ -44,5 +44,20 @@ export class MilestonesService {
   async listMilestonesWithFeatures(orgId: string) {
     const milestones = await this.milestoneRepository.findBy({ org: { id: orgId } });
     return await MilestoneMapper.toListWithFeaturesDto(milestones);
+  }
+
+  async get(orgId: string, id: string) {
+    const milestone = await this.milestoneRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+    return MilestoneMapper.toDto(milestone);
+  }
+
+  async update(orgId: string, id: string, updateMilestoneDto: CreateUpdateMilestoneDto) {
+    this.validateMilestone(updateMilestoneDto);
+    const milestone = await this.milestoneRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+    milestone.title = updateMilestoneDto.title;
+    milestone.description = updateMilestoneDto.description;
+    milestone.dueDate = new Date(updateMilestoneDto.dueDate);
+    const savedMilestone = await this.milestoneRepository.save(milestone);
+    return MilestoneMapper.toDto(savedMilestone);
   }
 }

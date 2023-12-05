@@ -116,4 +116,60 @@ describe("MilestonesController", () => {
       expect(milestones[0].dueDate).toEqual("2020-01-01");
     });
   });
+  describe("when getting a milestone", () => {
+    it("should return the milestone", async () => {
+      const milestone = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my milestone",
+          description: "my milestone",
+          dueDate: "2020-01-01"
+        }
+      );
+      const milestoneResponse = await controller.get({
+        user: {
+          org: org.id
+        }
+      }, milestone.id);
+      expect(milestoneResponse.id).toBeDefined();
+      expect(milestoneResponse.title).toEqual("my milestone");
+      expect(milestoneResponse.description).toEqual("my milestone");
+      expect(milestoneResponse.timeline).toEqual(Timeline.PAST.valueOf());
+      expect(milestoneResponse.dueDate).toEqual("2020-01-01");
+    });
+  });
+  describe("when updating a milestone", () => {
+    it("should return the milestone", async () => {
+      const milestone = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my milestone",
+          description: "my milestone",
+          dueDate: "2020-01-01"
+        }
+      );
+      const milestoneResponse = await controller.update({
+        user: {
+          org: org.id
+        }
+      }, milestone.id, {
+        title: "my milestone",
+        description: "my milestone",
+        dueDate: "2020-01-01"
+      });
+      expect(milestoneResponse.id).toBeDefined();
+      expect(milestoneResponse.title).toEqual("my milestone");
+      expect(milestoneResponse.description).toEqual("my milestone");
+      expect(milestoneResponse.timeline).toEqual(Timeline.PAST.valueOf());
+      expect(milestoneResponse.dueDate).toEqual("2020-01-01");
+    });
+  });
 });
