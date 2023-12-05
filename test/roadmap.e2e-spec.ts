@@ -227,4 +227,64 @@ describe("FeaturesController (e2e)", () => {
         });
     });
   });
+  describe("/milestones/:id (GET)", () => {
+    it("should return 200", async () => {
+      const milestoneResponse = await request(app.getHttpServer())
+        .post("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my milestone",
+          description: "my milestone description",
+          dueDate: "2020-01-01"
+        })
+        .expect(HttpStatus.CREATED);
+      await request(app.getHttpServer())
+        .post("/features")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my feature",
+          description: "my feature description",
+          priority: "medium",
+          milestone: milestoneResponse.body.id
+        })
+        .expect(HttpStatus.CREATED);
+      return request(app.getHttpServer())
+        .get(`/milestones/${milestoneResponse.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.id).toBeDefined();
+          expect(body.title).toEqual("my milestone");
+          expect(body.dueDate).toEqual("2020-01-01");
+        });
+    });
+  });
+  describe("/milestones/:id (PUT)", () => {
+    it("should return 200", async () => {
+      const milestoneResponse = await request(app.getHttpServer())
+        .post("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my milestone",
+          description: "my milestone description",
+          dueDate: "2020-01-01"
+        })
+        .expect(HttpStatus.CREATED);
+      return request(app.getHttpServer())
+        .put(`/milestones/${milestoneResponse.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my milestone updated",
+          description: "my milestone description updated",
+          dueDate: "2020-02-01"
+        })
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.id).toBeDefined();
+          expect(body.title).toEqual("my milestone updated");
+          expect(body.description).toEqual("my milestone description updated");
+          expect(body.dueDate).toEqual("2020-02-01");
+        });
+    });
+  });
 });

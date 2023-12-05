@@ -154,4 +154,37 @@ describe("MilestonesService", () => {
       expect(milestones[1].features.length).toEqual(0);
     });
   });
+  describe("when getting a milestone", () => {
+    it("should return the milestone", async () => {
+      const milestone = await service.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone",
+        dueDate: "2020-01-01"
+      });
+      const foundMilestone = await service.get(org.id, milestone.id);
+      expect(foundMilestone.id).toEqual(milestone.id);
+      expect(foundMilestone.title).toEqual(milestone.title);
+      expect(foundMilestone.description).toEqual(milestone.description);
+      expect(foundMilestone.timeline).toEqual("past");
+      expect(foundMilestone.dueDate).toEqual(milestone.dueDate);
+    });
+  });
+  describe("when updating a milestone", () => {
+    it("should return the milestone", async () => {
+      const milestone = await service.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone",
+        dueDate: "2020-01-01"
+      });
+      const updatedMilestone = await service.update(org.id, milestone.id, {
+        title: "my milestone updated",
+        description: "my milestone updated",
+        dueDate: "2020-01-02"
+      });
+      expect(updatedMilestone.id).toEqual(milestone.id);
+      expect(updatedMilestone.title).toEqual("my milestone updated");
+      expect(updatedMilestone.description).toEqual("my milestone updated");
+      expect(updatedMilestone.dueDate).toEqual("2020-01-02");
+    });
+  });
 });

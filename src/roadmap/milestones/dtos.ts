@@ -1,4 +1,4 @@
-export interface CreateMilestoneDto {
+export interface CreateUpdateMilestoneDto {
   title: string;
   description: string;
   dueDate: string;
