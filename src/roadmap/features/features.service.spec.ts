@@ -217,4 +217,140 @@ describe("FeaturesService", () => {
       expect(features[0].updatedAt).toBeDefined();
     });
   });
+  describe("when getting a feature", () => {
+    it("should return a feature", async () => {
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        timeline: Timeline.THIS_QUARTER
+      });
+      const foundFeature = await service.get(org.id, feature.id);
+      expect(foundFeature.id).toEqual(feature.id);
+      expect(foundFeature.title).toEqual(feature.title);
+      expect(foundFeature.priority).toEqual(feature.priority);
+      expect(foundFeature.createdAt).toBeDefined();
+      expect(foundFeature.updatedAt).toBeDefined();
+    });
+    it("should throw an error if the feature does not exist", async () => {
+      await expect(
+        service.get(org.id, "non-existent-feature")
+      ).rejects.toThrowError();
+    });
+    it("should return the feature with the key result", async () => {
+      const objective = await okrsService.create(org.id, {
+        objective: {
+          title: "my objective"
+        },
+        keyResults: [
+          {
+            title: "my key result"
+          }
+        ]
+      });
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        keyResult: objective.keyResults[0].id,
+        timeline: Timeline.THIS_QUARTER
+      });
+      const foundFeature = await service.get(org.id, feature.id);
+      expect(foundFeature.keyResult).toBeDefined();
+      expect(foundFeature.keyResult.id).toEqual(objective.keyResults[0].id);
+      expect(foundFeature.keyResult.title).toEqual(objective.keyResults[0].title);
+    });
+    it("should return the feature with the milestone", async () => {
+      const milestone = await milestonesService.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone description",
+        dueDate: "2020-01-01"
+      });
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        milestone: milestone.id,
+        timeline: Timeline.THIS_QUARTER
+      });
+      const foundFeature = await service.get(org.id, feature.id);
+      expect(foundFeature.milestone).toBeDefined();
+      expect(foundFeature.milestone.id).toEqual(milestone.id);
+      expect(foundFeature.milestone.title).toEqual(milestone.title);
+    });
+  });
+  describe("when updating a feature", () => {
+    it("should return a feature", async () => {
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        timeline: Timeline.THIS_QUARTER
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: "my updated feature",
+        description: "my updated feature description",
+        priority: Priority.LOW,
+        timeline: Timeline.NEXT_QUARTER
+      });
+      expect(updatedFeature.id).toEqual(feature.id);
+      expect(updatedFeature.title).toEqual("my updated feature");
+      expect(updatedFeature.description).toEqual("my updated feature description");
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.timeline).toEqual(Timeline.NEXT_QUARTER);
+      expect(updatedFeature.createdAt).toEqual(feature.createdAt);
+      expect(updatedFeature.updatedAt).not.toEqual(feature.updatedAt);
+    });
+    it("should update the feature with a key result", async () => {
+      const objective = await okrsService.create(org.id, {
+        objective: {
+          title: "my objective"
+        },
+        keyResults: [
+          {
+            title: "my key result"
+          }
+        ]
+      });
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        timeline: Timeline.THIS_QUARTER
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: "my updated feature",
+        description: "my updated feature description",
+        priority: Priority.LOW,
+        keyResult: objective.keyResults[0].id,
+        timeline: Timeline.NEXT_QUARTER
+      });
+      expect(updatedFeature.keyResult).toBeDefined();
+      expect(updatedFeature.keyResult.id).toEqual(objective.keyResults[0].id);
+      expect(updatedFeature.keyResult.title).toEqual(objective.keyResults[0].title);
+    });
+    it("should update the feature with a milestone", async () => {
+      const milestone = await milestonesService.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone description",
+        dueDate: "2020-01-01"
+      });
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        timeline: Timeline.THIS_QUARTER
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: "my updated feature",
+        description: "my updated feature description",
+        priority: Priority.LOW,
+        milestone: milestone.id,
+        timeline: Timeline.NEXT_QUARTER
+      });
+      expect(updatedFeature.milestone).toBeDefined();
+      expect(updatedFeature.milestone.id).toEqual(milestone.id);
+      expect(updatedFeature.milestone.title).toEqual(milestone.title);
+    });
+  });
 });

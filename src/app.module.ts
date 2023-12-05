@@ -26,7 +26,8 @@ import jwtConfig from "./config/jwt.config";
         password: configService.get("database.password"),
         database: configService.get("database.name"),
         entities: [__dirname + "/**/*.entity{.ts,.js}"],
-        synchronize: true
+        synchronize: true,
+        logging: true
       }),
       inject: [ConfigService],
       imports: [ConfigModule]
