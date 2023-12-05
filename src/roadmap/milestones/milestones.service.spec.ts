@@ -187,4 +187,32 @@ describe("MilestonesService", () => {
       expect(updatedMilestone.dueDate).toEqual("2020-01-02");
     });
   });
+  describe("when deleting a milestone", () => {
+    it("should delete the milestone", async () => {
+      const milestone = await service.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone",
+        dueDate: "2020-01-01"
+      });
+      await service.delete(org.id, milestone.id);
+      await expect(service.get(org.id, milestone.id)).rejects.toThrow();
+    });
+    it("should not delete the features but remove the milestone reference", async () => {
+      const milestone = await service.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone",
+        dueDate: "2020-01-01"
+      });
+      const feature = await featuresService.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        milestone: milestone.id,
+        timeline: Timeline.NEXT_QUARTER
+      });
+      await service.delete(org.id, milestone.id);
+      const foundFeature = await featuresService.get(org.id, feature.id);
+      expect(foundFeature.milestone).toBeUndefined();
+    });
+  });
 });

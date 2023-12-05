@@ -172,4 +172,26 @@ describe("MilestonesController", () => {
       expect(milestoneResponse.dueDate).toEqual("2020-01-01");
     });
   });
+  describe("when deleting a milestone", () => {
+    it("deletes the milestone", async () => {
+      const milestone = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my milestone",
+          description: "my milestone",
+          dueDate: "2020-01-01"
+        }
+      );
+      const milestoneResponse = await controller.delete({
+        user: {
+          org: org.id
+        }
+      }, milestone.id);
+      expect(milestoneResponse).toEqual({});
+    });
+  });
 });

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -61,10 +62,21 @@ export class MilestonesController {
 
   @Put(":id")
   @HttpCode(HttpStatus.OK)
-  async update(@Request() request, @Param("id") id, @Body() updateMilestoneDto: CreateUpdateMilestoneDto) {
+  async update(@Request() request, @Param("id") id: string, @Body() updateMilestoneDto: CreateUpdateMilestoneDto) {
     const { org: orgId } = request.user;
     try {
       return await this.milestonesService.update(orgId, id, updateMilestoneDto);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Delete(":id")
+  @HttpCode(HttpStatus.OK)
+  async delete(@Request() request, @Param("id") id: string) {
+    const { org: orgId } = request.user;
+    try {
+      return await this.milestonesService.delete(orgId, id);
     } catch (e) {
       throw new BadRequestException();
     }

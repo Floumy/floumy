@@ -287,4 +287,21 @@ describe("FeaturesController (e2e)", () => {
         });
     });
   });
+  describe("/milestones/:id (DELETE)", () => {
+    it("should return 200", async () => {
+      const milestoneResponse = await request(app.getHttpServer())
+        .post("/milestones")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "my milestone",
+          description: "my milestone description",
+          dueDate: "2020-01-01"
+        })
+        .expect(HttpStatus.CREATED);
+      return request(app.getHttpServer())
+        .delete(`/milestones/${milestoneResponse.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK);
+    });
+  });
 });

@@ -60,4 +60,13 @@ export class MilestonesService {
     const savedMilestone = await this.milestoneRepository.save(milestone);
     return MilestoneMapper.toDto(savedMilestone);
   }
+
+  async delete(orgId: string, id: string) {
+    const milestone = await this.milestoneRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+    const features = await milestone.features;
+    features.forEach(feature => feature.milestone = null);
+    await this.milestoneRepository.manager.save(features);
+    await this.milestoneRepository.remove(milestone);
+    return MilestoneMapper.toDto(milestone);
+  }
 }
