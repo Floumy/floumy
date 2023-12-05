@@ -191,7 +191,7 @@ describe("MilestonesController", () => {
           org: org.id
         }
       }, milestone.id);
-      expect(milestoneResponse).toEqual({});
+      expect(milestoneResponse).toBeUndefined();
     });
   });
 });

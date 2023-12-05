@@ -67,6 +67,5 @@ export class MilestonesService {
     features.forEach(feature => feature.milestone = null);
     await this.milestoneRepository.manager.save(features);
     await this.milestoneRepository.remove(milestone);
-    return MilestoneMapper.toDto(milestone);
   }
 }
