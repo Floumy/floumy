@@ -353,4 +353,16 @@ describe("FeaturesService", () => {
       expect(updatedFeature.milestone.title).toEqual(milestone.title);
     });
   });
+  describe("when deleting a feature", () => {
+    it("should delete the feature", async () => {
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        timeline: Timeline.THIS_QUARTER
+      });
+      await service.deleteFeature(org.id, feature.id);
+      await expect(service.get(org.id, feature.id)).rejects.toThrowError();
+    });
+  });
 });

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -72,6 +73,17 @@ export class FeaturesController {
     try {
       const { org: orgId } = request.user;
       return await this.featuresService.updateFeature(orgId, id, updateFeatureDto);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Delete(":id")
+  @HttpCode(HttpStatus.OK)
+  async delete(@Request() request, @Param("id") id: string) {
+    try {
+      const { org: orgId } = request.user;
+      await this.featuresService.deleteFeature(orgId, id);
     } catch (e) {
       throw new BadRequestException();
     }

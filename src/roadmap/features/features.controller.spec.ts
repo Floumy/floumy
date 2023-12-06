@@ -191,4 +191,29 @@ describe("FeaturesController", () => {
       expect(feature.updatedAt).toBeDefined();
     });
   });
+  describe("when deleting a feature", () => {
+    it("should return 200", async () => {
+      const featureResponse = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.THIS_QUARTER
+        });
+      const feature = await controller.delete({
+        user: {
+          org: org.id
+        }
+      }, featureResponse.id);
+      expect(feature.title).toEqual("my feature");
+      expect(feature.priority).toEqual(Priority.HIGH);
+      expect(feature.createdAt).toBeDefined();
+      expect(feature.updatedAt).toBeDefined();
+    });
+  });
 });
