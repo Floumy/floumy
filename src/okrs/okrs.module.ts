@@ -6,9 +6,10 @@ import { Objective } from "./objective.entity";
 import { OrgsModule } from "../orgs/orgs.module";
 import { AuthModule } from "../auth/auth.module";
 import { KeyResult } from "./key-result.entity";
+import { Feature } from "../roadmap/features/feature.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Objective, KeyResult]), OrgsModule, AuthModule],
+  imports: [TypeOrmModule.forFeature([Objective, KeyResult, Feature]), OrgsModule, AuthModule],
   providers: [OkrsService],
   controllers: [OkrsController],
   exports: [OkrsService]
