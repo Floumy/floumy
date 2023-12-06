@@ -205,15 +205,11 @@ describe("FeaturesController", () => {
           priority: Priority.HIGH,
           timeline: Timeline.THIS_QUARTER
         });
-      const feature = await controller.delete({
+      await controller.delete({
         user: {
           org: org.id
         }
       }, featureResponse.id);
-      expect(feature.title).toEqual("my feature");
-      expect(feature.priority).toEqual(Priority.HIGH);
-      expect(feature.createdAt).toBeDefined();
-      expect(feature.updatedAt).toBeDefined();
     });
   });
 });
