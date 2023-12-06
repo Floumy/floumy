@@ -68,7 +68,7 @@ export class FeaturesController {
 
   @Put(":id")
   @HttpCode(HttpStatus.OK)
-  async update(@Request() request, id: string, @Body() updateFeatureDto: CreateUpdateFeatureDto) {
+  async update(@Request() request, @Param("id") id: string, @Body() updateFeatureDto: CreateUpdateFeatureDto) {
     try {
       const { org: orgId } = request.user;
       return await this.featuresService.updateFeature(orgId, id, updateFeatureDto);

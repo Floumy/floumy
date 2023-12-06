@@ -14,7 +14,7 @@ import { TimelineService } from "../../common/timeline.service";
 export class FeaturesService {
 
   constructor(
-    @InjectRepository(Feature) private featureRepository: Repository<Feature>,
+    @InjectRepository(Feature) private featuresRepository: Repository<Feature>,
     private orgsService: OrgsService,
     private okrsService: OkrsService,
     private milestonesService: MilestonesService
@@ -42,7 +42,7 @@ export class FeaturesService {
       const milestone = await this.milestonesService.findOneById(orgId, featureDto.milestone);
       feature.milestone = Promise.resolve(milestone);
     }
-    const savedFeature = await this.featureRepository.save(feature);
+    const savedFeature = await this.featuresRepository.save(feature);
     return await FeatureMapper.toDto(savedFeature);
   }
 
@@ -54,28 +54,35 @@ export class FeaturesService {
   }
 
   async listFeatures(orgId: string) {
-    const features = await this.featureRepository.findBy({ org: { id: orgId } });
+    const features = await this.featuresRepository.findBy({ org: { id: orgId } });
     return FeatureMapper.toListDto(features);
   }
 
   async listFeaturesWithoutMilestone(orgId: string) {
-    const features = await this.featureRepository.findBy({ org: { id: orgId }, milestone: { id: null } });
+    const features = await this.featuresRepository
+      .createQueryBuilder("feature")
+      .leftJoinAndSelect("feature.org", "org")
+      .leftJoinAndSelect("feature.milestone", "milestone")
+      .where("org.id = :orgId", { orgId })
+      .andWhere("milestone.id IS NULL")
+      .getMany();
+
     return FeatureMapper.toListDto(features);
   }
 
   async get(orgId: string, id: string) {
-    const feature = await this.featureRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+    const feature = await this.featuresRepository.findOneByOrFail({ org: { id: orgId }, id: id });
     return await FeatureMapper.toDto(feature);
   }
 
   async getFeature(orgId: string, id: string) {
-    const feature = await this.featureRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+    const feature = await this.featuresRepository.findOneByOrFail({ org: { id: orgId }, id: id });
     return await FeatureMapper.toDto(feature);
   }
 
   async updateFeature(orgId: string, id: string, updateFeatureDto: CreateUpdateFeatureDto) {
     this.validateFeature(updateFeatureDto);
-    const feature = await this.featureRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+    const feature = await this.featuresRepository.findOneByOrFail({ org: { id: orgId }, id: id });
     feature.title = updateFeatureDto.title;
     feature.description = updateFeatureDto.description;
     feature.priority = updateFeatureDto.priority;
@@ -91,7 +98,7 @@ export class FeaturesService {
       const milestone = await this.milestonesService.findOneById(orgId, updateFeatureDto.milestone);
       feature.milestone = Promise.resolve(milestone);
     }
-    const savedFeature = await this.featureRepository.save(feature);
+    const savedFeature = await this.featuresRepository.save(feature);
     return await FeatureMapper.toDto(savedFeature);
   }
 }
