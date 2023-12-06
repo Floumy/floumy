@@ -107,4 +107,9 @@ export class FeaturesService {
     const savedFeature = await this.featuresRepository.save(feature);
     return await FeatureMapper.toDto(savedFeature);
   }
+
+  async deleteFeature(orgId: string, id: string) {
+    const feature = await this.featuresRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+    await this.featuresRepository.remove(feature);
+  }
 }
