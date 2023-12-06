@@ -93,11 +93,17 @@ export class FeaturesService {
     if (updateFeatureDto.keyResult) {
       const keyResult = await this.okrsService.getKeyResultByOrgId(orgId, updateFeatureDto.keyResult);
       feature.keyResult = Promise.resolve(keyResult);
+    } else {
+      feature.keyResult = Promise.resolve(null);
     }
+
     if (updateFeatureDto.milestone) {
       const milestone = await this.milestonesService.findOneById(orgId, updateFeatureDto.milestone);
       feature.milestone = Promise.resolve(milestone);
+    } else {
+      feature.milestone = Promise.resolve(null);
     }
+
     const savedFeature = await this.featuresRepository.save(feature);
     return await FeatureMapper.toDto(savedFeature);
   }
