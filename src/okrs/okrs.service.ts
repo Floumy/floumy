@@ -7,6 +7,7 @@ import { KeyResult } from "./key-result.entity";
 import { KeyResultMapper, OKRMapper } from "./mappers";
 import { OKRStatus } from "./okrstatus.enum";
 import { TimelineService } from "../common/timeline.service";
+import { Feature } from "../roadmap/features/feature.entity";
 
 @Injectable()
 export class OkrsService {
@@ -15,6 +16,8 @@ export class OkrsService {
               private objectiveRepository: Repository<Objective>,
               @InjectRepository(KeyResult)
               private keyResultRepository: Repository<KeyResult>,
+              @InjectRepository(Feature)
+              private featureRepository: Repository<Feature>,
               private orgsService: OrgsService) {
   }
 
@@ -79,6 +82,7 @@ export class OkrsService {
   }
 
   async delete(orgId: string, id: string) {
+    await this.removeKeyResultsAssociations(orgId, id);
     await this.keyResultRepository.delete({ objective: { id, org: { id: orgId } } });
     await this.objectiveRepository.delete({ id, org: { id: orgId } });
   }
@@ -127,6 +131,7 @@ export class OkrsService {
   }[]) {
     for (const existingKeyResult of existingKeyResults) {
       if (!keyResults.find(keyResult => keyResult.id === existingKeyResult.id)) {
+        await this.removeKeyResultAssociations(existingKeyResult.id);
         await this.keyResultRepository.delete({ id: existingKeyResult.id });
       }
     }
@@ -175,8 +180,20 @@ export class OkrsService {
       { status }
     );
   }
+
   async listKeyResults(orgId: string) {
     const keyResults = await this.keyResultRepository.findBy({ org: { id: orgId } });
     return await KeyResultMapper.toListDTO(keyResults);
+  }
+
+  private async removeKeyResultsAssociations(orgId: string, id: string) {
+    const keyResults = await this.keyResultRepository.findBy({ objective: { id, org: { id: orgId } } });
+    for (const keyResult of keyResults) {
+      await this.removeKeyResultAssociations(keyResult.id);
+    }
+  }
+
+  private async removeKeyResultAssociations(id: string) {
+    await this.featureRepository.update({ keyResult: { id } }, { keyResult: null });
   }
 }

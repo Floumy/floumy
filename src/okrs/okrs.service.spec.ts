@@ -6,20 +6,24 @@ import { OrgsService } from "../orgs/orgs.service";
 import { User } from "../users/user.entity";
 import { Org } from "../orgs/org.entity";
 import { KeyResult } from "./key-result.entity";
+import { Repository } from "typeorm";
+import { Feature } from "../roadmap/features/feature.entity";
 
 describe("OkrsService", () => {
   let service: OkrsService;
   let orgsService: OrgsService;
+  let featuresRepository: Repository<Feature>;
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature])],
       [OkrsService, OrgsService]
     );
     cleanup = dbCleanup;
     service = module.get<OkrsService>(OkrsService);
     orgsService = module.get<OrgsService>(OrgsService);
+    featuresRepository = module.get<Repository<Feature>>(Repository);
   });
 
   afterEach(async () => {
@@ -240,6 +244,26 @@ describe("OkrsService", () => {
       await service.createKeyResult(objective, "Test Key Result");
       await service.delete(org.id, objective.id);
       await expect(service.get(org.id, objective.id)).rejects.toThrow();
+    });
+    it("should remove the key results from the associated feature", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      const keyResult = await service.createKeyResult(objective, "Test Key Result");
+      const feature = new Feature();
+      feature.org = Promise.resolve(org);
+      feature.title = "Test Feature";
+      feature.keyResult = Promise.resolve(keyResult);
+      await featuresRepository.save(feature);
+      await service.delete(org.id, objective.id);
+      const storedFeature = await featuresRepository.findOne({ where: { id: feature.id } });
+      expect(storedFeature).toBeDefined();
+      expect(storedFeature.keyResult).toBeNull();
     });
   });
 
