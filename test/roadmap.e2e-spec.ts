@@ -68,6 +68,7 @@ describe("FeaturesController (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
+          timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[0].id
         })
         .expect(HttpStatus.CREATED)
@@ -103,6 +104,7 @@ describe("FeaturesController (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
+          timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[0].id
         })
         .expect(HttpStatus.CREATED);
@@ -128,7 +130,8 @@ describe("FeaturesController (e2e)", () => {
         .send({
           title: "my feature",
           description: "my feature description",
-          priority: "medium"
+          priority: "medium",
+          timeline: "this-quarter"
         })
         .expect(HttpStatus.CREATED);
       return request(app.getHttpServer())
@@ -153,7 +156,8 @@ describe("FeaturesController (e2e)", () => {
         .send({
           title: "my milestone",
           description: "my milestone description",
-          dueDate: "2020-01-01"
+          dueDate: "2020-01-01",
+          timeline: "this-quarter"
         })
         .expect(HttpStatus.CREATED)
         .expect(({ body }) => {
@@ -206,6 +210,7 @@ describe("FeaturesController (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
+          timeline: "this-quarter",
           milestone: milestoneResponse.body.id
         })
         .expect(HttpStatus.CREATED);
@@ -245,6 +250,7 @@ describe("FeaturesController (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
+          timeline: "this-quarter",
           milestone: milestoneResponse.body.id
         })
         .expect(HttpStatus.CREATED);
@@ -335,6 +341,7 @@ describe("FeaturesController (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
+          timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[0].id,
           milestone: milestoneResponse.body.id
         })
@@ -386,6 +393,7 @@ describe("FeaturesController (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
+          timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[0].id,
           milestone: milestoneResponse.body.id
         })
@@ -397,6 +405,7 @@ describe("FeaturesController (e2e)", () => {
           title: "my feature updated",
           description: "my feature description updated",
           priority: "high",
+          timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[1].id,
           milestone: null
         })
@@ -408,7 +417,7 @@ describe("FeaturesController (e2e)", () => {
           expect(body.priority).toEqual("high");
           expect(body.keyResult.id).toEqual(okrResponse.body.keyResults[1].id);
           expect(body.keyResult.title).toEqual("My Key Result 2");
-          expect(body.milestone).toBeNull();
+          expect(body.milestone).toBeUndefined();
         });
     });
   });
