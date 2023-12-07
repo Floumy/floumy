@@ -9,6 +9,7 @@ import { Org } from "../orgs/org.entity";
 import { TokensService } from "../auth/tokens.service";
 import { KeyResult } from "./key-result.entity";
 import { NotFoundException } from "@nestjs/common";
+import { Feature } from "../roadmap/features/feature.entity";
 
 describe("OkrsController", () => {
   let controller: OkrsController;
@@ -17,7 +18,7 @@ describe("OkrsController", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature])],
       [OkrsService, OrgsService, TokensService],
       [OkrsController]
     );

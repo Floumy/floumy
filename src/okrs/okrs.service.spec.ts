@@ -1,6 +1,6 @@
 import { OkrsService } from "./okrs.service";
 import { setupTestingModule } from "../../test/test.utils";
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { Objective } from "./objective.entity";
 import { OrgsService } from "../orgs/orgs.service";
 import { User } from "../users/user.entity";
@@ -23,7 +23,7 @@ describe("OkrsService", () => {
     cleanup = dbCleanup;
     service = module.get<OkrsService>(OkrsService);
     orgsService = module.get<OrgsService>(OrgsService);
-    featuresRepository = module.get<Repository<Feature>>(Repository);
+    featuresRepository = module.get<Repository<Feature>>(getRepositoryToken(Feature));
   });
 
   afterEach(async () => {
@@ -258,12 +258,13 @@ describe("OkrsService", () => {
       const feature = new Feature();
       feature.org = Promise.resolve(org);
       feature.title = "Test Feature";
+      feature.description = "";
       feature.keyResult = Promise.resolve(keyResult);
       await featuresRepository.save(feature);
       await service.delete(org.id, objective.id);
       const storedFeature = await featuresRepository.findOne({ where: { id: feature.id } });
       expect(storedFeature).toBeDefined();
-      expect(storedFeature.keyResult).toBeNull();
+      expect(await storedFeature.keyResult).toBeNull();
     });
   });
 
