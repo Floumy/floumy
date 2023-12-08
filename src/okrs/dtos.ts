@@ -1,4 +1,3 @@
-
 interface ObjectiveDto {
   title: string;
   timeline?: string;
@@ -25,7 +24,17 @@ interface PatchObjectiveDto {
   status?: string;
 }
 
+interface FeatureDto {
+  id: string;
+  title: string;
+  priority: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface KeyResultDto {
+  features: FeatureDto[];
   id: string;
   title: string;
   progress: number;

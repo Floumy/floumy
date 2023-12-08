@@ -32,6 +32,19 @@ export class OKRMapper {
   }
 }
 
+class FeatureMapper {
+  static toDTO(feature): FeatureDto {
+    return {
+      id: feature.id,
+      title: feature.title,
+      priority: feature.priority,
+      status: feature.status,
+      createdAt: feature.createdAt,
+      updatedAt: feature.updatedAt
+    };
+  }
+}
+
 export class KeyResultMapper {
   static async toDTO(keyResult: KeyResult): Promise<KeyResultDto> {
     const objective = await keyResult.objective;
@@ -42,7 +55,8 @@ export class KeyResultMapper {
       timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
       createdAt: keyResult.createdAt,
       updatedAt: keyResult.updatedAt,
-      status: keyResult.status
+      status: keyResult.status,
+      features: (await keyResult.features).map(FeatureMapper.toDTO)
     };
   }
 
