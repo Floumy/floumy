@@ -158,6 +158,60 @@ describe("OKRsController (e2e)", () => {
         });
     });
 
+    it("should return 200 with key results and features", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR"
+          },
+          keyResults: [
+            { title: "My Key Result 1" },
+            { title: "My Key Result 2" }
+          ]
+        });
+
+      await request(app.getHttpServer())
+        .post("/roadmap/features")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "My Feature",
+          description: "My Feature Description",
+          priority: "high",
+          keyResult: okrResponse.body.keyResults[0].id
+        })
+        .expect(HttpStatus.CREATED);
+
+      return request(app.getHttpServer())
+        .get(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.objective.id).toEqual(okrResponse.body.objective.id);
+          expect(body.objective.title).toEqual("My OKR");
+          expect(body.objective.createdAt).toBeDefined();
+          expect(body.objective.updatedAt).toBeDefined();
+          expect(body.keyResults).toHaveLength(2);
+          expect(body.keyResults[0].id).toBeDefined();
+          expect(body.keyResults[0].title).toEqual("My Key Result 1");
+          expect(body.keyResults[0].createdAt).toBeDefined();
+          expect(body.keyResults[0].updatedAt).toBeDefined();
+          expect(body.keyResults[0].features).toHaveLength(1);
+          expect(body.keyResults[0].features[0].id).toBeDefined();
+          expect(body.keyResults[0].features[0].title).toEqual("My Feature");
+          expect(body.keyResults[0].features[0].priority).toEqual("high");
+          expect(body.keyResults[0].features[0].status).toEqual("planned");
+          expect(body.keyResults[0].features[0].createdAt).toBeDefined();
+          expect(body.keyResults[0].features[0].updatedAt).toBeDefined();
+          expect(body.keyResults[1].id).toBeDefined();
+          expect(body.keyResults[1].title).toEqual("My Key Result 2");
+          expect(body.keyResults[1].createdAt).toBeDefined();
+          expect(body.keyResults[1].updatedAt).toBeDefined();
+          expect(body.keyResults[1].features).toHaveLength(0);
+        });
+    });
+
     it("should return 404", async () => {
       return request(app.getHttpServer())
         .get(`/okrs/123`)
