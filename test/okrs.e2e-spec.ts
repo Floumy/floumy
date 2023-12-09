@@ -18,6 +18,10 @@ import { TokensService } from "../src/auth/tokens.service";
 import { KeyResult } from "../src/okrs/key-result.entity";
 import { Objective } from "../src/okrs/objective.entity";
 import { Feature } from "../src/roadmap/features/feature.entity";
+import { FeaturesController } from "../src/roadmap/features/features.controller";
+import { FeaturesService } from "../src/roadmap/features/features.service";
+import { MilestonesService } from "../src/roadmap/milestones/milestones.service";
+import { Milestone } from "../src/roadmap/milestones/milestone.entity";
 
 describe("OKRsController (e2e)", () => {
   let app: INestApplication;
@@ -26,9 +30,9 @@ describe("OKRsController (e2e)", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective, KeyResult, Feature])],
-      [AuthService, UsersService, Reflector, OkrsService, TokensService],
-      [AuthController, OkrsController]
+      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective, KeyResult, Feature, Milestone])],
+      [AuthService, UsersService, Reflector, OkrsService, TokensService, FeaturesService, MilestonesService],
+      [AuthController, OkrsController, FeaturesController]
     );
     cleanup = dbCleanup;
     app = module.createNestApplication();
@@ -173,12 +177,13 @@ describe("OKRsController (e2e)", () => {
         });
 
       await request(app.getHttpServer())
-        .post("/roadmap/features")
+        .post("/features")
         .set("Authorization", `Bearer ${accessToken}`)
         .send({
           title: "My Feature",
           description: "My Feature Description",
           priority: "high",
+          timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[0].id
         })
         .expect(HttpStatus.CREATED);
