@@ -1,9 +1,18 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import { Org } from "../../orgs/org.entity";
 import { FeatureStatus } from "./featurestatus.enum";
 import { KeyResult } from "../../okrs/key-result.entity";
 import { Priority } from "../../common/priority.enum";
 import { Milestone } from "../milestones/milestone.entity";
+import { WorkItem } from "../../backlog/work-items/work-item.entity";
 
 @Entity()
 export class Feature {
@@ -39,4 +48,6 @@ export class Feature {
   keyResult: Promise<KeyResult>;
   @ManyToOne(() => Milestone, milestone => milestone.features, { lazy: true })
   milestone: Promise<Milestone>;
+  @OneToMany(() => WorkItem, workItem => workItem.feature, { lazy: true })
+  workItems: Promise<WorkItem[]>;
 }
