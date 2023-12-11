@@ -13,6 +13,7 @@ class FeatureMapper {
 
 export default class WorkItemMapper {
   static async toDto(workItem: WorkItem): Promise<WorkItemDto> {
+    const feature = await workItem.feature;
     return {
       id: workItem.id,
       title: workItem.title,
@@ -20,7 +21,7 @@ export default class WorkItemMapper {
       priority: workItem.priority,
       type: workItem.type,
       status: workItem.status,
-      feature: FeatureMapper.toDto(await workItem.feature),
+      feature: feature ? FeatureMapper.toDto(feature) : undefined,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt
     };
