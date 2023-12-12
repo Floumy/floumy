@@ -19,6 +19,13 @@ import { WorkItemsService } from "../src/backlog/work-items/work-items.service";
 import { WorkItemsController } from "../src/backlog/work-items/work-items.controller";
 import { WorkItem } from "../src/backlog/work-items/work-item.entity";
 import * as request from "supertest";
+import { BacklogModule } from "../src/backlog/backlog.module";
+import { OkrsModule } from "../src/okrs/okrs.module";
+import { OkrsService } from "../src/okrs/okrs.service";
+import { MilestonesService } from "../src/roadmap/milestones/milestones.service";
+import { Milestone } from "../src/roadmap/milestones/milestone.entity";
+import { KeyResult } from "../src/okrs/key-result.entity";
+import { Objective } from "../src/okrs/objective.entity";
 
 describe("Backlog (e2e)", () => {
   let app: INestApplication;
@@ -27,8 +34,8 @@ describe("Backlog (e2e)", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Feature, WorkItem])],
-      [AuthService, UsersService, Reflector, TokensService, FeaturesService, WorkItemsService],
+      [UsersModule, OrgsModule, BacklogModule, OkrsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Feature, Objective, KeyResult, WorkItem, Milestone])],
+      [AuthService, UsersService, Reflector, TokensService, FeaturesService, WorkItemsService, OkrsService, MilestonesService],
       [AuthController, FeaturesController, WorkItemsController]
     );
     cleanup = dbCleanup;
