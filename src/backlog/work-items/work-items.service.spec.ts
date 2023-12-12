@@ -1,4 +1,3 @@
-import { Test, TestingModule } from "@nestjs/testing";
 import { WorkItemsService } from "./work-items.service";
 import { UsersService } from "../../users/users.service";
 import { FeaturesService } from "../../roadmap/features/features.service";
@@ -76,6 +75,36 @@ describe("WorkItemsService", () => {
       expect(workItem.type).toEqual(WorkItemType.USER_STORY);
       expect(workItem.feature.id).toBeDefined();
       expect(workItem.feature.title).toEqual("my feature");
+    });
+  });
+  describe("when listing work items", () => {
+    it("should return the list of work items", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          feature: feature.id
+        });
+      const workItems = await service.listWorkItems(org.id);
+      expect(workItems).toBeDefined();
+      expect(workItems.length).toEqual(1);
+      expect(workItems[0].title).toEqual("my work item");
+      expect(workItems[0].description).toEqual("my work item description");
+      expect(workItems[0].priority).toEqual(Priority.HIGH);
+      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
+      expect(workItems[0].feature.id).toBeDefined();
+      expect(workItems[0].feature.title).toEqual("my feature");
     });
   });
 });

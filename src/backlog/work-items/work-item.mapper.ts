@@ -26,4 +26,8 @@ export default class WorkItemMapper {
       updatedAt: workItem.updatedAt
     };
   }
+
+  static async toListDto(workItems: WorkItem[]) {
+    return await Promise.all(workItems.map(this.toDto));
+  }
 }

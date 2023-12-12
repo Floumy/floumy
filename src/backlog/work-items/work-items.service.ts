@@ -29,4 +29,9 @@ export class WorkItemsService {
     workItem.org = Promise.resolve(org);
     return WorkItemMapper.toDto(await this.workItemsRepository.save(workItem));
   }
+
+  async listWorkItems(orgId: string) {
+    const workItems = await this.workItemsRepository.find({ where: { org: { id: orgId } } });
+    return await WorkItemMapper.toListDto(workItems);
+  }
 }
