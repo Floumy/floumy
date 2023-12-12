@@ -1,4 +1,14 @@
-import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post, Request, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Request,
+  UseGuards
+} from "@nestjs/common";
 import { AuthGuard } from "../../auth/auth.guard";
 import { WorkItemsService } from "./work-items.service";
 import { CreateUpdateWorkItemDto, WorkItemDto } from "./dtos";
@@ -19,5 +29,11 @@ export class WorkItemsController {
       throw new BadRequestException(e.message);
     }
 
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async list(@Request() request) {
+    return await this.workItemsService.listWorkItems(request.user.org);
   }
 }
