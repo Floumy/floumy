@@ -123,7 +123,7 @@ describe("WorkItemsController", () => {
       expect(workItems[0].title).toEqual("my work item");
       expect(workItems[0].description).toEqual("my work item description");
       expect(workItems[0].priority).toEqual("high");
-      expect(workItems[0].type).toEqual("user-story");
+      expect(workItems[0].type).toEqual("technical-debt");
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
       expect(workItems[0].status).toEqual("backlog");
