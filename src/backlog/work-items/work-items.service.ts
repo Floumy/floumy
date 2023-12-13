@@ -49,4 +49,9 @@ export class WorkItemsService {
       workItem.feature = Promise.resolve(feature);
     }
   }
+
+  async deleteWorkItem(orgId: string, id: string) {
+    const workItem = await this.workItemsRepository.findOneByOrFail({ id, org: { id: orgId } });
+    await this.workItemsRepository.remove(workItem);
+  }
 }

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -57,6 +58,16 @@ export class WorkItemsController {
       return await this.workItemsService.updateWorkItem(request.user.org, id, workItemDto);
     } catch (e) {
       throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete(":id")
+  @HttpCode(HttpStatus.OK)
+  async delete(@Request() request, @Param("id") id: string) {
+    try {
+      await this.workItemsService.deleteWorkItem(request.user.org, id);
+    } catch (e) {
+      throw new NotFoundException(e.message);
     }
   }
 }

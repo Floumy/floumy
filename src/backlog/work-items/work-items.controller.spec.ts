@@ -228,4 +228,47 @@ describe("WorkItemsController", () => {
       expect(workItemResponse.feature.title).toEqual(feature.title);
     });
   });
+  describe("when deleting a work item", () => {
+    it("should delete the work item", async () => {
+      const feature = await featureService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER
+        });
+      const workItem = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          feature: feature.id
+        }
+      );
+      await controller.delete(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        workItem.id
+      );
+      const workItems = await controller.list(
+        {
+          user: {
+            org: org.id
+          }
+        }
+      );
+
+      expect(workItems.length).toEqual(0);
+    });
+  });
 });
