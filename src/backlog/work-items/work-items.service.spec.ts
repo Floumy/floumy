@@ -107,4 +107,33 @@ describe("WorkItemsService", () => {
       expect(workItems[0].feature.title).toEqual("my feature");
     });
   });
+  describe("when getting a work item", () => {
+    it("should return the work item", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER
+        });
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          feature: feature.id
+        });
+      const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
+      expect(foundWorkItem).toBeDefined();
+      expect(foundWorkItem.title).toEqual("my work item");
+      expect(foundWorkItem.description).toEqual("my work item description");
+      expect(foundWorkItem.priority).toEqual(Priority.HIGH);
+      expect(foundWorkItem.type).toEqual(WorkItemType.USER_STORY);
+      expect(foundWorkItem.feature.id).toBeDefined();
+      expect(foundWorkItem.feature.title).toEqual("my feature");
+    });
+  });
 });

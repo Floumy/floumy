@@ -129,4 +129,50 @@ describe("WorkItemsController", () => {
       expect(workItems[0].status).toEqual("backlog");
     });
   });
+  describe("when getting a work item", () => {
+    it("should return the work item", async () => {
+      const feature = await featureService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER
+        });
+      const workItem = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          feature: feature.id
+        }
+      );
+      const workItemResponse = await controller.get(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        workItem.id
+      );
+
+      expect(workItemResponse.id).toBeDefined();
+      expect(workItemResponse.title).toEqual("my work item");
+      expect(workItemResponse.description).toEqual("my work item description");
+      expect(workItemResponse.priority).toEqual("high");
+      expect(workItemResponse.type).toEqual("technical-debt");
+      expect(workItemResponse.createdAt).toBeDefined();
+      expect(workItemResponse.updatedAt).toBeDefined();
+      expect(workItemResponse.status).toEqual("backlog");
+      expect(workItemResponse.feature).toBeDefined();
+      expect(workItemResponse.feature.id).toEqual(feature.id);
+      expect(workItemResponse.feature.title).toEqual(feature.title);
+    });
+  });
 });

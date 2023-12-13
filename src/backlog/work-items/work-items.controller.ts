@@ -5,6 +5,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
+  Param,
   Post,
   Request,
   UseGuards
@@ -35,5 +37,15 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async list(@Request() request) {
     return await this.workItemsService.listWorkItems(request.user.org);
+  }
+
+  @Get(":id")
+  @HttpCode(HttpStatus.OK)
+  async get(@Request() request, @Param("id") id: string) {
+    try {
+      return await this.workItemsService.getWorkItem(request.user.org, id);
+    } catch (e) {
+      throw new NotFoundException(e.message);
+    }
   }
 }
