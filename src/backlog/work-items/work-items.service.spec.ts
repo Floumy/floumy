@@ -16,6 +16,7 @@ import { WorkItem } from "./work-item.entity";
 import { Priority } from "../../common/priority.enum";
 import { Timeline } from "../../common/timeline.enum";
 import { WorkItemType } from "./work-item-type.enum";
+import { EntityNotFoundError } from "typeorm";
 
 describe("WorkItemsService", () => {
   let usersService: UsersService;
@@ -199,8 +200,7 @@ describe("WorkItemsService", () => {
           feature: feature.id
         });
       await service.deleteWorkItem(org.id, workItem.id);
-      const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
-      expect(foundWorkItem).toBeUndefined();
+      expect(service.getWorkItem(org.id, workItem.id)).rejects.toThrow(EntityNotFoundError);
     });
   });
 });
