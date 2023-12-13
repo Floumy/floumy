@@ -100,4 +100,27 @@ describe("Backlog (e2e)", () => {
       expect(listWorkItemsResponse.body[0].status).toEqual("backlog");
     });
   });
+
+  describe("/work-items/:id (GET)", () => {
+    it("should get a work item", async () => {
+      const createWorkItemResponse = await request(app.getHttpServer())
+        .post("/work-items")
+        .send({
+          title: "Work Item 1",
+          description: "Work Item 1 description",
+          priority: "high"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      const workItemId = createWorkItemResponse.body.id;
+      const getWorkItemResponse = await request(app.getHttpServer())
+        .get(`/work-items/${workItemId}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+      expect(getWorkItemResponse.statusCode).toEqual(200);
+      expect(getWorkItemResponse.body.id).toEqual(workItemId);
+      expect(getWorkItemResponse.body.title).toEqual("Work Item 1");
+      expect(getWorkItemResponse.body.description).toEqual("Work Item 1 description");
+      expect(getWorkItemResponse.body.priority).toEqual("high");
+      expect(getWorkItemResponse.body.status).toEqual("backlog");
+    });
+  });
 });

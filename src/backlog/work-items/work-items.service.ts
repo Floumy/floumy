@@ -34,4 +34,9 @@ export class WorkItemsService {
     const workItems = await this.workItemsRepository.find({ where: { org: { id: orgId } } });
     return await WorkItemMapper.toListDto(workItems);
   }
+
+  async getWorkItem(orgId: string, id: string) {
+    const workItem = await this.workItemsRepository.findOneByOrFail({ id, org: { id: orgId } });
+    return WorkItemMapper.toDto(workItem);
+  }
 }
