@@ -171,8 +171,8 @@ describe("WorkItemsService", () => {
         feature: feature2.id
       });
       expect(foundWorkItem).toBeDefined();
-      expect(foundWorkItem.title).toEqual("my work item update");
-      expect(foundWorkItem.description).toEqual("my work item description update");
+      expect(foundWorkItem.title).toEqual("my work item updated");
+      expect(foundWorkItem.description).toEqual("my work item description updated");
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
       expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
       expect(foundWorkItem.feature.id).toBeDefined();
