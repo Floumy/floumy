@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Request,
   UseGuards
 } from "@nestjs/common";
@@ -46,6 +47,16 @@ export class WorkItemsController {
       return await this.workItemsService.getWorkItem(request.user.org, id);
     } catch (e) {
       throw new NotFoundException(e.message);
+    }
+  }
+
+  @Put(":id")
+  @HttpCode(HttpStatus.OK)
+  async update(@Request() request, @Param("id") id: string, @Body() workItemDto: CreateUpdateWorkItemDto) {
+    try {
+      return await this.workItemsService.updateWorkItem(request.user.org, id, workItemDto);
+    } catch (e) {
+      throw new BadRequestException(e.message);
     }
   }
 }

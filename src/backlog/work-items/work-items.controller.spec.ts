@@ -175,4 +175,57 @@ describe("WorkItemsController", () => {
       expect(workItemResponse.feature.title).toEqual(feature.title);
     });
   });
+  describe("when updating a work item", () => {
+    it("should return the updated work item", async () => {
+      const feature = await featureService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER
+        });
+      const workItem = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          feature: feature.id
+        }
+      );
+      const workItemResponse = await controller.update(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        workItem.id,
+        {
+          title: "my work item updated",
+          description: "my work item description updated",
+          priority: Priority.LOW,
+          type: WorkItemType.BUG,
+          feature: feature.id
+        }
+      );
+
+      expect(workItemResponse.id).toBeDefined();
+      expect(workItemResponse.title).toEqual("my work item updated");
+      expect(workItemResponse.description).toEqual("my work item description updated");
+      expect(workItemResponse.priority).toEqual("low");
+      expect(workItemResponse.type).toEqual("bug");
+      expect(workItemResponse.createdAt).toBeDefined();
+      expect(workItemResponse.updatedAt).toBeDefined();
+      expect(workItemResponse.status).toEqual("backlog");
+      expect(workItemResponse.feature).toBeDefined();
+      expect(workItemResponse.feature.id).toEqual(feature.id);
+      expect(workItemResponse.feature.title).toEqual(feature.title);
+    });
+  });
 });

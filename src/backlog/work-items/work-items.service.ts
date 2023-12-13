@@ -18,14 +18,7 @@ export class WorkItemsService {
   async createWorkItem(orgId: string, workItemDto: CreateUpdateWorkItemDto) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
     const workItem = new WorkItem();
-    workItem.title = workItemDto.title;
-    workItem.description = workItemDto.description;
-    workItem.priority = workItemDto.priority;
-    workItem.type = workItemDto.type;
-    if (workItemDto.feature) {
-      const feature = await this.featuresRepository.findOneByOrFail({ id: workItemDto.feature, org: { id: orgId } });
-      workItem.feature = Promise.resolve(feature);
-    }
+    await this.setWorkItemData(workItem, workItemDto, orgId);
     workItem.org = Promise.resolve(org);
     return WorkItemMapper.toDto(await this.workItemsRepository.save(workItem));
   }
@@ -38,5 +31,22 @@ export class WorkItemsService {
   async getWorkItem(orgId: string, id: string) {
     const workItem = await this.workItemsRepository.findOneByOrFail({ id, org: { id: orgId } });
     return WorkItemMapper.toDto(workItem);
+  }
+
+  async updateWorkItem(orgId: string, id: string, workItemDto: CreateUpdateWorkItemDto) {
+    const workItem = await this.workItemsRepository.findOneByOrFail({ id, org: { id: orgId } });
+    await this.setWorkItemData(workItem, workItemDto, orgId);
+    return WorkItemMapper.toDto(await this.workItemsRepository.save(workItem));
+  }
+
+  private async setWorkItemData(workItem: WorkItem, workItemDto: CreateUpdateWorkItemDto, orgId: string) {
+    workItem.title = workItemDto.title;
+    workItem.description = workItemDto.description;
+    workItem.priority = workItemDto.priority;
+    workItem.type = workItemDto.type;
+    if (workItemDto.feature) {
+      const feature = await this.featuresRepository.findOneByOrFail({ id: workItemDto.feature, org: { id: orgId } });
+      workItem.feature = Promise.resolve(feature);
+    }
   }
 }
