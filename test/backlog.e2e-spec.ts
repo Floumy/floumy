@@ -187,4 +187,25 @@ describe("Backlog (e2e)", () => {
       expect(updateWorkItemResponse.body.feature.id).toEqual(featureId);
     });
   });
+  describe("/work-items/:id (DELETE)", () => {
+    it("should delete a work item", async () => {
+      const createWorkItemResponse = await request(app.getHttpServer())
+        .post("/work-items")
+        .send({
+          title: "Work Item 1",
+          description: "Work Item 1 description",
+          priority: "high"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      const workItemId = createWorkItemResponse.body.id;
+      const deleteWorkItemResponse = await request(app.getHttpServer())
+        .delete(`/work-items/${workItemId}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+      expect(deleteWorkItemResponse.statusCode).toEqual(200);
+      const getWorkItemResponse = await request(app.getHttpServer())
+        .get(`/work-items/${workItemId}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+      expect(getWorkItemResponse.statusCode).toEqual(404);
+    });
+  });
 });

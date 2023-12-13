@@ -179,4 +179,28 @@ describe("WorkItemsService", () => {
       expect(foundWorkItem.feature.title).toEqual("my other feature");
     });
   });
+  describe("when deleting a work item", () => {
+    it("should delete the work item", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER
+        });
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          feature: feature.id
+        });
+      await service.deleteWorkItem(org.id, workItem.id);
+      const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
+      expect(foundWorkItem).toBeUndefined();
+    });
+  });
 });
