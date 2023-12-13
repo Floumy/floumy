@@ -123,4 +123,68 @@ describe("Backlog (e2e)", () => {
       expect(getWorkItemResponse.body.status).toEqual("backlog");
     });
   });
+  describe("/work-items/:id (PUT)", () => {
+    it("should update a work item", async () => {
+      const createWorkItemResponse = await request(app.getHttpServer())
+        .post("/work-items")
+        .send({
+          title: "Work Item 1",
+          description: "Work Item 1 description",
+          priority: "high"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      const workItemId = createWorkItemResponse.body.id;
+      const updateWorkItemResponse = await request(app.getHttpServer())
+        .put(`/work-items/${workItemId}`)
+        .send({
+          title: "Work Item 1 updated",
+          description: "Work Item 1 description updated",
+          priority: "low"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      expect(updateWorkItemResponse.statusCode).toEqual(200);
+      expect(updateWorkItemResponse.body.id).toEqual(workItemId);
+      expect(updateWorkItemResponse.body.title).toEqual("Work Item 1 updated");
+      expect(updateWorkItemResponse.body.description).toEqual("Work Item 1 description updated");
+      expect(updateWorkItemResponse.body.priority).toEqual("low");
+      expect(updateWorkItemResponse.body.status).toEqual("backlog");
+    });
+    it("should update a work item with a feature", async () => {
+      const createFeatureResponse = await request(app.getHttpServer())
+        .post("/features")
+        .send({
+          title: "Feature 1",
+          description: "Feature 1 description",
+          priority: "high",
+          timeline: "this-quarter"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      const featureId = createFeatureResponse.body.id;
+      const createWorkItemResponse = await request(app.getHttpServer())
+        .post("/work-items")
+        .send({
+          title: "Work Item 1",
+          description: "Work Item 1 description",
+          priority: "high"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      const workItemId = createWorkItemResponse.body.id;
+      const updateWorkItemResponse = await request(app.getHttpServer())
+        .put(`/work-items/${workItemId}`)
+        .send({
+          title: "Work Item 1 updated",
+          description: "Work Item 1 description updated",
+          priority: "low",
+          feature: featureId
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      expect(updateWorkItemResponse.statusCode).toEqual(200);
+      expect(updateWorkItemResponse.body.id).toEqual(workItemId);
+      expect(updateWorkItemResponse.body.title).toEqual("Work Item 1 updated");
+      expect(updateWorkItemResponse.body.description).toEqual("Work Item 1 description updated");
+      expect(updateWorkItemResponse.body.priority).toEqual("low");
+      expect(updateWorkItemResponse.body.status).toEqual("backlog");
+      expect(updateWorkItemResponse.body.feature.id).toEqual(featureId);
+    });
+  });
 });
