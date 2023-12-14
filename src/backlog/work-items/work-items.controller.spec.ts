@@ -18,6 +18,7 @@ import { OkrsService } from "../../okrs/okrs.service";
 import { Milestone } from "../../roadmap/milestones/milestone.entity";
 import { MilestonesService } from "../../roadmap/milestones/milestones.service";
 import { WorkItemsService } from "./work-items.service";
+import { WorkItemStatus } from "./work-item-status.enum";
 
 describe("WorkItemsController", () => {
   let controller: WorkItemsController;
@@ -69,7 +70,8 @@ describe("WorkItemsController", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         }
       );
 
@@ -107,7 +109,8 @@ describe("WorkItemsController", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         }
       );
       const workItems = await controller.list(
@@ -150,7 +153,8 @@ describe("WorkItemsController", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         }
       );
       const workItemResponse = await controller.get(
@@ -196,7 +200,8 @@ describe("WorkItemsController", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         }
       );
       const workItemResponse = await controller.update(
@@ -211,7 +216,8 @@ describe("WorkItemsController", () => {
           description: "my work item description updated",
           priority: Priority.LOW,
           type: WorkItemType.BUG,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         }
       );
 
@@ -249,7 +255,8 @@ describe("WorkItemsController", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         }
       );
       await controller.delete(

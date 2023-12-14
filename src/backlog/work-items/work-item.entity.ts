@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Priority } from "../../common/priority.enum";
-import { WorkItemStatus } from "./workt-item-status.enum";
+import { WorkItemStatus } from "./work-item-status.enum";
 import { Org } from "../../orgs/org.entity";
 import { Feature } from "../../roadmap/features/feature.entity";
 import { WorkItemType } from "./work-item-type.enum";
@@ -31,6 +31,10 @@ export class WorkItem {
     default: WorkItemStatus.BACKLOG
   })
   status: WorkItemStatus;
+  @Column({
+    nullable: true
+  })
+  estimation: number;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

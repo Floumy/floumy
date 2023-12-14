@@ -17,6 +17,7 @@ import { Priority } from "../../common/priority.enum";
 import { Timeline } from "../../common/timeline.enum";
 import { WorkItemType } from "./work-item-type.enum";
 import { EntityNotFoundError } from "typeorm";
+import { WorkItemStatus } from "./work-item-status.enum";
 
 describe("WorkItemsService", () => {
   let usersService: UsersService;
@@ -66,7 +67,8 @@ describe("WorkItemsService", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         });
       expect(workItem).toBeDefined();
       expect(workItem.id).toBeDefined();
@@ -95,7 +97,8 @@ describe("WorkItemsService", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         });
       const workItems = await service.listWorkItems(org.id);
       expect(workItems).toBeDefined();
@@ -125,7 +128,8 @@ describe("WorkItemsService", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         });
       const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
       expect(foundWorkItem).toBeDefined();
@@ -162,14 +166,16 @@ describe("WorkItemsService", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature1.id
+          feature: feature1.id,
+          status: WorkItemStatus.BACKLOG
         });
       const foundWorkItem = await service.updateWorkItem(org.id, workItem.id, {
         title: "my work item updated",
         description: "my work item description updated",
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
-        feature: feature2.id
+        feature: feature2.id,
+        status: WorkItemStatus.BACKLOG
       });
       expect(foundWorkItem).toBeDefined();
       expect(foundWorkItem.title).toEqual("my work item updated");
@@ -197,7 +203,8 @@ describe("WorkItemsService", () => {
           description: "my work item description",
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature.id
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
         });
       await service.deleteWorkItem(org.id, workItem.id);
       expect(service.getWorkItem(org.id, workItem.id)).rejects.toThrow(EntityNotFoundError);

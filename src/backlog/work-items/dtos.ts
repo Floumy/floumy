@@ -1,12 +1,14 @@
 import { Priority } from "../../common/priority.enum";
 import { WorkItemType } from "./work-item-type.enum";
-import { WorkItemStatus } from "./workt-item-status.enum";
+import { WorkItemStatus } from "./work-item-status.enum";
 
 export interface CreateUpdateWorkItemDto {
   title: string;
   description: string;
   priority: Priority;
   type: WorkItemType;
+  status: WorkItemStatus;
+  estimation?: number;
   feature?: string;
 }
 
@@ -17,6 +19,7 @@ export interface WorkItemDto {
   priority: Priority;
   type: WorkItemType;
   status: WorkItemStatus;
+  estimation?: number;
   feature?: {
     id: string;
     title: string;

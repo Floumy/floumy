@@ -44,6 +44,8 @@ export class WorkItemsService {
     workItem.description = workItemDto.description;
     workItem.priority = workItemDto.priority;
     workItem.type = workItemDto.type;
+    workItem.status = workItemDto.status;
+    workItem.estimation = workItemDto.estimation;
     if (workItemDto.feature) {
       const feature = await this.featuresRepository.findOneByOrFail({ id: workItemDto.feature, org: { id: orgId } });
       workItem.feature = Promise.resolve(feature);
