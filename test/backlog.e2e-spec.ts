@@ -57,7 +57,8 @@ describe("Backlog (e2e)", () => {
           title: "Feature 1",
           description: "Feature 1 description",
           priority: "high",
-          timeline: "this-quarter"
+          timeline: "this-quarter",
+          status: "in-progress"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const featureId = createFeatureResponse.body.id;
@@ -67,7 +68,8 @@ describe("Backlog (e2e)", () => {
           title: "Work Item 1",
           description: "Work Item 1 description",
           priority: "high",
-          feature: featureId
+          feature: featureId,
+          status: "backlog"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       expect(createWorkItemResponse.statusCode).toEqual(201);
@@ -85,7 +87,8 @@ describe("Backlog (e2e)", () => {
         .send({
           title: "Work Item 1",
           description: "Work Item 1 description",
-          priority: "high"
+          priority: "high",
+          status: "backlog"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const listWorkItemsResponse = await request(app.getHttpServer())
@@ -108,7 +111,8 @@ describe("Backlog (e2e)", () => {
         .send({
           title: "Work Item 1",
           description: "Work Item 1 description",
-          priority: "high"
+          priority: "high",
+          status: "backlog"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const workItemId = createWorkItemResponse.body.id;
@@ -130,7 +134,8 @@ describe("Backlog (e2e)", () => {
         .send({
           title: "Work Item 1",
           description: "Work Item 1 description",
-          priority: "high"
+          priority: "high",
+          status: "backlog"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const workItemId = createWorkItemResponse.body.id;
@@ -139,7 +144,8 @@ describe("Backlog (e2e)", () => {
         .send({
           title: "Work Item 1 updated",
           description: "Work Item 1 description updated",
-          priority: "low"
+          priority: "low",
+          status: "backlog"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       expect(updateWorkItemResponse.statusCode).toEqual(200);
@@ -156,7 +162,8 @@ describe("Backlog (e2e)", () => {
           title: "Feature 1",
           description: "Feature 1 description",
           priority: "high",
-          timeline: "this-quarter"
+          timeline: "this-quarter",
+          status: "in-progress"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const featureId = createFeatureResponse.body.id;
@@ -165,7 +172,8 @@ describe("Backlog (e2e)", () => {
         .send({
           title: "Work Item 1",
           description: "Work Item 1 description",
-          priority: "high"
+          priority: "high",
+          status: "backlog"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const workItemId = createWorkItemResponse.body.id;
@@ -175,7 +183,8 @@ describe("Backlog (e2e)", () => {
           title: "Work Item 1 updated",
           description: "Work Item 1 description updated",
           priority: "low",
-          feature: featureId
+          feature: featureId,
+          status: "backlog"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       expect(updateWorkItemResponse.statusCode).toEqual(200);
@@ -194,7 +203,8 @@ describe("Backlog (e2e)", () => {
         .send({
           title: "Work Item 1",
           description: "Work Item 1 description",
-          priority: "high"
+          priority: "high",
+          status: "backlog"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const workItemId = createWorkItemResponse.body.id;

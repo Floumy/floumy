@@ -21,6 +21,7 @@ export default class WorkItemMapper {
       priority: workItem.priority,
       type: workItem.type,
       status: workItem.status,
+      estimation: workItem.estimation,
       feature: feature ? FeatureMapper.toDto(feature) : undefined,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt
