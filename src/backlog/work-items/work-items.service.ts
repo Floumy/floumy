@@ -50,6 +50,9 @@ export class WorkItemsService {
       const feature = await this.featuresRepository.findOneByOrFail({ id: workItemDto.feature, org: { id: orgId } });
       workItem.feature = Promise.resolve(feature);
     }
+    if (workItem.feature && !workItemDto.feature) {
+      workItem.feature = Promise.resolve(null);
+    }
   }
 
   async deleteWorkItem(orgId: string, id: string) {

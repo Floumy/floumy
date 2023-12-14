@@ -185,6 +185,39 @@ describe("WorkItemsService", () => {
       expect(foundWorkItem.feature.id).toBeDefined();
       expect(foundWorkItem.feature.title).toEqual("my other feature");
     });
+    it("should remove the association with the feature if the feature is not provided", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER
+        });
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
+        });
+      const foundWorkItem = await service.updateWorkItem(org.id, workItem.id, {
+        title: "my work item updated",
+        description: "my work item description updated",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.BACKLOG
+      });
+      expect(foundWorkItem).toBeDefined();
+      expect(foundWorkItem.title).toEqual("my work item updated");
+      expect(foundWorkItem.description).toEqual("my work item description updated");
+      expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
+      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.feature).toBeUndefined();
+    });
   });
   describe("when deleting a work item", () => {
     it("should delete the work item", async () => {
