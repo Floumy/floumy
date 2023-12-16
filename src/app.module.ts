@@ -12,8 +12,6 @@ import { BacklogModule } from "./backlog/backlog.module";
 import databaseConfig from "./config/database.config";
 import encryptionConfig from "./config/encryption.config";
 import jwtConfig from "./config/jwt.config";
-import { addTransactionalDataSource } from "typeorm-transactional";
-import { DataSource } from "typeorm";
 
 @Module({
   imports: [
@@ -32,13 +30,6 @@ import { DataSource } from "typeorm";
         synchronize: true,
         logging: true
       }),
-      async dataSourceFactory(options) {
-        if (!options) {
-          throw new Error("Invalid options passed");
-        }
-
-        return addTransactionalDataSource(new DataSource(options));
-      },
       inject: [ConfigService],
       imports: [ConfigModule]
     }),
