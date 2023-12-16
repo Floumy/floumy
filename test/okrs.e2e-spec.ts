@@ -22,6 +22,7 @@ import { FeaturesController } from "../src/roadmap/features/features.controller"
 import { FeaturesService } from "../src/roadmap/features/features.service";
 import { MilestonesService } from "../src/roadmap/milestones/milestones.service";
 import { Milestone } from "../src/roadmap/milestones/milestone.entity";
+import { BacklogModule } from "../src/backlog/backlog.module";
 
 describe("OKRsController (e2e)", () => {
   let app: INestApplication;
@@ -30,7 +31,7 @@ describe("OKRsController (e2e)", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective, KeyResult, Feature, Milestone])],
+      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective, KeyResult, Feature, Milestone]), BacklogModule],
       [AuthService, UsersService, Reflector, OkrsService, TokensService, FeaturesService, MilestonesService],
       [AuthController, OkrsController, FeaturesController]
     );
