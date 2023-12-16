@@ -231,7 +231,7 @@ describe("FeaturesService", () => {
         priority: Priority.HIGH,
         timeline: Timeline.THIS_QUARTER
       });
-      const foundFeature = await service.get(org.id, feature.id);
+      const foundFeature = await service.getFeature(org.id, feature.id);
       expect(foundFeature.id).toEqual(feature.id);
       expect(foundFeature.title).toEqual(feature.title);
       expect(foundFeature.priority).toEqual(feature.priority);
@@ -240,7 +240,7 @@ describe("FeaturesService", () => {
     });
     it("should throw an error if the feature does not exist", async () => {
       await expect(
-        service.get(org.id, "non-existent-feature")
+        service.getFeature(org.id, "non-existent-feature")
       ).rejects.toThrowError();
     });
     it("should return the feature with the key result", async () => {
@@ -261,7 +261,7 @@ describe("FeaturesService", () => {
         keyResult: objective.keyResults[0].id,
         timeline: Timeline.THIS_QUARTER
       });
-      const foundFeature = await service.get(org.id, feature.id);
+      const foundFeature = await service.getFeature(org.id, feature.id);
       expect(foundFeature.keyResult).toBeDefined();
       expect(foundFeature.keyResult.id).toEqual(objective.keyResults[0].id);
       expect(foundFeature.keyResult.title).toEqual(objective.keyResults[0].title);
@@ -279,7 +279,7 @@ describe("FeaturesService", () => {
         milestone: milestone.id,
         timeline: Timeline.THIS_QUARTER
       });
-      const foundFeature = await service.get(org.id, feature.id);
+      const foundFeature = await service.getFeature(org.id, feature.id);
       expect(foundFeature.milestone).toBeDefined();
       expect(foundFeature.milestone.id).toEqual(milestone.id);
       expect(foundFeature.milestone.title).toEqual(milestone.title);
@@ -368,7 +368,7 @@ describe("FeaturesService", () => {
         timeline: Timeline.THIS_QUARTER
       });
       await service.deleteFeature(org.id, feature.id);
-      await expect(service.get(org.id, feature.id)).rejects.toThrowError();
+      await expect(service.getFeature(org.id, feature.id)).rejects.toThrowError();
     });
     it("should remove the association between features and work items", async () => {
       const feature = await service.createFeature(org.id, {

@@ -211,7 +211,7 @@ describe("MilestonesService", () => {
         timeline: Timeline.NEXT_QUARTER
       });
       await service.delete(org.id, milestone.id);
-      const foundFeature = await featuresService.get(org.id, feature.id);
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
       expect(foundFeature.milestone).toBeUndefined();
     });
   });

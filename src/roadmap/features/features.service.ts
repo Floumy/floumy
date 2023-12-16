@@ -72,11 +72,6 @@ export class FeaturesService {
     return FeatureMapper.toListDto(features);
   }
 
-  async get(orgId: string, id: string) {
-    const feature = await this.featuresRepository.findOneByOrFail({ org: { id: orgId }, id: id });
-    return await FeatureMapper.toDto(feature);
-  }
-
   async getFeature(orgId: string, id: string) {
     const feature = await this.featuresRepository.findOneByOrFail({ org: { id: orgId }, id: id });
     return await FeatureMapper.toDto(feature);
