@@ -23,15 +23,16 @@ import { Objective } from "../src/okrs/objective.entity";
 import { MilestonesController } from "../src/roadmap/milestones/milestones.controller";
 import { Milestone } from "../src/roadmap/milestones/milestone.entity";
 import { MilestonesService } from "../src/roadmap/milestones/milestones.service";
+import { BacklogModule } from "../src/backlog/backlog.module";
 
-describe("FeaturesController (e2e)", () => {
+describe("Roadmap (e2e)", () => {
   let app: INestApplication;
   let accessToken: string;
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective, KeyResult, Feature, Milestone])],
+      [UsersModule, OrgsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Objective, KeyResult, Feature, Milestone]), BacklogModule],
       [AuthService, UsersService, Reflector, OkrsService, TokensService, FeaturesService, MilestonesService],
       [AuthController, FeaturesController, OkrsController, MilestonesController]
     );
