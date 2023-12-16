@@ -13,6 +13,7 @@ import { MilestonesService } from "./milestones.service";
 import { Milestone } from "./milestone.entity";
 import { Timeline } from "../../common/timeline.enum";
 import { Feature } from "../features/feature.entity";
+import { BacklogModule } from "../../backlog/backlog.module";
 
 describe("MilestonesController", () => {
   let controller: MilestonesController;
@@ -21,7 +22,7 @@ describe("MilestonesController", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Milestone, Feature]), UsersModule],
+      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Milestone, Feature]), UsersModule, BacklogModule],
       [OkrsService, OrgsService, TokensService, MilestonesService],
       [MilestonesController]
     );
