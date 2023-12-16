@@ -13,9 +13,10 @@ import { AuthModule } from "src/auth/auth.module";
 import { MilestonesController } from "./milestones/milestones.controller";
 import { MilestonesService } from "./milestones/milestones.service";
 import { Milestone } from "./milestones/milestone.entity";
+import { BacklogModule } from "../backlog/backlog.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Feature, Org, KeyResult, Objective, Milestone]), OrgsModule, OkrsModule, AuthModule],
+  imports: [TypeOrmModule.forFeature([Feature, Org, KeyResult, Objective, Milestone]), OrgsModule, OkrsModule, AuthModule, BacklogModule],
   controllers: [FeaturesController, MilestonesController],
   providers: [FeaturesService, OrgsService, OkrsModule, MilestonesService]
 })

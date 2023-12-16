@@ -59,4 +59,8 @@ export class WorkItemsService {
     const workItem = await this.workItemsRepository.findOneByOrFail({ id, org: { id: orgId } });
     await this.workItemsRepository.remove(workItem);
   }
+
+  removeFeatureFromWorkItems(orgId: string, id: string) {
+    return this.workItemsRepository.update({ org: { id: orgId }, feature: { id } }, { feature: null });
+  }
 }

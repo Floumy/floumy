@@ -9,6 +9,8 @@ import { OrgsService } from "../../orgs/orgs.service";
 import { OkrsService } from "../../okrs/okrs.service";
 import { MilestonesService } from "../milestones/milestones.service";
 import { TimelineService } from "../../common/timeline.service";
+import { WorkItemsService } from "../../backlog/work-items/work-items.service";
+import { Transactional } from "typeorm-transactional";
 
 @Injectable()
 export class FeaturesService {
@@ -17,7 +19,8 @@ export class FeaturesService {
     @InjectRepository(Feature) private featuresRepository: Repository<Feature>,
     private orgsService: OrgsService,
     private okrsService: OkrsService,
-    private milestonesService: MilestonesService
+    private milestonesService: MilestonesService,
+    private workItemsService: WorkItemsService
   ) {
   }
 
@@ -108,8 +111,10 @@ export class FeaturesService {
     return await FeatureMapper.toDto(savedFeature);
   }
 
+  @Transactional()
   async deleteFeature(orgId: string, id: string) {
     const feature = await this.featuresRepository.findOneByOrFail({ org: { id: orgId }, id: id });
+    await this.workItemsService.removeFeatureFromWorkItems(orgId, id);
     await this.featuresRepository.remove(feature);
   }
 }
