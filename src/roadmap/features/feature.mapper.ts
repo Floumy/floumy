@@ -11,6 +11,7 @@ export class FeatureMapper {
       priority: feature.priority,
       timeline: TimelineService.startAndEndDatesToTimeline(feature.startDate, feature.endDate),
       status: feature.status,
+      workItems: (await feature.workItems).map(WorkItemMapper.toDto),
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
     };
@@ -41,5 +42,20 @@ export class FeatureMapper {
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
     }));
+  }
+}
+
+class WorkItemMapper {
+  static toDto(workItem: any): any {
+    return {
+      id: workItem.id,
+      title: workItem.title,
+      description: workItem.description,
+      priority: workItem.priority,
+      status: workItem.status,
+      type: workItem.type,
+      createdAt: workItem.createdAt,
+      updatedAt: workItem.updatedAt
+    };
   }
 }
