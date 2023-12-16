@@ -13,10 +13,15 @@ import { User } from "../../users/user.entity";
 import { MilestonesService } from "../milestones/milestones.service";
 import { Milestone } from "../milestones/milestone.entity";
 import { Timeline } from "../../common/timeline.enum";
+import { WorkItemStatus } from "../../backlog/work-items/work-item-status.enum";
+import { WorkItemsService } from "../../backlog/work-items/work-items.service";
+import { WorkItem } from "../../backlog/work-items/work-item.entity";
+import { WorkItemType } from "../../backlog/work-items/work-item-type.enum";
 
 describe("FeaturesService", () => {
   let usersService: UsersService;
   let service: FeaturesService;
+  let workItemsService: WorkItemsService;
   let milestonesService: MilestonesService;
   let okrsService: OkrsService;
   let orgsService: OrgsService;
@@ -27,8 +32,8 @@ describe("FeaturesService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone])],
-      [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService]
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, WorkItem])],
+      [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, WorkItemsService]
     );
     cleanup = dbCleanup;
     service = module.get<FeaturesService>(FeaturesService);
@@ -36,6 +41,7 @@ describe("FeaturesService", () => {
     okrsService = module.get<OkrsService>(OkrsService);
     orgsService = module.get<OrgsService>(OrgsService);
     milestonesService = module.get<MilestonesService>(MilestonesService);
+    workItemsService = module.get<WorkItemsService>(WorkItemsService);
     const user = await usersService.create(
       "Test User",
       "test@example.com",
@@ -363,6 +369,25 @@ describe("FeaturesService", () => {
       });
       await service.deleteFeature(org.id, feature.id);
       await expect(service.get(org.id, feature.id)).rejects.toThrowError();
+    });
+    it("should remove the association between features and work items", async () => {
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        timeline: Timeline.THIS_QUARTER
+      });
+      const workItem = await workItemsService.createWorkItem(org.id, {
+        title: "my work item",
+        description: "my work item description",
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        feature: feature.id,
+        status: WorkItemStatus.BACKLOG
+      });
+      await service.deleteFeature(org.id, feature.id);
+      const foundWorkItem = await workItemsService.getWorkItem(org.id, workItem.id);
+      expect(foundWorkItem.feature).toBeUndefined();
     });
   });
 });
