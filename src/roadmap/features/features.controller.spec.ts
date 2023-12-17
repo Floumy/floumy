@@ -16,6 +16,7 @@ import { MilestonesService } from "../milestones/milestones.service";
 import { Milestone } from "../milestones/milestone.entity";
 import { Timeline } from "../../common/timeline.enum";
 import { BacklogModule } from "../../backlog/backlog.module";
+import { FeatureStatus } from "./featurestatus.enum";
 
 describe("FeaturesController", () => {
   let controller: FeaturesController;
@@ -60,12 +61,14 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.DEPRECATED
         });
       expect(featureResponse.title).toEqual("my feature");
       expect(featureResponse.description).toEqual("my feature description");
       expect(featureResponse.priority).toEqual(Priority.HIGH);
       expect(featureResponse.timeline).toEqual(Timeline.NEXT_QUARTER);
+      expect(featureResponse.status).toEqual(FeatureStatus.DEPRECATED);
       expect(featureResponse.createdAt).toBeDefined();
     });
     it("should return 400 if title is missing", async () => {
@@ -80,7 +83,8 @@ describe("FeaturesController", () => {
             title: null,
             description: "my feature description",
             priority: Priority.HIGH,
-            timeline: Timeline.THIS_QUARTER
+            timeline: Timeline.THIS_QUARTER,
+            status: FeatureStatus.CANCELED
           });
       } catch (e) {
         expect(e.message).toEqual("Bad Request");
@@ -99,7 +103,8 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.DEPRECATED
         });
       const features = await controller.list({
         user: {
@@ -124,7 +129,8 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.DEPRECATED
         });
       const features = await controller.listWithoutMilestone({
         user: {
@@ -149,7 +155,8 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.DEPRECATED
         });
       const feature = await controller.get({
         user: {
@@ -174,7 +181,8 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.DEPRECATED
         });
       const feature = await controller.update({
         user: {
@@ -184,10 +192,12 @@ describe("FeaturesController", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.IN_DESIGN
       });
       expect(feature.title).toEqual("my feature");
       expect(feature.priority).toEqual(Priority.HIGH);
+      expect(feature.status).toEqual(FeatureStatus.IN_DESIGN);
       expect(feature.createdAt).toBeDefined();
       expect(feature.updatedAt).toBeDefined();
     });
@@ -204,7 +214,8 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.DEPRECATED
         });
       await controller.delete({
         user: {

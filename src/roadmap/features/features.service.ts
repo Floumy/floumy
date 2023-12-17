@@ -30,6 +30,7 @@ export class FeaturesService {
     feature.title = featureDto.title;
     feature.description = featureDto.description;
     feature.priority = featureDto.priority;
+    feature.status = featureDto.status;
     feature.org = Promise.resolve(org);
     TimelineService.validateTimeline(featureDto.timeline);
     const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(featureDto.timeline);
@@ -51,6 +52,8 @@ export class FeaturesService {
   private validateFeature(featureDto: CreateUpdateFeatureDto) {
     if (!featureDto.title) throw new Error("Feature title is required");
     if (!featureDto.priority) throw new Error("Feature priority is required");
+    if (!featureDto.timeline) throw new Error("Feature timeline is required");
+    if (!featureDto.status) throw new Error("Feature status is required");
     if (!Object.values(Priority).includes(featureDto.priority)) throw new Error("Invalid priority");
     TimelineService.validateTimeline(featureDto.timeline);
   }
@@ -83,6 +86,7 @@ export class FeaturesService {
     feature.title = updateFeatureDto.title;
     feature.description = updateFeatureDto.description;
     feature.priority = updateFeatureDto.priority;
+    feature.status = updateFeatureDto.status;
     const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(updateFeatureDto.timeline);
     feature.startDate = startDate;
     feature.endDate = endDate;
