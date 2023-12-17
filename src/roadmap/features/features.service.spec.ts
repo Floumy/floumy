@@ -17,6 +17,7 @@ import { WorkItemStatus } from "../../backlog/work-items/work-item-status.enum";
 import { WorkItemsService } from "../../backlog/work-items/work-items.service";
 import { WorkItem } from "../../backlog/work-items/work-item.entity";
 import { WorkItemType } from "../../backlog/work-items/work-item-type.enum";
+import { FeatureStatus } from "./featurestatus.enum";
 
 describe("FeaturesService", () => {
   let usersService: UsersService;
@@ -64,7 +65,8 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.DEPRECATED
       });
       expect(feature.id).toBeDefined();
       expect(feature.title).toEqual("my feature");
@@ -77,7 +79,8 @@ describe("FeaturesService", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.REVIEW
         })
       ).rejects.toThrowError();
     });
@@ -87,7 +90,8 @@ describe("FeaturesService", () => {
           title: "",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.REVIEW
         })
       ).rejects.toThrowError();
     });
@@ -97,7 +101,8 @@ describe("FeaturesService", () => {
           title: "my feature",
           description: "my feature description",
           priority: null,
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.REVIEW
         })
       ).rejects.toThrowError();
     });
@@ -117,7 +122,8 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       expect(feature.keyResult).toBeDefined();
       expect(feature.keyResult.id).toEqual(objective.keyResults[0].id);
@@ -130,7 +136,8 @@ describe("FeaturesService", () => {
           description: "my feature description",
           priority: Priority.HIGH,
           keyResult: "non-existent-key-result",
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.REVIEW
         })
       ).rejects.toThrowError();
     });
@@ -158,7 +165,8 @@ describe("FeaturesService", () => {
           description: "my feature description",
           priority: Priority.HIGH,
           keyResult: objective.keyResults[0].id,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.REVIEW
         })
       ).rejects.toThrowError();
     });
@@ -173,7 +181,8 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         milestone: milestone.id,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       expect(feature.milestone).toBeDefined();
       expect(feature.milestone.id).toEqual(milestone.id);
@@ -197,7 +206,8 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       const features = await service.listFeatures(org.id);
       expect(features.length).toEqual(1);
@@ -213,7 +223,8 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.NEXT_QUARTER
+        timeline: Timeline.NEXT_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       const features = await service.listFeaturesWithoutMilestone(org.id);
       expect(features.length).toEqual(1);
@@ -229,7 +240,8 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       const foundFeature = await service.getFeature(org.id, feature.id);
       expect(foundFeature.id).toEqual(feature.id);
@@ -259,7 +271,8 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       const foundFeature = await service.getFeature(org.id, feature.id);
       expect(foundFeature.keyResult).toBeDefined();
@@ -277,7 +290,8 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         milestone: milestone.id,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       const foundFeature = await service.getFeature(org.id, feature.id);
       expect(foundFeature.milestone).toBeDefined();
@@ -291,19 +305,22 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       const updatedFeature = await service.updateFeature(org.id, feature.id, {
         title: "my updated feature",
         description: "my updated feature description",
         priority: Priority.LOW,
-        timeline: Timeline.NEXT_QUARTER
+        timeline: Timeline.NEXT_QUARTER,
+        status: FeatureStatus.DEPRECATED
       });
       expect(updatedFeature.id).toEqual(feature.id);
       expect(updatedFeature.title).toEqual("my updated feature");
       expect(updatedFeature.description).toEqual("my updated feature description");
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.timeline).toEqual(Timeline.NEXT_QUARTER);
+      expect(updatedFeature.status).toEqual(FeatureStatus.DEPRECATED);
       expect(updatedFeature.createdAt).toEqual(feature.createdAt);
       expect(updatedFeature.updatedAt).not.toEqual(feature.updatedAt);
     });
@@ -322,14 +339,16 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       const updatedFeature = await service.updateFeature(org.id, feature.id, {
         title: "my updated feature",
         description: "my updated feature description",
         priority: Priority.LOW,
         keyResult: objective.keyResults[0].id,
-        timeline: Timeline.NEXT_QUARTER
+        timeline: Timeline.NEXT_QUARTER,
+        status: FeatureStatus.DEPRECATED
       });
       expect(updatedFeature.keyResult).toBeDefined();
       expect(updatedFeature.keyResult.id).toEqual(objective.keyResults[0].id);
@@ -345,14 +364,16 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       const updatedFeature = await service.updateFeature(org.id, feature.id, {
         title: "my updated feature",
         description: "my updated feature description",
         priority: Priority.LOW,
         milestone: milestone.id,
-        timeline: Timeline.NEXT_QUARTER
+        timeline: Timeline.NEXT_QUARTER,
+        status: FeatureStatus.DEPRECATED
       });
       expect(updatedFeature.milestone).toBeDefined();
       expect(updatedFeature.milestone.id).toEqual(milestone.id);
@@ -365,7 +386,8 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       await service.deleteFeature(org.id, feature.id);
       await expect(service.getFeature(org.id, feature.id)).rejects.toThrowError();
@@ -375,7 +397,8 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER
+        timeline: Timeline.THIS_QUARTER,
+        status: FeatureStatus.REVIEW
       });
       const workItem = await workItemsService.createWorkItem(org.id, {
         title: "my work item",

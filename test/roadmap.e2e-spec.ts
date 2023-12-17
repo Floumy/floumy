@@ -69,6 +69,7 @@ describe("Roadmap (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
+          status: "in-design",
           timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[0].id
         })
@@ -78,6 +79,7 @@ describe("Roadmap (e2e)", () => {
           expect(body.title).toEqual("my feature");
           expect(body.description).toEqual("my feature description");
           expect(body.priority).toEqual("medium");
+          expect(body.status).toEqual("in-design");
           expect(body.keyResult.id).toEqual(okrResponse.body.keyResults[0].id);
           expect(body.keyResult.title).toEqual("My Key Result 1");
         });
