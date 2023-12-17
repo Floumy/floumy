@@ -4,11 +4,10 @@ export enum WorkItemStatus {
   IN_PROGRESS = "in-progress",
   BLOCKED = "blocked",
   CODE_REVIEW = "code-review",
-  QA_TESTING = "qa-testing",
+  TESTING = "testing",
   REVISIONS = "revisions",
   READY_FOR_DEPLOYMENT = "ready-for-deployment",
   DEPLOYED = "deployed",
   DONE = "done",
   CLOSED = "closed",
-  CANCELLED = "cancelled"
 }
