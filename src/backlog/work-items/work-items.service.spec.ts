@@ -18,6 +18,7 @@ import { Timeline } from "../../common/timeline.enum";
 import { WorkItemType } from "./work-item-type.enum";
 import { EntityNotFoundError } from "typeorm";
 import { WorkItemStatus } from "./work-item-status.enum";
+import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
 
 describe("WorkItemsService", () => {
   let usersService: UsersService;
@@ -58,7 +59,8 @@ describe("WorkItemsService", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
         org.id,
@@ -88,7 +90,8 @@ describe("WorkItemsService", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       await service.createWorkItem(
         org.id,
@@ -119,7 +122,8 @@ describe("WorkItemsService", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
         org.id,
@@ -149,7 +153,8 @@ describe("WorkItemsService", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const feature2 = await featuresService.createFeature(
         org.id,
@@ -157,7 +162,8 @@ describe("WorkItemsService", () => {
           title: "my other feature",
           description: "my other feature description",
           priority: Priority.MEDIUM,
-          timeline: Timeline.THIS_QUARTER
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
         org.id,
@@ -192,7 +198,8 @@ describe("WorkItemsService", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
         org.id,
@@ -227,7 +234,8 @@ describe("WorkItemsService", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
         org.id,

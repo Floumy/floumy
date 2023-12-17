@@ -54,6 +54,7 @@ class WorkItemMapper {
       priority: workItem.priority,
       status: workItem.status,
       type: workItem.type,
+      estimation: workItem.estimation,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt
     };

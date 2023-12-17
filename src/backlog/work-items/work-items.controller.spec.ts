@@ -19,6 +19,7 @@ import { Milestone } from "../../roadmap/milestones/milestone.entity";
 import { MilestonesService } from "../../roadmap/milestones/milestones.service";
 import { WorkItemsService } from "./work-items.service";
 import { WorkItemStatus } from "./work-item-status.enum";
+import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
 
 describe("WorkItemsController", () => {
   let controller: WorkItemsController;
@@ -57,7 +58,8 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const workItemResponse = await controller.create(
         {
@@ -96,7 +98,8 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       await controller.create(
         {
@@ -140,7 +143,8 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const workItem = await controller.create(
         {
@@ -187,7 +191,8 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const workItem = await controller.create(
         {
@@ -242,7 +247,8 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
         });
       const workItem = await controller.create(
         {
