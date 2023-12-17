@@ -185,6 +185,7 @@ describe("OKRs (e2e)", () => {
           description: "My Feature Description",
           priority: "high",
           timeline: "this-quarter",
+          status: "planned",
           keyResult: okrResponse.body.keyResults[0].id
         })
         .expect(HttpStatus.CREATED);
