@@ -24,7 +24,7 @@ import { MilestonesService } from "../src/roadmap/milestones/milestones.service"
 import { Milestone } from "../src/roadmap/milestones/milestone.entity";
 import { BacklogModule } from "../src/backlog/backlog.module";
 
-describe("OKRsController (e2e)", () => {
+describe("OKRs (e2e)", () => {
   let app: INestApplication;
   let accessToken: string;
   let cleanup: () => Promise<void>;
