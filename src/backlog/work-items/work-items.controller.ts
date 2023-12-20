@@ -41,6 +41,12 @@ export class WorkItemsController {
     return await this.workItemsService.listWorkItems(request.user.org);
   }
 
+  @Get("open")
+  @HttpCode(HttpStatus.OK)
+  async listOpen(@Request() request) {
+    return await this.workItemsService.listOpenWorkItems(request.user.org);
+  }
+
   @Get(":id")
   @HttpCode(HttpStatus.OK)
   async get(@Request() request, @Param("id") id: string) {

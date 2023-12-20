@@ -251,4 +251,61 @@ describe("WorkItemsService", () => {
       expect(service.getWorkItem(org.id, workItem.id)).rejects.toThrow(EntityNotFoundError);
     });
   });
+  describe("when listing open work items", () => {
+    it("should return the list of open work items", async () => {
+      const feature1 = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
+        });
+      const feature2 = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my other feature",
+          description: "my other feature description",
+          priority: Priority.MEDIUM,
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.PLANNED
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          feature: feature1.id,
+          status: WorkItemStatus.BACKLOG
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my other work item",
+          description: "my other work item description",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          feature: feature2.id,
+          status: WorkItemStatus.BACKLOG
+        });
+      const workItems = await service.listOpenWorkItems(org.id);
+      expect(workItems).toBeDefined();
+      expect(workItems.length).toEqual(2);
+      expect(workItems[0].title).toEqual("my work item");
+      expect(workItems[0].description).toEqual("my work item description");
+      expect(workItems[0].priority).toEqual(Priority.HIGH);
+      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
+      expect(workItems[0].feature.id).toBeDefined();
+      expect(workItems[0].feature.title).toEqual("my feature");
+      expect(workItems[1].title).toEqual("my other work item");
+      expect(workItems[1].description).toEqual("my other work item description");
+      expect(workItems[1].priority).toEqual(Priority.MEDIUM);
+      expect(workItems[1].type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(workItems[1].feature.id).toBeDefined();
+      expect(workItems[1].feature.title).toEqual("my other feature");
+    });
+  });
 });

@@ -284,4 +284,49 @@ describe("WorkItemsController", () => {
       expect(workItems.length).toEqual(0);
     });
   });
+  describe("when getting open work items", () => {
+    it("should return the open work items", async () => {
+      const feature = await featureService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
+        });
+      await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          feature: feature.id,
+          status: WorkItemStatus.BACKLOG
+        }
+      );
+      const workItems = await controller.listOpen(
+        {
+          user: {
+            org: org.id
+          }
+        }
+      );
+
+      expect(workItems.length).toEqual(1);
+      expect(workItems[0].id).toBeDefined();
+      expect(workItems[0].title).toEqual("my work item");
+      expect(workItems[0].description).toEqual("my work item description");
+      expect(workItems[0].priority).toEqual("high");
+      expect(workItems[0].type).toEqual("technical-debt");
+      expect(workItems[0].createdAt).toBeDefined();
+      expect(workItems[0].updatedAt).toBeDefined();
+      expect(workItems[0].status).toEqual("backlog");
+    });
+  });
 });
