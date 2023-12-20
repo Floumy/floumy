@@ -6,6 +6,7 @@ import { Repository } from "typeorm";
 import { WorkItem } from "./work-item.entity";
 import WorkItemMapper from "./work-item.mapper";
 import { Org } from "../../orgs/org.entity";
+import { WorkItemStatus } from "./work-item-status.enum";
 
 @Injectable()
 export class WorkItemsService {
@@ -62,5 +63,18 @@ export class WorkItemsService {
 
   removeFeatureFromWorkItems(orgId: string, id: string) {
     return this.workItemsRepository.update({ org: { id: orgId }, feature: { id } }, { feature: null });
+  }
+
+  async listOpenWorkItems(orgId: string) {
+    const workItems = await this.workItemsRepository
+      .createQueryBuilder("workItem")
+      .where("workItem.orgId = :orgId", { orgId })
+      .andWhere("workItem.status NOT IN (:closedStatus, :doneStatus)",
+        {
+          closedStatus: WorkItemStatus.CLOSED,
+          doneStatus: WorkItemStatus.DONE
+        })
+      .getMany();
+    return await WorkItemMapper.toListDto(workItems);
   }
 }
