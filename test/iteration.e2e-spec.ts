@@ -72,4 +72,30 @@ describe("Iteration (e2e)", () => {
       expect(response.body.duration).toEqual(1);
     });
   });
+
+  describe("/iterations (GET)", () => {
+    it("should return a list of iterations", async () => {
+      await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 1",
+          startDate: "2020-01-01",
+          duration: 1
+        })
+        .expect(201);
+
+      const response = await request(app.getHttpServer())
+        .get("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(response.body[0].id).toBeDefined();
+      expect(response.body[0].title).toBeDefined();
+      expect(response.body[0].goal).toEqual("Goal 1");
+      expect(response.body[0].startDate).toEqual("2020-01-01");
+      expect(response.body[0].endDate).toEqual("2020-01-07");
+      expect(response.body[0].duration).toEqual(1);
+    });
+  });
 });

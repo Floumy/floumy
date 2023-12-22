@@ -75,4 +75,22 @@ describe("IterationsService", () => {
       expect(iteration.title).toEqual("Iteration CW51-CW52 2023");
     });
   });
+  describe("when listing iterations", () => {
+    it("should list iterations", async () => {
+      await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: "2020-01-01",
+        duration: 1
+      });
+      const iterations = await service.list(org.id);
+      expect(iterations[0].id).toBeDefined();
+      expect(iterations[0].title).toEqual("Iteration CW1-CW2 2020");
+      expect(iterations[0].goal).toEqual("Test Iteration");
+      expect(iterations[0].startDate).toEqual("2020-01-01");
+      expect(iterations[0].endDate).toEqual("2020-01-07");
+      expect(iterations[0].duration).toEqual(1);
+      expect(iterations[0].createdAt).toBeDefined();
+      expect(iterations[0].updatedAt).toBeDefined();
+    });
+  });
 });

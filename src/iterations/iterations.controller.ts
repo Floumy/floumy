@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post, Request, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "../auth/auth.guard";
 import { CreateOrUpdateIterationDto } from "./dtos";
 import { IterationsService } from "./iterations.service";
@@ -17,5 +17,10 @@ export class IterationsController {
     } catch (e) {
       throw new BadRequestException(e.message);
     }
+  }
+
+  @Get()
+  async list(@Request() request) {
+    return await this.iterationsService.list(request.user.orgId);
   }
 }
