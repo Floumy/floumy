@@ -50,4 +50,18 @@ export class IterationsService {
     const savedIteration = await this.iterationRepository.save(iteration);
     return IterationMapper.toDto(savedIteration);
   }
+
+  async list(orgId: string) {
+    const iterations = await this.iterationRepository.find({
+      where: {
+        org: {
+          id: orgId
+        }
+      },
+      order: {
+        startDate: "DESC"
+      }
+    });
+    return iterations.map(iteration => IterationMapper.toDto(iteration));
+  }
 }

@@ -66,4 +66,23 @@ describe("IterationsController", () => {
       expect(iteration.duration).toEqual(1);
     });
   });
+
+  describe("when listing iterations", () => {
+    it("should list iterations", async () => {
+      await controller.create({
+        user: { orgId: org.id }
+      }, {
+        goal: "Goal 1",
+        startDate: "2020-01-01",
+        duration: 1
+      });
+      const iterations = await controller.list({
+        user: { orgId: org.id }
+      });
+      expect(iterations.length).toEqual(1);
+      expect(iterations[0].goal).toEqual("Goal 1");
+      expect(iterations[0].startDate).toEqual("2020-01-01");
+      expect(iterations[0].duration).toEqual(1);
+    });
+  });
 });
