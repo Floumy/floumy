@@ -26,6 +26,9 @@ import { MilestonesService } from "../src/roadmap/milestones/milestones.service"
 import { Milestone } from "../src/roadmap/milestones/milestone.entity";
 import { KeyResult } from "../src/okrs/key-result.entity";
 import { Objective } from "../src/okrs/objective.entity";
+import { IterationsController } from "../src/iterations/iterations.controller";
+import { Iteration } from "../src/iterations/Iteration.entity";
+import { IterationsService } from "../src/iterations/iterations.service";
 
 describe("Iteration (e2e)", () => {
   let app: INestApplication;
@@ -34,9 +37,9 @@ describe("Iteration (e2e)", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, OrgsModule, BacklogModule, OkrsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Feature, Objective, KeyResult, WorkItem, Milestone])],
-      [AuthService, UsersService, Reflector, TokensService, FeaturesService, WorkItemsService, OkrsService, MilestonesService],
-      [AuthController, FeaturesController, WorkItemsController]
+      [UsersModule, OrgsModule, BacklogModule, OkrsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Feature, Objective, KeyResult, WorkItem, Milestone, Iteration])],
+      [AuthService, UsersService, Reflector, TokensService, FeaturesService, WorkItemsService, OkrsService, MilestonesService, IterationsService],
+      [AuthController, FeaturesController, WorkItemsController, IterationsController]
     );
     cleanup = dbCleanup;
     app = module.createNestApplication();
@@ -62,7 +65,7 @@ describe("Iteration (e2e)", () => {
         .expect(201);
 
       expect(response.body.id).toBeDefined();
-      expect(response.body.name).toBeDefined();
+      expect(response.body.title).toBeDefined();
       expect(response.body.goal).toEqual("Goal 1");
       expect(response.body.startDate).toEqual("2020-01-01");
       expect(response.body.endDate).toEqual("2020-01-07");
