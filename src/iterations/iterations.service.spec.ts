@@ -66,5 +66,13 @@ describe("IterationsService", () => {
       expect(iteration.createdAt).toBeDefined();
       expect(iteration.updatedAt).toBeDefined();
     });
+    it("should calculate the correct iteration title", async () => {
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: "2023-12-22",
+        duration: 1
+      });
+      expect(iteration.title).toEqual("Iteration CW51-CW52 2023");
+    });
   });
 });
