@@ -59,7 +59,7 @@ export class IterationsService {
         }
       },
       order: {
-        startDate: "DESC"
+        startDate: "ASC"
       }
     });
     return iterations.map(iteration => IterationMapper.toDto(iteration));
