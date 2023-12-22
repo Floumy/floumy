@@ -9,6 +9,7 @@ import { OkrsModule } from "./okrs/okrs.module";
 import { OrgsModule } from "./orgs/orgs.module";
 import { RoadmapModule } from "./roadmap/roadmap.module";
 import { BacklogModule } from "./backlog/backlog.module";
+import { IterationsModule } from "./iterations/iterations.module";
 import databaseConfig from "./config/database.config";
 import encryptionConfig from "./config/encryption.config";
 import jwtConfig from "./config/jwt.config";
@@ -38,7 +39,8 @@ import jwtConfig from "./config/jwt.config";
     OkrsModule,
     OrgsModule,
     RoadmapModule,
-    BacklogModule
+    BacklogModule,
+    IterationsModule
   ],
   controllers: [AppController],
   providers: [AppService]

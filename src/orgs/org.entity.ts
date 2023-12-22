@@ -5,6 +5,7 @@ import { KeyResult } from "../okrs/key-result.entity";
 import { Feature } from "../roadmap/features/feature.entity";
 import { Milestone } from "../roadmap/milestones/milestone.entity";
 import { WorkItem } from "../backlog/work-items/work-item.entity";
+import { Iteration } from "../iterations/Iteration.entity";
 
 @Entity()
 export class Org {
@@ -26,4 +27,6 @@ export class Org {
   milestones: Promise<Milestone[]>;
   @OneToMany(() => WorkItem, workItem => workItem.org, { lazy: true })
   workItems: Promise<WorkItem[]>;
+  @OneToMany(() => Iteration, iteration => iteration.org, { lazy: true })
+  iterations: Promise<Iteration[]>;
 }
