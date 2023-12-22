@@ -15,6 +15,8 @@ import { TokensService } from "../auth/tokens.service";
 import { MilestonesService } from "../roadmap/milestones/milestones.service";
 import { WorkItemsService } from "../backlog/work-items/work-items.service";
 import { UsersService } from "../users/users.service";
+import { Iteration } from "./Iteration.entity";
+import { IterationsService } from "./iterations.service";
 
 describe("IterationsController", () => {
   let controller: IterationsController;
@@ -24,8 +26,8 @@ describe("IterationsController", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone]), UsersModule],
-      [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService, WorkItemsService],
+      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone, Iteration]), UsersModule],
+      [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService, WorkItemsService, IterationsService],
       [IterationsController]
     );
     cleanup = dbCleanup;
