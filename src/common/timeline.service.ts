@@ -32,14 +32,15 @@ export class TimelineService {
     const quarter = Math.floor((date.getMonth() + 3) / 3);
     const currentQuarter = TimelineService.getCurrentQuarter();
 
-    if (date < today) return Timeline.PAST;
     if (date.getFullYear() === today.getFullYear()) {
       if (quarter === currentQuarter) return Timeline.THIS_QUARTER;
       if (quarter === currentQuarter + 1) return Timeline.NEXT_QUARTER;
     }
-    if (date.getFullYear() > today.getFullYear()) {
+    if (date.getFullYear() === today.getFullYear() + 1) {
       if (quarter === 1 && currentQuarter === 4) return Timeline.NEXT_QUARTER;
     }
+    if (date < today) return Timeline.PAST;
+
     return Timeline.LATER;
   }
 
