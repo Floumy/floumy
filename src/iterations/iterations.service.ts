@@ -13,9 +13,22 @@ export class IterationsService {
               @InjectRepository(Org) private orgRepository: Repository<Org>) {
   }
 
-  getIterationWeekNumbersForTitle(startDate: Date, endDate: Date) {
-    const startWeekNumber = Math.ceil((startDate.getDate() + 6 - startDate.getDay()) / 7);
-    const endWeekNumber = Math.ceil((endDate.getDate() + 6 - endDate.getDay()) / 7);
+  getWeekNumber(d: Date): number {
+    // Copy date so don't modify original
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    // Set to nearest Thursday: current date + 4 - day number
+    // Make Sunday's day number 7
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    // Get first day of year
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    // Calculate and return full weeks to nearest Thursday
+    // @ts-ignore
+    return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+  }
+
+  getIterationCalendarWeekNumbersForTitle(startDate: Date, endDate: Date) {
+    const startWeekNumber = this.getWeekNumber(startDate);
+    const endWeekNumber = this.getWeekNumber(endDate);
     if (startWeekNumber === endWeekNumber) {
       return `CW${startWeekNumber}`;
     }
@@ -32,7 +45,7 @@ export class IterationsService {
     // Duration is in weeks
     iteration.duration = iterationDto.duration;
     iteration.endDate = new Date(iteration.startDate.getTime() + iteration.duration * 7 * 24 * 60 * 60 * 1000 - 1);
-    iteration.title = `Iteration ${this.getIterationWeekNumbersForTitle(iteration.startDate, iteration.endDate)} ${iteration.startDate.getFullYear()}`;
+    iteration.title = `Iteration ${this.getIterationCalendarWeekNumbersForTitle(iteration.startDate, iteration.endDate)} ${iteration.startDate.getFullYear()}`;
     iteration.org = Promise.resolve(org);
     const savedIteration = await this.iterationRepository.save(iteration);
     return IterationMapper.toDto(savedIteration);
