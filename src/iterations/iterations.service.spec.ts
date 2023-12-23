@@ -146,4 +146,24 @@ describe("IterationsService", () => {
       expect(iterations.length).toEqual(0);
     });
   });
+
+  describe("when listing current and future iterations", () => {
+    it("should list current and future iterations", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: startDate,
+        duration: 1
+      });
+      const iterations = await service.listCurrentAndFuture(org.id);
+      expect(iterations[0].id).toBeDefined();
+      expect(iterations[0].title).toBeDefined();
+      expect(iterations[0].goal).toEqual("Test Iteration");
+      expect(iterations[0].startDate).toEqual(startDate);
+      expect(iterations[0].endDate).toBeDefined();
+      expect(iterations[0].duration).toEqual(1);
+      expect(iterations[0].createdAt).toBeDefined();
+      expect(iterations[0].updatedAt).toBeDefined();
+    });
+  });
 });

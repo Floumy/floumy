@@ -178,4 +178,38 @@ describe("Iteration (e2e)", () => {
         .expect(404);
     });
   });
+  describe("/iterations/current-and-future (GET)", () => {
+    it("should return a list of current and future iterations", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 1",
+          startDate: "2019-01-01",
+          duration: 1
+        })
+        .expect(201);
+      await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 2",
+          startDate: startDate,
+          duration: 1
+        })
+        .expect(201);
+
+      const response = await request(app.getHttpServer())
+        .get("/iterations/current-and-future")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(response.body[0].id).toBeDefined();
+      expect(response.body[0].title).toBeDefined();
+      expect(response.body[0].goal).toEqual("Goal 2");
+      expect(response.body[0].startDate).toEqual(startDate);
+      expect(response.body[0].duration).toEqual(1);
+    });
+  });
 });
