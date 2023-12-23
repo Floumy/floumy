@@ -10,6 +10,7 @@ export interface CreateUpdateWorkItemDto {
   status: WorkItemStatus;
   estimation?: number;
   feature?: string;
+  iteration?: string;
 }
 
 export interface WorkItemDto {
@@ -21,6 +22,10 @@ export interface WorkItemDto {
   status: WorkItemStatus;
   estimation?: number;
   feature?: {
+    id: string;
+    title: string;
+  };
+  iteration?: {
     id: string;
     title: string;
   };

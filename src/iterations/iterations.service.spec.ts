@@ -15,11 +15,16 @@ import { MilestonesService } from "../roadmap/milestones/milestones.service";
 import { IterationsService } from "./iterations.service";
 import { Iteration } from "./Iteration.entity";
 import { BacklogModule } from "../backlog/backlog.module";
+import { WorkItemsService } from "../backlog/work-items/work-items.service";
+import { Priority } from "../common/priority.enum";
+import { WorkItemType } from "../backlog/work-items/work-item-type.enum";
+import { WorkItemStatus } from "../backlog/work-items/work-item-status.enum";
 
 describe("IterationsService", () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
   let service: IterationsService;
+  let workItemsService: WorkItemsService;
   let org: Org;
 
   let cleanup: () => Promise<void>;
@@ -27,12 +32,13 @@ describe("IterationsService", () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, WorkItem, Iteration]), BacklogModule],
-      [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, IterationsService]
+      [OkrsService, OrgsService, FeaturesService, UsersService, WorkItemsService, MilestonesService, IterationsService]
     );
     cleanup = dbCleanup;
     service = module.get<IterationsService>(IterationsService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
+    workItemsService = module.get<WorkItemsService>(WorkItemsService);
     const user = await usersService.create(
       "Test User",
       "test@example.com",
@@ -144,6 +150,28 @@ describe("IterationsService", () => {
       await service.delete(org.id, iteration.id);
       const iterations = await service.list(org.id);
       expect(iterations.length).toEqual(0);
+    });
+    it("should remove the iteration from the work items", async () => {
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: "2020-01-01",
+        duration: 1
+      });
+      const workItem = await workItemsService.createWorkItem(org.id, {
+        title: "Test Work Item",
+        description: "Test Work Item Description",
+        priority: Priority.HIGH,
+        type: WorkItemType.BUG,
+        status: WorkItemStatus.BACKLOG,
+        estimation: 1,
+        iteration: iteration.id
+      });
+      await service.delete(org.id, iteration.id);
+      const workItems = await workItemsService.listWorkItems(org.id);
+      expect(workItems.length).toEqual(1);
+      expect(workItems[0].id).toEqual(workItem.id);
+      expect(workItems[0].iteration).toBeUndefined();
+
     });
   });
 

@@ -7,12 +7,14 @@ import { WorkItem } from "./work-item.entity";
 import WorkItemMapper from "./work-item.mapper";
 import { Org } from "../../orgs/org.entity";
 import { WorkItemStatus } from "./work-item-status.enum";
+import { Iteration } from "../../iterations/Iteration.entity";
 
 @Injectable()
 export class WorkItemsService {
 
   constructor(@InjectRepository(WorkItem) private workItemsRepository: Repository<WorkItem>,
               @InjectRepository(Feature) private featuresRepository: Repository<Feature>,
+              @InjectRepository(Iteration) private iterationsRepository: Repository<Iteration>,
               @InjectRepository(Org) private orgsRepository: Repository<Org>) {
   }
 
@@ -51,8 +53,18 @@ export class WorkItemsService {
       const feature = await this.featuresRepository.findOneByOrFail({ id: workItemDto.feature, org: { id: orgId } });
       workItem.feature = Promise.resolve(feature);
     }
+    if (workItemDto.iteration) {
+      const iteration = await this.iterationsRepository.findOneByOrFail({
+        id: workItemDto.iteration,
+        org: { id: orgId }
+      });
+      workItem.iteration = Promise.resolve(iteration);
+    }
     if (workItem.feature && !workItemDto.feature) {
       workItem.feature = Promise.resolve(null);
+    }
+    if (workItem.iteration && !workItemDto.iteration) {
+      workItem.iteration = Promise.resolve(null);
     }
   }
 

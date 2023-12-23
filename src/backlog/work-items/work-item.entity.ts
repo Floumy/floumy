@@ -4,6 +4,7 @@ import { WorkItemStatus } from "./work-item-status.enum";
 import { Org } from "../../orgs/org.entity";
 import { Feature } from "../../roadmap/features/feature.entity";
 import { WorkItemType } from "./work-item-type.enum";
+import { Iteration } from "../../iterations/Iteration.entity";
 
 @Entity()
 export class WorkItem {
@@ -43,4 +44,6 @@ export class WorkItem {
   org: Promise<Org>;
   @ManyToOne(() => Feature, feature => feature.workItems, { lazy: true })
   feature: Promise<Feature>;
+  @ManyToOne(() => Iteration, iteration => iteration.workItems, { lazy: true })
+  iteration: Promise<Iteration>;
 }
