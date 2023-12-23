@@ -39,6 +39,12 @@ export class IterationsController {
     return await this.iterationsService.list(request.user.org);
   }
 
+  @Get("current-and-future")
+  @HttpCode(200)
+  async listCurrentAndFuture(@Request() request) {
+    return await this.iterationsService.listCurrentAndFuture(request.user.org);
+  }
+
   @Get(":id")
   @HttpCode(200)
   async get(@Request() request, @Param("id") id: string) {
