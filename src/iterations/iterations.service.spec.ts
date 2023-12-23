@@ -93,4 +93,57 @@ describe("IterationsService", () => {
       expect(iterations[0].updatedAt).toBeDefined();
     });
   });
+  describe("when getting an iteration", () => {
+    it("should get an iteration", async () => {
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: "2020-01-01",
+        duration: 1
+      });
+      const foundIteration = await service.get(org.id, iteration.id);
+      expect(foundIteration.id).toBeDefined();
+      expect(foundIteration.title).toEqual("Iteration CW1-CW2 2020");
+      expect(foundIteration.goal).toEqual("Test Iteration");
+      expect(foundIteration.startDate).toEqual("2020-01-01");
+      expect(foundIteration.endDate).toEqual("2020-01-07");
+      expect(foundIteration.duration).toEqual(1);
+      expect(foundIteration.createdAt).toBeDefined();
+      expect(foundIteration.updatedAt).toBeDefined();
+    });
+  });
+  describe("when updating an iteration", () => {
+    it("should update an iteration", async () => {
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: "2020-01-01",
+        duration: 1
+      });
+      const updatedIteration = await service.update(org.id, iteration.id, {
+        goal: "Updated Test Iteration",
+        startDate: "2020-01-01",
+        duration: 2
+      });
+      expect(updatedIteration.id).toBeDefined();
+      expect(updatedIteration.title).toEqual("Iteration CW1-CW3 2020");
+      expect(updatedIteration.goal).toEqual("Updated Test Iteration");
+      expect(updatedIteration.startDate).toEqual("2020-01-01");
+      expect(updatedIteration.endDate).toEqual("2020-01-14");
+      expect(updatedIteration.duration).toEqual(2);
+      expect(updatedIteration.createdAt).toBeDefined();
+      expect(updatedIteration.updatedAt).toBeDefined();
+    });
+  });
+
+  describe("when deleting an iteration", () => {
+    it("should delete an iteration", async () => {
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: "2020-01-01",
+        duration: 1
+      });
+      await service.delete(org.id, iteration.id);
+      const iterations = await service.list(org.id);
+      expect(iterations.length).toEqual(0);
+    });
+  });
 });
