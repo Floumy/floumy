@@ -98,4 +98,84 @@ describe("Iteration (e2e)", () => {
       expect(response.body[0].duration).toEqual(1);
     });
   });
+
+  describe("/iterations/:id (GET)", () => {
+    it("should return an iteration", async () => {
+      const iteration = await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 1",
+          startDate: "2020-01-01",
+          duration: 1
+        })
+        .expect(201);
+
+      const response = await request(app.getHttpServer())
+        .get(`/iterations/${iteration.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(response.body.id).toBeDefined();
+      expect(response.body.title).toBeDefined();
+      expect(response.body.goal).toEqual("Goal 1");
+      expect(response.body.startDate).toEqual("2020-01-01");
+      expect(response.body.endDate).toEqual("2020-01-07");
+      expect(response.body.duration).toEqual(1);
+    });
+  });
+
+  describe("/iterations/:id (PUT)", () => {
+    it("should update an iteration", async () => {
+      const iteration = await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 1",
+          startDate: "2020-01-01",
+          duration: 1
+        })
+        .expect(201);
+
+      const response = await request(app.getHttpServer())
+        .put(`/iterations/${iteration.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 2",
+          startDate: "2020-01-01",
+          duration: 1
+        })
+        .expect(200);
+
+      expect(response.body.id).toBeDefined();
+      expect(response.body.title).toBeDefined();
+      expect(response.body.goal).toEqual("Goal 2");
+      expect(response.body.startDate).toEqual("2020-01-01");
+      expect(response.body.endDate).toEqual("2020-01-07");
+      expect(response.body.duration).toEqual(1);
+    });
+  });
+  describe("/iterations/:id (DELETE)", () => {
+    it("should delete an iteration", async () => {
+      const iteration = await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 1",
+          startDate: "2020-01-01",
+          duration: 1
+        })
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(`/iterations/${iteration.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      await request(app.getHttpServer())
+        .get(`/iterations/${iteration.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(404);
+    });
+  });
 });

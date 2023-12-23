@@ -44,8 +44,8 @@ export class IterationsService {
     iteration.startDate.setUTCHours(0, 0, 0, 0);
     // Duration is in weeks
     iteration.duration = iterationDto.duration;
-    iteration.endDate = new Date(iteration.startDate.getTime() + iteration.duration * 7 * 24 * 60 * 60 * 1000 - 1);
-    iteration.title = `Iteration ${this.getIterationCalendarWeekNumbersForTitle(iteration.startDate, iteration.endDate)} ${iteration.startDate.getFullYear()}`;
+    iteration.endDate = this.getIterationEndDate(iteration);
+    iteration.title = this.getIterationTitle(iteration);
     iteration.org = Promise.resolve(org);
     const savedIteration = await this.iterationRepository.save(iteration);
     return IterationMapper.toDto(savedIteration);
@@ -63,5 +63,51 @@ export class IterationsService {
       }
     });
     return iterations.map(iteration => IterationMapper.toDto(iteration));
+  }
+
+  async get(orgId: string, id: string) {
+    const iteration = await this.iterationRepository.findOneByOrFail({
+      id,
+      org: {
+        id: orgId
+      }
+    });
+    return IterationMapper.toDto(iteration);
+  }
+
+  async update(orgId: string, id: string, updateIterationDto: CreateOrUpdateIterationDto) {
+    const iteration = await this.iterationRepository.findOneByOrFail({
+      id,
+      org: {
+        id: orgId
+      }
+    });
+    iteration.goal = updateIterationDto.goal;
+    iteration.startDate = new Date(updateIterationDto.startDate);
+    iteration.startDate.setUTCHours(0, 0, 0, 0);
+    // Duration is in weeks
+    iteration.duration = updateIterationDto.duration;
+    iteration.endDate = this.getIterationEndDate(iteration);
+    iteration.title = this.getIterationTitle(iteration);
+    const savedIteration = await this.iterationRepository.save(iteration);
+    return IterationMapper.toDto(savedIteration);
+  }
+
+  getIterationTitle(iteration: Iteration) {
+    return `Iteration ${this.getIterationCalendarWeekNumbersForTitle(iteration.startDate, iteration.endDate)} ${iteration.startDate.getFullYear()}`;
+  }
+
+  getIterationEndDate(iteration: Iteration) {
+    return new Date(iteration.startDate.getTime() + iteration.duration * 7 * 24 * 60 * 60 * 1000 - 1);
+  }
+
+  async delete(orgId: string, id: string) {
+    const iteration = await this.iterationRepository.findOneByOrFail({
+      id,
+      org: {
+        id: orgId
+      }
+    });
+    await this.iterationRepository.remove(iteration);
   }
 }
