@@ -50,7 +50,7 @@ export class IterationsService {
     iteration.title = this.getIterationTitle(iteration);
     iteration.org = Promise.resolve(org);
     const savedIteration = await this.iterationRepository.save(iteration);
-    return IterationMapper.toDto(savedIteration);
+    return await IterationMapper.toDto(savedIteration);
   }
 
   async list(orgId: string) {
@@ -64,7 +64,7 @@ export class IterationsService {
         startDate: "ASC"
       }
     });
-    return iterations.map(iteration => IterationMapper.toDto(iteration));
+    return await Promise.all(iterations.map(iteration => IterationMapper.toDto(iteration)));
   }
 
   async get(orgId: string, id: string) {
@@ -74,7 +74,7 @@ export class IterationsService {
         id: orgId
       }
     });
-    return IterationMapper.toDto(iteration);
+    return await IterationMapper.toDto(iteration);
   }
 
   async update(orgId: string, id: string, updateIterationDto: CreateOrUpdateIterationDto) {
@@ -92,7 +92,7 @@ export class IterationsService {
     iteration.endDate = this.getIterationEndDate(iteration);
     iteration.title = this.getIterationTitle(iteration);
     const savedIteration = await this.iterationRepository.save(iteration);
-    return IterationMapper.toDto(savedIteration);
+    return await IterationMapper.toDto(savedIteration);
   }
 
   getIterationTitle(iteration: Iteration) {
@@ -126,7 +126,7 @@ export class IterationsService {
         startDate: "ASC"
       }
     });
-    return iterations.map(iteration => IterationMapper.toDto(iteration));
+    return await Promise.all(iterations.map(iteration => IterationMapper.toDto(iteration)));
   }
 
   private async removeWorkItemsFromIteration(iteration: Iteration) {
