@@ -5,11 +5,13 @@ import { MoreThan, Repository } from "typeorm";
 import { Org } from "../orgs/org.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { IterationMapper } from "./iteration.mapper";
+import { WorkItem } from "../backlog/work-items/work-item.entity";
 
 @Injectable()
 export class IterationsService {
 
   constructor(@InjectRepository(Iteration) private iterationRepository: Repository<Iteration>,
+              @InjectRepository(WorkItem) private workItemsRepository: Repository<WorkItem>,
               @InjectRepository(Org) private orgRepository: Repository<Org>) {
   }
 
@@ -108,6 +110,7 @@ export class IterationsService {
         id: orgId
       }
     });
+    this.removeWorkItemsFromIteration(iteration);
     await this.iterationRepository.remove(iteration);
   }
 
@@ -124,5 +127,13 @@ export class IterationsService {
       }
     });
     return iterations.map(iteration => IterationMapper.toDto(iteration));
+  }
+
+  private async removeWorkItemsFromIteration(iteration: Iteration) {
+    const workItems = await iteration.workItems;
+    for (const workItem of workItems) {
+      workItem.iteration = Promise.resolve(null);
+      await this.workItemsRepository.save(workItem);
+    }
   }
 }
