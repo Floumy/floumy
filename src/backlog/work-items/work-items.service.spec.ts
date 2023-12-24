@@ -19,6 +19,7 @@ import { EntityNotFoundError } from "typeorm";
 import { WorkItemStatus } from "./work-item-status.enum";
 import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
+import { WorkItem } from "./work-item.entity";
 
 describe("WorkItemsService", () => {
   let usersService: UsersService;
@@ -31,7 +32,7 @@ describe("WorkItemsService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, Iteration])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, Iteration, WorkItem])],
       [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, WorkItemsService]
     );
     cleanup = dbCleanup;
