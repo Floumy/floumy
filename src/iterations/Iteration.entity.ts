@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Org } from "../orgs/org.entity";
 import { WorkItem } from "../backlog/work-items/work-item.entity";
+import { IterationStatus } from "./iteration-status.enum";
 
 @Entity()
 export class Iteration {
@@ -24,6 +25,12 @@ export class Iteration {
   endDate: Date;
   @Column()
   duration: number;
+  @Column({
+    type: "enum",
+    enum: IterationStatus,
+    default: IterationStatus.PLANNED
+  })
+  status: IterationStatus;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
