@@ -80,6 +80,14 @@ describe("IterationsService", () => {
       });
       expect(iteration.title).toEqual("Iteration CW51-CW52 2023");
     });
+    it("should set the status to planned", async () => {
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: "2020-01-01",
+        duration: 1
+      });
+      expect(iteration.status).toEqual("planned");
+    });
   });
   describe("when listing iterations", () => {
     it("should list iterations", async () => {

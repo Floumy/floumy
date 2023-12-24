@@ -212,4 +212,134 @@ describe("Iteration (e2e)", () => {
       expect(response.body[0].duration).toEqual(1);
     });
   });
+  describe("/iterations/:id/start (POST)", () => {
+    it("should start an iteration", async () => {
+      const iteration = await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 1",
+          startDate: "2020-01-01",
+          duration: 1
+        })
+        .expect(201);
+
+      const response = await request(app.getHttpServer())
+        .post(`/iterations/${iteration.body.id}/start`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(response.body.id).toBeDefined();
+      expect(response.body.title).toBeDefined();
+      expect(response.body.goal).toEqual("Goal 1");
+      expect(response.body.startDate).toEqual("2020-01-01");
+      expect(response.body.endDate).toEqual("2020-01-07");
+      expect(response.body.actualStartDate).toBeDefined();
+      expect(response.body.duration).toEqual(1);
+      expect(response.body.status).toEqual("active");
+    });
+  });
+  describe("/iterations/:id/complete (POST)", () => {
+    it("should complete an iteration", async () => {
+      const iteration = await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 1",
+          startDate: "2020-01-01",
+          duration: 1
+        })
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(`/iterations/${iteration.body.id}/start`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .post(`/iterations/${iteration.body.id}/complete`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(response.body.id).toBeDefined();
+      expect(response.body.title).toBeDefined();
+      expect(response.body.goal).toEqual("Goal 1");
+      expect(response.body.startDate).toEqual("2020-01-01");
+      expect(response.body.endDate).toEqual("2020-01-07");
+      expect(response.body.actualEndDate).toBeDefined();
+      expect(response.body.duration).toEqual(1);
+      expect(response.body.status).toEqual("completed");
+    });
+  });
+  describe("/iterations/active (GET)", () => {
+    it("should return the active iteration", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iterationResponse = await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 1",
+          startDate: "2019-01-01",
+          duration: 1
+        })
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(`/iterations/${iterationResponse.body.id}/start`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get("/iterations/active")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(response.body.id).toBeDefined();
+      expect(response.body.title).toBeDefined();
+      expect(response.body.goal).toEqual("Goal 2");
+      expect(response.body.startDate).toEqual(startDate);
+      expect(response.body.duration).toEqual(1);
+    });
+    it("should return work items for the active iteration", async () => {
+      const iterationResponse = await request(app.getHttpServer())
+        .post("/iterations")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          goal: "Goal 1",
+          startDate: "2019-01-01",
+          duration: 1
+        })
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(`/iterations/${iterationResponse.body.id}/start`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      const workItemResponse = await request(app.getHttpServer())
+        .post("/work-items")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "Work Item 1",
+          description: "Work Item 1",
+          priority: "low",
+          type: "feature",
+          status: "planned",
+          iteration: iterationResponse.body.id
+        })
+        .expect(201);
+
+      const response = await request(app.getHttpServer())
+        .get("/iterations/active")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(response.body.workItems[0].id).toEqual(workItemResponse.body.id);
+      expect(response.body.workItems[0].title).toEqual("Work Item 1");
+      expect(response.body.workItems[0].description).toEqual("Work Item 1");
+      expect(response.body.workItems[0].priority).toEqual("low");
+      expect(response.body.workItems[0].type).toEqual("feature");
+      expect(response.body.workItems[0].status).toEqual("planned");
+    });
+  });
 });

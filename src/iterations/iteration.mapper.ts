@@ -31,7 +31,8 @@ export class IterationMapper {
       workItems: workItems.map(WorkItemMapper.toDto),
       duration: iteration.duration,
       createdAt: iteration.createdAt,
-      updatedAt: iteration.updatedAt
+      updatedAt: iteration.updatedAt,
+      status: iteration.status
     };
   }
 }
