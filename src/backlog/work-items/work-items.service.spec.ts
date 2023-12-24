@@ -12,13 +12,13 @@ import { KeyResult } from "../../okrs/key-result.entity";
 import { Feature } from "../../roadmap/features/feature.entity";
 import { User } from "../../users/user.entity";
 import { Milestone } from "../../roadmap/milestones/milestone.entity";
-import { WorkItem } from "./work-item.entity";
 import { Priority } from "../../common/priority.enum";
 import { Timeline } from "../../common/timeline.enum";
 import { WorkItemType } from "./work-item-type.enum";
 import { EntityNotFoundError } from "typeorm";
 import { WorkItemStatus } from "./work-item-status.enum";
 import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
+import { Iteration } from "../../iterations/Iteration.entity";
 
 describe("WorkItemsService", () => {
   let usersService: UsersService;
@@ -31,7 +31,7 @@ describe("WorkItemsService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, WorkItem])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, Iteration])],
       [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, WorkItemsService]
     );
     cleanup = dbCleanup;

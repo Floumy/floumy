@@ -20,6 +20,7 @@ import { MilestonesService } from "../../roadmap/milestones/milestones.service";
 import { WorkItemsService } from "./work-items.service";
 import { WorkItemStatus } from "./work-item-status.enum";
 import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
+import { Iteration } from "../../iterations/Iteration.entity";
 
 describe("WorkItemsController", () => {
   let controller: WorkItemsController;
@@ -29,7 +30,7 @@ describe("WorkItemsController", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone]), UsersModule],
+      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone, Iteration]), UsersModule],
       [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService, WorkItemsService],
       [WorkItemsController]
     );

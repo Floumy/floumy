@@ -18,6 +18,7 @@ import { WorkItemsService } from "../../backlog/work-items/work-items.service";
 import { WorkItem } from "../../backlog/work-items/work-item.entity";
 import { WorkItemType } from "../../backlog/work-items/work-item-type.enum";
 import { FeatureStatus } from "./featurestatus.enum";
+import { Iteration } from "../../iterations/Iteration.entity";
 
 describe("FeaturesService", () => {
   let usersService: UsersService;
@@ -33,7 +34,7 @@ describe("FeaturesService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, WorkItem])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, WorkItem, Iteration])],
       [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, WorkItemsService]
     );
     cleanup = dbCleanup;

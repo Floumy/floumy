@@ -17,6 +17,7 @@ import { Milestone } from "../milestones/milestone.entity";
 import { Timeline } from "../../common/timeline.enum";
 import { BacklogModule } from "../../backlog/backlog.module";
 import { FeatureStatus } from "./featurestatus.enum";
+import { Iteration } from "../../iterations/Iteration.entity";
 
 describe("FeaturesController", () => {
   let controller: FeaturesController;
@@ -25,7 +26,7 @@ describe("FeaturesController", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, Milestone]), UsersModule, BacklogModule],
+      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, Milestone, Iteration]), UsersModule, BacklogModule],
       [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService],
       [FeaturesController]
     );
