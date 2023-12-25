@@ -17,12 +17,16 @@ import { WorkItemsService } from "../backlog/work-items/work-items.service";
 import { UsersService } from "../users/users.service";
 import { Iteration } from "./Iteration.entity";
 import { IterationsService } from "./iterations.service";
+import { Priority } from "../common/priority.enum";
+import { WorkItemType } from "../backlog/work-items/work-item-type.enum";
+import { WorkItemStatus } from "../backlog/work-items/work-item-status.enum";
 
 describe("IterationsController", () => {
   let controller: IterationsController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let featureService: FeaturesService;
+  let workItemService: WorkItemsService;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -41,6 +45,7 @@ describe("IterationsController", () => {
     );
     org = await orgsService.createForUser(user);
     featureService = module.get<FeaturesService>(FeaturesService);
+    workItemService = module.get<WorkItemsService>(WorkItemsService);
   });
 
   afterEach(async () => {
@@ -160,6 +165,79 @@ describe("IterationsController", () => {
       expect(iterations[0].goal).toEqual("Goal 1");
       expect(iterations[0].startDate).toEqual(startDate);
       expect(iterations[0].duration).toEqual(1);
+    });
+  });
+  describe("when starting an iteration", () => {
+    it("should start an iteration", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await controller.create({
+        user: { orgId: org.id }
+      }, {
+        goal: "Goal 1",
+        startDate: startDate,
+        duration: 1
+      });
+      const startedIteration = await controller.startIteration({
+        user: { orgId: org.id }
+      }, iteration.id);
+      expect(startedIteration.goal).toEqual("Goal 1");
+      expect(startedIteration.startDate).toEqual(startDate);
+      expect(startedIteration.actualStartDate).toBeDefined();
+      expect(startedIteration.duration).toEqual(1);
+      expect(startedIteration.status).toEqual("active");
+    });
+  });
+  describe("when getting the active iteration", () => {
+    it("should return the active iteration", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await controller.create({
+        user: { orgId: org.id }
+      }, {
+        goal: "Goal 1",
+        startDate: startDate,
+        duration: 1
+      });
+      await workItemService.createWorkItem(org.id, {
+        title: "Work Item 1",
+        description: "Work Item 1",
+        priority: Priority.LOW,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.READY_TO_START,
+        iteration: iteration.id
+      });
+      await controller.startIteration({
+        user: { orgId: org.id }
+      }, iteration.id);
+      const activeIteration = await controller.getActiveIteration({
+        user: { orgId: org.id }
+      });
+      expect(activeIteration.goal).toEqual("Goal 1");
+      expect(activeIteration.startDate).toEqual(startDate);
+      expect(activeIteration.duration).toEqual(1);
+      expect(activeIteration.status).toEqual("active");
+      expect(activeIteration.workItems.length).toEqual(1);
+    });
+  });
+  describe("when completing an iteration", () => {
+    it("should complete an iteration", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await controller.create({
+        user: { orgId: org.id }
+      }, {
+        goal: "Goal 1",
+        startDate: startDate,
+        duration: 1
+      });
+      await controller.startIteration({
+        user: { orgId: org.id }
+      }, iteration.id);
+      const completedIteration = await controller.completeIteration({
+        user: { orgId: org.id }
+      }, iteration.id);
+      expect(completedIteration.goal).toEqual("Goal 1");
+      expect(completedIteration.startDate).toEqual(startDate);
+      expect(completedIteration.duration).toEqual(1);
+      expect(completedIteration.status).toEqual("completed");
     });
   });
 });

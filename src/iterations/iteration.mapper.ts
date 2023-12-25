@@ -2,6 +2,11 @@ import { Iteration } from "./Iteration.entity";
 import { TimelineService } from "../common/timeline.service";
 import { WorkItem } from "../backlog/work-items/work-item.entity";
 
+function formatDate(date: Date) {
+  if (!date) return null;
+  return date.toISOString().split("T")[0];
+}
+
 class WorkItemMapper {
   static toDto(workItem: WorkItem) {
     return {
@@ -25,8 +30,10 @@ export class IterationMapper {
       id: iteration.id,
       title: iteration.title,
       goal: iteration.goal,
-      startDate: iteration.startDate.toISOString().split("T")[0],
-      endDate: iteration.endDate.toISOString().split("T")[0],
+      startDate: formatDate(iteration.startDate),
+      endDate: formatDate(iteration.endDate),
+      actualStartDate: formatDate(iteration.actualStartDate),
+      actualEndDate: formatDate(iteration.actualEndDate),
       timeline: TimelineService.convertDateToTimeline(iteration.startDate),
       workItems: workItems.map(WorkItemMapper.toDto),
       duration: iteration.duration,

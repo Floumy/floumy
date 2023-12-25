@@ -6,6 +6,7 @@ import { Org } from "../orgs/org.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { IterationMapper } from "./iteration.mapper";
 import { WorkItem } from "../backlog/work-items/work-item.entity";
+import { IterationStatus } from "./iteration-status.enum";
 
 @Injectable()
 export class IterationsService {
@@ -135,5 +136,58 @@ export class IterationsService {
       workItem.iteration = Promise.resolve(null);
       await this.workItemsRepository.save(workItem);
     }
+  }
+
+  async startIteration(orgId: string, id: string) {
+    await this.completeActiveIterationIfExists(orgId);
+
+    const iteration = await this.iterationRepository.findOneByOrFail({
+      id,
+      org: {
+        id: orgId
+      }
+    });
+    iteration.actualStartDate = new Date();
+    iteration.status = IterationStatus.ACTIVE;
+    const savedIteration = await this.iterationRepository.save(iteration);
+    return await IterationMapper.toDto(savedIteration);
+  }
+
+  private async completeActiveIterationIfExists(orgId: string) {
+    const activeIteration = await this.iterationRepository.findOneBy({
+      org: {
+        id: orgId
+      },
+      status: IterationStatus.ACTIVE
+    });
+
+    if (activeIteration) {
+      activeIteration.actualEndDate = new Date();
+      activeIteration.status = IterationStatus.COMPLETED;
+      await this.iterationRepository.save(activeIteration);
+    }
+  }
+
+  async getActiveIteration(orgId: string) {
+    const iteration = await this.iterationRepository.findOneBy({
+      org: {
+        id: orgId
+      },
+      status: IterationStatus.ACTIVE
+    });
+    return iteration ? await IterationMapper.toDto(iteration) : null;
+  }
+
+  async completeIteration(orgId: string, id: string) {
+    const iteration = await this.iterationRepository.findOneByOrFail({
+      id,
+      org: {
+        id: orgId
+      }
+    });
+    iteration.actualEndDate = new Date();
+    iteration.status = IterationStatus.COMPLETED;
+    const savedIteration = await this.iterationRepository.save(iteration);
+    return await IterationMapper.toDto(savedIteration);
   }
 }

@@ -273,7 +273,6 @@ describe("Iteration (e2e)", () => {
   });
   describe("/iterations/active (GET)", () => {
     it("should return the active iteration", async () => {
-      const startDate = (new Date()).toISOString().split("T")[0];
       const iterationResponse = await request(app.getHttpServer())
         .post("/iterations")
         .set("Authorization", `Bearer ${accessToken}`)
@@ -296,8 +295,9 @@ describe("Iteration (e2e)", () => {
 
       expect(response.body.id).toBeDefined();
       expect(response.body.title).toBeDefined();
-      expect(response.body.goal).toEqual("Goal 2");
-      expect(response.body.startDate).toEqual(startDate);
+      expect(response.body.goal).toEqual("Goal 1");
+      expect(response.body.startDate).toEqual("2019-01-01");
+      expect(response.body.actualStartDate).toBeDefined();
       expect(response.body.duration).toEqual(1);
     });
     it("should return work items for the active iteration", async () => {
@@ -323,8 +323,8 @@ describe("Iteration (e2e)", () => {
           title: "Work Item 1",
           description: "Work Item 1",
           priority: "low",
-          type: "feature",
-          status: "planned",
+          type: "bug",
+          status: "backlog",
           iteration: iterationResponse.body.id
         })
         .expect(201);
@@ -338,8 +338,8 @@ describe("Iteration (e2e)", () => {
       expect(response.body.workItems[0].title).toEqual("Work Item 1");
       expect(response.body.workItems[0].description).toEqual("Work Item 1");
       expect(response.body.workItems[0].priority).toEqual("low");
-      expect(response.body.workItems[0].type).toEqual("feature");
-      expect(response.body.workItems[0].status).toEqual("planned");
+      expect(response.body.workItems[0].type).toEqual("bug");
+      expect(response.body.workItems[0].status).toEqual("backlog");
     });
   });
 });

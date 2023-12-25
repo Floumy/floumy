@@ -23,6 +23,10 @@ export class Iteration {
   startDate: Date;
   @Column()
   endDate: Date;
+  @Column({ nullable: true })
+  actualStartDate: Date;
+  @Column({ nullable: true })
+  actualEndDate: Date;
   @Column()
   duration: number;
   @Column({
