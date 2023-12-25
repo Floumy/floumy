@@ -45,6 +45,32 @@ export class IterationsController {
     return await this.iterationsService.listCurrentAndFuture(request.user.org);
   }
 
+  @Post(":id/start")
+  @HttpCode(200)
+  async startIteration(@Request() request, @Param("id") id: string) {
+    try {
+      return await this.iterationsService.startIteration(request.user.org, id);
+    } catch (e) {
+      throw new NotFoundException(e.message);
+    }
+  }
+
+  @Get("active")
+  @HttpCode(200)
+  async getActiveIteration(@Request() request) {
+    return await this.iterationsService.getActiveIteration(request.user.org);
+  }
+
+  @Post(":id/complete")
+  @HttpCode(200)
+  async completeIteration(@Request() request, @Param("id") id: string) {
+    try {
+      return await this.iterationsService.completeIteration(request.user.org, id);
+    } catch (e) {
+      throw new NotFoundException(e.message);
+    }
+  }
+
   @Get(":id")
   @HttpCode(200)
   async get(@Request() request, @Param("id") id: string) {

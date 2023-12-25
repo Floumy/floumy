@@ -202,4 +202,100 @@ describe("IterationsService", () => {
       expect(iterations[0].updatedAt).toBeDefined();
     });
   });
+
+  describe("when starting an iteration", () => {
+    it("should start an iteration", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: startDate,
+        duration: 1
+      });
+      const startedIteration = await service.startIteration(org.id, iteration.id);
+      expect(startedIteration.goal).toEqual("Test Iteration");
+      expect(startedIteration.startDate).toEqual(startDate);
+      expect(startedIteration.actualStartDate).toBeDefined();
+      expect(startedIteration.duration).toEqual(1);
+      expect(startedIteration.status).toEqual("active");
+    });
+    it("should complete the previous iteration", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration1 = await service.create(org.id, {
+        goal: "Test Iteration 1",
+        startDate: startDate,
+        duration: 1
+      });
+      await service.startIteration(org.id, iteration1.id);
+      const iteration2 = await service.create(org.id, {
+        goal: "Test Iteration 2",
+        startDate: startDate,
+        duration: 1
+      });
+      const startedIteration = await service.startIteration(org.id, iteration2.id);
+      const completedIteration = await service.get(org.id, iteration1.id);
+      expect(completedIteration.status).toEqual("completed");
+      expect(completedIteration.actualEndDate).toBeDefined();
+      expect(completedIteration.actualStartDate).toBeDefined();
+      expect(startedIteration.goal).toEqual("Test Iteration 2");
+      expect(startedIteration.startDate).toEqual(startDate);
+      expect(startedIteration.actualStartDate).toBeDefined();
+      expect(startedIteration.duration).toEqual(1);
+      expect(startedIteration.status).toEqual("active");
+    });
+  });
+
+  describe("when getting the active iteration", () => {
+    it("should return the active iteration", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: startDate,
+        duration: 1
+      });
+      const workItem = await workItemsService.createWorkItem(org.id, {
+        title: "Work Item 1",
+        description: "Work Item 1",
+        priority: Priority.LOW,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.BACKLOG,
+        estimation: 1,
+        iteration: iteration.id
+      });
+      const startedIteration = await service.startIteration(org.id, iteration.id);
+      const activeIteration = await service.getActiveIteration(org.id);
+      expect(activeIteration.id).toEqual(startedIteration.id);
+      expect(activeIteration.workItems.length).toEqual(1);
+      expect(activeIteration.workItems[0].id).toEqual(workItem.id);
+    });
+    it("should return null if there is no active iteration", async () => {
+      const activeIteration = await service.getActiveIteration(org.id);
+      expect(activeIteration).toBeNull();
+    });
+  });
+  describe("when completing an iteration", () => {
+    it("should complete an iteration", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: startDate,
+        duration: 1
+      });
+      const workItem = await workItemsService.createWorkItem(org.id, {
+        title: "Work Item 1",
+        description: "Work Item 1",
+        priority: Priority.LOW,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.BACKLOG,
+        estimation: 1,
+        iteration: iteration.id
+      });
+      const startedIteration = await service.startIteration(org.id, iteration.id);
+      const completedIteration = await service.completeIteration(org.id, startedIteration.id);
+      expect(completedIteration.id).toEqual(startedIteration.id);
+      expect(completedIteration.workItems.length).toEqual(1);
+      expect(completedIteration.workItems[0].id).toEqual(workItem.id);
+      expect(completedIteration.status).toEqual("completed");
+      expect(completedIteration.actualEndDate).toBeDefined();
+    });
+  });
 });
