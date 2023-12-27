@@ -60,7 +60,7 @@ describe("IterationsController", () => {
   describe("when creating a new iteration", () => {
     it("should create a new iteration", async () => {
       const iteration = await controller.create({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, {
         goal: "Goal 1",
         startDate: "2020-01-01",
@@ -75,14 +75,14 @@ describe("IterationsController", () => {
   describe("when listing iterations", () => {
     it("should list iterations", async () => {
       await controller.create({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, {
         goal: "Goal 1",
         startDate: "2020-01-01",
         duration: 1
       });
       const iterations = await controller.list({
-        user: { orgId: org.id }
+        user: { org: org.id }
       });
       expect(iterations.length).toEqual(1);
       expect(iterations[0].goal).toEqual("Goal 1");
@@ -94,14 +94,14 @@ describe("IterationsController", () => {
   describe("when getting an iteration", () => {
     it("should get an iteration", async () => {
       const iteration = await controller.create({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, {
         goal: "Goal 1",
         startDate: "2020-01-01",
         duration: 1
       });
       const foundIteration = await controller.get({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, iteration.id);
       expect(foundIteration.goal).toEqual("Goal 1");
       expect(foundIteration.startDate).toEqual("2020-01-01");
@@ -112,14 +112,14 @@ describe("IterationsController", () => {
   describe("when updating an iteration", () => {
     it("should update an iteration", async () => {
       const iteration = await controller.create({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, {
         goal: "Goal 1",
         startDate: "2020-01-01",
         duration: 1
       });
       const updatedIteration = await controller.update({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, iteration.id, {
         goal: "Goal 2",
         startDate: "2020-01-02",
@@ -133,17 +133,17 @@ describe("IterationsController", () => {
   describe("when deleting an iteration", () => {
     it("should delete an iteration", async () => {
       const iteration = await controller.create({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, {
         goal: "Goal 1",
         startDate: "2020-01-01",
         duration: 1
       });
       await controller.delete({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, iteration.id);
       const iterations = await controller.list({
-        user: { orgId: org.id }
+        user: { org: org.id }
       });
       expect(iterations.length).toEqual(0);
     });
@@ -152,14 +152,14 @@ describe("IterationsController", () => {
     it("should start an iteration", async () => {
       const startDate = (new Date()).toISOString().split("T")[0];
       const iteration = await controller.create({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, {
         goal: "Goal 1",
         startDate: startDate,
         duration: 1
       });
       const startedIteration = await controller.startIteration({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, iteration.id);
       expect(startedIteration.goal).toEqual("Goal 1");
       expect(startedIteration.startDate).toEqual(startDate);
@@ -172,7 +172,7 @@ describe("IterationsController", () => {
     it("should return the active iteration", async () => {
       const startDate = (new Date()).toISOString().split("T")[0];
       const iteration = await controller.create({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, {
         goal: "Goal 1",
         startDate: startDate,
@@ -187,10 +187,10 @@ describe("IterationsController", () => {
         iteration: iteration.id
       });
       await controller.startIteration({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, iteration.id);
       const activeIteration = await controller.getActiveIteration({
-        user: { orgId: org.id }
+        user: { org: org.id }
       });
       expect(activeIteration.goal).toEqual("Goal 1");
       expect(activeIteration.startDate).toEqual(startDate);
@@ -203,17 +203,17 @@ describe("IterationsController", () => {
     it("should complete an iteration", async () => {
       const startDate = (new Date()).toISOString().split("T")[0];
       const iteration = await controller.create({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, {
         goal: "Goal 1",
         startDate: startDate,
         duration: 1
       });
       await controller.startIteration({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, iteration.id);
       const completedIteration = await controller.completeIteration({
-        user: { orgId: org.id }
+        user: { org: org.id }
       }, iteration.id);
       expect(completedIteration.goal).toEqual("Goal 1");
       expect(completedIteration.startDate).toEqual(startDate);
