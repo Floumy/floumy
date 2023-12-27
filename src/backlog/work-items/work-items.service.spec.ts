@@ -71,7 +71,7 @@ describe("WorkItemsService", () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         });
       expect(workItem).toBeDefined();
       expect(workItem.id).toBeDefined();
@@ -102,7 +102,7 @@ describe("WorkItemsService", () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         });
       const workItems = await service.listWorkItems(org.id);
       expect(workItems).toBeDefined();
@@ -134,7 +134,7 @@ describe("WorkItemsService", () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         });
       const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
       expect(foundWorkItem).toBeDefined();
@@ -174,7 +174,7 @@ describe("WorkItemsService", () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           feature: feature1.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         });
       const foundWorkItem = await service.updateWorkItem(org.id, workItem.id, {
         title: "my work item updated",
@@ -182,7 +182,7 @@ describe("WorkItemsService", () => {
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
         feature: feature2.id,
-        status: WorkItemStatus.BACKLOG
+        status: WorkItemStatus.PLANNED
       });
       expect(foundWorkItem).toBeDefined();
       expect(foundWorkItem.title).toEqual("my work item updated");
@@ -210,14 +210,14 @@ describe("WorkItemsService", () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         });
       const foundWorkItem = await service.updateWorkItem(org.id, workItem.id, {
         title: "my work item updated",
         description: "my work item description updated",
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
-        status: WorkItemStatus.BACKLOG
+        status: WorkItemStatus.PLANNED
       });
       expect(foundWorkItem).toBeDefined();
       expect(foundWorkItem.title).toEqual("my work item updated");
@@ -246,7 +246,7 @@ describe("WorkItemsService", () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         });
       await service.deleteWorkItem(org.id, workItem.id);
       expect(service.getWorkItem(org.id, workItem.id)).rejects.toThrow(EntityNotFoundError);
@@ -280,7 +280,7 @@ describe("WorkItemsService", () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           feature: feature1.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         });
       await service.createWorkItem(
         org.id,
@@ -290,7 +290,7 @@ describe("WorkItemsService", () => {
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           feature: feature2.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         });
       const workItems = await service.listOpenWorkItems(org.id);
       expect(workItems).toBeDefined();

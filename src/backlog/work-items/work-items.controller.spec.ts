@@ -74,7 +74,7 @@ describe("WorkItemsController", () => {
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         }
       );
 
@@ -85,7 +85,7 @@ describe("WorkItemsController", () => {
       expect(workItemResponse.type).toEqual("technical-debt");
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
-      expect(workItemResponse.status).toEqual("backlog");
+      expect(workItemResponse.status).toEqual("planned");
       expect(workItemResponse.feature).toBeDefined();
       expect(workItemResponse.feature.id).toEqual(feature.id);
       expect(workItemResponse.feature.title).toEqual(feature.title);
@@ -114,7 +114,7 @@ describe("WorkItemsController", () => {
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         }
       );
       const workItems = await controller.list(
@@ -133,7 +133,7 @@ describe("WorkItemsController", () => {
       expect(workItems[0].type).toEqual("technical-debt");
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
-      expect(workItems[0].status).toEqual("backlog");
+      expect(workItems[0].status).toEqual("planned");
     });
   });
   describe("when getting a work item", () => {
@@ -159,7 +159,7 @@ describe("WorkItemsController", () => {
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         }
       );
       const workItemResponse = await controller.get(
@@ -178,7 +178,7 @@ describe("WorkItemsController", () => {
       expect(workItemResponse.type).toEqual("technical-debt");
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
-      expect(workItemResponse.status).toEqual("backlog");
+      expect(workItemResponse.status).toEqual("planned");
       expect(workItemResponse.feature).toBeDefined();
       expect(workItemResponse.feature.id).toEqual(feature.id);
       expect(workItemResponse.feature.title).toEqual(feature.title);
@@ -207,7 +207,7 @@ describe("WorkItemsController", () => {
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         }
       );
       const workItemResponse = await controller.update(
@@ -223,7 +223,7 @@ describe("WorkItemsController", () => {
           priority: Priority.LOW,
           type: WorkItemType.BUG,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         }
       );
 
@@ -234,7 +234,7 @@ describe("WorkItemsController", () => {
       expect(workItemResponse.type).toEqual("bug");
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
-      expect(workItemResponse.status).toEqual("backlog");
+      expect(workItemResponse.status).toEqual("planned");
       expect(workItemResponse.feature).toBeDefined();
       expect(workItemResponse.feature.id).toEqual(feature.id);
       expect(workItemResponse.feature.title).toEqual(feature.title);
@@ -263,7 +263,7 @@ describe("WorkItemsController", () => {
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         }
       );
       await controller.delete(
@@ -308,7 +308,7 @@ describe("WorkItemsController", () => {
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
           feature: feature.id,
-          status: WorkItemStatus.BACKLOG
+          status: WorkItemStatus.PLANNED
         }
       );
       const workItems = await controller.listOpen(
@@ -327,7 +327,7 @@ describe("WorkItemsController", () => {
       expect(workItems[0].type).toEqual("technical-debt");
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
-      expect(workItems[0].status).toEqual("backlog");
+      expect(workItems[0].status).toEqual("planned");
     });
   });
 });
