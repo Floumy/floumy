@@ -407,7 +407,7 @@ describe("FeaturesService", () => {
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
         feature: feature.id,
-        status: WorkItemStatus.BACKLOG
+        status: WorkItemStatus.PLANNED
       });
       await service.deleteFeature(org.id, feature.id);
       const foundWorkItem = await workItemsService.getWorkItem(org.id, workItem.id);

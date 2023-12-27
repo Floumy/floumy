@@ -170,7 +170,7 @@ describe("IterationsService", () => {
         description: "Test Work Item Description",
         priority: Priority.HIGH,
         type: WorkItemType.BUG,
-        status: WorkItemStatus.BACKLOG,
+        status: WorkItemStatus.PLANNED,
         estimation: 1,
         iteration: iteration.id
       });
@@ -257,7 +257,7 @@ describe("IterationsService", () => {
         description: "Work Item 1",
         priority: Priority.LOW,
         type: WorkItemType.TECHNICAL_DEBT,
-        status: WorkItemStatus.BACKLOG,
+        status: WorkItemStatus.PLANNED,
         estimation: 1,
         iteration: iteration.id
       });
@@ -285,7 +285,7 @@ describe("IterationsService", () => {
         description: "Work Item 1",
         priority: Priority.LOW,
         type: WorkItemType.TECHNICAL_DEBT,
-        status: WorkItemStatus.BACKLOG,
+        status: WorkItemStatus.PLANNED,
         estimation: 1,
         iteration: iteration.id
       });

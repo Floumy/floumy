@@ -29,7 +29,7 @@ export class WorkItem {
   @Column({
     type: "enum",
     enum: WorkItemStatus,
-    default: WorkItemStatus.BACKLOG
+    default: WorkItemStatus.PLANNED
   })
   status: WorkItemStatus;
   @Column({

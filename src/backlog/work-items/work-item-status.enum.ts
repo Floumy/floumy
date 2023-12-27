@@ -1,5 +1,5 @@
 export enum WorkItemStatus {
-  BACKLOG = "backlog",
+  PLANNED = "planned",
   READY_TO_START = "ready-to-start",
   IN_PROGRESS = "in-progress",
   BLOCKED = "blocked",

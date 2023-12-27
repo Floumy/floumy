@@ -70,7 +70,7 @@ describe("Backlog (e2e)", () => {
           description: "Work Item 1 description",
           priority: "high",
           feature: featureId,
-          status: "backlog"
+          status: "planned"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       expect(createWorkItemResponse.statusCode).toEqual(201);
@@ -89,7 +89,7 @@ describe("Backlog (e2e)", () => {
           title: "Work Item 1",
           description: "Work Item 1 description",
           priority: "high",
-          status: "backlog"
+          status: "planned"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const listWorkItemsResponse = await request(app.getHttpServer())
@@ -101,7 +101,7 @@ describe("Backlog (e2e)", () => {
       expect(listWorkItemsResponse.body[0].title).toEqual("Work Item 1");
       expect(listWorkItemsResponse.body[0].description).toEqual("Work Item 1 description");
       expect(listWorkItemsResponse.body[0].priority).toEqual("high");
-      expect(listWorkItemsResponse.body[0].status).toEqual("backlog");
+      expect(listWorkItemsResponse.body[0].status).toEqual("planned");
     });
   });
 
@@ -113,7 +113,7 @@ describe("Backlog (e2e)", () => {
           title: "Work Item 1",
           description: "Work Item 1 description",
           priority: "high",
-          status: "backlog"
+          status: "planned"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const workItemId = createWorkItemResponse.body.id;
@@ -125,7 +125,7 @@ describe("Backlog (e2e)", () => {
       expect(getWorkItemResponse.body.title).toEqual("Work Item 1");
       expect(getWorkItemResponse.body.description).toEqual("Work Item 1 description");
       expect(getWorkItemResponse.body.priority).toEqual("high");
-      expect(getWorkItemResponse.body.status).toEqual("backlog");
+      expect(getWorkItemResponse.body.status).toEqual("planned");
     });
   });
   describe("/work-items/:id (PUT)", () => {
@@ -136,7 +136,7 @@ describe("Backlog (e2e)", () => {
           title: "Work Item 1",
           description: "Work Item 1 description",
           priority: "high",
-          status: "backlog"
+          status: "planned"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const workItemId = createWorkItemResponse.body.id;
@@ -146,7 +146,7 @@ describe("Backlog (e2e)", () => {
           title: "Work Item 1 updated",
           description: "Work Item 1 description updated",
           priority: "low",
-          status: "backlog"
+          status: "planned"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       expect(updateWorkItemResponse.statusCode).toEqual(200);
@@ -154,7 +154,7 @@ describe("Backlog (e2e)", () => {
       expect(updateWorkItemResponse.body.title).toEqual("Work Item 1 updated");
       expect(updateWorkItemResponse.body.description).toEqual("Work Item 1 description updated");
       expect(updateWorkItemResponse.body.priority).toEqual("low");
-      expect(updateWorkItemResponse.body.status).toEqual("backlog");
+      expect(updateWorkItemResponse.body.status).toEqual("planned");
     });
     it("should update a work item with a feature", async () => {
       const createFeatureResponse = await request(app.getHttpServer())
@@ -174,7 +174,7 @@ describe("Backlog (e2e)", () => {
           title: "Work Item 1",
           description: "Work Item 1 description",
           priority: "high",
-          status: "backlog"
+          status: "planned"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const workItemId = createWorkItemResponse.body.id;
@@ -185,7 +185,7 @@ describe("Backlog (e2e)", () => {
           description: "Work Item 1 description updated",
           priority: "low",
           feature: featureId,
-          status: "backlog"
+          status: "planned"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       expect(updateWorkItemResponse.statusCode).toEqual(200);
@@ -193,7 +193,7 @@ describe("Backlog (e2e)", () => {
       expect(updateWorkItemResponse.body.title).toEqual("Work Item 1 updated");
       expect(updateWorkItemResponse.body.description).toEqual("Work Item 1 description updated");
       expect(updateWorkItemResponse.body.priority).toEqual("low");
-      expect(updateWorkItemResponse.body.status).toEqual("backlog");
+      expect(updateWorkItemResponse.body.status).toEqual("planned");
       expect(updateWorkItemResponse.body.feature.id).toEqual(featureId);
     });
   });
@@ -205,7 +205,7 @@ describe("Backlog (e2e)", () => {
           title: "Work Item 1",
           description: "Work Item 1 description",
           priority: "high",
-          status: "backlog"
+          status: "planned"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const workItemId = createWorkItemResponse.body.id;
@@ -227,7 +227,7 @@ describe("Backlog (e2e)", () => {
           title: "Work Item 1",
           description: "Work Item 1 description",
           priority: "high",
-          status: "backlog"
+          status: "planned"
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const listWorkItemsResponse = await request(app.getHttpServer())
@@ -239,7 +239,7 @@ describe("Backlog (e2e)", () => {
       expect(listWorkItemsResponse.body[0].title).toEqual("Work Item 1");
       expect(listWorkItemsResponse.body[0].description).toEqual("Work Item 1 description");
       expect(listWorkItemsResponse.body[0].priority).toEqual("high");
-      expect(listWorkItemsResponse.body[0].status).toEqual("backlog");
+      expect(listWorkItemsResponse.body[0].status).toEqual("planned");
     });
   });
 });

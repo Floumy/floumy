@@ -324,7 +324,7 @@ describe("Iteration (e2e)", () => {
           description: "Work Item 1",
           priority: "low",
           type: "bug",
-          status: "backlog",
+          status: "planned",
           iteration: iterationResponse.body.id
         })
         .expect(201);
@@ -339,7 +339,7 @@ describe("Iteration (e2e)", () => {
       expect(response.body.workItems[0].description).toEqual("Work Item 1");
       expect(response.body.workItems[0].priority).toEqual("low");
       expect(response.body.workItems[0].type).toEqual("bug");
-      expect(response.body.workItems[0].status).toEqual("backlog");
+      expect(response.body.workItems[0].status).toEqual("planned");
     });
   });
 });
