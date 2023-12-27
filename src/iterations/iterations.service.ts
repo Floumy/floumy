@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { CreateOrUpdateIterationDto } from "./dtos";
 import { Iteration } from "./Iteration.entity";
-import { MoreThan, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { Org } from "../orgs/org.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { IterationMapper } from "./iteration.mapper";
@@ -113,21 +113,6 @@ export class IterationsService {
     });
     this.removeWorkItemsFromIteration(iteration);
     await this.iterationRepository.remove(iteration);
-  }
-
-  async listCurrentAndFuture(orgId: string) {
-    const iterations = await this.iterationRepository.find({
-      where: {
-        org: {
-          id: orgId
-        },
-        endDate: MoreThan(new Date())
-      },
-      order: {
-        startDate: "ASC"
-      }
-    });
-    return await Promise.all(iterations.map(iteration => IterationMapper.toDto(iteration)));
   }
 
   private async removeWorkItemsFromIteration(iteration: Iteration) {

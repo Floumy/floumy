@@ -148,25 +148,6 @@ describe("IterationsController", () => {
       expect(iterations.length).toEqual(0);
     });
   });
-  describe("when getting current and future iterations", () => {
-    it("should return a list of current and future iterations", async () => {
-      const startDate = (new Date()).toISOString().split("T")[0];
-      await controller.create({
-        user: { orgId: org.id }
-      }, {
-        goal: "Goal 1",
-        startDate: startDate,
-        duration: 1
-      });
-      const iterations = await controller.listCurrentAndFuture({
-        user: { orgId: org.id }
-      });
-      expect(iterations.length).toEqual(1);
-      expect(iterations[0].goal).toEqual("Goal 1");
-      expect(iterations[0].startDate).toEqual(startDate);
-      expect(iterations[0].duration).toEqual(1);
-    });
-  });
   describe("when starting an iteration", () => {
     it("should start an iteration", async () => {
       const startDate = (new Date()).toISOString().split("T")[0];
