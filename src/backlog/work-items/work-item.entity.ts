@@ -36,6 +36,10 @@ export class WorkItem {
     nullable: true
   })
   estimation: number;
+  @Column({
+    nullable: true
+  })
+  completedAt: Date;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

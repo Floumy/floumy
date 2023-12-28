@@ -226,6 +226,30 @@ describe("WorkItemsService", () => {
       expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
       expect(foundWorkItem.feature).toBeUndefined();
     });
+    it("should update the completedAt field if the status is DONE", async () => {
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          status: WorkItemStatus.PLANNED
+        });
+      const foundWorkItem = await service.updateWorkItem(org.id, workItem.id, {
+        title: "my work item updated",
+        description: "my work item description updated",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.DONE
+      });
+      expect(foundWorkItem).toBeDefined();
+      expect(foundWorkItem.title).toEqual("my work item updated");
+      expect(foundWorkItem.description).toEqual("my work item description updated");
+      expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
+      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.completedAt).toBeDefined();
+    });
   });
   describe("when deleting a work item", () => {
     it("should delete the work item", async () => {
