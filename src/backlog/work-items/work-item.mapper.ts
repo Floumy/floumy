@@ -35,6 +35,7 @@ export default class WorkItemMapper {
       estimation: workItem.estimation,
       feature: feature ? FeatureMapper.toDto(feature) : undefined,
       iteration: iteration ? IterationMapper.toDto(iteration) : undefined,
+      completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt
     };

@@ -49,6 +49,7 @@ export class WorkItemsService {
     workItem.type = workItemDto.type;
     workItem.status = workItemDto.status;
     workItem.estimation = workItemDto.estimation;
+    workItem.completedAt = workItemDto.status === WorkItemStatus.DONE ? new Date() : null;
     if (workItemDto.feature) {
       const feature = await this.featuresRepository.findOneByOrFail({ id: workItemDto.feature, org: { id: orgId } });
       workItem.feature = Promise.resolve(feature);

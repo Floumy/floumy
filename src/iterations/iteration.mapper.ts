@@ -17,6 +17,7 @@ class WorkItemMapper {
       type: workItem.type,
       status: workItem.status,
       estimation: workItem.estimation,
+      completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt
     };

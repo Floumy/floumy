@@ -14,6 +14,7 @@ export interface CreateUpdateWorkItemDto {
 }
 
 export interface WorkItemDto {
+  completedAt: Date;
   id: string;
   title: string;
   description: string;
