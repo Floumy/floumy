@@ -26,7 +26,8 @@ export class FeatureMapper {
     if (featureMilestone) {
       featureDto["milestone"] = {
         id: featureMilestone.id,
-        title: featureMilestone.title
+        title: featureMilestone.title,
+        dueDate: featureMilestone.dueDate
       };
     }
     return featureDto;
