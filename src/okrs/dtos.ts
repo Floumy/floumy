@@ -29,6 +29,20 @@ interface FeatureDto {
   title: string;
   priority: string;
   status: string;
+  workItems?: WorkItemDto[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface WorkItemDto {
+  id: string;
+  title: string;
+  description: string;
+  priority: string;
+  type: string;
+  status: string;
+  estimation: number;
+  completedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
