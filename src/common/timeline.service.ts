@@ -6,9 +6,11 @@ export class TimelineService {
   }
 
   static calculateQuarterDates(quarter: number) {
+    const startDate = new Date(new Date().getFullYear(), 3 * quarter - 3, 1, 0, 0, 0, 0);
+    const endDate = new Date(new Date().getFullYear(), 3 * quarter, 0, 23, 59, 59, 999);
     return {
-      startDate: new Date(new Date().getFullYear(), 3 * quarter - 3, 1),
-      endDate: new Date(new Date().getFullYear(), 3 * quarter, 0)
+      startDate: startDate,
+      endDate: endDate
     };
   }
 
