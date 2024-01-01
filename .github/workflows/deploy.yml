@@ -33,6 +33,8 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
+            doctl auth switch --context floumy
+            doctl registry login
             docker pull registry.digitalocean.com/floumy/api:latest
             docker stop api || true
             docker rm api || true
