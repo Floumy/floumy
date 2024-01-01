@@ -38,4 +38,5 @@ jobs:
             docker pull registry.digitalocean.com/floumy/api:latest
             docker stop api || true
             docker rm api || true
-            docker run -d --name api -p 4000:4000 registry.digitalocean.com/floumy/api:latest
+            docker run -d --restart=always --name api -p 4000:4000 registry.digitalocean.com/floumy/api:latest
+            docker image prune -f
