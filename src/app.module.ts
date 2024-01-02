@@ -29,7 +29,7 @@ import jwtConfig from "./config/jwt.config";
         database: configService.get("database.name"),
         entities: [__dirname + "/**/*.entity{.ts,.js}"],
         synchronize: true,
-        logging: true
+        logging: false
       }),
       inject: [ConfigService],
       imports: [ConfigModule]
