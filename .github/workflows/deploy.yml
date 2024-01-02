@@ -38,5 +38,5 @@ jobs:
             docker pull registry.digitalocean.com/floumy/api:latest
             docker stop api || true
             docker rm api || true
-            docker run -d --restart=always --name api --network=floumy -p 4000:8080 registry.digitalocean.com/floumy/api:latest
+            docker run -d --restart=always --name api -e DB_HOST=floumy-db -e DB_USERNAME=floumy -e DB_PASSWORD=floumy -e DB_DATABASE=floumy --network=floumy -p 4000:8080 registry.digitalocean.com/floumy/api:latest
             docker image prune -f
