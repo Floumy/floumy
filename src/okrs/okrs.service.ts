@@ -145,7 +145,7 @@ export class OkrsService {
 
   async patchKeyResult(orgId: any, objectiveId: string, keyResultId: string, updateKeyResultDto: PatchKeyResultDto) {
     const keyResult = await this.keyResultRepository.findOneByOrFail({ id: keyResultId, objective: { id: objectiveId, org: { id: orgId } } });
-    if (updateKeyResultDto.progress) {
+    if (updateKeyResultDto.progress !== undefined && updateKeyResultDto.progress !== null) {
       keyResult.progress = updateKeyResultDto.progress;
       const savedKeyResult = await this.keyResultRepository.save(keyResult);
       await this.updateObjectiveProgress(await keyResult.objective);

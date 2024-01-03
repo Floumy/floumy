@@ -488,6 +488,37 @@ describe("OKRs (e2e)", () => {
           expect(body.objective.status).toEqual("off-track");
         });
     });
+    it("should update the progress of a key result when the progress is 0", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: {
+            title: "My OKR"
+          },
+          keyResults: [
+            { title: "My Key Result 1" },
+            { title: "My Key Result 2" },
+            { title: "My Key Result 3" }
+          ]
+        });
+
+      await request(app.getHttpServer())
+        .patch(`/okrs/${okrResponse.body.objective.id}/key-results/${okrResponse.body.keyResults[0].id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          progress: 0
+        })
+        .expect(HttpStatus.OK);
+
+      return request(app.getHttpServer())
+        .get(`/okrs/${okrResponse.body.objective.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.objective.progress).toEqual(0);
+        });
+    });
   });
   describe("OKR (GET) /okrs/key-results", () => {
     it("should return 200", async () => {

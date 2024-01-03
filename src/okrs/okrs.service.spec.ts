@@ -392,6 +392,22 @@ describe("OkrsService", () => {
       const updatedKR = await service.getKeyResult(okr.keyResults[0].id);
       expect(updatedKR.status).toEqual("off-track");
     });
+    it("should be able to update the key result progress to 0", async () => {
+      const org = await createTestOrg();
+      const okr = await service.create(org.id, {
+        objective: {
+          title: "My OKR"
+        },
+        keyResults: [
+          { title: "My KR 1" },
+          { title: "My KR 2" },
+          { title: "My KR 3" }
+        ]
+      });
+      await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { progress: 0 });
+      const updatedKR = await service.getKeyResult(okr.keyResults[0].id);
+      expect(updatedKR.progress).toEqual(0);
+    });
   });
   describe("when listing key results", () => {
     it("should return an empty array", async () => {
