@@ -20,11 +20,13 @@ import { WorkItemStatus } from "./work-item-status.enum";
 import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
 import { WorkItem } from "./work-item.entity";
+import { IterationsService } from "../../iterations/iterations.service";
 
 describe("WorkItemsService", () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
   let featuresService: FeaturesService;
+  let iterationService: IterationsService;
   let service: WorkItemsService;
   let org: Org;
 
@@ -33,10 +35,11 @@ describe("WorkItemsService", () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, Iteration, WorkItem])],
-      [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, WorkItemsService]
+      [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, WorkItemsService, IterationsService]
     );
     cleanup = dbCleanup;
     service = module.get<WorkItemsService>(WorkItemsService);
+    iterationService = module.get<IterationsService>(IterationsService);
     featuresService = module.get<FeaturesService>(FeaturesService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
@@ -316,7 +319,7 @@ describe("WorkItemsService", () => {
           feature: feature2.id,
           status: WorkItemStatus.PLANNED
         });
-      const workItems = await service.listOpenWorkItems(org.id);
+      const workItems = await service.listOpenWorkItemsWithoutIterations(org.id);
       expect(workItems).toBeDefined();
       expect(workItems.length).toEqual(2);
       expect(workItems[0].title).toEqual("my work item");
@@ -331,6 +334,61 @@ describe("WorkItemsService", () => {
       expect(workItems[1].type).toEqual(WorkItemType.TECHNICAL_DEBT);
       expect(workItems[1].feature.id).toBeDefined();
       expect(workItems[1].feature.title).toEqual("my other feature");
+    });
+    it("should return the open work items that are not associated with an iteration", async () => {
+      const iteration = await iterationService.create(org.id, {
+        goal: "my iteration description",
+        startDate: "2020-01-01",
+        duration: 7
+      });
+      const feature1 = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          timeline: Timeline.NEXT_QUARTER,
+          status: FeatureStatus.PLANNED
+        });
+      const feature2 = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my other feature",
+          description: "my other feature description",
+          priority: Priority.MEDIUM,
+          timeline: Timeline.THIS_QUARTER,
+          status: FeatureStatus.PLANNED
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          feature: feature1.id,
+          status: WorkItemStatus.PLANNED,
+          iteration: iteration.id
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my other work item",
+          description: "my other work item description",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          feature: feature2.id,
+          status: WorkItemStatus.PLANNED
+        });
+      const workItems = await service.listOpenWorkItemsWithoutIterations(org.id);
+      expect(workItems).toBeDefined();
+      expect(workItems.length).toEqual(1);
+      expect(workItems[0].title).toEqual("my other work item");
+      expect(workItems[0].description).toEqual("my other work item description");
+      expect(workItems[0].priority).toEqual(Priority.MEDIUM);
+      expect(workItems[0].type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(workItems[0].feature.id).toBeDefined();
+      expect(workItems[0].feature.title).toEqual("my other feature");
     });
   });
 });

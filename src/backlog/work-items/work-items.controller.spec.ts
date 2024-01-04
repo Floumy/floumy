@@ -311,7 +311,7 @@ describe("WorkItemsController", () => {
           status: WorkItemStatus.PLANNED
         }
       );
-      const workItems = await controller.listOpen(
+      const workItems = await controller.listOpenWithoutIterations(
         {
           user: {
             org: org.id
