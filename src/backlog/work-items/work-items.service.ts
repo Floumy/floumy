@@ -78,7 +78,7 @@ export class WorkItemsService {
     return this.workItemsRepository.update({ org: { id: orgId }, feature: { id } }, { feature: null });
   }
 
-  async listOpenWorkItems(orgId: string) {
+  async listOpenWorkItemsWithoutIterations(orgId: string) {
     const workItems = await this.workItemsRepository
       .createQueryBuilder("workItem")
       .where("workItem.orgId = :orgId", { orgId })
@@ -87,6 +87,7 @@ export class WorkItemsService {
           closedStatus: WorkItemStatus.CLOSED,
           doneStatus: WorkItemStatus.DONE
         })
+      .andWhere("workItem.iterationId IS NULL")
       .getMany();
     return await WorkItemMapper.toListDto(workItems);
   }

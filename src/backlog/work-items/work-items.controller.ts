@@ -43,8 +43,8 @@ export class WorkItemsController {
 
   @Get("open")
   @HttpCode(HttpStatus.OK)
-  async listOpen(@Request() request) {
-    return await this.workItemsService.listOpenWorkItems(request.user.org);
+  async listOpenWithoutIterations(@Request() request) {
+    return await this.workItemsService.listOpenWorkItemsWithoutIterations(request.user.org);
   }
 
   @Get(":id")
