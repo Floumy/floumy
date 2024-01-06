@@ -15,7 +15,6 @@ export interface FeatureDto {
   title: string;
   description?: string;
   priority: Priority;
-  timeline: string;
   status: FeatureStatus;
   keyResult?: {
     id: string;

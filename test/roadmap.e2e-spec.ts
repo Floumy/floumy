@@ -71,7 +71,6 @@ describe("Roadmap (e2e)", () => {
           description: "my feature description",
           priority: "medium",
           status: "planned",
-          timeline: "this-quarter",
           keyResult: okrResponse.body.keyResults[0].id
         })
         .expect(HttpStatus.CREATED)
@@ -108,7 +107,6 @@ describe("Roadmap (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
-          timeline: "this-quarter",
           status: "planned",
           keyResult: okrResponse.body.keyResults[0].id
         })
@@ -136,7 +134,6 @@ describe("Roadmap (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
-          timeline: "this-quarter",
           status: "planned"
         })
         .expect(HttpStatus.CREATED);
@@ -216,7 +213,6 @@ describe("Roadmap (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
-          timeline: "this-quarter",
           status: "planned",
           milestone: milestoneResponse.body.id
         })
@@ -257,7 +253,6 @@ describe("Roadmap (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
-          timeline: "this-quarter",
           status: "planned",
           milestone: milestoneResponse.body.id
         })
@@ -349,7 +344,6 @@ describe("Roadmap (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
-          timeline: "this-quarter",
           status: "planned",
           keyResult: okrResponse.body.keyResults[0].id,
           milestone: milestoneResponse.body.id
@@ -402,7 +396,6 @@ describe("Roadmap (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
-          timeline: "this-quarter",
           status: "planned",
           keyResult: okrResponse.body.keyResults[0].id,
           milestone: milestoneResponse.body.id
@@ -415,7 +408,6 @@ describe("Roadmap (e2e)", () => {
           title: "my feature updated",
           description: "my feature description updated",
           priority: "high",
-          timeline: "this-quarter",
           status: "planned",
           keyResult: okrResponse.body.keyResults[1].id,
           milestone: null
@@ -463,7 +455,6 @@ describe("Roadmap (e2e)", () => {
           title: "my feature",
           description: "my feature description",
           priority: "medium",
-          timeline: "this-quarter",
           status: "planned",
           keyResult: okrResponse.body.keyResults[0].id,
           milestone: milestoneResponse.body.id

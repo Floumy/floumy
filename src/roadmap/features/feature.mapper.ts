@@ -1,6 +1,5 @@
 import { Feature } from "./feature.entity";
 import { FeatureDto, FeaturesListDto } from "./dtos";
-import { TimelineService } from "../../common/timeline.service";
 
 export class FeatureMapper {
   static async toDto(feature: Feature): Promise<FeatureDto> {
@@ -9,7 +8,6 @@ export class FeatureMapper {
       title: feature.title,
       description: feature.description,
       priority: feature.priority,
-      timeline: TimelineService.startAndEndDatesToTimeline(feature.startDate, feature.endDate),
       status: feature.status,
       workItems: (await feature.workItems).map(WorkItemMapper.toDto),
       createdAt: feature.createdAt,
@@ -39,7 +37,6 @@ export class FeatureMapper {
       title: feature.title,
       priority: feature.priority,
       status: feature.status,
-      timeline: TimelineService.startAndEndDatesToTimeline(feature.startDate, feature.endDate),
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
     }));
