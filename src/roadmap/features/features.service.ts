@@ -8,7 +8,6 @@ import { Priority } from "../../common/priority.enum";
 import { OrgsService } from "../../orgs/orgs.service";
 import { OkrsService } from "../../okrs/okrs.service";
 import { MilestonesService } from "../milestones/milestones.service";
-import { TimelineService } from "../../common/timeline.service";
 import { WorkItemsService } from "../../backlog/work-items/work-items.service";
 
 @Injectable()
@@ -32,10 +31,7 @@ export class FeaturesService {
     feature.priority = featureDto.priority;
     feature.status = featureDto.status;
     feature.org = Promise.resolve(org);
-    TimelineService.validateTimeline(featureDto.timeline);
-    const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(featureDto.timeline);
-    feature.startDate = startDate;
-    feature.endDate = endDate;
+
     if (featureDto.keyResult) {
       const keyResult = await this.okrsService.getKeyResultByOrgId(orgId, featureDto.keyResult);
       feature.keyResult = Promise.resolve(keyResult);
@@ -52,10 +48,8 @@ export class FeaturesService {
   private validateFeature(featureDto: CreateUpdateFeatureDto) {
     if (!featureDto.title) throw new Error("Feature title is required");
     if (!featureDto.priority) throw new Error("Feature priority is required");
-    if (!featureDto.timeline) throw new Error("Feature timeline is required");
     if (!featureDto.status) throw new Error("Feature status is required");
     if (!Object.values(Priority).includes(featureDto.priority)) throw new Error("Invalid priority");
-    TimelineService.validateTimeline(featureDto.timeline);
   }
 
   async listFeatures(orgId: string) {
@@ -87,9 +81,6 @@ export class FeaturesService {
     feature.description = updateFeatureDto.description;
     feature.priority = updateFeatureDto.priority;
     feature.status = updateFeatureDto.status;
-    const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(updateFeatureDto.timeline);
-    feature.startDate = startDate;
-    feature.endDate = endDate;
 
     if (updateFeatureDto.keyResult) {
       const keyResult = await this.okrsService.getKeyResultByOrgId(orgId, updateFeatureDto.keyResult);

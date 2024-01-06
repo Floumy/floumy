@@ -1,11 +1,9 @@
 import { Priority } from "../../common/priority.enum";
-import { Timeline } from "../../common/timeline.enum";
 import { FeatureStatus } from "./featurestatus.enum";
 
 export interface CreateUpdateFeatureDto {
   title: string;
   priority: Priority;
-  timeline: Timeline;
   status: FeatureStatus;
   description?: string;
   milestone?: string;
