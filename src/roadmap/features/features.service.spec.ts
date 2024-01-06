@@ -223,6 +223,38 @@ describe("FeaturesService", () => {
       expect(features[0].createdAt).toBeDefined();
       expect(features[0].updatedAt).toBeDefined();
     });
+    it("should not return features with a milestone", async () => {
+      const milestone = await milestonesService.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone description",
+        dueDate: "2020-01-01"
+      });
+      await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        milestone: milestone.id,
+        status: FeatureStatus.PLANNED
+      });
+      const features = await service.listFeaturesWithoutMilestone(org.id);
+      expect(features.length).toEqual(0);
+    });
+    it("should not return features that are closed or completed", async () => {
+      await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.CLOSED
+      });
+      await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.COMPLETED
+      });
+      const features = await service.listFeaturesWithoutMilestone(org.id);
+      expect(features.length).toEqual(0);
+    });
   });
   describe("when getting a feature", () => {
     it("should return a feature", async () => {
