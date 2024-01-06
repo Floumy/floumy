@@ -10,7 +10,6 @@ import { FeaturesService } from "../../roadmap/features/features.service";
 import { UsersService } from "../../users/users.service";
 import { WorkItem } from "./work-item.entity";
 import { Priority } from "../../common/priority.enum";
-import { Timeline } from "../../common/timeline.enum";
 import { WorkItemType } from "./work-item-type.enum";
 import { Objective } from "../../okrs/objective.entity";
 import { KeyResult } from "../../okrs/key-result.entity";
@@ -59,7 +58,6 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER,
           status: FeatureStatus.PLANNED
         });
       const workItemResponse = await controller.create(
@@ -99,7 +97,6 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER,
           status: FeatureStatus.PLANNED
         });
       await controller.create(
@@ -144,7 +141,6 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER,
           status: FeatureStatus.PLANNED
         });
       const workItem = await controller.create(
@@ -192,7 +188,6 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER,
           status: FeatureStatus.PLANNED
         });
       const workItem = await controller.create(
@@ -248,7 +243,6 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER,
           status: FeatureStatus.PLANNED
         });
       const workItem = await controller.create(
@@ -293,7 +287,6 @@ describe("WorkItemsController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER,
           status: FeatureStatus.PLANNED
         });
       await controller.create(

@@ -14,7 +14,6 @@ import { UsersService } from "../../users/users.service";
 import { UsersModule } from "../../users/users.module";
 import { MilestonesService } from "../milestones/milestones.service";
 import { Milestone } from "../milestones/milestone.entity";
-import { Timeline } from "../../common/timeline.enum";
 import { BacklogModule } from "../../backlog/backlog.module";
 import { FeatureStatus } from "./featurestatus.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
@@ -62,13 +61,11 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.NEXT_QUARTER,
           status: FeatureStatus.CLOSED
         });
       expect(featureResponse.title).toEqual("my feature");
       expect(featureResponse.description).toEqual("my feature description");
       expect(featureResponse.priority).toEqual(Priority.HIGH);
-      expect(featureResponse.timeline).toEqual(Timeline.NEXT_QUARTER);
       expect(featureResponse.status).toEqual(FeatureStatus.CLOSED);
       expect(featureResponse.createdAt).toBeDefined();
     });
@@ -84,7 +81,6 @@ describe("FeaturesController", () => {
             title: null,
             description: "my feature description",
             priority: Priority.HIGH,
-            timeline: Timeline.THIS_QUARTER,
             status: FeatureStatus.PLANNED
           });
       } catch (e) {
@@ -104,7 +100,6 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER,
           status: FeatureStatus.PLANNED
         });
       const features = await controller.list({
@@ -130,7 +125,6 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER,
           status: FeatureStatus.PLANNED
         });
       const features = await controller.listWithoutMilestone({
@@ -156,7 +150,6 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER,
           status: FeatureStatus.PLANNED
         });
       const feature = await controller.get({
@@ -182,7 +175,6 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER,
           status: FeatureStatus.PLANNED
         });
       const feature = await controller.update({
@@ -193,7 +185,6 @@ describe("FeaturesController", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.CLOSED
       });
       expect(feature.title).toEqual("my feature");
@@ -215,7 +206,6 @@ describe("FeaturesController", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER,
           status: FeatureStatus.PLANNED
         });
       await controller.delete({

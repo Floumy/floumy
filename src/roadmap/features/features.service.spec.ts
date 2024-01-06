@@ -12,7 +12,6 @@ import { Priority } from "../../common/priority.enum";
 import { User } from "../../users/user.entity";
 import { MilestonesService } from "../milestones/milestones.service";
 import { Milestone } from "../milestones/milestone.entity";
-import { Timeline } from "../../common/timeline.enum";
 import { WorkItemStatus } from "../../backlog/work-items/work-item-status.enum";
 import { WorkItemsService } from "../../backlog/work-items/work-items.service";
 import { WorkItem } from "../../backlog/work-items/work-item.entity";
@@ -66,7 +65,6 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       expect(feature.id).toBeDefined();
@@ -80,7 +78,6 @@ describe("FeaturesService", () => {
           title: "my feature",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER,
           status: FeatureStatus.PLANNED
         })
       ).rejects.toThrowError();
@@ -91,7 +88,6 @@ describe("FeaturesService", () => {
           title: "",
           description: "my feature description",
           priority: Priority.HIGH,
-          timeline: Timeline.THIS_QUARTER,
           status: FeatureStatus.PLANNED
         })
       ).rejects.toThrowError();
@@ -102,7 +98,6 @@ describe("FeaturesService", () => {
           title: "my feature",
           description: "my feature description",
           priority: null,
-          timeline: Timeline.THIS_QUARTER,
           status: FeatureStatus.PLANNED
         })
       ).rejects.toThrowError();
@@ -123,7 +118,6 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       expect(feature.keyResult).toBeDefined();
@@ -137,7 +131,6 @@ describe("FeaturesService", () => {
           description: "my feature description",
           priority: Priority.HIGH,
           keyResult: "non-existent-key-result",
-          timeline: Timeline.THIS_QUARTER,
           status: FeatureStatus.PLANNED
         })
       ).rejects.toThrowError();
@@ -166,7 +159,6 @@ describe("FeaturesService", () => {
           description: "my feature description",
           priority: Priority.HIGH,
           keyResult: objective.keyResults[0].id,
-          timeline: Timeline.NEXT_QUARTER,
           status: FeatureStatus.PLANNED
         })
       ).rejects.toThrowError();
@@ -182,7 +174,6 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         milestone: milestone.id,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       expect(feature.milestone).toBeDefined();
@@ -207,7 +198,6 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const features = await service.listFeatures(org.id);
@@ -224,7 +214,6 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.NEXT_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const features = await service.listFeaturesWithoutMilestone(org.id);
@@ -241,7 +230,6 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const foundFeature = await service.getFeature(org.id, feature.id);
@@ -272,7 +260,6 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const foundFeature = await service.getFeature(org.id, feature.id);
@@ -291,7 +278,6 @@ describe("FeaturesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         milestone: milestone.id,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const foundFeature = await service.getFeature(org.id, feature.id);
@@ -306,21 +292,18 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const updatedFeature = await service.updateFeature(org.id, feature.id, {
         title: "my updated feature",
         description: "my updated feature description",
         priority: Priority.LOW,
-        timeline: Timeline.NEXT_QUARTER,
         status: FeatureStatus.CLOSED
       });
       expect(updatedFeature.id).toEqual(feature.id);
       expect(updatedFeature.title).toEqual("my updated feature");
       expect(updatedFeature.description).toEqual("my updated feature description");
       expect(updatedFeature.priority).toEqual(Priority.LOW);
-      expect(updatedFeature.timeline).toEqual(Timeline.NEXT_QUARTER);
       expect(updatedFeature.status).toEqual(FeatureStatus.CLOSED);
       expect(updatedFeature.createdAt).toEqual(feature.createdAt);
       expect(updatedFeature.updatedAt).not.toEqual(feature.updatedAt);
@@ -340,7 +323,6 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const updatedFeature = await service.updateFeature(org.id, feature.id, {
@@ -348,7 +330,6 @@ describe("FeaturesService", () => {
         description: "my updated feature description",
         priority: Priority.LOW,
         keyResult: objective.keyResults[0].id,
-        timeline: Timeline.NEXT_QUARTER,
         status: FeatureStatus.PLANNED
       });
       expect(updatedFeature.keyResult).toBeDefined();
@@ -365,7 +346,6 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const updatedFeature = await service.updateFeature(org.id, feature.id, {
@@ -373,7 +353,6 @@ describe("FeaturesService", () => {
         description: "my updated feature description",
         priority: Priority.LOW,
         milestone: milestone.id,
-        timeline: Timeline.NEXT_QUARTER,
         status: FeatureStatus.PLANNED
       });
       expect(updatedFeature.milestone).toBeDefined();
@@ -387,7 +366,6 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       await service.deleteFeature(org.id, feature.id);
@@ -398,7 +376,6 @@ describe("FeaturesService", () => {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
-        timeline: Timeline.THIS_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const workItem = await workItemsService.createWorkItem(org.id, {

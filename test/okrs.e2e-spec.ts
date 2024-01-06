@@ -184,7 +184,6 @@ describe("OKRs (e2e)", () => {
           title: "My Feature",
           description: "My Feature Description",
           priority: "high",
-          timeline: "this-quarter",
           status: "planned",
           keyResult: okrResponse.body.keyResults[0].id
         })

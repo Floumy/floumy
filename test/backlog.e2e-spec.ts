@@ -58,7 +58,6 @@ describe("Backlog (e2e)", () => {
           title: "Feature 1",
           description: "Feature 1 description",
           priority: "high",
-          timeline: "this-quarter",
           status: "in-progress"
         })
         .set("Authorization", `Bearer ${accessToken}`);
@@ -163,7 +162,6 @@ describe("Backlog (e2e)", () => {
           title: "Feature 1",
           description: "Feature 1 description",
           priority: "high",
-          timeline: "this-quarter",
           status: "in-progress"
         })
         .set("Authorization", `Bearer ${accessToken}`);

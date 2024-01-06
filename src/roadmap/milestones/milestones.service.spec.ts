@@ -12,7 +12,6 @@ import { FeaturesService } from "../features/features.service";
 import { Feature } from "../features/feature.entity";
 import { Priority } from "../../common/priority.enum";
 import { OkrsService } from "../../okrs/okrs.service";
-import { Timeline } from "../../common/timeline.enum";
 import { BacklogModule } from "../../backlog/backlog.module";
 import { FeatureStatus } from "../features/featurestatus.enum";
 
@@ -137,7 +136,6 @@ describe("MilestonesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         milestone: milestone.id,
-        timeline: Timeline.NEXT_QUARTER,
         status: FeatureStatus.PLANNED
       });
       const milestones = await service.listMilestonesWithFeatures(org.id);
@@ -211,7 +209,6 @@ describe("MilestonesService", () => {
         description: "my feature description",
         priority: Priority.HIGH,
         milestone: milestone.id,
-        timeline: Timeline.NEXT_QUARTER,
         status: FeatureStatus.PLANNED
       });
       await service.delete(org.id, milestone.id);
