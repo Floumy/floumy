@@ -64,6 +64,7 @@ export class FeaturesService {
       .leftJoinAndSelect("feature.milestone", "milestone")
       .where("org.id = :orgId", { orgId })
       .andWhere("milestone.id IS NULL")
+      .andWhere("feature.status not in (:...status)", { status: ["closed", "completed"] })
       .getMany();
 
     return FeatureMapper.toListDto(features);
