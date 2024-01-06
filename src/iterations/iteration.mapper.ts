@@ -1,6 +1,7 @@
 import { Iteration } from "./Iteration.entity";
 import { TimelineService } from "../common/timeline.service";
 import { WorkItem } from "../backlog/work-items/work-item.entity";
+import { Feature } from "../roadmap/features/feature.entity";
 
 function formatDate(date: Date) {
   if (!date) return null;
@@ -8,7 +9,8 @@ function formatDate(date: Date) {
 }
 
 class WorkItemMapper {
-  static toDto(workItem: WorkItem) {
+  static async toDto(workItem: WorkItem) {
+    const feature = await workItem.feature;
     return {
       id: workItem.id,
       title: workItem.title,
@@ -17,9 +19,19 @@ class WorkItemMapper {
       type: workItem.type,
       status: workItem.status,
       estimation: workItem.estimation,
+      feature: feature ? FeatureMapper.toDto(feature) : null,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt
+    };
+  }
+}
+
+class FeatureMapper {
+  static toDto(feature: Feature) {
+    return {
+      id: feature.id,
+      title: feature.title
     };
   }
 }
@@ -36,7 +48,7 @@ export class IterationMapper {
       actualStartDate: formatDate(iteration.actualStartDate),
       actualEndDate: formatDate(iteration.actualEndDate),
       timeline: TimelineService.convertDateToTimeline(iteration.startDate),
-      workItems: workItems.map(WorkItemMapper.toDto),
+      workItems: await Promise.all(workItems.map(WorkItemMapper.toDto)),
       duration: iteration.duration,
       createdAt: iteration.createdAt,
       updatedAt: iteration.updatedAt,
