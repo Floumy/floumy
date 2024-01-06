@@ -111,7 +111,7 @@ export class IterationsService {
         id: orgId
       }
     });
-    this.removeWorkItemsFromIteration(iteration);
+    await this.removeWorkItemsFromIteration(iteration);
     await this.iterationRepository.remove(iteration);
   }
 
