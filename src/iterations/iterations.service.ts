@@ -172,7 +172,15 @@ export class IterationsService {
     });
     iteration.actualEndDate = new Date();
     iteration.status = IterationStatus.COMPLETED;
+    iteration.velocity = await this.calculateIterationVelocity(iteration);
     const savedIteration = await this.iterationRepository.save(iteration);
     return await IterationMapper.toDto(savedIteration);
+  }
+
+  private async calculateIterationVelocity(iteration: Iteration) {
+    const workItems = await iteration.workItems;
+    return workItems
+      .filter(workItem => workItem.estimation)
+      .reduce((sum, workItem) => sum + workItem.estimation, 0);
   }
 }

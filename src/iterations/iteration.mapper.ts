@@ -49,6 +49,7 @@ export class IterationMapper {
       actualEndDate: formatDate(iteration.actualEndDate),
       timeline: TimelineService.convertDateToTimeline(iteration.startDate),
       workItems: await Promise.all(workItems.map(WorkItemMapper.toDto)),
+      velocity: iteration.velocity,
       duration: iteration.duration,
       createdAt: iteration.createdAt,
       updatedAt: iteration.updatedAt,

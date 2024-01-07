@@ -277,5 +277,72 @@ describe("IterationsService", () => {
       expect(completedIteration.status).toEqual("completed");
       expect(completedIteration.actualEndDate).toBeDefined();
     });
+    it("should store the velocity", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: startDate,
+        duration: 1
+      });
+      await workItemsService.createWorkItem(org.id, {
+        title: "Work Item 1",
+        description: "Work Item 1",
+        priority: Priority.LOW,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.PLANNED,
+        estimation: 10,
+        iteration: iteration.id
+      });
+      const startedIteration = await service.startIteration(org.id, iteration.id);
+      const completedIteration = await service.completeIteration(org.id, startedIteration.id);
+      expect(completedIteration.velocity).toEqual(10);
+    });
+    it("should handle the case when there is no estimation", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: startDate,
+        duration: 1
+      });
+      await workItemsService.createWorkItem(org.id, {
+        title: "Work Item 1",
+        description: "Work Item 1",
+        priority: Priority.LOW,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.PLANNED,
+        iteration: iteration.id
+      });
+      const startedIteration = await service.startIteration(org.id, iteration.id);
+      const completedIteration = await service.completeIteration(org.id, startedIteration.id);
+      expect(completedIteration.velocity).toEqual(0);
+    });
+    it("should handle the case when there is a mix of estimations", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await service.create(org.id, {
+        goal: "Test Iteration",
+        startDate: startDate,
+        duration: 1
+      });
+      await workItemsService.createWorkItem(org.id, {
+        title: "Work Item 1",
+        description: "Work Item 1",
+        priority: Priority.LOW,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.PLANNED,
+        estimation: 10,
+        iteration: iteration.id
+      });
+      await workItemsService.createWorkItem(org.id, {
+        title: "Work Item 2",
+        description: "Work Item 2",
+        priority: Priority.LOW,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.PLANNED,
+        iteration: iteration.id
+      });
+      const startedIteration = await service.startIteration(org.id, iteration.id);
+      const completedIteration = await service.completeIteration(org.id, startedIteration.id);
+      expect(completedIteration.velocity).toEqual(10);
+    });
   });
 });
