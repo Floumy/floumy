@@ -3,7 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from "typeorm";
@@ -24,8 +24,8 @@ export class User {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @OneToOne(() => RefreshToken, refreshToken => refreshToken.user, { cascade: true, lazy: true })
-  refreshToken: Promise<RefreshToken>;
+  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user, { cascade: true, lazy: true })
+  refreshTokens: Promise<RefreshToken[]>;
   @ManyToOne(() => Org, org => org.users, { lazy: true })
   org: Promise<Org>;
 
