@@ -29,6 +29,8 @@ export class Iteration {
   actualEndDate: Date;
   @Column()
   duration: number;
+  @Column({ nullable: true })
+  velocity: number;
   @Column({
     type: "enum",
     enum: IterationStatus,
