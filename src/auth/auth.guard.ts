@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { Request } from "express";
 import { Reflector } from "@nestjs/core";
 import { IS_PUBLIC_KEY } from "./public.guard";
@@ -6,6 +6,7 @@ import { TokensService } from "./tokens.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
 
   constructor(private tokenService: TokensService, private reflector: Reflector) {
   }
@@ -21,6 +22,8 @@ export class AuthGuard implements CanActivate {
     try {
       request["user"] = await this.tokenService.verifyAccessToken(token);
     } catch (error) {
+      this.logger.error(`Failed to verify access token: ${token}`);
+      this.logger.error(error);
       throw new UnauthorizedException();
     }
   }
@@ -38,6 +41,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
+      this.logger.error("No token provided");
       throw new UnauthorizedException();
     }
     await this.verifyAccessToken(request, token);
