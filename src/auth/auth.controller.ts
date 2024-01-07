@@ -46,7 +46,6 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get("profile")
   getProfile(@Request() request): string {
-    // request.user is actually the decoded jwt payload
     return request.user;
   }
 
