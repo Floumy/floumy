@@ -3,7 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from "typeorm";
@@ -27,7 +27,7 @@ export class RefreshToken {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => User, user => user.refreshToken, { lazy: true })
+  @ManyToOne(() => User, user => user.refreshTokens, { lazy: true })
   @JoinColumn()
   user: Promise<User>;
 

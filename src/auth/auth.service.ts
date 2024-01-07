@@ -35,31 +35,23 @@ export class AuthService {
   }
 
   private async getOrCreateRefreshToken(user: User) {
-    const refreshToken = await user.refreshToken;
+    const refreshToken = await this.refreshTokenRepository.findOne({
+      where: { user: { id: user.id } },
+      order: { createdAt: "DESC" }
+    });
 
-    if (!refreshToken) {
+    if (!refreshToken || refreshToken.expirationDate.getTime() < Date.now()) {
       return await this.createRefreshToken(user);
-    }
-
-    if (refreshToken.expirationDate.getTime() < Date.now()) {
-      return await this.updateRefreshToken(user, refreshToken);
     }
 
     return refreshToken.token;
   }
 
-  private async updateRefreshToken(user: User, refreshToken: RefreshToken) {
-    const token = await this.tokensService.generateRefreshToken(user);
-    refreshToken.token = token;
-    refreshToken.expirationDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    await this.refreshTokenRepository.save(refreshToken);
-    return token;
-  }
-
   private async createRefreshToken(user: User) {
     const token = await this.tokensService.generateRefreshToken(user);
-    user.refreshToken = Promise.resolve(new RefreshToken(token));
-    await this.usersService.update(user);
+    const refreshToken = new RefreshToken(token);
+    refreshToken.user = Promise.resolve(user);
+    await this.refreshTokenRepository.save(refreshToken);
     return token;
   }
 
@@ -96,7 +88,7 @@ export class AuthService {
     const user = await refreshTokenEntity.user;
     return {
       accessToken: await this.tokensService.generateAccessToken(user),
-      refreshToken: await this.updateRefreshToken(user, refreshTokenEntity)
+      refreshToken: await this.createRefreshToken(user)
     };
   }
 }
