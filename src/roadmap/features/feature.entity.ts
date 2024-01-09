@@ -20,7 +20,7 @@ export class Feature {
   id: string;
   @Column()
   title: string;
-  @Column()
+  @Column({ nullable: true })
   description: string;
   @Column({
     type: "enum",
