@@ -34,6 +34,10 @@ export class Feature {
     default: FeatureStatus.PLANNED
   })
   status: FeatureStatus;
+  @Column({ default: 0 })
+  progress: number;
+  @Column({ default: 0 })
+  workItemsCount: number;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

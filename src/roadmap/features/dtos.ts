@@ -16,6 +16,8 @@ export interface FeatureDto {
   description?: string;
   priority: Priority;
   status: FeatureStatus;
+  progress: number;
+  workItemsCount: number;
   keyResult?: {
     id: string;
     title: string;
