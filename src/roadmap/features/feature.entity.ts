@@ -34,7 +34,7 @@ export class Feature {
     default: FeatureStatus.PLANNED
   })
   status: FeatureStatus;
-  @Column({ default: 0 })
+  @Column({ default: 0, type: "float" })
   progress: number;
   @Column({ default: 0 })
   workItemsCount: number;
