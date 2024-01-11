@@ -23,7 +23,11 @@ export class WorkItemsService {
     const workItem = new WorkItem();
     await this.setWorkItemData(workItem, workItemDto, orgId);
     workItem.org = Promise.resolve(org);
-    return WorkItemMapper.toDto(await this.workItemsRepository.save(workItem));
+    const savedWorkItem = await this.workItemsRepository.save(workItem);
+    const feature = await savedWorkItem.feature;
+    await this.updateFeatureProgress(feature);
+
+    return WorkItemMapper.toDto(savedWorkItem);
   }
 
   async listWorkItems(orgId: string) {
@@ -38,8 +42,15 @@ export class WorkItemsService {
 
   async updateWorkItem(orgId: string, id: string, workItemDto: CreateUpdateWorkItemDto) {
     const workItem = await this.workItemsRepository.findOneByOrFail({ id, org: { id: orgId } });
+    const oldFeature = await workItem.feature;
     await this.setWorkItemData(workItem, workItemDto, orgId);
-    return WorkItemMapper.toDto(await this.workItemsRepository.save(workItem));
+    const savedWorkItem = await this.workItemsRepository.save(workItem);
+    const newFeature = await savedWorkItem.feature;
+    await this.updateFeatureProgress(oldFeature);
+    if (newFeature && (!oldFeature || oldFeature.id !== newFeature.id)) {
+      await this.updateFeatureProgress(newFeature);
+    }
+    return WorkItemMapper.toDto(savedWorkItem);
   }
 
   private async setWorkItemData(workItem: WorkItem, workItemDto: CreateUpdateWorkItemDto, orgId: string) {
@@ -50,6 +61,8 @@ export class WorkItemsService {
     workItem.status = workItemDto.status;
     workItem.estimation = workItemDto.estimation;
     workItem.completedAt = workItemDto.status === WorkItemStatus.DONE ? new Date() : null;
+    workItem.feature = Promise.resolve(null);
+    workItem.iteration = Promise.resolve(null);
     if (workItemDto.feature) {
       const feature = await this.featuresRepository.findOneByOrFail({ id: workItemDto.feature, org: { id: orgId } });
       workItem.feature = Promise.resolve(feature);
@@ -61,17 +74,15 @@ export class WorkItemsService {
       });
       workItem.iteration = Promise.resolve(iteration);
     }
-    if (workItem.feature && !workItemDto.feature) {
-      workItem.feature = Promise.resolve(null);
-    }
-    if (workItem.iteration && !workItemDto.iteration) {
-      workItem.iteration = Promise.resolve(null);
-    }
   }
 
   async deleteWorkItem(orgId: string, id: string) {
     const workItem = await this.workItemsRepository.findOneByOrFail({ id, org: { id: orgId } });
+    const feature = await workItem.feature;
     await this.workItemsRepository.remove(workItem);
+    if (feature) {
+      await this.updateFeatureProgress(feature);
+    }
   }
 
   removeFeatureFromWorkItems(orgId: string, id: string) {
@@ -90,5 +101,20 @@ export class WorkItemsService {
       .andWhere("workItem.iterationId IS NULL")
       .getMany();
     return await WorkItemMapper.toListDto(workItems);
+  }
+
+  private async updateFeatureProgress(feature: Feature) {
+    if (!feature) return;
+
+    const workItems = await feature.workItems;
+    feature.workItemsCount = workItems.length;
+    feature.progress = 0;
+    await this.featuresRepository.save(feature);
+
+    if (workItems.length > 0) {
+      const completedWorkItems = workItems.filter(workItem => workItem.status === WorkItemStatus.DONE);
+      feature.progress = completedWorkItems.length / workItems.length * 100;
+      await this.featuresRepository.save(feature);
+    }
   }
 }

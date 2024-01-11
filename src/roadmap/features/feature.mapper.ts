@@ -9,6 +9,8 @@ export class FeatureMapper {
       description: feature.description,
       priority: feature.priority,
       status: feature.status,
+      progress: feature.progress,
+      workItemsCount: feature.workItemsCount,
       workItems: (await feature.workItems).map(WorkItemMapper.toDto),
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt

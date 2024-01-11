@@ -379,4 +379,317 @@ describe("WorkItemsService", () => {
       expect(workItems[0].feature.title).toEqual("my other feature");
     });
   });
+  describe("when creating a work item with a feature", () => {
+    it("should update the feature progress", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          feature: feature.id,
+          estimation: 13,
+          status: WorkItemStatus.DONE
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my other work item",
+          description: "my other work item description",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          feature: feature.id,
+          estimation: 13,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.progress).toEqual(50);
+    });
+    it("should update the feature workItemsCount", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          feature: feature.id,
+          estimation: 13,
+          status: WorkItemStatus.DONE
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my other work item",
+          description: "my other work item description",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          feature: feature.id,
+          estimation: 13,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.workItemsCount).toEqual(2);
+    });
+  });
+  describe("when updating a work item with a feature", () => {
+    it("should update the feature progress", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      const workItem1 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.DONE
+        });
+      const workItem2 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my other work item",
+          description: "my other work item description",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          estimation: 13,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      await service.updateWorkItem(org.id, workItem1.id, {
+        title: "my work item",
+        description: "my work item description",
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        estimation: 13,
+        status: WorkItemStatus.DONE,
+        feature: feature.id
+      });
+      await service.updateWorkItem(org.id, workItem2.id, {
+        title: "my other work item",
+        description: "my other work item description",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        estimation: 13,
+        status: WorkItemStatus.IN_PROGRESS,
+        feature: feature.id
+      });
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.progress).toEqual(50);
+    });
+    it("should update the feature workItemsCount", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      const workItem1 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.DONE
+        });
+      const workItem2 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my other work item",
+          description: "my other work item description",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      await service.updateWorkItem(org.id, workItem1.id, {
+        title: "my work item",
+        description: "my work item description",
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        estimation: 13,
+        status: WorkItemStatus.DONE,
+        feature: feature.id
+      });
+      await service.updateWorkItem(org.id, workItem2.id, {
+        title: "my other work item",
+        description: "my other work item description",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        estimation: 13,
+        status: WorkItemStatus.IN_PROGRESS,
+        feature: null
+      });
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.workItemsCount).toEqual(1);
+    });
+    it("should update the feature progress and count when changing the feature of a work item", async () => {
+      const feature1 = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature 1",
+          description: "my feature description 1",
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      const feature2 = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature 2",
+          description: "my feature description 2",
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      const workItem1 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 1",
+          description: "my work item description 1",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature1.id,
+          status: WorkItemStatus.DONE
+        });
+      const workItem2 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 2",
+          description: "my work item description 2",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          estimation: 13,
+          feature: feature2.id,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      await service.updateWorkItem(org.id, workItem1.id, {
+        title: "my work item 1",
+        description: "my work item description 1",
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        estimation: 13,
+        status: WorkItemStatus.DONE,
+        feature: feature2.id
+      });
+      await service.updateWorkItem(org.id, workItem2.id, {
+        title: "my work item 2",
+        description: "my work item description 2",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        estimation: 13,
+        status: WorkItemStatus.IN_PROGRESS,
+        feature: feature2.id
+      });
+      const foundFeature1 = await featuresService.getFeature(org.id, feature1.id);
+      expect(foundFeature1.progress).toEqual(0);
+      expect(foundFeature1.workItemsCount).toEqual(0);
+      const foundFeature2 = await featuresService.getFeature(org.id, feature2.id);
+      expect(foundFeature2.progress).toEqual(50);
+      expect(foundFeature2.workItemsCount).toEqual(2);
+    });
+  });
+  describe("when deleting a work item with a feature", () => {
+    it("should update the feature progress", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      const workItem1 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.DONE
+        });
+      const workItem2 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my other work item",
+          description: "my other work item description",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      await service.deleteWorkItem(org.id, workItem1.id);
+      await service.deleteWorkItem(org.id, workItem2.id);
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.progress).toEqual(0);
+    });
+    it("should update the feature workItemsCount", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      const workItem1 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.DONE
+        });
+      const workItem2 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my other work item",
+          description: "my other work item description",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      await service.deleteWorkItem(org.id, workItem1.id);
+      await service.deleteWorkItem(org.id, workItem2.id);
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.workItemsCount).toEqual(0);
+    });
+  });
 });
