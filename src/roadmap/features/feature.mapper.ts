@@ -39,6 +39,8 @@ export class FeatureMapper {
       title: feature.title,
       priority: feature.priority,
       status: feature.status,
+      progress: feature.progress,
+      workItemsCount: feature.workItemsCount,
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
     }));
