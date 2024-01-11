@@ -109,6 +109,8 @@ describe("FeaturesController", () => {
       });
       expect(features[0].title).toEqual("my feature");
       expect(features[0].priority).toEqual(Priority.HIGH);
+      expect(features[0].progress).toEqual(0);
+      expect(features[0].workItemsCount).toEqual(0);
       expect(features[0].createdAt).toBeDefined();
       expect(features[0].updatedAt).toBeDefined();
     });
