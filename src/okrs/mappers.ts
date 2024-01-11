@@ -41,6 +41,8 @@ class FeatureMapper {
       title: feature.title,
       priority: feature.priority,
       status: feature.status,
+      workItemsCount: feature.workItemsCount,
+      progress: feature.progress,
       workItems: (await feature.workItems).map(WorkItemMapper.toDto),
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt

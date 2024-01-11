@@ -33,6 +33,8 @@ export interface FeatureListItemDto {
   title: string;
   priority: string;
   status: string;
+  progress: number;
+  workItemsCount: number;
   createdAt: Date;
   updatedAt: Date;
 }

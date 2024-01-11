@@ -37,6 +37,8 @@ export class MilestoneMapper {
         title: feature.title,
         priority: feature.priority.valueOf(),
         status: feature.status.valueOf(),
+        progress: feature.progress,
+        workItemsCount: feature.workItemsCount,
         createdAt: feature.createdAt,
         updatedAt: feature.updatedAt
       }))

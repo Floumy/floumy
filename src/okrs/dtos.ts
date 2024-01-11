@@ -29,6 +29,8 @@ interface FeatureDto {
   title: string;
   priority: string;
   status: string;
+  workItemsCount: number;
+  progress: number;
   workItems?: WorkItemDto[];
   createdAt: Date;
   updatedAt: Date;
