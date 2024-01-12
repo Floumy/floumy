@@ -60,7 +60,11 @@ export class WorkItemsService {
     workItem.type = workItemDto.type;
     workItem.status = workItemDto.status;
     workItem.estimation = workItemDto.estimation;
-    workItem.completedAt = workItemDto.status === WorkItemStatus.DONE ? new Date() : null;
+    let completedAt = null;
+    if (workItemDto.status === WorkItemStatus.DONE || workItemDto.status === WorkItemStatus.CLOSED) {
+      completedAt = new Date();
+    }
+    workItem.completedAt = completedAt;
     workItem.feature = Promise.resolve(null);
     workItem.iteration = Promise.resolve(null);
     if (workItemDto.feature) {
