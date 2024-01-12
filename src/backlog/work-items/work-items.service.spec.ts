@@ -83,6 +83,40 @@ describe("WorkItemsService", () => {
       expect(workItem.feature.id).toBeDefined();
       expect(workItem.feature.title).toEqual("my feature");
     });
+    it("should update the feature progress", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.DONE
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my other work item",
+          description: "my other work item description",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.progress).toEqual(50);
+    });
   });
   describe("when listing work items", () => {
     it("should return the list of work items", async () => {
@@ -238,6 +272,30 @@ describe("WorkItemsService", () => {
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
         status: WorkItemStatus.DONE
+      });
+      expect(foundWorkItem).toBeDefined();
+      expect(foundWorkItem.title).toEqual("my work item updated");
+      expect(foundWorkItem.description).toEqual("my work item description updated");
+      expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
+      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.completedAt).toBeDefined();
+    });
+    it("should update the completedAt field if the status is CLOSED", async () => {
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          status: WorkItemStatus.PLANNED
+        });
+      const foundWorkItem = await service.updateWorkItem(org.id, workItem.id, {
+        title: "my work item updated",
+        description: "my work item description updated",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.CLOSED
       });
       expect(foundWorkItem).toBeDefined();
       expect(foundWorkItem.title).toEqual("my work item updated");
