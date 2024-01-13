@@ -750,4 +750,49 @@ describe("WorkItemsService", () => {
       expect(foundFeature.workItemsCount).toEqual(0);
     });
   });
+  describe("when closing a work item", () => {
+    it("should update the feature progress", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.MEDIUM,
+          status: FeatureStatus.IN_PROGRESS
+        });
+      await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 1",
+          description: "my work item description 1",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.DONE
+        });
+      const workItem2 = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 2",
+          description: "my work item description 2",
+          priority: Priority.MEDIUM,
+          type: WorkItemType.TECHNICAL_DEBT,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      await service.updateWorkItem(org.id, workItem2.id, {
+        title: "my work item 2",
+        description: "my work item description 2",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        estimation: 13,
+        feature: feature.id,
+        status: WorkItemStatus.CLOSED
+      });
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.progress).toEqual(100);
+    });
+  });
 });
