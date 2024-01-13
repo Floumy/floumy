@@ -60,11 +60,10 @@ export class WorkItemsService {
     workItem.type = workItemDto.type;
     workItem.status = workItemDto.status;
     workItem.estimation = workItemDto.estimation;
-    let completedAt = null;
+    workItem.completedAt = null;
     if (workItemDto.status === WorkItemStatus.DONE || workItemDto.status === WorkItemStatus.CLOSED) {
-      completedAt = new Date();
+      workItem.completedAt = new Date();
     }
-    workItem.completedAt = completedAt;
     workItem.feature = Promise.resolve(null);
     workItem.iteration = Promise.resolve(null);
     if (workItemDto.feature) {
@@ -116,7 +115,7 @@ export class WorkItemsService {
     await this.featuresRepository.save(feature);
 
     if (workItems.length > 0) {
-      const completedWorkItems = workItems.filter(workItem => workItem.status === WorkItemStatus.DONE);
+      const completedWorkItems = workItems.filter(workItem => workItem.status === WorkItemStatus.DONE || workItem.status === WorkItemStatus.CLOSED);
       feature.progress = completedWorkItems.length / workItems.length * 100;
       await this.featuresRepository.save(feature);
     }
