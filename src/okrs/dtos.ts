@@ -21,7 +21,9 @@ interface PatchKeyResultDto {
 }
 
 interface PatchObjectiveDto {
+  title?: string;
   status?: string;
+  timeline?: string;
 }
 
 interface FeatureDto {
