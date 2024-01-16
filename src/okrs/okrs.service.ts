@@ -144,7 +144,10 @@ export class OkrsService {
   }
 
   async patchKeyResult(orgId: any, objectiveId: string, keyResultId: string, updateKeyResultDto: PatchKeyResultDto) {
-    const keyResult = await this.keyResultRepository.findOneByOrFail({ id: keyResultId, objective: { id: objectiveId, org: { id: orgId } } });
+    const keyResult = await this.keyResultRepository.findOneByOrFail({
+      id: keyResultId,
+      objective: { id: objectiveId, org: { id: orgId } }
+    });
     if (updateKeyResultDto.progress !== undefined && updateKeyResultDto.progress !== null) {
       keyResult.progress = updateKeyResultDto.progress;
       const savedKeyResult = await this.keyResultRepository.save(keyResult);
@@ -174,11 +177,24 @@ export class OkrsService {
   }
 
   async patchObjective(orgId: any, objectiveId: string, updateObjectiveDto: PatchObjectiveDto) {
-    const status = Object.values(OKRStatus).find(status => status === updateObjectiveDto.status);
-    return await this.objectiveRepository.update(
-      { id: objectiveId, org: { id: orgId } },
-      { status }
-    );
+    const objective = await this.objectiveRepository.findOneByOrFail({ id: objectiveId, org: { id: orgId } });
+
+    if (updateObjectiveDto.title) {
+      objective.title = updateObjectiveDto.title;
+    }
+
+    if (updateObjectiveDto.status) {
+      objective.status = Object.values(OKRStatus).find(status => status === updateObjectiveDto.status);
+    }
+
+    if (updateObjectiveDto.timeline) {
+      TimelineService.validateTimeline(updateObjectiveDto.timeline);
+      const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(updateObjectiveDto.timeline);
+      objective.startDate = startDate;
+      objective.endDate = endDate;
+    }
+
+    return OKRMapper.toDTO(await this.objectiveRepository.save(objective), await objective.keyResults);
   }
 
   async listKeyResults(orgId: string) {

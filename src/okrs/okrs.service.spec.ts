@@ -427,4 +427,46 @@ describe("OkrsService", () => {
       expect(keyResults[0].title).toEqual("Test Key Result");
     });
   });
+
+  describe("When partially updating an objective", () => {
+    it("should update the objective title", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      await service.patchObjective(org.id, objective.id, { title: "Updated Objective" });
+      const storedObjective = await service.getObjective(objective.id);
+      expect(storedObjective.title).toEqual("Updated Objective");
+    });
+    it("should update the objective timeline", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      await service.patchObjective(org.id, objective.id, { timeline: "next-quarter" });
+      const storedOKR = await service.get(org.id, objective.id);
+      expect(storedOKR.objective.timeline).toEqual("next-quarter");
+    });
+    it("should update the objective status", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      await service.patchObjective(org.id, objective.id, { status: "off-track" });
+      const storedOKR = await service.get(org.id, objective.id);
+      expect(storedOKR.objective.status).toEqual("off-track");
+    });
+  });
 });
