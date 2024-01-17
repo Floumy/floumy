@@ -560,4 +560,21 @@ describe("OKRs (e2e)", () => {
         });
     });
   });
+  describe("Key Result (DELETE)", () => {
+    it("should return 200", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+            objective: { title: "My OKR" },
+            keyResults: [{ title: "My Key Result 1" }]
+          }
+        );
+
+      return request(app.getHttpServer())
+        .delete(`/okrs/${okrResponse.body.objective.id}/key-results/${okrResponse.body.keyResults[0].id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK);
+    });
+  });
 });

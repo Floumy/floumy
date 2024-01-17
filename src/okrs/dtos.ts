@@ -16,6 +16,7 @@ interface CreateOrUpdateOKRDto {
 }
 
 interface PatchKeyResultDto {
+  title?: string;
   progress?: number;
   status?: string;
 }

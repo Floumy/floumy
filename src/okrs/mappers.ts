@@ -74,7 +74,7 @@ export class KeyResultMapper {
     return {
       id: keyResult.id,
       title: keyResult.title,
-      progress: parseFloat(keyResult.progress?.toFixed(2)),
+      progress: keyResult.progress ? parseFloat(keyResult.progress?.toFixed(2)) : 0,
       timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
       createdAt: keyResult.createdAt,
       updatedAt: keyResult.updatedAt,

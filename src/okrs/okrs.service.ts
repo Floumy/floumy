@@ -139,7 +139,11 @@ export class OkrsService {
 
   private async updateObjectiveProgress(objective: Objective) {
     const keyResults = await objective.keyResults;
-    objective.progress = keyResults.reduce((acc, keyResult) => acc + keyResult.progress, 0) / keyResults.length;
+    if (keyResults.length === 0) {
+      objective.progress = 0;
+    } else {
+      objective.progress = keyResults.reduce((acc, keyResult) => acc + keyResult.progress, 0) / keyResults.length;
+    }
     await this.objectiveRepository.save(objective);
   }
 
@@ -148,20 +152,22 @@ export class OkrsService {
       id: keyResultId,
       objective: { id: objectiveId, org: { id: orgId } }
     });
+
+    if (updateKeyResultDto.title) {
+      keyResult.title = updateKeyResultDto.title;
+    }
+
     if (updateKeyResultDto.progress !== undefined && updateKeyResultDto.progress !== null) {
       keyResult.progress = updateKeyResultDto.progress;
-      const savedKeyResult = await this.keyResultRepository.save(keyResult);
-      await this.updateObjectiveProgress(await keyResult.objective);
-      return await KeyResultMapper.toDTO(savedKeyResult);
     }
 
     if (updateKeyResultDto.status) {
       keyResult.status = Object.values(OKRStatus).find(status => status === updateKeyResultDto.status);
-      const savedKeyResult = await this.keyResultRepository.save(keyResult);
-      return await KeyResultMapper.toDTO(savedKeyResult);
     }
 
-    throw new Error("Invalid patch key result dto");
+    const savedKeyResult = await this.keyResultRepository.save(keyResult);
+    await this.updateObjectiveProgress(await keyResult.objective);
+    return await KeyResultMapper.toDTO(savedKeyResult);
   }
 
   async getKeyResult(id: string) {
@@ -211,5 +217,11 @@ export class OkrsService {
 
   private async removeKeyResultAssociations(id: string) {
     await this.featureRepository.update({ keyResult: { id } }, { keyResult: null });
+  }
+
+  async deleteKeyResult(orgId: any, objectiveId: string, keyResultId: string) {
+    await this.removeKeyResultAssociations(keyResultId);
+    await this.keyResultRepository.delete({ id: keyResultId, objective: { id: objectiveId, org: { id: orgId } } });
+    await this.updateObjectiveProgress(await this.objectiveRepository.findOneBy({ id: objectiveId }));
   }
 }

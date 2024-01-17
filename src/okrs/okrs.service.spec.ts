@@ -409,6 +409,24 @@ describe("OkrsService", () => {
       expect(updatedKR.progress).toEqual(0);
     });
   });
+  describe("when updating a key result title", () => {
+    it("should update the key result title", async () => {
+      const org = await createTestOrg();
+      const okr = await service.create(org.id, {
+        objective: {
+          title: "My OKR"
+        },
+        keyResults: [
+          { title: "My KR 1" },
+          { title: "My KR 2" },
+          { title: "My KR 3" }
+        ]
+      });
+      await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { title: "Updated KR 1" });
+      const updatedKR = await service.getKeyResult(okr.keyResults[0].id);
+      expect(updatedKR.title).toEqual("Updated KR 1");
+    });
+  });
   describe("when listing key results", () => {
     it("should return an empty array", async () => {
       const org = await createTestOrg();
@@ -467,6 +485,36 @@ describe("OkrsService", () => {
       await service.patchObjective(org.id, objective.id, { status: "off-track" });
       const storedOKR = await service.get(org.id, objective.id);
       expect(storedOKR.objective.status).toEqual("off-track");
+    });
+  });
+  describe("when deleting a key result", () => {
+    it("should delete the key result", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      const keyResult = await service.createKeyResult(objective, "Test Key Result");
+      await service.deleteKeyResult(org.id, objective.id, keyResult.id);
+      await expect(service.getKeyResult(keyResult.id)).rejects.toThrow();
+    });
+    it("should update the objective progress", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      const keyResult = await service.createKeyResult(objective, "Test Key Result");
+      await service.patchKeyResult(org.id, objective.id, keyResult.id, { progress: 0.5 });
+      await service.deleteKeyResult(org.id, objective.id, keyResult.id);
+      const updatedObjective = await service.getObjective(objective.id);
+      expect(updatedObjective.progress).toEqual(0);
     });
   });
 });
