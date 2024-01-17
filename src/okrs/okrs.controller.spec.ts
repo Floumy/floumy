@@ -576,4 +576,39 @@ describe("OkrsController", () => {
       expect(keyResults.map(kr => kr.title).sort()).toEqual(["My key result", "My key result 2", "My key result 3"]);
     });
   });
+  describe("when deleting a key result", () => {
+    it("should delete the key result", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        },
+        {
+          objective: {
+            title: "My OKR"
+          },
+          keyResults: [
+            { title: "My key result" }
+          ]
+        });
+      await controller.deleteKeyResult(
+        okr.objective.id,
+        okr.keyResults[0].id,
+        {
+          user: {
+            org: org.id
+          }
+        }
+      );
+      const okr2 = await controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(okr2.keyResults.length).toEqual(0);
+    });
+  });
 });

@@ -109,4 +109,14 @@ export class OkrsController {
       updateObjectiveDto
     );
   }
+
+  @Delete(":objectiveId/key-results/:keyResultId")
+  @HttpCode(HttpStatus.OK)
+  async deleteKeyResult(
+    @Param("objectiveId") objectiveId: string,
+    @Param("keyResultId") keyResultId: string,
+    @Request() request) {
+    const { org: orgId } = request.user;
+    await this.okrsService.deleteKeyResult(orgId, objectiveId, keyResultId);
+  }
 }
