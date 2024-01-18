@@ -241,7 +241,7 @@ describe("OkrsService", () => {
         org.id,
         { title: "Test Objective" }
       );
-      await service.createKeyResult(objective, "Test Key Result");
+      await service.createKeyResultFor(objective, "Test Key Result");
       await service.delete(org.id, objective.id);
       await expect(service.get(org.id, objective.id)).rejects.toThrow();
     });
@@ -254,7 +254,7 @@ describe("OkrsService", () => {
           timeline: "this-quarter"
         }
       );
-      const keyResult = await service.createKeyResult(objective, "Test Key Result");
+      const keyResult = await service.createKeyResultFor(objective, "Test Key Result");
       const feature = new Feature();
       feature.org = Promise.resolve(org);
       feature.title = "Test Feature";
@@ -335,7 +335,7 @@ describe("OkrsService", () => {
         ]
       });
       await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { progress: 0.5 });
-      const updatedKR = await service.getKeyResult(okr.keyResults[0].id);
+      const updatedKR = await service.getKeyResultBy(okr.keyResults[0].id);
       expect(updatedKR.progress).toEqual(0.5);
     });
     it("should update the objective progress", async () => {
@@ -389,7 +389,7 @@ describe("OkrsService", () => {
         ]
       });
       await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { status: "off-track" });
-      const updatedKR = await service.getKeyResult(okr.keyResults[0].id);
+      const updatedKR = await service.getKeyResultBy(okr.keyResults[0].id);
       expect(updatedKR.status).toEqual("off-track");
     });
     it("should be able to update the key result progress to 0", async () => {
@@ -405,7 +405,7 @@ describe("OkrsService", () => {
         ]
       });
       await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { progress: 0 });
-      const updatedKR = await service.getKeyResult(okr.keyResults[0].id);
+      const updatedKR = await service.getKeyResultBy(okr.keyResults[0].id);
       expect(updatedKR.progress).toEqual(0);
     });
   });
@@ -423,7 +423,7 @@ describe("OkrsService", () => {
         ]
       });
       await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { title: "Updated KR 1" });
-      const updatedKR = await service.getKeyResult(okr.keyResults[0].id);
+      const updatedKR = await service.getKeyResultBy(okr.keyResults[0].id);
       expect(updatedKR.title).toEqual("Updated KR 1");
     });
   });
@@ -439,7 +439,7 @@ describe("OkrsService", () => {
         org.id,
         { title: "Test Objective" }
       );
-      await service.createKeyResult(objective, "Test Key Result");
+      await service.createKeyResultFor(objective, "Test Key Result");
       const keyResults = await service.listKeyResults(org.id);
       expect(keyResults).toHaveLength(1);
       expect(keyResults[0].title).toEqual("Test Key Result");
@@ -497,9 +497,9 @@ describe("OkrsService", () => {
           timeline: "this-quarter"
         }
       );
-      const keyResult = await service.createKeyResult(objective, "Test Key Result");
+      const keyResult = await service.createKeyResultFor(objective, "Test Key Result");
       await service.deleteKeyResult(org.id, objective.id, keyResult.id);
-      await expect(service.getKeyResult(keyResult.id)).rejects.toThrow();
+      await expect(service.getKeyResultBy(keyResult.id)).rejects.toThrow();
     });
     it("should update the objective progress", async () => {
       const org = await createTestOrg();
@@ -510,11 +510,103 @@ describe("OkrsService", () => {
           timeline: "this-quarter"
         }
       );
-      const keyResult = await service.createKeyResult(objective, "Test Key Result");
+      const keyResult = await service.createKeyResultFor(objective, "Test Key Result");
       await service.patchKeyResult(org.id, objective.id, keyResult.id, { progress: 0.5 });
       await service.deleteKeyResult(org.id, objective.id, keyResult.id);
       const updatedObjective = await service.getObjective(objective.id);
       expect(updatedObjective.progress).toEqual(0);
+    });
+  });
+  describe("when updating a key result", () => {
+    it("should update the key result", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      const keyResult = await service.createKeyResultFor(objective, "Test Key Result");
+      await service.updateKeyResult(org.id, objective.id, keyResult.id, {
+        title: "Updated Key Result",
+        progress: 0.5,
+        status: "off-track"
+      });
+      const updatedKR = await service.getKeyResultBy(keyResult.id);
+      expect(updatedKR.title).toEqual("Updated Key Result");
+      expect(updatedKR.progress).toEqual(0.5);
+      expect(updatedKR.status).toEqual("off-track");
+    });
+    it("should update the objective progress", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      const keyResult = await service.createKeyResultFor(objective, "Test Key Result");
+      await service.updateKeyResult(org.id, objective.id, keyResult.id, {
+        title: "Updated Key Result",
+        progress: 0.5,
+        status: "off-track"
+      });
+      const updatedObjective = await service.getObjective(objective.id);
+      expect(updatedObjective.progress).toEqual(0.5);
+    });
+  });
+  describe("when creating a key result", () => {
+    it("should create the key result", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      const keyResult = await service.createKeyResult(org.id, objective.id, {
+        title: "Test Key Result",
+        progress: 0.5,
+        status: "off-track"
+      });
+      const storedKR = await service.getKeyResultBy(keyResult.id);
+      expect(storedKR.title).toEqual("Test Key Result");
+      expect(storedKR.progress).toEqual(0.5);
+      expect(storedKR.status).toEqual("off-track");
+    });
+    it("should update the objective progress", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        {
+          title: "Test Objective",
+          timeline: "this-quarter"
+        }
+      );
+      await service.createKeyResult(org.id, objective.id, {
+        title: "Test Key Result",
+        progress: 0.5,
+        status: "off-track"
+      });
+      const updatedObjective = await service.getObjective(objective.id);
+      expect(updatedObjective.progress).toEqual(0.5);
+    });
+  });
+  describe("when getting a key result", () => {
+    it("should return the key result", async () => {
+      const org = await createTestOrg();
+      const objective = await service.createObjective(
+        org.id,
+        { title: "Test Objective" }
+      );
+      const keyResult = await service.createKeyResultFor(objective, "Test Key Result");
+      const storedKR = await service.getKeyResult(org.id, objective.id, keyResult.id);
+      expect(storedKR.title).toEqual("Test Key Result");
+      expect(storedKR.progress).toEqual(0);
+      expect(storedKR.status).toEqual("on-track");
     });
   });
 });

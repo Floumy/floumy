@@ -110,6 +110,25 @@ export class OkrsController {
     );
   }
 
+  @Put(":objectiveId/key-results/:keyResultId")
+  @HttpCode(HttpStatus.OK)
+  async updateKeyResult(@Param("objectiveId") objectiveId: string,
+                        @Param("keyResultId") keyResultId: string,
+                        @Request() request,
+                        @Body() updateKeyResultDto: CreateOrUpdateKeyResultDto) {
+    const { org: orgId } = request.user;
+    try {
+      return await this.okrsService.updateKeyResult(
+        orgId,
+        objectiveId,
+        keyResultId,
+        updateKeyResultDto
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
   @Delete(":objectiveId/key-results/:keyResultId")
   @HttpCode(HttpStatus.OK)
   async deleteKeyResult(
@@ -118,5 +137,27 @@ export class OkrsController {
     @Request() request) {
     const { org: orgId } = request.user;
     await this.okrsService.deleteKeyResult(orgId, objectiveId, keyResultId);
+  }
+
+  @Post(":objectiveId/key-results")
+  @HttpCode(HttpStatus.CREATED)
+  async createKeyResult(@Param("objectiveId") objectiveId: string, @Request() request, @Body() createKeyResultDto: CreateOrUpdateKeyResultDto) {
+    const { org: orgId } = request.user;
+    try {
+      return await this.okrsService.createKeyResult(orgId, objectiveId, createKeyResultDto);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Get(":objectiveId/key-results/:keyResultId")
+  @HttpCode(HttpStatus.OK)
+  async getKeyResult(@Param("objectiveId") objectiveId: string, @Param("keyResultId") keyResultId: string, @Request() request) {
+    const { org: orgId } = request.user;
+    try {
+      return await this.okrsService.getKeyResult(orgId, objectiveId, keyResultId);
+    } catch (e) {
+      throw new NotFoundException();
+    }
   }
 }

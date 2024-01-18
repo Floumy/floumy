@@ -577,4 +577,70 @@ describe("OKRs (e2e)", () => {
         .expect(HttpStatus.OK);
     });
   });
+  describe("Key Result (PUT)", () => {
+    it("should return 200", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+            objective: { title: "My OKR" },
+            keyResults: [{ title: "My Key Result 1" }]
+          }
+        );
+
+      return request(app.getHttpServer())
+        .put(`/okrs/${okrResponse.body.objective.id}/key-results/${okrResponse.body.keyResults[0].id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "My Other Key Result 1",
+          status: "off-track",
+          progress: 0.5
+        })
+        .expect(HttpStatus.OK);
+    });
+  });
+  describe("Key Result (POST)", () => {
+    it("should return 201", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ objective: { title: "My OKR" } });
+
+      return request(app.getHttpServer())
+        .post(`/okrs/${okrResponse.body.objective.id}/key-results`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          title: "My Key Result 1",
+          status: "off-track",
+          progress: 0.5
+        })
+        .expect(HttpStatus.CREATED)
+        .expect(({ body }) => {
+          expect(body.id).toBeDefined();
+          expect(body.title).toEqual("My Key Result 1");
+        });
+    });
+  });
+  describe("Key Result (GET)", () => {
+    it("should return 200", async () => {
+      const okrResponse = await request(app.getHttpServer())
+        .post("/okrs")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({
+          objective: { title: "My OKR" },
+          keyResults: [{ title: "My Key Result 1" }]
+        });
+
+      return request(app.getHttpServer())
+        .get(`/okrs/${okrResponse.body.objective.id}/key-results/${okrResponse.body.keyResults[0].id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(HttpStatus.OK)
+        .expect(({ body }) => {
+          expect(body.id).toEqual(okrResponse.body.keyResults[0].id);
+          expect(body.title).toEqual("My Key Result 1");
+          expect(body.createdAt).toBeDefined();
+          expect(body.updatedAt).toBeDefined();
+        });
+    });
+  });
 });

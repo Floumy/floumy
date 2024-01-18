@@ -38,7 +38,7 @@ export class OkrsService {
     return await this.objectiveRepository.save(newObjective);
   }
 
-  async createKeyResult(objective: Objective, title: string) {
+  async createKeyResultFor(objective: Objective, title: string) {
     if (!title) throw new Error("Key Result title is required");
     const keyResultEntity = new KeyResult();
     keyResultEntity.title = title;
@@ -94,7 +94,7 @@ export class OkrsService {
     const objective = await this.createObjective(orgId, okrDto.objective);
     if (!okrDto.keyResults || okrDto.keyResults.length === 0) return await OKRMapper.toDTO(objective, []);
 
-    const keyResults = await Promise.all(okrDto.keyResults.map(keyResult => this.createKeyResult(objective, keyResult.title)));
+    const keyResults = await Promise.all(okrDto.keyResults.map(keyResult => this.createKeyResultFor(objective, keyResult.title)));
 
     return await OKRMapper.toDTO(objective, keyResults);
   }
@@ -120,7 +120,7 @@ export class OkrsService {
       if (keyResult.id) {
         await this.keyResultRepository.update({ id: keyResult.id }, { title: keyResult.title });
       } else {
-        await this.createKeyResult(objective, keyResult.title);
+        await this.createKeyResultFor(objective, keyResult.title);
       }
     }
   }
@@ -170,7 +170,7 @@ export class OkrsService {
     return await KeyResultMapper.toDTO(savedKeyResult);
   }
 
-  async getKeyResult(id: string) {
+  async getKeyResultBy(id: string) {
     return await this.keyResultRepository.findOneByOrFail({ id });
   }
 
@@ -219,9 +219,55 @@ export class OkrsService {
     await this.featureRepository.update({ keyResult: { id } }, { keyResult: null });
   }
 
-  async deleteKeyResult(orgId: any, objectiveId: string, keyResultId: string) {
+  async deleteKeyResult(orgId: string, objectiveId: string, keyResultId: string) {
     await this.removeKeyResultAssociations(keyResultId);
     await this.keyResultRepository.delete({ id: keyResultId, objective: { id: objectiveId, org: { id: orgId } } });
     await this.updateObjectiveProgress(await this.objectiveRepository.findOneBy({ id: objectiveId }));
+  }
+
+  async updateKeyResult(orgId: string, objectiveId: string, keyResultId: string, updateKeyResultDto: CreateOrUpdateKeyResultDto) {
+    const keyResult = await this.keyResultRepository.findOneByOrFail({
+      id: keyResultId,
+      objective: { id: objectiveId, org: { id: orgId } }
+    });
+
+    this.validateCreateOrUpdateKeyResult(updateKeyResultDto);
+
+    keyResult.title = updateKeyResultDto.title;
+    keyResult.progress = updateKeyResultDto.progress;
+    keyResult.status = Object.values(OKRStatus).find(status => status === updateKeyResultDto.status);
+
+    const savedKeyResult = await this.keyResultRepository.save(keyResult);
+    await this.updateObjectiveProgress(await keyResult.objective);
+    return await KeyResultMapper.toDTO(savedKeyResult);
+  }
+
+  private validateCreateOrUpdateKeyResult(updateKeyResultDto: CreateOrUpdateKeyResultDto) {
+    if (!updateKeyResultDto.title) throw new Error("Key Result title is required");
+    if (updateKeyResultDto.progress === undefined || updateKeyResultDto.progress === null) throw new Error("Key Result progress is required");
+    if (!updateKeyResultDto.status) throw new Error("Key Result status is required");
+    if (!Object.values(OKRStatus).find(status => status === updateKeyResultDto.status)) throw new Error("Key Result status is invalid");
+  }
+
+  async createKeyResult(orgId: string, objectiveId: string, createKeyResultDto: CreateOrUpdateKeyResultDto) {
+    const objective = await this.objectiveRepository.findOneByOrFail({ id: objectiveId, org: { id: orgId } });
+    this.validateCreateOrUpdateKeyResult(createKeyResultDto);
+    const keyResult = new KeyResult();
+    keyResult.title = createKeyResultDto.title;
+    keyResult.progress = createKeyResultDto.progress;
+    keyResult.status = Object.values(OKRStatus).find(status => status === createKeyResultDto.status);
+    keyResult.objective = Promise.resolve(objective);
+    keyResult.org = Promise.resolve(await objective.org);
+    const savedKeyResult = await this.keyResultRepository.save(keyResult);
+    await this.updateObjectiveProgress(objective);
+    return await KeyResultMapper.toDTO(savedKeyResult);
+  }
+
+  async getKeyResult(orgId: string, objectiveId: string, keyResultId: string) {
+    const keyResult = await this.keyResultRepository.findOneByOrFail({
+      id: keyResultId,
+      objective: { id: objectiveId, org: { id: orgId } }
+    });
+    return await KeyResultMapper.toDTO(keyResult);
   }
 }

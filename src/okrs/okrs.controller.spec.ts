@@ -611,4 +611,109 @@ describe("OkrsController", () => {
       expect(okr2.keyResults.length).toEqual(0);
     });
   });
+  describe("when updating a key result", () => {
+    it("should update the key result", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        }, {
+          objective: {
+            title: "My OKR"
+          },
+          keyResults: [
+            { title: "My key result" }
+          ]
+        }
+      );
+      await controller.updateKeyResult(
+        okr.objective.id,
+        okr.keyResults[0].id,
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "My key result 2",
+          progress: 0.5,
+          status: "off-track"
+        }
+      );
+      const okr2 = await controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(okr2.keyResults[0].title).toEqual("My key result 2");
+    });
+  });
+  describe("when creating a key result", () => {
+    it("should create the key result", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        }, {
+          objective: {
+            title: "My OKR"
+          }
+        }
+      );
+      await controller.createKeyResult(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "My key result",
+          progress: 0.5,
+          status: "off-track"
+        }
+      );
+      const okr2 = await controller.get(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id
+          }
+        });
+      expect(okr2.keyResults.length).toEqual(1);
+      expect(okr2.keyResults[0].title).toEqual("My key result");
+    });
+  });
+  describe("When getting a key result", () => {
+    it("should return the key result", async () => {
+      const org = await createTestOrg();
+      const okr = await controller.create({
+          user: {
+            org: org.id
+          }
+        }, {
+          objective: {
+            title: "My OKR"
+          },
+          keyResults: [
+            { title: "My key result" }
+          ]
+        }
+      );
+      const keyResult = await controller.getKeyResult(
+        okr.objective.id,
+        okr.keyResults[0].id,
+        {
+          user: {
+            org: org.id
+          }
+        }
+      );
+      expect(keyResult.title).toEqual("My key result");
+    });
+  });
 });

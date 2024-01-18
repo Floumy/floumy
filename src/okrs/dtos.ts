@@ -21,6 +21,12 @@ interface PatchKeyResultDto {
   status?: string;
 }
 
+interface CreateOrUpdateKeyResultDto {
+  title: string;
+  progress: number;
+  status: string;
+}
+
 interface PatchObjectiveDto {
   title?: string;
   status?: string;
