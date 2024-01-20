@@ -240,4 +240,40 @@ describe("Backlog (e2e)", () => {
       expect(listWorkItemsResponse.body[0].status).toEqual("planned");
     });
   });
+  describe("/work-items/:id (PATCH)", () => {
+    it("should update a work item iteration", async () => {
+      const createIterationResponse = await request(app.getHttpServer())
+        .post("/iterations")
+        .send({
+          title: "Iteration 1",
+          description: "Iteration 1 description",
+          status: "planned"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      const iterationId = createIterationResponse.body.id;
+      const createWorkItemResponse = await request(app.getHttpServer())
+        .post("/work-items")
+        .send({
+          title: "Work Item 1",
+          description: "Work Item 1 description",
+          priority: "high",
+          status: "planned"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      const workItemId = createWorkItemResponse.body.id;
+      const updateWorkItemResponse = await request(app.getHttpServer())
+        .patch(`/work-items/${workItemId}`)
+        .send({
+          iteration: iterationId
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      expect(updateWorkItemResponse.statusCode).toEqual(200);
+      expect(updateWorkItemResponse.body.id).toEqual(workItemId);
+      expect(updateWorkItemResponse.body.title).toEqual("Work Item 1");
+      expect(updateWorkItemResponse.body.description).toEqual("Work Item 1 description");
+      expect(updateWorkItemResponse.body.priority).toEqual("high");
+      expect(updateWorkItemResponse.body.status).toEqual("planned");
+      expect(updateWorkItemResponse.body.iteration.id).toEqual(iterationId);
+    });
+  });
 });

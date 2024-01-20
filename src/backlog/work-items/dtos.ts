@@ -33,3 +33,7 @@ export interface WorkItemDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface WorkItemPatchDto {
+  iteration?: string;
+}

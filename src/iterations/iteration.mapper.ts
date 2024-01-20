@@ -11,6 +11,7 @@ function formatDate(date: Date) {
 class WorkItemMapper {
   static async toDto(workItem: WorkItem) {
     const feature = await workItem.feature;
+    const iteration = await workItem.iteration;
     return {
       id: workItem.id,
       title: workItem.title,
@@ -19,6 +20,7 @@ class WorkItemMapper {
       type: workItem.type,
       status: workItem.status,
       estimation: workItem.estimation,
+      iteration: iteration ? { id: iteration.id, title: iteration.title } : null,
       feature: feature ? FeatureMapper.toDto(feature) : null,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,

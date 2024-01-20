@@ -8,6 +8,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Put,
   Request,
@@ -15,7 +16,7 @@ import {
 } from "@nestjs/common";
 import { AuthGuard } from "../../auth/auth.guard";
 import { WorkItemsService } from "./work-items.service";
-import { CreateUpdateWorkItemDto, WorkItemDto } from "./dtos";
+import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from "./dtos";
 
 @Controller("work-items")
 @UseGuards(AuthGuard)
@@ -74,6 +75,16 @@ export class WorkItemsController {
       await this.workItemsService.deleteWorkItem(request.user.org, id);
     } catch (e) {
       throw new NotFoundException(e.message);
+    }
+  }
+
+  @Patch(":id")
+  @HttpCode(HttpStatus.OK)
+  async patch(@Request() request, @Param("id") id: string, @Body() workItemDto: WorkItemPatchDto) {
+    try {
+      return await this.workItemsService.patchWorkItem(request.user.org, id, workItemDto);
+    } catch (e) {
+      throw new BadRequestException(e.message);
     }
   }
 }

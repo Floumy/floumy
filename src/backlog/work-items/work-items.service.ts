@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CreateUpdateWorkItemDto } from "./dtos";
+import { CreateUpdateWorkItemDto, WorkItemPatchDto } from "./dtos";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Feature } from "../../roadmap/features/feature.entity";
 import { Repository } from "typeorm";
@@ -119,5 +119,21 @@ export class WorkItemsService {
       feature.progress = completedWorkItems.length / workItems.length * 100;
       await this.featuresRepository.save(feature);
     }
+  }
+
+  async patchWorkItem(orgId: string, workItemId: string, workItemPatchDto: WorkItemPatchDto) {
+    const workItem = await this.workItemsRepository.findOneByOrFail({ id: workItemId, org: { id: orgId } });
+    const currentIteration = await workItem.iteration;
+    if (workItemPatchDto.iteration) {
+      const iteration = await this.iterationsRepository.findOneByOrFail({
+        id: workItemPatchDto.iteration,
+        org: { id: orgId }
+      });
+      workItem.iteration = Promise.resolve(iteration);
+    } else if (currentIteration != null) {
+      workItem.iteration = Promise.resolve(null);
+    }
+    const savedWorkItem = await this.workItemsRepository.save(workItem);
+    return await WorkItemMapper.toDto(savedWorkItem);
   }
 }
