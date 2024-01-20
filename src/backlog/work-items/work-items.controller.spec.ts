@@ -20,17 +20,19 @@ import { WorkItemsService } from "./work-items.service";
 import { WorkItemStatus } from "./work-item-status.enum";
 import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
+import { IterationsService } from "../../iterations/iterations.service";
 
 describe("WorkItemsController", () => {
   let controller: WorkItemsController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let featureService: FeaturesService;
+  let iterationsService: IterationsService;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone, Iteration]), UsersModule],
-      [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService, WorkItemsService],
+      [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService, WorkItemsService, IterationsService],
       [WorkItemsController]
     );
     cleanup = dbCleanup;
@@ -44,6 +46,7 @@ describe("WorkItemsController", () => {
     );
     org = await orgsService.createForUser(user);
     featureService = module.get<FeaturesService>(FeaturesService);
+    iterationsService = module.get<IterationsService>(IterationsService);
   });
 
   afterEach(async () => {
@@ -321,6 +324,44 @@ describe("WorkItemsController", () => {
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
       expect(workItems[0].status).toEqual("planned");
+    });
+  });
+  describe("when patching a work item", () => {
+    it("should return the patched work item", async () => {
+      const workItem = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED
+        }
+      );
+      const iteration = await iterationsService.create(
+        org.id,
+        {
+          goal: "my iteration description",
+          startDate: "2019-01-01",
+          duration: 2
+        });
+      const updatedWorkItem = await controller.patch(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        workItem.id,
+        {
+          iteration: iteration.id
+        }
+      );
+      expect(updatedWorkItem.id).toEqual(workItem.id);
+      expect(updatedWorkItem.iteration.id).toEqual(iteration.id);
     });
   });
 });

@@ -795,4 +795,33 @@ describe("WorkItemsService", () => {
       expect(foundFeature.progress).toEqual(100);
     });
   });
+  describe("when patching a work item", () => {
+    it("should allow to patch the iteration", async () => {
+      await iterationService.create(org.id, {
+        goal: "my iteration description",
+        startDate: "2020-01-01",
+        duration: 7
+      });
+      const iteration2 = await iterationService.create(org.id, {
+        goal: "my iteration description",
+        startDate: "2020-01-01",
+        duration: 7
+      });
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 1",
+          description: "my work item description 1",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          status: WorkItemStatus.DONE
+        });
+      await service.patchWorkItem(org.id, workItem.id, {
+        iteration: iteration2.id
+      });
+      const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
+      expect(foundWorkItem.iteration.id).toEqual(iteration2.id);
+    });
+  });
 });
