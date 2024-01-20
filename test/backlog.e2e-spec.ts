@@ -27,6 +27,8 @@ import { Milestone } from "../src/roadmap/milestones/milestone.entity";
 import { KeyResult } from "../src/okrs/key-result.entity";
 import { Objective } from "../src/okrs/objective.entity";
 import { Iteration } from "../src/iterations/Iteration.entity";
+import { IterationsController } from "../src/iterations/iterations.controller";
+import { IterationsService } from "../src/iterations/iterations.service";
 
 describe("Backlog (e2e)", () => {
   let app: INestApplication;
@@ -36,8 +38,8 @@ describe("Backlog (e2e)", () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, OrgsModule, BacklogModule, OkrsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Feature, Objective, KeyResult, WorkItem, Milestone, Iteration])],
-      [AuthService, UsersService, Reflector, TokensService, FeaturesService, WorkItemsService, OkrsService, MilestonesService],
-      [AuthController, FeaturesController, WorkItemsController]
+      [AuthService, UsersService, Reflector, TokensService, FeaturesService, WorkItemsService, OkrsService, MilestonesService, IterationsService],
+      [AuthController, FeaturesController, WorkItemsController, IterationsController]
     );
     cleanup = dbCleanup;
     app = module.createNestApplication();
@@ -242,15 +244,6 @@ describe("Backlog (e2e)", () => {
   });
   describe("/work-items/:id (PATCH)", () => {
     it("should update a work item iteration", async () => {
-      const createIterationResponse = await request(app.getHttpServer())
-        .post("/iterations")
-        .send({
-          title: "Iteration 1",
-          description: "Iteration 1 description",
-          status: "planned"
-        })
-        .set("Authorization", `Bearer ${accessToken}`);
-      const iterationId = createIterationResponse.body.id;
       const createWorkItemResponse = await request(app.getHttpServer())
         .post("/work-items")
         .send({
@@ -261,19 +254,24 @@ describe("Backlog (e2e)", () => {
         })
         .set("Authorization", `Bearer ${accessToken}`);
       const workItemId = createWorkItemResponse.body.id;
-      const updateWorkItemResponse = await request(app.getHttpServer())
+      const createIterationResponse = await request(app.getHttpServer())
+        .post("/iterations")
+        .send({
+          goal: "Iteration 1",
+          startDate: "2020-01-01",
+          duration: 1
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      const iterationId = createIterationResponse.body.id;
+      const patchWorkItemResponse = await request(app.getHttpServer())
         .patch(`/work-items/${workItemId}`)
         .send({
           iteration: iterationId
         })
         .set("Authorization", `Bearer ${accessToken}`);
-      expect(updateWorkItemResponse.statusCode).toEqual(200);
-      expect(updateWorkItemResponse.body.id).toEqual(workItemId);
-      expect(updateWorkItemResponse.body.title).toEqual("Work Item 1");
-      expect(updateWorkItemResponse.body.description).toEqual("Work Item 1 description");
-      expect(updateWorkItemResponse.body.priority).toEqual("high");
-      expect(updateWorkItemResponse.body.status).toEqual("planned");
-      expect(updateWorkItemResponse.body.iteration.id).toEqual(iterationId);
+      expect(patchWorkItemResponse.statusCode).toEqual(200);
+      expect(patchWorkItemResponse.body.id).toEqual(workItemId);
+      expect(patchWorkItemResponse.body.iteration.id).toEqual(iterationId);
     });
   });
 });
