@@ -327,7 +327,7 @@ describe("WorkItemsController", () => {
     });
   });
   describe("when patching a work item", () => {
-    it("should return the patched work item", async () => {
+    it("should update the iteration", async () => {
       const workItem = await controller.create(
         {
           user: {
@@ -362,6 +362,35 @@ describe("WorkItemsController", () => {
       );
       expect(updatedWorkItem.id).toEqual(workItem.id);
       expect(updatedWorkItem.iteration.id).toEqual(iteration.id);
+    });
+    it("should update the status", async () => {
+      const workItem = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED
+        }
+      );
+      const updatedWorkItem = await controller.patch(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        workItem.id,
+        {
+          status: WorkItemStatus.IN_PROGRESS
+        }
+      );
+      expect(updatedWorkItem.id).toEqual(workItem.id);
+      expect(updatedWorkItem.status).toEqual(WorkItemStatus.IN_PROGRESS);
     });
   });
 });
