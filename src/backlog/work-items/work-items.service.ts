@@ -124,16 +124,30 @@ export class WorkItemsService {
   async patchWorkItem(orgId: string, workItemId: string, workItemPatchDto: WorkItemPatchDto) {
     const workItem = await this.workItemsRepository.findOneByOrFail({ id: workItemId, org: { id: orgId } });
     const currentIteration = await workItem.iteration;
+
+    await this.updateIteration(workItem, workItemPatchDto, orgId, currentIteration);
+    this.updateStatusAndCompletionDate(workItem, workItemPatchDto);
+
+    const savedWorkItem = await this.workItemsRepository.save(workItem);
+    return WorkItemMapper.toDto(savedWorkItem);
+  }
+
+  private async updateIteration(workItem: WorkItem, workItemPatchDto: WorkItemPatchDto, orgId: string, currentIteration: Iteration) {
     if (workItemPatchDto.iteration) {
       const iteration = await this.iterationsRepository.findOneByOrFail({
         id: workItemPatchDto.iteration,
         org: { id: orgId }
       });
       workItem.iteration = Promise.resolve(iteration);
-    } else if (currentIteration != null) {
+    } else if (currentIteration != null && workItemPatchDto.iteration === null) {
       workItem.iteration = Promise.resolve(null);
     }
-    const savedWorkItem = await this.workItemsRepository.save(workItem);
-    return await WorkItemMapper.toDto(savedWorkItem);
+  }
+
+  private updateStatusAndCompletionDate(workItem: WorkItem, workItemPatchDto: WorkItemPatchDto) {
+    if (workItemPatchDto.status) {
+      workItem.status = workItemPatchDto.status;
+      workItem.completedAt = [WorkItemStatus.DONE, WorkItemStatus.CLOSED].includes(workItemPatchDto.status) ? new Date() : null;
+    }
   }
 }

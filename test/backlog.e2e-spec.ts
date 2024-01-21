@@ -273,5 +273,27 @@ describe("Backlog (e2e)", () => {
       expect(patchWorkItemResponse.body.id).toEqual(workItemId);
       expect(patchWorkItemResponse.body.iteration.id).toEqual(iterationId);
     });
+    it("should update the work item status", async () => {
+      const createWorkItemResponse = await request(app.getHttpServer())
+        .post("/work-items")
+        .send({
+          title: "Work Item 1",
+          description: "Work Item 1 description",
+          priority: "high",
+          status: "planned"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      const workItemId = createWorkItemResponse.body.id;
+      const patchWorkItemResponse = await request(app.getHttpServer())
+        .patch(`/work-items/${workItemId}`)
+        .send({
+          status: "done"
+        })
+        .set("Authorization", `Bearer ${accessToken}`);
+      expect(patchWorkItemResponse.statusCode).toEqual(200);
+      expect(patchWorkItemResponse.body.id).toEqual(workItemId);
+      expect(patchWorkItemResponse.body.status).toEqual("done");
+      expect(patchWorkItemResponse.body.completedAt).toBeDefined();
+    });
   });
 });

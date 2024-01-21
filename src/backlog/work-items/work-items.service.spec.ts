@@ -823,5 +823,22 @@ describe("WorkItemsService", () => {
       const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
       expect(foundWorkItem.iteration.id).toEqual(iteration2.id);
     });
+    it("should allow to patch the status", async () => {
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 1",
+          description: "my work item description 1",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          status: WorkItemStatus.DONE
+        });
+      await service.patchWorkItem(org.id, workItem.id, {
+        status: WorkItemStatus.IN_PROGRESS
+      });
+      const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
+      expect(foundWorkItem.status).toEqual(WorkItemStatus.IN_PROGRESS);
+    });
   });
 });
