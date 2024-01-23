@@ -156,12 +156,12 @@ export class WorkItemsService {
 
   async uploadFiles(files: Array<Express.Multer.File>) {
     const s3Client = new S3Client({
-      endpoint: "https://fra1.digitaloceanspaces.com", // Find your endpoint in the control panel, under Settings. Prepend "https://".
-      forcePathStyle: false, // Configures to use subdomain/virtual calling format.
+      endpoint: "https://fra1.digitaloceanspaces.com",
+      forcePathStyle: false,
       region: "fra1", // Must be "us-east-1" when creating new Spaces. Otherwise, use the region in your endpoint (for example, nyc3).
       credentials: {
-        accessKeyId: process.env.SPACES_KEY, // Access key pair. You can create access key pairs using the control panel or API.
-        secretAccessKey: process.env.SPACES_SECRET // Secret access key defined through an environment variable.
+        accessKeyId: process.env.SPACES_KEY,
+        secretAccessKey: process.env.SPACES_SECRET
       }
     });
     for (const file of files) {

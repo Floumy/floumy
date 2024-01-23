@@ -11,7 +11,7 @@ async function bootstrap() {
     origin: process.env.FRONTEND_URL,
     credentials: true
   });
-  app.use(bodyParser.json({ limit: "50mb" }));
+  app.use(bodyParser.json({ limit: "300mb" }));
   app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
   await app.listen(8080);
 }
