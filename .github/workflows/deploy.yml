@@ -32,11 +32,14 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
+          env: |
+            SPACES_KEY=${{ secrets.SPACES_KEY }}
+            SPACES_SECRET=${{ secrets.SPACES_SECRET }}
           script: |
             doctl auth switch --context floumy
             doctl registry login
             docker pull registry.digitalocean.com/floumy/api:latest
             docker stop api || true
             docker rm api || true
-            docker run -d --restart=always --name api -e FRONTEND_URL=https://staging.app.floumy.com -e DB_HOST=floumy-db -e DB_USERNAME=floumy -e DB_PASSWORD=floumy -e DB_DATABASE=floumy -e SPACES_KEY=${{ secrets.SPACES_KEY }} -e SPACES_SECRET=${{ secrets.SPACES_SECRET }} --network=floumy -p 4000:8080 registry.digitalocean.com/floumy/api:latest
+            docker run -d --restart=always --name api -e FRONTEND_URL=https://staging.app.floumy.com -e DB_HOST=floumy-db -e DB_USERNAME=floumy -e DB_PASSWORD=floumy -e DB_DATABASE=floumy -e SPACES_KEY=$SPACES_KEY -e SPACES_SECRET=$SPACES_SECRET --network=floumy -p 4000:8080 registry.digitalocean.com/floumy/api:latest
             docker image prune -f
