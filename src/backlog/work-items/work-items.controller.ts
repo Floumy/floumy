@@ -92,7 +92,7 @@ export class WorkItemsController {
   }
 
   @Post(":id/files")
-  @UseInterceptors(FilesInterceptor("files"))
+  @UseInterceptors(FilesInterceptor("files", 10, { limits: { fileSize: 250 * 1024 * 1024 } }))
   async uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
     return await this.workItemsService.uploadFiles(files);
   }
