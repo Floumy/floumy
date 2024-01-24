@@ -12,14 +12,11 @@ import {
   Post,
   Put,
   Request,
-  UploadedFiles,
-  UseGuards,
-  UseInterceptors
+  UseGuards
 } from "@nestjs/common";
 import { AuthGuard } from "../../auth/auth.guard";
 import { WorkItemsService } from "./work-items.service";
 import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from "./dtos";
-import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller("work-items")
 @UseGuards(AuthGuard)
@@ -89,11 +86,5 @@ export class WorkItemsController {
     } catch (e) {
       throw new BadRequestException(e.message);
     }
-  }
-
-  @Post(":id/files")
-  @UseInterceptors(FilesInterceptor("files", 10, { limits: { fileSize: 250 * 1024 * 1024 } }))
-  async uploadFile(@UploadedFiles() files: Array<Express.Multer.File>) {
-    return await this.workItemsService.uploadFiles(files);
   }
 }
