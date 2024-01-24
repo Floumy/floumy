@@ -1,9 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { v4 as uuidV4 } from "uuid";
 
 @Injectable()
 export class FilesService {
-  async uploadFile(filename: string, file: Express.Multer.File) {
+  async uploadFile(file: Express.Multer.File) {
+    const filename = `${uuidV4()}-${file.originalname}`;
     const s3Client = new S3Client({
       endpoint: "https://fra1.digitaloceanspaces.com",
       forcePathStyle: false,
@@ -19,5 +21,6 @@ export class FilesService {
       Body: file.buffer,
       ACL: "public-read"
     }));
+    return filename;
   }
 }
