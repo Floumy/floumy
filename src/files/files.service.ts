@@ -21,6 +21,6 @@ export class FilesService {
       Body: file.buffer,
       ACL: "public-read"
     }));
-    return filename;
+    return { filename };
   }
 }
