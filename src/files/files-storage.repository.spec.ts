@@ -1,18 +1,18 @@
-import { FilesService } from "./files.service";
+import { FilesStorageRepository } from "./files-storage.repository";
 import { setupTestingModule } from "../../test/test.utils";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Org } from "../orgs/org.entity";
 import { UsersModule } from "../users/users.module";
 import { AuthModule } from "../auth/auth.module";
 import { BacklogModule } from "../backlog/backlog.module";
-import { FilesStorageRepository } from "./files-storage.repository";
+import { FilesService } from "./files.service";
 import { WorkItemsController } from "../backlog/work-items/work-items.controller";
 import { FilesController } from "./files.controller";
 import { OrgsService } from "../orgs/orgs.service";
 import { UsersService } from "../users/users.service";
 
-describe("FilesService", () => {
-  let service: FilesService;
+describe("FilesStorageRepository", () => {
+  let service: FilesStorageRepository;
   let cleanup: () => Promise<void>;
   let org: Org;
 
@@ -31,7 +31,7 @@ describe("FilesService", () => {
     );
     cleanup = dbCleanup;
 
-    service = module.get<FilesService>(FilesService);
+    service = module.get<FilesStorageRepository>(FilesStorageRepository);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
     const user = await usersService.create(
