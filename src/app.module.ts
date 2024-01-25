@@ -14,11 +14,12 @@ import { FilesModule } from "./files/files.module";
 import databaseConfig from "./config/database.config";
 import encryptionConfig from "./config/encryption.config";
 import jwtConfig from "./config/jwt.config";
+import fileStorageConfig from "./config/file-storage.config";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [databaseConfig, encryptionConfig, jwtConfig]
+      load: [databaseConfig, encryptionConfig, jwtConfig, fileStorageConfig]
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
@@ -35,6 +36,7 @@ import jwtConfig from "./config/jwt.config";
       inject: [ConfigService],
       imports: [ConfigModule]
     }),
+
     AuthModule,
     UsersModule,
     OkrsModule,
