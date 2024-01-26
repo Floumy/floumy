@@ -10,15 +10,16 @@ import { S3Client } from "@aws-sdk/client-s3";
 const s3ClientProvider = {
   provide: "S3_CLIENT",
   useFactory: (configService: ConfigService) => {
-    return new S3Client({
-      endpoint: configService.get("SPACES_ENDPOINT"),
-      forcePathStyle: configService.get("SPACES_FORCE_PATH_STYLE"),
-      region: configService.get("SPACES_REGION"),
+    const configuration = {
+      endpoint: configService.get("fileStorage.endpoint"),
+      forcePathStyle: configService.get("fileStorage.forcePathStyle"),
+      region: configService.get("fileStorage.region"),
       credentials: {
-        accessKeyId: configService.get("SPACES_KEY"),
-        secretAccessKey: configService.get("SPACES_SECRET")
+        accessKeyId: configService.get("fileStorage.credentials.accessKeyId"),
+        secretAccessKey: configService.get("fileStorage.credentials.secretAccessKey")
       }
-    });
+    };
+    return new S3Client(configuration);
   },
   inject: [ConfigService]
 };
