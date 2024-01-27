@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
@@ -14,6 +14,13 @@ export class FilesStorageRepository {
       Key: key,
       Body: fileBuffer,
       ACL: "private"
+    }));
+  }
+
+  async getObject(path: string) {
+    return await this.s3Client.send(new GetObjectCommand({
+      Bucket: this.configService.get("fileStorage.bucket"),
+      Key: path
     }));
   }
 }
