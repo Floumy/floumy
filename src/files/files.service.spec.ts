@@ -19,7 +19,12 @@ describe("FilesService", () => {
 
   beforeEach(async () => {
     const mockS3Client = {
-      send: jest.fn()
+      send: jest.fn().mockImplementation(() => ({
+        $metadata: {
+          httpStatusCode: 200
+        },
+        Location: "https://test-bucket.nyc3.digitaloceanspaces.com"
+      }))
     };
 
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -66,6 +71,38 @@ describe("FilesService", () => {
         size: 9,
         type: "text/plain"
       });
+    });
+  });
+
+  describe("getFile", () => {
+    it("should get a file", async () => {
+      const file = {
+        originalname: "test.txt",
+        mimetype: "text/plain",
+        size: 9,
+        buffer: Buffer.from("Test file")
+      };
+      const uploadedFile = await service.uploadFile(org.id, file as any);
+      const result = await service.getFile(org.id, uploadedFile.id);
+      expect(result.id).toEqual(uploadedFile.id);
+      expect(result.name).toEqual("test.txt");
+      expect(result.size).toEqual(9);
+      expect(result.type).toEqual("text/plain");
+      expect(result.object).toBeDefined();
+    });
+  });
+
+  describe("deleteFile", () => {
+    it("should delete a file", async () => {
+      const file = {
+        originalname: "test.txt",
+        mimetype: "text/plain",
+        size: 9,
+        buffer: Buffer.from("Test file")
+      };
+      const uploadedFile = await service.uploadFile(org.id, file as any);
+      await service.deleteFile(org.id, uploadedFile.id);
+      await expect(service.getFile(org.id, uploadedFile.id)).rejects.toThrow();
     });
   });
 });

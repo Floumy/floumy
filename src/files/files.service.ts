@@ -38,4 +38,10 @@ export class FilesService {
       object: await this.filesStorageRepository.getObject(file.path)
     };
   }
+
+  async deleteFile(orgId: string, fileId: string) {
+    const file = await this.filesRepository.findOneByOrFail({ id: fileId, org: { id: orgId } });
+    await this.filesStorageRepository.deleteObject(file.path);
+    await this.filesRepository.delete(file.id);
+  }
 }
