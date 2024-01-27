@@ -30,7 +30,7 @@ export class FilesController {
   @UseInterceptors(FileInterceptor("file"))
   async uploadFile(@UploadedFile(new ParseFilePipe({
                        validators: [
-                         new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 })
+                         new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 })
                        ]
                      })) file: Express.Multer.File,
                    @Request() request) {
