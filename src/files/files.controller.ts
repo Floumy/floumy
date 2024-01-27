@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Header,
   HttpStatus,
@@ -36,9 +37,9 @@ export class FilesController {
     return await this.filesService.uploadFile(request.user.org, file);
   }
 
-  @Get("/:fileId")
+  @Get("/:id")
   @Header("Access-Control-Expose-Headers", "Content-Disposition")
-  async getFile(@Param("fileId") fileId: string, @Request() request, @Response() response) {
+  async getFile(@Param("id") fileId: string, @Request() request, @Response() response) {
     try {
       const file = await this.filesService.getFile(request.user.org, fileId);
       response.setHeader("Content-Type", file.object.ContentType);
@@ -51,7 +52,12 @@ export class FilesController {
         response.status(HttpStatus.INTERNAL_SERVER_ERROR).send();
       }
     } catch (e) {
-      response.status(HttpStatus.INTERNAL_SERVER_ERROR).send();
+      response.status(HttpStatus.NOT_FOUND).send();
     }
+  }
+
+  @Delete("/:id")
+  async deleteFile(@Param("id") fileId: string, @Request() request) {
+    await this.filesService.deleteFile(request.user.org, fileId);
   }
 }

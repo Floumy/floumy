@@ -84,4 +84,24 @@ describe("Files (e2e)", () => {
       });
     });
   });
+
+  describe("DELETE /files/:id", () => {
+    it("should delete a file", async () => {
+      const uploadResponse = await request(app.getHttpServer())
+        .post("/files")
+        .set("Authorization", `Bearer ${accessToken}`)
+        .attach("file", Buffer.from("test"), "test.txt")
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(`/files/${uploadResponse.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(200);
+
+      await request(app.getHttpServer())
+        .get(`/files/${uploadResponse.body.id}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(404);
+    });
+  });
 });

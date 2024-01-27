@@ -71,4 +71,22 @@ describe("FilesController", () => {
       expect(result.type).toEqual("text/plain");
     });
   });
+
+  describe("deleteFile", () => {
+    it("should delete a file", async () => {
+      const file = {
+        originalname: "test.txt",
+        size: 4,
+        mimetype: "text/plain",
+        buffer: Buffer.from("test")
+      };
+      const result = await controller.uploadFile(file as any, { user: { org: org.id } });
+      await controller.deleteFile(result.id, { user: { org: org.id } });
+
+      const response = { status: jest.fn().mockReturnValue({ send: jest.fn() }), send: jest.fn() };
+      const request = { user: { org: org.id } };
+      await controller.getFile(result.id, request, response);
+      expect(response.status).toHaveBeenCalledWith(404);
+    });
+  });
 });
