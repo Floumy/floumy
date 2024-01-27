@@ -26,8 +26,7 @@ export class FilesController {
                          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 })
                        ]
                      })) file: Express.Multer.File,
-                   @Request() request: any) {
-
+                   @Request() request) {
     return await this.filesService.uploadFile(request.user.org, file);
   }
 }

@@ -9,11 +9,11 @@ export class FilesStorageRepository {
   }
 
   async storeObject(key: string, fileBuffer: Buffer) {
-    await this.s3Client.send(new PutObjectCommand({
+    return await this.s3Client.send(new PutObjectCommand({
       Bucket: this.configService.get("fileStorage.bucket"),
       Key: key,
       Body: fileBuffer,
-      ACL: "public-read"
+      ACL: "private"
     }));
   }
 }

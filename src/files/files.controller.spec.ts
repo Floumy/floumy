@@ -10,6 +10,7 @@ import { WorkItemsController } from "../backlog/work-items/work-items.controller
 import { UsersService } from "../users/users.service";
 import { AuthModule } from "../auth/auth.module";
 import { BacklogModule } from "../backlog/backlog.module";
+import { File } from "./file.entity";
 
 describe("FilesController", () => {
   let controller: FilesController;
@@ -18,11 +19,16 @@ describe("FilesController", () => {
 
   beforeEach(async () => {
     const mockS3Client = {
-      send: jest.fn()
+      send: jest.fn().mockImplementation(() => ({
+        $metadata: {
+          httpStatusCode: 200
+        },
+        Location: "https://test-bucket.nyc3.digitaloceanspaces.com"
+      }))
     };
 
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org]), UsersModule, AuthModule, BacklogModule],
+      [TypeOrmModule.forFeature([Org, File]), UsersModule, AuthModule, BacklogModule],
       [FilesService, FilesStorageRepository, {
         provide: "S3_CLIENT",
         useValue: mockS3Client
@@ -48,5 +54,21 @@ describe("FilesController", () => {
 
   it("should be defined", () => {
     expect(controller).toBeDefined();
+  });
+
+  describe("uploadFile", () => {
+    it("should upload a file", async () => {
+      const file = {
+        originalname: "test.txt",
+        size: 4,
+        mimetype: "text/plain",
+        buffer: Buffer.from("test")
+      };
+      const result = await controller.uploadFile(file as any, { user: { org: org.id } });
+      expect(result.id).toBeDefined();
+      expect(result.name).toEqual("test.txt");
+      expect(result.size).toEqual(4);
+      expect(result.type).toEqual("text/plain");
+    });
   });
 });

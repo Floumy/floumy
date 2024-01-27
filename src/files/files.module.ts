@@ -6,6 +6,9 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { AuthModule } from "../auth/auth.module";
 import { UsersModule } from "../users/users.module";
 import { S3Client } from "@aws-sdk/client-s3";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { File } from "./file.entity";
+import { Org } from "../orgs/org.entity";
 
 const s3ClientProvider = {
   provide: "S3_CLIENT",
@@ -27,7 +30,7 @@ const s3ClientProvider = {
 @Module({
   controllers: [FilesController],
   providers: [FilesService, FilesStorageRepository, s3ClientProvider],
-  imports: [ConfigModule, AuthModule, UsersModule]
+  imports: [ConfigModule, AuthModule, UsersModule, TypeOrmModule.forFeature([Org, File])]
 })
 export class FilesModule {
 }
