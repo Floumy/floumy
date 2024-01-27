@@ -6,6 +6,7 @@ import { Feature } from "../roadmap/features/feature.entity";
 import { Milestone } from "../roadmap/milestones/milestone.entity";
 import { WorkItem } from "../backlog/work-items/work-item.entity";
 import { Iteration } from "../iterations/Iteration.entity";
+import { File } from "../files/file.entity";
 
 @Entity()
 export class Org {
@@ -29,4 +30,6 @@ export class Org {
   workItems: Promise<WorkItem[]>;
   @OneToMany(() => Iteration, iteration => iteration.org, { lazy: true })
   iterations: Promise<Iteration[]>;
+  @OneToMany(() => File, file => file.org, { lazy: true })
+  files: Promise<File[]>;
 }

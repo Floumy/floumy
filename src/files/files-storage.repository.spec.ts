@@ -10,6 +10,7 @@ import { WorkItemsController } from "../backlog/work-items/work-items.controller
 import { FilesController } from "./files.controller";
 import { OrgsService } from "../orgs/orgs.service";
 import { UsersService } from "../users/users.service";
+import { File } from "./file.entity";
 
 describe("FilesStorageRepository", () => {
   let service: FilesStorageRepository;
@@ -22,7 +23,7 @@ describe("FilesStorageRepository", () => {
     };
 
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org]), UsersModule, AuthModule, BacklogModule],
+      [TypeOrmModule.forFeature([Org, File]), UsersModule, AuthModule, BacklogModule],
       [FilesService, FilesStorageRepository, {
         provide: "S3_CLIENT",
         useValue: mockS3Client
