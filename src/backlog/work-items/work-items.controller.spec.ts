@@ -1,7 +1,7 @@
 import { WorkItemsController } from "./work-items.controller";
 import { Org } from "../../orgs/org.entity";
 import { setupTestingModule } from "../../../test/test.utils";
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { Feature } from "../../roadmap/features/feature.entity";
 import { UsersModule } from "../../users/users.module";
 import { OrgsService } from "../../orgs/orgs.service";
@@ -21,6 +21,9 @@ import { WorkItemStatus } from "./work-item-status.enum";
 import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
 import { IterationsService } from "../../iterations/iterations.service";
+import { File } from "../../files/file.entity";
+import { Repository } from "typeorm";
+import { WorkItemFile } from "./work-item-file.entity";
 
 describe("WorkItemsController", () => {
   let controller: WorkItemsController;
@@ -28,10 +31,11 @@ describe("WorkItemsController", () => {
   let org: Org;
   let featureService: FeaturesService;
   let iterationsService: IterationsService;
+  let fileRepository: Repository<File>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone, Iteration]), UsersModule],
+      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone, Iteration, File, WorkItemFile]), UsersModule],
       [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService, WorkItemsService, IterationsService],
       [WorkItemsController]
     );
@@ -47,6 +51,7 @@ describe("WorkItemsController", () => {
     org = await orgsService.createForUser(user);
     featureService = module.get<FeaturesService>(FeaturesService);
     iterationsService = module.get<IterationsService>(IterationsService);
+    fileRepository = module.get<Repository<File>>(getRepositoryToken(File));
   });
 
   afterEach(async () => {
@@ -90,6 +95,59 @@ describe("WorkItemsController", () => {
       expect(workItemResponse.feature).toBeDefined();
       expect(workItemResponse.feature.id).toEqual(feature.id);
       expect(workItemResponse.feature.title).toEqual(feature.title);
+    });
+    it("should create a work item with files", async () => {
+      const file1Entity = new File();
+      file1Entity.name = "file1";
+      file1Entity.path = "path1";
+      file1Entity.type = "image/png";
+      file1Entity.size = 100;
+      file1Entity.url = "url1";
+      file1Entity.org = Promise.resolve(org);
+      const file2Entity = new File();
+      file2Entity.name = "file2";
+      file2Entity.path = "path2";
+      file2Entity.type = "image/png";
+      file2Entity.size = 100;
+      file2Entity.url = "url2";
+      file2Entity.org = Promise.resolve(org);
+      const file1 = await fileRepository.save(file1Entity);
+      const file2 = await fileRepository.save(file2Entity);
+      const workItemResponse = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+          files: [
+            {
+              id: file1.id
+            },
+            {
+              id: file2.id
+            }
+          ]
+        }
+      );
+
+      expect(workItemResponse.id).toBeDefined();
+      expect(workItemResponse.title).toEqual("my work item");
+      expect(workItemResponse.description).toEqual("my work item description");
+      expect(workItemResponse.priority).toEqual("high");
+      expect(workItemResponse.type).toEqual("technical-debt");
+      expect(workItemResponse.createdAt).toBeDefined();
+      expect(workItemResponse.updatedAt).toBeDefined();
+      expect(workItemResponse.status).toEqual("planned");
+      expect(workItemResponse.files).toBeDefined();
+      expect(workItemResponse.files.length).toEqual(2);
+      expect(workItemResponse.files[0].id).toEqual(file1.id);
+      expect(workItemResponse.files[1].id).toEqual(file2.id);
     });
   });
   describe("when listing work items", () => {
@@ -236,6 +294,80 @@ describe("WorkItemsController", () => {
       expect(workItemResponse.feature).toBeDefined();
       expect(workItemResponse.feature.id).toEqual(feature.id);
       expect(workItemResponse.feature.title).toEqual(feature.title);
+    });
+    it("should update the work item with files", async () => {
+      const file1Entity = new File();
+      file1Entity.name = "file1";
+      file1Entity.path = "path1";
+      file1Entity.type = "image/png";
+      file1Entity.size = 100;
+      file1Entity.url = "url1";
+      file1Entity.org = Promise.resolve(org);
+      const file2Entity = new File();
+      file2Entity.name = "file2";
+      file2Entity.path = "path2";
+      file2Entity.type = "image/png";
+      file2Entity.size = 100;
+      file2Entity.url = "url2";
+      file2Entity.org = Promise.resolve(org);
+      const file1 = await fileRepository.save(file1Entity);
+      const file2 = await fileRepository.save(file2Entity);
+      const feature = await featureService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED
+        });
+      const workItem = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          feature: feature.id,
+          status: WorkItemStatus.PLANNED
+        }
+      );
+      const workItemResponse = await controller.update(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        workItem.id,
+        {
+          title: "my work item updated",
+          description: "my work item description updated",
+          priority: Priority.LOW,
+          type: WorkItemType.BUG,
+          status: WorkItemStatus.PLANNED,
+          files: [
+            {
+              id: file1.id
+            },
+            {
+              id: file2.id
+            }
+          ]
+        }
+      );
+
+      expect(workItemResponse.id).toBeDefined();
+      expect(workItemResponse.title).toEqual("my work item updated");
+      expect(workItemResponse.description).toEqual("my work item description updated");
+      expect(workItemResponse.priority).toEqual("low");
+      expect(workItemResponse.type).toEqual("bug");
+      expect(workItemResponse.createdAt).toBeDefined();
+      expect(workItemResponse.updatedAt).toBeDefined();
+      expect(workItemResponse.status).toEqual("planned");
+      expect(workItemResponse.files).toBeDefined();
     });
   });
   describe("when deleting a work item", () => {

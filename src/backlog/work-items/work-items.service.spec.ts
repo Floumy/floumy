@@ -6,7 +6,7 @@ import { OkrsService } from "../../okrs/okrs.service";
 import { OrgsService } from "../../orgs/orgs.service";
 import { Org } from "../../orgs/org.entity";
 import { setupTestingModule } from "../../../test/test.utils";
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { Objective } from "../../okrs/objective.entity";
 import { KeyResult } from "../../okrs/key-result.entity";
 import { Feature } from "../../roadmap/features/feature.entity";
@@ -14,18 +14,21 @@ import { User } from "../../users/user.entity";
 import { Milestone } from "../../roadmap/milestones/milestone.entity";
 import { Priority } from "../../common/priority.enum";
 import { WorkItemType } from "./work-item-type.enum";
-import { EntityNotFoundError } from "typeorm";
+import { EntityNotFoundError, Repository } from "typeorm";
 import { WorkItemStatus } from "./work-item-status.enum";
 import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
 import { WorkItem } from "./work-item.entity";
 import { IterationsService } from "../../iterations/iterations.service";
+import { File } from "../../files/file.entity";
+import { WorkItemFile } from "./work-item-file.entity";
 
 describe("WorkItemsService", () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
   let featuresService: FeaturesService;
   let iterationService: IterationsService;
+  let filesRepository: Repository<File>;
   let service: WorkItemsService;
   let org: Org;
 
@@ -33,7 +36,7 @@ describe("WorkItemsService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, Iteration, WorkItem])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, Iteration, WorkItem, File, WorkItemFile])],
       [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, WorkItemsService, IterationsService]
     );
     cleanup = dbCleanup;
@@ -42,6 +45,7 @@ describe("WorkItemsService", () => {
     featuresService = module.get<FeaturesService>(FeaturesService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
+    filesRepository = module.get<Repository<File>>(getRepositoryToken(File));
     const user = await usersService.create(
       "Test User",
       "test@example.com",
@@ -116,6 +120,54 @@ describe("WorkItemsService", () => {
         });
       const foundFeature = await featuresService.getFeature(org.id, feature.id);
       expect(foundFeature.progress).toEqual(50);
+    });
+    it("should create the work item with files", async () => {
+      const file1 = new File();
+      file1.name = "file1";
+      file1.size = 100;
+      file1.type = "text/plain";
+      file1.path = "/path/to/file1";
+      file1.url = "https://example.com/file1";
+      file1.org = Promise.resolve(org);
+      const savedFile1 = await filesRepository.save(file1);
+      const file2 = new File();
+      file2.name = "file2";
+      file2.size = 100;
+      file2.type = "text/plain";
+      file2.path = "/path/to/file1";
+      file2.url = "https://example.com/file1";
+      file2.org = Promise.resolve(org);
+      const savedFile2 = await filesRepository.save(file2);
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          status: WorkItemStatus.DONE,
+          files: [
+            {
+              id: savedFile1.id
+            },
+            {
+              id: savedFile2.id
+            }
+          ]
+        });
+      expect(workItem).toBeDefined();
+      expect(workItem.id).toBeDefined();
+      expect(workItem.title).toEqual("my work item");
+      expect(workItem.description).toEqual("my work item description");
+      expect(workItem.priority).toEqual(Priority.HIGH);
+      expect(workItem.type).toEqual(WorkItemType.USER_STORY);
+      expect(workItem.estimation).toEqual(13);
+      expect(workItem.status).toEqual(WorkItemStatus.DONE);
+      expect(workItem.files).toBeDefined();
+      expect(workItem.files.length).toEqual(2);
+      expect(workItem.files[0].id).toEqual(savedFile1.id);
+      expect(workItem.files[1].id).toEqual(savedFile2.id);
     });
   });
   describe("when listing work items", () => {
@@ -303,6 +355,65 @@ describe("WorkItemsService", () => {
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
       expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
       expect(foundWorkItem.completedAt).toBeDefined();
+    });
+    it("should update the work item files", async () => {
+      const file1 = new File();
+      file1.name = "file1";
+      file1.size = 100;
+      file1.type = "text/plain";
+      file1.path = "/path/to/file1";
+      file1.url = "https://example.com/file1";
+      file1.org = Promise.resolve(org);
+      const savedFile1 = await filesRepository.save(file1);
+      const file2 = new File();
+      file2.name = "file2";
+      file2.size = 100;
+      file2.type = "text/plain";
+      file2.path = "/path/to/file1";
+      file2.url = "https://example.com/file1";
+      file2.org = Promise.resolve(org);
+      const savedFile2 = await filesRepository.save(file2);
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          status: WorkItemStatus.DONE,
+          files: [
+            {
+              id: savedFile1.id
+            },
+            {
+              id: savedFile2.id
+            }
+          ]
+        });
+      const foundWorkItem = await service.updateWorkItem(org.id, workItem.id, {
+        title: "my work item updated",
+        description: "my work item description updated",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        estimation: 13,
+        status: WorkItemStatus.DONE,
+        files: [
+          {
+            id: savedFile1.id
+          }
+        ]
+      });
+      expect(foundWorkItem).toBeDefined();
+      expect(foundWorkItem.title).toEqual("my work item updated");
+      expect(foundWorkItem.description).toEqual("my work item description updated");
+      expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
+      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.estimation).toEqual(13);
+      expect(foundWorkItem.status).toEqual(WorkItemStatus.DONE);
+      expect(foundWorkItem.files).toBeDefined();
+      expect(foundWorkItem.files.length).toEqual(1);
+      expect(foundWorkItem.files[0].id).toEqual(savedFile1.id);
     });
   });
   describe("when deleting a work item", () => {

@@ -6,6 +6,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Org } from "../orgs/org.entity";
 import { Repository } from "typeorm";
 import { File } from "./file.entity";
+import { WorkItemFile } from "../backlog/work-items/work-item-file.entity";
 
 @Injectable()
 export class FilesService {
@@ -13,6 +14,7 @@ export class FilesService {
     private configService: ConfigService,
     @InjectRepository(Org) private orgsRepository: Repository<Org>,
     @InjectRepository(File) private filesRepository: Repository<File>,
+    @InjectRepository(WorkItemFile) private workItemFilesRepository: Repository<WorkItemFile>,
     private filesStorageRepository: FilesStorageRepository) {
   }
 
@@ -42,6 +44,7 @@ export class FilesService {
   async deleteFile(orgId: string, fileId: string) {
     const file = await this.filesRepository.findOneByOrFail({ id: fileId, org: { id: orgId } });
     await this.filesStorageRepository.deleteObject(file.path);
+    await this.workItemFilesRepository.delete({ file: { id: file.id } });
     await this.filesRepository.delete(file.id);
   }
 }
