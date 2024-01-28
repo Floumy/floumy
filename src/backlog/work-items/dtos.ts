@@ -11,6 +11,7 @@ export interface CreateUpdateWorkItemDto {
   estimation?: number;
   feature?: string;
   iteration?: string;
+  files?: { id: string; }[];
 }
 
 export interface WorkItemDto {
@@ -30,6 +31,12 @@ export interface WorkItemDto {
     id: string;
     title: string;
   };
+  files?: {
+    id: string;
+    name: string;
+    size: number;
+    type: string;
+  }[];
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,10 +1,19 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import { Priority } from "../../common/priority.enum";
 import { WorkItemStatus } from "./work-item-status.enum";
 import { Org } from "../../orgs/org.entity";
 import { Feature } from "../../roadmap/features/feature.entity";
 import { WorkItemType } from "./work-item-type.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
+import { WorkItemFile } from "./work-item-file.entity";
 
 @Entity()
 export class WorkItem {
@@ -50,4 +59,6 @@ export class WorkItem {
   feature: Promise<Feature>;
   @ManyToOne(() => Iteration, iteration => iteration.workItems, { lazy: true })
   iteration: Promise<Iteration>;
+  @OneToMany(() => WorkItemFile, workItemFile => workItemFile.workItem)
+  workItemFiles: Promise<WorkItemFile[]>;
 }

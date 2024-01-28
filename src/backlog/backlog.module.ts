@@ -12,11 +12,13 @@ import { OrgsModule } from "../orgs/orgs.module";
 import { OkrsModule } from "../okrs/okrs.module";
 import { WorkItem } from "./work-items/work-item.entity";
 import { Iteration } from "../iterations/Iteration.entity";
+import { File } from "../files/file.entity";
+import { WorkItemFile } from "./work-items/work-item-file.entity";
 
 @Module({
   controllers: [WorkItemsController],
   providers: [WorkItemsService],
-  imports: [TypeOrmModule.forFeature([Feature, Org, KeyResult, Objective, Milestone, WorkItem, Iteration]), OrgsModule, OkrsModule, AuthModule],
+  imports: [TypeOrmModule.forFeature([Feature, Org, KeyResult, Objective, Milestone, WorkItem, Iteration, File, WorkItemFile]), OrgsModule, OkrsModule, AuthModule],
   exports: [WorkItemsService]
 })
 export class BacklogModule {

@@ -35,6 +35,15 @@ export default class WorkItemMapper {
       estimation: workItem.estimation,
       feature: feature ? FeatureMapper.toDto(feature) : undefined,
       iteration: iteration ? IterationMapper.toDto(iteration) : undefined,
+      files: await Promise.all((await workItem.workItemFiles).map(async workItemFile => {
+        const file = await workItemFile.file;
+        return {
+          id: file.id,
+          name: file.name,
+          size: file.size,
+          type: file.type
+        };
+      })),
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt

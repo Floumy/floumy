@@ -8,6 +8,8 @@ import WorkItemMapper from "./work-item.mapper";
 import { Org } from "../../orgs/org.entity";
 import { WorkItemStatus } from "./work-item-status.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
+import { File } from "../../files/file.entity";
+import { WorkItemFile } from "./work-item-file.entity";
 
 
 @Injectable()
@@ -16,7 +18,9 @@ export class WorkItemsService {
   constructor(@InjectRepository(WorkItem) private workItemsRepository: Repository<WorkItem>,
               @InjectRepository(Feature) private featuresRepository: Repository<Feature>,
               @InjectRepository(Iteration) private iterationsRepository: Repository<Iteration>,
-              @InjectRepository(Org) private orgsRepository: Repository<Org>) {
+              @InjectRepository(Org) private orgsRepository: Repository<Org>,
+              @InjectRepository(File) private filesRepository: Repository<File>,
+              @InjectRepository(WorkItemFile) private workItemFilesRepository: Repository<WorkItemFile>) {
   }
 
   async createWorkItem(orgId: string, workItemDto: CreateUpdateWorkItemDto) {
@@ -27,8 +31,24 @@ export class WorkItemsService {
     const savedWorkItem = await this.workItemsRepository.save(workItem);
     const feature = await savedWorkItem.feature;
     await this.updateFeatureProgress(feature);
-
+    await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
     return WorkItemMapper.toDto(savedWorkItem);
+  }
+
+  private async setWorkItemsFiles(workItem: WorkItem, workItemDto: CreateUpdateWorkItemDto, savedWorkItem: WorkItem) {
+    workItem.workItemFiles = Promise.resolve([]);
+    await this.workItemFilesRepository.delete({ workItem: { id: workItem.id } });
+    if (workItemDto.files && workItemDto.files.length > 0) {
+      const files = await this.filesRepository.findBy(workItemDto.files);
+      const workItemFiles = files.map(file => {
+        const workItemFile = new WorkItemFile();
+        workItemFile.file = Promise.resolve(file);  // Assign the file entity directly
+        workItemFile.workItem = Promise.resolve(savedWorkItem); // Assign the workItem entity directly
+        return workItemFile;
+      });
+      await this.workItemFilesRepository.save(workItemFiles);
+      workItem.workItemFiles = Promise.resolve(workItemFiles);
+    }
   }
 
   async listWorkItems(orgId: string) {
@@ -51,6 +71,7 @@ export class WorkItemsService {
     if (newFeature && (!oldFeature || oldFeature.id !== newFeature.id)) {
       await this.updateFeatureProgress(newFeature);
     }
+    await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
     return WorkItemMapper.toDto(savedWorkItem);
   }
 
