@@ -20,6 +20,8 @@ import { IterationsService } from "./iterations.service";
 import { Priority } from "../common/priority.enum";
 import { WorkItemType } from "../backlog/work-items/work-item-type.enum";
 import { WorkItemStatus } from "../backlog/work-items/work-item-status.enum";
+import { File } from "../files/file.entity";
+import { WorkItemFile } from "../backlog/work-items/work-item-file.entity";
 
 describe("IterationsController", () => {
   let controller: IterationsController;
@@ -30,7 +32,7 @@ describe("IterationsController", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone, Iteration]), UsersModule],
+      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone, Iteration, File, WorkItemFile]), UsersModule],
       [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService, WorkItemsService, IterationsService],
       [IterationsController]
     );
