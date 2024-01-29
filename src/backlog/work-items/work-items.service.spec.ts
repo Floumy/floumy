@@ -951,5 +951,57 @@ describe("WorkItemsService", () => {
       const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
       expect(foundWorkItem.status).toEqual(WorkItemStatus.IN_PROGRESS);
     });
+    it("should update the feature progress when changing the status to DONE", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          status: FeatureStatus.IN_PROGRESS,
+          priority: Priority.LOW
+        });
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 1",
+          description: "my work item description 1",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      await service.patchWorkItem(org.id, workItem.id, {
+        status: WorkItemStatus.DONE
+      });
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.progress).toEqual(100);
+    });
+    it("should update the feature progress when changing the status to CLOSED", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          status: FeatureStatus.IN_PROGRESS,
+          priority: Priority.LOW
+        });
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 1",
+          description: "my work item description 1",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.IN_PROGRESS
+        });
+      await service.patchWorkItem(org.id, workItem.id, {
+        status: WorkItemStatus.CLOSED
+      });
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.progress).toEqual(100);
+    });
   });
 });
