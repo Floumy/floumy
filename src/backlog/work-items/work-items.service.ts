@@ -151,6 +151,7 @@ export class WorkItemsService {
     this.updateStatusAndCompletionDate(workItem, workItemPatchDto);
 
     const savedWorkItem = await this.workItemsRepository.save(workItem);
+    await this.updateFeatureProgress(await savedWorkItem.feature);
     return WorkItemMapper.toDto(savedWorkItem);
   }
 
