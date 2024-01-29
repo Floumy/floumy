@@ -33,6 +33,7 @@ import { File } from "../src/files/file.entity";
 import { FilesService } from "../src/files/files.service";
 import { FilesController } from "../src/files/files.controller";
 import { FilesStorageRepository } from "../src/files/files-storage.repository";
+import { WorkItemFile } from "../src/backlog/work-items/work-item-file.entity";
 
 describe("Files (e2e)", () => {
   let app: INestApplication;
@@ -50,7 +51,7 @@ describe("Files (e2e)", () => {
     };
 
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, OrgsModule, BacklogModule, OkrsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Feature, Objective, KeyResult, WorkItem, Milestone, Iteration, File])],
+      [UsersModule, OrgsModule, BacklogModule, OkrsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Feature, Objective, KeyResult, WorkItem, Milestone, Iteration, File, WorkItemFile])],
       [AuthService, UsersService, Reflector, TokensService, FeaturesService, WorkItemsService, OkrsService, MilestonesService, IterationsService, FilesService, FilesStorageRepository, {
         provide: "S3_CLIENT",
         useValue: mockS3Client
