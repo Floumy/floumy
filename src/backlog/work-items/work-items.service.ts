@@ -149,6 +149,7 @@ export class WorkItemsService {
 
     await this.updateIteration(workItem, workItemPatchDto, orgId, currentIteration);
     this.updateStatusAndCompletionDate(workItem, workItemPatchDto);
+    this.updatePriority(workItem, workItemPatchDto);
 
     const savedWorkItem = await this.workItemsRepository.save(workItem);
     await this.updateFeatureProgress(await savedWorkItem.feature);
@@ -171,6 +172,12 @@ export class WorkItemsService {
     if (workItemPatchDto.status) {
       workItem.status = workItemPatchDto.status;
       workItem.completedAt = [WorkItemStatus.DONE, WorkItemStatus.CLOSED].includes(workItemPatchDto.status) ? new Date() : null;
+    }
+  }
+
+  private updatePriority(workItem: WorkItem, workItemPatchDto: WorkItemPatchDto) {
+    if (workItemPatchDto.priority) {
+      workItem.priority = workItemPatchDto.priority;
     }
   }
 }

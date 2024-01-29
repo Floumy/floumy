@@ -1003,5 +1003,48 @@ describe("WorkItemsService", () => {
       const foundFeature = await featuresService.getFeature(org.id, feature.id);
       expect(foundFeature.progress).toEqual(100);
     });
+    it("should update the feature progress when changing the status to IN_PROGRESS", async () => {
+      const feature = await featuresService.createFeature(
+        org.id,
+        {
+          title: "my feature",
+          description: "my feature description",
+          status: FeatureStatus.IN_PROGRESS,
+          priority: Priority.LOW
+        });
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 1",
+          description: "my work item description 1",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          feature: feature.id,
+          status: WorkItemStatus.DONE
+        });
+      await service.patchWorkItem(org.id, workItem.id, {
+        status: WorkItemStatus.IN_PROGRESS
+      });
+      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      expect(foundFeature.progress).toEqual(0);
+    });
+    it("should update the work item priority", async () => {
+      const workItem = await service.createWorkItem(
+        org.id,
+        {
+          title: "my work item 1",
+          description: "my work item description 1",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          estimation: 13,
+          status: WorkItemStatus.DONE
+        });
+      await service.patchWorkItem(org.id, workItem.id, {
+        priority: Priority.LOW
+      });
+      const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
+      expect(foundWorkItem.priority).toEqual(Priority.LOW);
+    });
   });
 });

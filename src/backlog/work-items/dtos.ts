@@ -44,4 +44,5 @@ export interface WorkItemDto {
 export interface WorkItemPatchDto {
   iteration?: string;
   status?: WorkItemStatus;
+  priority?: Priority;
 }
