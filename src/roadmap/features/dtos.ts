@@ -10,6 +10,12 @@ export interface CreateUpdateFeatureDto {
   keyResult?: string;
 }
 
+export interface PatchFeatureDto {
+  priority?: Priority;
+  status?: FeatureStatus;
+  milestone?: string;
+}
+
 export interface FeatureDto {
   id: string;
   title: string;
