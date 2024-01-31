@@ -20,6 +20,7 @@ import { Iteration } from "../../iterations/Iteration.entity";
 
 describe("FeaturesController", () => {
   let controller: FeaturesController;
+  let milestoneService: MilestonesService;
   let cleanup: () => Promise<void>;
   let org: Org;
 
@@ -33,6 +34,8 @@ describe("FeaturesController", () => {
     controller = module.get<FeaturesController>(FeaturesController);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
+    milestoneService = module.get<MilestonesService>(MilestonesService);
+
     const user = await usersService.create(
       "Test User",
       "test@example.com",
@@ -215,6 +218,92 @@ describe("FeaturesController", () => {
           org: org.id
         }
       }, featureResponse.id);
+    });
+  });
+  describe("when patching the feature", () => {
+    it("should update the status", async () => {
+      const featureResponse = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED
+        });
+      const feature = await controller.patch({
+        user: {
+          org: org.id
+        }
+      }, featureResponse.id, {
+        status: FeatureStatus.CLOSED
+      });
+      expect(feature.title).toEqual("my feature");
+      expect(feature.priority).toEqual(Priority.HIGH);
+      expect(feature.status).toEqual(FeatureStatus.CLOSED);
+      expect(feature.createdAt).toBeDefined();
+      expect(feature.updatedAt).toBeDefined();
+    });
+    it("should update the priority", async () => {
+      const featureResponse = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED
+        });
+      const feature = await controller.patch({
+        user: {
+          org: org.id
+        }
+      }, featureResponse.id, {
+        priority: Priority.LOW
+      });
+      expect(feature.title).toEqual("my feature");
+      expect(feature.priority).toEqual(Priority.LOW);
+      expect(feature.status).toEqual(FeatureStatus.PLANNED);
+      expect(feature.createdAt).toBeDefined();
+      expect(feature.updatedAt).toBeDefined();
+    });
+    it("should update the milestone", async () => {
+      const milestone = await milestoneService.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone description",
+        dueDate: "2020-01-01"
+      });
+      const featureResponse = await controller.create(
+        {
+          user: {
+            org: org.id
+          }
+        },
+        {
+          title: "my feature",
+          description: "my feature description",
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED
+        });
+      const feature = await controller.patch({
+        user: {
+          org: org.id
+        }
+      }, featureResponse.id, {
+        milestone: milestone.id
+      });
+      expect(feature.title).toEqual("my feature");
+      expect(feature.priority).toEqual(Priority.HIGH);
+      expect(feature.status).toEqual(FeatureStatus.PLANNED);
+      expect(feature.milestone.id).toEqual(milestone.id);
+      expect(feature.createdAt).toBeDefined();
+      expect(feature.updatedAt).toBeDefined();
     });
   });
 });

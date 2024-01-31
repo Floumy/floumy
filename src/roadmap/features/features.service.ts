@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CreateUpdateFeatureDto } from "./dtos";
+import { CreateUpdateFeatureDto, PatchFeatureDto } from "./dtos";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Feature } from "./feature.entity";
@@ -105,5 +105,23 @@ export class FeaturesService {
     const feature = await this.featuresRepository.findOneByOrFail({ org: { id: orgId }, id: id });
     await this.workItemsService.removeFeatureFromWorkItems(orgId, id);
     await this.featuresRepository.remove(feature);
+  }
+
+  async patchFeature(orgId: string, featureId: string, patchFeatureDto: PatchFeatureDto) {
+    const feature = await this.featuresRepository.findOneByOrFail({ org: { id: orgId }, id: featureId });
+    if (patchFeatureDto.status) {
+      feature.status = patchFeatureDto.status;
+    }
+    if (patchFeatureDto.priority) {
+      feature.priority = patchFeatureDto.priority;
+    }
+    if (patchFeatureDto.milestone) {
+      const milestone = await this.milestonesService.findOneById(orgId, patchFeatureDto.milestone);
+      feature.milestone = Promise.resolve(milestone);
+    } else if (patchFeatureDto.milestone === null && feature.milestone) {
+      feature.milestone = Promise.resolve(null);
+    }
+    const savedFeature = await this.featuresRepository.save(feature);
+    return await FeatureMapper.toDto(savedFeature);
   }
 }

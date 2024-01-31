@@ -425,4 +425,147 @@ describe("FeaturesService", () => {
       expect(foundWorkItem.feature).toBeUndefined();
     });
   });
+  describe("when patching a feature", () => {
+    it("should update the status", async () => {
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED
+      });
+      const updatedFeature = await service.patchFeature(org.id, feature.id, {
+        status: FeatureStatus.CLOSED
+      });
+      expect(updatedFeature.title).toEqual("my feature");
+      expect(updatedFeature.priority).toEqual(Priority.HIGH);
+      expect(updatedFeature.status).toEqual(FeatureStatus.CLOSED);
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it("should update the priority", async () => {
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED
+      });
+      const updatedFeature = await service.patchFeature(org.id, feature.id, {
+        priority: Priority.HIGH
+      });
+      expect(updatedFeature.title).toEqual("my feature");
+      expect(updatedFeature.priority).toEqual(Priority.HIGH);
+      expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it("should update the milestone", async () => {
+      const milestone = await milestonesService.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone description",
+        dueDate: "2020-01-01"
+      });
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED
+      });
+      const updatedFeature = await service.patchFeature(org.id, feature.id, {
+        milestone: milestone.id
+      });
+      expect(updatedFeature.title).toEqual("my feature");
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
+      expect(updatedFeature.milestone).toBeDefined();
+      expect(updatedFeature.milestone.id).toEqual(milestone.id);
+      expect(updatedFeature.milestone.title).toEqual(milestone.title);
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it("should throw an error if the milestone does not exist", async () => {
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED
+      });
+      await expect(
+        service.patchFeature(org.id, feature.id, {
+          milestone: "non-existent-milestone"
+        })
+      ).rejects.toThrowError();
+    });
+    it("should throw an error if the milestone does not belong to the org", async () => {
+      const otherOrg = await orgsService.createForUser(
+        await usersService.create(
+          "Other User",
+          "testing@example.com",
+          "testtesttest"
+        ));
+      const milestone = await milestonesService.createMilestone(otherOrg.id, {
+        title: "my milestone",
+        description: "my milestone description",
+        dueDate: "2020-01-01"
+      });
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED
+      });
+      await expect(
+        service.patchFeature(org.id, feature.id, {
+          milestone: milestone.id
+        })
+      ).rejects.toThrowError();
+    });
+    it("should update milestones to null", async () => {
+      const milestone = await milestonesService.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone description",
+        dueDate: "2020-01-01"
+      });
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.LOW,
+        milestone: milestone.id,
+        status: FeatureStatus.PLANNED
+      });
+      const updatedFeature = await service.patchFeature(org.id, feature.id, {
+        milestone: null
+      });
+      expect(updatedFeature.title).toEqual("my feature");
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
+      expect(updatedFeature.milestone).toBeUndefined();
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it("should not update the milestone if the update is for another field", async () => {
+      const milestone = await milestonesService.createMilestone(org.id, {
+        title: "my milestone",
+        description: "my milestone description",
+        dueDate: "2020-01-01"
+      });
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        milestone: milestone.id,
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED
+      });
+      const updatedFeature = await service.patchFeature(org.id, feature.id, {
+        status: FeatureStatus.IN_PROGRESS
+      });
+      expect(updatedFeature.title).toEqual("my feature");
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.status).toEqual(FeatureStatus.IN_PROGRESS);
+      expect(updatedFeature.milestone).toBeDefined();
+      expect(updatedFeature.milestone.id).toEqual(milestone.id);
+      expect(updatedFeature.milestone.title).toEqual(milestone.title);
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+  });
 });

@@ -7,13 +7,14 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Request,
   UseGuards
 } from "@nestjs/common";
 import { FeaturesService } from "./features.service";
-import { CreateUpdateFeatureDto } from "./dtos";
+import { CreateUpdateFeatureDto, PatchFeatureDto } from "./dtos";
 import { AuthGuard } from "../../auth/auth.guard";
 
 @Controller("features")
@@ -84,6 +85,17 @@ export class FeaturesController {
     try {
       const { org: orgId } = request.user;
       await this.featuresService.deleteFeature(orgId, id);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Patch(":id")
+  @HttpCode(HttpStatus.OK)
+  async patch(@Request() request, @Param("id") id: string, @Body() patchFeatureDto: PatchFeatureDto) {
+    try {
+      const { org: orgId } = request.user;
+      return await this.featuresService.patchFeature(orgId, id, patchFeatureDto);
     } catch (e) {
       throw new BadRequestException();
     }
