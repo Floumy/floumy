@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { CreateUpdateFeatureDto, PatchFeatureDto } from "./dtos";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Feature } from "./feature.entity";
 import { FeatureMapper } from "./feature.mapper";
@@ -9,6 +9,8 @@ import { OrgsService } from "../../orgs/orgs.service";
 import { OkrsService } from "../../okrs/okrs.service";
 import { MilestonesService } from "../milestones/milestones.service";
 import { WorkItemsService } from "../../backlog/work-items/work-items.service";
+import { FeatureFile } from "./feature-file.entity";
+import { File } from "../../files/file.entity";
 
 @Injectable()
 export class FeaturesService {
@@ -18,7 +20,9 @@ export class FeaturesService {
     private orgsService: OrgsService,
     private okrsService: OkrsService,
     private milestonesService: MilestonesService,
-    private workItemsService: WorkItemsService
+    private workItemsService: WorkItemsService,
+    @InjectRepository(FeatureFile) private featureFilesRepository: Repository<FeatureFile>,
+    @InjectRepository(File) private filesRepository: Repository<File>
   ) {
   }
 
@@ -41,8 +45,26 @@ export class FeaturesService {
       const milestone = await this.milestonesService.findOneById(orgId, featureDto.milestone);
       feature.milestone = Promise.resolve(milestone);
     }
+
     const savedFeature = await this.featuresRepository.save(feature);
+
+    if (featureDto.files) {
+      await this.addFiles(featureDto, feature);
+    }
+
     return await FeatureMapper.toDto(savedFeature);
+  }
+
+  private async addFiles(featureDto: CreateUpdateFeatureDto, feature: Feature) {
+    const files = await this.filesRepository.findBy({ id: In(featureDto.files.map(file => file.id)) });
+    const featureFiles = files.map(file => {
+      const featureFile = new FeatureFile();
+      featureFile.feature = Promise.resolve(feature);
+      featureFile.file = Promise.resolve(file);
+      return featureFile;
+    });
+    await this.featureFilesRepository.save(featureFiles);
+    feature.featureFiles = Promise.resolve(featureFiles);
   }
 
   private validateFeature(featureDto: CreateUpdateFeatureDto) {
@@ -95,6 +117,12 @@ export class FeaturesService {
       feature.milestone = Promise.resolve(milestone);
     } else {
       feature.milestone = Promise.resolve(null);
+    }
+
+    if (updateFeatureDto.files) {
+      await this.addFiles(updateFeatureDto, feature);
+    } else {
+      feature.featureFiles = Promise.resolve([]);
     }
 
     const savedFeature = await this.featuresRepository.save(feature);

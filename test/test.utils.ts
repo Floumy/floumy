@@ -35,6 +35,14 @@ export async function setupTestingModule(
   providers: any[],
   controllers: any[] = []
 ) {
+  const mockS3Client = {
+    send: jest.fn().mockImplementation(() => ({
+      $metadata: {
+        httpStatusCode: 200
+      },
+      Location: "https://test-bucket.nyc3.digitaloceanspaces.com"
+    }))
+  };
   const module: TestingModule = await Test.createTestingModule({
     controllers,
     imports: [
@@ -45,7 +53,10 @@ export async function setupTestingModule(
       }),
       ...imports
     ],
-    providers: [ConfigService, ...providers]
+    providers: [ConfigService, {
+      provide: "S3_CLIENT",
+      useValue: mockS3Client
+    }, ...providers]
   }).compile();
 
   const dataSource = new DataSource(testDbOptions);
