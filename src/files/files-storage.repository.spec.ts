@@ -19,16 +19,9 @@ describe("FilesStorageRepository", () => {
   let org: Org;
 
   beforeEach(async () => {
-    const mockS3Client = {
-      send: jest.fn()
-    };
-
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [TypeOrmModule.forFeature([Org, File, WorkItemFile]), UsersModule, AuthModule, BacklogModule],
-      [FilesService, FilesStorageRepository, {
-        provide: "S3_CLIENT",
-        useValue: mockS3Client
-      }],
+      [FilesService, FilesStorageRepository],
       [WorkItemsController, FilesController]
     );
     cleanup = dbCleanup;

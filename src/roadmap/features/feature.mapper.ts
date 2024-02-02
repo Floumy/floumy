@@ -12,6 +12,15 @@ export class FeatureMapper {
       progress: feature.progress,
       workItemsCount: feature.workItemsCount,
       workItems: (await feature.workItems).map(WorkItemMapper.toDto),
+      files: await Promise.all((await feature.featureFiles).map(async featureFile => {
+        const file = await featureFile.file;
+        return {
+          id: file.id,
+          name: file.name,
+          size: file.size,
+          type: file.type
+        };
+      })),
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
     };

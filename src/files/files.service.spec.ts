@@ -24,21 +24,9 @@ describe("FilesService", () => {
   let workItemRepository: Repository<WorkItem>;
 
   beforeEach(async () => {
-    const mockS3Client = {
-      send: jest.fn().mockImplementation(() => ({
-        $metadata: {
-          httpStatusCode: 200
-        },
-        Location: "https://test-bucket.nyc3.digitaloceanspaces.com"
-      }))
-    };
-
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [TypeOrmModule.forFeature([Org, File, WorkItemFile]), UsersModule, AuthModule, BacklogModule],
-      [FilesService, FilesStorageRepository, {
-        provide: "S3_CLIENT",
-        useValue: mockS3Client
-      }],
+      [FilesService, FilesStorageRepository],
       [WorkItemsController, FilesController]
     );
     cleanup = dbCleanup;

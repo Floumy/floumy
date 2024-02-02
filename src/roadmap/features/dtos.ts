@@ -8,6 +8,7 @@ export interface CreateUpdateFeatureDto {
   description?: string;
   milestone?: string;
   keyResult?: string;
+  files?: { id: string }[];
 }
 
 export interface PatchFeatureDto {
@@ -32,6 +33,12 @@ export interface FeatureDto {
     id: string;
     title: string;
   };
+  files?: {
+    id: string;
+    name: string;
+    size: number;
+    type: string;
+  }[];
   createdAt: Date;
   updatedAt: Date;
 }

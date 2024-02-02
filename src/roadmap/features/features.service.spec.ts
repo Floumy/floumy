@@ -20,6 +20,9 @@ import { FeatureStatus } from "./featurestatus.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
 import { File } from "../../files/file.entity";
 import { WorkItemFile } from "../../backlog/work-items/work-item-file.entity";
+import { FilesService } from "../../files/files.service";
+import { FilesStorageRepository } from "../../files/files-storage.repository";
+import { FeatureFile } from "./feature-file.entity";
 
 describe("FeaturesService", () => {
   let usersService: UsersService;
@@ -28,6 +31,7 @@ describe("FeaturesService", () => {
   let milestonesService: MilestonesService;
   let okrsService: OkrsService;
   let orgsService: OrgsService;
+  let filesService: FilesService;
 
   let org: Org;
 
@@ -35,8 +39,8 @@ describe("FeaturesService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, WorkItem, Iteration, File, WorkItemFile])],
-      [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, WorkItemsService]
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User, Milestone, WorkItem, Iteration, File, WorkItemFile, FeatureFile])],
+      [OkrsService, OrgsService, FeaturesService, UsersService, MilestonesService, WorkItemsService, FilesService, FilesStorageRepository]
     );
     cleanup = dbCleanup;
     service = module.get<FeaturesService>(FeaturesService);
@@ -45,6 +49,7 @@ describe("FeaturesService", () => {
     orgsService = module.get<OrgsService>(OrgsService);
     milestonesService = module.get<MilestonesService>(MilestonesService);
     workItemsService = module.get<WorkItemsService>(WorkItemsService);
+    filesService = module.get<FilesService>(FilesService);
     const user = await usersService.create(
       "Test User",
       "test@example.com",
@@ -181,6 +186,27 @@ describe("FeaturesService", () => {
       expect(feature.milestone).toBeDefined();
       expect(feature.milestone.id).toEqual(milestone.id);
       expect(feature.milestone.title).toEqual(milestone.title);
+    });
+    it("should create a feature with files", async () => {
+      const file = await filesService.uploadFile(org.id, {
+        originalname: "my file",
+        buffer: Buffer.from("file content"),
+        size: 100,
+        mimetype: "text/plain"
+      } as any);
+
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+        files: [file]
+      });
+
+      expect(feature.files).toBeDefined();
+      expect(feature.files.length).toEqual(1);
+      expect(feature.files[0].id).toEqual(file.id);
+      expect(feature.files[0].name).toEqual(file.name);
     });
   });
   describe("when listing features", () => {
@@ -392,6 +418,31 @@ describe("FeaturesService", () => {
       expect(updatedFeature.milestone).toBeDefined();
       expect(updatedFeature.milestone.id).toEqual(milestone.id);
       expect(updatedFeature.milestone.title).toEqual(milestone.title);
+    });
+    it("should update the feature with files", async () => {
+      const file = await filesService.uploadFile(org.id, {
+        originalname: "my file",
+        buffer: Buffer.from("file content"),
+        size: 100,
+        mimetype: "text/plain"
+      } as any);
+      const feature = await service.createFeature(org.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: "my updated feature",
+        description: "my updated feature description",
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        files: [file]
+      });
+      expect(updatedFeature.files).toBeDefined();
+      expect(updatedFeature.files.length).toEqual(1);
+      expect(updatedFeature.files[0].id).toEqual(file.id);
+      expect(updatedFeature.files[0].name).toEqual(file.name);
     });
   });
   describe("when deleting a feature", () => {

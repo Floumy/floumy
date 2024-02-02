@@ -13,6 +13,7 @@ import { KeyResult } from "../../okrs/key-result.entity";
 import { Priority } from "../../common/priority.enum";
 import { Milestone } from "../milestones/milestone.entity";
 import { WorkItem } from "../../backlog/work-items/work-item.entity";
+import { FeatureFile } from "./feature-file.entity";
 
 @Entity()
 export class Feature {
@@ -50,4 +51,7 @@ export class Feature {
   milestone: Promise<Milestone>;
   @OneToMany(() => WorkItem, workItem => workItem.feature, { lazy: true })
   workItems: Promise<WorkItem[]>;
+  @OneToMany(() => FeatureFile, featureFile => featureFile.feature)
+  featureFiles: Promise<FeatureFile[]>;
+
 }
