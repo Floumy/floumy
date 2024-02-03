@@ -12,6 +12,7 @@ import { OrgsService } from "../orgs/orgs.service";
 import { UsersService } from "../users/users.service";
 import { File } from "./file.entity";
 import { WorkItemFile } from "../backlog/work-items/work-item-file.entity";
+import { FeatureFile } from "../roadmap/features/feature-file.entity";
 
 describe("FilesStorageRepository", () => {
   let service: FilesStorageRepository;
@@ -20,7 +21,7 @@ describe("FilesStorageRepository", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, File, WorkItemFile]), UsersModule, AuthModule, BacklogModule],
+      [TypeOrmModule.forFeature([Org, File, WorkItemFile, FeatureFile]), UsersModule, AuthModule, BacklogModule],
       [FilesService, FilesStorageRepository],
       [WorkItemsController, FilesController]
     );
