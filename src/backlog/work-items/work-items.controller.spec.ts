@@ -24,6 +24,7 @@ import { IterationsService } from "../../iterations/iterations.service";
 import { File } from "../../files/file.entity";
 import { Repository } from "typeorm";
 import { WorkItemFile } from "./work-item-file.entity";
+import { FeatureFile } from "../../roadmap/features/feature-file.entity";
 
 describe("WorkItemsController", () => {
   let controller: WorkItemsController;
@@ -35,7 +36,7 @@ describe("WorkItemsController", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone, Iteration, File, WorkItemFile]), UsersModule],
+      [TypeOrmModule.forFeature([Org, Objective, KeyResult, Feature, WorkItem, Milestone, Iteration, File, FeatureFile, WorkItemFile]), UsersModule],
       [OkrsService, OrgsService, TokensService, FeaturesService, MilestonesService, WorkItemsService, IterationsService],
       [WorkItemsController]
     );
