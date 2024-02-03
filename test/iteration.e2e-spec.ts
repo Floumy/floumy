@@ -31,6 +31,7 @@ import { Iteration } from "../src/iterations/Iteration.entity";
 import { IterationsService } from "../src/iterations/iterations.service";
 import { File } from "../src/files/file.entity";
 import { WorkItemFile } from "../src/backlog/work-items/work-item-file.entity";
+import { FeatureFile } from "../src/roadmap/features/feature-file.entity";
 
 describe("Iteration (e2e)", () => {
   let app: INestApplication;
@@ -39,7 +40,7 @@ describe("Iteration (e2e)", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, OrgsModule, BacklogModule, OkrsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Feature, Objective, KeyResult, WorkItem, Milestone, Iteration, File, WorkItemFile])],
+      [UsersModule, OrgsModule, BacklogModule, OkrsModule, TypeOrmModule.forFeature([User, RefreshToken, Org, Feature, Objective, KeyResult, WorkItem, Milestone, Iteration, File, FeatureFile, WorkItemFile])],
       [AuthService, UsersService, Reflector, TokensService, FeaturesService, WorkItemsService, OkrsService, MilestonesService, IterationsService],
       [AuthController, FeaturesController, WorkItemsController, IterationsController]
     );

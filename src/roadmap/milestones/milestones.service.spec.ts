@@ -14,6 +14,8 @@ import { Priority } from "../../common/priority.enum";
 import { OkrsService } from "../../okrs/okrs.service";
 import { BacklogModule } from "../../backlog/backlog.module";
 import { FeatureStatus } from "../features/featurestatus.enum";
+import { File } from "../../files/file.entity";
+import { FeatureFile } from "../features/feature-file.entity";
 
 describe("MilestonesService", () => {
   let usersService: UsersService;
@@ -27,7 +29,7 @@ describe("MilestonesService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Milestone, Feature, User, Objective, KeyResult]), BacklogModule],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Milestone, Feature, User, Objective, KeyResult, File, FeatureFile]), BacklogModule],
       [OrgsService, MilestonesService, UsersService, FeaturesService, OkrsService]
     );
     cleanup = dbCleanup;
