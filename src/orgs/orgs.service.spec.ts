@@ -43,4 +43,15 @@ describe("OrgsService", () => {
     expect(fetchedOrg).not.toBeNull();
     expect(fetchedOrg.id).toEqual(org.id);
   });
+
+  describe("when listing members", () => {
+    it("should return the members of the org", async () => {
+      const savedUser = await usersService.create("Test User", "test@example.com", "testtesttest");
+      const members = await service.listMembers((await savedUser.org).id);
+      expect(members.length).toBe(1);
+      expect(members[0].id).toBeDefined();
+      expect(members[0].email).toBe("test@example.com");
+      expect(members[0].name).toBe("Test User");
+    });
+  });
 });
