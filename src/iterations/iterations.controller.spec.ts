@@ -28,7 +28,6 @@ describe("IterationsController", () => {
   let controller: IterationsController;
   let cleanup: () => Promise<void>;
   let org: Org;
-  let featureService: FeaturesService;
   let workItemService: WorkItemsService;
 
   beforeEach(async () => {
@@ -47,7 +46,6 @@ describe("IterationsController", () => {
       "testtesttest"
     );
     org = await orgsService.createForUser(user);
-    featureService = module.get<FeaturesService>(FeaturesService);
     workItemService = module.get<WorkItemsService>(WorkItemsService);
   });
 
