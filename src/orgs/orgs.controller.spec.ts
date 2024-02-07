@@ -49,13 +49,14 @@ describe("OrgsController", () => {
     await cleanup();
   });
 
-  describe("when listing members", () => {
-    it("should return the members of the org", async () => {
-      const members = await controller.listMembers({ user: { org: org.id } });
-      expect(members.length).toBe(1);
-      expect(members[0].id).toBeDefined();
-      expect(members[0].email).toBe("test@example.com");
-      expect(members[0].name).toBe("Test User");
+  describe("when getting the org", () => {
+    it("should return the org", async () => {
+      const result = await controller.getOrg({ user: { org: org.id } });
+      expect(result.id).toBe(org.id);
+      expect(result.invitationToken).toBeDefined();
+      expect(result.createdAt).toBeDefined();
+      expect(result.updatedAt).toBeDefined();
+      expect(result.members).toHaveLength(1);
     });
   });
 });

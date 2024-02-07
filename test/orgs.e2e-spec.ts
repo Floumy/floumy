@@ -55,17 +55,17 @@ describe("Orgs (e2e)", () => {
     await cleanup();
   });
 
-  describe("when listing members", () => {
-    it("should return the members of the org", async () => {
+  describe("when getting an org", () => {
+    it("should return the org of the user", async () => {
       const response = await request(app.getHttpServer())
-        .get("/orgs/members")
+        .get("/orgs/current")
         .set("Authorization", `Bearer ${accessToken}`);
       expect(response.status).toBe(200);
-      expect(response.body.length).toBe(1);
-      expect(response.body[0].id).toBeDefined();
-      expect(response.body[0].email).toBe("john.doe@example.com");
-      expect(response.body[0].name).toBe("John Doe");
-      expect(response.body[0].createdAt).toBeDefined();
+      expect(response.body.id).toBeDefined();
+      expect(response.body.invitationToken).toBeDefined();
+      expect(response.body.createdAt).toBeDefined();
+      expect(response.body.updatedAt).toBeDefined();
+      expect(response.body.members).toHaveLength(1);
     });
   });
 });

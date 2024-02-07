@@ -3,7 +3,7 @@ import { User } from "../users/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Org } from "./org.entity";
-import { MembersMapper } from "./orgs.mapper";
+import { OrgsMapper } from "./orgs.mapper";
 
 @Injectable()
 export class OrgsService {
@@ -25,8 +25,8 @@ export class OrgsService {
     return this.orgRepository.findOneByOrFail({ id: orgId });
   }
 
-  async listMembers(orgId: string) {
+  async getOrg(orgId: string) {
     const org = await this.findOneById(orgId);
-    return MembersMapper.toMembers(await org.users);
+    return await OrgsMapper.toOrg(org);
   }
 }
