@@ -5,6 +5,7 @@ import { RefreshToken } from "./refresh-token.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { TokensService } from "./tokens.service";
+import { SignUpDto } from "./auth.dtos";
 
 export type AuthDto = {
   accessToken: string;
@@ -55,8 +56,8 @@ export class AuthService {
     return token;
   }
 
-  async signUp(name: string, email: string, password: string) {
-    const user = await this.usersService.create(name, email, password);
+  async signUp(signUpDto: SignUpDto): Promise<AuthDto> {
+    const user = await this.usersService.create(signUpDto.name, signUpDto.email, signUpDto.password, signUpDto.invitationToken);
     const accessToken = await this.tokensService.generateAccessToken(user);
     const refreshToken = await this.createRefreshToken(user);
     return {
