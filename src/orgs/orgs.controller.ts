@@ -9,11 +9,10 @@ export class OrgsController {
   constructor(private orgsService: OrgsService) {
   }
 
-  @Get("members")
+  @Get("current")
   @HttpCode(200)
-  async listMembers(@Request() request) {
+  async getOrg(@Request() request) {
     const org = request.user.org;
-    return await this.orgsService.listMembers(org);
+    return await this.orgsService.getOrg(org);
   }
-
 }

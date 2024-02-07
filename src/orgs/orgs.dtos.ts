@@ -4,3 +4,11 @@ export interface MemberDto {
   email: string;
   createdAt: Date;
 }
+
+export interface OrgDto {
+  id: string;
+  invitationToken: string;
+  createdAt: Date;
+  updatedAt: Date;
+  members: MemberDto[];
+}

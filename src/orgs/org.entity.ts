@@ -1,4 +1,4 @@
-import { CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "../users/user.entity";
 import { Objective } from "../okrs/objective.entity";
 import { KeyResult } from "../okrs/key-result.entity";
@@ -12,6 +12,8 @@ import { File } from "../files/file.entity";
 export class Org {
   @PrimaryGeneratedColumn("uuid")
   id: string;
+  @Column({ unique: true, default: () => "uuid_generate_v4()" })
+  invitationToken: string;
   @OneToMany(() => User, user => user.org, { lazy: true })
   users: Promise<User[]>;
   @CreateDateColumn()
