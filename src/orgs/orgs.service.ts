@@ -29,4 +29,8 @@ export class OrgsService {
     const org = await this.findOneById(orgId);
     return await OrgsMapper.toOrg(org);
   }
+
+  async findOneByInvitationToken(invitationToken: string) {
+    return await this.orgRepository.findOneBy({ invitationToken });
+  }
 }

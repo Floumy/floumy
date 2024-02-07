@@ -13,21 +13,7 @@ import {
 import { AuthDto, AuthService } from "./auth.service";
 import { AuthGuard } from "./auth.guard";
 import { Public } from "./public.guard";
-
-interface SignInDto {
-  email: string;
-  password: string;
-}
-
-interface SignUpDto {
-  name: string;
-  email: string;
-  password: string;
-}
-
-interface RefreshTokenDto {
-  refreshToken: string;
-}
+import { RefreshTokenDto, SignInDto, SignUpDto } from "./auth.dtos";
 
 @Controller("auth")
 export class AuthController {
@@ -54,7 +40,7 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() signUpDto: SignUpDto) {
     try {
-      return await this.authService.signUp(signUpDto.name, signUpDto.email, signUpDto.password);
+      return await this.authService.signUp(signUpDto);
     } catch (e) {
       this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);

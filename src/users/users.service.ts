@@ -19,12 +19,17 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
-  async create(name: string, email: string, password: string) {
+  async create(name: string, email: string, password: string, invitationToken?: string) {
     await this.validateUser(name, email, password);
     const hashedPassword = await this.encryptPassword(password);
     const user = new User(name, email, hashedPassword);
-    const org = await this.orgsService.createForUser(user);
-    user.org = Promise.resolve(org);
+    if (invitationToken) {
+      const org = await this.orgsService.findOneByInvitationToken(invitationToken);
+      if (!org) throw new Error("Invalid invitation token");
+      user.org = Promise.resolve(org);
+    } else {
+      user.org = Promise.resolve(await this.orgsService.createForUser(user));
+    }
     return await this.usersRepository.save(user);
   }
 

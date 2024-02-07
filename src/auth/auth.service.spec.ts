@@ -32,18 +32,34 @@ describe("AuthService", () => {
 
   describe("when signing in with valid credentials", () => {
     it("should return the access and refresh tokens", async () => {
-      await service.signUp("John Doe", "john@example.com", "testtesttest");
+      const signUpDto = {
+        name: "John Doe",
+        email: "john@example.com",
+        password: "testtesttest"
+      };
+      await service.signUp(signUpDto);
       const { accessToken, refreshToken } = await service.signIn("john@example.com", "testtesttest");
       expect(accessToken).toBeDefined();
       expect(refreshToken).toBeDefined();
     });
     it("should return the same refresh token if it's not expired", async () => {
-      const { refreshToken: originalRefreshToken } = await service.signUp("John Doe", "john@example.com", "testtesttest");
+      const signUpDto = {
+        name: "John Doe",
+        email: "john@example.com",
+        password: "testtesttest"
+      };
+
+      const { refreshToken: originalRefreshToken } = await service.signUp(signUpDto);
       const { refreshToken: newRefreshToken } = await service.signIn("john@example.com", "testtesttest");
       expect(originalRefreshToken).toEqual(newRefreshToken);
     });
     it("should return a new refresh token if it's expired", async () => {
-      const { refreshToken: originalRefreshToken } = await service.signUp("John Doe", "john@example.com", "testtesttest");
+      const signUpDto = {
+        name: "John Doe",
+        email: "john@example.com",
+        password: "testtesttest"
+      };
+      const { refreshToken: originalRefreshToken } = await service.signUp(signUpDto);
       await new Promise(resolve => setTimeout(resolve, 1000));
       const refreshTokenEntity = await refreshTokenRepository.findOneByOrFail({ token: originalRefreshToken });
       refreshTokenEntity.expirationDate = new Date(Date.now() - 1000);
@@ -61,13 +77,19 @@ describe("AuthService", () => {
 
   describe("when signing up with invalid credentials", () => {
     it("should throw an error", async () => {
-      await expect(service.signUp("", "", "")).rejects.toThrow();
+      await expect(service.signUp({ name: "", password: "", email: "" })).rejects.toThrow();
     });
   });
 
   describe("when refreshing an access token", () => {
     it("should return a new access token and a new refresh token", async () => {
-      const { accessToken, refreshToken } = await service.signUp("Test User", "test@example.com", "testtesttest");
+      const signUpDto = {
+        name: "John Doe",
+        email: "test@example.com",
+        password: "testtesttest"
+      };
+
+      const { accessToken, refreshToken } = await service.signUp(signUpDto);
       // sleep 1 second to make sure the generate refresh token is different
       await new Promise(resolve => setTimeout(resolve, 1000));
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await service.refreshToken(refreshToken);
@@ -75,7 +97,12 @@ describe("AuthService", () => {
       expect(refreshToken).not.toEqual(newRefreshToken);
     });
     it("should store the new refresh token in the database", async () => {
-      const { refreshToken } = await service.signUp("Test User", "test@example.com", "testtesttest");
+      const signUpDto = {
+        name: "John Doe",
+        email: "test@example.com",
+        password: "testtesttest"
+      };
+      const { refreshToken } = await service.signUp(signUpDto);
       // sleep 1 second to make sure the generate refresh token is different
       await new Promise(resolve => setTimeout(resolve, 1000));
       const { refreshToken: newRefreshToken } = await service.refreshToken(refreshToken);

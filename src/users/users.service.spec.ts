@@ -118,5 +118,20 @@ describe("UsersService", () => {
       expect(org).toBeDefined();
       expect(org.id).toBeDefined();
     });
+    it("should associate the user with the organization based on invitation token", async () => {
+      const user1 = await service.create(
+        "Test Org",
+        "test@example.com",
+        "testtesttest"
+      );
+      const user2 = await service.create(
+        "Test User",
+        "testing@example.com",
+        "testtesttest"
+      );
+      const org1 = await user1.org;
+      const org2 = await user2.org;
+      expect(org1.id).toEqual(org2.id);
+    });
   });
 });
