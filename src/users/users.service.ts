@@ -5,6 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ConfigService } from "@nestjs/config";
 import * as bcrypt from "bcrypt";
 import { OrgsService } from "../orgs/orgs.service";
+import { UserMapper } from "./user.mapper";
 
 @Injectable()
 export class UsersService {
@@ -71,5 +72,10 @@ export class UsersService {
 
   async update(user: User) {
     await this.usersRepository.save(user);
+  }
+
+  async findOne(userId: string) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    return UserMapper.toDto(user);
   }
 }
