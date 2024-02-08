@@ -135,4 +135,18 @@ describe("UsersService", () => {
       expect(org1.id).toEqual(org2.id);
     });
   });
+  describe("when getting a user by id", () => {
+    it("should return the user object", async () => {
+      const user = await service.create(
+        "Test User",
+        "test@example.com",
+        "testtesttest"
+      );
+      const foundUser = await service.findOne(user.id);
+      expect(foundUser).toBeDefined();
+      expect(foundUser.id).toEqual(user.id);
+      expect(foundUser.name).toEqual(user.name);
+      expect(foundUser.email).toEqual(user.email);
+    });
+  });
 });
