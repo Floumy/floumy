@@ -124,12 +124,13 @@ describe("UsersService", () => {
         "test@example.com",
         "testtesttest"
       );
+      const org1 = await user1.org;
       const user2 = await service.create(
         "Test User",
         "testing@example.com",
-        "testtesttest"
+        "testtesttest",
+        org1.invitationToken
       );
-      const org1 = await user1.org;
       const org2 = await user2.org;
       expect(org1.id).toEqual(org2.id);
     });
