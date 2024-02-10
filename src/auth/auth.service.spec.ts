@@ -6,20 +6,26 @@ import { RefreshToken } from "./refresh-token.entity";
 import { Repository } from "typeorm";
 import { setupTestingModule } from "../../test/test.utils";
 import { TokensService } from "./tokens.service";
+import { NotificationsService } from "../notifications/notifications.service";
 
 describe("AuthService", () => {
   let service: AuthService;
   let cleanup: () => Promise<void>;
   let refreshTokenRepository: Repository<RefreshToken>;
+  let notificationsService: NotificationsService;
 
   beforeEach(async () => {
+    const notificationServiceMock = {
+      sendActivationEmail: jest.fn()
+    };
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
-      [AuthService, TokensService]
+      [AuthService, TokensService, { provide: NotificationsService, useValue: notificationServiceMock }]
     );
     cleanup = dbCleanup;
     service = module.get<AuthService>(AuthService);
     refreshTokenRepository = module.get<Repository<RefreshToken>>(getRepositoryToken(RefreshToken));
+    notificationsService = module.get<NotificationsService>(NotificationsService);
   });
 
   afterEach(async () => {
@@ -78,6 +84,18 @@ describe("AuthService", () => {
   describe("when signing up with invalid credentials", () => {
     it("should throw an error", async () => {
       await expect(service.signUp({ name: "", password: "", email: "" })).rejects.toThrow();
+    });
+  });
+
+  describe("when signing up with valid credentials", () => {
+    it("should send an activation email", async () => {
+      const signUpDto = {
+        name: "John Doe",
+        email: "test@example.com",
+        password: "testtesttest"
+      };
+      await service.signUp(signUpDto);
+      expect(notificationsService.sendActivationEmail).toHaveBeenCalledWith("John Doe", "test@example.com", expect.any(String));
     });
   });
 

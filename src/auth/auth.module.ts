@@ -10,6 +10,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { RefreshToken } from "./refresh-token.entity";
 import { ConfigService } from "@nestjs/config";
 import { TokensService } from "./tokens.service";
+import { NotificationsModule } from "../notifications/notifications.module";
 
 @Module({
   controllers: [AuthController],
@@ -22,6 +23,7 @@ import { TokensService } from "./tokens.service";
     }],
   imports: [
     UsersModule,
+    NotificationsModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,

@@ -11,15 +11,18 @@ import { RoadmapModule } from "./roadmap/roadmap.module";
 import { BacklogModule } from "./backlog/backlog.module";
 import { IterationsModule } from "./iterations/iterations.module";
 import { FilesModule } from "./files/files.module";
+import { NotificationsModule } from "./notifications/notifications.module";
 import databaseConfig from "./config/database.config";
 import encryptionConfig from "./config/encryption.config";
 import jwtConfig from "./config/jwt.config";
 import fileStorageConfig from "./config/file-storage.config";
+import emailConfig from "./config/mail.config";
+import appConfig from "./config/app.config";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [databaseConfig, encryptionConfig, jwtConfig, fileStorageConfig]
+      load: [databaseConfig, encryptionConfig, jwtConfig, fileStorageConfig, emailConfig, appConfig]
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
@@ -44,7 +47,8 @@ import fileStorageConfig from "./config/file-storage.config";
     RoadmapModule,
     BacklogModule,
     IterationsModule,
-    FilesModule
+    FilesModule,
+    NotificationsModule
   ],
   controllers: [AppController],
   providers: [AppService]
