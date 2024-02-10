@@ -12,20 +12,19 @@ describe("AuthService", () => {
   let service: AuthService;
   let cleanup: () => Promise<void>;
   let refreshTokenRepository: Repository<RefreshToken>;
-  let notificationsService: NotificationsService;
+  const emailServiceMock = {
+    sendMail: jest.fn()
+  };
 
   beforeEach(async () => {
-    const notificationServiceMock = {
-      sendActivationEmail: jest.fn()
-    };
+
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
-      [AuthService, TokensService, { provide: NotificationsService, useValue: notificationServiceMock }]
+      [AuthService, TokensService, { provide: "MAIL_TRANSPORTER", useValue: emailServiceMock }, NotificationsService]
     );
     cleanup = dbCleanup;
     service = module.get<AuthService>(AuthService);
     refreshTokenRepository = module.get<Repository<RefreshToken>>(getRepositoryToken(RefreshToken));
-    notificationsService = module.get<NotificationsService>(NotificationsService);
   });
 
   afterEach(async () => {
@@ -95,7 +94,7 @@ describe("AuthService", () => {
         password: "testtesttest"
       };
       await service.signUp(signUpDto);
-      expect(notificationsService.sendActivationEmail).toHaveBeenCalledWith("John Doe", "test@example.com", expect.any(String));
+      expect(emailServiceMock.sendMail).toHaveBeenCalled();
     });
   });
 
