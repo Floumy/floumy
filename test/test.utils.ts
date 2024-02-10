@@ -35,6 +35,9 @@ export async function setupTestingModule(
   providers: any[],
   controllers: any[] = []
 ) {
+  const emailServiceMock = {
+    sendMail: jest.fn()
+  };
   const mockS3Client = {
     send: jest.fn().mockImplementation(() => ({
       $metadata: {
@@ -56,6 +59,9 @@ export async function setupTestingModule(
     providers: [ConfigService, {
       provide: "S3_CLIENT",
       useValue: mockS3Client
+    }, {
+      provide: "MAIL_TRANSPORTER",
+      useValue: emailServiceMock
     }, ...providers]
   }).compile();
 

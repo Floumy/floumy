@@ -6,6 +6,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { TokensService } from "./tokens.service";
 import { SignUpDto } from "./auth.dtos";
+import { v4 as uuid } from "uuid";
+import { NotificationsService } from "../notifications/notifications.service";
 
 export type AuthDto = {
   accessToken: string;
@@ -19,7 +21,8 @@ export class AuthService {
   constructor(private usersService: UsersService,
               @InjectRepository(RefreshToken)
               private refreshTokenRepository: Repository<RefreshToken>,
-              private tokensService: TokensService) {
+              private tokensService: TokensService,
+              private notificationsService: NotificationsService) {
   }
 
   async signIn(email: string, password: string): Promise<AuthDto> {
@@ -59,6 +62,8 @@ export class AuthService {
   async signUp(signUpDto: SignUpDto): Promise<AuthDto> {
     const user = await this.usersService.create(signUpDto.name, signUpDto.email, signUpDto.password, signUpDto.invitationToken);
     const accessToken = await this.tokensService.generateAccessToken(user);
+    const activationToken = await this.generateActivationToken();
+    await this.notificationsService.sendActivationEmail(user.name, user.email, activationToken);
     const refreshToken = await this.createRefreshToken(user);
     return {
       accessToken: accessToken,
@@ -91,5 +96,9 @@ export class AuthService {
       accessToken: await this.tokensService.generateAccessToken(user),
       refreshToken: await this.createRefreshToken(user)
     };
+  }
+
+  private async generateActivationToken() {
+    return uuid();
   }
 }

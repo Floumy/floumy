@@ -24,6 +24,10 @@ export class User {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @Column({ default: false })
+  isActive: boolean;
+  @Column({ nullable: true })
+  activationToken: string;
   @OneToMany(() => RefreshToken, refreshToken => refreshToken.user, { cascade: true, lazy: true })
   refreshTokens: Promise<RefreshToken[]>;
   @ManyToOne(() => Org, org => org.users, { lazy: true })
