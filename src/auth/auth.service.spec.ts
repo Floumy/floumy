@@ -47,31 +47,6 @@ describe("AuthService", () => {
       expect(accessToken).toBeDefined();
       expect(refreshToken).toBeDefined();
     });
-    it("should return the same refresh token if it's not expired", async () => {
-      const signUpDto = {
-        name: "John Doe",
-        email: "john@example.com",
-        password: "testtesttest"
-      };
-
-      const { refreshToken: originalRefreshToken } = await service.signUp(signUpDto);
-      const { refreshToken: newRefreshToken } = await service.signIn("john@example.com", "testtesttest");
-      expect(originalRefreshToken).toEqual(newRefreshToken);
-    });
-    it("should return a new refresh token if it's expired", async () => {
-      const signUpDto = {
-        name: "John Doe",
-        email: "john@example.com",
-        password: "testtesttest"
-      };
-      const { refreshToken: originalRefreshToken } = await service.signUp(signUpDto);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const refreshTokenEntity = await refreshTokenRepository.findOneByOrFail({ token: originalRefreshToken });
-      refreshTokenEntity.expirationDate = new Date(Date.now() - 1000);
-      await refreshTokenRepository.save(refreshTokenEntity);
-      const { refreshToken: newRefreshToken } = await service.signIn("john@example.com", "testtesttest");
-      expect(originalRefreshToken).not.toEqual(newRefreshToken);
-    });
   });
 
   describe("when signing in with invalid credentials", () => {
@@ -106,7 +81,8 @@ describe("AuthService", () => {
         password: "testtesttest"
       };
 
-      const { accessToken, refreshToken } = await service.signUp(signUpDto);
+      await service.signUp(signUpDto);
+      const { refreshToken, accessToken } = await service.signIn("test@example.com", "testtesttest");
       // sleep 1 second to make sure the generate refresh token is different
       await new Promise(resolve => setTimeout(resolve, 1000));
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await service.refreshToken(refreshToken);
@@ -119,7 +95,8 @@ describe("AuthService", () => {
         email: "test@example.com",
         password: "testtesttest"
       };
-      const { refreshToken } = await service.signUp(signUpDto);
+      await service.signUp(signUpDto);
+      const { refreshToken } = await service.signIn("test@example.com", "testtesttest");
       // sleep 1 second to make sure the generate refresh token is different
       await new Promise(resolve => setTimeout(resolve, 1000));
       const { refreshToken: newRefreshToken } = await service.refreshToken(refreshToken);

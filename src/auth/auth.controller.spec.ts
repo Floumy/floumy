@@ -48,24 +48,19 @@ describe("AuthController", () => {
     });
   });
 
-  describe("when signing up with valid credentials", () => {
-    it("should return an access token", async () => {
-      const { accessToken } = await controller.signUp({
-        name: "Test User",
-        email: "test@example.com",
-        password: "testtesttest"
-      });
-      expect(accessToken).toBeDefined();
-    });
-  });
-
   describe("when refreshing an access token", () => {
     it("should return a new access token and a new refresh token", async () => {
-      const { accessToken, refreshToken } = await controller.signUp({
+      await controller.signUp({
         name: "Test User",
         email: "test@example.com",
         password: "testtesttest"
       });
+
+      const { accessToken, refreshToken } = await controller.signIn({
+        email: "test@example.com",
+        password: "testtesttest"
+      });
+
       // Wait for 1 second to make sure the refresh token is regenerated
       await new Promise(resolve => setTimeout(resolve, 1000));
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await controller.refreshToken({

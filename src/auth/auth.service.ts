@@ -59,7 +59,7 @@ export class AuthService {
     return token;
   }
 
-  async signUp(signUpDto: SignUpDto): Promise<AuthDto> {
+  async signUp(signUpDto: SignUpDto): Promise<void> {
     const user = await this.usersService.create(signUpDto.name, signUpDto.email, signUpDto.password, signUpDto.invitationToken);
 
     try {
@@ -67,12 +67,8 @@ export class AuthService {
       await this.notificationsService.sendActivationEmail(user.name, user.email, activationToken);
     } catch (e) {
       this.logger.error(e.message);
+      throw new Error("Failed to send activation email");
     }
-
-    return {
-      accessToken: await this.tokensService.generateAccessToken(user),
-      refreshToken: await this.createRefreshToken(user)
-    };
   }
 
   async refreshToken(refreshToken: string) {
