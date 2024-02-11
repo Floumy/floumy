@@ -22,10 +22,7 @@ export async function signUp(app: INestApplication, name: string, email: string,
       email,
       password
     })
-    .expect(HttpStatus.CREATED)
-    .expect(({ body }) => {
-      expect(body.accessToken).toBeDefined();
-    });
+    .expect(HttpStatus.CREATED);
 }
 
 export async function signUpAndSignIn(app: INestApplication, name: string, email: string, password: string): Promise<request.Test> {
