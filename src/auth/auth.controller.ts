@@ -58,6 +58,11 @@ export class AuthController {
   @Post("activate")
   @HttpCode(HttpStatus.OK)
   async activateAccount(@Body() activationDto: { activationToken: string }) {
-    return await this.authService.activateAccount(activationDto.activationToken);
+    try {
+      return await this.authService.activateAccount(activationDto.activationToken);
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

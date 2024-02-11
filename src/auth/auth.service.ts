@@ -109,11 +109,16 @@ export class AuthService {
   }
 
   async activateAccount(activationToken: string) {
+    if (!activationToken) {
+      this.logger.error("Activation token not provided");
+      throw new Error("Activation token not provided");
+    }
+
     const user = await this.usersService.findOneByActivationToken(activationToken);
 
     if (!user) {
       this.logger.error("User not found");
-      throw new UnauthorizedException();
+      throw new Error("Activation token not found");
     }
 
     user.isActive = true;
