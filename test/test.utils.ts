@@ -39,7 +39,7 @@ export async function setupTestingModule(
   const emailServiceMock = {
     sendMail: jest.fn()
   };
-  const mockS3Client = {
+  const s3ClientMock = {
     send: jest.fn().mockImplementation(() => ({
       $metadata: {
         httpStatusCode: 200
@@ -60,7 +60,7 @@ export async function setupTestingModule(
     ],
     providers: [ConfigService, {
       provide: "S3_CLIENT",
-      useValue: mockS3Client
+      useValue: s3ClientMock
     }, {
       provide: "MAIL_TRANSPORTER",
       useValue: emailServiceMock
