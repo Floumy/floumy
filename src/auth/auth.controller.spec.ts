@@ -6,6 +6,7 @@ import { setupTestingModule } from "../../test/test.utils";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { RefreshToken } from "./refresh-token.entity";
 import { TokensService } from "./tokens.service";
+import { NotificationsService } from "../notifications/notifications.service";
 
 describe("AuthController", () => {
   let controller: AuthController;
@@ -14,7 +15,7 @@ describe("AuthController", () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
-      [AuthService, TokensService],
+      [AuthService, TokensService, NotificationsService],
       [AuthController]
     );
     cleanup = dbCleanup;
