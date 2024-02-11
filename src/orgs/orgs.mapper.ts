@@ -12,6 +12,7 @@ export class MembersMapper {
       id: member.id,
       name: member.name,
       email: member.email,
+      isActive: member.isActive,
       createdAt: member.createdAt
     };
   }
