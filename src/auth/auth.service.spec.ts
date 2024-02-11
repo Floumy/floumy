@@ -23,12 +23,12 @@ describe("AuthService", () => {
     cleanup = dbCleanup;
     service = module.get<AuthService>(AuthService);
     refreshTokenRepository = module.get<Repository<RefreshToken>>(getRepositoryToken(RefreshToken));
-    emailServiceMock = module.get("MAIL_TRANSPORTER");
+    emailServiceMock = module.get("POSTMARK_CLIENT");
   });
 
   afterEach(async () => {
     await cleanup();
-    emailServiceMock.sendMail.mockClear();
+    emailServiceMock.sendEmail.mockClear();
   });
 
   it("should be defined", () => {
@@ -94,7 +94,7 @@ describe("AuthService", () => {
         password: "testtesttest"
       };
       await service.signUp(signUpDto);
-      expect(emailServiceMock.sendMail).toHaveBeenCalled();
+      expect(emailServiceMock.sendEmail).toHaveBeenCalled();
     });
   });
 

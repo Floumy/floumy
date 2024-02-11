@@ -1,28 +1,23 @@
 import { Module } from "@nestjs/common";
 import { NotificationsService } from "./notifications.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { createTransport } from "nodemailer";
+import { ServerClient } from "postmark";
 
-const mailTransporterProvider = {
-  provide: "MAIL_TRANSPORTER",
+const postmarkClientProvider = {
+  provide: "POSTMARK_CLIENT",
   useFactory: (configService: ConfigService) => {
-    return createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: configService.get("mail.user"),
-        clientId: configService.get("mail.clientId"),
-        clientSecret: configService.get("mail.clientSecret"),
-        refreshToken: configService.get("mail.refreshToken"),
-        accessToken: configService.get("mail.accessToken")
-      }
-    });
+    // This is a workaround to avoid creating the provider if the API key is not set
+    // which is the case when running tests
+    if (!configService.get("mail.postmarkApiKey")) {
+      return null;
+    }
+    return new ServerClient(configService.get("mail.postmarkApiKey"));
   },
   inject: [ConfigService]
 };
 
 @Module({
-  providers: [NotificationsService, mailTransporterProvider],
+  providers: [NotificationsService, postmarkClientProvider],
   exports: [NotificationsService],
   imports: [ConfigModule]
 })

@@ -4,13 +4,13 @@ import { ConfigModule } from "@nestjs/config";
 
 describe("NotificationsService", () => {
   let service: NotificationsService;
-  let emailServiceMock: { sendMail: jest.Mock };
+  let emailServiceMock: { sendEmail: jest.Mock };
   beforeEach(async () => {
     emailServiceMock = {
-      sendMail: jest.fn()
+      sendEmail: jest.fn()
     };
     const module: TestingModule = await Test.createTestingModule({
-      providers: [NotificationsService, { provide: "MAIL_TRANSPORTER", useValue: emailServiceMock }],
+      providers: [NotificationsService, { provide: "POSTMARK_CLIENT", useValue: emailServiceMock }],
       imports: [ConfigModule]
     }).compile();
 
@@ -28,7 +28,7 @@ describe("NotificationsService", () => {
         "test@example.com",
         "test"
       );
-      expect(emailServiceMock.sendMail).toHaveBeenCalled();
+      expect(emailServiceMock.sendEmail).toHaveBeenCalled();
     });
   });
 });

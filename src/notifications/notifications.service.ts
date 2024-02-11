@@ -1,24 +1,28 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Transporter } from "nodemailer";
 import { ConfigService } from "@nestjs/config";
+import { ServerClient } from "postmark";
 
 @Injectable()
 export class NotificationsService {
 
 
-  constructor(@Inject("MAIL_TRANSPORTER") private transporter: Transporter, private configService: ConfigService) {
+  constructor(
+    @Inject("POSTMARK_CLIENT") private postmarkClient: ServerClient,
+    private configService: ConfigService) {
   }
 
+
   async sendActivationEmail(name: string, email: string, activationToken: string) {
-    await this.transporter.sendMail({
-      from: this.configService.get("mail.user"),
-      to: email,
-      subject: "Activate your account",
-      html: `
+    await this.postmarkClient.sendEmail({
+      From: this.configService.get("mail.user"),
+      To: email,
+      Subject: "Activate your account",
+      HtmlBody: `
         <h1>Hello ${name}</h1>
         <p>Click <a href="${this.configService.get("app.url")}/auth/activate/${activationToken}">here</a> to activate your account</p>
       `,
-      text: `Hello ${name}, click here to activate your account: ${this.configService.get("app.url")}/auth/activate/${activationToken}`
+      TextBody: `Hello ${name}, click here to activate your account: ${this.configService.get("app.url")}/auth/activate/${activationToken}`,
+      MessageStream: "outbound"
     });
   }
 }
