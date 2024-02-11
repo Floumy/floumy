@@ -12,23 +12,23 @@ describe("AuthService", () => {
   let service: AuthService;
   let cleanup: () => Promise<void>;
   let refreshTokenRepository: Repository<RefreshToken>;
-  const emailServiceMock = {
-    sendMail: jest.fn()
-  };
+  let emailServiceMock: any;
 
   beforeEach(async () => {
 
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
-      [AuthService, TokensService, { provide: "MAIL_TRANSPORTER", useValue: emailServiceMock }, NotificationsService]
+      [AuthService, TokensService, NotificationsService]
     );
     cleanup = dbCleanup;
     service = module.get<AuthService>(AuthService);
     refreshTokenRepository = module.get<Repository<RefreshToken>>(getRepositoryToken(RefreshToken));
+    emailServiceMock = module.get("MAIL_TRANSPORTER");
   });
 
   afterEach(async () => {
     await cleanup();
+    emailServiceMock.sendMail.mockClear();
   });
 
   it("should be defined", () => {
