@@ -7,21 +7,27 @@ import { Repository } from "typeorm";
 import { setupTestingModule } from "../../test/test.utils";
 import { TokensService } from "./tokens.service";
 import { NotificationsService } from "../notifications/notifications.service";
+import { Org } from "../orgs/org.entity";
+import { User } from "../users/user.entity";
+import { UsersService } from "../users/users.service";
+import { OrgsService } from "../orgs/orgs.service";
 
 describe("AuthService", () => {
   let service: AuthService;
   let cleanup: () => Promise<void>;
   let refreshTokenRepository: Repository<RefreshToken>;
   let emailServiceMock: any;
+  let usersService: UsersService;
 
   beforeEach(async () => {
 
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
-      [AuthService, TokensService, NotificationsService]
+      [UsersModule, TypeOrmModule.forFeature([RefreshToken, User, Org])],
+      [AuthService, TokensService, NotificationsService, UsersService, OrgsService]
     );
     cleanup = dbCleanup;
     service = module.get<AuthService>(AuthService);
+    usersService = module.get<UsersService>(UsersService);
     refreshTokenRepository = module.get<Repository<RefreshToken>>(getRepositoryToken(RefreshToken));
     emailServiceMock = module.get("POSTMARK_CLIENT");
   });
@@ -79,6 +85,16 @@ describe("AuthService", () => {
       };
       await service.signUp(signUpDto);
       expect(emailServiceMock.sendEmail).toHaveBeenCalled();
+    });
+    it("should store the activation token in the database", async () => {
+      const signUpDto = {
+        name: "John Doe",
+        email: "test@example.com",
+        password: "testtesttest"
+      };
+      await service.signUp(signUpDto);
+      const user = await usersService.findOneByEmail("test@example.com");
+      expect(user.activationToken).toBeDefined();
     });
   });
 
