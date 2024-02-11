@@ -47,6 +47,15 @@ describe("AuthService", () => {
       expect(accessToken).toBeDefined();
       expect(refreshToken).toBeDefined();
     });
+    it("should not allow to sign in with an inactive account", async () => {
+      const signUpDto = {
+        name: "John Doe",
+        email: "john@example.com",
+        password: "testtesttest"
+      };
+      await service.signUp(signUpDto);
+      await expect(service.signIn("john@example.com", "testtesttest")).rejects.toThrow(UnauthorizedException);
+    });
   });
 
   describe("when signing in with invalid credentials", () => {

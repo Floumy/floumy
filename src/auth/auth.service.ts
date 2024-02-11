@@ -27,6 +27,10 @@ export class AuthService {
 
   async signIn(email: string, password: string): Promise<AuthDto> {
     const user = await this.usersService.findOneByEmail(email);
+    if (!user.isActive) {
+      this.logger.error("User is not active");
+      throw new UnauthorizedException();
+    }
     if (!await this.usersService.isPasswordCorrect(password, user?.password)) {
       this.logger.error("Invalid credentials");
       throw new UnauthorizedException();
