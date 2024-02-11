@@ -53,4 +53,11 @@ export class AuthController {
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
     return await this.authService.refreshToken(refreshTokenDto.refreshToken);
   }
+
+  @Public()
+  @Post("activate")
+  @HttpCode(HttpStatus.OK)
+  async activateAccount(@Body() activationDto: { activationToken: string }) {
+    return await this.authService.activateAccount(activationDto.activationToken);
+  }
 }

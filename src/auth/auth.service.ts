@@ -69,6 +69,8 @@ export class AuthService {
     try {
       const activationToken = await this.generateActivationToken();
       await this.notificationsService.sendActivationEmail(user.name, user.email, activationToken);
+      user.activationToken = activationToken;
+      await this.usersService.save(user);
     } catch (e) {
       this.logger.error(e.message);
       throw new Error("Failed to send activation email");
@@ -104,5 +106,18 @@ export class AuthService {
 
   private async generateActivationToken() {
     return uuid();
+  }
+
+  async activateAccount(activationToken: string) {
+    const user = await this.usersService.findOneByActivationToken(activationToken);
+
+    if (!user) {
+      this.logger.error("User not found");
+      throw new UnauthorizedException();
+    }
+
+    user.isActive = true;
+    user.activationToken = null;
+    await this.usersService.save(user);
   }
 }

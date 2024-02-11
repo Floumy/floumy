@@ -78,4 +78,12 @@ export class UsersService {
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     return UserMapper.toDto(user);
   }
+
+  async findOneByActivationToken(activationToken: string) {
+    return this.usersRepository.findOneBy({ activationToken });
+  }
+
+  async save(user: User) {
+    return this.usersRepository.save(user);
+  }
 }
