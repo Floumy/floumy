@@ -7,7 +7,7 @@ import databaseConfig from "../src/config/database.config";
 import encryptionConfig from "../src/config/encryption.config";
 import jwtConfig from "../src/config/jwt.config";
 import { testDbOptions } from "./test-db.options";
-import { NotificationsModule } from "../src/notifications/notifications.module";
+import { NotificationsService } from "../src/notifications/notifications.service";
 
 
 export async function clearDatabase(dataSource: DataSource) {
@@ -37,7 +37,9 @@ export async function setupTestingModule(
   controllers: any[] = []
 ) {
   const emailServiceMock = {
-    sendMail: jest.fn()
+    sendMail: jest.fn().mockImplementation(() => ({
+      messageId: "test"
+    }))
   };
   const s3ClientMock = {
     send: jest.fn().mockImplementation(() => ({
@@ -55,16 +57,21 @@ export async function setupTestingModule(
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig]
       }),
-      NotificationsModule,
       ...imports
     ],
-    providers: [ConfigService, {
-      provide: "S3_CLIENT",
-      useValue: s3ClientMock
-    }, {
-      provide: "MAIL_TRANSPORTER",
-      useValue: emailServiceMock
-    }, ...providers]
+    providers: [
+      ConfigService,
+      ...providers,
+      {
+        provide: "S3_CLIENT",
+        useValue: s3ClientMock
+      },
+      {
+        provide: "MAIL_TRANSPORTER",
+        useValue: emailServiceMock
+      },
+      NotificationsService
+    ]
   }).compile();
 
   const dataSource = new DataSource(testDbOptions);
