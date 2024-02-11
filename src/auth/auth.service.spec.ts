@@ -135,4 +135,22 @@ describe("AuthService", () => {
       await expect(service.refreshToken("invalid")).rejects.toThrow(UnauthorizedException);
     });
   });
+
+  describe("when activating an account", () => {
+    it("should activate the account", async () => {
+      const signUpDto = {
+        name: "John Doe",
+        email: "test@example.com",
+        password: "testtesttest"
+      };
+      await service.signUp(signUpDto);
+      const user = await usersService.findOneByEmail(signUpDto.email);
+      await service.activateAccount(user.activationToken);
+      const activatedUser = await usersService.findOneByEmail(signUpDto.email);
+      expect(activatedUser.isActive).toBe(true);
+    });
+    it("should throw an error if the activation token is invalid", async () => {
+      await expect(service.activateAccount("invalid")).rejects.toThrow(UnauthorizedException);
+    });
+  });
 });
