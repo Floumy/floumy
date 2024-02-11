@@ -9,7 +9,11 @@ const postmarkClientProvider = {
     // This is a workaround to avoid creating the provider if the API key is not set
     // which is the case when running tests
     if (!configService.get("mail.postmarkApiKey")) {
-      return null;
+      return {
+        sendEmail: async () => {
+          console.error("Email not sent because the API key is not set");
+        }
+      };
     }
     return new ServerClient(configService.get("mail.postmarkApiKey"));
   },
