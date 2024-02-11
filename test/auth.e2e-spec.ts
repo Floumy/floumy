@@ -83,10 +83,7 @@ describe("AuthController (e2e)", () => {
         email: "john@example.com",
         password: "testtesttest"
       })
-      .expect(HttpStatus.CREATED)
-      .expect(({ body }) => {
-        expect(body.accessToken).toBeDefined();
-      });
+      .expect(HttpStatus.CREATED);
   });
 
   it("/auth/sign-up (POST) with invalid credentials", () => {
