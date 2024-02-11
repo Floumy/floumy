@@ -36,11 +36,6 @@ export async function setupTestingModule(
   providers: any[],
   controllers: any[] = []
 ) {
-  const emailServiceMock = {
-    sendMail: jest.fn().mockImplementation(() => ({
-      messageId: "test"
-    }))
-  };
   const s3ClientMock = {
     send: jest.fn().mockImplementation(() => ({
       $metadata: {
@@ -48,6 +43,10 @@ export async function setupTestingModule(
       },
       Location: "https://test-bucket.nyc3.digitaloceanspaces.com"
     }))
+  };
+  const postmarkClientMock = {
+    sendEmail: jest.fn().mockImplementation(() => {
+    })
   };
   const module: TestingModule = await Test.createTestingModule({
     controllers,
@@ -67,8 +66,8 @@ export async function setupTestingModule(
         useValue: s3ClientMock
       },
       {
-        provide: "MAIL_TRANSPORTER",
-        useValue: emailServiceMock
+        provide: "POSTMARK_CLIENT",
+        useValue: postmarkClientMock
       },
       NotificationsService
     ]

@@ -61,13 +61,17 @@ export class AuthService {
 
   async signUp(signUpDto: SignUpDto): Promise<AuthDto> {
     const user = await this.usersService.create(signUpDto.name, signUpDto.email, signUpDto.password, signUpDto.invitationToken);
-    const accessToken = await this.tokensService.generateAccessToken(user);
-    const activationToken = await this.generateActivationToken();
-    await this.notificationsService.sendActivationEmail(user.name, user.email, activationToken);
-    const refreshToken = await this.createRefreshToken(user);
+
+    try {
+      const activationToken = await this.generateActivationToken();
+      await this.notificationsService.sendActivationEmail(user.name, user.email, activationToken);
+    } catch (e) {
+      this.logger.error(e.message);
+    }
+
     return {
-      accessToken: accessToken,
-      refreshToken: refreshToken
+      accessToken: await this.tokensService.generateAccessToken(user),
+      refreshToken: await this.createRefreshToken(user)
     };
   }
 
