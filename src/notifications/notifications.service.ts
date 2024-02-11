@@ -19,9 +19,9 @@ export class NotificationsService {
       Subject: "Activate your account",
       HtmlBody: `
         <h1>Hello ${name}</h1>
-        <p>Click <a href="${this.configService.get("app.url")}/auth/activate/${activationToken}">here</a> to activate your account</p>
+        <p>Click <a href="${this.configService.get("app.url")}/auth/activate?token=${activationToken}">here</a> to activate your account</p>
       `,
-      TextBody: `Hello ${name}, click here to activate your account: ${this.configService.get("app.url")}/auth/activate/${activationToken}`,
+      TextBody: `Hello ${name}, click here to activate your account: ${this.configService.get("app.url")}/auth/activate?token=${activationToken}`,
       MessageStream: "outbound"
     });
   }
