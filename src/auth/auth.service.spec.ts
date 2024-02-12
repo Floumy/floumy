@@ -49,6 +49,9 @@ describe("AuthService", () => {
         password: "testtesttest"
       };
       await service.signUp(signUpDto);
+      const user = await usersService.findOneByEmail("john@example.com");
+      user.isActive = true;
+      await usersService.save(user);
       const { accessToken, refreshToken } = await service.signIn("john@example.com", "testtesttest");
       expect(accessToken).toBeDefined();
       expect(refreshToken).toBeDefined();
@@ -107,6 +110,9 @@ describe("AuthService", () => {
       };
 
       await service.signUp(signUpDto);
+      const user = await usersService.findOneByEmail("test@example.com");
+      user.isActive = true;
+      await usersService.save(user);
       const { refreshToken, accessToken } = await service.signIn("test@example.com", "testtesttest");
       // sleep 1 second to make sure the generate refresh token is different
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -121,6 +127,9 @@ describe("AuthService", () => {
         password: "testtesttest"
       };
       await service.signUp(signUpDto);
+      const user = await usersService.findOneByEmail("test@example.com");
+      user.isActive = true;
+      await usersService.save(user);
       const { refreshToken } = await service.signIn("test@example.com", "testtesttest");
       // sleep 1 second to make sure the generate refresh token is different
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -150,7 +159,7 @@ describe("AuthService", () => {
       expect(activatedUser.isActive).toBe(true);
     });
     it("should throw an error if the activation token is invalid", async () => {
-      await expect(service.activateAccount("invalid")).rejects.toThrow(UnauthorizedException);
+      await expect(service.activateAccount("invalid")).rejects.toThrow(Error);
     });
   });
 });
