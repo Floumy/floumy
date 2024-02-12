@@ -40,6 +40,9 @@ describe("AuthController", () => {
   describe("when signing in with valid credentials", () => {
     it("should return an access token", async () => {
       await controller.signUp({ name: "John Doe", email: "john@example.com", password: "testtesttest" });
+      const user = await usersService.findOneByEmail("john@example.com");
+      user.isActive = true;
+      await usersService.save(user);
       const { accessToken } = await controller.signIn({ email: "john@example.com", password: "testtesttest" });
       expect(accessToken).toBeDefined();
     });
@@ -61,6 +64,10 @@ describe("AuthController", () => {
         email: "test@example.com",
         password: "testtesttest"
       });
+
+      const user = await usersService.findOneByEmail("test@example.com");
+      user.isActive = true;
+      await usersService.save(user);
 
       const { accessToken, refreshToken } = await controller.signIn({
         email: "test@example.com",

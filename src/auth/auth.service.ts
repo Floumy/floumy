@@ -27,7 +27,7 @@ export class AuthService {
 
   async signIn(email: string, password: string): Promise<AuthDto> {
     const user = await this.usersService.findOneByEmail(email);
-    if (!user.isActive) {
+    if (!user?.isActive) {
       this.logger.error("User is not active");
       throw new UnauthorizedException();
     }
