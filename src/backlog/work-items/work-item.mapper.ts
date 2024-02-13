@@ -55,7 +55,7 @@ export default class WorkItemMapper {
           type: file.type
         };
       })),
-      createdBy: UserMapper.toDto(createdBy),
+      createdBy: createdBy ? UserMapper.toDto(createdBy) : undefined,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt
