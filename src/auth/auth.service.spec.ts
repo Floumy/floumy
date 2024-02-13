@@ -140,26 +140,43 @@ describe("AuthService", () => {
       expect(refreshTokenEntity.expirationDate.getTime()).toBeGreaterThan(Date.now());
       expect(newRefreshToken).not.toEqual(refreshToken);
     });
+
     it("should throw an error if the refresh token is invalid", async () => {
       await expect(service.refreshToken("invalid")).rejects.toThrow(UnauthorizedException);
     });
-  });
 
-  describe("when activating an account", () => {
-    it("should activate the account", async () => {
+    it("should throw an error if the user is not active", async () => {
       const signUpDto = {
         name: "John Doe",
-        email: "test@example.com",
+        email: "john@example.com",
         password: "testtesttest"
       };
       await service.signUp(signUpDto);
-      const user = await usersService.findOneByEmail(signUpDto.email);
-      await service.activateAccount(user.activationToken);
-      const activatedUser = await usersService.findOneByEmail(signUpDto.email);
-      expect(activatedUser.isActive).toBe(true);
+      const user = await usersService.findOneByEmail("john@example.com");
+      user.isActive = true;
+      await usersService.save(user);
+      const { refreshToken } = await service.signIn("john@example.com", "testtesttest");
+      user.isActive = false;
+      await usersService.save(user);
+      await expect(service.refreshToken(refreshToken)).rejects.toThrow(UnauthorizedException);
     });
-    it("should throw an error if the activation token is invalid", async () => {
-      await expect(service.activateAccount("invalid")).rejects.toThrow(Error);
+
+    describe("when activating an account", () => {
+      it("should activate the account", async () => {
+        const signUpDto = {
+          name: "John Doe",
+          email: "test@example.com",
+          password: "testtesttest"
+        };
+        await service.signUp(signUpDto);
+        const user = await usersService.findOneByEmail(signUpDto.email);
+        await service.activateAccount(user.activationToken);
+        const activatedUser = await usersService.findOneByEmail(signUpDto.email);
+        expect(activatedUser.isActive).toBe(true);
+      });
+      it("should throw an error if the activation token is invalid", async () => {
+        await expect(service.activateAccount("invalid")).rejects.toThrow(Error);
+      });
     });
   });
 });

@@ -5,9 +5,10 @@ import { ConfigModule } from "@nestjs/config";
 import { Org } from "./org.entity";
 import { OrgsController } from "./orgs.controller";
 import { TokensService } from "../auth/tokens.service";
+import { User } from "../users/user.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Org]), ConfigModule],
+  imports: [TypeOrmModule.forFeature([Org, User]), ConfigModule],
   providers: [OrgsService, TokensService],
   exports: [OrgsService],
   controllers: [OrgsController]

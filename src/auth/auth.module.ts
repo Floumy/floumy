@@ -11,6 +11,7 @@ import { RefreshToken } from "./refresh-token.entity";
 import { ConfigService } from "@nestjs/config";
 import { TokensService } from "./tokens.service";
 import { NotificationsModule } from "../notifications/notifications.module";
+import { User } from "../users/user.entity";
 
 @Module({
   controllers: [AuthController],
@@ -29,7 +30,7 @@ import { NotificationsModule } from "../notifications/notifications.module";
       secret: jwtConstants.secret,
       signOptions: { expiresIn: "60s" }
     }),
-    TypeOrmModule.forFeature([RefreshToken])
+    TypeOrmModule.forFeature([RefreshToken, User])
   ],
   exports: [AuthService, TokensService]
 })

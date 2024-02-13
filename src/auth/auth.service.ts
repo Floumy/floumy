@@ -98,6 +98,12 @@ export class AuthService {
     }
 
     const user = await refreshTokenEntity.user;
+
+    if (!user.isActive) {
+      this.logger.error("User is not active");
+      throw new UnauthorizedException();
+    }
+
     return {
       accessToken: await this.tokensService.generateAccessToken(user),
       refreshToken: await this.createRefreshToken(user)

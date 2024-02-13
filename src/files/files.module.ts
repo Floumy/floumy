@@ -11,6 +11,7 @@ import { File } from "./file.entity";
 import { Org } from "../orgs/org.entity";
 import { WorkItemFile } from "../backlog/work-items/work-item-file.entity";
 import { FeatureFile } from "../roadmap/features/feature-file.entity";
+import { User } from "../users/user.entity";
 
 const s3ClientProvider = {
   provide: "S3_CLIENT",
@@ -32,7 +33,7 @@ const s3ClientProvider = {
 @Module({
   controllers: [FilesController],
   providers: [FilesService, FilesStorageRepository, s3ClientProvider],
-  imports: [ConfigModule, AuthModule, UsersModule, TypeOrmModule.forFeature([Org, File, WorkItemFile, FeatureFile])]
+  imports: [ConfigModule, AuthModule, UsersModule, TypeOrmModule.forFeature([Org, File, WorkItemFile, FeatureFile, User])]
 })
 export class FilesModule {
 }
