@@ -7,9 +7,10 @@ import { OrgsModule } from "../orgs/orgs.module";
 import { UsersController } from "./users.controller";
 import { AuthGuard } from "../auth/auth.guard";
 import { TokensService } from "../auth/tokens.service";
+import { RefreshToken } from "../auth/refresh-token.entity";
 
 @Module({
-  imports: [OrgsModule, TypeOrmModule.forFeature([User]), ConfigModule],
+  imports: [OrgsModule, TypeOrmModule.forFeature([User, RefreshToken]), ConfigModule],
   providers: [UsersService, AuthGuard, TokensService],
   exports: [UsersService],
   controllers: [UsersController]
