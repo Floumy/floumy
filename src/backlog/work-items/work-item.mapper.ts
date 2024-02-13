@@ -2,6 +2,7 @@ import { WorkItem } from "./work-item.entity";
 import { WorkItemDto } from "./dtos";
 import { Feature } from "../../roadmap/features/feature.entity";
 import { Iteration } from "../../iterations/Iteration.entity";
+import { User } from "../../users/user.entity";
 
 class FeatureMapper {
   static toDto(feature: Feature) {
@@ -21,10 +22,20 @@ class IterationMapper {
   }
 }
 
+class UserMapper {
+  static toDto(user: User) {
+    return {
+      id: user.id,
+      name: user.name
+    };
+  }
+}
+
 export default class WorkItemMapper {
   static async toDto(workItem: WorkItem): Promise<WorkItemDto> {
     const feature = await workItem.feature;
     const iteration = await workItem.iteration;
+    const createdBy = await workItem.createdBy;
     return {
       id: workItem.id,
       title: workItem.title,
@@ -44,6 +55,7 @@ export default class WorkItemMapper {
           type: file.type
         };
       })),
+      createdBy: UserMapper.toDto(createdBy),
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt

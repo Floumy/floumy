@@ -37,6 +37,7 @@ export interface WorkItemDto {
     size: number;
     type: string;
   }[];
+  createdBy: UserDto;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,4 +46,9 @@ export interface WorkItemPatchDto {
   iteration?: string;
   status?: WorkItemStatus;
   priority?: Priority;
+}
+
+export interface UserDto {
+  id: string;
+  name: string;
 }

@@ -32,6 +32,7 @@ describe("WorkItemsService", () => {
   let filesRepository: Repository<File>;
   let service: WorkItemsService;
   let org: Org;
+  let user: User;
 
   let cleanup: () => Promise<void>;
 
@@ -47,7 +48,7 @@ describe("WorkItemsService", () => {
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     filesRepository = module.get<Repository<File>>(getRepositoryToken(File));
-    const user = await usersService.create(
+    user = await usersService.create(
       "Test User",
       "test@example.com",
       "testtesttest"
@@ -70,7 +71,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -87,6 +88,8 @@ describe("WorkItemsService", () => {
       expect(workItem.type).toEqual(WorkItemType.USER_STORY);
       expect(workItem.feature.id).toBeDefined();
       expect(workItem.feature.title).toEqual("my feature");
+      expect(workItem.createdBy.id).toEqual(user.id);
+      expect(workItem.createdBy.name).toEqual(user.name);
     });
     it("should update the feature progress", async () => {
       const feature = await featuresService.createFeature(
@@ -98,7 +101,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -109,7 +112,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.DONE
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my other work item",
           description: "my other work item description",
@@ -140,7 +143,7 @@ describe("WorkItemsService", () => {
       file2.org = Promise.resolve(org);
       const savedFile2 = await filesRepository.save(file2);
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -182,7 +185,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -213,7 +216,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -251,7 +254,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -286,7 +289,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -311,7 +314,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the completedAt field if the status is DONE", async () => {
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -335,7 +338,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the completedAt field if the status is CLOSED", async () => {
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -375,7 +378,7 @@ describe("WorkItemsService", () => {
       file2.org = Promise.resolve(org);
       const savedFile2 = await filesRepository.save(file2);
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -428,7 +431,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -460,7 +463,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -470,7 +473,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.PLANNED
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my other work item",
           description: "my other work item description",
@@ -518,7 +521,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -529,7 +532,7 @@ describe("WorkItemsService", () => {
           iteration: iteration.id
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my other work item",
           description: "my other work item description",
@@ -560,7 +563,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -571,7 +574,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.DONE
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my other work item",
           description: "my other work item description",
@@ -594,7 +597,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -605,7 +608,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.DONE
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my other work item",
           description: "my other work item description",
@@ -630,7 +633,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       const workItem1 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -641,7 +644,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.DONE
         });
       const workItem2 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my other work item",
           description: "my other work item description",
@@ -681,7 +684,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       const workItem1 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -692,7 +695,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.DONE
         });
       const workItem2 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my other work item",
           description: "my other work item description",
@@ -741,7 +744,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       const workItem1 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 1",
           description: "my work item description 1",
@@ -752,7 +755,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.DONE
         });
       const workItem2 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 2",
           description: "my work item description 2",
@@ -799,7 +802,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       const workItem1 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -810,7 +813,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.DONE
         });
       const workItem2 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my other work item",
           description: "my other work item description",
@@ -835,7 +838,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       const workItem1 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item",
           description: "my work item description",
@@ -846,7 +849,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.DONE
         });
       const workItem2 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my other work item",
           description: "my other work item description",
@@ -873,7 +876,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 1",
           description: "my work item description 1",
@@ -884,7 +887,7 @@ describe("WorkItemsService", () => {
           status: WorkItemStatus.DONE
         });
       const workItem2 = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 2",
           description: "my work item description 2",
@@ -920,7 +923,7 @@ describe("WorkItemsService", () => {
         duration: 7
       });
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 1",
           description: "my work item description 1",
@@ -937,7 +940,7 @@ describe("WorkItemsService", () => {
     });
     it("should allow to patch the status", async () => {
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 1",
           description: "my work item description 1",
@@ -962,7 +965,7 @@ describe("WorkItemsService", () => {
           priority: Priority.LOW
         });
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 1",
           description: "my work item description 1",
@@ -988,7 +991,7 @@ describe("WorkItemsService", () => {
           priority: Priority.LOW
         });
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 1",
           description: "my work item description 1",
@@ -1014,7 +1017,7 @@ describe("WorkItemsService", () => {
           priority: Priority.LOW
         });
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 1",
           description: "my work item description 1",
@@ -1032,7 +1035,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the work item priority", async () => {
       const workItem = await service.createWorkItem(
-        org.id,
+        user.id,
         {
           title: "my work item 1",
           description: "my work item description 1",

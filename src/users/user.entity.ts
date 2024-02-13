@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { RefreshToken } from "../auth/refresh-token.entity";
 import { Org } from "../orgs/org.entity";
+import { WorkItem } from "../backlog/work-items/work-item.entity";
 
 @Entity()
 export class User {
@@ -30,6 +31,8 @@ export class User {
   activationToken: string;
   @OneToMany(() => RefreshToken, refreshToken => refreshToken.user, { cascade: true, lazy: true })
   refreshTokens: Promise<RefreshToken[]>;
+  @OneToMany(() => WorkItem, workItem => workItem.createdBy, { lazy: true })
+  createdWorkItems: Promise<WorkItem[]>;
   @ManyToOne(() => Org, org => org.users, { lazy: true })
   org: Promise<Org>;
 

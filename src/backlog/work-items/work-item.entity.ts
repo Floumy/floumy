@@ -14,6 +14,7 @@ import { Feature } from "../../roadmap/features/feature.entity";
 import { WorkItemType } from "./work-item-type.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
 import { WorkItemFile } from "./work-item-file.entity";
+import { User } from "../../users/user.entity";
 
 @Entity()
 export class WorkItem {
@@ -53,6 +54,8 @@ export class WorkItem {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @ManyToOne(() => User, user => user.createdWorkItems, { lazy: true })
+  createdBy: Promise<User>;
   @ManyToOne(() => Org, org => org.workItems, { lazy: true })
   org: Promise<Org>;
   @ManyToOne(() => Feature, feature => feature.workItems, { lazy: true })
