@@ -6,11 +6,13 @@ import { ConfigService } from "@nestjs/config";
 import * as bcrypt from "bcrypt";
 import { OrgsService } from "../orgs/orgs.service";
 import { UserMapper } from "./user.mapper";
+import { RefreshToken } from "../auth/refresh-token.entity";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(RefreshToken) private refreshTokensRepository: Repository<RefreshToken>,
     private orgsService: OrgsService,
     private configService: ConfigService
   ) {
@@ -85,5 +87,25 @@ export class UsersService {
 
   async save(user: User) {
     return this.usersRepository.save(user);
+  }
+
+  async deactivate(orgId: string, userId: string) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId, org: { id: orgId } });
+    await this.validateThatThereWillBeAtLeastOneActiveUser(user);
+    user.isActive = false;
+    await this.usersRepository.save(user);
+    await this.removeRefreshTokensFor(user);
+  }
+
+  private async validateThatThereWillBeAtLeastOneActiveUser(user: User) {
+    const org = await user.org;
+    const users = await org.users;
+    const activeUsers = users.filter(u => u.isActive);
+    if (activeUsers.length <= 1) throw new Error("Cannot deactivate the only active user in the org");
+  }
+
+  private async removeRefreshTokensFor(user: User) {
+    const refreshTokens = await user.refreshTokens;
+    await Promise.all(refreshTokens.map(token => this.refreshTokensRepository.remove(token)));
   }
 }

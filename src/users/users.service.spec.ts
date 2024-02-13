@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./user.entity";
 import { setupTestingModule } from "../../test/test.utils";
 import { OrgsModule } from "../orgs/orgs.module";
+import { RefreshToken } from "../auth/refresh-token.entity";
 
 describe("UsersService", () => {
   let service: UsersService;
@@ -10,7 +11,7 @@ describe("UsersService", () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [OrgsModule, TypeOrmModule.forFeature([User])],
+      [OrgsModule, TypeOrmModule.forFeature([User, RefreshToken])],
       [UsersService]
     );
     cleanup = dbCleanup;
@@ -147,6 +148,29 @@ describe("UsersService", () => {
       expect(foundUser.id).toEqual(user.id);
       expect(foundUser.name).toEqual(user.name);
       expect(foundUser.email).toEqual(user.email);
+    });
+  });
+  describe("when deactivating a user", () => {
+    it("should deactivate the user", async () => {
+      const user = await service.create(
+        "Test User",
+        "test@example.com",
+        "testtesttest"
+      );
+      user.isActive = true;
+      await service.save(user);
+      const org = await user.org;
+      const newUser = await service.create(
+        "Test User",
+        "test2@example.com",
+        "testtesttest",
+        org.invitationToken
+      );
+      newUser.isActive = true;
+      await service.save(newUser);
+      await service.deactivate(org.id, newUser.id);
+      const foundUser = await service.findOne(newUser.id);
+      expect(foundUser.isActive).toBe(false);
     });
   });
 });

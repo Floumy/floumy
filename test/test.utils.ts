@@ -8,6 +8,9 @@ import encryptionConfig from "../src/config/encryption.config";
 import jwtConfig from "../src/config/jwt.config";
 import { testDbOptions } from "./test-db.options";
 import { NotificationsService } from "../src/notifications/notifications.service";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { User } from "../src/users/user.entity";
+import { RefreshToken } from "../src/auth/refresh-token.entity";
 
 
 export async function clearDatabase(dataSource: DataSource) {
@@ -53,6 +56,7 @@ export async function setupTestingModule(
     imports: [
       jwtModule,
       typeOrmModule,
+      TypeOrmModule.forFeature([User, RefreshToken]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig]
       }),
