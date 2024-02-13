@@ -62,7 +62,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async update(@Request() request, @Param("id") id: string, @Body() workItemDto: CreateUpdateWorkItemDto) {
     try {
-      return await this.workItemsService.updateWorkItem(request.user.sub, id, workItemDto);
+      return await this.workItemsService.updateWorkItem(request.user.org, id, workItemDto);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
