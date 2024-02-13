@@ -7,10 +7,11 @@ import { WorkItem } from "../backlog/work-items/work-item.entity";
 import { OrgsModule } from "../orgs/orgs.module";
 import { AuthModule } from "../auth/auth.module";
 import { Iteration } from "./Iteration.entity";
+import { User } from "../users/user.entity";
 
 @Module({
   controllers: [IterationsController],
-  imports: [TypeOrmModule.forFeature([Org, WorkItem, Iteration]), OrgsModule, AuthModule],
+  imports: [TypeOrmModule.forFeature([Org, WorkItem, Iteration, User]), OrgsModule, AuthModule],
   providers: [IterationsService]
 })
 export class IterationsModule {
