@@ -32,7 +32,7 @@ describe("FeaturesService", () => {
   let okrsService: OkrsService;
   let orgsService: OrgsService;
   let filesService: FilesService;
-
+  let user: User;
   let org: Org;
 
   let cleanup: () => Promise<void>;
@@ -50,7 +50,7 @@ describe("FeaturesService", () => {
     milestonesService = module.get<MilestonesService>(MilestonesService);
     workItemsService = module.get<WorkItemsService>(WorkItemsService);
     filesService = module.get<FilesService>(FilesService);
-    const user = await usersService.create(
+    user = await usersService.create(
       "Test User",
       "test@example.com",
       "testtesttest"
@@ -463,7 +463,7 @@ describe("FeaturesService", () => {
         priority: Priority.HIGH,
         status: FeatureStatus.PLANNED
       });
-      const workItem = await workItemsService.createWorkItem(org.id, {
+      const workItem = await workItemsService.createWorkItem(user.id, {
         title: "my work item",
         description: "my work item description",
         priority: Priority.HIGH,

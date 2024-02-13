@@ -5,11 +5,11 @@ import { Feature } from "../../roadmap/features/feature.entity";
 import { Repository } from "typeorm";
 import { WorkItem } from "./work-item.entity";
 import WorkItemMapper from "./work-item.mapper";
-import { Org } from "../../orgs/org.entity";
 import { WorkItemStatus } from "./work-item-status.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
 import { File } from "../../files/file.entity";
 import { WorkItemFile } from "./work-item-file.entity";
+import { User } from "../../users/user.entity";
 
 
 @Injectable()
@@ -18,15 +18,17 @@ export class WorkItemsService {
   constructor(@InjectRepository(WorkItem) private workItemsRepository: Repository<WorkItem>,
               @InjectRepository(Feature) private featuresRepository: Repository<Feature>,
               @InjectRepository(Iteration) private iterationsRepository: Repository<Iteration>,
-              @InjectRepository(Org) private orgsRepository: Repository<Org>,
+              @InjectRepository(User) private usersRepository: Repository<User>,
               @InjectRepository(File) private filesRepository: Repository<File>,
               @InjectRepository(WorkItemFile) private workItemFilesRepository: Repository<WorkItemFile>) {
   }
 
-  async createWorkItem(orgId: string, workItemDto: CreateUpdateWorkItemDto) {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+  async createWorkItem(userId: string, workItemDto: CreateUpdateWorkItemDto) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    const org = await user.org;
     const workItem = new WorkItem();
-    await this.setWorkItemData(workItem, workItemDto, orgId);
+    workItem.createdBy = Promise.resolve(user);
+    await this.setWorkItemData(workItem, workItemDto, org.id);
     workItem.org = Promise.resolve(org);
     const savedWorkItem = await this.workItemsRepository.save(workItem);
     const feature = await savedWorkItem.feature;

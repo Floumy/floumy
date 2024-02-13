@@ -29,7 +29,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.CREATED)
   async create(@Request() request, @Body() workItemDto: CreateUpdateWorkItemDto): Promise<WorkItemDto> {
     try {
-      return await this.workItemsService.createWorkItem(request.user.org, workItemDto);
+      return await this.workItemsService.createWorkItem(request.user.sub, workItemDto);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -62,7 +62,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async update(@Request() request, @Param("id") id: string, @Body() workItemDto: CreateUpdateWorkItemDto) {
     try {
-      return await this.workItemsService.updateWorkItem(request.user.org, id, workItemDto);
+      return await this.workItemsService.updateWorkItem(request.user.sub, id, workItemDto);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

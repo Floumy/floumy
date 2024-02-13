@@ -29,6 +29,7 @@ describe("IterationsService", () => {
   let service: IterationsService;
   let workItemsService: WorkItemsService;
   let org: Org;
+  let user: User;
 
   let cleanup: () => Promise<void>;
 
@@ -42,7 +43,7 @@ describe("IterationsService", () => {
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     workItemsService = module.get<WorkItemsService>(WorkItemsService);
-    const user = await usersService.create(
+    user = await usersService.create(
       "Test User",
       "test@example.com",
       "testtesttest"
@@ -168,7 +169,7 @@ describe("IterationsService", () => {
         startDate: "2020-01-01",
         duration: 1
       });
-      const workItem = await workItemsService.createWorkItem(org.id, {
+      const workItem = await workItemsService.createWorkItem(user.id, {
         title: "Test Work Item",
         description: "Test Work Item Description",
         priority: Priority.HIGH,
@@ -182,7 +183,6 @@ describe("IterationsService", () => {
       expect(workItems.length).toEqual(1);
       expect(workItems[0].id).toEqual(workItem.id);
       expect(workItems[0].iteration).toBeUndefined();
-
     });
   });
 
@@ -235,7 +235,7 @@ describe("IterationsService", () => {
         startDate: startDate,
         duration: 1
       });
-      const workItem = await workItemsService.createWorkItem(org.id, {
+      const workItem = await workItemsService.createWorkItem(user.id, {
         title: "Work Item 1",
         description: "Work Item 1",
         priority: Priority.LOW,
@@ -263,7 +263,7 @@ describe("IterationsService", () => {
         startDate: startDate,
         duration: 1
       });
-      const workItem = await workItemsService.createWorkItem(org.id, {
+      const workItem = await workItemsService.createWorkItem(user.id, {
         title: "Work Item 1",
         description: "Work Item 1",
         priority: Priority.LOW,
@@ -287,7 +287,7 @@ describe("IterationsService", () => {
         startDate: startDate,
         duration: 1
       });
-      await workItemsService.createWorkItem(org.id, {
+      await workItemsService.createWorkItem(user.id, {
         title: "Work Item 1",
         description: "Work Item 1",
         priority: Priority.LOW,
@@ -307,7 +307,7 @@ describe("IterationsService", () => {
         startDate: startDate,
         duration: 1
       });
-      await workItemsService.createWorkItem(org.id, {
+      await workItemsService.createWorkItem(user.id, {
         title: "Work Item 1",
         description: "Work Item 1",
         priority: Priority.LOW,
@@ -326,7 +326,7 @@ describe("IterationsService", () => {
         startDate: startDate,
         duration: 1
       });
-      await workItemsService.createWorkItem(org.id, {
+      await workItemsService.createWorkItem(user.id, {
         title: "Work Item 1",
         description: "Work Item 1",
         priority: Priority.LOW,
@@ -335,7 +335,7 @@ describe("IterationsService", () => {
         estimation: 10,
         iteration: iteration.id
       });
-      await workItemsService.createWorkItem(org.id, {
+      await workItemsService.createWorkItem(user.id, {
         title: "Work Item 2",
         description: "Work Item 2",
         priority: Priority.LOW,
