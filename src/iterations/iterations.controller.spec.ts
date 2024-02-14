@@ -23,11 +23,13 @@ import { WorkItemStatus } from "../backlog/work-items/work-item-status.enum";
 import { File } from "../files/file.entity";
 import { WorkItemFile } from "../backlog/work-items/work-item-file.entity";
 import { FeatureFile } from "../roadmap/features/feature-file.entity";
+import { User } from "../users/user.entity";
 
 describe("IterationsController", () => {
   let controller: IterationsController;
   let cleanup: () => Promise<void>;
   let org: Org;
+  let user: User;
   let workItemService: WorkItemsService;
 
   beforeEach(async () => {
@@ -40,7 +42,7 @@ describe("IterationsController", () => {
     controller = module.get<IterationsController>(IterationsController);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
-    const user = await usersService.create(
+    user = await usersService.create(
       "Test User",
       "test@example.com",
       "testtesttest"
@@ -179,7 +181,7 @@ describe("IterationsController", () => {
         startDate: startDate,
         duration: 1
       });
-      await workItemService.createWorkItem(org.id, {
+      await workItemService.createWorkItem(user.id, {
         title: "Work Item 1",
         description: "Work Item 1",
         priority: Priority.LOW,
