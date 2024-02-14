@@ -22,10 +22,10 @@ export class FeatureMapper {
           type: file.type
         };
       })),
-      createdBy: {
+      createdBy: createdBy ? {
         id: createdBy.id,
         name: createdBy.name
-      },
+      } : undefined,
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
     };
