@@ -74,7 +74,7 @@ describe("WorkItemsController", () => {
       const workItemResponse = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -119,7 +119,7 @@ describe("WorkItemsController", () => {
       const workItemResponse = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -166,7 +166,7 @@ describe("WorkItemsController", () => {
       await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -210,7 +210,7 @@ describe("WorkItemsController", () => {
       const workItem = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -257,7 +257,7 @@ describe("WorkItemsController", () => {
       const workItem = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -326,7 +326,7 @@ describe("WorkItemsController", () => {
       const workItem = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -386,7 +386,7 @@ describe("WorkItemsController", () => {
       const workItem = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -430,7 +430,7 @@ describe("WorkItemsController", () => {
       await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -466,7 +466,7 @@ describe("WorkItemsController", () => {
       const workItem = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -502,7 +502,7 @@ describe("WorkItemsController", () => {
       const workItem = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {

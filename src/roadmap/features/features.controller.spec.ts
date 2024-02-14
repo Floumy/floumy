@@ -19,12 +19,14 @@ import { FeatureStatus } from "./featurestatus.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
 import { File } from "../../files/file.entity";
 import { FeatureFile } from "./feature-file.entity";
+import { User } from "../../users/user.entity";
 
 describe("FeaturesController", () => {
   let controller: FeaturesController;
   let milestoneService: MilestonesService;
   let cleanup: () => Promise<void>;
   let org: Org;
+  let user: User;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -38,7 +40,7 @@ describe("FeaturesController", () => {
     const usersService = module.get<UsersService>(UsersService);
     milestoneService = module.get<MilestonesService>(MilestonesService);
 
-    const user = await usersService.create(
+    user = await usersService.create(
       "Test User",
       "test@example.com",
       "testtesttest"
@@ -59,7 +61,7 @@ describe("FeaturesController", () => {
       const featureResponse = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -79,7 +81,7 @@ describe("FeaturesController", () => {
         await controller.create(
           {
             user: {
-              org: org.id
+              sub: user.id
             }
           },
           {
@@ -98,7 +100,7 @@ describe("FeaturesController", () => {
       await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -125,7 +127,7 @@ describe("FeaturesController", () => {
       await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -150,7 +152,7 @@ describe("FeaturesController", () => {
       const featureResponse = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -175,7 +177,7 @@ describe("FeaturesController", () => {
       const featureResponse = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -206,7 +208,7 @@ describe("FeaturesController", () => {
       const featureResponse = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -227,7 +229,7 @@ describe("FeaturesController", () => {
       const featureResponse = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -253,7 +255,7 @@ describe("FeaturesController", () => {
       const featureResponse = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
@@ -284,7 +286,7 @@ describe("FeaturesController", () => {
       const featureResponse = await controller.create(
         {
           user: {
-            org: org.id
+            sub: user.id
           }
         },
         {
