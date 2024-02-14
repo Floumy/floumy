@@ -14,6 +14,7 @@ import { Priority } from "../../common/priority.enum";
 import { Milestone } from "../milestones/milestone.entity";
 import { WorkItem } from "../../backlog/work-items/work-item.entity";
 import { FeatureFile } from "./feature-file.entity";
+import { User } from "../../users/user.entity";
 
 @Entity()
 export class Feature {
@@ -45,6 +46,8 @@ export class Feature {
   updatedAt: Date;
   @ManyToOne(() => Org, org => org.features, { lazy: true })
   org: Promise<Org>;
+  @ManyToOne(() => User, user => user.createdFeatures, { lazy: true })
+  createdBy: Promise<User>;
   @ManyToOne(() => KeyResult, keyResult => keyResult.features, { lazy: true })
   keyResult: Promise<KeyResult>;
   @ManyToOne(() => Milestone, milestone => milestone.features, { lazy: true })

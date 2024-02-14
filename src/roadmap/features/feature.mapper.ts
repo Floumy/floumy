@@ -3,6 +3,7 @@ import { FeatureDto, FeaturesListDto } from "./dtos";
 
 export class FeatureMapper {
   static async toDto(feature: Feature): Promise<FeatureDto> {
+    const createdBy = await feature.createdBy;
     const featureDto = {
       id: feature.id,
       title: feature.title,
@@ -21,6 +22,10 @@ export class FeatureMapper {
           type: file.type
         };
       })),
+      createdBy: {
+        id: createdBy.id,
+        name: createdBy.name
+      },
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
     };

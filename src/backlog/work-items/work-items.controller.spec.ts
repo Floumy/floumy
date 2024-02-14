@@ -25,11 +25,13 @@ import { File } from "../../files/file.entity";
 import { Repository } from "typeorm";
 import { WorkItemFile } from "./work-item-file.entity";
 import { FeatureFile } from "../../roadmap/features/feature-file.entity";
+import { User } from "../../users/user.entity";
 
 describe("WorkItemsController", () => {
   let controller: WorkItemsController;
   let cleanup: () => Promise<void>;
   let org: Org;
+  let user: User;
   let featureService: FeaturesService;
   let iterationsService: IterationsService;
   let fileRepository: Repository<File>;
@@ -44,7 +46,7 @@ describe("WorkItemsController", () => {
     controller = module.get<WorkItemsController>(WorkItemsController);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
-    const user = await usersService.create(
+    user = await usersService.create(
       "Test User",
       "test@example.com",
       "testtesttest"
@@ -62,7 +64,7 @@ describe("WorkItemsController", () => {
   describe("when creating a work item", () => {
     it("should return the created work item", async () => {
       const feature = await featureService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -154,7 +156,7 @@ describe("WorkItemsController", () => {
   describe("when listing work items", () => {
     it("should return the list of work items", async () => {
       const feature = await featureService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -198,7 +200,7 @@ describe("WorkItemsController", () => {
   describe("when getting a work item", () => {
     it("should return the work item", async () => {
       const feature = await featureService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -245,7 +247,7 @@ describe("WorkItemsController", () => {
   describe("when updating a work item", () => {
     it("should return the updated work item", async () => {
       const feature = await featureService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -314,7 +316,7 @@ describe("WorkItemsController", () => {
       const file1 = await fileRepository.save(file1Entity);
       const file2 = await fileRepository.save(file2Entity);
       const feature = await featureService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -374,7 +376,7 @@ describe("WorkItemsController", () => {
   describe("when deleting a work item", () => {
     it("should delete the work item", async () => {
       const feature = await featureService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -418,7 +420,7 @@ describe("WorkItemsController", () => {
   describe("when getting open work items", () => {
     it("should return the open work items", async () => {
       const feature = await featureService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",

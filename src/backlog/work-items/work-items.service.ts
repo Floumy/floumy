@@ -24,6 +24,7 @@ export class WorkItemsService {
   }
 
   async createWorkItem(userId: string, workItemDto: CreateUpdateWorkItemDto) {
+    if (!userId) throw new Error("User id is required");
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const org = await user.org;
     const workItem = new WorkItem();

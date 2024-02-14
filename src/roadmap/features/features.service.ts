@@ -5,19 +5,19 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Feature } from "./feature.entity";
 import { FeatureMapper } from "./feature.mapper";
 import { Priority } from "../../common/priority.enum";
-import { OrgsService } from "../../orgs/orgs.service";
 import { OkrsService } from "../../okrs/okrs.service";
 import { MilestonesService } from "../milestones/milestones.service";
 import { WorkItemsService } from "../../backlog/work-items/work-items.service";
 import { FeatureFile } from "./feature-file.entity";
 import { File } from "../../files/file.entity";
+import { User } from "../../users/user.entity";
 
 @Injectable()
 export class FeaturesService {
 
   constructor(
     @InjectRepository(Feature) private featuresRepository: Repository<Feature>,
-    private orgsService: OrgsService,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private okrsService: OkrsService,
     private milestonesService: MilestonesService,
     private workItemsService: WorkItemsService,
@@ -26,23 +26,26 @@ export class FeaturesService {
   ) {
   }
 
-  async createFeature(orgId: any, featureDto: CreateUpdateFeatureDto) {
+  async createFeature(userId: string, featureDto: CreateUpdateFeatureDto) {
+    if (!userId) throw new Error("User id is required");
     this.validateFeature(featureDto);
-    const org = await this.orgsService.findOneById(orgId);
+    const user = await this.userRepository.findOneByOrFail({ id: userId });
+    const org = await user.org;
     const feature = new Feature();
     feature.title = featureDto.title;
     feature.description = featureDto.description;
     feature.priority = featureDto.priority;
     feature.status = featureDto.status;
     feature.org = Promise.resolve(org);
+    feature.createdBy = Promise.resolve(user);
 
     if (featureDto.keyResult) {
-      const keyResult = await this.okrsService.getKeyResultByOrgId(orgId, featureDto.keyResult);
+      const keyResult = await this.okrsService.getKeyResultByOrgId(org.id, featureDto.keyResult);
       feature.keyResult = Promise.resolve(keyResult);
     }
 
     if (featureDto.milestone) {
-      const milestone = await this.milestonesService.findOneById(orgId, featureDto.milestone);
+      const milestone = await this.milestonesService.findOneById(org.id, featureDto.milestone);
       feature.milestone = Promise.resolve(milestone);
     }
 
