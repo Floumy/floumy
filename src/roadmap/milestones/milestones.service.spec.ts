@@ -22,7 +22,7 @@ describe("MilestonesService", () => {
   let service: MilestonesService;
   let orgsService: OrgsService;
   let featuresService: FeaturesService;
-
+  let user: User;
   let org: Org;
 
   let cleanup: () => Promise<void>;
@@ -37,7 +37,7 @@ describe("MilestonesService", () => {
     usersService = module.get<UsersService>(UsersService);
     orgsService = module.get<OrgsService>(OrgsService);
     featuresService = module.get<FeaturesService>(FeaturesService);
-    const user = await usersService.create(
+    user = await usersService.create(
       "Test User",
       "test@example.com",
       "testtesttest"
@@ -133,7 +133,7 @@ describe("MilestonesService", () => {
         description: "my milestone 2",
         dueDate: "2020-01-01"
       });
-      await featuresService.createFeature(org.id, {
+      await featuresService.createFeature(user.id, {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,
@@ -206,7 +206,7 @@ describe("MilestonesService", () => {
         description: "my milestone",
         dueDate: "2020-01-01"
       });
-      const feature = await featuresService.createFeature(org.id, {
+      const feature = await featuresService.createFeature(user.id, {
         title: "my feature",
         description: "my feature description",
         priority: Priority.HIGH,

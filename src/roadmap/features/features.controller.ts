@@ -27,9 +27,8 @@ export class FeaturesController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Request() request, @Body() featureDto: CreateUpdateFeatureDto) {
-    const { org: orgId } = request.user;
     try {
-      return await this.featuresService.createFeature(orgId, featureDto);
+      return await this.featuresService.createFeature(request.user.sub, featureDto);
     } catch (e) {
       throw new BadRequestException();
     }

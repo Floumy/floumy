@@ -10,6 +10,7 @@ import {
 import { RefreshToken } from "../auth/refresh-token.entity";
 import { Org } from "../orgs/org.entity";
 import { WorkItem } from "../backlog/work-items/work-item.entity";
+import { Feature } from "../roadmap/features/feature.entity";
 
 @Entity()
 export class User {
@@ -33,6 +34,8 @@ export class User {
   refreshTokens: Promise<RefreshToken[]>;
   @OneToMany(() => WorkItem, workItem => workItem.createdBy, { lazy: true })
   createdWorkItems: Promise<WorkItem[]>;
+  @OneToMany(() => Feature, feature => feature.createdBy, { lazy: true })
+  createdFeatures: Promise<Feature[]>;
   @ManyToOne(() => Org, org => org.users, { lazy: true })
   org: Promise<Org>;
 

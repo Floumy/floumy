@@ -63,7 +63,7 @@ describe("WorkItemsService", () => {
   describe("when creating a work item", () => {
     it("should return the created work item", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -93,7 +93,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the feature progress", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -177,7 +177,7 @@ describe("WorkItemsService", () => {
   describe("when listing work items", () => {
     it("should return the list of work items", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -208,7 +208,7 @@ describe("WorkItemsService", () => {
   describe("when getting a work item", () => {
     it("should return the work item", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -238,7 +238,7 @@ describe("WorkItemsService", () => {
   describe("when updating a work item", () => {
     it("should return the updated work item", async () => {
       const feature1 = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -246,7 +246,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       const feature2 = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my other feature",
           description: "my other feature description",
@@ -281,7 +281,7 @@ describe("WorkItemsService", () => {
     });
     it("should remove the association with the feature if the feature is not provided", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -423,7 +423,7 @@ describe("WorkItemsService", () => {
   describe("when deleting a work item", () => {
     it("should delete the work item", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -447,7 +447,7 @@ describe("WorkItemsService", () => {
   describe("when listing open work items", () => {
     it("should return the list of open work items", async () => {
       const feature1 = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -455,7 +455,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       const feature2 = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my other feature",
           description: "my other feature description",
@@ -505,7 +505,7 @@ describe("WorkItemsService", () => {
         duration: 7
       });
       const feature1 = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -513,7 +513,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.PLANNED
         });
       const feature2 = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my other feature",
           description: "my other feature description",
@@ -555,7 +555,7 @@ describe("WorkItemsService", () => {
   describe("when creating a work item with a feature", () => {
     it("should update the feature progress", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -589,7 +589,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the feature workItemsCount", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -625,7 +625,7 @@ describe("WorkItemsService", () => {
   describe("when updating a work item with a feature", () => {
     it("should update the feature progress", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -676,7 +676,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the feature workItemsCount", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -728,7 +728,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the feature progress and count when changing the feature of a work item", async () => {
       const feature1 = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature 1",
           description: "my feature description 1",
@@ -736,7 +736,7 @@ describe("WorkItemsService", () => {
           status: FeatureStatus.IN_PROGRESS
         });
       const feature2 = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature 2",
           description: "my feature description 2",
@@ -794,7 +794,7 @@ describe("WorkItemsService", () => {
   describe("when deleting a work item with a feature", () => {
     it("should update the feature progress", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -830,7 +830,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the feature workItemsCount", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -868,7 +868,7 @@ describe("WorkItemsService", () => {
   describe("when closing a work item", () => {
     it("should update the feature progress", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -957,7 +957,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the feature progress when changing the status to DONE", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -983,7 +983,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the feature progress when changing the status to CLOSED", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
@@ -1009,7 +1009,7 @@ describe("WorkItemsService", () => {
     });
     it("should update the feature progress when changing the status to IN_PROGRESS", async () => {
       const feature = await featuresService.createFeature(
-        org.id,
+        user.id,
         {
           title: "my feature",
           description: "my feature description",
