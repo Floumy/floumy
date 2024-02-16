@@ -38,6 +38,12 @@ export class FeaturesService {
     feature.status = featureDto.status;
     feature.org = Promise.resolve(org);
     feature.createdBy = Promise.resolve(user);
+    if (featureDto.assignedTo) {
+      const assignedTo = await this.userRepository.findOneByOrFail({ id: featureDto.assignedTo, org: { id: org.id } });
+      if (assignedTo) {
+        feature.assignedTo = Promise.resolve(assignedTo);
+      }
+    }
 
     if (featureDto.keyResult) {
       const keyResult = await this.okrsService.getKeyResultByOrgId(org.id, featureDto.keyResult);
@@ -126,6 +132,16 @@ export class FeaturesService {
       await this.addFiles(updateFeatureDto, feature);
     } else {
       feature.featureFiles = Promise.resolve([]);
+    }
+
+    if (updateFeatureDto.assignedTo) {
+      const assignedTo = await this.userRepository.findOneByOrFail({
+        id: updateFeatureDto.assignedTo,
+        org: { id: orgId }
+      });
+      feature.assignedTo = Promise.resolve(assignedTo);
+    } else if (feature.assignedTo) {
+      feature.assignedTo = Promise.resolve(null);
     }
 
     const savedFeature = await this.featuresRepository.save(feature);

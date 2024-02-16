@@ -48,6 +48,8 @@ export class Feature {
   org: Promise<Org>;
   @ManyToOne(() => User, user => user.createdFeatures, { lazy: true })
   createdBy: Promise<User>;
+  @ManyToOne(() => User, user => user.assignedFeatures, { lazy: true })
+  assignedTo: Promise<User>;
   @ManyToOne(() => KeyResult, keyResult => keyResult.features, { lazy: true })
   keyResult: Promise<KeyResult>;
   @ManyToOne(() => Milestone, milestone => milestone.features, { lazy: true })
