@@ -102,6 +102,10 @@ export class WorkItemsService {
       });
       workItem.iteration = Promise.resolve(iteration);
     }
+    if (workItemDto.assignedTo) {
+      const assignedTo = await this.usersRepository.findOneByOrFail({ id: workItemDto.assignedTo, org: { id: orgId } });
+      workItem.assignedTo = Promise.resolve(assignedTo);
+    }
   }
 
   async deleteWorkItem(orgId: string, id: string) {

@@ -419,6 +419,39 @@ describe("WorkItemsService", () => {
       expect(foundWorkItem.files.length).toEqual(1);
       expect(foundWorkItem.files[0].id).toEqual(savedFile1.id);
     });
+    it("should add the work item assignment to the user", async () => {
+      const otherUser = await usersService.create(
+        "Other User",
+        "testing@example.com",
+        "testtesttest",
+        org.invitationToken
+      );
+      const workItem = await service.createWorkItem(
+        user.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          status: WorkItemStatus.PLANNED
+        });
+      const foundWorkItem = await service.updateWorkItem(org.id, workItem.id, {
+        title: "my work item updated",
+        description: "my work item description updated",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.PLANNED,
+        assignedTo: otherUser.id
+      });
+      expect(foundWorkItem).toBeDefined();
+      expect(foundWorkItem.title).toEqual("my work item updated");
+      expect(foundWorkItem.description).toEqual("my work item description updated");
+      expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
+      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.assignedTo).toBeDefined();
+      expect(foundWorkItem.assignedTo.id).toEqual(otherUser.id);
+      expect(foundWorkItem.assignedTo.name).toEqual(otherUser.name);
+    });
   });
   describe("when deleting a work item", () => {
     it("should delete the work item", async () => {

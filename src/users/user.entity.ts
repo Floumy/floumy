@@ -34,6 +34,8 @@ export class User {
   refreshTokens: Promise<RefreshToken[]>;
   @OneToMany(() => WorkItem, workItem => workItem.createdBy, { lazy: true })
   createdWorkItems: Promise<WorkItem[]>;
+  @OneToMany(() => WorkItem, workItem => workItem.assignedTo, { lazy: true })
+  assignedWorkItems: Promise<WorkItem[]>;
   @OneToMany(() => Feature, feature => feature.createdBy, { lazy: true })
   createdFeatures: Promise<Feature[]>;
   @ManyToOne(() => Org, org => org.users, { lazy: true })
