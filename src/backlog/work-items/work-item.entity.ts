@@ -56,6 +56,8 @@ export class WorkItem {
   updatedAt: Date;
   @ManyToOne(() => User, user => user.createdWorkItems, { lazy: true })
   createdBy: Promise<User>;
+  @ManyToOne(() => User, user => user.assignedWorkItems, { lazy: true })
+  assignedTo: Promise<User>;
   @ManyToOne(() => Org, org => org.workItems, { lazy: true })
   org: Promise<Org>;
   @ManyToOne(() => Feature, feature => feature.workItems, { lazy: true })
