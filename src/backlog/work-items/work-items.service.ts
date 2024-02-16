@@ -105,6 +105,8 @@ export class WorkItemsService {
     if (workItemDto.assignedTo) {
       const assignedTo = await this.usersRepository.findOneByOrFail({ id: workItemDto.assignedTo, org: { id: orgId } });
       workItem.assignedTo = Promise.resolve(assignedTo);
+    } else if (workItem.assignedTo) {
+      workItem.assignedTo = Promise.resolve(null);
     }
   }
 

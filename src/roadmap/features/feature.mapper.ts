@@ -4,6 +4,7 @@ import { FeatureDto, FeaturesListDto } from "./dtos";
 export class FeatureMapper {
   static async toDto(feature: Feature): Promise<FeatureDto> {
     const createdBy = await feature.createdBy;
+    const assignedTo = await feature.assignedTo;
     const featureDto = {
       id: feature.id,
       title: feature.title,
@@ -25,6 +26,10 @@ export class FeatureMapper {
       createdBy: createdBy ? {
         id: createdBy.id,
         name: createdBy.name
+      } : undefined,
+      assignedTo: assignedTo ? {
+        id: assignedTo.id,
+        name: assignedTo.name
       } : undefined,
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt

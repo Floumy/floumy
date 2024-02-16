@@ -38,6 +38,8 @@ export class User {
   assignedWorkItems: Promise<WorkItem[]>;
   @OneToMany(() => Feature, feature => feature.createdBy, { lazy: true })
   createdFeatures: Promise<Feature[]>;
+  @OneToMany(() => Feature, feature => feature.assignedTo, { lazy: true })
+  assignedFeatures: Promise<Feature[]>;
   @ManyToOne(() => Org, org => org.users, { lazy: true })
   org: Promise<Org>;
 

@@ -206,6 +206,23 @@ describe("FeaturesService", () => {
       expect(feature.files[0].id).toEqual(file.id);
       expect(feature.files[0].name).toEqual(file.name);
     });
+    it("should create a feature with assigned to", async () => {
+      const otherUser = await usersService.create(
+        "Jane Doe",
+        "jane.doe@example.com",
+        "testtesttest",
+        org.invitationToken);
+      const feature = await service.createFeature(user.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+        assignedTo: otherUser.id
+      });
+      expect(feature.assignedTo).toBeDefined();
+      expect(feature.assignedTo.id).toEqual(otherUser.id);
+      expect(feature.assignedTo.name).toEqual(otherUser.name);
+    });
   });
   describe("when listing features", () => {
     it("should return a list of features", async () => {
@@ -442,6 +459,51 @@ describe("FeaturesService", () => {
       expect(updatedFeature.files[0].id).toEqual(file.id);
       expect(updatedFeature.files[0].name).toEqual(file.name);
     });
+    it("should update the feature with assigned to", async () => {
+      const otherUser = await usersService.create(
+        "Jane Doe",
+        "jane.doe@example.com",
+        "testtesttest",
+        org.invitationToken);
+      const feature = await service.createFeature(user.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: "my updated feature",
+        description: "my updated feature description",
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        assignedTo: otherUser.id
+      });
+      expect(updatedFeature.assignedTo).toBeDefined();
+      expect(updatedFeature.assignedTo.id).toEqual(otherUser.id);
+      expect(updatedFeature.assignedTo.name).toEqual(otherUser.name);
+    });
+    it("should update the feature with assigned to to null", async () => {
+      const otherUser = await usersService.create(
+        "Jane Doe",
+        "jane.doe@example.com",
+        "testtesttest",
+        org.invitationToken);
+      const feature = await service.createFeature(user.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+        assignedTo: otherUser.id
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: "my updated feature",
+        description: "my updated feature description",
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        assignedTo: null
+      });
+      expect(updatedFeature.assignedTo).toBeUndefined();
+    });
   });
   describe("when deleting a feature", () => {
     it("should delete the feature", async () => {
@@ -617,4 +679,5 @@ describe("FeaturesService", () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
   });
-});
+})
+;

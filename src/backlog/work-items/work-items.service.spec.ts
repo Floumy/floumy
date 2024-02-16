@@ -452,6 +452,36 @@ describe("WorkItemsService", () => {
       expect(foundWorkItem.assignedTo.id).toEqual(otherUser.id);
       expect(foundWorkItem.assignedTo.name).toEqual(otherUser.name);
     });
+    it("should remove the work item assignment if the assignedTo field is not provided", async () => {
+      const otherUser = await usersService.create(
+        "Other User",
+        "other.user@example.com",
+        "testtesttest",
+        org.invitationToken);
+      const workItem = await service.createWorkItem(
+        user.id,
+        {
+          title: "my work item",
+          description: "my work item description",
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          status: WorkItemStatus.PLANNED,
+          assignedTo: otherUser.id
+        });
+      const foundWorkItem = await service.updateWorkItem(org.id, workItem.id, {
+        title: "my work item updated",
+        description: "my work item description updated",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        status: WorkItemStatus.PLANNED
+      });
+      expect(foundWorkItem).toBeDefined();
+      expect(foundWorkItem.title).toEqual("my work item updated");
+      expect(foundWorkItem.description).toEqual("my work item description updated");
+      expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
+      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.assignedTo).toBeUndefined();
+    });
   });
   describe("when deleting a work item", () => {
     it("should delete the work item", async () => {
