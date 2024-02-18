@@ -5,6 +5,7 @@ import { TimelineService } from "../common/timeline.service";
 export class OKRMapper {
 
   static async toDTO(objective: Objective, keyResults: KeyResult[]) {
+    const assignedTo = await objective.assignedTo;
     return {
       objective: {
         id: objective.id,
@@ -15,7 +16,11 @@ export class OKRMapper {
         status: objective.status,
         timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
         startDate: objective.startDate,
-        endDate: objective.endDate
+        endDate: objective.endDate,
+        assignedTo: assignedTo ? {
+          id: assignedTo.id,
+          name: assignedTo.name
+        } : undefined
       },
       keyResults: await KeyResultMapper.toListDTO(keyResults)
     };

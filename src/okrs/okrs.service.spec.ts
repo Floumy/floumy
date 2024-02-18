@@ -8,21 +8,24 @@ import { Org } from "../orgs/org.entity";
 import { KeyResult } from "./key-result.entity";
 import { Repository } from "typeorm";
 import { Feature } from "../roadmap/features/feature.entity";
+import { UsersService } from "../users/users.service";
 
 describe("OkrsService", () => {
   let service: OkrsService;
   let orgsService: OrgsService;
   let featuresRepository: Repository<Feature>;
+  let usersService: UsersService;
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature])],
-      [OkrsService, OrgsService]
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User])],
+      [OkrsService, OrgsService, UsersService]
     );
     cleanup = dbCleanup;
     service = module.get<OkrsService>(OkrsService);
     orgsService = module.get<OrgsService>(OrgsService);
+    usersService = module.get<UsersService>(UsersService);
     featuresRepository = module.get<Repository<Feature>>(getRepositoryToken(Feature));
   });
 
@@ -91,6 +94,18 @@ describe("OkrsService", () => {
         { title: "Test Objective", timeline: "invalid" }
       )).rejects.toThrow();
     });
+
+    it("should assign the objective to a user", async () => {
+      const user = await usersService.create("Test User", "testing@example.com", "testtesttest");
+      const org = await user.org;
+      const objective = await service.createObjective(
+        org.id,
+        { title: "Test Objective", assignedTo: user.id }
+      );
+      const storedObjective = await service.findObjectiveById(objective.id);
+      const assignedTo = await storedObjective.assignedTo;
+      expect(assignedTo).not.toBeNull();
+    });
   });
 
   describe("when listing objectives", () => {
@@ -134,12 +149,10 @@ describe("OkrsService", () => {
         { title: "Test Objective" }
       );
       const okrDto = {
-        objective: {
-          title: "Updated Objective",
-          description: "Updated Objective Description"
-        }
+        title: "Updated Objective",
+        status: objective.status
       };
-      await service.update(org.id, objective.id, okrDto);
+      await service.updateObjective(org.id, objective.id, okrDto);
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual("Updated Objective");
@@ -151,78 +164,54 @@ describe("OkrsService", () => {
         { title: "Test Objective" }
       );
       const okrDto = {
-        objective: {
-          title: "Updated Objective",
-          description: "Updated Objective Description",
-          timeline: "this-quarter"
-        }
+        title: "Updated Objective",
+        status: objective.status,
+        timeline: "this-quarter"
       };
-      await service.update(org.id, objective.id, okrDto);
+      await service.updateObjective(org.id, objective.id, okrDto);
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.timeline).toEqual("this-quarter");
     });
   });
 
-  describe("when updating an objective with key results", () => {
-    it("should update the values in db", async () => {
-      const org = await createTestOrg();
-      const objective = await service.createObjective(
-        org.id,
-        { title: "Test Objective" }
-      );
-      const okrDto = {
-        objective: {
-          title: "Updated Objective",
-          description: "Updated Objective Description"
-        },
-        keyResults: [
-          { title: "Updated KR 1" },
-          { title: "Updated KR 2" },
-          { title: "Updated KR 3" }
-        ]
-      };
-      await service.update(org.id, objective.id, okrDto);
-      const storedObjective = await service.get(org.id, objective.id);
-      expect(storedObjective).toBeDefined();
-      expect(storedObjective.objective.title).toEqual("Updated Objective");
-      expect(storedObjective.keyResults).toHaveLength(3);
-      expect(storedObjective.keyResults[0].title).toEqual("Updated KR 1");
-      expect(storedObjective.keyResults[1].title).toEqual("Updated KR 2");
-      expect(storedObjective.keyResults[2].title).toEqual("Updated KR 3");
-    });
-    it("should update objective progress", async () => {
-      const org = await createTestOrg();
-      const okr = await service.create(
-        org.id,
-        {
-          objective: {
-            title: "Test Objective"
-          },
-          keyResults: [
-            { title: "KR 1" },
-            { title: "KR 2" },
-            { title: "KR 3" }
-          ]
-        }
-      );
-      await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[0].id, { progress: 0.5 });
-      await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[1].id, { progress: 0.5 });
-      await service.patchKeyResult(org.id, okr.objective.id, okr.keyResults[2].id, { progress: 0.5 });
-      await service.update(org.id, okr.objective.id, {
-        objective: {
-          title: "Updated Objective"
-        },
-        keyResults: [
-          { id: okr.keyResults[0].id, title: "Updated KR 1" },
-          { id: okr.keyResults[1].id, title: "Updated KR 2" },
-          { title: "New KR 4" },
-          { title: "New KR 5" }
-        ]
-      });
-      const storedOkr = await service.get(org.id, okr.objective.id);
-      expect(storedOkr.objective.progress).toEqual(0.25);
-    });
+  it("should update the assigned user", async () => {
+    const user = await usersService.create("Test User", "test@example.com", "testtesttest");
+    const org = await user.org;
+    const objective = await service.createObjective(
+      org.id,
+      { title: "Test Objective" }
+    );
+    const okrDto = {
+      title: "Updated Objective",
+      status: objective.status,
+      description: "Updated Objective Description",
+      assignedTo: user.id
+    };
+    await service.updateObjective(org.id, objective.id, okrDto);
+    const storedObjective = await service.get(org.id, objective.id);
+    expect(storedObjective).toBeDefined();
+    const assignedTo = storedObjective.objective.assignedTo;
+    expect(assignedTo).not.toBeNull();
+  });
+  it("should update the assigned user to null", async () => {
+    const user = await usersService.create("Test User", "test@example.com", "testtesttest");
+    const org = await user.org;
+    const objective = await service.createObjective(
+      org.id,
+      { title: "Test Objective" }
+    );
+    const okrDto = {
+      title: "Updated Objective",
+      status: objective.status,
+      description: "Updated Objective Description",
+      assignedTo: null
+    };
+    await service.updateObjective(org.id, objective.id, okrDto);
+    const storedObjective = await service.get(org.id, objective.id);
+    expect(storedObjective).toBeDefined();
+    const assignedTo = storedObjective.objective.assignedTo;
+    expect(assignedTo).toBeUndefined();
   });
 
   describe("when deleting an objective", () => {
@@ -609,4 +598,5 @@ describe("OkrsService", () => {
       expect(storedKR.status).toEqual("on-track");
     });
   });
-});
+})
+;

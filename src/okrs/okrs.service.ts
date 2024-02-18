@@ -8,6 +8,7 @@ import { KeyResultMapper, OKRMapper } from "./mappers";
 import { OKRStatus } from "./okrstatus.enum";
 import { TimelineService } from "../common/timeline.service";
 import { Feature } from "../roadmap/features/feature.entity";
+import { User } from "../users/user.entity";
 
 @Injectable()
 export class OkrsService {
@@ -18,6 +19,8 @@ export class OkrsService {
               private keyResultRepository: Repository<KeyResult>,
               @InjectRepository(Feature)
               private featureRepository: Repository<Feature>,
+              @InjectRepository(User)
+              private usersRepository: Repository<User>,
               private orgsService: OrgsService) {
   }
 
@@ -34,6 +37,12 @@ export class OkrsService {
       const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(objective.timeline);
       newObjective.startDate = startDate;
       newObjective.endDate = endDate;
+    }
+    if (objective.assignedTo) {
+      newObjective.assignedTo = Promise.resolve(await this.usersRepository.findOneByOrFail({
+        id: objective.assignedTo,
+        org: { id: orgId }
+      }));
     }
     return await this.objectiveRepository.save(newObjective);
   }
@@ -62,23 +71,36 @@ export class OkrsService {
     return await OKRMapper.toDTO(objective, keyResults.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()));
   }
 
-  async update(orgId: string, id: string, okrDto: CreateOrUpdateOKRDto) {
-    if (okrDto.objective.timeline) {
-      TimelineService.validateTimeline(okrDto.objective.timeline);
+  async updateObjective(orgId: string, id: string, okrDto: UpdateObjectiveDto) {
+    if (!okrDto.title) throw new Error("Objective title is required");
+    if (!okrDto.status) throw new Error("Obj");
+    const objective = await this.objectiveRepository.findOneByOrFail({ id, org: { id: orgId } });
+
+    objective.title = okrDto.title;
+
+    if (okrDto.timeline) {
+      TimelineService.validateTimeline(okrDto.timeline);
+      const objectiveDates = TimelineService.getStartAndEndDatesByTimelineValue(okrDto.timeline);
+      objective.startDate = objectiveDates.startDate;
+      objective.endDate = objectiveDates.endDate;
+    } else if (objective.startDate && objective.endDate) {
+      objective.startDate = null;
+      objective.endDate = null;
     }
-    const objectiveDates = TimelineService.getStartAndEndDatesByTimelineValue(okrDto.objective.timeline);
-    await this.objectiveRepository.update(
-      { id, org: { id: orgId } },
-      {
-        title: okrDto.objective.title,
-        startDate: objectiveDates.startDate,
-        endDate: objectiveDates.endDate
-      }
-    );
-    if (okrDto.keyResults && okrDto.keyResults.length > 0) {
-      await this.updateKeyResults(id, okrDto.keyResults);
+
+    const assignedTo = await objective.assignedTo;
+    if (okrDto.assignedTo) {
+      const assignedToUser = await this.usersRepository.findOneByOrFail({
+        id: okrDto.assignedTo,
+        org: { id: orgId }
+      });
+      objective.assignedTo = Promise.resolve(assignedToUser);
+    } else if (assignedTo) {
+      objective.assignedTo = Promise.resolve(null);
     }
-    await this.updateObjectiveProgress(await this.objectiveRepository.findOneByOrFail({ id }));
+
+    const savedObjective = await this.objectiveRepository.save(objective);
+    return OKRMapper.toDTO(savedObjective, await savedObjective.keyResults);
   }
 
   async delete(orgId: string, id: string) {
@@ -97,19 +119,6 @@ export class OkrsService {
     const keyResults = await Promise.all(okrDto.keyResults.map(keyResult => this.createKeyResultFor(objective, keyResult.title)));
 
     return await OKRMapper.toDTO(objective, keyResults);
-  }
-
-  private async updateKeyResults(id: string, keyResults: {
-    id?: string,
-    title: string
-  }[]) {
-    const objective = await this.objectiveRepository.findOneByOrFail({ id });
-    const notEmptyKeyResults = keyResults
-      .filter(keyResult =>
-        keyResult.title.replace(/\s+/g, "").length > 0);
-    const existingKeyResults = await objective.keyResults;
-    await this.deleteKeyResultsThatAreNotInTheList(existingKeyResults, notEmptyKeyResults);
-    await this.updateOrCreateKeyResults(objective, notEmptyKeyResults);
   }
 
   private async updateOrCreateKeyResults(objective: Objective, keyResults: {
@@ -200,7 +209,14 @@ export class OkrsService {
       objective.endDate = endDate;
     }
 
-    return OKRMapper.toDTO(await this.objectiveRepository.save(objective), await objective.keyResults);
+    if (updateObjectiveDto.assignedTo) {
+      objective.assignedTo = Promise.resolve(await this.usersRepository.findOneByOrFail({
+        id: updateObjectiveDto.assignedTo,
+        org: { id: orgId }
+      }));
+    } else if (objective.assignedTo)
+
+      return OKRMapper.toDTO(await this.objectiveRepository.save(objective), await objective.keyResults);
   }
 
   async listKeyResults(orgId: string) {

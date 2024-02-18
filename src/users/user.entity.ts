@@ -11,6 +11,7 @@ import { RefreshToken } from "../auth/refresh-token.entity";
 import { Org } from "../orgs/org.entity";
 import { WorkItem } from "../backlog/work-items/work-item.entity";
 import { Feature } from "../roadmap/features/feature.entity";
+import { Objective } from "../okrs/objective.entity";
 
 @Entity()
 export class User {
@@ -40,6 +41,8 @@ export class User {
   createdFeatures: Promise<Feature[]>;
   @OneToMany(() => Feature, feature => feature.assignedTo, { lazy: true })
   assignedFeatures: Promise<Feature[]>;
+  @OneToMany(() => Objective, objective => objective.assignedTo, { lazy: true })
+  assignedObjectives: any;
   @ManyToOne(() => Org, org => org.users, { lazy: true })
   org: Promise<Org>;
 
