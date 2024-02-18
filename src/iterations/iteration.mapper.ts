@@ -12,6 +12,7 @@ class WorkItemMapper {
   static async toDto(workItem: WorkItem) {
     const feature = await workItem.feature;
     const iteration = await workItem.iteration;
+    const assignedTo = await workItem.assignedTo;
     return {
       id: workItem.id,
       title: workItem.title,
@@ -22,6 +23,7 @@ class WorkItemMapper {
       estimation: workItem.estimation,
       iteration: iteration ? { id: iteration.id, title: iteration.title } : null,
       feature: feature ? FeatureMapper.toDto(feature) : null,
+      assignedTo: assignedTo ? { id: assignedTo.id, name: assignedTo.name } : null,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt
