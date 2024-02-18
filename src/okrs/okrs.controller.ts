@@ -60,13 +60,6 @@ export class OkrsController {
     }
   }
 
-  @Put(":id")
-  @HttpCode(HttpStatus.OK)
-  async update(@Param("id") id: string, @Request() request, @Body() okrDto: CreateOrUpdateOKRDto) {
-    const { org: orgId } = request.user;
-    await this.okrsService.update(orgId, id, okrDto);
-  }
-
   @Delete(":id")
   @HttpCode(HttpStatus.OK)
   async delete(@Param("id") id: string, @Request() request) {
@@ -95,19 +88,23 @@ export class OkrsController {
     }
   }
 
-  @Patch(":objectiveId")
+  @Put("objective/:objectiveId")
   @HttpCode(HttpStatus.OK)
-  async patchObjective(
+  async updateObjective(
     @Param("objectiveId") objectiveId: string,
     @Request() request,
-    @Body() updateObjectiveDto: PatchObjectiveDto
+    @Body() updateObjectiveDto: UpdateObjectiveDto
   ) {
     const { org: orgId } = request.user;
-    return await this.okrsService.patchObjective(
-      orgId,
-      objectiveId,
-      updateObjectiveDto
-    );
+    try {
+      return await this.okrsService.updateObjective(
+        orgId,
+        objectiveId,
+        updateObjectiveDto
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
   }
 
   @Put(":objectiveId/key-results/:keyResultId")

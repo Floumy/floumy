@@ -10,6 +10,7 @@ import {
 import { Org } from "../orgs/org.entity";
 import { KeyResult } from "./key-result.entity";
 import { OKRStatus } from "./okrstatus.enum";
+import { User } from "../users/user.entity";
 
 @Entity()
 export class Objective {
@@ -37,4 +38,6 @@ export class Objective {
   org: Promise<Org>;
   @OneToMany(() => KeyResult, keyResult => keyResult.objective, { lazy: true })
   keyResults: Promise<KeyResult[]>;
+  @ManyToOne(() => User, user => user.assignedObjectives, { lazy: true })
+  assignedTo: Promise<User>;
 }

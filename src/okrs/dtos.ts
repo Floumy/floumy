@@ -1,6 +1,7 @@
 interface ObjectiveDto {
   title: string;
   timeline?: string;
+  assignedTo?: string;
 }
 
 interface CreateOrUpdateKRDto {
@@ -8,6 +9,13 @@ interface CreateOrUpdateKRDto {
   title: string;
   progress?: number;
   status?: string;
+}
+
+interface UpdateObjectiveDto {
+  title: string;
+  status: string;
+  timeline?: string;
+  assignedTo?: string;
 }
 
 interface CreateOrUpdateOKRDto {
@@ -31,6 +39,7 @@ interface PatchObjectiveDto {
   title?: string;
   status?: string;
   timeline?: string;
+  assignedTo?: string;
 }
 
 interface FeatureDto {
