@@ -166,34 +166,6 @@ export class OkrsService {
     return await this.objectiveRepository.findOneByOrFail({ id });
   }
 
-  async patchObjective(orgId: any, objectiveId: string, updateObjectiveDto: PatchObjectiveDto) {
-    const objective = await this.objectiveRepository.findOneByOrFail({ id: objectiveId, org: { id: orgId } });
-
-    if (updateObjectiveDto.title) {
-      objective.title = updateObjectiveDto.title;
-    }
-
-    if (updateObjectiveDto.status) {
-      objective.status = Object.values(OKRStatus).find(status => status === updateObjectiveDto.status);
-    }
-
-    if (updateObjectiveDto.timeline) {
-      TimelineService.validateTimeline(updateObjectiveDto.timeline);
-      const { startDate, endDate } = TimelineService.getStartAndEndDatesByTimelineValue(updateObjectiveDto.timeline);
-      objective.startDate = startDate;
-      objective.endDate = endDate;
-    }
-
-    if (updateObjectiveDto.assignedTo) {
-      objective.assignedTo = Promise.resolve(await this.usersRepository.findOneByOrFail({
-        id: updateObjectiveDto.assignedTo,
-        org: { id: orgId }
-      }));
-    } else if (objective.assignedTo)
-
-      return OKRMapper.toDTO(await this.objectiveRepository.save(objective), await objective.keyResults);
-  }
-
   async listKeyResults(orgId: string) {
     const keyResults = await this.keyResultRepository.findBy({ org: { id: orgId } });
     return await KeyResultMapper.toListDTO(keyResults);

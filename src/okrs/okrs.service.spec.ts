@@ -346,24 +346,6 @@ describe("OkrsService", () => {
       expect(updatedObjective.progress).toEqual(0.5);
     });
   });
-  describe("when updating the objective status", () => {
-    it("should update the objective status", async () => {
-      const org = await createTestOrg();
-      const okr = await service.create(org.id, {
-        objective: {
-          title: "My OKR"
-        },
-        keyResults: [
-          { title: "My KR 1" },
-          { title: "My KR 2" },
-          { title: "My KR 3" }
-        ]
-      });
-      await service.patchObjective(org.id, okr.objective.id, { status: "off-track" });
-      const updatedObjective = await service.getObjective(okr.objective.id);
-      expect(updatedObjective.status).toEqual("off-track");
-    });
-  });
   describe("when updating the key result status", () => {
     it("should update the key result status", async () => {
       const org = await createTestOrg();
@@ -432,48 +414,6 @@ describe("OkrsService", () => {
       const keyResults = await service.listKeyResults(org.id);
       expect(keyResults).toHaveLength(1);
       expect(keyResults[0].title).toEqual("Test Key Result");
-    });
-  });
-
-  describe("When partially updating an objective", () => {
-    it("should update the objective title", async () => {
-      const org = await createTestOrg();
-      const objective = await service.createObjective(
-        org.id,
-        {
-          title: "Test Objective",
-          timeline: "this-quarter"
-        }
-      );
-      await service.patchObjective(org.id, objective.id, { title: "Updated Objective" });
-      const storedObjective = await service.getObjective(objective.id);
-      expect(storedObjective.title).toEqual("Updated Objective");
-    });
-    it("should update the objective timeline", async () => {
-      const org = await createTestOrg();
-      const objective = await service.createObjective(
-        org.id,
-        {
-          title: "Test Objective",
-          timeline: "this-quarter"
-        }
-      );
-      await service.patchObjective(org.id, objective.id, { timeline: "next-quarter" });
-      const storedOKR = await service.get(org.id, objective.id);
-      expect(storedOKR.objective.timeline).toEqual("next-quarter");
-    });
-    it("should update the objective status", async () => {
-      const org = await createTestOrg();
-      const objective = await service.createObjective(
-        org.id,
-        {
-          title: "Test Objective",
-          timeline: "this-quarter"
-        }
-      );
-      await service.patchObjective(org.id, objective.id, { status: "off-track" });
-      const storedOKR = await service.get(org.id, objective.id);
-      expect(storedOKR.objective.status).toEqual("off-track");
     });
   });
   describe("when deleting a key result", () => {
