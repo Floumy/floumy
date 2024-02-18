@@ -121,31 +121,6 @@ export class OkrsService {
     return await OKRMapper.toDTO(objective, keyResults);
   }
 
-  private async updateOrCreateKeyResults(objective: Objective, keyResults: {
-    id?: string;
-    title: string
-  }[]) {
-    for (const keyResult of keyResults) {
-      if (keyResult.id) {
-        await this.keyResultRepository.update({ id: keyResult.id }, { title: keyResult.title });
-      } else {
-        await this.createKeyResultFor(objective, keyResult.title);
-      }
-    }
-  }
-
-  private async deleteKeyResultsThatAreNotInTheList(existingKeyResults: KeyResult[], keyResults: {
-    id?: string;
-    title: string
-  }[]) {
-    for (const existingKeyResult of existingKeyResults) {
-      if (!keyResults.find(keyResult => keyResult.id === existingKeyResult.id)) {
-        await this.removeKeyResultAssociations(existingKeyResult.id);
-        await this.keyResultRepository.delete({ id: existingKeyResult.id });
-      }
-    }
-  }
-
   private async updateObjectiveProgress(objective: Objective) {
     const keyResults = await objective.keyResults;
     if (keyResults.length === 0) {
