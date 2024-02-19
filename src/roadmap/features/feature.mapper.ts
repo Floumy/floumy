@@ -52,17 +52,26 @@ export class FeatureMapper {
     return featureDto;
   }
 
-  static toListDto(features: Feature[]): FeaturesListDto[] {
-    return features.map(feature => ({
+  static async toListDto(features: Feature[]): Promise<FeaturesListDto[]> {
+    return await Promise.all(features.map(FeatureMapper.toListItemDto));
+  }
+
+  static async toListItemDto(feature: Feature): Promise<FeaturesListDto> {
+    const assignedTo = await feature.assignedTo;
+    return {
       id: feature.id,
       title: feature.title,
       priority: feature.priority,
       status: feature.status,
       progress: feature.progress,
       workItemsCount: feature.workItemsCount,
+      assignedTo: assignedTo ? {
+        id: assignedTo.id,
+        name: assignedTo.name
+      } : null,
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt
-    }));
+    };
   }
 }
 

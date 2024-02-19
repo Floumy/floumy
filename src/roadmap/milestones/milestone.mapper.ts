@@ -1,6 +1,7 @@
 import { Milestone } from "./milestone.entity";
 import { MilestoneDto, MilestoneListItemDto, MilestoneListWithFeaturesItemDto } from "./dtos";
 import { TimelineService } from "../../common/timeline.service";
+import { Feature } from "../features/feature.entity";
 
 export class MilestoneMapper {
   static toDto(milestone: Milestone): MilestoneDto {
@@ -32,20 +33,31 @@ export class MilestoneMapper {
       description: milestone.description,
       dueDate: MilestoneMapper.formatDate(milestone.dueDate),
       timeline: TimelineService.convertDateToTimeline(milestone.dueDate).valueOf(),
-      features: (await milestone.features).map(feature => ({
-        id: feature.id,
-        title: feature.title,
-        priority: feature.priority.valueOf(),
-        status: feature.status.valueOf(),
-        progress: feature.progress,
-        workItemsCount: feature.workItemsCount,
-        createdAt: feature.createdAt,
-        updatedAt: feature.updatedAt
-      }))
+      features: await Promise.all((await milestone.features).map(FeatureMapper.toDto))
     })));
   }
 
   private static formatDate(date: Date): string {
     return date.toISOString().split("T")[0];
   };
+}
+
+class FeatureMapper {
+  static async toDto(feature: Feature): Promise<FeatureDto> {
+    const assignedTo = await feature.assignedTo;
+    return {
+      id: feature.id,
+      title: feature.title,
+      priority: feature.priority.valueOf(),
+      status: feature.status.valueOf(),
+      progress: feature.progress,
+      workItemsCount: feature.workItemsCount,
+      assignedTo: assignedTo ? {
+        id: assignedTo.id,
+        name: assignedTo.name
+      } : null,
+      createdAt: feature.createdAt,
+      updatedAt: feature.updatedAt
+    };
+  }
 }
