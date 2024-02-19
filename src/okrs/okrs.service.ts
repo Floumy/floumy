@@ -62,7 +62,7 @@ export class OkrsService {
 
   async list(orgId: string) {
     const objectives = await this.objectiveRepository.findBy({ org: { id: orgId } });
-    return OKRMapper.toListDTO(objectives);
+    return await OKRMapper.toListDTO(objectives);
   }
 
   async get(orgId: any, id: string) {

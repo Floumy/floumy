@@ -26,16 +26,25 @@ export class OKRMapper {
     };
   }
 
-  static toListDTO(objectives: Objective[]) {
-    return objectives.map(objective => ({
+  static async toListDTO(objectives: Objective[]) {
+    return await Promise.all(objectives.map(OKRMapper.toListItemDto));
+  }
+
+  static async toListItemDto(objective: Objective) {
+    const assignedTo = await objective.assignedTo;
+    return {
       id: objective.id,
       title: objective.title,
       status: objective.status,
       timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
       progress: parseFloat(objective.progress?.toFixed(2)),
+      assignedTo: assignedTo ? {
+        id: assignedTo.id,
+        name: assignedTo.name
+      } : null,
       createdAt: objective.createdAt,
       updatedAt: objective.updatedAt
-    }));
+    };
   }
 }
 
