@@ -35,13 +35,6 @@ interface CreateOrUpdateKeyResultDto {
   status: string;
 }
 
-interface PatchObjectiveDto {
-  title?: string;
-  status?: string;
-  timeline?: string;
-  assignedTo?: string;
-}
-
 interface FeatureDto {
   id: string;
   title: string;
@@ -50,6 +43,7 @@ interface FeatureDto {
   workItemsCount: number;
   progress: number;
   workItems?: WorkItemDto[];
+  assignedTo?: { id: string, name: string };
   createdAt: Date;
   updatedAt: Date;
 }

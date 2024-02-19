@@ -85,7 +85,7 @@ export class FeaturesService {
 
   async listFeatures(orgId: string) {
     const features = await this.featuresRepository.findBy({ org: { id: orgId } });
-    return FeatureMapper.toListDto(features);
+    return await FeatureMapper.toListDto(features);
   }
 
   async listFeaturesWithoutMilestone(orgId: string) {
@@ -98,7 +98,7 @@ export class FeaturesService {
       .andWhere("feature.status not in (:...status)", { status: ["closed", "completed"] })
       .getMany();
 
-    return FeatureMapper.toListDto(features);
+    return await FeatureMapper.toListDto(features);
   }
 
   async getFeature(orgId: string, id: string) {

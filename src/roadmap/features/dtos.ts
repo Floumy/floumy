@@ -59,6 +59,10 @@ export interface FeaturesListDto {
   status: string;
   progress: number;
   workItemsCount: number;
+  assignedTo?: {
+    id: string;
+    name: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
