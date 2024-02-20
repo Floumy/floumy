@@ -108,4 +108,8 @@ export class UsersService {
     const refreshTokens = await user.refreshTokens;
     await Promise.all(refreshTokens.map(token => this.refreshTokensRepository.remove(token)));
   }
+
+  async findOneByPasswordResetToken(resetToken: string) {
+    return this.usersRepository.findOneByOrFail({ passwordResetToken: resetToken });
+  }
 }

@@ -179,4 +179,34 @@ describe("AuthService", () => {
       });
     });
   });
+
+  describe("when resetting a password", () => {
+    it("should send a password reset email", async () => {
+      const signUpDto = {
+        name: "John Doe",
+        email: "john.doe@example.com",
+        password: "testtesttest"
+      };
+      await service.signUp(signUpDto);
+      await service.requestPasswordReset(signUpDto.email);
+      expect(emailServiceMock.sendEmail).toHaveBeenCalled();
+    });
+  });
+
+  describe("when setting a new password", () => {
+    it("should set a new password", async () => {
+      const signUpDto = {
+        name: "John Doe",
+        email: "john.doe@example.com",
+        password: "testtesttest"
+      };
+      await service.signUp(signUpDto);
+      const user = await usersService.findOneByEmail(signUpDto.email);
+      user.passwordResetToken = "test";
+      await usersService.save(user);
+      await service.resetPassword("newpassword", "test");
+      const userWithNewPassword = await usersService.findOneByEmail(signUpDto.email);
+      expect(userWithNewPassword.password).not.toEqual(user.password);
+    });
+  });
 });

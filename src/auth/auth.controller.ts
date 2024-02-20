@@ -65,4 +65,27 @@ export class AuthController {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Public()
+  @Post("send-reset-password-link")
+  @HttpCode(HttpStatus.OK)
+  async requestPasswordReset(@Body() sendResetPasswordLinkDto: { email: string }) {
+    try {
+      await this.authService.requestPasswordReset(sendResetPasswordLinkDto.email);
+    } catch (e) {
+      this.logger.error(e.message);
+    }
+  }
+
+  @Public()
+  @Post("reset-password")
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() resetPasswordDto: { password: string; resetToken: string }) {
+    try {
+      await this.authService.resetPassword(resetPasswordDto.password, resetPasswordDto.resetToken);
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 }

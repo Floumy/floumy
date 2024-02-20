@@ -131,4 +131,30 @@ export class AuthService {
     user.activationToken = null;
     await this.usersService.save(user);
   }
+
+  async requestPasswordReset(email: string) {
+    const user = await this.usersService.findOneByEmail(email);
+
+    if (!user) {
+      this.logger.error("User not found");
+      return;
+    }
+
+    user.passwordResetToken = uuid();
+    await this.usersService.save(user);
+    await this.notificationsService.sendPasswordResetEmail(user.name, user.email, user.passwordResetToken);
+  }
+
+  async resetPassword(newPassword: string, resetToken: string) {
+    const user = await this.usersService.findOneByPasswordResetToken(resetToken);
+
+    if (!user) {
+      this.logger.error("User not found");
+      throw new Error("Password reset token not found");
+    }
+
+    user.password = await this.usersService.encryptPassword(newPassword);
+    user.passwordResetToken = null;
+    await this.usersService.save(user);
+  }
 }
