@@ -100,4 +100,39 @@ describe("AuthController", () => {
       expect(updatedUser.isActive).toBe(true);
     });
   });
+
+  describe("when requesting a password reset", () => {
+    it("should send a password reset email", async () => {
+      const signUpDto = {
+        name: "John Doe",
+        email: "john.doe@example.com",
+        password: "testtesttest"
+      };
+      await controller.signUp(signUpDto);
+      const user = await usersService.findOneByEmail(signUpDto.email);
+      await controller.requestPasswordReset({ email: user.email });
+      const updatedUser = await usersService.findOneByEmail(signUpDto.email);
+      expect(updatedUser.passwordResetToken).toBeDefined();
+    });
+  });
+
+  describe("when resetting a password", () => {
+    it("should reset the password", async () => {
+      const signUpDto = {
+        name: "John Doe",
+        email: "john.doe@example.com",
+        password: "testtesttest"
+      };
+      await controller.signUp(signUpDto);
+      const user = await usersService.findOneByEmail(signUpDto.email);
+      await controller.requestPasswordReset({ email: user.email });
+      const updatedUser = await usersService.findOneByEmail(signUpDto.email);
+      await controller.resetPassword({
+        resetToken: updatedUser.passwordResetToken,
+        newPassword: "newpassword"
+      });
+      const userWithNewPassword = await usersService.findOneByEmail(signUpDto.email);
+      expect(userWithNewPassword.password).not.toEqual(user.password);
+    });
+  });
 });

@@ -31,6 +31,8 @@ export class User {
   isActive: boolean;
   @Column({ nullable: true })
   activationToken: string;
+  @Column({ nullable: true })
+  passwordResetToken: string;
   @OneToMany(() => RefreshToken, refreshToken => refreshToken.user, { cascade: true, lazy: true })
   refreshTokens: Promise<RefreshToken[]>;
   @OneToMany(() => WorkItem, workItem => workItem.createdBy, { lazy: true })
