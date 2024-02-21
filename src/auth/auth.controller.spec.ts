@@ -129,7 +129,7 @@ describe("AuthController", () => {
       const updatedUser = await usersService.findOneByEmail(signUpDto.email);
       await controller.resetPassword({
         resetToken: updatedUser.passwordResetToken,
-        newPassword: "newpassword"
+        password: "newpassword"
       });
       const userWithNewPassword = await usersService.findOneByEmail(signUpDto.email);
       expect(userWithNewPassword.password).not.toEqual(user.password);
