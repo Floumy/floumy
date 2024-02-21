@@ -60,4 +60,20 @@ export class IterationMapper {
       status: iteration.status
     };
   }
+
+  static toListItemDto(iteration: Iteration) {
+    return {
+      id: iteration.id,
+      title: iteration.title,
+      goal: iteration.goal,
+      startDate: formatDate(iteration.startDate),
+      endDate: formatDate(iteration.endDate),
+      actualStartDate: formatDate(iteration.actualStartDate),
+      actualEndDate: formatDate(iteration.actualEndDate),
+      duration: iteration.duration,
+      createdAt: iteration.createdAt,
+      updatedAt: iteration.updatedAt,
+      status: iteration.status
+    };
+  }
 }

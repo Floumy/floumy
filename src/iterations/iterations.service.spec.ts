@@ -100,7 +100,7 @@ describe("IterationsService", () => {
         startDate: "2020-01-01",
         duration: 1
       });
-      const iterations = await service.list(org.id);
+      const iterations = await service.listWithWorkItems(org.id);
       expect(iterations[0].id).toBeDefined();
       expect(iterations[0].title).toEqual("Iteration CW1-CW2 2020");
       expect(iterations[0].goal).toEqual("Test Iteration");
@@ -160,7 +160,7 @@ describe("IterationsService", () => {
         duration: 1
       });
       await service.delete(org.id, iteration.id);
-      const iterations = await service.list(org.id);
+      const iterations = await service.listWithWorkItems(org.id);
       expect(iterations.length).toEqual(0);
     });
     it("should remove the iteration from the work items", async () => {
@@ -346,6 +346,39 @@ describe("IterationsService", () => {
       const startedIteration = await service.startIteration(org.id, iteration.id);
       const completedIteration = await service.completeIteration(org.id, startedIteration.id);
       expect(completedIteration.velocity).toEqual(10);
+    });
+  });
+  describe("when listing iterations", () => {
+    it("should list iterations", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      await service.create(org.id, {
+        goal: "Test Iteration 1",
+        startDate: startDate,
+        duration: 1
+      });
+      await service.create(org.id, {
+        goal: "Test Iteration 2",
+        startDate: startDate,
+        duration: 1
+      });
+      const iterations = await service.list(org.id);
+      expect(iterations.length).toEqual(2);
+      expect(iterations[0].id).toBeDefined();
+      expect(iterations[0].title).toBeDefined();
+      expect(iterations[0].goal).toEqual("Test Iteration 1");
+      expect(iterations[0].startDate).toEqual(startDate);
+      expect(iterations[0].endDate).toBeDefined();
+      expect(iterations[0].duration).toEqual(1);
+      expect(iterations[0].createdAt).toBeDefined();
+      expect(iterations[0].updatedAt).toBeDefined();
+      expect(iterations[1].id).toBeDefined();
+      expect(iterations[1].title).toBeDefined();
+      expect(iterations[1].goal).toEqual("Test Iteration 2");
+      expect(iterations[1].startDate).toEqual(startDate);
+      expect(iterations[1].endDate).toBeDefined();
+      expect(iterations[1].duration).toEqual(1);
+      expect(iterations[1].createdAt).toBeDefined();
+      expect(iterations[1].updatedAt).toBeDefined();
     });
   });
 });
