@@ -84,7 +84,7 @@ describe("IterationsController", () => {
         startDate: "2020-01-01",
         duration: 1
       });
-      const iterations = await controller.list({
+      const iterations = await controller.listWithWorkItems({
         user: { org: org.id }
       });
       expect(iterations.length).toEqual(1);
@@ -145,7 +145,7 @@ describe("IterationsController", () => {
       await controller.delete({
         user: { org: org.id }
       }, iteration.id);
-      const iterations = await controller.list({
+      const iterations = await controller.listWithWorkItems({
         user: { org: org.id }
       });
       expect(iterations.length).toEqual(0);
@@ -222,6 +222,30 @@ describe("IterationsController", () => {
       expect(completedIteration.startDate).toEqual(startDate);
       expect(completedIteration.duration).toEqual(1);
       expect(completedIteration.status).toEqual("completed");
+    });
+  });
+  describe("when listing the iterations", () => {
+    it("should return the iterations list without work items", async () => {
+      const startDate = (new Date()).toISOString().split("T")[0];
+      const iteration = await controller.create({
+        user: { org: org.id }
+      }, {
+        goal: "Goal 1",
+        startDate: startDate,
+        duration: 1
+      });
+      const iterationsList = await controller.list({
+        user: { org: org.id }
+      });
+      expect(iterationsList.length).toEqual(1);
+      expect(iterationsList[0].id).toEqual(iteration.id);
+      expect(iterationsList[0].title).toEqual(iteration.title);
+      expect(iterationsList[0].status).toEqual(iteration.status);
+      expect(iterationsList[0].startDate).toEqual(iteration.startDate);
+      expect(iterationsList[0].duration).toEqual(iteration.duration);
+      expect(iterationsList[0].endDate).toEqual(iteration.endDate);
+      expect(iterationsList[0].createdAt).toEqual(iteration.createdAt);
+      expect(iterationsList[0].updatedAt).toEqual(iteration.updatedAt);
     });
   });
 });

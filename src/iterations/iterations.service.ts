@@ -54,7 +54,7 @@ export class IterationsService {
     return await IterationMapper.toDto(savedIteration);
   }
 
-  async list(orgId: string) {
+  async listWithWorkItems(orgId: string) {
     const iterations = await this.iterationRepository.find({
       where: {
         org: {
@@ -182,5 +182,19 @@ export class IterationsService {
     return workItems
       .filter(workItem => workItem.estimation)
       .reduce((sum, workItem) => sum + workItem.estimation, 0);
+  }
+
+  async list(orgId: string) {
+    const iterations = await this.iterationRepository.find({
+      where: {
+        org: {
+          id: orgId
+        }
+      },
+      order: {
+        startDate: "ASC"
+      }
+    });
+    return await Promise.all(iterations.map(iteration => IterationMapper.toListItemDto(iteration)));
   }
 }

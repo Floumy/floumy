@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
@@ -33,8 +34,14 @@ export class IterationsController {
     }
   }
 
-  @Get()
+  @Get("with-work-items")
   @HttpCode(200)
+  async listWithWorkItems(@Request() request) {
+    return await this.iterationsService.listWithWorkItems(request.user.org);
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
   async list(@Request() request) {
     return await this.iterationsService.list(request.user.org);
   }
