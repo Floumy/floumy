@@ -54,13 +54,13 @@ export class WorkItem {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @ManyToOne(() => User, user => user.createdWorkItems, { lazy: true })
+  @ManyToOne(() => User, user => user.createdWorkItems, { lazy: false })
   createdBy: Promise<User>;
-  @ManyToOne(() => User, user => user.assignedWorkItems, { lazy: true })
+  @ManyToOne(() => User, user => user.assignedWorkItems, { lazy: false })
   assignedTo: Promise<User>;
-  @ManyToOne(() => Org, org => org.workItems, { lazy: true })
+  @ManyToOne(() => Org, org => org.workItems, { lazy: false })
   org: Promise<Org>;
-  @ManyToOne(() => Feature, feature => feature.workItems, { lazy: true })
+  @ManyToOne(() => Feature, feature => feature.workItems, { lazy: false })
   feature: Promise<Feature>;
   @ManyToOne(() => Iteration, iteration => iteration.workItems, { lazy: true })
   iteration: Promise<Iteration>;
