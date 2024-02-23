@@ -2,8 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from "typeorm";
@@ -15,6 +17,7 @@ import { WorkItemType } from "./work-item-type.enum";
 import { Iteration } from "../../iterations/Iteration.entity";
 import { WorkItemFile } from "./work-item-file.entity";
 import { User } from "../../users/user.entity";
+import { WorkItemsStatusStats } from "./work-items-status-stats.entity";
 
 @Entity()
 export class WorkItem {
@@ -66,4 +69,7 @@ export class WorkItem {
   iteration: Promise<Iteration>;
   @OneToMany(() => WorkItemFile, workItemFile => workItemFile.workItem)
   workItemFiles: Promise<WorkItemFile[]>;
+  @OneToOne(() => WorkItemsStatusStats, (workItemsStatusStats) => workItemsStatusStats.workItem, { lazy: true })
+  @JoinColumn()
+  workItemsStatusStats: Promise<WorkItemsStatusStats>;
 }
