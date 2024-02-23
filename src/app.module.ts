@@ -18,6 +18,7 @@ import jwtConfig from "./config/jwt.config";
 import fileStorageConfig from "./config/file-storage.config";
 import emailConfig from "./config/mail.config";
 import appConfig from "./config/app.config";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import appConfig from "./config/app.config";
       inject: [ConfigService],
       imports: [ConfigModule]
     }),
-
+    EventEmitterModule.forRoot(),
     AuthModule,
     UsersModule,
     OkrsModule,

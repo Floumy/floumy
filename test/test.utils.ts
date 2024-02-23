@@ -11,6 +11,7 @@ import { NotificationsService } from "../src/notifications/notifications.service
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "../src/users/user.entity";
 import { RefreshToken } from "../src/auth/refresh-token.entity";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 
 
 export async function clearDatabase(dataSource: DataSource) {
@@ -60,6 +61,7 @@ export async function setupTestingModule(
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig]
       }),
+      EventEmitterModule.forRoot(),
       ...imports
     ],
     providers: [

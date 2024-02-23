@@ -10,6 +10,7 @@ import { Iteration } from "../../iterations/Iteration.entity";
 import { File } from "../../files/file.entity";
 import { WorkItemFile } from "./work-item-file.entity";
 import { User } from "../../users/user.entity";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 
 
 @Injectable()
@@ -20,7 +21,8 @@ export class WorkItemsService {
               @InjectRepository(Iteration) private iterationsRepository: Repository<Iteration>,
               @InjectRepository(User) private usersRepository: Repository<User>,
               @InjectRepository(File) private filesRepository: Repository<File>,
-              @InjectRepository(WorkItemFile) private workItemFilesRepository: Repository<WorkItemFile>) {
+              @InjectRepository(WorkItemFile) private workItemFilesRepository: Repository<WorkItemFile>,
+              private EventEmitter: EventEmitter2) {
   }
 
   async createWorkItem(userId: string, workItemDto: CreateUpdateWorkItemDto) {
@@ -35,6 +37,7 @@ export class WorkItemsService {
     const feature = await savedWorkItem.feature;
     await this.updateFeatureProgress(feature);
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
+    this.EventEmitter.emit("workItem.created", savedWorkItem);
     return WorkItemMapper.toDto(savedWorkItem);
   }
 
@@ -75,6 +78,7 @@ export class WorkItemsService {
       await this.updateFeatureProgress(newFeature);
     }
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
+    this.EventEmitter.emit("workItem.updated", savedWorkItem);
     return WorkItemMapper.toDto(savedWorkItem);
   }
 
@@ -117,6 +121,7 @@ export class WorkItemsService {
     if (feature) {
       await this.updateFeatureProgress(feature);
     }
+    this.EventEmitter.emit("workItem.deleted", workItem);
   }
 
   removeFeatureFromWorkItems(orgId: string, id: string) {
