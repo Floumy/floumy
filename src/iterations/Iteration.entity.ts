@@ -43,6 +43,6 @@ export class Iteration {
   updatedAt: Date;
   @ManyToOne(() => Org, org => org.iterations, { lazy: true })
   org: Promise<Org>;
-  @OneToMany(() => WorkItem, workItem => workItem.iteration, { lazy: true })
+  @OneToMany(() => WorkItem, workItem => workItem.iteration, { lazy: false })
   workItems: Promise<WorkItem[]>;
 }
