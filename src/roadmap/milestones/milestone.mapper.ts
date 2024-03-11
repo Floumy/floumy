@@ -1,7 +1,11 @@
-import { Milestone } from "./milestone.entity";
-import { MilestoneDto, MilestoneListItemDto, MilestoneListWithFeaturesItemDto } from "./dtos";
-import { TimelineService } from "../../common/timeline.service";
-import { Feature } from "../features/feature.entity";
+import { Milestone } from './milestone.entity';
+import {
+  MilestoneDto,
+  MilestoneListItemDto,
+  MilestoneListWithFeaturesItemDto,
+} from './dtos';
+import { TimelineService } from '../../common/timeline.service';
+import { Feature } from '../features/feature.entity';
 
 export class MilestoneMapper {
   static toDto(milestone: Milestone): MilestoneDto {
@@ -10,36 +14,48 @@ export class MilestoneMapper {
       title: milestone.title,
       description: milestone.description,
       dueDate: MilestoneMapper.formatDate(milestone.dueDate),
-      timeline: TimelineService.convertDateToTimeline(milestone.dueDate).valueOf(),
+      timeline: TimelineService.convertDateToTimeline(
+        milestone.dueDate,
+      ).valueOf(),
       createdAt: milestone.createdAt,
-      updatedAt: milestone.updatedAt
+      updatedAt: milestone.updatedAt,
     };
   }
 
   static toListDto(milestones: Milestone[]): MilestoneListItemDto[] {
-    return milestones.map(milestone => ({
+    return milestones.map((milestone) => ({
       id: milestone.id,
       title: milestone.title,
       description: milestone.description,
-      timeline: TimelineService.convertDateToTimeline(milestone.dueDate).valueOf(),
-      dueDate: MilestoneMapper.formatDate(milestone.dueDate)
+      timeline: TimelineService.convertDateToTimeline(
+        milestone.dueDate,
+      ).valueOf(),
+      dueDate: MilestoneMapper.formatDate(milestone.dueDate),
     }));
   }
 
-  static async toListWithFeaturesDto(milestones: Milestone[]): Promise<MilestoneListWithFeaturesItemDto[]> {
-    return await Promise.all(milestones.map(async milestone => ({
-      id: milestone.id,
-      title: milestone.title,
-      description: milestone.description,
-      dueDate: MilestoneMapper.formatDate(milestone.dueDate),
-      timeline: TimelineService.convertDateToTimeline(milestone.dueDate).valueOf(),
-      features: await Promise.all((await milestone.features).map(FeatureMapper.toDto))
-    })));
+  static async toListWithFeaturesDto(
+    milestones: Milestone[],
+  ): Promise<MilestoneListWithFeaturesItemDto[]> {
+    return await Promise.all(
+      milestones.map(async (milestone) => ({
+        id: milestone.id,
+        title: milestone.title,
+        description: milestone.description,
+        dueDate: MilestoneMapper.formatDate(milestone.dueDate),
+        timeline: TimelineService.convertDateToTimeline(
+          milestone.dueDate,
+        ).valueOf(),
+        features: await Promise.all(
+          (await milestone.features).map(FeatureMapper.toDto),
+        ),
+      })),
+    );
   }
 
   private static formatDate(date: Date): string {
-    return date.toISOString().split("T")[0];
-  };
+    return date.toISOString().split('T')[0];
+  }
 }
 
 class FeatureMapper {
@@ -52,12 +68,14 @@ class FeatureMapper {
       status: feature.status.valueOf(),
       progress: feature.progress,
       workItemsCount: feature.workItemsCount,
-      assignedTo: assignedTo ? {
-        id: assignedTo.id,
-        name: assignedTo.name
-      } : null,
+      assignedTo: assignedTo
+        ? {
+            id: assignedTo.id,
+            name: assignedTo.name,
+          }
+        : null,
       createdAt: feature.createdAt,
-      updatedAt: feature.updatedAt
+      updatedAt: feature.updatedAt,
     };
   }
 }
