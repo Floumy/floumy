@@ -10,6 +10,7 @@ export interface MilestoneDto {
   description: string;
   dueDate: string;
   timeline: string;
+  features: FeatureListItemDto[];
   createdAt: Date;
   updatedAt: Date;
 }

@@ -8,7 +8,7 @@ import { TimelineService } from '../../common/timeline.service';
 import { Feature } from '../features/feature.entity';
 
 export class MilestoneMapper {
-  static toDto(milestone: Milestone): MilestoneDto {
+  static async toDto(milestone: Milestone): Promise<MilestoneDto> {
     return {
       id: milestone.id,
       title: milestone.title,
@@ -17,6 +17,9 @@ export class MilestoneMapper {
       timeline: TimelineService.convertDateToTimeline(
         milestone.dueDate,
       ).valueOf(),
+      features: await Promise.all(
+        (await milestone.features).map(FeatureMapper.toDto),
+      ),
       createdAt: milestone.createdAt,
       updatedAt: milestone.updatedAt,
     };

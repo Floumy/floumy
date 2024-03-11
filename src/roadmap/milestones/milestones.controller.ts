@@ -11,25 +11,29 @@ import {
   Post,
   Put,
   Request,
-  UseGuards
-} from "@nestjs/common";
-import { MilestonesService } from "./milestones.service";
-import { CreateUpdateMilestoneDto } from "./dtos";
-import { AuthGuard } from "../../auth/auth.guard";
+  UseGuards,
+} from '@nestjs/common';
+import { MilestonesService } from './milestones.service';
+import { CreateUpdateMilestoneDto } from './dtos';
+import { AuthGuard } from '../../auth/auth.guard';
 
-@Controller("milestones")
+@Controller('milestones')
 @UseGuards(AuthGuard)
 export class MilestonesController {
-
-  constructor(private milestonesService: MilestonesService) {
-  }
+  constructor(private milestonesService: MilestonesService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Request() request, @Body() createMilestoneDto: CreateUpdateMilestoneDto) {
+  async create(
+    @Request() request,
+    @Body() createMilestoneDto: CreateUpdateMilestoneDto,
+  ) {
     const { org: orgId } = request.user;
     try {
-      return await this.milestonesService.createMilestone(orgId, createMilestoneDto);
+      return await this.milestonesService.createMilestone(
+        orgId,
+        createMilestoneDto,
+      );
     } catch (e) {
       throw new BadRequestException();
     }
@@ -42,16 +46,16 @@ export class MilestonesController {
     return await this.milestonesService.listMilestonesWithFeatures(orgId);
   }
 
-  @Get("/list")
+  @Get('/list')
   @HttpCode(HttpStatus.OK)
   async list(@Request() request) {
     const { org: orgId } = request.user;
     return await this.milestonesService.listMilestones(orgId);
   }
 
-  @Get(":id")
+  @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async get(@Request() request, @Param("id") id) {
+  async get(@Request() request, @Param('id') id) {
     const { org: orgId } = request.user;
     try {
       return await this.milestonesService.get(orgId, id);
@@ -60,9 +64,13 @@ export class MilestonesController {
     }
   }
 
-  @Put(":id")
+  @Put(':id')
   @HttpCode(HttpStatus.OK)
-  async update(@Request() request, @Param("id") id: string, @Body() updateMilestoneDto: CreateUpdateMilestoneDto) {
+  async update(
+    @Request() request,
+    @Param('id') id: string,
+    @Body() updateMilestoneDto: CreateUpdateMilestoneDto,
+  ) {
     const { org: orgId } = request.user;
     try {
       return await this.milestonesService.update(orgId, id, updateMilestoneDto);
@@ -71,9 +79,9 @@ export class MilestonesController {
     }
   }
 
-  @Delete(":id")
+  @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Request() request, @Param("id") id: string) {
+  async delete(@Request() request, @Param('id') id: string) {
     const { org: orgId } = request.user;
     try {
       return await this.milestonesService.delete(orgId, id);
