@@ -1,9 +1,9 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { WorkItem } from "./work-item.entity";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { WorkItem } from './work-item.entity';
 
 @Entity()
 export class WorkItemsStatusStats {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column({ default: 0 })
   planned: number;
@@ -27,6 +27,8 @@ export class WorkItemsStatusStats {
   done: number;
   @Column({ default: 0 })
   closed: number;
-  @OneToOne(() => WorkItem, (workItem) => workItem.workItemsStatusStats, { lazy: true })
+  @OneToOne(() => WorkItem, (workItem) => workItem.workItemsStatusStats, {
+    lazy: true,
+  })
   workItem: Promise<WorkItem>;
 }
