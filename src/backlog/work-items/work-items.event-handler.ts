@@ -1,22 +1,24 @@
-import { OnEvent } from "@nestjs/event-emitter";
-import { InjectRepository } from "@nestjs/typeorm";
-import { WorkItemsStatusLog } from "./work-items-status-log.entity";
-import { Repository } from "typeorm";
-import { WorkItemStatus } from "./work-item-status.enum";
-import { WorkItemsStatusStats } from "./work-items-status-stats.entity";
-import { WorkItem } from "./work-item.entity";
-import { Injectable } from "@nestjs/common";
+import { OnEvent } from '@nestjs/event-emitter';
+import { InjectRepository } from '@nestjs/typeorm';
+import { WorkItemsStatusLog } from './work-items-status-log.entity';
+import { Repository } from 'typeorm';
+import { WorkItemStatus } from './work-item-status.enum';
+import { WorkItemsStatusStats } from './work-items-status-stats.entity';
+import { WorkItem } from './work-item.entity';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class WorkItemsEventHandler {
   constructor(
-    @InjectRepository(WorkItemsStatusLog) private workItemsStatusLogRepository: Repository<WorkItemsStatusLog>,
-    @InjectRepository(WorkItemsStatusStats) private workItemStatusRepository: Repository<WorkItemsStatusStats>,
-    @InjectRepository(WorkItem) private workItemsRepository: Repository<WorkItem>
-  ) {
-  }
+    @InjectRepository(WorkItemsStatusLog)
+    private workItemsStatusLogRepository: Repository<WorkItemsStatusLog>,
+    @InjectRepository(WorkItemsStatusStats)
+    private workItemStatusRepository: Repository<WorkItemsStatusStats>,
+    @InjectRepository(WorkItem)
+    private workItemsRepository: Repository<WorkItem>,
+  ) {}
 
-  @OnEvent("workItem.created")
+  @OnEvent('workItem.created')
   async handleWorkItemCreated(event: WorkItem) {
     const workItemStatusStats = new WorkItemsStatusStats();
     workItemStatusStats.workItem = Promise.resolve(event);
@@ -29,40 +31,57 @@ export class WorkItemsEventHandler {
     await this.workItemStatusRepository.save(workItemStatusStats);
   }
 
-  @OnEvent("workItem.deleted")
+  @OnEvent('workItem.deleted')
   async handleWorkItemDeleted(event: WorkItem) {
     await this.workItemStatusRepository.delete({ workItem: { id: event.id } });
     await this.workItemsStatusLogRepository.delete({ workItemId: event.id });
   }
 
-  @OnEvent("workItem.updated")
+  @OnEvent('workItem.updated')
   async handleWorkItemUpdated(event: WorkItem) {
-    const previousStatus = await this.workItemsStatusLogRepository.findOne({
+    const previousStatusLog = await this.workItemsStatusLogRepository.findOne({
       where: { workItemId: event.id },
-      order: { timestamp: "DESC" }
+      order: { timestamp: 'DESC' },
     });
     const workItemStatusLog = new WorkItemsStatusLog();
     workItemStatusLog.workItemId = event.id;
     workItemStatusLog.status = event.status;
     workItemStatusLog.timestamp = event.updatedAt;
     await this.workItemsStatusLogRepository.save(workItemStatusLog);
-    if (!previousStatus) {
+    if (!previousStatusLog) {
       return;
     }
-    const timeSpentInStatus = event.updatedAt.getTime() - previousStatus.timestamp.getTime();
-    await this.updateWorkItemStatusStats(event.id, event.status, timeSpentInStatus);
+    const timeSpentInStatus =
+      event.updatedAt.getTime() - previousStatusLog.timestamp.getTime();
+    await this.updateWorkItemStatusStats(
+      event.id,
+      previousStatusLog.status,
+      timeSpentInStatus,
+    );
   }
 
-  private async updateWorkItemStatusStats(workItemId: string, newStatus: string, timeSpentInStatus: number) {
-    let workItemStatusStats = await this.workItemStatusRepository.findOne({ where: { workItem: { id: workItemId } } });
+  private async updateWorkItemStatusStats(
+    workItemId: string,
+    oldStatus: string,
+    timeSpentInStatus: number,
+  ) {
+    let workItemStatusStats = await this.workItemStatusRepository.findOne({
+      where: { workItem: { id: workItemId } },
+    });
     if (!workItemStatusStats) {
-      const workItem = await this.workItemsRepository.findOne({ where: { id: workItemId } });
+      const workItem = await this.workItemsRepository.findOne({
+        where: { id: workItemId },
+      });
       workItemStatusStats = new WorkItemsStatusStats();
       workItemStatusStats.workItem = Promise.resolve(workItem);
-      workItemStatusStats[newStatus] = timeSpentInStatus;
+      workItemStatusStats[oldStatus] = timeSpentInStatus;
       await this.workItemStatusRepository.save(workItemStatusStats);
     } else {
-      workItemStatusStats[newStatus] += timeSpentInStatus;
+      // Kebab case to camel case
+      const statusProperty = oldStatus.replace(/-([a-z])/g, (g) =>
+        g[1].toUpperCase(),
+      );
+      workItemStatusStats[statusProperty] += timeSpentInStatus;
       await this.workItemStatusRepository.save(workItemStatusStats);
     }
   }
