@@ -1,20 +1,22 @@
-import { Injectable } from "@nestjs/common";
-import { CreateOrUpdateIterationDto } from "./dtos";
-import { Iteration } from "./Iteration.entity";
-import { Repository } from "typeorm";
-import { Org } from "../orgs/org.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { IterationMapper } from "./iteration.mapper";
-import { WorkItem } from "../backlog/work-items/work-item.entity";
-import { IterationStatus } from "./iteration-status.enum";
+import { Injectable } from '@nestjs/common';
+import { CreateOrUpdateIterationDto } from './dtos';
+import { Iteration } from './Iteration.entity';
+import { Repository } from 'typeorm';
+import { Org } from '../orgs/org.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { IterationMapper } from './iteration.mapper';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { IterationStatus } from './iteration-status.enum';
 
 @Injectable()
 export class IterationsService {
-
-  constructor(@InjectRepository(Iteration) private iterationRepository: Repository<Iteration>,
-              @InjectRepository(WorkItem) private workItemsRepository: Repository<WorkItem>,
-              @InjectRepository(Org) private orgRepository: Repository<Org>) {
-  }
+  constructor(
+    @InjectRepository(Iteration)
+    private iterationRepository: Repository<Iteration>,
+    @InjectRepository(WorkItem)
+    private workItemsRepository: Repository<WorkItem>,
+    @InjectRepository(Org) private orgRepository: Repository<Org>,
+  ) {}
 
   getWeekNumber(d: Date): number {
     // Copy date so don't modify original
@@ -24,7 +26,7 @@ export class IterationsService {
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     // Get first day of year
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    // Calculate and return full weeks to nearest Thursday
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
   }
@@ -58,32 +60,38 @@ export class IterationsService {
     const iterations = await this.iterationRepository.find({
       where: {
         org: {
-          id: orgId
-        }
+          id: orgId,
+        },
       },
       order: {
-        startDate: "ASC"
-      }
+        startDate: 'ASC',
+      },
     });
-    return await Promise.all(iterations.map(iteration => IterationMapper.toDto(iteration)));
+    return await Promise.all(
+      iterations.map((iteration) => IterationMapper.toDto(iteration)),
+    );
   }
 
   async get(orgId: string, id: string) {
     const iteration = await this.iterationRepository.findOneByOrFail({
       id,
       org: {
-        id: orgId
-      }
+        id: orgId,
+      },
     });
     return await IterationMapper.toDto(iteration);
   }
 
-  async update(orgId: string, id: string, updateIterationDto: CreateOrUpdateIterationDto) {
+  async update(
+    orgId: string,
+    id: string,
+    updateIterationDto: CreateOrUpdateIterationDto,
+  ) {
     const iteration = await this.iterationRepository.findOneByOrFail({
       id,
       org: {
-        id: orgId
-      }
+        id: orgId,
+      },
     });
     iteration.goal = updateIterationDto.goal;
     iteration.startDate = new Date(updateIterationDto.startDate);
@@ -97,19 +105,26 @@ export class IterationsService {
   }
 
   getIterationTitle(iteration: Iteration) {
-    return `Iteration ${this.getIterationCalendarWeekNumbersForTitle(iteration.startDate, iteration.endDate)} ${iteration.startDate.getFullYear()}`;
+    return `Iteration ${this.getIterationCalendarWeekNumbersForTitle(
+      iteration.startDate,
+      iteration.endDate,
+    )} ${iteration.startDate.getFullYear()}`;
   }
 
   getIterationEndDate(iteration: Iteration) {
-    return new Date(iteration.startDate.getTime() + iteration.duration * 7 * 24 * 60 * 60 * 1000 - 1);
+    return new Date(
+      iteration.startDate.getTime() +
+        iteration.duration * 7 * 24 * 60 * 60 * 1000 -
+        1,
+    );
   }
 
   async delete(orgId: string, id: string) {
     const iteration = await this.iterationRepository.findOneByOrFail({
       id,
       org: {
-        id: orgId
-      }
+        id: orgId,
+      },
     });
     await this.removeWorkItemsFromIteration(iteration);
     await this.iterationRepository.remove(iteration);
@@ -129,8 +144,8 @@ export class IterationsService {
     const iteration = await this.iterationRepository.findOneByOrFail({
       id,
       org: {
-        id: orgId
-      }
+        id: orgId,
+      },
     });
     iteration.actualStartDate = new Date();
     iteration.status = IterationStatus.ACTIVE;
@@ -141,9 +156,9 @@ export class IterationsService {
   private async completeActiveIterationIfExists(orgId: string) {
     const activeIteration = await this.iterationRepository.findOneBy({
       org: {
-        id: orgId
+        id: orgId,
       },
-      status: IterationStatus.ACTIVE
+      status: IterationStatus.ACTIVE,
     });
 
     if (activeIteration) {
@@ -156,19 +171,21 @@ export class IterationsService {
   async getActiveIteration(orgId: string) {
     const iteration = await this.iterationRepository.findOneBy({
       org: {
-        id: orgId
+        id: orgId,
       },
-      status: IterationStatus.ACTIVE
+      status: IterationStatus.ACTIVE,
     });
-    return iteration ? await IterationMapper.toDto(iteration) : null;
+    return iteration
+      ? await IterationMapper.toActiveIterationDto(iteration)
+      : null;
   }
 
   async completeIteration(orgId: string, id: string) {
     const iteration = await this.iterationRepository.findOneByOrFail({
       id,
       org: {
-        id: orgId
-      }
+        id: orgId,
+      },
     });
     iteration.actualEndDate = new Date();
     iteration.status = IterationStatus.COMPLETED;
@@ -180,7 +197,7 @@ export class IterationsService {
   private async calculateIterationVelocity(iteration: Iteration) {
     const workItems = await iteration.workItems;
     return workItems
-      .filter(workItem => workItem.estimation)
+      .filter((workItem) => workItem.estimation)
       .reduce((sum, workItem) => sum + workItem.estimation, 0);
   }
 
@@ -188,13 +205,15 @@ export class IterationsService {
     const iterations = await this.iterationRepository.find({
       where: {
         org: {
-          id: orgId
-        }
+          id: orgId,
+        },
       },
       order: {
-        startDate: "ASC"
-      }
+        startDate: 'ASC',
+      },
     });
-    return await Promise.all(iterations.map(iteration => IterationMapper.toListItemDto(iteration)));
+    return await Promise.all(
+      iterations.map((iteration) => IterationMapper.toListItemDto(iteration)),
+    );
   }
 }

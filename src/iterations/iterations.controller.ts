@@ -11,18 +11,16 @@ import {
   Post,
   Put,
   Request,
-  UseGuards
-} from "@nestjs/common";
-import { AuthGuard } from "../auth/auth.guard";
-import { CreateOrUpdateIterationDto } from "./dtos";
-import { IterationsService } from "./iterations.service";
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '../auth/auth.guard';
+import { CreateOrUpdateIterationDto } from './dtos';
+import { IterationsService } from './iterations.service';
 
-@Controller("iterations")
+@Controller('iterations')
 @UseGuards(AuthGuard)
 export class IterationsController {
-
-  constructor(private iterationsService: IterationsService) {
-  }
+  constructor(private iterationsService: IterationsService) {}
 
   @Post()
   @HttpCode(201)
@@ -34,7 +32,7 @@ export class IterationsController {
     }
   }
 
-  @Get("with-work-items")
+  @Get('with-work-items')
   @HttpCode(200)
   async listWithWorkItems(@Request() request) {
     return await this.iterationsService.listWithWorkItems(request.user.org);
@@ -46,9 +44,9 @@ export class IterationsController {
     return await this.iterationsService.list(request.user.org);
   }
 
-  @Post(":id/start")
+  @Post(':id/start')
   @HttpCode(200)
-  async startIteration(@Request() request, @Param("id") id: string) {
+  async startIteration(@Request() request, @Param('id') id: string) {
     try {
       return await this.iterationsService.startIteration(request.user.org, id);
     } catch (e) {
@@ -56,25 +54,28 @@ export class IterationsController {
     }
   }
 
-  @Get("active")
+  @Get('active')
   @HttpCode(200)
   async getActiveIteration(@Request() request) {
     return await this.iterationsService.getActiveIteration(request.user.org);
   }
 
-  @Post(":id/complete")
+  @Post(':id/complete')
   @HttpCode(200)
-  async completeIteration(@Request() request, @Param("id") id: string) {
+  async completeIteration(@Request() request, @Param('id') id: string) {
     try {
-      return await this.iterationsService.completeIteration(request.user.org, id);
+      return await this.iterationsService.completeIteration(
+        request.user.org,
+        id,
+      );
     } catch (e) {
       throw new NotFoundException(e.message);
     }
   }
 
-  @Get(":id")
+  @Get(':id')
   @HttpCode(200)
-  async get(@Request() request, @Param("id") id: string) {
+  async get(@Request() request, @Param('id') id: string) {
     try {
       return await this.iterationsService.get(request.user.org, id);
     } catch (e) {
@@ -82,9 +83,13 @@ export class IterationsController {
     }
   }
 
-  @Put(":id")
+  @Put(':id')
   @HttpCode(200)
-  async update(@Request() request, @Param("id") id: string, @Body() body: CreateOrUpdateIterationDto) {
+  async update(
+    @Request() request,
+    @Param('id') id: string,
+    @Body() body: CreateOrUpdateIterationDto,
+  ) {
     try {
       return await this.iterationsService.update(request.user.org, id, body);
     } catch (e) {
@@ -92,9 +97,9 @@ export class IterationsController {
     }
   }
 
-  @Delete(":id")
+  @Delete(':id')
   @HttpCode(200)
-  async delete(@Request() request, @Param("id") id: string) {
+  async delete(@Request() request, @Param('id') id: string) {
     try {
       return await this.iterationsService.delete(request.user.org, id);
     } catch (e) {
