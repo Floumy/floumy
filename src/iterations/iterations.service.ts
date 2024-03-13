@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOrUpdateIterationDto } from './dtos';
-import { Iteration } from './Iteration.entity';
-import { Repository } from 'typeorm';
-import { Org } from '../orgs/org.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { IterationMapper } from './iteration.mapper';
-import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { IterationStatus } from './iteration-status.enum';
+import { Injectable } from "@nestjs/common";
+import { CreateOrUpdateIterationDto } from "./dtos";
+import { Iteration } from "./Iteration.entity";
+import { Repository } from "typeorm";
+import { Org } from "../orgs/org.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { IterationMapper } from "./iteration.mapper";
+import { WorkItem } from "../backlog/work-items/work-item.entity";
+import { IterationStatus } from "./iteration-status.enum";
 
 @Injectable()
 export class IterationsService {
@@ -176,7 +176,7 @@ export class IterationsService {
       status: IterationStatus.ACTIVE,
     });
     return iteration
-      ? await IterationMapper.toActiveIterationDto(iteration)
+      ? await IterationMapper.toDto(iteration)
       : null;
   }
 
