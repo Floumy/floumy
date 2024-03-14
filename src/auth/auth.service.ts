@@ -1,51 +1,54 @@
-import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
-import { UsersService } from "../users/users.service";
-import { User } from "../users/user.entity";
-import { RefreshToken } from "./refresh-token.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { TokensService } from "./tokens.service";
-import { SignUpDto } from "./auth.dtos";
-import { v4 as uuid } from "uuid";
-import { NotificationsService } from "../notifications/notifications.service";
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { User } from '../users/user.entity';
+import { RefreshToken } from './refresh-token.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TokensService } from './tokens.service';
+import { SignUpDto } from './auth.dtos';
+import { v4 as uuid } from 'uuid';
+import { NotificationsService } from '../notifications/notifications.service';
 
 export type AuthDto = {
   accessToken: string;
   refreshToken: string;
-}
+};
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  constructor(private usersService: UsersService,
-              @InjectRepository(RefreshToken)
-              private refreshTokenRepository: Repository<RefreshToken>,
-              private tokensService: TokensService,
-              private notificationsService: NotificationsService) {
-  }
+  constructor(
+    private usersService: UsersService,
+    @InjectRepository(RefreshToken)
+    private refreshTokenRepository: Repository<RefreshToken>,
+    private tokensService: TokensService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   async signIn(email: string, password: string): Promise<AuthDto> {
     const user = await this.usersService.findOneByEmail(email);
     if (!user?.isActive) {
-      this.logger.error("User is not active");
+      this.logger.error('User is not active');
       throw new UnauthorizedException();
     }
-    if (!await this.usersService.isPasswordCorrect(password, user?.password)) {
-      this.logger.error("Invalid credentials");
+    if (
+      !(await this.usersService.isPasswordCorrect(password, user?.password))
+    ) {
+      this.logger.error('Invalid credentials');
       throw new UnauthorizedException();
     }
     const refreshToken = await this.getOrCreateRefreshToken(user);
     return {
       accessToken: await this.tokensService.generateAccessToken(user),
-      refreshToken
+      refreshToken,
     };
   }
 
   private async getOrCreateRefreshToken(user: User) {
     const refreshToken = await this.refreshTokenRepository.findOne({
       where: { user: { id: user.id } },
-      order: { createdAt: "DESC" }
+      order: { createdAt: 'DESC' },
     });
 
     if (!refreshToken || refreshToken.expirationDate.getTime() < Date.now()) {
@@ -64,16 +67,25 @@ export class AuthService {
   }
 
   async signUp(signUpDto: SignUpDto): Promise<void> {
-    const user = await this.usersService.create(signUpDto.name, signUpDto.email, signUpDto.password, signUpDto.invitationToken);
+    const user = await this.usersService.create(
+      signUpDto.name,
+      signUpDto.email,
+      signUpDto.password,
+      signUpDto.invitationToken,
+    );
 
     try {
       const activationToken = await this.generateActivationToken();
-      await this.notificationsService.sendActivationEmail(user.name, user.email, activationToken);
+      await this.notificationsService.sendActivationEmail(
+        user.name,
+        user.email,
+        activationToken,
+      );
       user.activationToken = activationToken;
       await this.usersService.save(user);
     } catch (e) {
       this.logger.error(e.message);
-      throw new Error("Failed to send activation email");
+      throw new Error('Failed to send activation email');
     }
   }
 
@@ -85,28 +97,30 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const refreshTokenEntity = await this.refreshTokenRepository.findOneBy({ token: refreshToken });
+    const refreshTokenEntity = await this.refreshTokenRepository.findOneBy({
+      token: refreshToken,
+    });
 
     if (!refreshTokenEntity) {
-      this.logger.error("Refresh token not found");
+      this.logger.error('Refresh token not found');
       throw new UnauthorizedException();
     }
 
     if (refreshTokenEntity.expirationDate.getTime() < Date.now()) {
-      this.logger.error("Refresh token expired");
+      this.logger.error('Refresh token expired');
       throw new UnauthorizedException();
     }
 
     const user = await refreshTokenEntity.user;
 
     if (!user.isActive) {
-      this.logger.error("User is not active");
+      this.logger.error('User is not active');
       throw new UnauthorizedException();
     }
 
     return {
       accessToken: await this.tokensService.generateAccessToken(user),
-      refreshToken: await this.createRefreshToken(user)
+      refreshToken: await this.createRefreshToken(user),
     };
   }
 
@@ -116,15 +130,16 @@ export class AuthService {
 
   async activateAccount(activationToken: string) {
     if (!activationToken) {
-      this.logger.error("Activation token not provided");
-      throw new Error("Activation token not provided");
+      this.logger.error('Activation token not provided');
+      throw new Error('Activation token not provided');
     }
 
-    const user = await this.usersService.findOneByActivationToken(activationToken);
+    const user =
+      await this.usersService.findOneByActivationToken(activationToken);
 
     if (!user) {
-      this.logger.error("User not found");
-      throw new Error("Activation token not found");
+      this.logger.error('User not found');
+      throw new Error('Activation token not found');
     }
 
     user.isActive = true;
@@ -136,21 +151,26 @@ export class AuthService {
     const user = await this.usersService.findOneByEmail(email);
 
     if (!user) {
-      this.logger.error("User not found");
+      this.logger.error('User not found');
       return;
     }
 
     user.passwordResetToken = uuid();
     await this.usersService.save(user);
-    await this.notificationsService.sendPasswordResetEmail(user.name, user.email, user.passwordResetToken);
+    await this.notificationsService.sendPasswordResetEmail(
+      user.name,
+      user.email,
+      user.passwordResetToken,
+    );
   }
 
   async resetPassword(newPassword: string, resetToken: string) {
-    const user = await this.usersService.findOneByPasswordResetToken(resetToken);
+    const user =
+      await this.usersService.findOneByPasswordResetToken(resetToken);
 
     if (!user) {
-      this.logger.error("User not found");
-      throw new Error("Password reset token not found");
+      this.logger.error('User not found');
+      throw new Error('Password reset token not found');
     }
 
     user.password = await this.usersService.encryptPassword(newPassword);
