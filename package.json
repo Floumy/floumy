@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "npm run test-db:up && jest --config ./test/jest-e2e.json --runInBand && npm run test-db:down",
     "test-db:up": "podman container exists test-db || podman run --name test-db -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -e POSTGRES_DB=testdb -p 5455:5432 -d postgres",
-    "test-db:down": "podman stop test-db && podman rm test-db"
+    "test-db:down": "podman stop test-db && podman rm test-db",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
