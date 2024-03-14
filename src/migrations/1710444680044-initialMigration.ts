@@ -1,9 +1,9 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class InitialMigration1710444680044 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-        create table work_items_status_stats
+        create table if not exists work_items_status_stats
         (
             id                   uuid    default uuid_generate_v4() not null
                 constraint "PK_ae42751c0c83af19e8b6b64cdb1"
@@ -21,7 +21,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
             closed               integer default 0                  not null
         );
 
-        create table org
+        create table if not exists org
         (
             id                uuid      default uuid_generate_v4() not null
                 constraint "PK_703783130f152a752cadf7aa751"
@@ -33,7 +33,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
             "updatedAt"       timestamp default now()              not null
         );
 
-        create table milestone
+        create table if not exists milestone
         (
             id          uuid      default uuid_generate_v4() not null
                 constraint "PK_f8372abce331f60ba7b33fe23a7"
@@ -48,7 +48,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                     references org
         );
 
-        create table iteration
+        create table if not exists iteration
         (
             id                uuid                  default uuid_generate_v4() not null
                 constraint "PK_53b96079dea7a00e9a04e32cf10"
@@ -69,7 +69,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                     references org
         );
 
-        create table file
+        create table if not exists file
         (
             id                uuid      default uuid_generate_v4() not null
                 constraint "PK_36b46d232307066b3a2c9ea3a1d"
@@ -89,7 +89,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                     unique
         );
 
-        create table "user"
+        create table if not exists "user"
         (
             id                   uuid      default uuid_generate_v4() not null
                 constraint "PK_cace4a159ff9f2512dd42373760"
@@ -107,7 +107,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                     references org
         );
 
-        create table refresh_token
+        create table if not exists refresh_token
         (
             id               uuid      default uuid_generate_v4() not null
                 constraint "PK_b575dd3c21fb0831013c909e7fe"
@@ -121,7 +121,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                     references "user"
         );
 
-        create table objective
+        create table if not exists objective
         (
             id             uuid                  default uuid_generate_v4() not null
                 constraint "PK_1084365b2a588160b31361a252e"
@@ -141,7 +141,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                     references "user"
         );
 
-        create table key_result
+        create table if not exists key_result
         (
             id            uuid                   default uuid_generate_v4() not null
                 constraint "PK_9064c5abe9ba68432934564d43f"
@@ -159,7 +159,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                     references objective
         );
 
-        create table feature
+        create table if not exists feature
         (
             id               uuid                  default uuid_generate_v4() not null
                 constraint "PK_03930932f909ca4be8e33d16a2d"
@@ -189,7 +189,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                     references milestone
         );
 
-        create table work_item
+        create table if not exists work_item
         (
             id                       uuid                    default uuid_generate_v4() not null
                 constraint "PK_ef6a53d98d3a483417ae3334144"
@@ -225,7 +225,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                     references work_items_status_stats
         );
 
-        create table work_item_file
+        create table if not exists work_item_file
         (
             id           uuid default uuid_generate_v4() not null
                 constraint "PK_6b6427a9fb8277e20674ef6d5e3"
@@ -257,7 +257,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
         END IF;
         END $$;
 
-        create table feature_file
+        create table if not exists feature_file
         (
             id          uuid default uuid_generate_v4() not null
                 constraint "PK_72cd1dbab7f55b7b3d188e7d4ee"
@@ -271,7 +271,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
                 constraint "FK_6d850d597e4806d21a717d0c07c"
                     references file
         );
-        create table work_items_status_log
+        create table if not exists work_items_status_log
         (
             id           uuid default uuid_generate_v4() not null
                 constraint "PK_a46b90bef71b14f8b7a19aefaf5"
