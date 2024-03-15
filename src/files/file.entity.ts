@@ -2,18 +2,17 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
-import { Org } from "../orgs/org.entity";
-import { WorkItemFile } from "../backlog/work-items/work-item-file.entity";
+  UpdateDateColumn,
+} from 'typeorm';
+import { Org } from '../orgs/org.entity';
+import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 
 @Entity()
 export class File {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -37,10 +36,9 @@ export class File {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => Org, org => org.files, { lazy: true })
+  @ManyToOne(() => Org, (org) => org.files, { lazy: true })
   org: Promise<Org>;
 
   @OneToOne(() => WorkItemFile)
-  @JoinColumn()
   workItemFiles: Promise<WorkItemFile>;
 }

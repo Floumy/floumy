@@ -12,28 +12,31 @@ import {
   Post,
   Put,
   Request,
-  UseGuards
-} from "@nestjs/common";
-import { AuthGuard } from "../../auth/auth.guard";
-import { WorkItemsService } from "./work-items.service";
-import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from "./dtos";
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '../../auth/auth.guard';
+import { WorkItemsService } from './work-items.service';
+import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from './dtos';
 
-@Controller("work-items")
+@Controller('work-items')
 @UseGuards(AuthGuard)
 export class WorkItemsController {
-
-  constructor(private workItemsService: WorkItemsService) {
-  }
+  constructor(private workItemsService: WorkItemsService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Request() request, @Body() workItemDto: CreateUpdateWorkItemDto): Promise<WorkItemDto> {
+  async create(
+    @Request() request,
+    @Body() workItemDto: CreateUpdateWorkItemDto,
+  ): Promise<WorkItemDto> {
     try {
-      return await this.workItemsService.createWorkItem(request.user.sub, workItemDto);
+      return await this.workItemsService.createWorkItem(
+        request.user.sub,
+        workItemDto,
+      );
     } catch (e) {
       throw new BadRequestException(e.message);
     }
-
   }
 
   @Get()
@@ -42,15 +45,17 @@ export class WorkItemsController {
     return await this.workItemsService.listWorkItems(request.user.org);
   }
 
-  @Get("open")
+  @Get('open')
   @HttpCode(HttpStatus.OK)
   async listOpenWithoutIterations(@Request() request) {
-    return await this.workItemsService.listOpenWorkItemsWithoutIterations(request.user.org);
+    return await this.workItemsService.listOpenWorkItemsWithoutIterations(
+      request.user.org,
+    );
   }
 
-  @Get(":id")
+  @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async get(@Request() request, @Param("id") id: string) {
+  async get(@Request() request, @Param('id') id: string) {
     try {
       return await this.workItemsService.getWorkItem(request.user.org, id);
     } catch (e) {
@@ -58,19 +63,27 @@ export class WorkItemsController {
     }
   }
 
-  @Put(":id")
+  @Put(':id')
   @HttpCode(HttpStatus.OK)
-  async update(@Request() request, @Param("id") id: string, @Body() workItemDto: CreateUpdateWorkItemDto) {
+  async update(
+    @Request() request,
+    @Param('id') id: string,
+    @Body() workItemDto: CreateUpdateWorkItemDto,
+  ) {
     try {
-      return await this.workItemsService.updateWorkItem(request.user.org, id, workItemDto);
+      return await this.workItemsService.updateWorkItem(
+        request.user.org,
+        id,
+        workItemDto,
+      );
     } catch (e) {
       throw new BadRequestException(e.message);
     }
   }
 
-  @Delete(":id")
+  @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Request() request, @Param("id") id: string) {
+  async delete(@Request() request, @Param('id') id: string) {
     try {
       await this.workItemsService.deleteWorkItem(request.user.org, id);
     } catch (e) {
@@ -78,11 +91,19 @@ export class WorkItemsController {
     }
   }
 
-  @Patch(":id")
+  @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  async patch(@Request() request, @Param("id") id: string, @Body() workItemDto: WorkItemPatchDto) {
+  async patch(
+    @Request() request,
+    @Param('id') id: string,
+    @Body() workItemDto: WorkItemPatchDto,
+  ) {
     try {
-      return await this.workItemsService.patchWorkItem(request.user.org, id, workItemDto);
+      return await this.workItemsService.patchWorkItem(
+        request.user.org,
+        id,
+        workItemDto,
+      );
     } catch (e) {
       throw new BadRequestException(e.message);
     }
