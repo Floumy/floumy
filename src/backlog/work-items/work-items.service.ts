@@ -158,12 +158,12 @@ export class WorkItemsService {
     await this.deleteWorkItemFiles(orgId, workItem.id);
 
     const feature = await workItem.feature;
-    if (feature) {
-      await this.updateFeatureProgress(feature);
-    }
 
     await this.workItemsRepository.remove(workItem);
 
+    if (feature) {
+      await this.updateFeatureProgress(feature);
+    }
     this.EventEmitter.emit('workItem.deleted', workItem);
   }
 
