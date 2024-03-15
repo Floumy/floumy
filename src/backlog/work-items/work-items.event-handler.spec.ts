@@ -21,6 +21,8 @@ import { FeatureFile } from '../../roadmap/features/feature-file.entity';
 import { WorkItemsEventHandler } from './work-items.event-handler';
 import { WorkItemsStatusStats } from './work-items-status-stats.entity';
 import { WorkItemsStatusLog } from './work-items-status-log.entity';
+import { FilesService } from '../../files/files.service';
+import { FilesStorageRepository } from '../../files/files-storage.repository';
 
 describe('WorkItemsEventHandler', () => {
   let cleanup: () => Promise<void>;
@@ -54,6 +56,8 @@ describe('WorkItemsEventHandler', () => {
         WorkItemsService,
         IterationsService,
         WorkItemsEventHandler,
+        FilesService,
+        FilesStorageRepository,
       ],
     );
     handler = module.get<WorkItemsEventHandler>(WorkItemsEventHandler);
