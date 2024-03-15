@@ -4,7 +4,6 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
-import { BacklogModule } from '../backlog/backlog.module';
 import { FilesStorageRepository } from './files-storage.repository';
 import { WorkItemsController } from '../backlog/work-items/work-items.controller';
 import { FilesController } from './files.controller';
@@ -15,6 +14,9 @@ import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { Repository } from 'typeorm';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { FeatureFile } from '../roadmap/features/feature-file.entity';
+import { Feature } from '../roadmap/features/feature.entity';
+import { WorkItemsService } from '../backlog/work-items/work-items.service';
+import { Iteration } from '../iterations/Iteration.entity';
 
 describe('FilesService', () => {
   let service: FilesService;
@@ -27,12 +29,19 @@ describe('FilesService', () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [
-        TypeOrmModule.forFeature([Org, File, WorkItemFile, FeatureFile]),
+        TypeOrmModule.forFeature([
+          Org,
+          File,
+          WorkItemFile,
+          FeatureFile,
+          WorkItem,
+          Feature,
+          Iteration,
+        ]),
         UsersModule,
         AuthModule,
-        BacklogModule,
       ],
-      [FilesService, FilesStorageRepository],
+      [FilesService, WorkItemsService, FilesStorageRepository],
       [WorkItemsController, FilesController],
     );
     cleanup = dbCleanup;
