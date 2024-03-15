@@ -11,6 +11,7 @@ import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { User } from '../../users/user.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { FilesService } from '../../files/files.service';
 
 @Injectable()
 export class WorkItemsService {
@@ -24,6 +25,7 @@ export class WorkItemsService {
     @InjectRepository(File) private filesRepository: Repository<File>,
     @InjectRepository(WorkItemFile)
     private workItemFilesRepository: Repository<WorkItemFile>,
+    private filesService: FilesService,
     private EventEmitter: EventEmitter2,
   ) {}
 
@@ -152,11 +154,16 @@ export class WorkItemsService {
       id,
       org: { id: orgId },
     });
+
+    await this.deleteWorkItemFiles(orgId, workItem.id);
+
     const feature = await workItem.feature;
-    await this.workItemsRepository.remove(workItem);
     if (feature) {
       await this.updateFeatureProgress(feature);
     }
+
+    await this.workItemsRepository.remove(workItem);
+
     this.EventEmitter.emit('workItem.deleted', workItem);
   }
 
@@ -266,6 +273,16 @@ export class WorkItemsService {
   ) {
     if (workItemPatchDto.priority) {
       workItem.priority = workItemPatchDto.priority;
+    }
+  }
+
+  private async deleteWorkItemFiles(orgId: string, workItemId: string) {
+    const workItemFiles = await this.workItemFilesRepository.find({
+      where: { workItem: { id: workItemId } },
+    });
+    for (const workItemFile of workItemFiles) {
+      const file = await workItemFile.file;
+      await this.filesService.deleteFile(orgId, file.id);
     }
   }
 }

@@ -653,6 +653,25 @@ describe('FeaturesService', () => {
       );
       expect(foundWorkItem.feature).toBeUndefined();
     });
+    it("should remove the association between features and the feature's files", async () => {
+      const file = await filesService.uploadFile(org.id, {
+        originalname: 'my file',
+        buffer: Buffer.from('file content'),
+        size: 100,
+        mimetype: 'text/plain',
+      } as any);
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+        files: [file],
+      });
+      await service.deleteFeature(org.id, feature.id);
+      await expect(
+        filesService.getFile(org.id, file.id),
+      ).rejects.toThrowError();
+    });
   });
   describe('when patching a feature', () => {
     it('should update the status', async () => {
