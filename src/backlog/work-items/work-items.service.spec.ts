@@ -23,6 +23,8 @@ import { IterationsService } from '../../iterations/iterations.service';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { FeatureFile } from '../../roadmap/features/feature-file.entity';
+import { FilesService } from '../../files/files.service';
+import { FilesStorageRepository } from '../../files/files-storage.repository';
 
 describe('WorkItemsService', () => {
   let usersService: UsersService;
@@ -61,6 +63,8 @@ describe('WorkItemsService', () => {
         MilestonesService,
         WorkItemsService,
         IterationsService,
+        FilesService,
+        FilesStorageRepository,
       ],
     );
     cleanup = dbCleanup;
@@ -500,6 +504,47 @@ describe('WorkItemsService', () => {
       expect(service.getWorkItem(org.id, workItem.id)).rejects.toThrow(
         EntityNotFoundError,
       );
+    });
+    it("should delete the work item's files", async () => {
+      const file1 = new File();
+      file1.name = 'file1';
+      file1.size = 100;
+      file1.type = 'text/plain';
+      file1.path = '/path/to/file1';
+      file1.url = 'https://example.com/file1';
+      file1.org = Promise.resolve(org);
+      const savedFile1 = await filesRepository.save(file1);
+      const file2 = new File();
+      file2.name = 'file2';
+      file2.size = 100;
+      file2.type = 'text/plain';
+      file2.path = '/path/to/file1';
+      file2.url = 'https://example.com/file1';
+      file2.org = Promise.resolve(org);
+      const savedFile2 = await filesRepository.save(file2);
+      const workItem = await service.createWorkItem(user.id, {
+        title: 'my work item',
+        description: 'my work item description',
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        estimation: 13,
+        status: WorkItemStatus.DONE,
+        files: [
+          {
+            id: savedFile1.id,
+          },
+          {
+            id: savedFile2.id,
+          },
+        ],
+      });
+      await service.deleteWorkItem(org.id, workItem.id);
+      expect(
+        filesRepository.findOneByOrFail({ id: savedFile1.id }),
+      ).rejects.toThrow(EntityNotFoundError);
+      expect(
+        filesRepository.findOneByOrFail({ id: savedFile2.id }),
+      ).rejects.toThrow(EntityNotFoundError);
     });
   });
   describe('when listing open work items', () => {

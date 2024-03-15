@@ -11,6 +11,7 @@ import { WorkItemsService } from '../../backlog/work-items/work-items.service';
 import { FeatureFile } from './feature-file.entity';
 import { File } from '../../files/file.entity';
 import { User } from '../../users/user.entity';
+import { FilesService } from '../../files/files.service';
 
 @Injectable()
 export class FeaturesService {
@@ -23,6 +24,7 @@ export class FeaturesService {
     @InjectRepository(FeatureFile)
     private featureFilesRepository: Repository<FeatureFile>,
     @InjectRepository(File) private filesRepository: Repository<File>,
+    private filesService: FilesService,
   ) {}
 
   async createFeature(userId: string, featureDto: CreateUpdateFeatureDto) {
@@ -185,6 +187,7 @@ export class FeaturesService {
       org: { id: orgId },
       id: id,
     });
+    await this.deleteFeatureFiles(orgId, feature.id);
     await this.workItemsService.removeFeatureFromWorkItems(orgId, id);
     await this.featuresRepository.remove(feature);
   }
@@ -215,5 +218,16 @@ export class FeaturesService {
     }
     const savedFeature = await this.featuresRepository.save(feature);
     return await FeatureMapper.toDto(savedFeature);
+  }
+
+  private async deleteFeatureFiles(orgId: string, id: string) {
+    const featureFiles = await this.featureFilesRepository.findBy({
+      feature: { id, org: { id: orgId } },
+    });
+
+    for (const featureFile of featureFiles) {
+      const file = await featureFile.file;
+      await this.filesService.deleteFile(orgId, file.id);
+    }
   }
 }
