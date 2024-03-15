@@ -11,24 +11,25 @@ import {
   Post,
   Put,
   Request,
-  UseGuards
-} from "@nestjs/common";
-import { FeaturesService } from "./features.service";
-import { CreateUpdateFeatureDto, PatchFeatureDto } from "./dtos";
-import { AuthGuard } from "../../auth/auth.guard";
+  UseGuards,
+} from '@nestjs/common';
+import { FeaturesService } from './features.service';
+import { CreateUpdateFeatureDto, PatchFeatureDto } from './dtos';
+import { AuthGuard } from '../../auth/auth.guard';
 
-@Controller("features")
+@Controller('features')
 @UseGuards(AuthGuard)
 export class FeaturesController {
-
-  constructor(private featuresService: FeaturesService) {
-  }
+  constructor(private featuresService: FeaturesService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Request() request, @Body() featureDto: CreateUpdateFeatureDto) {
     try {
-      return await this.featuresService.createFeature(request.user.sub, featureDto);
+      return await this.featuresService.createFeature(
+        request.user.sub,
+        featureDto,
+      );
     } catch (e) {
       throw new BadRequestException();
     }
@@ -45,7 +46,7 @@ export class FeaturesController {
     }
   }
 
-  @Get("/without-milestone")
+  @Get('/without-milestone')
   @HttpCode(HttpStatus.OK)
   async listWithoutMilestone(@Request() request) {
     try {
@@ -56,9 +57,9 @@ export class FeaturesController {
     }
   }
 
-  @Get(":id")
+  @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async get(@Request() request, @Param("id") id: string) {
+  async get(@Request() request, @Param('id') id: string) {
     try {
       const { org: orgId } = request.user;
       return await this.featuresService.getFeature(orgId, id);
@@ -67,20 +68,29 @@ export class FeaturesController {
     }
   }
 
-  @Put(":id")
+  @Put(':id')
   @HttpCode(HttpStatus.OK)
-  async update(@Request() request, @Param("id") id: string, @Body() updateFeatureDto: CreateUpdateFeatureDto) {
+  async update(
+    @Request() request,
+    @Param('id') id: string,
+    @Body() updateFeatureDto: CreateUpdateFeatureDto,
+  ) {
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.updateFeature(orgId, id, updateFeatureDto);
+      return await this.featuresService.updateFeature(
+        orgId,
+        id,
+        updateFeatureDto,
+      );
     } catch (e) {
+      console.log(e);
       throw new BadRequestException();
     }
   }
 
-  @Delete(":id")
+  @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Request() request, @Param("id") id: string) {
+  async delete(@Request() request, @Param('id') id: string) {
     try {
       const { org: orgId } = request.user;
       await this.featuresService.deleteFeature(orgId, id);
@@ -89,12 +99,20 @@ export class FeaturesController {
     }
   }
 
-  @Patch(":id")
+  @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  async patch(@Request() request, @Param("id") id: string, @Body() patchFeatureDto: PatchFeatureDto) {
+  async patch(
+    @Request() request,
+    @Param('id') id: string,
+    @Body() patchFeatureDto: PatchFeatureDto,
+  ) {
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.patchFeature(orgId, id, patchFeatureDto);
+      return await this.featuresService.patchFeature(
+        orgId,
+        id,
+        patchFeatureDto,
+      );
     } catch (e) {
       throw new BadRequestException();
     }
