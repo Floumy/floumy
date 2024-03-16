@@ -45,7 +45,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
         migrationsRun: true,
         synchronize: false,
-        logging: true,
+        logging: false,
       }),
       inject: [ConfigService],
       imports: [ConfigModule],
