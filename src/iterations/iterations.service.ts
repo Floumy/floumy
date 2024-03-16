@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOrUpdateIterationDto } from './dtos';
 import { Iteration } from './Iteration.entity';
-import { Repository } from 'typeorm';
+import { IsNull, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IterationMapper } from './iteration.mapper';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { IterationStatus } from './iteration-status.enum';
+import { Timeline } from '../common/timeline.enum';
+import { TimelineService } from '../common/timeline.service';
 
 @Injectable()
 export class IterationsService {
@@ -50,6 +52,7 @@ export class IterationsService {
     // Duration is in weeks
     iteration.duration = iterationDto.duration;
     iteration.endDate = this.getIterationEndDate(iteration);
+    iteration.endDate.setUTCHours(23, 59, 59, 999);
     iteration.title = this.getIterationTitle(iteration);
     iteration.org = Promise.resolve(org);
     const savedIteration = await this.iterationRepository.save(iteration);
@@ -212,6 +215,51 @@ export class IterationsService {
     });
     return await Promise.all(
       iterations.map((iteration) => IterationMapper.toListItemDto(iteration)),
+    );
+  }
+
+  async listForTimeline(orgId: string, timeline: Timeline) {
+    let where = {
+      org: {
+        id: orgId,
+      },
+    } as any;
+    switch (timeline) {
+      case Timeline.THIS_QUARTER:
+      case Timeline.NEXT_QUARTER: {
+        const { startDate, endDate } =
+          TimelineService.getStartAndEndDatesByTimelineValue(
+            timeline.valueOf(),
+          );
+        where.startDate = MoreThanOrEqual(startDate);
+        where.endDate = LessThanOrEqual(endDate);
+        break;
+      }
+      case Timeline.LATER:
+        const nextQuarterEndDate = TimelineService.calculateQuarterDates(
+          TimelineService.getCurrentQuarter() + 1,
+        ).endDate;
+        where = [
+          {
+            org: { id: orgId },
+            startDate: MoreThanOrEqual(nextQuarterEndDate),
+          },
+          { org: { id: orgId }, startDate: IsNull() },
+        ];
+        break;
+      case Timeline.PAST:
+        where.endDate = LessThanOrEqual(new Date());
+        break;
+    }
+    const iterations = await this.iterationRepository.find({
+      where,
+      order: {
+        startDate: 'ASC',
+      },
+      relations: ['workItems'],
+    });
+    return await Promise.all(
+      iterations.map((iteration) => IterationMapper.toDto(iteration)),
     );
   }
 }
