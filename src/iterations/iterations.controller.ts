@@ -16,6 +16,7 @@ import {
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateOrUpdateIterationDto } from './dtos';
 import { IterationsService } from './iterations.service';
+import { Timeline } from '../common/timeline.enum';
 
 @Controller('iterations')
 @UseGuards(AuthGuard)
@@ -105,5 +106,16 @@ export class IterationsController {
     } catch (e) {
       throw new NotFoundException(e.message);
     }
+  }
+
+  @Get('timeline/:timeline')
+  async listForTimeline(
+    @Request() request,
+    @Param('timeline') timeline: Timeline,
+  ) {
+    return await this.iterationsService.listForTimeline(
+      request.user.org,
+      timeline,
+    );
   }
 }

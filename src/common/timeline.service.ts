@@ -1,4 +1,4 @@
-import { Timeline } from "./timeline.enum";
+import { Timeline } from './timeline.enum';
 
 export class TimelineService {
   static getCurrentQuarter() {
@@ -6,11 +6,27 @@ export class TimelineService {
   }
 
   static calculateQuarterDates(quarter: number) {
-    const startDate = new Date(new Date().getFullYear(), 3 * quarter - 3, 1, 0, 0, 0, 0);
-    const endDate = new Date(new Date().getFullYear(), 3 * quarter, 0, 23, 59, 59, 999);
+    const startDate = new Date(
+      new Date().getFullYear(),
+      3 * quarter - 3,
+      1,
+      0,
+      0,
+      0,
+      0,
+    );
+    const endDate = new Date(
+      new Date().getFullYear(),
+      3 * quarter,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
     return {
       startDate: startDate,
-      endDate: endDate
+      endDate: endDate,
     };
   }
 
@@ -24,7 +40,7 @@ export class TimelineService {
     }
     return {
       startDate: null,
-      endDate: null
+      endDate: null,
     };
   }
 
@@ -49,27 +65,30 @@ export class TimelineService {
   static startAndEndDatesToTimeline(startDate: Date, endDate: Date) {
     const now = new Date();
     if (!startDate && !endDate) {
-      return "later";
+      return 'later';
     }
 
     if (endDate.getTime() < now.getTime()) {
-      return "past";
+      return 'past';
     }
 
-    if (startDate.getTime() <= now.getTime() && endDate.getTime() >= now.getTime()) {
-      return "this-quarter";
+    if (
+      startDate.getTime() <= now.getTime() &&
+      endDate.getTime() >= now.getTime()
+    ) {
+      return 'this-quarter';
     }
 
     if (startDate.getTime() > now.getTime()) {
-      return "next-quarter";
+      return 'next-quarter';
     }
 
-    return "later";
+    return 'later';
   }
 
   static validateTimeline(timeline: string) {
-    if (!Object.values(Timeline).find(t => t === timeline)) {
-      throw new Error("Invalid timeline");
+    if (!Object.values(Timeline).find((t) => t === timeline)) {
+      throw new Error('Invalid timeline');
     }
   }
 }

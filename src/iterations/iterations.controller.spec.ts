@@ -26,6 +26,7 @@ import { FeatureFile } from '../roadmap/features/feature-file.entity';
 import { User } from '../users/user.entity';
 import { FilesService } from '../files/files.service';
 import { FilesStorageRepository } from '../files/files-storage.repository';
+import { Timeline } from '../common/timeline.enum';
 
 describe('IterationsController', () => {
   let controller: IterationsController;
@@ -121,6 +122,32 @@ describe('IterationsController', () => {
       expect(iterations.length).toEqual(1);
       expect(iterations[0].goal).toEqual('Goal 1');
       expect(iterations[0].startDate).toEqual('2020-01-01');
+      expect(iterations[0].duration).toEqual(1);
+    });
+  });
+
+  describe('when listing iterations for a timeline', () => {
+    it('should list iterations for a timeline', async () => {
+      const currentDateAsString = new Date().toISOString().split('T')[0];
+      await controller.create(
+        {
+          user: { org: org.id },
+        },
+        {
+          goal: 'Goal 1',
+          startDate: currentDateAsString,
+          duration: 1,
+        },
+      );
+      const iterations = await controller.listForTimeline(
+        {
+          user: { org: org.id },
+        },
+        Timeline.THIS_QUARTER,
+      );
+      expect(iterations.length).toEqual(1);
+      expect(iterations[0].goal).toEqual('Goal 1');
+      expect(iterations[0].startDate).toEqual(currentDateAsString);
       expect(iterations[0].duration).toEqual(1);
     });
   });

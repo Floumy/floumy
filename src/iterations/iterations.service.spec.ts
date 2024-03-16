@@ -24,6 +24,8 @@ import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { FeatureFile } from '../roadmap/features/feature-file.entity';
 import { FilesService } from '../files/files.service';
 import { FilesStorageRepository } from '../files/files-storage.repository';
+import { Timeline } from '../common/timeline.enum';
+import { TimelineService } from '../common/timeline.service';
 
 describe('IterationsService', () => {
   let usersService: UsersService;
@@ -439,6 +441,80 @@ describe('IterationsService', () => {
       expect(iterations[1].duration).toEqual(1);
       expect(iterations[1].createdAt).toBeDefined();
       expect(iterations[1].updatedAt).toBeDefined();
+    });
+  });
+
+  describe('when listing iterations for a specific timeline', () => {
+    it('should list iterations for the past', async () => {
+      const startDate = new Date().toISOString().split('T')[0];
+      await service.create(org.id, {
+        goal: 'Test Iteration 1',
+        startDate: '2020-01-01',
+        duration: 1,
+      });
+      await service.create(org.id, {
+        goal: 'Test Iteration 2',
+        startDate: startDate,
+        duration: 1,
+      });
+      const iterations = await service.listForTimeline(org.id, Timeline.PAST);
+      expect(iterations.length).toEqual(1);
+    });
+    it('should list iterations for this quarter', async () => {
+      const startDate = new Date().toISOString().split('T')[0];
+      await service.create(org.id, {
+        goal: 'Test Iteration 1',
+        startDate: startDate,
+        duration: 1,
+      });
+      await service.create(org.id, {
+        goal: 'Test Iteration 2',
+        startDate: startDate,
+        duration: 1,
+      });
+      const iterations = await service.listForTimeline(
+        org.id,
+        Timeline.THIS_QUARTER,
+      );
+      expect(iterations.length).toEqual(2);
+    });
+    it('should list iterations for the next quarter', async () => {
+      const { startDate } = TimelineService.getStartAndEndDatesByTimelineValue(
+        Timeline.NEXT_QUARTER.valueOf(),
+      );
+      startDate.setDate(startDate.getDate() + 1);
+      await service.create(org.id, {
+        goal: 'Test Iteration 1',
+        startDate: startDate.toISOString().split('T')[0],
+        duration: 1,
+      });
+      await service.create(org.id, {
+        goal: 'Test Iteration 2',
+        startDate: '2020-01-01',
+        duration: 1,
+      });
+      const iterations = await service.listForTimeline(
+        org.id,
+        Timeline.NEXT_QUARTER,
+      );
+      expect(iterations.length).toEqual(1);
+    });
+    it('should list iterations for later', async () => {
+      const futureDate = TimelineService.calculateQuarterDates(
+        TimelineService.getCurrentQuarter() + 4,
+      ).startDate;
+      await service.create(org.id, {
+        goal: 'Test Iteration 1',
+        startDate: futureDate.toISOString().split('T')[0],
+        duration: 1,
+      });
+      await service.create(org.id, {
+        goal: 'Test Iteration 2',
+        startDate: futureDate.toISOString().split('T')[0],
+        duration: 1,
+      });
+      const iterations = await service.listForTimeline(org.id, Timeline.LATER);
+      expect(iterations.length).toEqual(2);
     });
   });
 });
