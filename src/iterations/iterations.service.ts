@@ -256,7 +256,6 @@ export class IterationsService {
       order: {
         startDate: 'ASC',
       },
-      relations: ['workItems'],
     });
     return await Promise.all(
       iterations.map((iteration) => IterationMapper.toDto(iteration)),
