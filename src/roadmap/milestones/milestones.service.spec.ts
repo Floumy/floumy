@@ -17,6 +17,8 @@ import { FeatureStatus } from '../features/featurestatus.enum';
 import { File } from '../../files/file.entity';
 import { FeatureFile } from '../features/feature-file.entity';
 import { FilesModule } from '../../files/files.module';
+import { Timeline } from '../../common/timeline.enum';
+import { TimelineService } from '../../common/timeline.service';
 
 describe('MilestonesService', () => {
   let usersService: UsersService;
@@ -240,6 +242,72 @@ describe('MilestonesService', () => {
       await service.delete(org.id, milestone.id);
       const foundFeature = await featuresService.getFeature(org.id, feature.id);
       expect(foundFeature.milestone).toBeUndefined();
+    });
+  });
+  describe('when listing milestones for a timeline', () => {
+    it('should return the milestones for the past timeline', async () => {
+      await service.createMilestone(org.id, {
+        title: 'my milestone',
+        description: 'my milestone',
+        dueDate: '2020-01-01',
+      });
+      const milestones = await service.listForTimeline(org.id, Timeline.PAST);
+      expect(milestones.length).toEqual(1);
+      expect(milestones[0].id).toBeDefined();
+      expect(milestones[0].title).toEqual('my milestone');
+      expect(milestones[0].dueDate).toEqual('2020-01-01');
+      expect(milestones[0].timeline).toEqual('past');
+    });
+    it('should return the milestones for the current timeline', async () => {
+      const dueDate = TimelineService.getStartAndEndDatesByTimelineValue(
+        Timeline.THIS_QUARTER.valueOf(),
+      ).endDate;
+      dueDate.setDate(dueDate.getDate() - 1);
+      await service.createMilestone(org.id, {
+        title: 'my milestone',
+        description: 'my milestone',
+        dueDate: dueDate.toISOString().split('T')[0],
+      });
+      const milestones = await service.listForTimeline(
+        org.id,
+        Timeline.THIS_QUARTER,
+      );
+      expect(milestones.length).toEqual(1);
+    });
+    it('should return the milestones for the future timeline', async () => {
+      const dueDate = TimelineService.getStartAndEndDatesByTimelineValue(
+        Timeline.NEXT_QUARTER.valueOf(),
+      ).endDate;
+      dueDate.setDate(dueDate.getDate() - 10);
+      await service.createMilestone(org.id, {
+        title: 'my milestone',
+        description: 'my milestone',
+        dueDate: dueDate.toISOString().split('T')[0],
+      });
+      const milestones = await service.listForTimeline(
+        org.id,
+        Timeline.NEXT_QUARTER,
+      );
+      expect(milestones.length).toEqual(1);
+    });
+    it('should return the milestones for the later timeline', async () => {
+      const { startDate: dueDate } = TimelineService.calculateQuarterDates(
+        TimelineService.getCurrentQuarter() + 3,
+      );
+      dueDate.setDate(dueDate.getDate() + 10);
+      await service.createMilestone(org.id, {
+        title: 'my milestone',
+        description: 'my milestone',
+        dueDate: dueDate.toISOString().split('T')[0],
+      });
+      const milestones = await service.listForTimeline(org.id, Timeline.LATER);
+      expect(milestones.length).toEqual(1);
+      expect(milestones[0].id).toBeDefined();
+      expect(milestones[0].title).toEqual('my milestone');
+      expect(milestones[0].dueDate).toEqual(
+        dueDate.toISOString().split('T')[0],
+      );
+      expect(milestones[0].timeline).toEqual('later');
     });
   });
 });

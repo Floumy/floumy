@@ -218,4 +218,33 @@ describe('MilestonesController', () => {
       expect(milestoneResponse).toBeUndefined();
     });
   });
+
+  describe('when listing milestones for a timeline', () => {
+    it('should return the milestones', async () => {
+      await controller.create(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        {
+          title: 'my milestone',
+          description: 'my milestone',
+          dueDate: '2020-01-01',
+        },
+      );
+      const milestones = await controller.listForTimeline(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        Timeline.PAST,
+      );
+      expect(milestones.length).toEqual(1);
+      expect(milestones[0].id).toBeDefined();
+      expect(milestones[0].title).toEqual('my milestone');
+      expect(milestones[0].dueDate).toEqual('2020-01-01');
+    });
+  });
 });

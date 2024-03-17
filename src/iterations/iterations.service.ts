@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOrUpdateIterationDto } from './dtos';
 import { Iteration } from './Iteration.entity';
-import { IsNull, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import {
+  IsNull,
+  LessThan,
+  LessThanOrEqual,
+  MoreThan,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IterationMapper } from './iteration.mapper';
@@ -242,13 +249,13 @@ export class IterationsService {
         where = [
           {
             org: { id: orgId },
-            startDate: MoreThanOrEqual(nextQuarterEndDate),
+            startDate: MoreThan(nextQuarterEndDate),
           },
           { org: { id: orgId }, startDate: IsNull() },
         ];
         break;
       case Timeline.PAST:
-        where.endDate = LessThanOrEqual(new Date());
+        where.endDate = LessThan(new Date());
         break;
     }
     const iterations = await this.iterationRepository.find({

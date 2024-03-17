@@ -16,6 +16,7 @@ import {
 import { MilestonesService } from './milestones.service';
 import { CreateUpdateMilestoneDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
+import { Timeline } from '../../common/timeline.enum';
 
 @Controller('milestones')
 @UseGuards(AuthGuard)
@@ -88,5 +89,16 @@ export class MilestonesController {
     } catch (e) {
       throw new BadRequestException();
     }
+  }
+
+  @Get('timeline/:timeline')
+  async listForTimeline(
+    @Request() request,
+    @Param('timeline') timeline: Timeline,
+  ) {
+    return await this.milestonesService.listForTimeline(
+      request.user.org,
+      timeline,
+    );
   }
 }
