@@ -113,7 +113,10 @@ export class MilestonesService {
           TimelineService.getStartAndEndDatesByTimelineValue(
             timeline.valueOf(),
           );
-        where.dueDate = Between(startDate, endDate);
+        where.dueDate = Between(
+          startDate.toISOString().split('T')[0],
+          endDate.toISOString().split('T')[0],
+        );
         break;
       }
       case Timeline.LATER:
@@ -133,6 +136,7 @@ export class MilestonesService {
         break;
     }
 
+    console.log('where', where);
     const milestones = await this.milestoneRepository.find({
       where,
     });
