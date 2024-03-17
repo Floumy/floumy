@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUpdateMilestoneDto } from './dtos';
 import { Milestone } from './milestone.entity';
-import { Repository } from 'typeorm';
+import { Between, IsNull, LessThan, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrgsService } from '../../orgs/orgs.service';
 import { MilestoneMapper } from './milestone.mapper';
+import { Timeline } from '../../common/timeline.enum';
+import { TimelineService } from '../../common/timeline.service';
 
 @Injectable()
 export class MilestonesService {
@@ -97,5 +99,44 @@ export class MilestonesService {
     features.forEach((feature) => (feature.milestone = null));
     await this.milestoneRepository.manager.save(features);
     await this.milestoneRepository.remove(milestone);
+  }
+
+  async listForTimeline(orgId: string, timeline: Timeline) {
+    let where = {
+      org: { id: orgId },
+    } as any;
+
+    switch (timeline) {
+      case Timeline.THIS_QUARTER:
+      case Timeline.NEXT_QUARTER: {
+        const { startDate, endDate } =
+          TimelineService.getStartAndEndDatesByTimelineValue(
+            timeline.valueOf(),
+          );
+        where.dueDate = Between(startDate, endDate);
+        break;
+      }
+      case Timeline.LATER:
+        const nextQuarterEndDate = TimelineService.calculateQuarterDates(
+          TimelineService.getCurrentQuarter() + 1,
+        ).endDate;
+        where = [
+          {
+            org: { id: orgId },
+            dueDate: MoreThan(nextQuarterEndDate),
+          },
+          { org: { id: orgId }, dueDate: IsNull() },
+        ];
+        break;
+      case Timeline.PAST:
+        where.dueDate = LessThan(new Date());
+        break;
+    }
+
+    const milestones = await this.milestoneRepository.find({
+      where,
+    });
+
+    return await Promise.all(milestones.map(MilestoneMapper.toDto));
   }
 }
