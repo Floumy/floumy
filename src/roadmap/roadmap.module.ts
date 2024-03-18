@@ -18,9 +18,11 @@ import { File } from '../files/file.entity';
 import { FeatureFile } from './features/feature-file.entity';
 import { User } from '../users/user.entity';
 import { FilesModule } from '../files/files.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.register(),
     TypeOrmModule.forFeature([
       Feature,
       Org,

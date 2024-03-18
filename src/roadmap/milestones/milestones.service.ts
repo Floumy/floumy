@@ -136,7 +136,6 @@ export class MilestonesService {
         break;
     }
 
-    console.log('where', where);
     const milestones = await this.milestoneRepository.find({
       where,
     });

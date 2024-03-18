@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Public } from "./auth/public.guard";
+import { Public } from './auth/public.guard';
 
 @Controller()
 export class AppController {

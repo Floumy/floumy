@@ -13,13 +13,16 @@ import {
   Put,
   Request,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '../../auth/auth.guard';
 import { WorkItemsService } from './work-items.service';
 import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from './dtos';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('work-items')
 @UseGuards(AuthGuard)
+@UseInterceptors(CacheInterceptor)
 export class WorkItemsController {
   constructor(private workItemsService: WorkItemsService) {}
 

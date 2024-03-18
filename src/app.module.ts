@@ -20,9 +20,11 @@ import emailConfig from './config/mail.config';
 import appConfig from './config/app.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.register(),
     ConfigModule.forRoot({
       load: [
         databaseConfig,

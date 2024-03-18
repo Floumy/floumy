@@ -13,13 +13,16 @@ import {
   Put,
   Request,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OkrsService } from './okrs.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Timeline } from '../common/timeline.enum';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('okrs')
 @UseGuards(AuthGuard)
+@UseInterceptors(CacheInterceptor)
 export class OkrsController {
   constructor(private okrsService: OkrsService) {}
 

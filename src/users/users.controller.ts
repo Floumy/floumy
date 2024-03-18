@@ -1,15 +1,23 @@
-import { Controller, Get, HttpCode, HttpException, HttpStatus, Param, Post, Request, UseGuards } from "@nestjs/common";
-import { UsersService } from "./users.service";
-import { AuthGuard } from "../auth/auth.guard";
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { UsersService } from './users.service';
+import { AuthGuard } from '../auth/auth.guard';
 
-@Controller("users")
+@Controller('users')
 @UseGuards(AuthGuard)
 export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
 
-  constructor(private readonly usersService: UsersService) {
-  }
-
-  @Get("me")
+  @Get('me')
   @HttpCode(HttpStatus.OK)
   async getCurrentUser(@Request() req: any) {
     try {
@@ -19,9 +27,9 @@ export class UsersController {
     }
   }
 
-  @Post(":id/deactivate")
+  @Post(':id/deactivate')
   @HttpCode(HttpStatus.ACCEPTED)
-  async deactivateUser(@Request() req: any, @Param("id") id: string) {
+  async deactivateUser(@Request() req: any, @Param('id') id: string) {
     try {
       await this.usersService.deactivate(req.user.org, id);
     } catch (e) {

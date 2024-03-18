@@ -28,6 +28,7 @@ import { FeatureFile } from '../../roadmap/features/feature-file.entity';
 import { User } from '../../users/user.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
+import { CacheModule } from '@nestjs/cache-manager';
 
 describe('WorkItemsController', () => {
   let controller: WorkItemsController;
@@ -41,6 +42,7 @@ describe('WorkItemsController', () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [
+        CacheModule.register(),
         TypeOrmModule.forFeature([
           Org,
           Objective,

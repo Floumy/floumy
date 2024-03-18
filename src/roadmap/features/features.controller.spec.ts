@@ -24,6 +24,7 @@ import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
+import { CacheModule } from '@nestjs/cache-manager';
 
 describe('FeaturesController', () => {
   let controller: FeaturesController;
@@ -35,6 +36,7 @@ describe('FeaturesController', () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [
+        CacheModule.register(),
         TypeOrmModule.forFeature([
           Org,
           Objective,

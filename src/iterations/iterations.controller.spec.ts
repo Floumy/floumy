@@ -27,6 +27,7 @@ import { User } from '../users/user.entity';
 import { FilesService } from '../files/files.service';
 import { FilesStorageRepository } from '../files/files-storage.repository';
 import { Timeline } from '../common/timeline.enum';
+import { CacheModule } from '@nestjs/cache-manager';
 
 describe('IterationsController', () => {
   let controller: IterationsController;
@@ -38,6 +39,7 @@ describe('IterationsController', () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [
+        CacheModule.register(),
         TypeOrmModule.forFeature([
           Org,
           Objective,
