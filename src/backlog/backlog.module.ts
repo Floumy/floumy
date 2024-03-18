@@ -19,11 +19,13 @@ import { WorkItemsStatusLog } from './work-items/work-items-status-log.entity';
 import { WorkItemsStatusStats } from './work-items/work-items-status-stats.entity';
 import { WorkItemsEventHandler } from './work-items/work-items.event-handler';
 import { FilesModule } from '../files/files.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   controllers: [WorkItemsController],
   providers: [WorkItemsService, WorkItemsEventHandler],
   imports: [
+    CacheModule.register(),
     TypeOrmModule.forFeature([
       Feature,
       Org,

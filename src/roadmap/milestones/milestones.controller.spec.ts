@@ -15,6 +15,7 @@ import { Timeline } from '../../common/timeline.enum';
 import { Feature } from '../features/feature.entity';
 import { BacklogModule } from '../../backlog/backlog.module';
 import { FilesModule } from '../../files/files.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 describe('MilestonesController', () => {
   let controller: MilestonesController;
@@ -24,6 +25,7 @@ describe('MilestonesController', () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [
+        CacheModule.register(),
         TypeOrmModule.forFeature([
           Org,
           Objective,
