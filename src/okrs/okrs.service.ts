@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Objective } from './objective.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrgsService } from '../orgs/orgs.service';
 import { KeyResult } from './key-result.entity';
@@ -319,10 +319,23 @@ export class OkrsService {
   }
 
   async listForTimeline(orgId: string, timeline: Timeline) {
+    if (timeline === Timeline.PAST) {
+      return await this.listPastObjectives(orgId);
+    }
     const { startDate, endDate } =
       TimelineService.getStartAndEndDatesByTimelineValue(timeline);
     const objectives = await this.objectiveRepository.find({
       where: { org: { id: orgId }, startDate, endDate },
+    });
+    return await OKRMapper.toListDTO(objectives);
+  }
+
+  private async listPastObjectives(orgId: string) {
+    const { startDate } = TimelineService.calculateQuarterDates(
+      TimelineService.getCurrentQuarter(),
+    );
+    const objectives = await this.objectiveRepository.find({
+      where: { org: { id: orgId }, endDate: LessThan(startDate) },
     });
     return await OKRMapper.toListDTO(objectives);
   }
