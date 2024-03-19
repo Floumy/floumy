@@ -30,7 +30,6 @@
     "@nestjs/event-emitter": "^2.0.4",
     "@nestjs/jwt": "^10.1.1",
     "@nestjs/platform-express": "^10.3.0",
-    "@nestjs/platform-fastify": "^10.3.4",
     "@nestjs/schedule": "^4.0.1",
     "@nestjs/typeorm": "^10.0.0",
     "aws-sdk": "^2.1541.0",
