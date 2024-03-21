@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Setup the production environment
-FROM node:20.11.1
+FROM node:latest
 
 WORKDIR /usr/src/app
 
