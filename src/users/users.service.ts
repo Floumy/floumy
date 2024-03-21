@@ -1,34 +1,40 @@
-import { Injectable } from "@nestjs/common";
-import { User } from "./user.entity";
-import { Repository } from "typeorm";
-import { InjectRepository } from "@nestjs/typeorm";
-import { ConfigService } from "@nestjs/config";
-import * as bcrypt from "bcrypt";
-import { OrgsService } from "../orgs/orgs.service";
-import { UserMapper } from "./user.mapper";
-import { RefreshToken } from "../auth/refresh-token.entity";
+import { Injectable } from '@nestjs/common';
+import { User } from './user.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
+import { OrgsService } from '../orgs/orgs.service';
+import { UserMapper } from './user.mapper';
+import { RefreshToken } from '../auth/refresh-token.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
-    @InjectRepository(RefreshToken) private refreshTokensRepository: Repository<RefreshToken>,
+    @InjectRepository(RefreshToken)
+    private refreshTokensRepository: Repository<RefreshToken>,
     private orgsService: OrgsService,
-    private configService: ConfigService
-  ) {
-  }
+    private configService: ConfigService,
+  ) {}
 
   async findOneByEmail(email: string): Promise<User | undefined> {
     return this.usersRepository.findOneBy({ email });
   }
 
-  async create(name: string, email: string, password: string, invitationToken?: string) {
+  async create(
+    name: string,
+    email: string,
+    password: string,
+    invitationToken?: string,
+  ) {
     await this.validateUser(name, email, password);
     const hashedPassword = await this.encryptPassword(password);
     const user = new User(name, email, hashedPassword);
     if (invitationToken) {
-      const org = await this.orgsService.findOneByInvitationToken(invitationToken);
-      if (!org) throw new Error("Invalid invitation token");
+      const org =
+        await this.orgsService.findOneByInvitationToken(invitationToken);
+      if (!org) throw new Error('Invalid invitation token');
       user.org = Promise.resolve(org);
     } else {
       user.org = Promise.resolve(await this.orgsService.createForUser(user));
@@ -37,7 +43,10 @@ export class UsersService {
   }
 
   async encryptPassword(password: string) {
-    return bcrypt.hash(password, +this.configService.get<number>("encryption.rounds"));
+    return bcrypt.hash(
+      password,
+      +this.configService.get<number>('encryption.rounds'),
+    );
   }
 
   async isPasswordCorrect(password: string, hash: string) {
@@ -49,23 +58,26 @@ export class UsersService {
   }
 
   private async validateUser(name: string, email: string, password: string) {
-    if (!this.isNameValid(name)) throw new Error("Invalid name");
-    if (!this.isEmailValid(email)) throw new Error("Invalid email");
-    if (!this.isPasswordValid(password)) throw new Error("Invalid password");
-    if (await this.findOneByEmail(email)) throw new Error("Email already exists");
+    if (!this.isNameValid(name)) throw new Error('Invalid name');
+    if (!this.isEmailValid(email)) throw new Error('Invalid email');
+    if (!this.isPasswordValid(password)) throw new Error('Invalid password');
+    if (await this.findOneByEmail(email))
+      throw new Error('Email already exists');
   }
 
   private isPasswordValid(password: string) {
-    return password !== "" && password.length >= 8;
+    return password !== '' && password.length >= 8;
   }
 
   private isEmailValid(email: string) {
-    const emailRegex = new RegExp("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$");
-    return email !== "" && emailRegex.test(email);
+    const emailRegex = new RegExp(
+      '^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$',
+    );
+    return email !== '' && emailRegex.test(email);
   }
 
   private isNameValid(name: string) {
-    return name !== "" && name.length >= 2;
+    return name !== '' && name.length >= 2;
   }
 
   async clear() {
@@ -90,7 +102,10 @@ export class UsersService {
   }
 
   async deactivate(orgId: string, userId: string) {
-    const user = await this.usersRepository.findOneByOrFail({ id: userId, org: { id: orgId } });
+    const user = await this.usersRepository.findOneByOrFail({
+      id: userId,
+      org: { id: orgId },
+    });
     await this.validateThatThereWillBeAtLeastOneActiveUser(user);
     user.isActive = false;
     await this.usersRepository.save(user);
@@ -100,16 +115,21 @@ export class UsersService {
   private async validateThatThereWillBeAtLeastOneActiveUser(user: User) {
     const org = await user.org;
     const users = await org.users;
-    const activeUsers = users.filter(u => u.isActive);
-    if (activeUsers.length <= 1) throw new Error("Cannot deactivate the only active user in the org");
+    const activeUsers = users.filter((u) => u.isActive);
+    if (activeUsers.length <= 1)
+      throw new Error('Cannot deactivate the only active user in the org');
   }
 
   private async removeRefreshTokensFor(user: User) {
     const refreshTokens = await user.refreshTokens;
-    await Promise.all(refreshTokens.map(token => this.refreshTokensRepository.remove(token)));
+    await Promise.all(
+      refreshTokens.map((token) => this.refreshTokensRepository.remove(token)),
+    );
   }
 
   async findOneByPasswordResetToken(resetToken: string) {
-    return this.usersRepository.findOneByOrFail({ passwordResetToken: resetToken });
+    return this.usersRepository.findOneByOrFail({
+      passwordResetToken: resetToken,
+    });
   }
 }

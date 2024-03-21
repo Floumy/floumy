@@ -379,5 +379,7 @@ export class InitialMigration1710444680044 implements MigrationInterface {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async down(queryRunner: QueryRunner): Promise<void> {}
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    // It's not recommended to remove tables in a production environment
+  }
 }

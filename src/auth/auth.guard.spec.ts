@@ -1,27 +1,28 @@
-import { AuthService } from "./auth.service";
-import { TestingModule } from "@nestjs/testing";
-import { UsersModule } from "../users/users.module";
-import { AuthGuard } from "./auth.guard";
-import { Reflector } from "@nestjs/core";
-import { ExecutionContext, UnauthorizedException } from "@nestjs/common";
-import { setupTestingModule } from "../../test/test.utils";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { RefreshToken } from "./refresh-token.entity";
-import { TokensService } from "./tokens.service";
-import { User } from "../users/user.entity";
-import { Org } from "../orgs/org.entity";
-import { Repository } from "typeorm";
+import { AuthService } from './auth.service';
+import { TestingModule } from '@nestjs/testing';
+import { UsersModule } from '../users/users.module';
+import { AuthGuard } from './auth.guard';
+import { Reflector } from '@nestjs/core';
+import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { setupTestingModule } from '../../test/test.utils';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RefreshToken } from './refresh-token.entity';
+import { TokensService } from './tokens.service';
+import { User } from '../users/user.entity';
+import { Org } from '../orgs/org.entity';
+import { Repository } from 'typeorm';
 
-describe("AuthGuard", () => {
+describe('AuthGuard', () => {
   let tokensService: TokensService;
   let module: TestingModule;
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
-    const { module: testingModule, cleanup: dbCleanup } = await setupTestingModule(
-      [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
-      [AuthService, Reflector, TokensService]
-    );
+    const { module: testingModule, cleanup: dbCleanup } =
+      await setupTestingModule(
+        [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
+        [AuthService, Reflector, TokensService],
+      );
     module = testingModule;
     cleanup = dbCleanup;
     tokensService = module.get<TokensService>(TokensService);
@@ -31,86 +32,79 @@ describe("AuthGuard", () => {
     await cleanup();
   });
 
-  it("should be defined", () => {
+  it('should be defined', () => {
     const reflector = module.get<Reflector>(Reflector);
     const repository = {
       findOneByOrFail: () => {
         return {
-          id: "1234",
-          isActive: true
+          id: '1234',
+          isActive: true,
         };
-      }
+      },
     } as unknown as Repository<User>;
     const guard = new AuthGuard(tokensService, reflector, repository);
     expect(guard).toBeInstanceOf(AuthGuard);
   });
 
-  it("should return true when the handler is public", async () => {
-    // TODO: Refactor this horrendous mock
+  it('should return true when the handler is public', async () => {
     const reflector = {
       getAllAndOverride: () => {
         return true;
-      }
+      },
     } as unknown as Reflector;
     const repository = {
       findOneByOrFail: () => {
         return {
-          id: "1234",
-          isActive: true
+          id: '1234',
+          isActive: true,
         };
-      }
+      },
     } as unknown as Repository<User>;
     const guard = new AuthGuard(tokensService, reflector, repository);
     const context = {
-      getHandler: () => {
-      },
-      getClass: () => {
-      }
+      getHandler: () => {},
+      getClass: () => {},
     } as ExecutionContext;
-    const isPublic = await guard["isPublic"](context);
+    const isPublic = await guard['isPublic'](context);
     expect(isPublic).toBe(true);
   });
 
-  it("should return false when the handler is not public", async () => {
-    // TODO: Refactor this horrendous mock
+  it('should return false when the handler is not public', async () => {
     const reflector = {
       getAllAndOverride: () => {
         return false;
-      }
+      },
     } as unknown as Reflector;
     const repository = {
       findOneByOrFail: () => {
         return {
-          id: "1234",
-          isActive: true
+          id: '1234',
+          isActive: true,
         };
-      }
+      },
     } as unknown as Repository<User>;
     const guard = new AuthGuard(tokensService, reflector, repository);
     const context = {
-      getHandler: () => {
-      },
-      getClass: () => {
-      }
+      getHandler: () => {},
+      getClass: () => {},
     } as ExecutionContext;
-    const isPublic = await guard["isPublic"](context);
+    const isPublic = await guard['isPublic'](context);
     expect(isPublic).toBe(false);
   });
 
-  it("should throw an error when no token is provided", async () => {
-    // TODO: Refactor this horrendous mock
+  it('should throw an error when no token is provided', async () => {
     const reflector = {
       getAllAndOverride: () => {
         return false;
-      }
+      },
     } as unknown as Reflector;
     const repository = {
       findOneByOrFail: () => {
         return {
-          id: "1234",
-          isActive: true
+          id: '1234',
+          isActive: true,
         };
-      }
+      },
     } as unknown as Repository<User>;
     const guard = new AuthGuard(tokensService, reflector, repository);
     const context = {
@@ -119,30 +113,29 @@ describe("AuthGuard", () => {
           getRequest: () => {
             return {
               headers: {
-                authorization: undefined
-              }
+                authorization: undefined,
+              },
             };
-          }
+          },
         };
-      }
+      },
     } as ExecutionContext;
     await expect(guard.canActivate(context)).rejects.toThrow();
   });
 
-  it("should throw an error when the token is invalid", async () => {
-    // TODO: Refactor this horrendous mock
+  it('should throw an error when the token is invalid', async () => {
     const reflector = {
       getAllAndOverride: () => {
         return false;
-      }
+      },
     } as unknown as Reflector;
     const repository = {
       findOneByOrFail: () => {
         return {
-          id: "1234",
-          isActive: true
+          id: '1234',
+          isActive: true,
         };
-      }
+      },
     } as unknown as Repository<User>;
     const guard = new AuthGuard(tokensService, reflector, repository);
     const context = {
@@ -151,93 +144,82 @@ describe("AuthGuard", () => {
           getRequest: () => {
             return {
               headers: {
-                authorization: "Bearer invalid"
-              }
+                authorization: 'Bearer invalid',
+              },
             };
-          }
+          },
         };
-      }
+      },
     } as ExecutionContext;
     await expect(guard.canActivate(context)).rejects.toThrow();
   });
 
-  it("should return true when the token is valid", async () => {
-    // TODO: Refactor this horrendous mock
+  it('should return true when the token is valid', async () => {
     const reflector = {
       getAllAndOverride: () => {
         return false;
-      }
+      },
     } as unknown as Reflector;
     const repository = {
       findOneByOrFail: () => {
         return {
-          id: "1234",
-          isActive: true
+          id: '1234',
+          isActive: true,
         };
-      }
+      },
     } as unknown as Repository<User>;
     const guard = new AuthGuard(tokensService, reflector, repository);
-    const user = new User(
-      "John Doe",
-      "test@example.com",
-      "password"
-    );
-    user.id = "1234";
-    user.org = Promise.resolve({ id: "1234" } as Org);
+    const user = new User('John Doe', 'test@example.com', 'password');
+    user.id = '1234';
+    user.org = Promise.resolve({ id: '1234' } as Org);
     const accessToken = await tokensService.generateAccessToken(user);
     const context = {
-      getHandler: () => {
-
-      },
-      getClass: () => {
-
-      },
+      getHandler: () => {},
+      getClass: () => {},
       switchToHttp: () => {
         return {
           getRequest: () => {
             return {
               headers: {
-                authorization: `Bearer ${accessToken}`
-              }
+                authorization: `Bearer ${accessToken}`,
+              },
             };
-          }
+          },
         };
-      }
+      },
     } as ExecutionContext;
     const canActivate = await guard.canActivate(context);
     expect(canActivate).toBe(true);
   });
-  it("should return false when the user is not active", async () => {
+  it('should return false when the user is not active', async () => {
     const reflector = {
       getAllAndOverride: () => {
         return false;
-      }
+      },
     } as unknown as Reflector;
     const repository = {
       findOneByOrFail: () => {
         throw new Error();
-      }
+      },
     } as unknown as Repository<User>;
     const guard = new AuthGuard(tokensService, reflector, repository);
     const context = {
-      getHandler: () => {
-
-      },
-      getClass: () => {
-
-      },
+      getHandler: () => {},
+      getClass: () => {},
       switchToHttp: () => {
         return {
           getRequest: () => {
             return {
               headers: {
-                authorization: `Bearer invalid`
-              }
+                authorization: `Bearer invalid`,
+              },
             };
-          }
+          },
         };
-      }
+      },
     } as ExecutionContext;
-    await expect(guard.canActivate(context)).rejects.toThrow(UnauthorizedException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      UnauthorizedException,
+    );
   });
 });

@@ -242,7 +242,7 @@ export class IterationsService {
         where.endDate = LessThanOrEqual(endDate);
         break;
       }
-      case Timeline.LATER:
+      case Timeline.LATER: {
         const nextQuarterEndDate = TimelineService.calculateQuarterDates(
           TimelineService.getCurrentQuarter() + 1,
         ).endDate;
@@ -254,9 +254,14 @@ export class IterationsService {
           { org: { id: orgId }, startDate: IsNull() },
         ];
         break;
-      case Timeline.PAST:
-        where.endDate = LessThan(new Date());
+      }
+      case Timeline.PAST: {
+        const { startDate } = TimelineService.calculateQuarterDates(
+          TimelineService.getCurrentQuarter(),
+        );
+        where.endDate = LessThan(startDate);
         break;
+      }
     }
     const iterations = await this.iterationRepository.find({
       where,

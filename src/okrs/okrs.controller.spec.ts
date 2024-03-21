@@ -441,11 +441,9 @@ describe('OkrsController', () => {
       });
       expect(keyResults.length).toEqual(3);
       // check that the items are in the list regardless of the order
-      expect(keyResults.map((kr) => kr.title).sort()).toEqual([
-        'My key result',
-        'My key result 2',
-        'My key result 3',
-      ]);
+      expect(
+        keyResults.map((kr) => kr.title).sort((a, b) => a.localeCompare(b)),
+      ).toEqual(['My key result', 'My key result 2', 'My key result 3']);
     });
   });
   describe('when deleting a key result', () => {
