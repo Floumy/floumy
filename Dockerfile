@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM node:v20.11.1 AS builder
+FROM node:20.11.1 AS builder
 
 # Set the working directory
 WORKDIR /usr/src/app
