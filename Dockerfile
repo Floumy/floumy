@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --ignore-scripts
 
 # Copy the NestJS application source code
 COPY . .
@@ -25,7 +25,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm install --production
+RUN npm install --production --ignore-scripts
 
 # Copy the built application from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist
