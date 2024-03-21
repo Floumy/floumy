@@ -144,7 +144,7 @@ export class WorkItemsService {
         org: { id: orgId },
       });
       workItem.assignedTo = Promise.resolve(assignedTo);
-    } else if (workItem.assignedTo) {
+    } else if (await workItem.assignedTo) {
       workItem.assignedTo = Promise.resolve(null);
     }
   }

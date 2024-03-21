@@ -36,7 +36,7 @@ export class MilestonesService {
       throw new Error('Milestone title is required');
     if (!createMilestoneDto.dueDate)
       throw new Error('Milestone due date is required');
-    if (!createMilestoneDto.dueDate.match(/^\d{4}-\d{2}-\d{2}$/))
+    if (!/^\d{4}-\d{2}-\d{2}$/.exec(createMilestoneDto.dueDate))
       throw new Error('Invalid due date');
   }
 
@@ -119,7 +119,7 @@ export class MilestonesService {
         );
         break;
       }
-      case Timeline.LATER:
+      case Timeline.LATER: {
         const nextQuarterEndDate = TimelineService.calculateQuarterDates(
           TimelineService.getCurrentQuarter() + 1,
         ).endDate;
@@ -131,9 +131,14 @@ export class MilestonesService {
           { org: { id: orgId }, dueDate: IsNull() },
         ];
         break;
-      case Timeline.PAST:
-        where.dueDate = LessThan(new Date());
+      }
+      case Timeline.PAST: {
+        const { startDate } = TimelineService.calculateQuarterDates(
+          TimelineService.getCurrentQuarter(),
+        );
+        where.dueDate = LessThan(startDate);
         break;
+      }
     }
 
     const milestones = await this.milestoneRepository.find({
