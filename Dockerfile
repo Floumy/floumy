@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM node:latest AS builder
+FROM node:20.11.1 AS builder
 
 # Set the working directory
 WORKDIR /usr/src/app
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Setup the production environment
-FROM node:latest
+FROM node:20.11.1
 
 WORKDIR /usr/src/app
 
