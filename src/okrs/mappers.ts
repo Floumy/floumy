@@ -98,6 +98,7 @@ export class KeyResultMapper {
     const features = await keyResult.features;
     return {
       id: keyResult.id,
+      reference: `KR-${keyResult.sequenceNumber}`,
       title: keyResult.title,
       progress: keyResult.progress
         ? parseFloat(keyResult.progress?.toFixed(2))

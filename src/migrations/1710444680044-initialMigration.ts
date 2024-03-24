@@ -3,6 +3,14 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class InitialMigration1710444680044 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
+        create type iteration_status_enum as enum ('planned', 'active', 'completed');
+        create type work_item_type_enum as enum ('user-story', 'task', 'bug', 'spike', 'technical-debt');
+        create type work_item_priority_enum as enum ('low', 'medium', 'high');
+        create type work_item_status_enum as enum ('planned', 'ready-to-start', 'in-progress', 'blocked', 'code-review', 'testing', 'revisions', 'ready-for-deployment', 'deployed', 'done', 'closed');
+        create type feature_priority_enum as enum ('low', 'medium', 'high');
+        create type feature_status_enum as enum ('planned', 'ready-to-start', 'in-progress', 'completed', 'closed');
+        create type key_result_status_enum as enum ('on-track', 'off-track', 'ahead-of-schedule', 'completed', 'stalled', 'deferred', 'canceled', 'under-review', 'needs-attention', 'at-risk');
+        create type objective_status_enum as enum ('on-track', 'off-track', 'ahead-of-schedule', 'completed', 'stalled', 'deferred', 'canceled', 'under-review', 'needs-attention', 'at-risk');
         create table if not exists work_items_status_stats
         (
             id
