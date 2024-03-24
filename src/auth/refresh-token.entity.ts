@@ -5,14 +5,13 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
-import { User } from "../users/user.entity";
+  UpdateDateColumn,
+} from 'typeorm';
+import { User } from '../users/user.entity';
 
 @Entity()
 export class RefreshToken {
-
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -27,7 +26,7 @@ export class RefreshToken {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, user => user.refreshTokens, { lazy: true })
+  @ManyToOne(() => User, (user) => user.refreshTokens, { lazy: true })
   @JoinColumn()
   user: Promise<User>;
 
