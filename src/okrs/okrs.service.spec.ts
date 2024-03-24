@@ -622,5 +622,29 @@ describe('OkrsService', () => {
       const okrs = await service.listForTimeline(org.id, Timeline.PAST);
       expect(okrs).toHaveLength(0);
     });
+    it('should return the okrs for later', async () => {
+      const org = await createTestOrg();
+      await service.create(org.id, {
+        objective: {
+          title: 'My OKR',
+          timeline: 'this-quarter',
+        },
+        keyResults: [
+          { title: 'My KR 1' },
+          { title: 'My KR 2' },
+          { title: 'My KR 3' },
+        ],
+      });
+      await service.create(org.id, {
+        objective: {
+          title: 'My Other OKR',
+          timeline: 'later',
+        },
+        keyResults: [{ title: 'My Other KR 1' }],
+      });
+      const okrs = await service.listForTimeline(org.id, Timeline.LATER);
+      expect(okrs).toHaveLength(1);
+      expect(okrs[0].title).toEqual('My Other OKR');
+    });
   });
 });
