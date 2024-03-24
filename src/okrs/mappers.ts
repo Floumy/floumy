@@ -1,28 +1,33 @@
-import { KeyResult } from "./key-result.entity";
-import { Objective } from "./objective.entity";
-import { TimelineService } from "../common/timeline.service";
+import { KeyResult } from './key-result.entity';
+import { Objective } from './objective.entity';
+import { TimelineService } from '../common/timeline.service';
 
 export class OKRMapper {
-
   static async toDTO(objective: Objective, keyResults: KeyResult[]) {
     const assignedTo = await objective.assignedTo;
     return {
       objective: {
         id: objective.id,
+        reference: `O-${objective.sequenceNumber}`,
         title: objective.title,
         progress: parseFloat(objective.progress?.toFixed(2)),
         createdAt: objective.createdAt,
         updatedAt: objective.updatedAt,
         status: objective.status,
-        timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
+        timeline: TimelineService.startAndEndDatesToTimeline(
+          objective.startDate,
+          objective.endDate,
+        ),
         startDate: objective.startDate,
         endDate: objective.endDate,
-        assignedTo: assignedTo ? {
-          id: assignedTo.id,
-          name: assignedTo.name
-        } : undefined
+        assignedTo: assignedTo
+          ? {
+              id: assignedTo.id,
+              name: assignedTo.name,
+            }
+          : undefined,
       },
-      keyResults: await KeyResultMapper.toListDTO(keyResults)
+      keyResults: await KeyResultMapper.toListDTO(keyResults),
     };
   }
 
@@ -34,16 +39,22 @@ export class OKRMapper {
     const assignedTo = await objective.assignedTo;
     return {
       id: objective.id,
+      reference: `O-${objective.sequenceNumber}`,
       title: objective.title,
       status: objective.status,
-      timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
+      timeline: TimelineService.startAndEndDatesToTimeline(
+        objective.startDate,
+        objective.endDate,
+      ),
       progress: parseFloat(objective.progress?.toFixed(2)),
-      assignedTo: assignedTo ? {
-        id: assignedTo.id,
-        name: assignedTo.name
-      } : null,
+      assignedTo: assignedTo
+        ? {
+            id: assignedTo.id,
+            name: assignedTo.name,
+          }
+        : null,
       createdAt: objective.createdAt,
-      updatedAt: objective.updatedAt
+      updatedAt: objective.updatedAt,
     };
   }
 }
@@ -59,7 +70,7 @@ class FeatureMapper {
       progress: feature.progress,
       workItems: (await feature.workItems).map(WorkItemMapper.toDto),
       createdAt: feature.createdAt,
-      updatedAt: feature.updatedAt
+      updatedAt: feature.updatedAt,
     };
   }
 }
@@ -76,7 +87,7 @@ class WorkItemMapper {
       estimation: workItem.estimation,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
-      updatedAt: workItem.updatedAt
+      updatedAt: workItem.updatedAt,
     };
   }
 }
@@ -88,12 +99,17 @@ export class KeyResultMapper {
     return {
       id: keyResult.id,
       title: keyResult.title,
-      progress: keyResult.progress ? parseFloat(keyResult.progress?.toFixed(2)) : 0,
-      timeline: TimelineService.startAndEndDatesToTimeline(objective.startDate, objective.endDate),
+      progress: keyResult.progress
+        ? parseFloat(keyResult.progress?.toFixed(2))
+        : 0,
+      timeline: TimelineService.startAndEndDatesToTimeline(
+        objective.startDate,
+        objective.endDate,
+      ),
       createdAt: keyResult.createdAt,
       updatedAt: keyResult.updatedAt,
       status: keyResult.status,
-      features: await Promise.all(features.map(FeatureMapper.toDTO))
+      features: await Promise.all(features.map(FeatureMapper.toDTO)),
     };
   }
 
