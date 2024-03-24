@@ -43,7 +43,7 @@ interface FeatureDto {
   workItemsCount: number;
   progress: number;
   workItems?: WorkItemDto[];
-  assignedTo?: { id: string, name: string };
+  assignedTo?: { id: string; name: string };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -64,6 +64,7 @@ interface WorkItemDto {
 interface KeyResultDto {
   features: FeatureDto[];
   id: string;
+  reference: string;
   title: string;
   progress: number;
   timeline: string;

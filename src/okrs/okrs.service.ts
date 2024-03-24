@@ -305,7 +305,10 @@ export class OkrsService {
     );
     keyResult.objective = Promise.resolve(objective);
     keyResult.org = Promise.resolve(await objective.org);
-    const savedKeyResult = await this.keyResultRepository.save(keyResult);
+    await this.keyResultRepository.save(keyResult);
+    const savedKeyResult = await this.keyResultRepository.findOneByOrFail({
+      id: keyResult.id,
+    });
     await this.updateObjectiveProgress(objective);
     return await KeyResultMapper.toDTO(savedKeyResult);
   }

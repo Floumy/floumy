@@ -8,6 +8,8 @@ export const testDbOptions: DataSourceOptions = {
   password: 'testpass',
   database: 'testdb',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: true,
+  migrations: [__dirname + '/../src/migrations/*{.ts,.js}'],
+  migrationsRun: true,
+  synchronize: false,
   logging: false,
 };
