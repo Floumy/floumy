@@ -1,5 +1,5 @@
-import { Feature } from "./feature.entity";
-import { FeatureDto, FeaturesListDto } from "./dtos";
+import { Feature } from './feature.entity';
+import { FeatureDto, FeaturesListDto } from './dtos';
 
 export class FeatureMapper {
   static async toDto(feature: Feature): Promise<FeatureDto> {
@@ -14,39 +14,45 @@ export class FeatureMapper {
       progress: feature.progress,
       workItemsCount: feature.workItemsCount,
       workItems: (await feature.workItems).map(WorkItemMapper.toDto),
-      files: await Promise.all((await feature.featureFiles).map(async featureFile => {
-        const file = await featureFile.file;
-        return {
-          id: file.id,
-          name: file.name,
-          size: file.size,
-          type: file.type
-        };
-      })),
-      createdBy: createdBy ? {
-        id: createdBy.id,
-        name: createdBy.name
-      } : undefined,
-      assignedTo: assignedTo ? {
-        id: assignedTo.id,
-        name: assignedTo.name
-      } : undefined,
+      files: await Promise.all(
+        (await feature.featureFiles).map(async (featureFile) => {
+          const file = await featureFile.file;
+          return {
+            id: file.id,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+          };
+        }),
+      ),
+      createdBy: createdBy
+        ? {
+            id: createdBy.id,
+            name: createdBy.name,
+          }
+        : undefined,
+      assignedTo: assignedTo
+        ? {
+            id: assignedTo.id,
+            name: assignedTo.name,
+          }
+        : undefined,
       createdAt: feature.createdAt,
-      updatedAt: feature.updatedAt
+      updatedAt: feature.updatedAt,
     };
     const featureKeyResult = await feature.keyResult;
     if (featureKeyResult) {
-      featureDto["keyResult"] = {
+      featureDto['keyResult'] = {
         id: featureKeyResult.id,
-        title: featureKeyResult.title
+        title: featureKeyResult.title,
       };
     }
     const featureMilestone = await feature.milestone;
     if (featureMilestone) {
-      featureDto["milestone"] = {
+      featureDto['milestone'] = {
         id: featureMilestone.id,
         title: featureMilestone.title,
-        dueDate: featureMilestone.dueDate
+        dueDate: featureMilestone.dueDate,
       };
     }
     return featureDto;
@@ -65,12 +71,14 @@ export class FeatureMapper {
       status: feature.status,
       progress: feature.progress,
       workItemsCount: feature.workItemsCount,
-      assignedTo: assignedTo ? {
-        id: assignedTo.id,
-        name: assignedTo.name
-      } : null,
+      assignedTo: assignedTo
+        ? {
+            id: assignedTo.id,
+            name: assignedTo.name,
+          }
+        : null,
       createdAt: feature.createdAt,
-      updatedAt: feature.updatedAt
+      updatedAt: feature.updatedAt,
     };
   }
 }
@@ -79,6 +87,7 @@ class WorkItemMapper {
   static toDto(workItem: any): any {
     return {
       id: workItem.id,
+      reference: `WI-${workItem.sequenceNumber}`,
       title: workItem.title,
       description: workItem.description,
       priority: workItem.priority,
@@ -86,7 +95,7 @@ class WorkItemMapper {
       type: workItem.type,
       estimation: workItem.estimation,
       createdAt: workItem.createdAt,
-      updatedAt: workItem.updatedAt
+      updatedAt: workItem.updatedAt,
     };
   }
 }

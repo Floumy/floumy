@@ -1,14 +1,14 @@
-import { WorkItem } from "./work-item.entity";
-import { WorkItemDto } from "./dtos";
-import { Feature } from "../../roadmap/features/feature.entity";
-import { Iteration } from "../../iterations/Iteration.entity";
-import { User } from "../../users/user.entity";
+import { WorkItem } from './work-item.entity';
+import { WorkItemDto } from './dtos';
+import { Feature } from '../../roadmap/features/feature.entity';
+import { Iteration } from '../../iterations/Iteration.entity';
+import { User } from '../../users/user.entity';
 
 class FeatureMapper {
   static toDto(feature: Feature) {
     return {
       id: feature.id,
-      title: feature.title
+      title: feature.title,
     };
   }
 }
@@ -17,7 +17,7 @@ class IterationMapper {
   static toDto(iteration: Iteration) {
     return {
       id: iteration.id,
-      title: iteration.title
+      title: iteration.title,
     };
   }
 }
@@ -26,7 +26,7 @@ class UserMapper {
   static toDto(user: User) {
     return {
       id: user.id,
-      name: user.name
+      name: user.name,
     };
   }
 }
@@ -39,6 +39,7 @@ export default class WorkItemMapper {
     const assignedTo = await workItem.assignedTo;
     return {
       id: workItem.id,
+      reference: `WI-${workItem.sequenceNumber}`,
       title: workItem.title,
       description: workItem.description,
       priority: workItem.priority,
@@ -47,20 +48,22 @@ export default class WorkItemMapper {
       estimation: workItem.estimation,
       feature: feature ? FeatureMapper.toDto(feature) : undefined,
       iteration: iteration ? IterationMapper.toDto(iteration) : undefined,
-      files: await Promise.all((await workItem.workItemFiles).map(async workItemFile => {
-        const file = await workItemFile.file;
-        return {
-          id: file.id,
-          name: file.name,
-          size: file.size,
-          type: file.type
-        };
-      })),
+      files: await Promise.all(
+        (await workItem.workItemFiles).map(async (workItemFile) => {
+          const file = await workItemFile.file;
+          return {
+            id: file.id,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+          };
+        }),
+      ),
       createdBy: createdBy ? UserMapper.toDto(createdBy) : undefined,
       assignedTo: assignedTo ? UserMapper.toDto(assignedTo) : undefined,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
-      updatedAt: workItem.updatedAt
+      updatedAt: workItem.updatedAt,
     };
   }
 

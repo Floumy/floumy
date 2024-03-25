@@ -1,7 +1,7 @@
-import { Iteration } from "./Iteration.entity";
-import { TimelineService } from "../common/timeline.service";
-import { WorkItem } from "../backlog/work-items/work-item.entity";
-import { Feature } from "../roadmap/features/feature.entity";
+import { Iteration } from './Iteration.entity';
+import { TimelineService } from '../common/timeline.service';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { Feature } from '../roadmap/features/feature.entity';
 
 function formatDate(date: Date) {
   if (!date) return null;
@@ -15,6 +15,7 @@ class WorkItemMapper {
     const assignedTo = await workItem.assignedTo;
     return {
       id: workItem.id,
+      reference: `WI-${workItem.sequenceNumber}`,
       title: workItem.title,
       description: workItem.description,
       priority: workItem.priority,

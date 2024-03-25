@@ -1,6 +1,6 @@
-import { Priority } from "../../common/priority.enum";
-import { WorkItemType } from "./work-item-type.enum";
-import { WorkItemStatus } from "./work-item-status.enum";
+import { Priority } from '../../common/priority.enum';
+import { WorkItemType } from './work-item-type.enum';
+import { WorkItemStatus } from './work-item-status.enum';
 
 export interface CreateUpdateWorkItemDto {
   title: string;
@@ -12,12 +12,13 @@ export interface CreateUpdateWorkItemDto {
   feature?: string;
   iteration?: string;
   assignedTo?: string;
-  files?: { id: string; }[];
+  files?: { id: string }[];
 }
 
 export interface WorkItemDto {
   completedAt: Date;
   id: string;
+  reference: string;
   title: string;
   description: string;
   priority: Priority;
