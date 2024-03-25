@@ -1,5 +1,5 @@
-import { Priority } from "../../common/priority.enum";
-import { FeatureStatus } from "./featurestatus.enum";
+import { Priority } from '../../common/priority.enum';
+import { FeatureStatus } from './featurestatus.enum';
 
 export interface CreateUpdateFeatureDto {
   title: string;
@@ -54,6 +54,7 @@ export interface FeatureDto {
 
 export interface FeaturesListDto {
   id: string;
+  reference: string;
   title: string;
   priority: Priority;
   status: string;
