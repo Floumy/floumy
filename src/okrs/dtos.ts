@@ -37,6 +37,7 @@ interface CreateOrUpdateKeyResultDto {
 
 interface FeatureDto {
   id: string;
+  reference: string;
   title: string;
   priority: string;
   status: string;

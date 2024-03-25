@@ -65,7 +65,10 @@ export class FeaturesService {
       feature.milestone = Promise.resolve(milestone);
     }
 
-    const savedFeature = await this.featuresRepository.save(feature);
+    await this.featuresRepository.save(feature);
+    const savedFeature = await this.featuresRepository.findOneByOrFail({
+      id: feature.id,
+    });
 
     if (featureDto.files) {
       await this.addFiles(featureDto, feature);

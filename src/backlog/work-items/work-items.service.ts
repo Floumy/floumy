@@ -37,7 +37,10 @@ export class WorkItemsService {
     workItem.createdBy = Promise.resolve(user);
     await this.setWorkItemData(workItem, workItemDto, org.id);
     workItem.org = Promise.resolve(org);
-    const savedWorkItem = await this.workItemsRepository.save(workItem);
+    await this.workItemsRepository.save(workItem);
+    const savedWorkItem = await this.workItemsRepository.findOneByOrFail({
+      id: workItem.id,
+    });
     const feature = await savedWorkItem.feature;
     await this.updateFeatureProgress(feature);
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
