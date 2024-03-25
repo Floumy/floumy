@@ -57,6 +57,12 @@ export class WorkItem {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @Column({
+    type: 'int',
+    nullable: false,
+    unique: true,
+  })
+  sequenceNumber: number;
   @ManyToOne(() => User, (user) => user.createdWorkItems, { lazy: false })
   createdBy: Promise<User>;
   @ManyToOne(() => User, (user) => user.assignedWorkItems, { lazy: false })
