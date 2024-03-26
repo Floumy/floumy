@@ -1,17 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUpdateFeatureDto, PatchFeatureDto } from './dtos';
-import { In, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Feature } from './feature.entity';
-import { FeatureMapper } from './feature.mapper';
-import { Priority } from '../../common/priority.enum';
-import { OkrsService } from '../../okrs/okrs.service';
-import { MilestonesService } from '../milestones/milestones.service';
-import { WorkItemsService } from '../../backlog/work-items/work-items.service';
-import { FeatureFile } from './feature-file.entity';
-import { File } from '../../files/file.entity';
-import { User } from '../../users/user.entity';
-import { FilesService } from '../../files/files.service';
+import { Injectable } from "@nestjs/common";
+import { CreateUpdateFeatureDto, PatchFeatureDto } from "./dtos";
+import { In, Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Feature } from "./feature.entity";
+import { FeatureMapper } from "./feature.mapper";
+import { Priority } from "../../common/priority.enum";
+import { OkrsService } from "../../okrs/okrs.service";
+import { MilestonesService } from "../milestones/milestones.service";
+import { WorkItemsService } from "../../backlog/work-items/work-items.service";
+import { FeatureFile } from "./feature-file.entity";
+import { File } from "../../files/file.entity";
+import { User } from "../../users/user.entity";
+import { FilesService } from "../../files/files.service";
 
 @Injectable()
 export class FeaturesService {
@@ -218,6 +218,15 @@ export class FeaturesService {
       feature.milestone = Promise.resolve(milestone);
     } else if (patchFeatureDto.milestone === null && feature.milestone) {
       feature.milestone = Promise.resolve(null);
+    }
+    if (patchFeatureDto.keyResult) {
+      const keyResult = await this.okrsService.getKeyResultByOrgId(
+        orgId,
+        patchFeatureDto.keyResult
+      );
+      feature.keyResult = Promise.resolve(keyResult);
+    } else if (patchFeatureDto.keyResult === null && feature.keyResult) {
+      feature.keyResult = Promise.resolve(null);
     }
     const savedFeature = await this.featuresRepository.save(feature);
     return await FeatureMapper.toDto(savedFeature);
