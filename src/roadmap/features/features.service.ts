@@ -129,7 +129,7 @@ export class FeaturesService {
                      WHEN feature."priority" = 'medium' THEN 2
                      WHEN feature."priority" = 'low' THEN 3
                      ELSE 4
-                     END,
+                     END DESC,
                  feature."createdAt" DESC
     `;
     let params = [orgId] as any[];
