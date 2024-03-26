@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
   UseInterceptors,
@@ -40,10 +41,14 @@ export class FeaturesController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async list(@Request() request) {
+  async list(
+    @Request() request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 0,
+  ) {
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.listFeatures(orgId);
+      return await this.featuresService.listFeatures(orgId, page, limit);
     } catch (e) {
       throw new BadRequestException();
     }

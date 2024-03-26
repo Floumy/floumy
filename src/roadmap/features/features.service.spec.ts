@@ -274,6 +274,35 @@ describe('FeaturesService', () => {
       expect(features[0].createdAt).toBeDefined();
       expect(features[0].updatedAt).toBeDefined();
     });
+    it('should return the features paginated', async () => {
+      const objective = await okrsService.create(org.id, {
+        objective: {
+          title: 'my objective',
+        },
+        keyResults: [
+          {
+            title: 'my key result',
+          },
+        ],
+      });
+      await service.createFeature(user.id, {
+        title: 'my feature 1',
+        description: 'my feature description',
+        priority: Priority.HIGH,
+        keyResult: objective.keyResults[0].id,
+        status: FeatureStatus.PLANNED,
+      });
+      await service.createFeature(user.id, {
+        title: 'my feature 2',
+        description: 'my feature description',
+        priority: Priority.HIGH,
+        keyResult: objective.keyResults[0].id,
+        status: FeatureStatus.PLANNED,
+      });
+      const features = await service.listFeatures(org.id, 1, 1);
+      expect(features.length).toEqual(1);
+      expect(features[0].title).toEqual('my feature 2');
+    });
   });
   describe('when listing features without milestone', () => {
     it('should return a list of features', async () => {
