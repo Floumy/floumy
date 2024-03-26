@@ -120,17 +120,26 @@ export class FeaturesService {
   }
 
   async listFeatures(orgId: string, page: number = 1, limit: number = 0) {
-    const skip = (page - 1) * limit;
-    const features = await this.featuresRepository.find({
-      where: {
-        org: { id: orgId },
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-      skip: skip,
-      take: limit,
-    });
+    let query = `
+        SELECT *
+        FROM feature
+        WHERE feature."orgId" = $1
+        ORDER BY CASE
+                     WHEN feature."priority" = 'high' THEN 1
+                     WHEN feature."priority" = 'medium' THEN 2
+                     WHEN feature."priority" = 'low' THEN 3
+                     ELSE 4
+                     END,
+                 feature."createdAt" DESC
+    `;
+    let params = [orgId] as any[];
+    if (limit > 0) {
+      query += ' OFFSET $2 LIMIT $3';
+      const offset = (page - 1) * limit;
+      params = [orgId, offset, limit];
+    }
+
+    const features = await this.featuresRepository.query(query, params);
     return await FeatureMapper.toListDto(features);
   }
 
