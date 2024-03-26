@@ -1,28 +1,28 @@
-import { FeaturesService } from "./features.service";
-import { OkrsService } from "../../okrs/okrs.service";
-import { OrgsService } from "../../orgs/orgs.service";
-import { setupTestingModule } from "../../../test/test.utils";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { Objective } from "../../okrs/objective.entity";
-import { Org } from "../../orgs/org.entity";
-import { KeyResult } from "../../okrs/key-result.entity";
-import { Feature } from "./feature.entity";
-import { UsersService } from "../../users/users.service";
-import { Priority } from "../../common/priority.enum";
-import { User } from "../../users/user.entity";
-import { MilestonesService } from "../milestones/milestones.service";
-import { Milestone } from "../milestones/milestone.entity";
-import { WorkItemStatus } from "../../backlog/work-items/work-item-status.enum";
-import { WorkItemsService } from "../../backlog/work-items/work-items.service";
-import { WorkItem } from "../../backlog/work-items/work-item.entity";
-import { WorkItemType } from "../../backlog/work-items/work-item-type.enum";
-import { FeatureStatus } from "./featurestatus.enum";
-import { Iteration } from "../../iterations/Iteration.entity";
-import { File } from "../../files/file.entity";
-import { WorkItemFile } from "../../backlog/work-items/work-item-file.entity";
-import { FilesService } from "../../files/files.service";
-import { FilesStorageRepository } from "../../files/files-storage.repository";
-import { FeatureFile } from "./feature-file.entity";
+import { FeaturesService } from './features.service';
+import { OkrsService } from '../../okrs/okrs.service';
+import { OrgsService } from '../../orgs/orgs.service';
+import { setupTestingModule } from '../../../test/test.utils';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Objective } from '../../okrs/objective.entity';
+import { Org } from '../../orgs/org.entity';
+import { KeyResult } from '../../okrs/key-result.entity';
+import { Feature } from './feature.entity';
+import { UsersService } from '../../users/users.service';
+import { Priority } from '../../common/priority.enum';
+import { User } from '../../users/user.entity';
+import { MilestonesService } from '../milestones/milestones.service';
+import { Milestone } from '../milestones/milestone.entity';
+import { WorkItemStatus } from '../../backlog/work-items/work-item-status.enum';
+import { WorkItemsService } from '../../backlog/work-items/work-items.service';
+import { WorkItem } from '../../backlog/work-items/work-item.entity';
+import { WorkItemType } from '../../backlog/work-items/work-item-type.enum';
+import { FeatureStatus } from './featurestatus.enum';
+import { Iteration } from '../../iterations/Iteration.entity';
+import { File } from '../../files/file.entity';
+import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
+import { FilesService } from '../../files/files.service';
+import { FilesStorageRepository } from '../../files/files-storage.repository';
+import { FeatureFile } from './feature-file.entity';
 
 describe('FeaturesService', () => {
   let usersService: UsersService;
@@ -816,136 +816,136 @@ describe('FeaturesService', () => {
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });
-    it("should update the key result", async () => {
+    it('should update the key result', async () => {
       const objective = await okrsService.create(org.id, {
         objective: {
-          title: "my objective"
+          title: 'my objective',
         },
         keyResults: [
           {
-            title: "my key result"
-          }
-        ]
+            title: 'my key result',
+          },
+        ],
       });
       const feature = await service.createFeature(user.id, {
-        title: "my feature",
-        description: "my feature description",
+        title: 'my feature',
+        description: 'my feature description',
         priority: Priority.LOW,
-        status: FeatureStatus.PLANNED
+        status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.patchFeature(org.id, feature.id, {
-        keyResult: objective.keyResults[0].id
+        keyResult: objective.keyResults[0].id,
       });
-      expect(updatedFeature.title).toEqual("my feature");
+      expect(updatedFeature.title).toEqual('my feature');
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
       expect(updatedFeature.keyResult).toBeDefined();
       expect(updatedFeature.keyResult.id).toEqual(objective.keyResults[0].id);
       expect(updatedFeature.keyResult.title).toEqual(
-        objective.keyResults[0].title
+        objective.keyResults[0].title,
       );
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });
-    it("should throw an error if the key result does not exist", async () => {
+    it('should throw an error if the key result does not exist', async () => {
       const feature = await service.createFeature(user.id, {
-        title: "my feature",
-        description: "my feature description",
+        title: 'my feature',
+        description: 'my feature description',
         priority: Priority.LOW,
-        status: FeatureStatus.PLANNED
+        status: FeatureStatus.PLANNED,
       });
       await expect(
         service.patchFeature(org.id, feature.id, {
-          keyResult: "non-existent-key-result"
-        })
+          keyResult: 'non-existent-key-result',
+        }),
       ).rejects.toThrowError();
     });
-    it("should throw an error if the key result does not belong to the org", async () => {
+    it('should throw an error if the key result does not belong to the org', async () => {
       const objective = await okrsService.create(org.id, {
         objective: {
-          title: "my objective"
+          title: 'my objective',
         },
         keyResults: [
           {
-            title: "my key result"
-          }
-        ]
+            title: 'my key result',
+          },
+        ],
       });
       const otherOrg = await orgsService.createForUser(
         await usersService.create(
-          "Other User",
-          "testing@exmple.com",
-          "testtesttest"
-        )
+          'Other User',
+          'testing@exmple.com',
+          'testtesttest',
+        ),
       );
       const feature = await service.createFeature(user.id, {
-        title: "my feature",
-        description: "my feature description",
+        title: 'my feature',
+        description: 'my feature description',
         priority: Priority.LOW,
-        status: FeatureStatus.PLANNED
+        status: FeatureStatus.PLANNED,
       });
       await expect(
         service.patchFeature(otherOrg.id, feature.id, {
-          keyResult: objective.keyResults[0].id
-        })
+          keyResult: objective.keyResults[0].id,
+        }),
       ).rejects.toThrowError();
     });
-    it("should update the key result to null", async () => {
+    it('should update the key result to null', async () => {
       const objective = await okrsService.create(org.id, {
         objective: {
-          title: "my objective"
+          title: 'my objective',
         },
         keyResults: [
           {
-            title: "my key result"
-          }
-        ]
+            title: 'my key result',
+          },
+        ],
       });
       const feature = await service.createFeature(user.id, {
-        title: "my feature",
-        description: "my feature description",
+        title: 'my feature',
+        description: 'my feature description',
         keyResult: objective.keyResults[0].id,
         priority: Priority.LOW,
-        status: FeatureStatus.PLANNED
+        status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.patchFeature(org.id, feature.id, {
-        keyResult: null
+        keyResult: null,
       });
-      expect(updatedFeature.title).toEqual("my feature");
+      expect(updatedFeature.title).toEqual('my feature');
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
       expect(updatedFeature.keyResult).toBeUndefined();
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });
-    it("should not update the key result if the update is for another field", async () => {
+    it('should not update the key result if the update is for another field', async () => {
       const objective = await okrsService.create(org.id, {
         objective: {
-          title: "my objective"
+          title: 'my objective',
         },
         keyResults: [
           {
-            title: "my key result"
-          }
-        ]
+            title: 'my key result',
+          },
+        ],
       });
       const feature = await service.createFeature(user.id, {
-        title: "my feature",
-        description: "my feature description",
+        title: 'my feature',
+        description: 'my feature description',
         keyResult: objective.keyResults[0].id,
         priority: Priority.LOW,
-        status: FeatureStatus.PLANNED
+        status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.patchFeature(org.id, feature.id, {
-        status: FeatureStatus.IN_PROGRESS
+        status: FeatureStatus.IN_PROGRESS,
       });
-      expect(updatedFeature.title).toEqual("my feature");
+      expect(updatedFeature.title).toEqual('my feature');
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.status).toEqual(FeatureStatus.IN_PROGRESS);
       expect(updatedFeature.keyResult).toBeDefined();
       expect(updatedFeature.keyResult.id).toEqual(objective.keyResults[0].id);
       expect(updatedFeature.keyResult.title).toEqual(
-        objective.keyResults[0].title
+        objective.keyResults[0].title,
       );
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
