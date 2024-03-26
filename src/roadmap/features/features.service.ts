@@ -119,9 +119,17 @@ export class FeaturesService {
       throw new Error('Invalid priority');
   }
 
-  async listFeatures(orgId: string) {
-    const features = await this.featuresRepository.findBy({
-      org: { id: orgId },
+  async listFeatures(orgId: string, page: number = 1, limit: number = 0) {
+    const skip = (page - 1) * limit;
+    const features = await this.featuresRepository.find({
+      where: {
+        org: { id: orgId },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      skip: skip,
+      take: limit,
     });
     return await FeatureMapper.toListDto(features);
   }

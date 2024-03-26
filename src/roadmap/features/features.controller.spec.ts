@@ -151,6 +151,44 @@ describe('FeaturesController', () => {
       expect(features[0].createdAt).toBeDefined();
       expect(features[0].updatedAt).toBeDefined();
     });
+    it('should return features paginated', async () => {
+      await controller.create(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      await controller.create(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        {
+          title: 'my feature 2',
+          description: 'my feature description 2',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const features = await controller.list(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        1,
+        1,
+      );
+      expect(features.length).toEqual(1);
+    });
   });
   describe('when getting features without milestone', () => {
     it('should return 200', async () => {
