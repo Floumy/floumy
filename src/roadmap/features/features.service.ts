@@ -256,8 +256,18 @@ export class FeaturesService {
       id: featureId,
     });
     this.patchFeatureStatus(patchFeatureDto, feature);
-    this.patchFeturePriority(patchFeatureDto, feature);
+    this.patchFeaturePriority(patchFeatureDto, feature);
     await this.patchFeatureMilestone(patchFeatureDto, orgId, feature);
+
+    if (patchFeatureDto.keyResult) {
+      const keyResult = await this.okrsService.getKeyResultByOrgId(
+        orgId,
+        patchFeatureDto.keyResult,
+      );
+      feature.keyResult = Promise.resolve(keyResult);
+    } else if (patchFeatureDto.keyResult === null && feature.keyResult) {
+      feature.keyResult = Promise.resolve(null);
+    }
     const savedFeature = await this.featuresRepository.save(feature);
     return await FeatureMapper.toDto(savedFeature);
   }
@@ -278,7 +288,7 @@ export class FeaturesService {
     }
   }
 
-  private patchFeturePriority(
+  private patchFeaturePriority(
     patchFeatureDto: PatchFeatureDto,
     feature: Feature,
   ) {
