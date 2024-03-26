@@ -258,7 +258,16 @@ export class FeaturesService {
     this.patchFeatureStatus(patchFeatureDto, feature);
     this.patchFeaturePriority(patchFeatureDto, feature);
     await this.patchFeatureMilestone(patchFeatureDto, orgId, feature);
+    await this.patchFeatureKeyResult(patchFeatureDto, orgId, feature);
+    const savedFeature = await this.featuresRepository.save(feature);
+    return await FeatureMapper.toDto(savedFeature);
+  }
 
+  private async patchFeatureKeyResult(
+    patchFeatureDto: PatchFeatureDto,
+    orgId: string,
+    feature: Feature,
+  ) {
     if (patchFeatureDto.keyResult) {
       const keyResult = await this.okrsService.getKeyResultByOrgId(
         orgId,
@@ -268,8 +277,6 @@ export class FeaturesService {
     } else if (patchFeatureDto.keyResult === null && feature.keyResult) {
       feature.keyResult = Promise.resolve(null);
     }
-    const savedFeature = await this.featuresRepository.save(feature);
-    return await FeatureMapper.toDto(savedFeature);
   }
 
   private async patchFeatureMilestone(
