@@ -205,7 +205,7 @@ export class FeaturesService {
         org: { id: orgId },
       });
       feature.assignedTo = Promise.resolve(assignedTo);
-    } else if (feature.assignedTo) {
+    } else if (await feature.assignedTo) {
       feature.assignedTo = Promise.resolve(null);
     }
   }
@@ -291,7 +291,10 @@ export class FeaturesService {
         patchFeatureDto.keyResult,
       );
       feature.keyResult = Promise.resolve(keyResult);
-    } else if (patchFeatureDto.keyResult === null && feature.keyResult) {
+    } else if (
+      patchFeatureDto.keyResult === null &&
+      (await feature.keyResult)
+    ) {
       feature.keyResult = Promise.resolve(null);
     }
   }
@@ -307,7 +310,10 @@ export class FeaturesService {
         patchFeatureDto.milestone,
       );
       feature.milestone = Promise.resolve(milestone);
-    } else if (patchFeatureDto.milestone === null && feature.milestone) {
+    } else if (
+      patchFeatureDto.milestone === null &&
+      (await feature.milestone)
+    ) {
       feature.milestone = Promise.resolve(null);
     }
   }
