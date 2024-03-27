@@ -125,4 +125,25 @@ export class FeaturesController {
       throw new BadRequestException();
     }
   }
+
+  @Get('/search')
+  @HttpCode(HttpStatus.OK)
+  async search(
+    @Request() request,
+    @Query('q') query: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 0,
+  ) {
+    try {
+      const { org: orgId } = request.user;
+      return await this.featuresService.searchFeatures(
+        orgId,
+        query,
+        page,
+        limit,
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
 }

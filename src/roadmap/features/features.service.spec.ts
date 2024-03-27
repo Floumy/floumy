@@ -980,4 +980,64 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
   });
+  describe('when searching features', () => {
+    it('should return a list of features', async () => {
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+      });
+      const features = await service.searchFeatures(org.id, 'my feature');
+      expect(features.length).toEqual(1);
+      expect(features[0].id).toEqual(feature.id);
+      expect(features[0].title).toEqual('my feature');
+      expect(features[0].priority).toEqual(Priority.LOW);
+      expect(features[0].createdAt).toBeDefined();
+      expect(features[0].updatedAt).toBeDefined();
+    });
+    it('should return the features paginated', async () => {
+      await service.createFeature(user.id, {
+        title: 'my feature 1',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+      });
+      await service.createFeature(user.id, {
+        title: 'my feature 2',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+      });
+      const features = await service.searchFeatures(org.id, 'my feature', 1, 1);
+      expect(features.length).toEqual(1);
+      expect(features[0].title).toEqual('my feature 2');
+    });
+    it('should search features by reference', async () => {
+      const objective = await okrsService.create(org.id, {
+        objective: {
+          title: 'my objective',
+        },
+        keyResults: [
+          {
+            title: 'my key result',
+          },
+        ],
+      });
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        keyResult: objective.keyResults[0].id,
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+      });
+      const features = await service.searchFeatures(org.id, feature.reference);
+      expect(features.length).toEqual(1);
+      expect(features[0].id).toEqual(feature.id);
+      expect(features[0].title).toEqual('my feature');
+      expect(features[0].priority).toEqual(Priority.LOW);
+      expect(features[0].createdAt).toBeDefined();
+      expect(features[0].updatedAt).toBeDefined();
+    });
+  });
 });
