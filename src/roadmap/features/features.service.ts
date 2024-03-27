@@ -368,7 +368,7 @@ export class FeaturesService {
   }
 
   private isReference(search: string) {
-    return /^F-\d+$/.test(search);
+    return /^[fF]-\d+$/.test(search);
   }
 
   private async searchFeaturesByTitleOrDescription(
