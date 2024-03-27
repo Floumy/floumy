@@ -407,4 +407,33 @@ describe('FeaturesController', () => {
       expect(feature.updatedAt).toBeDefined();
     });
   });
+  describe('when searching features', () => {
+    it('should return 200', async () => {
+      await controller.create(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const features = await controller.search(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        'my feature',
+      );
+      expect(features[0].title).toEqual('my feature');
+      expect(features[0].priority).toEqual(Priority.HIGH);
+      expect(features[0].createdAt).toBeDefined();
+      expect(features[0].updatedAt).toBeDefined();
+    });
+  });
 });
