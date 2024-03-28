@@ -1,30 +1,30 @@
-import { WorkItemsService } from './work-items.service';
-import { UsersService } from '../../users/users.service';
-import { FeaturesService } from '../../roadmap/features/features.service';
-import { MilestonesService } from '../../roadmap/milestones/milestones.service';
-import { OkrsService } from '../../okrs/okrs.service';
-import { OrgsService } from '../../orgs/orgs.service';
-import { Org } from '../../orgs/org.entity';
-import { setupTestingModule } from '../../../test/test.utils';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { Objective } from '../../okrs/objective.entity';
-import { KeyResult } from '../../okrs/key-result.entity';
-import { Feature } from '../../roadmap/features/feature.entity';
-import { User } from '../../users/user.entity';
-import { Milestone } from '../../roadmap/milestones/milestone.entity';
-import { Priority } from '../../common/priority.enum';
-import { WorkItemType } from './work-item-type.enum';
-import { EntityNotFoundError, Repository } from 'typeorm';
-import { WorkItemStatus } from './work-item-status.enum';
-import { FeatureStatus } from '../../roadmap/features/featurestatus.enum';
-import { Iteration } from '../../iterations/Iteration.entity';
-import { WorkItem } from './work-item.entity';
-import { IterationsService } from '../../iterations/iterations.service';
-import { File } from '../../files/file.entity';
-import { WorkItemFile } from './work-item-file.entity';
-import { FeatureFile } from '../../roadmap/features/feature-file.entity';
-import { FilesService } from '../../files/files.service';
-import { FilesStorageRepository } from '../../files/files-storage.repository';
+import { WorkItemsService } from "./work-items.service";
+import { UsersService } from "../../users/users.service";
+import { FeaturesService } from "../../roadmap/features/features.service";
+import { MilestonesService } from "../../roadmap/milestones/milestones.service";
+import { OkrsService } from "../../okrs/okrs.service";
+import { OrgsService } from "../../orgs/orgs.service";
+import { Org } from "../../orgs/org.entity";
+import { setupTestingModule } from "../../../test/test.utils";
+import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
+import { Objective } from "../../okrs/objective.entity";
+import { KeyResult } from "../../okrs/key-result.entity";
+import { Feature } from "../../roadmap/features/feature.entity";
+import { User } from "../../users/user.entity";
+import { Milestone } from "../../roadmap/milestones/milestone.entity";
+import { Priority } from "../../common/priority.enum";
+import { WorkItemType } from "./work-item-type.enum";
+import { EntityNotFoundError, Repository } from "typeorm";
+import { WorkItemStatus } from "./work-item-status.enum";
+import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
+import { Iteration } from "../../iterations/Iteration.entity";
+import { WorkItem } from "./work-item.entity";
+import { IterationsService } from "../../iterations/iterations.service";
+import { File } from "../../files/file.entity";
+import { WorkItemFile } from "./work-item-file.entity";
+import { FeatureFile } from "../../roadmap/features/feature-file.entity";
+import { FilesService } from "../../files/files.service";
+import { FilesStorageRepository } from "../../files/files-storage.repository";
 
 describe('WorkItemsService', () => {
   let usersService: UsersService;
@@ -1117,6 +1117,82 @@ describe('WorkItemsService', () => {
       });
       const foundWorkItem = await service.getWorkItem(org.id, workItem.id);
       expect(foundWorkItem.priority).toEqual(Priority.LOW);
+    });
+  });
+  describe("when searching work items", () => {
+    it("should return the work items that match the search query", async () => {
+      const feature1 = await featuresService.createFeature(user.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED
+      });
+      const feature2 = await featuresService.createFeature(user.id, {
+        title: "my other feature",
+        description: "my other feature description",
+        priority: Priority.MEDIUM,
+        status: FeatureStatus.PLANNED
+      });
+      await service.createWorkItem(user.id, {
+        title: "my work item",
+        description: "my work item description",
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        feature: feature1.id,
+        status: WorkItemStatus.PLANNED
+      });
+      await service.createWorkItem(user.id, {
+        title: "my other work item",
+        description: "my other work item description",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        feature: feature2.id,
+        status: WorkItemStatus.PLANNED
+      });
+      const workItems = await service.searchWorkItems(org.id, "my work");
+      expect(workItems).toBeDefined();
+      expect(workItems.length).toEqual(1);
+      expect(workItems[0].title).toEqual("my work item");
+      expect(workItems[0].description).toEqual("my work item description");
+      expect(workItems[0].priority).toEqual(Priority.HIGH);
+      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
+    });
+    it("should return the work items that match the search query for the reference", async () => {
+      const feature1 = await featuresService.createFeature(user.id, {
+        title: "my feature",
+        description: "my feature description",
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED
+      });
+      const feature2 = await featuresService.createFeature(user.id, {
+        title: "my other feature",
+        description: "my other feature description",
+        priority: Priority.MEDIUM,
+        status: FeatureStatus.PLANNED
+      });
+      const workItem = await service.createWorkItem(user.id, {
+        title: "my work item",
+        description: "my work item description",
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        feature: feature1.id,
+        status: WorkItemStatus.PLANNED
+      });
+      await service.createWorkItem(user.id, {
+        title: "my other work item",
+        description: "my other work item description",
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        feature: feature2.id,
+        status: WorkItemStatus.PLANNED
+      });
+      const workItems = await service.searchWorkItems(org.id, workItem.reference);
+      expect(workItems).toBeDefined();
+      expect(workItems.length).toEqual(1);
+      expect(workItems[0].title).toEqual("my work item");
+      expect(workItems[0].description).toEqual("my work item description");
+      expect(workItems[0].priority).toEqual(Priority.HIGH);
+      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
     });
   });
 });
