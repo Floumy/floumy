@@ -140,7 +140,7 @@ export class FeaturesService {
     }
 
     const features = await this.featuresRepository.query(query, params);
-    return await FeatureMapper.toListDto(features);
+    return await FeatureMapper.toListDtoWithoutAssignees(features);
   }
 
   async listFeaturesWithoutMilestone(orgId: string) {
@@ -400,7 +400,7 @@ export class FeaturesService {
 
     const features = await this.featuresRepository.query(query, params);
 
-    return await FeatureMapper.toListDto(features);
+    return await FeatureMapper.toListDtoWithoutAssignees(features);
   }
 
   private async searchFeaturesByReference(
@@ -434,6 +434,6 @@ export class FeaturesService {
 
     const features = await this.featuresRepository.query(query, params);
 
-    return await FeatureMapper.toListDto(features);
+    return await FeatureMapper.toListDtoWithoutAssignees(features);
   }
 }
