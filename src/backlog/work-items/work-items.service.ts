@@ -1,17 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUpdateWorkItemDto, WorkItemPatchDto } from './dtos';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Feature } from '../../roadmap/features/feature.entity';
-import { Repository } from 'typeorm';
-import { WorkItem } from './work-item.entity';
-import WorkItemMapper from './work-item.mapper';
-import { WorkItemStatus } from './work-item-status.enum';
-import { Iteration } from '../../iterations/Iteration.entity';
-import { File } from '../../files/file.entity';
-import { WorkItemFile } from './work-item-file.entity';
-import { User } from '../../users/user.entity';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { FilesService } from '../../files/files.service';
+import { Injectable } from "@nestjs/common";
+import { CreateUpdateWorkItemDto, WorkItemPatchDto } from "./dtos";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Feature } from "../../roadmap/features/feature.entity";
+import { Repository } from "typeorm";
+import { WorkItem } from "./work-item.entity";
+import WorkItemMapper from "./work-item.mapper";
+import { WorkItemStatus } from "./work-item-status.enum";
+import { Iteration } from "../../iterations/Iteration.entity";
+import { File } from "../../files/file.entity";
+import { WorkItemFile } from "./work-item-file.entity";
+import { User } from "../../users/user.entity";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { FilesService } from "../../files/files.service";
 
 @Injectable()
 export class WorkItemsService {
@@ -304,5 +304,95 @@ export class WorkItemsService {
       const file = await workItemFile.file;
       await this.filesService.deleteFile(orgId, file.id);
     }
+  }
+
+  async searchWorkItems(
+    orgId: string,
+    search: string,
+    page: number = 1,
+    limit: number = 0
+  ) {
+    if (!search) return [];
+
+    if (this.isReference(search)) {
+      return await this.searchWorkItemsByReference(orgId, search, page, limit);
+    }
+
+    return await this.searchWorkItemsByTitleOrDescription(
+      orgId,
+      search,
+      page,
+      limit
+    );
+  }
+
+  private isReference(search: string) {
+    return /^[Ww][Ii]-\d+$/.test(search);
+  }
+
+  private async searchWorkItemsByTitleOrDescription(
+    orgId: string,
+    search: string,
+    page: number,
+    limit: number
+  ) {
+    let query = `
+        SELECT *
+        FROM work_item
+        WHERE work_item."orgId" = $1
+          AND (work_item.title ILIKE $2 OR work_item.description ILIKE $2)
+        ORDER BY CASE
+                     WHEN work_item."priority" = 'high' THEN 1
+                     WHEN work_item."priority" = 'medium' THEN 2
+                     WHEN work_item."priority" = 'low' THEN 3
+                     ELSE 4
+                     END,
+                 work_item."createdAt" DESC
+    `;
+    let params = [orgId, `%${search}%`] as any[];
+
+    if (limit > 0) {
+      query += " OFFSET $3 LIMIT $4";
+      const offset = (page - 1) * limit;
+      params = [orgId, `%${search}%`, offset, limit];
+    }
+
+    const workItems = await this.workItemsRepository.query(query, params);
+
+    return WorkItemMapper.toSimpleListDto(workItems);
+  }
+
+  private async searchWorkItemsByReference(
+    orgId: string,
+    search: string,
+    page: number,
+    limit: number
+  ) {
+    let query = `
+        SELECT *
+        FROM work_item
+        WHERE work_item."orgId" = $1
+          AND CAST(work_item."sequenceNumber" AS TEXT) LIKE $2
+        ORDER BY CASE
+                     WHEN work_item."priority" = 'high' THEN 1
+                     WHEN work_item."priority" = 'medium' THEN 2
+                     WHEN work_item."priority" = 'low' THEN 3
+                     ELSE 4
+                     END,
+                 work_item."createdAt" DESC
+    `;
+
+    const referenceSequenceNumber = search.split("-")[1];
+    let params = [orgId, `${referenceSequenceNumber}%`] as any[];
+
+    if (limit > 0) {
+      query += " OFFSET $3 LIMIT $4";
+      const offset = (page - 1) * limit;
+      params = [orgId, `${referenceSequenceNumber}%`, offset, limit];
+    }
+
+    const workItems = await this.workItemsRepository.query(query, params);
+
+    return WorkItemMapper.toSimpleListDto(workItems);
   }
 }
