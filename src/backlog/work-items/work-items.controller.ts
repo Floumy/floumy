@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
   UseInterceptors,
@@ -44,8 +45,20 @@ export class WorkItemsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async list(@Request() request) {
-    return await this.workItemsService.listWorkItems(request.user.org);
+  async list(
+    @Request() request,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 0,
+  ) {
+    try {
+      return await this.workItemsService.listWorkItems(
+        request.user.org,
+        page,
+        limit,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
   @Get('open')

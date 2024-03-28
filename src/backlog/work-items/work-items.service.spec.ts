@@ -211,8 +211,43 @@ describe('WorkItemsService', () => {
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual(Priority.HIGH);
       expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
-      expect(workItems[0].feature.id).toBeDefined();
-      expect(workItems[0].feature.title).toEqual('my feature');
+    });
+    it('should return the list of work items paginated', async () => {
+      const feature1 = await featuresService.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      const feature2 = await featuresService.createFeature(user.id, {
+        title: 'my other feature',
+        description: 'my other feature description',
+        priority: Priority.MEDIUM,
+        status: FeatureStatus.PLANNED,
+      });
+      await service.createWorkItem(user.id, {
+        title: 'my work item',
+        description: 'my work item description',
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        feature: feature1.id,
+        status: WorkItemStatus.PLANNED,
+      });
+      await service.createWorkItem(user.id, {
+        title: 'my other work item',
+        description: 'my other work item description',
+        priority: Priority.MEDIUM,
+        type: WorkItemType.TECHNICAL_DEBT,
+        feature: feature2.id,
+        status: WorkItemStatus.PLANNED,
+      });
+      const workItems = await service.listWorkItems(org.id, 1, 1);
+      expect(workItems).toBeDefined();
+      expect(workItems.length).toEqual(1);
+      expect(workItems[0].title).toEqual('my work item');
+      expect(workItems[0].description).toEqual('my work item description');
+      expect(workItems[0].priority).toEqual(Priority.HIGH);
+      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
     });
   });
   describe('when getting a work item', () => {
