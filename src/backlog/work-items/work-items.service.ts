@@ -70,11 +70,28 @@ export class WorkItemsService {
     }
   }
 
-  async listWorkItems(orgId: string) {
-    const workItems = await this.workItemsRepository.find({
-      where: { org: { id: orgId } },
-    });
-    return await WorkItemMapper.toListDto(workItems);
+  async listWorkItems(orgId: string, page: number = 1, limit: number = 0) {
+    let query = `
+        SELECT *
+        FROM work_item
+        WHERE work_item."orgId" = $1
+        ORDER BY CASE
+                     WHEN work_item."priority" = 'high' THEN 1
+                     WHEN work_item."priority" = 'medium' THEN 2
+                     WHEN work_item."priority" = 'low' THEN 3
+                     ELSE 4
+                     END,
+                 work_item."createdAt" DESC
+    `;
+    let params = [orgId] as any[];
+    if (limit > 0) {
+      query += ' OFFSET $2 LIMIT $3';
+      const offset = (page - 1) * limit;
+      params = [orgId, offset, limit];
+    }
+
+    const workItems = await this.workItemsRepository.query(query, params);
+    return WorkItemMapper.toSimpleListDto(workItems);
   }
 
   async getWorkItem(orgId: string, id: string) {

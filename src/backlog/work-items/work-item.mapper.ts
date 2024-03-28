@@ -67,7 +67,47 @@ export default class WorkItemMapper {
     };
   }
 
+  static async toListItemDto(workItem: WorkItem) {
+    const feature = await workItem.feature;
+    const assignedTo = await workItem.assignedTo;
+    return {
+      id: workItem.id,
+      reference: `WI-${workItem.sequenceNumber}`,
+      title: workItem.title,
+      description: workItem.description,
+      priority: workItem.priority,
+      type: workItem.type,
+      status: workItem.status,
+      estimation: workItem.estimation,
+      feature: feature ? FeatureMapper.toDto(feature) : undefined,
+      assignedTo: assignedTo ? UserMapper.toDto(assignedTo) : undefined,
+      completedAt: workItem.completedAt,
+      createdAt: workItem.createdAt,
+      updatedAt: workItem.updatedAt,
+    };
+  }
+
   static async toListDto(workItems: WorkItem[]) {
-    return await Promise.all(workItems.map(this.toDto));
+    return await Promise.all(workItems.map(this.toListItemDto));
+  }
+
+  static toSimpleListDto(workItems: WorkItem[]) {
+    return workItems.map(this.toSimpleListItemDto);
+  }
+
+  static toSimpleListItemDto(workItem: WorkItem) {
+    return {
+      id: workItem.id,
+      reference: `WI-${workItem.sequenceNumber}`,
+      title: workItem.title,
+      description: workItem.description,
+      priority: workItem.priority,
+      type: workItem.type,
+      status: workItem.status,
+      estimation: workItem.estimation,
+      completedAt: workItem.completedAt,
+      createdAt: workItem.createdAt,
+      updatedAt: workItem.updatedAt,
+    };
   }
 }
