@@ -59,6 +59,14 @@ export class FeatureMapper {
     return featureDto;
   }
 
+  static async toListDtoWithoutAssignees(
+    features: Feature[],
+  ): Promise<FeaturesListDto[]> {
+    return await Promise.all(
+      features.map(FeatureMapper.toListItemDtoWithoutAssignees),
+    );
+  }
+
   static async toListDto(features: Feature[]): Promise<FeaturesListDto[]> {
     return await Promise.all(features.map(FeatureMapper.toListItemDto));
   }
@@ -79,6 +87,22 @@ export class FeatureMapper {
             name: assignedTo.name,
           }
         : null,
+      createdAt: feature.createdAt,
+      updatedAt: feature.updatedAt,
+    };
+  }
+
+  static async toListItemDtoWithoutAssignees(
+    feature: Feature,
+  ): Promise<FeaturesListDto> {
+    return {
+      id: feature.id,
+      reference: `F-${feature.sequenceNumber}`,
+      title: feature.title,
+      priority: feature.priority,
+      status: feature.status,
+      progress: feature.progress,
+      workItemsCount: feature.workItemsCount,
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt,
     };
