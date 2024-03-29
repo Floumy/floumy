@@ -14,12 +14,12 @@ import {
   Query,
   Request,
   UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
-import { AuthGuard } from '../../auth/auth.guard';
-import { WorkItemsService } from './work-items.service';
-import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from './dtos';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+  UseInterceptors
+} from "@nestjs/common";
+import { AuthGuard } from "../../auth/auth.guard";
+import { WorkItemsService } from "./work-items.service";
+import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from "./dtos";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller('work-items')
 @UseGuards(AuthGuard)
@@ -58,6 +58,27 @@ export class WorkItemsController {
       );
     } catch (e) {
       throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get("/search")
+  @HttpCode(HttpStatus.OK)
+  async search(
+    @Request() request,
+    @Query("q") query: string,
+    @Query("page") page: number = 1,
+    @Query("limit") limit: number = 0
+  ) {
+    try {
+      const { org: orgId } = request.user;
+      return await this.workItemsService.searchWorkItems(
+        orgId,
+        query,
+        page,
+        limit
+      );
+    } catch (e) {
+      throw new BadRequestException();
     }
   }
 
