@@ -1,4 +1,7 @@
-import 'newrelic';
+if (process.env.NODE_ENV !== 'development') {
+  require('newrelic');
+}
+
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
