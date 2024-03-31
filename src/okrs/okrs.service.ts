@@ -85,13 +85,21 @@ export class OkrsService {
 
   async updateObjective(orgId: string, id: string, okrDto: UpdateObjectiveDto) {
     if (!okrDto.title) throw new Error('Objective title is required');
-    if (!okrDto.status) throw new Error('Obj');
+    if (
+      !okrDto.status ||
+      !Object.values(OKRStatus).find((status) => status === okrDto.status)
+    )
+      throw new Error('Objective status is required');
+
     const objective = await this.objectiveRepository.findOneByOrFail({
       id,
       org: { id: orgId },
     });
 
     objective.title = okrDto.title;
+    objective.status = Object.values(OKRStatus).find(
+      (status) => status === okrDto.status,
+    );
 
     if (okrDto.timeline) {
       TimelineService.validateTimeline(okrDto.timeline);
