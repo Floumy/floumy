@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { Feature } from '../roadmap/features/feature.entity';
 import { UsersService } from '../users/users.service';
 import { Timeline } from '../common/timeline.enum';
+import { OKRStatus } from './okrstatus.enum';
 
 describe('OkrsService', () => {
   let service: OkrsService;
@@ -150,12 +151,15 @@ describe('OkrsService', () => {
       });
       const okrDto = {
         title: 'Updated Objective',
-        status: objective.status,
+        status: OKRStatus.COMPLETED,
       };
       await service.updateObjective(org.id, objective.id, okrDto);
       const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual('Updated Objective');
+      expect(storedObjective.objective.status).toEqual(
+        OKRStatus.COMPLETED.valueOf(),
+      );
     });
     it('should update objective timeline', async () => {
       const org = await createTestOrg();
