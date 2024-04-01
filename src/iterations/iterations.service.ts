@@ -1,14 +1,20 @@
-import { Injectable } from "@nestjs/common";
-import { CreateOrUpdateIterationDto } from "./dtos";
-import { Iteration } from "./Iteration.entity";
-import { IsNull, LessThan, MoreThan, MoreThanOrEqual, Repository } from "typeorm";
-import { Org } from "../orgs/org.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { IterationMapper } from "./iteration.mapper";
-import { WorkItem } from "../backlog/work-items/work-item.entity";
-import { IterationStatus } from "./iteration-status.enum";
-import { Timeline } from "../common/timeline.enum";
-import { TimelineService } from "../common/timeline.service";
+import { Injectable } from '@nestjs/common';
+import { CreateOrUpdateIterationDto } from './dtos';
+import { Iteration } from './Iteration.entity';
+import {
+  IsNull,
+  LessThan,
+  MoreThan,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
+import { Org } from '../orgs/org.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { IterationMapper } from './iteration.mapper';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { IterationStatus } from './iteration-status.enum';
+import { Timeline } from '../common/timeline.enum';
+import { TimelineService } from '../common/timeline.service';
 
 @Injectable()
 export class IterationsService {
@@ -251,7 +257,7 @@ export class IterationsService {
         const { startDate } = TimelineService.calculateQuarterDates(
           TimelineService.getCurrentQuarter(),
         );
-        where.endDate = LessThan(startDate);
+        where.startDate = LessThan(startDate);
         break;
       }
     }
