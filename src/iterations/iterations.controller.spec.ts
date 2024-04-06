@@ -69,7 +69,7 @@ describe('IterationsController', () => {
     controller = module.get<IterationsController>(IterationsController);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
-    user = await usersService.create(
+    user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',

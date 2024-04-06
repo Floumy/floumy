@@ -1,16 +1,26 @@
-import { Injectable } from "@nestjs/common";
-import { User } from "../users/user.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Org } from "./org.entity";
-import { OrgsMapper } from "./orgs.mapper";
+import { Injectable } from '@nestjs/common';
+import { User } from '../users/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Org } from './org.entity';
+import { OrgsMapper } from './orgs.mapper';
 
 @Injectable()
 export class OrgsService {
+  constructor(@InjectRepository(Org) private orgRepository: Repository<Org>) {}
 
-  constructor(@InjectRepository(Org) private orgRepository: Repository<Org>) {
+  async createOrg(name: string) {
+    const org = new Org();
+    org.name = name;
+    return await this.orgRepository.save(org);
   }
 
+  /**
+   * This method is currently used only on tests
+   * and will be deprecated in the future
+   * @deprecated Use createOrg instead
+   * @param user
+   */
   async createForUser(user: User) {
     const org = new Org();
     org.users = Promise.resolve([user]);
@@ -32,5 +42,40 @@ export class OrgsService {
 
   async findOneByInvitationToken(invitationToken: string) {
     return await this.orgRepository.findOneBy({ invitationToken });
+  }
+
+  async getOrCreateOrg(invitationToken?: string, name?: string): Promise<Org> {
+    this.validateInvitationTokenAndName(invitationToken, name);
+
+    if (invitationToken && invitationToken.trim().length > 0) {
+      return await this.findOneByInvitationToken(invitationToken);
+    }
+
+    if (name && name.trim().length > 0) {
+      const org = new Org();
+      org.name = name.trim();
+      return await this.orgRepository.save(org);
+    }
+  }
+
+  private validateInvitationTokenAndName(
+    invitationToken: string,
+    name: string,
+  ) {
+    if (!invitationToken && !name) {
+      throw new Error('Invalid invitation token and name');
+    }
+
+    if (invitationToken && name) {
+      throw new Error('Invalid invitation token and name');
+    }
+
+    if (invitationToken && invitationToken.trim().length === 0) {
+      throw new Error('Invalid invitation token');
+    }
+
+    if (name && (name.trim().length === 0 || name.trim().length > 50)) {
+      throw new Error('Invalid name');
+    }
   }
 }

@@ -1,33 +1,33 @@
-import { WorkItemsController } from "./work-items.controller";
-import { Org } from "../../orgs/org.entity";
-import { setupTestingModule } from "../../../test/test.utils";
-import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
-import { Feature } from "../../roadmap/features/feature.entity";
-import { UsersModule } from "../../users/users.module";
-import { OrgsService } from "../../orgs/orgs.service";
-import { TokensService } from "../../auth/tokens.service";
-import { FeaturesService } from "../../roadmap/features/features.service";
-import { UsersService } from "../../users/users.service";
-import { WorkItem } from "./work-item.entity";
-import { Priority } from "../../common/priority.enum";
-import { WorkItemType } from "./work-item-type.enum";
-import { Objective } from "../../okrs/objective.entity";
-import { KeyResult } from "../../okrs/key-result.entity";
-import { OkrsService } from "../../okrs/okrs.service";
-import { Milestone } from "../../roadmap/milestones/milestone.entity";
-import { MilestonesService } from "../../roadmap/milestones/milestones.service";
-import { WorkItemsService } from "./work-items.service";
-import { WorkItemStatus } from "./work-item-status.enum";
-import { FeatureStatus } from "../../roadmap/features/featurestatus.enum";
-import { Iteration } from "../../iterations/Iteration.entity";
-import { IterationsService } from "../../iterations/iterations.service";
-import { File } from "../../files/file.entity";
-import { Repository } from "typeorm";
-import { WorkItemFile } from "./work-item-file.entity";
-import { FeatureFile } from "../../roadmap/features/feature-file.entity";
-import { User } from "../../users/user.entity";
-import { FilesService } from "../../files/files.service";
-import { FilesStorageRepository } from "../../files/files-storage.repository";
+import { WorkItemsController } from './work-items.controller';
+import { Org } from '../../orgs/org.entity';
+import { setupTestingModule } from '../../../test/test.utils';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { Feature } from '../../roadmap/features/feature.entity';
+import { UsersModule } from '../../users/users.module';
+import { OrgsService } from '../../orgs/orgs.service';
+import { TokensService } from '../../auth/tokens.service';
+import { FeaturesService } from '../../roadmap/features/features.service';
+import { UsersService } from '../../users/users.service';
+import { WorkItem } from './work-item.entity';
+import { Priority } from '../../common/priority.enum';
+import { WorkItemType } from './work-item-type.enum';
+import { Objective } from '../../okrs/objective.entity';
+import { KeyResult } from '../../okrs/key-result.entity';
+import { OkrsService } from '../../okrs/okrs.service';
+import { Milestone } from '../../roadmap/milestones/milestone.entity';
+import { MilestonesService } from '../../roadmap/milestones/milestones.service';
+import { WorkItemsService } from './work-items.service';
+import { WorkItemStatus } from './work-item-status.enum';
+import { FeatureStatus } from '../../roadmap/features/featurestatus.enum';
+import { Iteration } from '../../iterations/Iteration.entity';
+import { IterationsService } from '../../iterations/iterations.service';
+import { File } from '../../files/file.entity';
+import { Repository } from 'typeorm';
+import { WorkItemFile } from './work-item-file.entity';
+import { FeatureFile } from '../../roadmap/features/feature-file.entity';
+import { User } from '../../users/user.entity';
+import { FilesService } from '../../files/files.service';
+import { FilesStorageRepository } from '../../files/files-storage.repository';
 
 describe('WorkItemsController', () => {
   let controller: WorkItemsController;
@@ -72,7 +72,7 @@ describe('WorkItemsController', () => {
     controller = module.get<WorkItemsController>(WorkItemsController);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
-    user = await usersService.create(
+    user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',
@@ -536,45 +536,47 @@ describe('WorkItemsController', () => {
       expect(updatedWorkItem.status).toEqual(WorkItemStatus.IN_PROGRESS);
     });
   });
-  describe("when searching work items", () => {
-    it("should return the work items", async () => {
+  describe('when searching work items', () => {
+    it('should return the work items', async () => {
       const feature = await featureService.createFeature(user.id, {
-        title: "my feature",
-        description: "my feature description",
+        title: 'my feature',
+        description: 'my feature description',
         priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED
+        status: FeatureStatus.PLANNED,
       });
       await controller.create(
         {
           user: {
-            sub: user.id
-          }
+            sub: user.id,
+          },
         },
         {
-          title: "my work item",
-          description: "my work item description",
+          title: 'my work item',
+          description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
           feature: feature.id,
-          status: WorkItemStatus.PLANNED
-        }
-      );
-      const workItems = await controller.search({
-          user: {
-            org: org.id
-          }
+          status: WorkItemStatus.PLANNED,
         },
-        "work");
+      );
+      const workItems = await controller.search(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        'work',
+      );
 
       expect(workItems.length).toEqual(1);
       expect(workItems[0].id).toBeDefined();
-      expect(workItems[0].title).toEqual("my work item");
-      expect(workItems[0].description).toEqual("my work item description");
-      expect(workItems[0].priority).toEqual("high");
-      expect(workItems[0].type).toEqual("technical-debt");
+      expect(workItems[0].title).toEqual('my work item');
+      expect(workItems[0].description).toEqual('my work item description');
+      expect(workItems[0].priority).toEqual('high');
+      expect(workItems[0].type).toEqual('technical-debt');
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
-      expect(workItems[0].status).toEqual("planned");
+      expect(workItems[0].status).toEqual('planned');
     });
   });
 });

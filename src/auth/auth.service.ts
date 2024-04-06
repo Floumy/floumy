@@ -8,6 +8,7 @@ import { TokensService } from './tokens.service';
 import { SignUpDto } from './auth.dtos';
 import { v4 as uuid } from 'uuid';
 import { NotificationsService } from '../notifications/notifications.service';
+import { OrgsService } from '../orgs/orgs.service';
 
 export type AuthDto = {
   accessToken: string;
@@ -24,6 +25,7 @@ export class AuthService {
     private refreshTokenRepository: Repository<RefreshToken>,
     private tokensService: TokensService,
     private notificationsService: NotificationsService,
+    private orgsService: OrgsService,
   ) {}
 
   async signIn(email: string, password: string): Promise<AuthDto> {
@@ -67,11 +69,21 @@ export class AuthService {
   }
 
   async signUp(signUpDto: SignUpDto): Promise<void> {
-    const user = await this.usersService.create(
+    const org = await this.orgsService.getOrCreateOrg(
+      signUpDto.invitationToken,
+      signUpDto.productName,
+    );
+
+    if (!org) {
+      this.logger.error('Org not found');
+      throw new Error('Org not found');
+    }
+
+    const user = await this.usersService.createUser(
       signUpDto.name,
       signUpDto.email,
       signUpDto.password,
-      signUpDto.invitationToken,
+      org,
     );
 
     try {

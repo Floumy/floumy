@@ -61,7 +61,7 @@ describe('MilestonesService', () => {
     usersService = module.get<UsersService>(UsersService);
     orgsService = module.get<OrgsService>(OrgsService);
     featuresService = module.get<FeaturesService>(FeaturesService);
-    user = await usersService.create(
+    user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',

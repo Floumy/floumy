@@ -8,35 +8,34 @@ import {
   Logger,
   Post,
   Request,
-  UseGuards
-} from "@nestjs/common";
-import { AuthDto, AuthService } from "./auth.service";
-import { AuthGuard } from "./auth.guard";
-import { Public } from "./public.guard";
-import { RefreshTokenDto, SignInDto, SignUpDto } from "./auth.dtos";
+  UseGuards,
+} from '@nestjs/common';
+import { AuthDto, AuthService } from './auth.service';
+import { AuthGuard } from './auth.guard';
+import { Public } from './public.guard';
+import { RefreshTokenDto, SignInDto, SignUpDto } from './auth.dtos';
 
-@Controller("auth")
+@Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
-  constructor(private authService: AuthService) {
-  }
+  constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
-  @Post("sign-in")
+  @Post('sign-in')
   @Public()
   signIn(@Body() signInDto: SignInDto): Promise<AuthDto> {
     return this.authService.signIn(signInDto.email, signInDto.password);
   }
 
   @UseGuards(AuthGuard)
-  @Get("profile")
+  @Get('profile')
   getProfile(@Request() request): string {
     return request.user;
   }
 
   @Public()
-  @Post("sign-up")
+  @Post('sign-up')
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() signUpDto: SignUpDto) {
     try {
@@ -48,18 +47,20 @@ export class AuthController {
   }
 
   @Public()
-  @Post("refresh-token")
+  @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
     return await this.authService.refreshToken(refreshTokenDto.refreshToken);
   }
 
   @Public()
-  @Post("activate")
+  @Post('activate')
   @HttpCode(HttpStatus.OK)
   async activateAccount(@Body() activationDto: { activationToken: string }) {
     try {
-      return await this.authService.activateAccount(activationDto.activationToken);
+      return await this.authService.activateAccount(
+        activationDto.activationToken,
+      );
     } catch (e) {
       this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
@@ -67,22 +68,31 @@ export class AuthController {
   }
 
   @Public()
-  @Post("send-reset-password-link")
+  @Post('send-reset-password-link')
   @HttpCode(HttpStatus.OK)
-  async requestPasswordReset(@Body() sendResetPasswordLinkDto: { email: string }) {
+  async requestPasswordReset(
+    @Body() sendResetPasswordLinkDto: { email: string },
+  ) {
     try {
-      await this.authService.requestPasswordReset(sendResetPasswordLinkDto.email);
+      await this.authService.requestPasswordReset(
+        sendResetPasswordLinkDto.email,
+      );
     } catch (e) {
       this.logger.error(e.message);
     }
   }
 
   @Public()
-  @Post("reset-password")
+  @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  async resetPassword(@Body() resetPasswordDto: { password: string; resetToken: string }) {
+  async resetPassword(
+    @Body() resetPasswordDto: { password: string; resetToken: string },
+  ) {
     try {
-      await this.authService.resetPassword(resetPasswordDto.password, resetPasswordDto.resetToken);
+      await this.authService.resetPassword(
+        resetPasswordDto.password,
+        resetPasswordDto.resetToken,
+      );
     } catch (e) {
       this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);

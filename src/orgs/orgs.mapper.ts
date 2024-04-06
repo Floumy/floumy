@@ -1,6 +1,6 @@
-import { User } from "../users/user.entity";
-import { MemberDto, OrgDto } from "./orgs.dtos";
-import { Org } from "./org.entity";
+import { User } from '../users/user.entity';
+import { MemberDto, OrgDto } from './orgs.dtos';
+import { Org } from './org.entity';
 
 export class MembersMapper {
   static toMembers(members: User[]): MemberDto[] {
@@ -13,7 +13,7 @@ export class MembersMapper {
       name: member.name,
       email: member.email,
       isActive: member.isActive,
-      createdAt: member.createdAt
+      createdAt: member.createdAt,
     };
   }
 }
@@ -22,10 +22,11 @@ export class OrgsMapper {
   static async toOrg(org: Org): Promise<OrgDto> {
     return {
       id: org.id,
+      name: org.name,
       invitationToken: org.invitationToken,
       createdAt: org.createdAt,
       updatedAt: org.updatedAt,
-      members: MembersMapper.toMembers(await org.users)
+      members: MembersMapper.toMembers(await org.users),
     };
   }
 }

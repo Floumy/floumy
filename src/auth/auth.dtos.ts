@@ -8,6 +8,7 @@ export interface SignUpDto {
   email: string;
   password: string;
   invitationToken?: string;
+  productName?: string;
 }
 
 export interface RefreshTokenDto {

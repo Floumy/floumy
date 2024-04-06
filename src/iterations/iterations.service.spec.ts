@@ -1,31 +1,31 @@
-import { UsersService } from "../users/users.service";
-import { OrgsService } from "../orgs/orgs.service";
-import { FeaturesService } from "../roadmap/features/features.service";
-import { Org } from "../orgs/org.entity";
-import { setupTestingModule } from "../../test/test.utils";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { Objective } from "../okrs/objective.entity";
-import { KeyResult } from "../okrs/key-result.entity";
-import { Feature } from "../roadmap/features/feature.entity";
-import { User } from "../users/user.entity";
-import { Milestone } from "../roadmap/milestones/milestone.entity";
-import { WorkItem } from "../backlog/work-items/work-item.entity";
-import { OkrsService } from "../okrs/okrs.service";
-import { MilestonesService } from "../roadmap/milestones/milestones.service";
-import { IterationsService } from "./iterations.service";
-import { Iteration } from "./Iteration.entity";
-import { BacklogModule } from "../backlog/backlog.module";
-import { WorkItemsService } from "../backlog/work-items/work-items.service";
-import { Priority } from "../common/priority.enum";
-import { WorkItemType } from "../backlog/work-items/work-item-type.enum";
-import { WorkItemStatus } from "../backlog/work-items/work-item-status.enum";
-import { File } from "../files/file.entity";
-import { WorkItemFile } from "../backlog/work-items/work-item-file.entity";
-import { FeatureFile } from "../roadmap/features/feature-file.entity";
-import { FilesService } from "../files/files.service";
-import { FilesStorageRepository } from "../files/files-storage.repository";
-import { Timeline } from "../common/timeline.enum";
-import { TimelineService } from "../common/timeline.service";
+import { UsersService } from '../users/users.service';
+import { OrgsService } from '../orgs/orgs.service';
+import { FeaturesService } from '../roadmap/features/features.service';
+import { Org } from '../orgs/org.entity';
+import { setupTestingModule } from '../../test/test.utils';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Objective } from '../okrs/objective.entity';
+import { KeyResult } from '../okrs/key-result.entity';
+import { Feature } from '../roadmap/features/feature.entity';
+import { User } from '../users/user.entity';
+import { Milestone } from '../roadmap/milestones/milestone.entity';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { OkrsService } from '../okrs/okrs.service';
+import { MilestonesService } from '../roadmap/milestones/milestones.service';
+import { IterationsService } from './iterations.service';
+import { Iteration } from './Iteration.entity';
+import { BacklogModule } from '../backlog/backlog.module';
+import { WorkItemsService } from '../backlog/work-items/work-items.service';
+import { Priority } from '../common/priority.enum';
+import { WorkItemType } from '../backlog/work-items/work-item-type.enum';
+import { WorkItemStatus } from '../backlog/work-items/work-item-status.enum';
+import { File } from '../files/file.entity';
+import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
+import { FeatureFile } from '../roadmap/features/feature-file.entity';
+import { FilesService } from '../files/files.service';
+import { FilesStorageRepository } from '../files/files-storage.repository';
+import { Timeline } from '../common/timeline.enum';
+import { TimelineService } from '../common/timeline.service';
 
 describe('IterationsService', () => {
   let usersService: UsersService;
@@ -72,7 +72,7 @@ describe('IterationsService', () => {
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     workItemsService = module.get<WorkItemsService>(WorkItemsService);
-    user = await usersService.create(
+    user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',
