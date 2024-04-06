@@ -56,7 +56,7 @@ describe('FilesService', () => {
     workItemRepository = module.get<Repository<WorkItem>>(
       getRepositoryToken(WorkItem),
     );
-    const user = await usersService.create(
+    const user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',

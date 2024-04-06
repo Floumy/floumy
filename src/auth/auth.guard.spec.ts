@@ -11,6 +11,7 @@ import { TokensService } from './tokens.service';
 import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
 import { Repository } from 'typeorm';
+import { OrgsModule } from '../orgs/orgs.module';
 
 describe('AuthGuard', () => {
   let tokensService: TokensService;
@@ -20,7 +21,7 @@ describe('AuthGuard', () => {
   beforeEach(async () => {
     const { module: testingModule, cleanup: dbCleanup } =
       await setupTestingModule(
-        [UsersModule, TypeOrmModule.forFeature([RefreshToken])],
+        [UsersModule, TypeOrmModule.forFeature([RefreshToken]), OrgsModule],
         [AuthService, Reflector, TokensService],
       );
     module = testingModule;

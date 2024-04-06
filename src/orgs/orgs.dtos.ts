@@ -8,6 +8,7 @@ export interface MemberDto {
 
 export interface OrgDto {
   id: string;
+  name: string;
   invitationToken: string;
   createdAt: Date;
   updatedAt: Date;

@@ -67,7 +67,7 @@ describe('FeaturesController', () => {
     const usersService = module.get<UsersService>(UsersService);
     milestoneService = module.get<MilestonesService>(MilestonesService);
 
-    user = await usersService.create(
+    user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',

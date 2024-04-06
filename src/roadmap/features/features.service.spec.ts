@@ -73,7 +73,7 @@ describe('FeaturesService', () => {
     milestonesService = module.get<MilestonesService>(MilestonesService);
     workItemsService = module.get<WorkItemsService>(WorkItemsService);
     filesService = module.get<FilesService>(FilesService);
-    user = await usersService.create(
+    user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',
@@ -176,7 +176,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const otherUser = await usersService.create(
+      const otherUser = await usersService.createUserWithOrg(
         'Jane Doe',
         'jane.doe@example.com',
         'testtesttest',
@@ -230,7 +230,7 @@ describe('FeaturesService', () => {
       expect(feature.files[0].name).toEqual(file.name);
     });
     it('should create a feature with assigned to', async () => {
-      const otherUser = await usersService.create(
+      const otherUser = await usersService.createUserWithOrg(
         'Jane Doe',
         'jane.doe@example.com',
         'testtesttest',
@@ -519,7 +519,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.files[0].name).toEqual(file.name);
     });
     it('should update the feature with assigned to', async () => {
-      const otherUser = await usersService.create(
+      const otherUser = await usersService.createUserWithOrg(
         'Jane Doe',
         'jane.doe@example.com',
         'testtesttest',
@@ -543,7 +543,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.assignedTo.name).toEqual(otherUser.name);
     });
     it('should update the feature with assigned to to null', async () => {
-      const otherUser = await usersService.create(
+      const otherUser = await usersService.createUserWithOrg(
         'Jane Doe',
         'jane.doe@example.com',
         'testtesttest',
@@ -774,7 +774,7 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the milestone does not belong to the org', async () => {
       const otherOrg = await orgsService.createForUser(
-        await usersService.create(
+        await usersService.createUserWithOrg(
           'Other User',
           'testing@example.com',
           'testtesttest',
@@ -901,7 +901,7 @@ describe('FeaturesService', () => {
         ],
       });
       const otherOrg = await orgsService.createForUser(
-        await usersService.create(
+        await usersService.createUserWithOrg(
           'Other User',
           'testing@exmple.com',
           'testtesttest',

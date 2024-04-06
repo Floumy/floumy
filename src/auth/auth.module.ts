@@ -13,6 +13,7 @@ import { TokensService } from './tokens.service';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { User } from '../users/user.entity';
 import { RefreshTokensCleanerService } from './referesh-tokens-cleaner.service';
+import { OrgsModule } from '../orgs/orgs.module';
 
 @Module({
   controllers: [AuthController],
@@ -35,6 +36,7 @@ import { RefreshTokensCleanerService } from './referesh-tokens-cleaner.service';
       signOptions: { expiresIn: '60s' },
     }),
     TypeOrmModule.forFeature([RefreshToken, User]),
+    OrgsModule,
   ],
   exports: [AuthService, TokensService],
 })

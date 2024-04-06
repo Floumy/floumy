@@ -45,7 +45,7 @@ describe('FilesController', () => {
     controller = module.get<FilesController>(FilesController);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
-    const user = await usersService.create(
+    const user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',

@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { OrgsService } from '../orgs/orgs.service';
 import { UserMapper } from './user.mapper';
 import { RefreshToken } from '../auth/refresh-token.entity';
+import { Org } from '../orgs/org.entity';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +23,23 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
-  async create(
+  async createUser(name: string, email: string, password: string, org: Org) {
+    await this.validateUser(name, email, password);
+    const hashedPassword = await this.encryptPassword(password);
+    const user = new User(name, email, hashedPassword);
+    user.org = Promise.resolve(org);
+    return await this.usersRepository.save(user);
+  }
+
+  /**
+   * This method is used only by tests and will be removed in the future
+   * @deprecated Use createUser instead for production code
+   * @param name
+   * @param email
+   * @param password
+   * @param invitationToken
+   */
+  async createUserWithOrg(
     name: string,
     email: string,
     password: string,

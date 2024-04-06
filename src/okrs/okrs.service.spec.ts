@@ -98,7 +98,7 @@ describe('OkrsService', () => {
     });
 
     it('should assign the objective to a user', async () => {
-      const user = await usersService.create(
+      const user = await usersService.createUserWithOrg(
         'Test User',
         'testing@example.com',
         'testtesttest',
@@ -179,7 +179,7 @@ describe('OkrsService', () => {
   });
 
   it('should update the assigned user', async () => {
-    const user = await usersService.create(
+    const user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',
@@ -201,7 +201,7 @@ describe('OkrsService', () => {
     expect(assignedTo).not.toBeNull();
   });
   it('should update the assigned user to null', async () => {
-    const user = await usersService.create(
+    const user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',
