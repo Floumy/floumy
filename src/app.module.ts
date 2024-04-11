@@ -20,6 +20,7 @@ import appConfig from './config/app.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
+import { BipModule } from './bip/bip.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     IterationsModule,
     FilesModule,
     NotificationsModule,
+    BipModule,
   ],
   providers: [AppService],
 })

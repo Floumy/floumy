@@ -1,17 +1,17 @@
-import { Injectable } from "@nestjs/common";
-import { CreateUpdateWorkItemDto, WorkItemPatchDto } from "./dtos";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Feature } from "../../roadmap/features/feature.entity";
-import { Repository } from "typeorm";
-import { WorkItem } from "./work-item.entity";
-import WorkItemMapper from "./work-item.mapper";
-import { WorkItemStatus } from "./work-item-status.enum";
-import { Iteration } from "../../iterations/Iteration.entity";
-import { File } from "../../files/file.entity";
-import { WorkItemFile } from "./work-item-file.entity";
-import { User } from "../../users/user.entity";
-import { EventEmitter2 } from "@nestjs/event-emitter";
-import { FilesService } from "../../files/files.service";
+import { Injectable } from '@nestjs/common';
+import { CreateUpdateWorkItemDto, WorkItemPatchDto } from './dtos';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Feature } from '../../roadmap/features/feature.entity';
+import { Repository } from 'typeorm';
+import { WorkItem } from './work-item.entity';
+import WorkItemMapper from './work-item.mapper';
+import { WorkItemStatus } from './work-item-status.enum';
+import { Iteration } from '../../iterations/Iteration.entity';
+import { File } from '../../files/file.entity';
+import { WorkItemFile } from './work-item-file.entity';
+import { User } from '../../users/user.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { FilesService } from '../../files/files.service';
 
 @Injectable()
 export class WorkItemsService {
@@ -310,7 +310,7 @@ export class WorkItemsService {
     orgId: string,
     search: string,
     page: number = 1,
-    limit: number = 0
+    limit: number = 0,
   ) {
     if (!search) return [];
 
@@ -322,7 +322,7 @@ export class WorkItemsService {
       orgId,
       search,
       page,
-      limit
+      limit,
     );
   }
 
@@ -334,7 +334,7 @@ export class WorkItemsService {
     orgId: string,
     search: string,
     page: number,
-    limit: number
+    limit: number,
   ) {
     let query = `
         SELECT *
@@ -352,7 +352,7 @@ export class WorkItemsService {
     let params = [orgId, `%${search}%`] as any[];
 
     if (limit > 0) {
-      query += " OFFSET $3 LIMIT $4";
+      query += ' OFFSET $3 LIMIT $4';
       const offset = (page - 1) * limit;
       params = [orgId, `%${search}%`, offset, limit];
     }
@@ -366,7 +366,7 @@ export class WorkItemsService {
     orgId: string,
     search: string,
     page: number,
-    limit: number
+    limit: number,
   ) {
     let query = `
         SELECT *
@@ -382,11 +382,11 @@ export class WorkItemsService {
                  work_item."createdAt" DESC
     `;
 
-    const referenceSequenceNumber = search.split("-")[1];
+    const referenceSequenceNumber = search.split('-')[1];
     let params = [orgId, `${referenceSequenceNumber}%`] as any[];
 
     if (limit > 0) {
-      query += " OFFSET $3 LIMIT $4";
+      query += ' OFFSET $3 LIMIT $4';
       const offset = (page - 1) * limit;
       params = [orgId, `${referenceSequenceNumber}%`, offset, limit];
     }
