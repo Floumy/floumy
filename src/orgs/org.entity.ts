@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -14,6 +15,7 @@ import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Iteration } from '../iterations/Iteration.entity';
 import { File } from '../files/file.entity';
+import { BipSettings } from '../bip/bip-settings.entity';
 
 @Entity()
 export class Org {
@@ -43,4 +45,8 @@ export class Org {
   iterations: Promise<Iteration[]>;
   @OneToMany(() => File, (file) => file.org, { lazy: true })
   files: Promise<File[]>;
+  @OneToOne(() => BipSettings, (bipSettings) => bipSettings.org, {
+    lazy: true,
+  })
+  bipSettings: Promise<BipSettings>;
 }
