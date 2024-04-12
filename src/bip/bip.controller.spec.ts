@@ -63,4 +63,35 @@ describe('BipController', () => {
       });
     });
   });
+
+  describe('when getting BIP settings', () => {
+    it('should return BIP settings', async () => {
+      await controller.createOrUpdateSettings(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        {
+          isBuildInPublicEnabled: true,
+          isObjectivesPagePublic: true,
+          isRoadmapPagePublic: true,
+          isIterationsPagePublic: true,
+          isActiveIterationsPagePublic: true,
+        },
+      );
+      const settings = await controller.getSettings({
+        user: {
+          org: org.id,
+        },
+      });
+      expect(settings).toEqual({
+        isBuildInPublicEnabled: true,
+        isObjectivesPagePublic: true,
+        isRoadmapPagePublic: true,
+        isIterationsPagePublic: true,
+        isActiveIterationsPagePublic: true,
+      });
+    });
+  });
 });
