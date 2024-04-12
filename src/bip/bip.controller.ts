@@ -2,20 +2,18 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   Put,
   Request,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { BipSettingsDto } from './bip.dtos';
 import { AuthGuard } from '../auth/auth.guard';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import { BipService } from './bip.service';
 
-@Controller('bip')
+@Controller('build-in-public')
 @UseGuards(AuthGuard)
-@UseInterceptors(CacheInterceptor)
 export class BipController {
   constructor(private bipService: BipService) {}
 
@@ -30,6 +28,16 @@ export class BipController {
         request.user.org,
         settings,
       );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get('settings')
+  @HttpCode(200)
+  async getSettings(@Request() request) {
+    try {
+      return await this.bipService.getSettings(request.user.org);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
