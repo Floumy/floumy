@@ -5,6 +5,7 @@ import { BipSettings } from './bip-settings.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BipSettingsMapper } from './bip.dtos.mapper';
 import { Org } from '../orgs/org.entity';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class BipService {
@@ -32,10 +33,26 @@ export class BipService {
     return BipSettingsMapper.toDto(updatedSettings);
   }
 
-  async getSettings(id: string) {
+  async getSettings(orgId: string) {
     const bipSettings = await this.bipSettingsRepository.findOneByOrFail({
-      org: { id },
+      org: { id: orgId },
     });
     return BipSettingsMapper.toDto(bipSettings);
+  }
+
+  // TODO: Extract this in an event handler class
+  @OnEvent('org.created')
+  async createSettings(eventOrg: Org) {
+    const org = await this.orgRepository.findOneBy({ id: eventOrg.id });
+    if (!org) {
+      return;
+    }
+    if (await org.bipSettings) {
+      return;
+    }
+
+    const bipSettings = new BipSettings();
+    bipSettings.org = Promise.resolve(org);
+    await this.bipSettingsRepository.save(bipSettings);
   }
 }

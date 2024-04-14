@@ -26,7 +26,7 @@ export class WorkItemsService {
     @InjectRepository(WorkItemFile)
     private workItemFilesRepository: Repository<WorkItemFile>,
     private filesService: FilesService,
-    private EventEmitter: EventEmitter2,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createWorkItem(userId: string, workItemDto: CreateUpdateWorkItemDto) {
@@ -44,7 +44,7 @@ export class WorkItemsService {
     const feature = await savedWorkItem.feature;
     await this.updateFeatureProgress(feature);
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
-    this.EventEmitter.emit('workItem.created', savedWorkItem);
+    this.eventEmitter.emit('workItem.created', savedWorkItem);
     return WorkItemMapper.toDto(savedWorkItem);
   }
 
@@ -120,7 +120,7 @@ export class WorkItemsService {
       await this.updateFeatureProgress(newFeature);
     }
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
-    this.EventEmitter.emit('workItem.updated', savedWorkItem);
+    this.eventEmitter.emit('workItem.updated', savedWorkItem);
     return WorkItemMapper.toDto(savedWorkItem);
   }
 
@@ -184,7 +184,7 @@ export class WorkItemsService {
     if (feature) {
       await this.updateFeatureProgress(feature);
     }
-    this.EventEmitter.emit('workItem.deleted', workItem);
+    this.eventEmitter.emit('workItem.deleted', workItem);
   }
 
   removeFeatureFromWorkItems(orgId: string, id: string) {
@@ -248,7 +248,7 @@ export class WorkItemsService {
 
     const savedWorkItem = await this.workItemsRepository.save(workItem);
     await this.updateFeatureProgress(await savedWorkItem.feature);
-    this.EventEmitter.emit('workItem.updated', savedWorkItem);
+    this.eventEmitter.emit('workItem.updated', savedWorkItem);
     return WorkItemMapper.toDto(savedWorkItem);
   }
 
