@@ -4,16 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Org } from './org.entity';
 import { OrgsMapper } from './orgs.mapper';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class OrgsService {
-  constructor(@InjectRepository(Org) private orgRepository: Repository<Org>) {}
-
-  async createOrg(name: string) {
-    const org = new Org();
-    org.name = name;
-    return await this.orgRepository.save(org);
-  }
+  constructor(
+    @InjectRepository(Org) private orgRepository: Repository<Org>,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   /**
    * This method is currently used only on tests
@@ -24,7 +22,9 @@ export class OrgsService {
   async createForUser(user: User) {
     const org = new Org();
     org.users = Promise.resolve([user]);
-    return await this.orgRepository.save(org);
+    const savedOrg = await this.orgRepository.save(org);
+    this.eventEmitter.emit('org.created', savedOrg);
+    return savedOrg;
   }
 
   async clear() {
@@ -54,7 +54,9 @@ export class OrgsService {
     if (name && name.trim().length > 0) {
       const org = new Org();
       org.name = name.trim();
-      return await this.orgRepository.save(org);
+      const savedOrg = await this.orgRepository.save(org);
+      this.eventEmitter.emit('org.created', savedOrg);
+      return savedOrg;
     }
   }
 

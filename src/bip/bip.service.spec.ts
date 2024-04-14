@@ -52,4 +52,45 @@ describe('BipService', () => {
       expect(updatedSettings).toEqual(settings);
     });
   });
+
+  describe('createSettings', () => {
+    it('should create the default building in public settings on org created event', async () => {
+      await service.createSettings(org);
+      const settings = await service.getSettings(org.id);
+      expect(settings).toEqual({
+        isBuildInPublicEnabled: false,
+        isObjectivesPagePublic: false,
+        isRoadmapPagePublic: false,
+        isIterationsPagePublic: false,
+        isActiveIterationsPagePublic: false,
+      });
+    });
+    it('should not override existing settings', async () => {
+      const settings = {
+        isBuildInPublicEnabled: true,
+        isObjectivesPagePublic: true,
+        isRoadmapPagePublic: true,
+        isIterationsPagePublic: true,
+        isActiveIterationsPagePublic: true,
+      };
+      await service.createOrUpdateSettings(org.id, settings);
+      await service.createSettings(org);
+      const updatedSettings = await service.getSettings(org.id);
+      expect(updatedSettings).toEqual(settings);
+    });
+    it('should not throw an error if settings already exist', async () => {
+      const settings = {
+        isBuildInPublicEnabled: true,
+        isObjectivesPagePublic: true,
+        isRoadmapPagePublic: true,
+        isIterationsPagePublic: true,
+        isActiveIterationsPagePublic: true,
+      };
+      await service.createOrUpdateSettings(org.id, settings);
+      await expect(service.createSettings(org)).resolves.not.toThrow();
+    });
+    it('should not throw an error if org does not exist', async () => {
+      await expect(service.createSettings(new Org())).resolves.not.toThrow();
+    });
+  });
 });
