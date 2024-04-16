@@ -112,7 +112,6 @@ export class FeaturesController {
         updateFeatureDto,
       );
     } catch (e) {
-      console.log(e);
       throw new BadRequestException();
     }
   }
