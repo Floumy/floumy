@@ -65,6 +65,7 @@ describe('PublicController', () => {
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.isRoadmapPagePublic = true;
+    bipSettings.org = Promise.resolve(org);
     await bipRepository.save(bipSettings);
   });
 
