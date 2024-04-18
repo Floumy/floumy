@@ -19,6 +19,8 @@ import { FeatureFile } from './features/feature-file.entity';
 import { User } from '../users/user.entity';
 import { FilesModule } from '../files/files.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { PublicService } from './milestones/public/public.service';
+import { PublicController } from './milestones/public/public.controller';
 
 @Module({
   imports: [
@@ -39,7 +41,13 @@ import { CacheModule } from '@nestjs/cache-manager';
     BacklogModule,
     FilesModule,
   ],
-  controllers: [FeaturesController, MilestonesController],
-  providers: [FeaturesService, OrgsService, OkrsModule, MilestonesService],
+  controllers: [FeaturesController, MilestonesController, PublicController],
+  providers: [
+    FeaturesService,
+    OrgsService,
+    OkrsModule,
+    MilestonesService,
+    PublicService,
+  ],
 })
 export class RoadmapModule {}

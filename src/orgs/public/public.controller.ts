@@ -1,7 +1,9 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { PublicService } from './public.service';
+import { Public } from '../../auth/public.guard';
 
 @Controller('orgs')
+@Public()
 export class PublicController {
   constructor(private publicOrgsService: PublicService) {}
 
