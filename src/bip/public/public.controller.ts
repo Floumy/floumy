@@ -5,12 +5,12 @@ import { Public } from '../../auth/public.guard';
 @Controller('/build-in-public/org/:orgId')
 @Public()
 export class PublicController {
-  constructor(private publicService: PublicService) {}
+  constructor(private publicBipService: PublicService) {}
 
   @Get('settings')
   async getPublicSettings(@Param('orgId') orgId: string) {
     try {
-      return await this.publicService.getPublicSettings(orgId);
+      return await this.publicBipService.getPublicSettings(orgId);
     } catch (e) {
       throw new NotFoundException(e.message);
     }

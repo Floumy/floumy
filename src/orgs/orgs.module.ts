@@ -7,6 +7,8 @@ import { OrgsController } from './orgs.controller';
 import { TokensService } from '../auth/tokens.service';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
+import { PublicController } from './public/public.controller';
+import { PublicService } from './public/public.service';
 
 @Module({
   imports: [
@@ -14,8 +16,8 @@ import { CacheModule } from '@nestjs/cache-manager';
     TypeOrmModule.forFeature([Org, User]),
     ConfigModule,
   ],
-  providers: [OrgsService, TokensService],
+  providers: [OrgsService, TokensService, PublicService],
   exports: [OrgsService],
-  controllers: [OrgsController],
+  controllers: [OrgsController, PublicController],
 })
 export class OrgsModule {}
