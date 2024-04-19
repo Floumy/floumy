@@ -5,7 +5,7 @@ export class PublicWorkItemMapper {
 
     return {
       id: workItem.id,
-      reference: workItem.reference,
+      reference: `WI-${workItem.sequenceNumber}`,
       title: workItem.title,
       description: workItem.description,
       priority: workItem.priority,
