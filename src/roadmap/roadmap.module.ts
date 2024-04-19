@@ -19,8 +19,10 @@ import { FeatureFile } from './features/feature-file.entity';
 import { User } from '../users/user.entity';
 import { FilesModule } from '../files/files.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { PublicService } from './milestones/public/public.service';
-import { PublicController } from './milestones/public/public.controller';
+import { PublicController as MilestonesPublicController } from './milestones/public/public.controller';
+import { PublicService as MilestonesPublicService } from './milestones/public/public.service';
+import { PublicController as FeaturesPublicController } from './features/public/public.controller';
+import { PublicService as FeaturesPublicService } from './features/public/public.service';
 
 @Module({
   imports: [
@@ -41,13 +43,19 @@ import { PublicController } from './milestones/public/public.controller';
     BacklogModule,
     FilesModule,
   ],
-  controllers: [FeaturesController, MilestonesController, PublicController],
+  controllers: [
+    FeaturesController,
+    MilestonesController,
+    FeaturesPublicController,
+    MilestonesPublicController,
+  ],
   providers: [
     FeaturesService,
     OrgsService,
     OkrsModule,
     MilestonesService,
-    PublicService,
+    FeaturesPublicService,
+    MilestonesPublicService,
   ],
 })
 export class RoadmapModule {}
