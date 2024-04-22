@@ -9,16 +9,19 @@ import { KeyResult } from './key-result.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
+import { PublicController } from './public/public.controller';
+import { PublicService } from './public/public.service';
+import { Org } from '../orgs/org.entity';
 
 @Module({
   imports: [
     CacheModule.register(),
-    TypeOrmModule.forFeature([Objective, KeyResult, Feature, User]),
+    TypeOrmModule.forFeature([Objective, KeyResult, Feature, User, Org]),
     OrgsModule,
     AuthModule,
   ],
-  providers: [OkrsService],
-  controllers: [OkrsController],
+  providers: [OkrsService, PublicService],
+  controllers: [OkrsController, PublicController],
   exports: [OkrsService],
 })
 export class OkrsModule {}
