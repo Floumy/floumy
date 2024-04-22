@@ -330,6 +330,14 @@ export class OkrsService {
   }
 
   async listForTimeline(orgId: string, timeline: Timeline) {
+    const objectives = await this.listObjectivesForTimeline(orgId, timeline);
+    return await OKRMapper.toListDTO(objectives);
+  }
+
+  async listObjectivesForTimeline(
+    orgId: string,
+    timeline: Timeline,
+  ): Promise<Objective[]> {
     if (timeline === Timeline.PAST) {
       return await this.listPastObjectives(orgId);
     }
@@ -340,32 +348,29 @@ export class OkrsService {
 
     const { startDate, endDate } =
       TimelineService.getStartAndEndDatesByTimelineValue(timeline);
-    const objectives = await this.objectiveRepository.find({
+    return await this.objectiveRepository.find({
       where: { org: { id: orgId }, startDate, endDate },
     });
-    return await OKRMapper.toListDTO(objectives);
   }
 
   private async listPastObjectives(orgId: string) {
     const { startDate } = TimelineService.calculateQuarterDates(
       TimelineService.getCurrentQuarter(),
     );
-    const objectives = await this.objectiveRepository.find({
+    return await this.objectiveRepository.find({
       where: { org: { id: orgId }, endDate: LessThan(startDate) },
     });
-    return await OKRMapper.toListDTO(objectives);
   }
 
   private async listLaterObjectives(orgId: string) {
     const { endDate } = TimelineService.calculateQuarterDates(
       TimelineService.getCurrentQuarter() + 1,
     );
-    const objectives = await this.objectiveRepository.find({
+    return await this.objectiveRepository.find({
       where: [
         { org: { id: orgId }, startDate: MoreThan(endDate) },
         { org: { id: orgId }, startDate: IsNull(), endDate: IsNull() },
       ],
     });
-    return await OKRMapper.toListDTO(objectives);
   }
 }
