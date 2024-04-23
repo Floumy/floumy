@@ -19,4 +19,16 @@ export class PublicController {
       throw new BadRequestException();
     }
   }
+
+  @Get('/:okrId')
+  async getObjective(
+    @Param('orgId') orgId: string,
+    @Param('okrId') okrId: string,
+  ) {
+    try {
+      return await this.publicOkrsService.getObjective(orgId, okrId);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
 }

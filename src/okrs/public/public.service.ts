@@ -36,4 +36,13 @@ export class PublicService {
       throw new Error('Building in public is not enabled');
     }
   }
+
+  async getObjective(orgId: string, okrId: string) {
+    await this.validateOrgHasBuildingInPublicEnabled(orgId);
+
+    const { objective, keyResults } =
+      await this.okrsService.getObjectiveDetails(okrId, orgId);
+
+    return PublicOkrMapper.toDetailDto(objective, keyResults);
+  }
 }

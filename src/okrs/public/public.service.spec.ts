@@ -109,4 +109,43 @@ describe('PublicService', () => {
       ).rejects.toThrow('Building in public is not enabled');
     });
   });
+
+  describe('when getting an objective', () => {
+    it('should return the okr', async () => {
+      const okr = await okrsService.create(org.id, {
+        objective: {
+          title: 'Objective 1',
+          timeline: Timeline.THIS_QUARTER,
+        },
+        keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
+      });
+      const result = await service.getObjective(org.id, okr.objective.id);
+      expect(result).toBeDefined();
+      expect(result.objective.id).toBe(okr.objective.id);
+      expect(result.keyResults.length).toBe(2);
+    });
+    it('should validate that the building in public is enabled for the org', async () => {
+      const newOrg = new Org();
+      newOrg.name = 'Test Org 2';
+      await orgsRepository.save(newOrg);
+      const newOrgBipSettings = new BipSettings();
+      newOrgBipSettings.isBuildInPublicEnabled = false;
+      newOrgBipSettings.org = Promise.resolve(newOrg);
+      await bipSettingsRepository.save(newOrgBipSettings);
+      const okr = await okrsService.create(newOrg.id, {
+        objective: {
+          title: 'Objective 1',
+          timeline: Timeline.THIS_QUARTER,
+        },
+        keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
+      });
+      await expect(
+        service.getObjective(newOrg.id, okr.objective.id),
+      ).rejects.toThrow('Building in public is not enabled');
+    });
+    it('should throw an error if the objective does not exist', async () => {
+      const invalidUUID = '00000000-0000-0000-0000-000000000000';
+      await expect(service.getObjective(org.id, invalidUUID)).rejects.toThrow();
+    });
+  });
 });
