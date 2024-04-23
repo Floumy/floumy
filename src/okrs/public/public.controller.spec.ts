@@ -88,7 +88,7 @@ describe('PublicController', () => {
       const result = await controller.getObjective(org.id, okr.objective.id);
 
       expect(result).toBeDefined();
-      expect(result.id).toBe(okr.objective.id);
+      expect(result.objective.id).toBe(okr.objective.id);
       expect(result.keyResults.length).toBe(2);
     });
   });
