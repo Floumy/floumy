@@ -72,15 +72,18 @@ export class OkrsService {
   }
 
   async get(orgId: any, id: string) {
+    const { objective, keyResults } = await this.getObjectiveDetails(id, orgId);
+    return await OKRMapper.toDTO(objective, keyResults);
+  }
+
+  async getObjectiveDetails(id: string, orgId: any) {
     const objective = await this.objectiveRepository.findOneByOrFail({
       id,
       org: { id: orgId },
     });
     const keyResults = await objective.keyResults;
-    return await OKRMapper.toDTO(
-      objective,
-      keyResults.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
-    );
+    keyResults.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    return { objective, keyResults };
   }
 
   async updateObjective(orgId: string, id: string, okrDto: UpdateObjectiveDto) {
