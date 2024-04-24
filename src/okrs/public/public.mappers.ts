@@ -2,6 +2,8 @@ import { ObjectiveDto } from './dtos';
 import { Objective } from '../objective.entity';
 import { TimelineService } from '../../common/timeline.service';
 import { KeyResult } from '../key-result.entity';
+import { Feature } from '../../roadmap/features/feature.entity';
+import { WorkItem } from '../../backlog/work-items/work-item.entity';
 
 export class PublicOkrMapper {
   static toDTO(objective: Objective): ObjectiveDto {
@@ -20,7 +22,7 @@ export class PublicOkrMapper {
     };
   }
 
-  static toDetailDto(objective: Objective, keyResults: KeyResult[]) {
+  static async toDetailDto(objective: Objective, keyResults: KeyResult[]) {
     return {
       objective: {
         id: objective.id,
@@ -32,18 +34,58 @@ export class PublicOkrMapper {
         ),
         progress: parseFloat(objective.progress.toFixed(2)),
         status: objective.status,
+        startDate: objective.startDate,
+        endDate: objective.endDate,
         createdAt: objective.createdAt,
         updatedAt: objective.updatedAt,
       },
-      keyResults: keyResults.map((keyResult) => ({
-        id: keyResult.id,
-        reference: `KR-${keyResult.sequenceNumber}`,
-        title: keyResult.title,
-        progress: parseFloat(keyResult.progress.toFixed(2)),
-        status: keyResult.status,
-        createdAt: keyResult.createdAt,
-        updatedAt: keyResult.updatedAt,
-      })),
+      keyResults: await Promise.all(
+        keyResults.map(PublicOkrMapper.toKeyResultDto),
+      ),
+    };
+  }
+
+  static async toKeyResultDto(keyResult: KeyResult) {
+    const features = (await keyResult.features) || [];
+    return {
+      id: keyResult.id,
+      reference: `KR-${keyResult.sequenceNumber}`,
+      title: keyResult.title,
+      progress: parseFloat(keyResult.progress.toFixed(2)),
+      status: keyResult.status,
+      createdAt: keyResult.createdAt,
+      updatedAt: keyResult.updatedAt,
+      features: await Promise.all(features.map(PublicOkrMapper.toFeatureDto)),
+    };
+  }
+
+  static async toFeatureDto(feature: Feature) {
+    const workItems = (await feature.workItems) || [];
+    return {
+      id: feature.id,
+      reference: `F-${feature.sequenceNumber}`,
+      title: feature.title,
+      status: feature.status,
+      priority: feature.priority,
+      progress: parseFloat(feature.progress.toFixed(2)),
+      createdAt: feature.createdAt,
+      updatedAt: feature.updatedAt,
+      workItems: workItems.map(PublicOkrMapper.toWorkItemDto),
+    };
+  }
+
+  static toWorkItemDto(workItem: WorkItem) {
+    return {
+      id: workItem.id,
+      reference: `WI-${workItem.sequenceNumber}`,
+      title: workItem.title,
+      status: workItem.status,
+      type: workItem.type,
+      priority: workItem.priority,
+      estimation: workItem.estimation,
+      completedAt: workItem.completedAt,
+      createdAt: workItem.createdAt,
+      updatedAt: workItem.updatedAt,
     };
   }
 }

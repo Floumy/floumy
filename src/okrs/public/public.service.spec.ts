@@ -148,4 +148,75 @@ describe('PublicService', () => {
       await expect(service.getObjective(org.id, invalidUUID)).rejects.toThrow();
     });
   });
+  describe('when getting a key result', () => {
+    it('should return the key result', async () => {
+      const okr = await okrsService.create(org.id, {
+        objective: {
+          title: 'Objective 1',
+          timeline: Timeline.THIS_QUARTER,
+        },
+        keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
+      });
+      const keyResult = okr.keyResults[0];
+      const result = await service.getKeyResult(
+        org.id,
+        okr.objective.id,
+        keyResult.id,
+      );
+      expect(result).toBeDefined();
+      expect(result.id).toBe(keyResult.id);
+      expect(result.title).toBe(keyResult.title);
+      expect(result.progress).toBe(0);
+      expect(result.status).toBe('on-track');
+      expect(result.createdAt).toBeDefined();
+      expect(result.updatedAt).toBeDefined();
+      expect(result.reference).toBeDefined();
+      expect(result.features).toEqual([]);
+    });
+    it('should validate that the building in public is enabled for the org', async () => {
+      const newOrg = new Org();
+      newOrg.name = 'Test Org 2';
+      await orgsRepository.save(newOrg);
+      const newOrgBipSettings = new BipSettings();
+      newOrgBipSettings.isBuildInPublicEnabled = false;
+      newOrgBipSettings.org = Promise.resolve(newOrg);
+      await bipSettingsRepository.save(newOrgBipSettings);
+      const okr = await okrsService.create(newOrg.id, {
+        objective: {
+          title: 'Objective 1',
+          timeline: Timeline.THIS_QUARTER,
+        },
+        keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
+      });
+      const keyResult = okr.keyResults[0];
+      await expect(
+        service.getKeyResult(newOrg.id, okr.objective.id, keyResult.id),
+      ).rejects.toThrow('Building in public is not enabled');
+    });
+    it('should throw an error if the key result does not exist', async () => {
+      const okr = await okrsService.create(org.id, {
+        objective: {
+          title: 'Objective 1',
+          timeline: Timeline.THIS_QUARTER,
+        },
+        keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
+      });
+      const invalidUUID = '00000000-0000-0000-0000-000000000000';
+      await expect(
+        service.getKeyResult(org.id, okr.objective.id, invalidUUID),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the objective does not exist', async () => {
+      const invalidUUID = '00000000-0000-0000-0000-000000000000';
+      await expect(
+        service.getKeyResult(org.id, invalidUUID, invalidUUID),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the org does not exist', async () => {
+      const invalidUUID = '00000000-0000-0000-0000-000000000000';
+      await expect(
+        service.getKeyResult(invalidUUID, invalidUUID, invalidUUID),
+      ).rejects.toThrow();
+    });
+  });
 });

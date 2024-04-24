@@ -169,7 +169,7 @@ export class OkrsController {
   ) {
     const { org: orgId } = request.user;
     try {
-      return await this.okrsService.getKeyResult(
+      return await this.okrsService.getKeyResultDetail(
         orgId,
         objectiveId,
         keyResultId,

@@ -577,7 +577,7 @@ describe('OkrsService', () => {
         objective,
         'Test Key Result',
       );
-      const storedKR = await service.getKeyResult(
+      const storedKR = await service.getKeyResultDetail(
         org.id,
         objective.id,
         keyResult.id,
