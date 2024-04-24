@@ -43,6 +43,18 @@ export class PublicService {
     const { objective, keyResults } =
       await this.okrsService.getObjectiveDetails(okrId, orgId);
 
-    return PublicOkrMapper.toDetailDto(objective, keyResults);
+    return await PublicOkrMapper.toDetailDto(objective, keyResults);
+  }
+
+  async getKeyResult(orgId: string, objectiveId: string, keyResultId: string) {
+    await this.validateOrgHasBuildingInPublicEnabled(orgId);
+
+    const keyResult = await this.okrsService.getKeyResult(
+      orgId,
+      objectiveId,
+      keyResultId,
+    );
+
+    return PublicOkrMapper.toKeyResultDto(keyResult);
   }
 }

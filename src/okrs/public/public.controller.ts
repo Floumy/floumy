@@ -31,4 +31,21 @@ export class PublicController {
       throw new BadRequestException();
     }
   }
+
+  @Get('/:okrId/key-results/:keyResultId')
+  async getKeyResult(
+    @Param('orgId') orgId: string,
+    @Param('okrId') objectiveId: string,
+    @Param('keyResultId') keyResultId: string,
+  ) {
+    try {
+      return await this.publicOkrsService.getKeyResult(
+        orgId,
+        objectiveId,
+        keyResultId,
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
 }

@@ -92,4 +92,22 @@ describe('PublicController', () => {
       expect(result.keyResults.length).toBe(2);
     });
   });
+
+  describe('when getting a key result', () => {
+    it('should return the key result', async () => {
+      const okr = await okrsService.create(org.id, {
+        objective: { title: 'Objective 1', timeline: 'this-quarter' },
+        keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
+      });
+
+      const result = await controller.getKeyResult(
+        org.id,
+        okr.objective.id,
+        okr.keyResults[0].id,
+      );
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe(okr.keyResults[0].id);
+    });
+  });
 });

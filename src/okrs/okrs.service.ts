@@ -324,12 +324,21 @@ export class OkrsService {
     return await KeyResultMapper.toDTO(savedKeyResult);
   }
 
+  async getKeyResultDetail(
+    orgId: string,
+    objectiveId: string,
+    keyResultId: string,
+  ) {
+    return await KeyResultMapper.toDTO(
+      await this.getKeyResult(orgId, objectiveId, keyResultId),
+    );
+  }
+
   async getKeyResult(orgId: string, objectiveId: string, keyResultId: string) {
-    const keyResult = await this.keyResultRepository.findOneByOrFail({
+    return await this.keyResultRepository.findOneByOrFail({
       id: keyResultId,
       objective: { id: objectiveId, org: { id: orgId } },
     });
-    return await KeyResultMapper.toDTO(keyResult);
   }
 
   async listForTimeline(orgId: string, timeline: Timeline) {
