@@ -1,8 +1,10 @@
 import { BadRequestException, Controller, Get, Param } from '@nestjs/common';
 import { Timeline } from '../../common/timeline.enum';
 import { PublicService } from './public.service';
+import { Public } from '../../auth/public.guard';
 
 @Controller('orgs/:orgId/iterations')
+@Public()
 export class PublicController {
   constructor(private publicIterationsService: PublicService) {}
 
