@@ -225,6 +225,16 @@ export class IterationsService {
   }
 
   async listForTimeline(orgId: string, timeline: Timeline) {
+    const iterations = await this.findIterationsForTimeline(orgId, timeline);
+    return await Promise.all(
+      iterations.map((iteration) => IterationMapper.toDto(iteration)),
+    );
+  }
+
+  async findIterationsForTimeline(
+    orgId: string,
+    timeline: Timeline | Timeline.THIS_QUARTER | Timeline.NEXT_QUARTER,
+  ) {
     let where = {
       org: {
         id: orgId,
@@ -261,14 +271,11 @@ export class IterationsService {
         break;
       }
     }
-    const iterations = await this.iterationRepository.find({
+    return await this.iterationRepository.find({
       where,
       order: {
         startDate: 'ASC',
       },
     });
-    return await Promise.all(
-      iterations.map((iteration) => IterationMapper.toDto(iteration)),
-    );
   }
 }
