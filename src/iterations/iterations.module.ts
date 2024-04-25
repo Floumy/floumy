@@ -9,15 +9,17 @@ import { AuthModule } from '../auth/auth.module';
 import { Iteration } from './Iteration.entity';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
+import { PublicService } from './public/public.service';
+import { PublicController } from './public/public.controller';
 
 @Module({
-  controllers: [IterationsController],
+  controllers: [IterationsController, PublicController],
   imports: [
     CacheModule.register(),
     TypeOrmModule.forFeature([Org, WorkItem, Iteration, User]),
     OrgsModule,
     AuthModule,
   ],
-  providers: [IterationsService],
+  providers: [IterationsService, PublicService],
 })
 export class IterationsModule {}
