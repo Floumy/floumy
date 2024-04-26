@@ -109,4 +109,16 @@ describe('PublicController', () => {
       expect(result.length).toBe(1);
     });
   });
+
+  describe('When getting an iteration by id', () => {
+    it('should return an iteration', async () => {
+      const iteration = await iterationsService.create(org.id, {
+        goal: 'Test Goal',
+        startDate: new Date().toString(),
+        duration: 1,
+      });
+      const result = await controller.getIterationById(org.id, iteration.id);
+      expect(result).toBeDefined();
+    });
+  });
 });
