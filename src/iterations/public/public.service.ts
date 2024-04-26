@@ -14,19 +14,34 @@ export class PublicService {
   ) {}
 
   async listIterationsForTimeline(orgId: string, timeline: Timeline) {
+    await this.validateOrgHasBuildInPublicEnabled(orgId);
+
+    const iterations = await this.iterationsService.findIterationsForTimeline(
+      orgId,
+      timeline,
+    );
+
+    return await Promise.all(
+      iterations.map((iteration) => IterationMapper.toDto(iteration)),
+    );
+  }
+
+  private async validateOrgHasBuildInPublicEnabled(orgId: string) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
     const bipSettings = await org.bipSettings;
 
     if (!bipSettings || bipSettings.isBuildInPublicEnabled === false) {
       throw new Error('Building in public is not enabled');
     }
+  }
 
-    const iterations = await this.iterationsService.findIterationsForTimeline(
+  async getIterationById(orgId: string, iterationId: string) {
+    await this.validateOrgHasBuildInPublicEnabled(orgId);
+
+    const iteration = await this.iterationsService.findIterationByOrgIdAndId(
       orgId,
-      timeline,
+      iterationId,
     );
-    return await Promise.all(
-      iterations.map((iteration) => IterationMapper.toDto(iteration)),
-    );
+    return IterationMapper.toDto(iteration);
   }
 }

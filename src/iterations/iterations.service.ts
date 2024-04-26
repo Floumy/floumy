@@ -81,13 +81,17 @@ export class IterationsService {
     );
   }
 
-  async get(orgId: string, id: string) {
-    const iteration = await this.iterationRepository.findOneByOrFail({
-      id,
+  async findIterationByOrgIdAndId(orgId: string, iterationId: string) {
+    return await this.iterationRepository.findOneByOrFail({
+      id: iterationId,
       org: {
         id: orgId,
       },
     });
+  }
+
+  async get(orgId: string, id: string) {
+    const iteration = await this.findIterationByOrgIdAndId(orgId, id);
     return await IterationMapper.toDto(iteration);
   }
 

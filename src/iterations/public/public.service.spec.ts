@@ -121,4 +121,38 @@ describe('PublicService', () => {
       expect(result[0].goal).toEqual('Test Goal');
     });
   });
+
+  describe('when getting an iteration by id', () => {
+    it('should return an iteration', async () => {
+      const iteration = await iterationsService.create(org.id, {
+        goal: 'Test Goal',
+        startDate: new Date().toString(),
+        duration: 1,
+      });
+      const result = await service.getIterationById(org.id, iteration.id);
+      expect(result).toBeDefined();
+    });
+    it('should throw an error if the org does not have build in public enabled', async () => {
+      const bipSettings = new BipSettings();
+      bipSettings.isBuildInPublicEnabled = false;
+      bipSettings.org = Promise.resolve(org);
+      await bipSettingsRepository.save(bipSettings);
+      const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
+      await expect(
+        service.getIterationById(org.id, nonExistentUUID),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the iteration does not exist', async () => {
+      const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
+      await expect(
+        service.getIterationById(org.id, nonExistentUUID),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the org does not exist', async () => {
+      const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
+      await expect(
+        service.getIterationById(nonExistentUUID, nonExistentUUID),
+      ).rejects.toThrow();
+    });
+  });
 });

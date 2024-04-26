@@ -22,4 +22,19 @@ export class PublicController {
       throw new BadRequestException();
     }
   }
+
+  @Get('/:iterationId')
+  async getIterationById(
+    @Param('orgId') orgId: string,
+    @Param('iterationId') iterationId: string,
+  ) {
+    try {
+      return await this.publicIterationsService.getIterationById(
+        orgId,
+        iterationId,
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
 }
