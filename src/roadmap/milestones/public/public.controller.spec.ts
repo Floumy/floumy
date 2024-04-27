@@ -24,6 +24,7 @@ describe('PublicController', () => {
   let cleanup: () => Promise<void>;
   let org: Org;
   let bipRepository: Repository<BipSettings>;
+  let milestonesService: MilestonesService;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -51,6 +52,7 @@ describe('PublicController', () => {
     );
     cleanup = dbCleanup;
     controller = module.get<PublicController>(PublicController);
+    milestonesService = module.get<MilestonesService>(MilestonesService);
     bipRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
@@ -80,6 +82,20 @@ describe('PublicController', () => {
         Timeline.THIS_QUARTER,
       );
       expect(milestones).toEqual([]);
+    });
+  });
+
+  describe('when getting a milestone', () => {
+    it('should return the milestone', async () => {
+      const milestone = await milestonesService.createMilestone(org.id, {
+        title: 'test',
+        description: 'test description',
+        dueDate: '2023-02-02',
+      });
+
+      const actual = await controller.findMilestone(org.id, milestone.id);
+
+      expect(actual.id).toEqual(milestone.id);
     });
   });
 });

@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../../../orgs/org.entity';
 import { Timeline } from '../../../common/timeline.enum';
 import { MilestonesService } from '../milestones.service';
+import { PublicMilestoneMapper } from './public.mappers';
 
 @Injectable()
 export class PublicService {
@@ -14,6 +15,11 @@ export class PublicService {
   ) {}
 
   async listMilestones(orgId: string, timeline: Timeline) {
+    await this.validateBuildInPublicSettings(orgId);
+    return this.milestoneService.listForTimeline(orgId, timeline);
+  }
+
+  private async validateBuildInPublicSettings(orgId: string) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
     const bipSettings = await org.bipSettings;
     if (
@@ -22,6 +28,14 @@ export class PublicService {
     ) {
       throw new Error('Roadmap page is not public');
     }
-    return this.milestoneService.listForTimeline(orgId, timeline);
+  }
+
+  async findMilestone(orgId: string, milestoneId: string) {
+    await this.validateBuildInPublicSettings(orgId);
+    const milestone = await this.milestoneService.findOneById(
+      orgId,
+      milestoneId,
+    );
+    return await PublicMilestoneMapper.toDto(milestone);
   }
 }
