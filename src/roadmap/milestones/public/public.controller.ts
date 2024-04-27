@@ -19,4 +19,19 @@ export class PublicController {
       throw new NotFoundException();
     }
   }
+
+  @Get('/:milestoneId')
+  async findMilestone(
+    @Param('orgId') orgId: string,
+    @Param('milestoneId') milestoneId: string,
+  ) {
+    try {
+      return await this.publicMilestonesService.findMilestone(
+        orgId,
+        milestoneId,
+      );
+    } catch (e) {
+      throw new NotFoundException();
+    }
+  }
 }

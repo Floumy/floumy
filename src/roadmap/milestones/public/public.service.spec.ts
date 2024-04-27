@@ -134,4 +134,19 @@ describe('PublicService', () => {
       expect(milestones[1].features[0].title).toBe('Feature 3');
     });
   });
+
+  describe('when getting a milestone', () => {
+    it('should return the milestone', async () => {
+      const milestone = new Milestone();
+      milestone.org = Promise.resolve(org);
+      milestone.title = 'test';
+      milestone.description = 'test description';
+      milestone.dueDate = new Date();
+      await milestonesRepository.save(milestone);
+
+      const actual = await service.findMilestone(org.id, milestone.id);
+
+      expect(actual.id).toEqual(milestone.id);
+    });
+  });
 });
