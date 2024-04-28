@@ -31,6 +31,8 @@ import { PublicService } from './public.service';
 describe('PublicController', () => {
   let controller: PublicController;
   let iterationsService: IterationsService;
+  let bipSettingsRepository: Repository<BipSettings>;
+  let orgsService: OrgsService;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
@@ -69,12 +71,12 @@ describe('PublicController', () => {
     );
     cleanup = dbCleanup;
     controller = module.get<PublicController>(PublicController);
-    const orgsService = module.get<OrgsService>(OrgsService);
-    const usersService = module.get<UsersService>(UsersService);
-    const bipSettingsRepository = module.get<Repository<BipSettings>>(
+    orgsService = module.get<OrgsService>(OrgsService);
+    bipSettingsRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
     iterationsService = module.get<IterationsService>(IterationsService);
+    const usersService = module.get<UsersService>(UsersService);
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -118,6 +120,34 @@ describe('PublicController', () => {
         duration: 1,
       });
       const result = await controller.getIterationById(org.id, iteration.id);
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('When getting the active iteration', () => {
+    it('should return an iteration', async () => {
+      const orgWithActiveIteration = await orgsService.createForUser(user);
+      const bipSettings = new BipSettings();
+      bipSettings.isBuildInPublicEnabled = true;
+      bipSettings.isActiveIterationsPagePublic = true;
+      bipSettings.org = Promise.resolve(orgWithActiveIteration);
+      await bipSettingsRepository.save(bipSettings);
+
+      const iteration = await iterationsService.create(
+        orgWithActiveIteration.id,
+        {
+          goal: 'Test Goal',
+          startDate: new Date().toString(),
+          duration: 1,
+        },
+      );
+      await iterationsService.startIteration(
+        orgWithActiveIteration.id,
+        iteration.id,
+      );
+      const result = await controller.getActiveIteration(
+        orgWithActiveIteration.id,
+      );
       expect(result).toBeDefined();
     });
   });

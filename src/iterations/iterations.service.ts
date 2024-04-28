@@ -181,13 +181,17 @@ export class IterationsService {
     }
   }
 
-  async getActiveIteration(orgId: string) {
-    const iteration = await this.iterationRepository.findOneBy({
+  async findActiveIteration(orgId: string) {
+    return await this.iterationRepository.findOneBy({
       org: {
         id: orgId,
       },
       status: IterationStatus.ACTIVE,
     });
+  }
+
+  async getActiveIteration(orgId: string) {
+    const iteration = await this.findActiveIteration(orgId);
     return iteration ? await IterationMapper.toDto(iteration) : null;
   }
 
