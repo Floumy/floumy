@@ -23,6 +23,15 @@ export class PublicController {
     }
   }
 
+  @Get('/active')
+  async getActiveIteration(@Param('orgId') orgId: string) {
+    try {
+      return await this.publicIterationsService.getActiveIteration(orgId);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
   @Get('/:iterationId')
   async getIterationById(
     @Param('orgId') orgId: string,

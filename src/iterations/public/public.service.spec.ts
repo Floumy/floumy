@@ -155,4 +155,79 @@ describe('PublicService', () => {
       ).rejects.toThrow();
     });
   });
+  describe('when getting the active iteration', () => {
+    it('should return the active iteration', async () => {
+      const orgWithActiveIterations = await orgsService.getOrCreateOrg(
+        null,
+        'Test Org',
+      );
+      const bipSettings = new BipSettings();
+      bipSettings.isBuildInPublicEnabled = true;
+      bipSettings.isActiveIterationsPagePublic = true;
+      bipSettings.org = Promise.resolve(orgWithActiveIterations);
+      await bipSettingsRepository.save(bipSettings);
+
+      const iteration = await iterationsService.create(
+        orgWithActiveIterations.id,
+        {
+          goal: 'Test Goal',
+          startDate: new Date().toString(),
+          duration: 1,
+        },
+      );
+      await iterationsService.startIteration(
+        orgWithActiveIterations.id,
+        iteration.id,
+      );
+      const result = await service.getActiveIteration(
+        orgWithActiveIterations.id,
+      );
+      expect(result).toBeDefined();
+      expect(result.goal).toEqual('Test Goal');
+    });
+    it('should return null if there is no active iteration', async () => {
+      const orgWithActiveIterations = await orgsService.getOrCreateOrg(
+        null,
+        'Test Org',
+      );
+      const bipSettings = new BipSettings();
+      bipSettings.isBuildInPublicEnabled = true;
+      bipSettings.isActiveIterationsPagePublic = true;
+      bipSettings.org = Promise.resolve(orgWithActiveIterations);
+      await bipSettingsRepository.save(bipSettings);
+
+      await iterationsService.create(orgWithActiveIterations.id, {
+        goal: 'Test Goal',
+        startDate: new Date().toString(),
+        duration: 1,
+      });
+
+      const result = await service.getActiveIteration(
+        orgWithActiveIterations.id,
+      );
+
+      expect(result).toBeNull();
+    });
+    it('should throw an error if the org does not have build in public enabled', async () => {
+      const bipSettings = new BipSettings();
+      bipSettings.isBuildInPublicEnabled = false;
+      bipSettings.org = Promise.resolve(org);
+      await bipSettingsRepository.save(bipSettings);
+      await expect(service.getActiveIteration(org.id)).rejects.toThrow();
+    });
+    it('should throw an error if the org does not exist', async () => {
+      const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
+      await expect(
+        service.getActiveIteration(nonExistentUUID),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the org does not have active iterations page public enabled', async () => {
+      const bipSettings = new BipSettings();
+      bipSettings.isBuildInPublicEnabled = true;
+      bipSettings.isActiveIterationsPagePublic = false;
+      bipSettings.org = Promise.resolve(org);
+      await bipSettingsRepository.save(bipSettings);
+      await expect(service.getActiveIteration(org.id)).rejects.toThrow();
+    });
+  });
 });

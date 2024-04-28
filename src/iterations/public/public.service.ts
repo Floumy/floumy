@@ -44,4 +44,19 @@ export class PublicService {
     );
     return IterationMapper.toDto(iteration);
   }
+
+  async getActiveIteration(orgId: string) {
+    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+    const bipSettings = await org.bipSettings;
+    if (
+      !bipSettings ||
+      bipSettings.isBuildInPublicEnabled === false ||
+      bipSettings.isActiveIterationsPagePublic === false
+    ) {
+      throw new Error('Building in public is not enabled');
+    }
+
+    const iteration = await this.iterationsService.findActiveIteration(orgId);
+    return iteration ? await IterationMapper.toDto(iteration) : null;
+  }
 }
