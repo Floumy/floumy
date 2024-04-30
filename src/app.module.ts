@@ -21,7 +21,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BipModule } from './bip/bip.module';
-import { FeedModule } from './feed/feed.module';
 
 @Module({
   imports: [
@@ -65,7 +64,6 @@ import { FeedModule } from './feed/feed.module';
     FilesModule,
     NotificationsModule,
     BipModule,
-    FeedModule,
   ],
   providers: [AppService],
 })
