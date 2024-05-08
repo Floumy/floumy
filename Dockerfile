@@ -30,9 +30,6 @@ RUN npm install --production
 # Copy the built application from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist
 
-ENV NEW_RELIC_NO_CONFIG_FILE=true
-ENV NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
-ENV NEW_RELIC_LOG=stdout
 ENV NODE_ENV=production
 
 # Expose the port the app runs on
