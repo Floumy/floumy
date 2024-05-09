@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OkrsModule } from './okrs/okrs.module';
 import { OrgsModule } from './orgs/orgs.module';
@@ -36,20 +36,33 @@ import { BipModule } from './bip/bip.module';
       ],
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('database.host'),
-        port: +configService.get('database.port'),
-        username: configService.get('database.username'),
-        password: configService.get('database.password'),
-        database: configService.get('database.name'),
-        ssl: configService.get('database.ssl'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        migrations: [__dirname + '/migrations/*{.ts,.js}'],
-        migrationsRun: true,
-        synchronize: false,
-        logging: false,
-      }),
+      useFactory: (configService: ConfigService): TypeOrmModuleOptions => {
+        let settings: TypeOrmModuleOptions = {
+          type: 'postgres',
+          host: configService.get('database.host'),
+          port: +configService.get('database.port'),
+          username: configService.get('database.username'),
+          password: configService.get('database.password'),
+          database: configService.get('database.name'),
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          migrations: [__dirname + '/migrations/*{.ts,.js}'],
+          migrationsRun: true,
+          synchronize: false,
+          logging: false,
+        };
+
+        if (configService.get('database.ssl')) {
+          settings = {
+            ...settings,
+            ssl: {
+              rejectUnauthorized: true,
+              ca: configService.get('database.sslCertificate'),
+            },
+          };
+        }
+
+        return settings;
+      },
       inject: [ConfigService],
       imports: [ConfigModule],
     }),
