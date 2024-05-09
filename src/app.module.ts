@@ -43,6 +43,7 @@ import { BipModule } from './bip/bip.module';
         username: configService.get('database.username'),
         password: configService.get('database.password'),
         database: configService.get('database.name'),
+        ssl: configService.get('database.ssl'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
         migrationsRun: true,
