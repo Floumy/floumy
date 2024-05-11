@@ -13,16 +13,13 @@ import {
   Query,
   Request,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { FeaturesService } from './features.service';
 import { CreateUpdateFeatureDto, PatchFeatureDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('features')
 @UseGuards(AuthGuard)
-@UseInterceptors(CacheInterceptor)
 export class FeaturesController {
   constructor(private featuresService: FeaturesService) {}
 

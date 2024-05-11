@@ -12,17 +12,14 @@ import {
   Put,
   Request,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateOrUpdateIterationDto } from './dtos';
 import { IterationsService } from './iterations.service';
 import { Timeline } from '../common/timeline.enum';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('iterations')
 @UseGuards(AuthGuard)
-@UseInterceptors(CacheInterceptor)
 export class IterationsController {
   constructor(private iterationsService: IterationsService) {}
 
