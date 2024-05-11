@@ -12,17 +12,14 @@ import {
   Put,
   Request,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { MilestonesService } from './milestones.service';
 import { CreateUpdateMilestoneDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
 import { Timeline } from '../../common/timeline.enum';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('milestones')
 @UseGuards(AuthGuard)
-@UseInterceptors(CacheInterceptor)
 export class MilestonesController {
   constructor(private milestonesService: MilestonesService) {}
 

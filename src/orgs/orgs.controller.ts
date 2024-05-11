@@ -1,18 +1,9 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  Request,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { OrgsService } from './orgs.service';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('orgs')
 @UseGuards(AuthGuard)
-@UseInterceptors(CacheInterceptor)
 export class OrgsController {
   constructor(private orgsService: OrgsService) {}
 
