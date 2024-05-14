@@ -1,10 +1,18 @@
-import { BadRequestException, Controller, Get, Param } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Timeline } from '../../common/timeline.enum';
 import { PublicService } from './public.service';
 import { Public } from '../../auth/public.guard';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('orgs/:orgId/okrs')
 @Public()
+@UseInterceptors(CacheInterceptor)
 export class PublicController {
   constructor(private publicOkrsService: PublicService) {}
 
