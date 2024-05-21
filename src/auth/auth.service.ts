@@ -31,14 +31,16 @@ export class AuthService {
   async signIn(email: string, password: string): Promise<AuthDto> {
     const user = await this.usersService.findOneByEmail(email);
     if (!user?.isActive) {
-      this.logger.error('User is not active');
-      throw new UnauthorizedException();
+      this.logger.error('The user is not active');
+      throw new UnauthorizedException('Your account is not yet active.');
     }
     if (
       !(await this.usersService.isPasswordCorrect(password, user?.password))
     ) {
       this.logger.error('Invalid credentials');
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(
+        'Invalid credentials. Please check your email and password.',
+      );
     }
     const refreshToken = await this.getOrCreateRefreshToken(user);
     return {
@@ -75,8 +77,12 @@ export class AuthService {
     );
 
     if (!org) {
-      this.logger.error('Org not found');
-      throw new Error('Org not found');
+      this.logger.error(
+        'The organization for the invitation token was not found',
+      );
+      throw new Error(
+        'The organization for the invitation token was not found',
+      );
     }
 
     const user = await this.usersService.createUser(
@@ -97,7 +103,7 @@ export class AuthService {
       await this.usersService.save(user);
     } catch (e) {
       this.logger.error(e.message);
-      throw new Error('Failed to send activation email');
+      throw new Error('The activation email could not be sent');
     }
   }
 
