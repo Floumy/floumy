@@ -1,27 +1,26 @@
-import { Module } from "@nestjs/common";
-import { AppService } from "./app.service";
-import { AuthModule } from "./auth/auth.module";
-import { UsersModule } from "./users/users.module";
-import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { OkrsModule } from "./okrs/okrs.module";
-import { OrgsModule } from "./orgs/orgs.module";
-import { RoadmapModule } from "./roadmap/roadmap.module";
-import { BacklogModule } from "./backlog/backlog.module";
-import { IterationsModule } from "./iterations/iterations.module";
-import { FilesModule } from "./files/files.module";
-import { NotificationsModule } from "./notifications/notifications.module";
-import databaseConfig from "./config/database.config";
-import encryptionConfig from "./config/encryption.config";
-import jwtConfig from "./config/jwt.config";
-import fileStorageConfig from "./config/file-storage.config";
-import emailConfig from "./config/mail.config";
-import appConfig from "./config/app.config";
-import { EventEmitterModule } from "@nestjs/event-emitter";
-import { ScheduleModule } from "@nestjs/schedule";
-import { CacheModule } from "@nestjs/cache-manager";
-import { BipModule } from "./bip/bip.module";
-import { StripeModule } from "./stripe/stripe.module";
+import { Module } from '@nestjs/common';
+import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { OkrsModule } from './okrs/okrs.module';
+import { OrgsModule } from './orgs/orgs.module';
+import { RoadmapModule } from './roadmap/roadmap.module';
+import { BacklogModule } from './backlog/backlog.module';
+import { IterationsModule } from './iterations/iterations.module';
+import { FilesModule } from './files/files.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import databaseConfig from './config/database.config';
+import encryptionConfig from './config/encryption.config';
+import jwtConfig from './config/jwt.config';
+import fileStorageConfig from './config/file-storage.config';
+import emailConfig from './config/mail.config';
+import appConfig from './config/app.config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CacheModule } from '@nestjs/cache-manager';
+import { BipModule } from './bip/bip.module';
 
 @Module({
   imports: [
@@ -79,7 +78,6 @@ import { StripeModule } from "./stripe/stripe.module";
     FilesModule,
     NotificationsModule,
     BipModule,
-    StripeModule
   ],
   providers: [AppService],
 })
