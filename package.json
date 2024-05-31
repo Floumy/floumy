@@ -18,7 +18,7 @@
     "test:cov": "npm run test-db:up && jest --coverage --runInBand && npm run test-db:down",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "npm run test-db:up && jest --config ./test/jest-e2e.json --runInBand && npm run test-db:down",
-    "test-db:up": "docker container exists test-db || docker run --name test-db -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -e POSTGRES_DB=testdb -p 5455:5432 -d postgres",
+    "test-db:up": "[ -z \"$(docker ps -a -q -f name=test-db)\" ] && docker run --name test-db -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -e POSTGRES_DB=testdb -p 5455:5432 -d postgres || echo 'Container test-db already exists'",
     "test-db:down": "docker stop test-db && docker rm test-db",
     "typeorm": "typeorm-ts-node-commonjs"
   },
