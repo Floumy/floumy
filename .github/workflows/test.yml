@@ -9,13 +9,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Podman
+      - name: Set up Docker
         run: |
           sudo apt-get update -qq
-          sudo apt-get -qq -y install podman
+          sudo apt-get -qq -y install docker.io
 
-      - name: Pull PostgreSQL image with Podman
-        run: podman pull postgres:latest
+      - name: Pull PostgreSQL image with Docker
+        run: docker pull postgres:latest
 
       - name: Install Node.js
         uses: actions/setup-node@v2
