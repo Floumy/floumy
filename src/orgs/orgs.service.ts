@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Org } from './org.entity';
 import { OrgsMapper } from './orgs.mapper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PaymentPlan } from '../auth/payment.plan';
 
 @Injectable()
 export class OrgsService {
@@ -44,25 +45,29 @@ export class OrgsService {
     return await this.orgRepository.findOneBy({ invitationToken });
   }
 
-  async getOrCreateOrg(invitationToken?: string, name?: string): Promise<Org> {
-    this.validateInvitationTokenAndName(invitationToken, name);
+  async getByInvitationTokenOrCreateWithNameAndPlan(
+    invitationToken?: string,
+    name?: string,
+    plan?: PaymentPlan,
+  ): Promise<Org> {
+    this.validateGetOrCreateOrg(invitationToken, name, plan);
 
-    if (invitationToken && invitationToken.trim().length > 0) {
+    if (invitationToken) {
       return await this.findOneByInvitationToken(invitationToken);
     }
 
-    if (name && name.trim().length > 0) {
-      const org = new Org();
-      org.name = name.trim();
-      const savedOrg = await this.orgRepository.save(org);
-      this.eventEmitter.emit('org.created', savedOrg);
-      return savedOrg;
-    }
+    const org = new Org();
+    org.name = name.trim();
+    org.paymentPlan = plan;
+    const savedOrg = await this.orgRepository.save(org);
+    this.eventEmitter.emit('org.created', savedOrg);
+    return savedOrg;
   }
 
-  private validateInvitationTokenAndName(
+  private validateGetOrCreateOrg(
     invitationToken: string,
     name: string,
+    plan: PaymentPlan,
   ) {
     if (!invitationToken && !name) {
       throw new Error('Invalid invitation token and name');
@@ -78,6 +83,10 @@ export class OrgsService {
 
     if (name && (name.trim().length === 0 || name.trim().length > 50)) {
       throw new Error('Invalid name');
+    }
+
+    if (name && (!plan || !Object.values(PaymentPlan).includes(plan))) {
+      throw new Error('Invalid plan');
     }
   }
 }

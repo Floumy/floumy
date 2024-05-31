@@ -16,6 +16,7 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Iteration } from '../iterations/Iteration.entity';
 import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
+import { PaymentPlan } from '../auth/payment.plan';
 
 @Entity()
 export class Org {
@@ -31,6 +32,25 @@ export class Org {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @Column({
+    type: 'enum',
+    enum: PaymentPlan,
+    default: null,
+    nullable: true,
+  })
+  paymentPlan: PaymentPlan;
+  @Column({ default: false })
+  isTrial: boolean;
+  @Column()
+  trialEndDate: Date;
+  @Column({ default: false })
+  isPaid: boolean;
+  @Column()
+  nextPaymentDate: Date;
+  @Column({ default: false })
+  isPendingPayment: boolean;
+  @Column({ default: false })
+  isSuspended: boolean;
   @OneToMany(() => Objective, (objective) => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })

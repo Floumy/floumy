@@ -11,6 +11,7 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { OrgsService } from '../orgs/orgs.service';
 import { Org } from '../orgs/org.entity';
+import { PaymentPlan } from './payment.plan';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -158,6 +159,24 @@ describe('AuthController', () => {
         signUpDto.email,
       );
       expect(userWithNewPassword.password).not.toEqual(user.password);
+    });
+  });
+
+  describe('when signing up with valid credentials and a plan', () => {
+    it('should return the user', async () => {
+      const signUpDto = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        password: 'testtesttest',
+        productName: 'Test Product',
+        plan: PaymentPlan.BUILD_IN_PRIVATE,
+      };
+      await controller.signUp(signUpDto);
+      const user = await usersService.findOneByEmail(signUpDto.email);
+      expect(user).toBeDefined();
+      expect(user.id).toBeDefined();
+      expect(user.name).toBe(signUpDto.name);
+      expect(user.email).toBe(signUpDto.email);
     });
   });
 });

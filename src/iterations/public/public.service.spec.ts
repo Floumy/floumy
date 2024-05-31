@@ -26,6 +26,7 @@ import { BipSettings } from '../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
 import { CreateOrUpdateIterationDto } from '../dtos';
 import { Timeline } from '../../common/timeline.enum';
+import { PaymentPlan } from '../../auth/payment.plan';
 
 describe('PublicService', () => {
   let usersService: UsersService;
@@ -157,10 +158,12 @@ describe('PublicService', () => {
   });
   describe('when getting the active iteration', () => {
     it('should return the active iteration', async () => {
-      const orgWithActiveIterations = await orgsService.getOrCreateOrg(
-        null,
-        'Test Org',
-      );
+      const orgWithActiveIterations =
+        await orgsService.getByInvitationTokenOrCreateWithNameAndPlan(
+          null,
+          'Test Org',
+          PaymentPlan.BUILD_IN_PRIVATE,
+        );
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveIterationsPagePublic = true;
@@ -186,10 +189,12 @@ describe('PublicService', () => {
       expect(result.goal).toEqual('Test Goal');
     });
     it('should return null if there is no active iteration', async () => {
-      const orgWithActiveIterations = await orgsService.getOrCreateOrg(
-        null,
-        'Test Org',
-      );
+      const orgWithActiveIterations =
+        await orgsService.getByInvitationTokenOrCreateWithNameAndPlan(
+          null,
+          'Test Org',
+          PaymentPlan.BUILD_IN_PRIVATE,
+        );
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveIterationsPagePublic = true;

@@ -5,6 +5,7 @@ import { UsersService } from '../users/users.service';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { setupTestingModule } from '../../test/test.utils';
 import { Repository } from 'typeorm';
+import { PaymentPlan } from '../auth/payment.plan';
 
 describe('OrgsService', () => {
   let service: OrgsService;
@@ -63,18 +64,26 @@ describe('OrgsService', () => {
 
   describe('when getting or creating the org', () => {
     it('should validate that either the name or invitationToken are set', () => {
-      expect(service.getOrCreateOrg()).rejects.toThrow();
+      expect(
+        service.getByInvitationTokenOrCreateWithNameAndPlan(),
+      ).rejects.toThrow();
     });
     it('should return the org based on the invitationToken', async () => {
       const org = new Org();
       org.name = 'Some org';
       await orgsRepository.save(org);
-      const actual = await service.getOrCreateOrg(org.invitationToken);
+      const actual = await service.getByInvitationTokenOrCreateWithNameAndPlan(
+        org.invitationTo,
+      );
       expect(org.id).toEqual(actual.id);
       expect(actual.name).toEqual(org.name);
     });
     it('should return the newly created org with the provided name', async () => {
-      const actual = await service.getOrCreateOrg('', 'Test org');
+      const actual = await service.getByInvitationTokenOrCreateWithNameAndPlan(
+        '',
+        'Test org',
+        PaymentPlan.BUILD_IN_PRIVATE,
+      );
       expect(actual.id).toBeDefined();
       expect(actual.id).not.toBeNull();
       expect(actual.name).toEqual('Test org');
