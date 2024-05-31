@@ -49,32 +49,13 @@ export class AuthService {
     };
   }
 
-  private async getOrCreateRefreshToken(user: User) {
-    const refreshToken = await this.refreshTokenRepository.findOne({
-      where: { user: { id: user.id } },
-      order: { createdAt: 'DESC' },
-    });
-
-    if (!refreshToken || refreshToken.expirationDate.getTime() < Date.now()) {
-      return await this.createRefreshToken(user);
-    }
-
-    return refreshToken.token;
-  }
-
-  private async createRefreshToken(user: User) {
-    const token = await this.tokensService.generateRefreshToken(user);
-    const refreshToken = new RefreshToken(token);
-    refreshToken.user = Promise.resolve(user);
-    await this.refreshTokenRepository.save(refreshToken);
-    return token;
-  }
-
   async signUp(signUpDto: SignUpDto): Promise<void> {
-    const org = await this.orgsService.getOrCreateOrg(
-      signUpDto.invitationToken,
-      signUpDto.productName,
-    );
+    const org =
+      await this.orgsService.getByInvitationTokenOrCreateWithNameAndPlan(
+        signUpDto.invitationToken,
+        signUpDto.productName,
+        signUpDto.plan,
+      );
 
     if (!org) {
       this.logger.error(
@@ -142,10 +123,6 @@ export class AuthService {
     };
   }
 
-  private async generateActivationToken() {
-    return uuid();
-  }
-
   async activateAccount(activationToken: string) {
     if (!activationToken) {
       this.logger.error('Activation token not provided');
@@ -194,5 +171,30 @@ export class AuthService {
     user.password = await this.usersService.encryptPassword(newPassword);
     user.passwordResetToken = null;
     await this.usersService.save(user);
+  }
+
+  private async getOrCreateRefreshToken(user: User) {
+    const refreshToken = await this.refreshTokenRepository.findOne({
+      where: { user: { id: user.id } },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!refreshToken || refreshToken.expirationDate.getTime() < Date.now()) {
+      return await this.createRefreshToken(user);
+    }
+
+    return refreshToken.token;
+  }
+
+  private async createRefreshToken(user: User) {
+    const token = await this.tokensService.generateRefreshToken(user);
+    const refreshToken = new RefreshToken(token);
+    refreshToken.user = Promise.resolve(user);
+    await this.refreshTokenRepository.save(refreshToken);
+    return token;
+  }
+
+  private async generateActivationToken() {
+    return uuid();
   }
 }
