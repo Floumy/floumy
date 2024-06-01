@@ -56,9 +56,17 @@ export class OrgsService {
       return await this.findOneByInvitationToken(invitationToken);
     }
 
+    return await this.createOrg(name, plan);
+  }
+
+  private async createOrg(name: string, plan: PaymentPlan) {
     const org = new Org();
     org.name = name.trim();
-    org.paymentPlan = plan;
+
+    if (plan) {
+      org.paymentPlan = plan;
+    }
+
     const savedOrg = await this.orgRepository.save(org);
     this.eventEmitter.emit('org.created', savedOrg);
     return savedOrg;
@@ -85,7 +93,7 @@ export class OrgsService {
       throw new Error('Invalid name');
     }
 
-    if (name && (!plan || !Object.values(PaymentPlan).includes(plan))) {
+    if (name && plan && !Object.values(PaymentPlan).includes(plan)) {
       throw new Error('Invalid plan');
     }
   }

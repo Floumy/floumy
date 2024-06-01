@@ -158,6 +158,7 @@ describe('AuthService', () => {
         email: 'john.doe@example.com',
         password: 'testtesttest',
         productName: 'Test Product',
+        plan: 'invalid' as PaymentPlan,
       };
       await expect(service.signUp(signUpDto)).rejects.toThrow();
     });
