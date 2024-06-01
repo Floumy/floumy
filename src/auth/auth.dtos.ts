@@ -1,3 +1,5 @@
+import { PaymentPlan } from './payment.plan';
+
 export interface SignInDto {
   email: string;
   password: string;
