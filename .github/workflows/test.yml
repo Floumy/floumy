@@ -19,10 +19,6 @@ jobs:
       - name: Start PostgreSQL container
         run: |
           docker run --name postgres -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -e POSTGRES_DB=testdb -d postgres:latest
-          sleep 20 # wait for the database to start
-          docker exec -u postgres postgres psql -c "ALTER SYSTEM SET max_connections = '200';"
-          docker restart postgres
-          sleep 20 # wait for the database to restart
 
       - name: Install Node.js
         uses: actions/setup-node@v2

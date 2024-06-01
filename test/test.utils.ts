@@ -14,6 +14,8 @@ import { RefreshToken } from '../src/auth/refresh-token.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CacheModule } from '@nestjs/cache-manager';
 
+const dataSource = new DataSource(testDbOptions);
+
 export async function clearDatabase(dataSource: DataSource) {
   const queryRunner = dataSource.createQueryRunner();
   await queryRunner.connect();
@@ -79,9 +81,9 @@ export async function setupTestingModule(
     ],
   }).compile();
 
-  const dataSource = new DataSource(testDbOptions);
-
-  await dataSource.initialize();
+  if (!dataSource.isInitialized) {
+    await dataSource.initialize();
+  }
 
   return {
     module,
