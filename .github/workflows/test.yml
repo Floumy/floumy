@@ -11,23 +11,10 @@ jobs:
 
       - name: Set up Docker
         run: |
-          sudo apt-get update
-          sudo apt-get upgrade -y
-          sudo apt-get autoremove -y
-          sudo apt-get autoclean -y
-          sudo apt-mark showhold | xargs sudo apt-mark unhold
-          sudo apt-get install -f -y
-          sudo apt-get -qq install docker.io || {
-            echo "apt-get failed, falling back to Docker convenience script"
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sudo sh get-docker.sh
-          }
-        shell: bash
-
-      - name: Verify Docker Installation
-        run: |
-          docker --version
-        shell: bash
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sudo sh get-docker.sh
+          sudo usermod -aG docker $USER
+          newgrp docker
 
       - name: Pull PostgreSQL image with Docker
         run: docker pull postgres:latest
@@ -35,7 +22,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18.16.1'
+          node-version: '20.13.1'
 
       - name: Install dependencies
         run: npm ci
