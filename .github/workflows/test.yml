@@ -16,9 +16,9 @@ jobs:
           sudo usermod -aG docker $USER
           newgrp docker
 
-      - name: Start PostgreSQL container
+      - name: Pull PostgreSQL image
         run: |
-          docker run --name test-db -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -e POSTGRES_DB=testdb -p 5455:5432 -d postgres:13
+          docker pull postgres:13
 
       - name: Install Node.js
         uses: actions/setup-node@v2
