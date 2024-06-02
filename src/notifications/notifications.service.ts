@@ -1,22 +1,23 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { ServerClient } from "postmark";
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { ServerClient } from 'postmark';
 
 @Injectable()
 export class NotificationsService {
-
-
   constructor(
-    @Inject("POSTMARK_CLIENT") private postmarkClient: ServerClient,
-    private configService: ConfigService) {
-  }
+    @Inject('POSTMARK_CLIENT') private postmarkClient: ServerClient,
+    private configService: ConfigService,
+  ) {}
 
-
-  async sendActivationEmail(name: string, email: string, activationToken: string) {
+  async sendActivationEmail(
+    name: string,
+    email: string,
+    activationToken: string,
+  ) {
     await this.postmarkClient.sendEmail({
-      From: this.configService.get("mail.user"),
+      From: this.configService.get('mail.user'),
       To: email,
-      Subject: "Activate your account",
+      Subject: 'Activate your account',
       HtmlBody: `
         <!DOCTYPE html>
         <html lang="en">
@@ -56,11 +57,13 @@ export class NotificationsService {
         <body>
         <div class="container">
             <h2>Welcome Aboard! 🎉</h2>
-            <p>Dear ${name.split(" ")[0]},</p>
+            <p>Dear ${name.split(' ')[0]},</p>
             <p>I'm Alex, the founder of Floumy, thrilled to welcome you to our product management platform. You're about to transform how your projects come to life.</p>
             <p><b>Activate Your Account Now:</b></p>
             <p>To jumpstart your journey with Floumy, click below:</p>
-            <p><a href="${this.configService.get("app.url")}/auth/activation?token=${activationToken}">Activate My Account</a></p>
+            <p><a href="${this.configService.get(
+              'app.url',
+            )}/auth/activation?token=${activationToken}">Activate My Account</a></p>
             <p>Here’s why you’ll love Floumy:</p>
             <ul>
                 <li><b>Collaboration Made Easy:</b> Streamlined teamwork awaits.</li>
@@ -77,7 +80,7 @@ export class NotificationsService {
       TextBody: `
         Welcome Aboard! 🎉
 
-        Dear ${name.split(" ")[0]},
+        Dear ${name.split(' ')[0]},
         
         I'm Alex, the founder of Floumy, thrilled to welcome you to our product management platform. You're about to transform how your projects come to life.
         
@@ -85,7 +88,9 @@ export class NotificationsService {
         
         To jumpstart your journey with Floumy, use the activation link below:
         
-        ${this.configService.get("app.url")}/auth/activation?token=${activationToken}
+        ${this.configService.get(
+          'app.url',
+        )}/auth/activation?token=${activationToken}
         
         Here’s why you’ll love Floumy:
         
@@ -98,15 +103,19 @@ export class NotificationsService {
         
         Best Regards,
         Alex`,
-      MessageStream: "outbound"
+      MessageStream: 'outbound',
     });
   }
 
-  async sendPasswordResetEmail(name: string, email: string, resetToken: string) {
+  async sendPasswordResetEmail(
+    name: string,
+    email: string,
+    resetToken: string,
+  ) {
     await this.postmarkClient.sendEmail({
-      From: this.configService.get("mail.user"),
+      From: this.configService.get('mail.user'),
       To: email,
-      Subject: "Reset Your Password",
+      Subject: 'Reset Your Password',
       HtmlBody: `
         <!DOCTYPE html>
         <html lang="en">
@@ -146,11 +155,13 @@ export class NotificationsService {
         <body>
         <div class="container">
             <h2>Reset Your Password 🛠</h2>
-            <p>Dear ${name.split(" ")[0]},</p>
+            <p>Dear ${name.split(' ')[0]},</p>
             <p>We received a request to reset your password for your Floumy account. No worries, you can easily set up a new one!</p>
             <p><b>Reset Your Password:</b></p>
             <p>Simply click the link below to choose a new password:</p>
-            <p><a href="${this.configService.get("app.url")}/auth/reset-password?token=${resetToken}">Reset My Password</a></p>
+            <p><a href="${this.configService.get(
+              'app.url',
+            )}/auth/reset-password?token=${resetToken}">Reset My Password</a></p>
             <p>If you didn't request a password reset, please ignore this email or contact us if you have any concerns.</p>
             <p>Thanks for being a part of Floumy. We're here to ensure your experience is seamless and secure.</p>
             <p>Best Regards,<br>Alex<br></p>
@@ -161,7 +172,7 @@ export class NotificationsService {
       TextBody: `
       Reset Your Password 🛠
   
-      Dear ${name.split(" ")[0]},
+      Dear ${name.split(' ')[0]},
       
       We received a request to reset your password for your Floumy account. No worries, you can easily set up a new one!
       
@@ -169,7 +180,9 @@ export class NotificationsService {
       
       Simply use the link below to choose a new password:
       
-      ${this.configService.get("app.url")}/auth/reset-password?token=${resetToken}
+      ${this.configService.get(
+        'app.url',
+      )}/auth/reset-password?token=${resetToken}
       
       If you didn't request a password reset, please ignore this email or contact us if you have any concerns.
       
@@ -177,7 +190,7 @@ export class NotificationsService {
       
       Best Regards,
       Alex`,
-      MessageStream: "outbound"
+      MessageStream: 'outbound',
     });
   }
 }
