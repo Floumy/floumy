@@ -21,6 +21,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BipModule } from './bip/bip.module';
+import { PaymentsModule } from './payments/payments.module';
+import { StripeModule } from './stripe/stripe.module';
+import stripeConfig from './config/stripe.config';
 
 @Module({
   imports: [
@@ -33,6 +36,7 @@ import { BipModule } from './bip/bip.module';
         fileStorageConfig,
         emailConfig,
         appConfig,
+        stripeConfig,
       ],
     }),
     TypeOrmModule.forRootAsync({
@@ -78,6 +82,8 @@ import { BipModule } from './bip/bip.module';
     FilesModule,
     NotificationsModule,
     BipModule,
+    PaymentsModule,
+    StripeModule,
   ],
   providers: [AppService],
 })

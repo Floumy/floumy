@@ -1,0 +1,67 @@
+import { Injectable } from '@nestjs/common';
+import Stripe from 'stripe';
+import { ConfigService } from '@nestjs/config';
+
+@Injectable()
+export class StripeService {
+  private stripe: Stripe;
+
+  constructor(private configService: ConfigService) {
+    this.stripe = new Stripe(this.configService.get('stripe.secretKey'));
+  }
+
+  async createCustomer(email: string, name: string): Promise<Stripe.Customer> {
+    return await this.stripe.customers.create({
+      email,
+      name,
+    });
+  }
+
+  async createCheckoutSession(
+    customerId: string,
+    priceId: string,
+  ): Promise<Stripe.Checkout.Session> {
+    return this.stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      subscription_data: {
+        trial_period_days: 7,
+      },
+      success_url: this.configService.get('stripe.successUrl'),
+      cancel_url: this.configService.get('stripe.cancelUrl'),
+    });
+  }
+
+  constructEvent(
+    requestBody: any,
+    sig: string,
+    webhookSecret: string,
+  ): Stripe.Event {
+    return this.stripe.webhooks.constructEvent(requestBody, sig, webhookSecret);
+  }
+
+  async listActiveSubscriptions(
+    customerId: string,
+  ): Promise<Stripe.Subscription[]> {
+    const subscriptions = await this.stripe.subscriptions.list({
+      customer: customerId,
+      status: 'active',
+    });
+    return subscriptions.data;
+  }
+
+  constructWebhookEvent(requestBody: any, sig: any) {
+    return this.stripe.webhooks.constructEvent(
+      requestBody,
+      sig,
+      this.configService.get('stripe.webhookSecret'),
+    );
+  }
+}
