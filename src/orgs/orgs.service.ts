@@ -59,6 +59,24 @@ export class OrgsService {
     return await this.createOrg(name, plan);
   }
 
+  async saveStripeSubscription(
+    customerId: string,
+    isSubscribed: boolean,
+    nextPaymentDate: number,
+  ) {
+    const org = await this.orgRepository.findOneByOrFail({
+      stripeCustomerId: customerId,
+    });
+    org.isSubscribed = isSubscribed;
+    org.nextPaymentDate = new Date(nextPaymentDate);
+    await this.orgRepository.save(org);
+  }
+
+  async getStripeCustomerId(customerId: string) {
+    const org = await this.orgRepository.findOneByOrFail({ id: customerId });
+    return org.stripeCustomerId;
+  }
+
   private async createOrg(name: string, plan: PaymentPlan) {
     const org = new Org();
     org.name = name.trim();

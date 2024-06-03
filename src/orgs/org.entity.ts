@@ -40,17 +40,11 @@ export class Org {
   })
   paymentPlan: PaymentPlan;
   @Column({ default: false })
-  isTrial: boolean;
-  @Column()
-  trialEndDate: Date;
-  @Column({ default: false })
-  isPaid: boolean;
-  @Column()
+  isSubscribed: boolean;
+  @Column({ default: null, nullable: true })
   nextPaymentDate: Date;
-  @Column({ default: false })
-  isPendingPayment: boolean;
-  @Column({ default: false })
-  isSuspended: boolean;
+  @Column({ default: null, nullable: true })
+  stripeCustomerId: string;
   @OneToMany(() => Objective, (objective) => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })
