@@ -15,7 +15,7 @@ export class PaymentsService {
       const session = event.data.object as Stripe.Checkout.Session;
       const customerId = session.customer as string;
 
-      if (typeof session.subscription !== 'string') {
+      if (typeof session.subscription === 'object') {
         await this.orgsService.saveStripeSubscription(
           customerId,
           true,
@@ -51,15 +51,11 @@ export class PaymentsService {
     return this.stripeService.constructWebhookEvent(requestBody, sig);
   }
 
-  async createCheckoutSessionUrl(
-    customerId: string,
-    priceId: string,
-  ): Promise<string> {
-    const stripeCustomerId =
-      await this.orgsService.getStripeCustomerId(customerId);
+  async createCheckoutSessionUrl(orgId: string): Promise<string> {
+    const org = await this.orgsService.findOneById(orgId);
     const stripeSession = await this.stripeService.createCheckoutSession(
-      stripeCustomerId,
-      priceId,
+      org.stripeCustomerId,
+      this.stripeService.getPriceIdByPaymentPlan(org.paymentPlan),
     );
     return stripeSession.url;
   }
@@ -69,11 +65,10 @@ export class PaymentsService {
     return stripeCustomer.id;
   }
 
-  async hasActiveSubscriptions(customerId: string): Promise<boolean> {
-    const stripeCustomerId =
-      await this.orgsService.getStripeCustomerId(customerId);
+  async hasActiveSubscriptions(orgId: string): Promise<boolean> {
+    const org = await this.orgsService.findOneById(orgId);
     const activeSubscriptions =
-      await this.stripeService.listActiveSubscriptions(stripeCustomerId);
+      await this.stripeService.listActiveSubscriptions(org.stripeCustomerId);
     return activeSubscriptions.length > 0;
   }
 }

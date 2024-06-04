@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
+import { PaymentPlan } from '../auth/payment.plan';
 
 @Injectable()
 export class StripeService {
@@ -14,6 +15,17 @@ export class StripeService {
       email,
       name,
     });
+  }
+
+  getPriceIdByPaymentPlan(paymentPlan: PaymentPlan): string {
+    switch (paymentPlan) {
+      case PaymentPlan.BUILD_IN_PRIVATE:
+        return this.configService.get('stripe.buildInPrivatePriceId');
+      case PaymentPlan.BUILD_IN_PUBLIC:
+        return this.configService.get('stripe.buildInPublicPriceId');
+      default:
+        throw new Error('Invalid payment plan');
+    }
   }
 
   async createCheckoutSession(

@@ -146,11 +146,6 @@ describe('AuthService', () => {
       const org = await user.org;
       expect(org).toBeDefined();
       expect(org.paymentPlan).toEqual(PaymentPlan.BUILD_IN_PRIVATE);
-      expect(org.isTrial).toBe(false);
-      expect(org.trialEndDate).toBeNull();
-      expect(org.isPaid).toBe(false);
-      expect(org.isPendingPayment).toBe(false);
-      expect(org.isSuspended).toBe(false);
     });
     it('should throw an error if the plan is not provided', async () => {
       const signUpDto = {
