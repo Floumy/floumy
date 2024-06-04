@@ -1,14 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class StripeService {
-  private stripe: Stripe;
-
-  constructor(private configService: ConfigService) {
-    this.stripe = new Stripe(this.configService.get('stripe.secretKey'));
-  }
+  constructor(
+    @Inject('STRIPE_CLIENT') private stripe: Stripe,
+    private configService: ConfigService,
+  ) {}
 
   async createCustomer(email: string, name: string): Promise<Stripe.Customer> {
     return await this.stripe.customers.create({
@@ -37,14 +36,6 @@ export class StripeService {
       success_url: this.configService.get('stripe.successUrl'),
       cancel_url: this.configService.get('stripe.cancelUrl'),
     });
-  }
-
-  constructEvent(
-    requestBody: any,
-    sig: string,
-    webhookSecret: string,
-  ): Stripe.Event {
-    return this.stripe.webhooks.constructEvent(requestBody, sig, webhookSecret);
   }
 
   async listActiveSubscriptions(
