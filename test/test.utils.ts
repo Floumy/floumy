@@ -53,6 +53,28 @@ export async function setupTestingModule(
   const postmarkClientMock = {
     sendEmail: jest.fn().mockImplementation(() => {}),
   };
+  const stripeClientMock = {
+    webhooks: {
+      constructEvent: jest.fn().mockImplementation(() => {}),
+    },
+    subscriptions: {
+      list: jest.fn().mockImplementation(() => {
+        return {
+          data: [],
+        };
+      }),
+    },
+    checkout: {
+      sessions: {
+        create: jest.fn().mockImplementation(() => {
+          return {
+            url: 'https://checkout.stripe.com/checkout/session',
+          };
+        }),
+      },
+    },
+  };
+
   const module: TestingModule = await Test.createTestingModule({
     controllers,
     imports: [
@@ -76,6 +98,10 @@ export async function setupTestingModule(
       {
         provide: 'POSTMARK_CLIENT',
         useValue: postmarkClientMock,
+      },
+      {
+        provide: 'STRIPE_CLIENT',
+        useValue: stripeClientMock,
       },
       NotificationsService,
     ],

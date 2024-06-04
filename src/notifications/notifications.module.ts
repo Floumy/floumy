@@ -1,29 +1,28 @@
-import { Module } from "@nestjs/common";
-import { NotificationsService } from "./notifications.service";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { ServerClient } from "postmark";
+import { Module } from '@nestjs/common';
+import { NotificationsService } from './notifications.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServerClient } from 'postmark';
 
 const postmarkClientProvider = {
-  provide: "POSTMARK_CLIENT",
+  provide: 'POSTMARK_CLIENT',
   useFactory: (configService: ConfigService) => {
     // This is a workaround to avoid creating the provider if the API key is not set
     // which is the case when running tests
-    if (!configService.get("mail.postmarkApiKey")) {
+    if (!configService.get('mail.postmarkApiKey')) {
       return {
         sendEmail: async () => {
-          console.error("Email not sent because the API key is not set");
-        }
+          console.error('Email not sent because the API key is not set');
+        },
       };
     }
-    return new ServerClient(configService.get("mail.postmarkApiKey"));
+    return new ServerClient(configService.get('mail.postmarkApiKey'));
   },
-  inject: [ConfigService]
+  inject: [ConfigService],
 };
 
 @Module({
   providers: [NotificationsService, postmarkClientProvider],
   exports: [NotificationsService],
-  imports: [ConfigModule]
+  imports: [ConfigModule],
 })
-export class NotificationsModule {
-}
+export class NotificationsModule {}
