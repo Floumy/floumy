@@ -23,6 +23,7 @@ import { PublicController as MilestonesPublicController } from './milestones/pub
 import { PublicService as MilestonesPublicService } from './milestones/public/public.service';
 import { PublicController as FeaturesPublicController } from './features/public/public.controller';
 import { PublicService as FeaturesPublicService } from './features/public/public.service';
+import { StripeModule } from '../stripe/stripe.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { PublicService as FeaturesPublicService } from './features/public/public
     AuthModule,
     BacklogModule,
     FilesModule,
+    StripeModule,
   ],
   controllers: [
     FeaturesController,

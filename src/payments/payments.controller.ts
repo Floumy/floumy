@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Request } from '@nestjs/common';
+import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { Public } from '../auth/public.guard';
 import Stripe from 'stripe';
 import { PaymentsService } from './payments.service';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('payments')
 export class PaymentsController {
@@ -25,22 +26,17 @@ export class PaymentsController {
     return { received: true };
   }
 
+  @UseGuards(AuthGuard)
   @Post('/checkout-session')
   async createCheckoutSession(@Request() request: any) {
     const org = request.user.org;
-
-    const sessionUrl = await this.paymentService.createCheckoutSessionUrl(org);
-
-    return { url: sessionUrl };
+    return { url: await this.paymentService.createCheckoutSessionUrl(org) };
   }
 
-  @Get('/has-active-subscriptions')
+  @UseGuards(AuthGuard)
+  @Get('/subscriptions-details')
   async hasActiveSubscription(@Request() request: any) {
     const org = request.user.org;
-
-    const hasActiveSubscription =
-      await this.paymentService.hasActiveSubscriptions(org);
-
-    return { hasActiveSubscription };
+    return await this.paymentService.getSubscriptionStatus(org);
   }
 }

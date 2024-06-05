@@ -75,6 +75,7 @@ import stripeConfig from './config/stripe.config';
     AuthModule,
     UsersModule,
     OkrsModule,
+    StripeModule,
     OrgsModule,
     RoadmapModule,
     BacklogModule,
@@ -83,7 +84,6 @@ import stripeConfig from './config/stripe.config';
     NotificationsModule,
     BipModule,
     PaymentsModule,
-    StripeModule,
   ],
   providers: [AppService],
 })

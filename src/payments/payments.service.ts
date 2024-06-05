@@ -60,15 +60,15 @@ export class PaymentsService {
     return stripeSession.url;
   }
 
-  async createCustomer(email: string, name: string): Promise<string> {
-    const stripeCustomer = await this.stripeService.createCustomer(email, name);
-    return stripeCustomer.id;
-  }
-
-  async hasActiveSubscriptions(orgId: string): Promise<boolean> {
+  async getSubscriptionStatus(
+    orgId: string,
+  ): Promise<{ hasActiveSubscriptions: boolean; nextPaymentDate: Date }> {
     const org = await this.orgsService.findOneById(orgId);
     const activeSubscriptions =
       await this.stripeService.listActiveSubscriptions(org.stripeCustomerId);
-    return activeSubscriptions.length > 0;
+    return {
+      nextPaymentDate: org.nextPaymentDate,
+      hasActiveSubscriptions: activeSubscriptions.length > 0,
+    };
   }
 }
