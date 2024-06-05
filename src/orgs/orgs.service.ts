@@ -6,12 +6,14 @@ import { Org } from './org.entity';
 import { OrgsMapper } from './orgs.mapper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PaymentPlan } from '../auth/payment.plan';
+import { StripeService } from '../stripe/stripe.service';
 
 @Injectable()
 export class OrgsService {
   constructor(
     @InjectRepository(Org) private orgRepository: Repository<Org>,
     private eventEmitter: EventEmitter2,
+    private stripeService: StripeService,
   ) {}
 
   /**
@@ -72,14 +74,11 @@ export class OrgsService {
     await this.orgRepository.save(org);
   }
 
-  async getStripeCustomerId(customerId: string) {
-    const org = await this.orgRepository.findOneByOrFail({ id: customerId });
-    return org.stripeCustomerId;
-  }
-
   private async createOrg(name: string, plan: PaymentPlan) {
     const org = new Org();
     org.name = name.trim();
+    const stripeCustomer = await this.stripeService.createCustomer(org.name);
+    org.stripeCustomerId = stripeCustomer.id;
 
     if (plan) {
       org.paymentPlan = plan;

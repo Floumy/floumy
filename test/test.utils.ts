@@ -13,6 +13,9 @@ import { User } from '../src/users/user.entity';
 import { RefreshToken } from '../src/auth/refresh-token.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CacheModule } from '@nestjs/cache-manager';
+import { OrgsModule } from '../src/orgs/orgs.module';
+import { StripeModule } from '../src/stripe/stripe.module';
+import { AuthModule } from '../src/auth/auth.module';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -73,6 +76,13 @@ export async function setupTestingModule(
         }),
       },
     },
+    customers: {
+      create: jest.fn().mockImplementation(() => {
+        return {
+          id: 'cus_test',
+        };
+      }),
+    },
   };
 
   const module: TestingModule = await Test.createTestingModule({
@@ -86,6 +96,9 @@ export async function setupTestingModule(
         load: [databaseConfig, encryptionConfig, jwtConfig],
       }),
       EventEmitterModule.forRoot(),
+      OrgsModule,
+      StripeModule,
+      AuthModule,
       ...imports,
     ],
     providers: [

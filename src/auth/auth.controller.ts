@@ -35,7 +35,7 @@ export class AuthController {
   }
 
   @Public()
-  @Post('sign-up-disabled')
+  @Post('sign-up')
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() signUpDto: SignUpDto) {
     try {

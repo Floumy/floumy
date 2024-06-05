@@ -6,15 +6,18 @@ import { PaymentPlan } from '../auth/payment.plan';
 @Injectable()
 export class StripeService {
   constructor(
-    @Inject('STRIPE_CLIENT') private stripe: Stripe,
+    @Inject('STRIPE_CLIENT') private readonly stripe: Stripe,
     private configService: ConfigService,
   ) {}
 
-  async createCustomer(email: string, name: string): Promise<Stripe.Customer> {
-    return await this.stripe.customers.create({
-      email,
+  async createCustomer(name: string): Promise<{ id: string }> {
+    const stripeCustomer = await this.stripe.customers.create({
       name,
     });
+
+    return {
+      id: stripeCustomer?.id,
+    };
   }
 
   getPriceIdByPaymentPlan(paymentPlan: PaymentPlan): string {

@@ -27,6 +27,7 @@ import { Repository } from 'typeorm';
 import { CreateOrUpdateIterationDto } from '../dtos';
 import { Timeline } from '../../common/timeline.enum';
 import { PaymentPlan } from '../../auth/payment.plan';
+import { OrgsModule } from '../../orgs/orgs.module';
 
 describe('PublicService', () => {
   let usersService: UsersService;
@@ -56,11 +57,11 @@ describe('PublicService', () => {
           FeatureFile,
           BipSettings,
         ]),
+        OrgsModule,
         BacklogModule,
       ],
       [
         OkrsService,
-        OrgsService,
         FeaturesService,
         UsersService,
         WorkItemsService,

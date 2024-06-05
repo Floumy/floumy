@@ -3,9 +3,18 @@ import { PaymentsService } from './payments.service';
 import { PaymentsController } from './payments.controller';
 import { OrgsModule } from '../orgs/orgs.module';
 import { StripeModule } from '../stripe/stripe.module';
+import { AuthModule } from '../auth/auth.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Org } from '../orgs/org.entity';
+import { User } from '../users/user.entity';
 
 @Module({
-  imports: [OrgsModule, StripeModule],
+  imports: [
+    OrgsModule,
+    StripeModule,
+    AuthModule,
+    TypeOrmModule.forFeature([Org, User]),
+  ],
   providers: [PaymentsService],
   controllers: [PaymentsController],
   exports: [PaymentsService],
