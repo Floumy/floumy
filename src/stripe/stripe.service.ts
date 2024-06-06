@@ -63,7 +63,7 @@ export class StripeService {
     return subscriptions.data;
   }
 
-  constructWebhookEvent(requestBody: any, sig: any) {
+  constructWebhookEvent(requestBody: any, sig: any): Stripe.Event {
     return this.stripe.webhooks.constructEvent(
       requestBody,
       sig,

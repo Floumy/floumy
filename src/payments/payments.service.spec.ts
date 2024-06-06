@@ -8,6 +8,7 @@ import { StripeModule } from '../stripe/stripe.module';
 
 describe('PaymentsService', () => {
   let service: PaymentsService;
+
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
@@ -16,6 +17,7 @@ describe('PaymentsService', () => {
       [PaymentsService],
     );
     service = module.get<PaymentsService>(PaymentsService);
+
     cleanup = dbCleanup;
   });
 
