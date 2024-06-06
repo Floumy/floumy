@@ -88,5 +88,21 @@ describe('OrgsService', () => {
       expect(actual.id).not.toBeNull();
       expect(actual.name).toEqual('Test org');
     });
+    it('should create a new org with the provided plan', async () => {
+      const actual = await service.getByInvitationTokenOrCreateWithNameAndPlan(
+        '',
+        'Test org',
+        PaymentPlan.BUILD_IN_PRIVATE,
+      );
+      expect(actual.paymentPlan).toEqual(PaymentPlan.BUILD_IN_PRIVATE);
+    });
+    it('should create a new org with a stripe customer', async () => {
+      const actual = await service.getByInvitationTokenOrCreateWithNameAndPlan(
+        '',
+        'Test org',
+        PaymentPlan.BUILD_IN_PRIVATE,
+      );
+      expect(actual.stripeCustomerId).toBeDefined();
+    });
   });
 });
