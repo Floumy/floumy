@@ -13,9 +13,11 @@ import { User } from '../src/users/user.entity';
 import { RefreshToken } from '../src/auth/refresh-token.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CacheModule } from '@nestjs/cache-manager';
-import { OrgsModule } from '../src/orgs/orgs.module';
-import { StripeModule } from '../src/stripe/stripe.module';
-import { AuthModule } from '../src/auth/auth.module';
+import { StripeService } from '../src/stripe/stripe.service';
+import { OrgsService } from '../src/orgs/orgs.service';
+import { PaymentsService } from '../src/payments/payments.service';
+import { Org } from '../src/orgs/org.entity';
+import { TokensService } from '../src/auth/tokens.service';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -91,14 +93,11 @@ export async function setupTestingModule(
       CacheModule.register(),
       jwtModule,
       typeOrmModule,
-      TypeOrmModule.forFeature([User, RefreshToken]),
+      TypeOrmModule.forFeature([User, RefreshToken, Org]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],
       }),
       EventEmitterModule.forRoot(),
-      OrgsModule,
-      StripeModule,
-      AuthModule,
       ...imports,
     ],
     providers: [
@@ -117,6 +116,10 @@ export async function setupTestingModule(
         useValue: stripeClientMock,
       },
       NotificationsService,
+      StripeService,
+      OrgsService,
+      PaymentsService,
+      TokensService,
     ],
   }).compile();
 
