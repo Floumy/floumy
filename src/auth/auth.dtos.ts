@@ -1,5 +1,3 @@
-import { PaymentPlan } from './payment.plan';
-
 export interface SignInDto {
   email: string;
   password: string;
@@ -10,7 +8,6 @@ export interface SignUpDto {
   email: string;
   password: string;
   invitationToken?: string;
-  plan?: PaymentPlan;
   productName?: string;
 }
 

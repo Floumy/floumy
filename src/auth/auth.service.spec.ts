@@ -11,7 +11,6 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { OrgsService } from '../orgs/orgs.service';
-import { PaymentPlan } from './payment.plan';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -132,30 +131,6 @@ describe('AuthService', () => {
       const org = await user.org;
       expect(org).toBeDefined();
       expect(org.name).toEqual('Test Product');
-    });
-    it('should create the org with the provided plan', async () => {
-      const signUpDto = {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        password: 'testtesttest',
-        productName: 'Test Product',
-        plan: PaymentPlan.BUILD_IN_PRIVATE,
-      };
-      await service.signUp(signUpDto);
-      const user = await usersService.findOneByEmail('john.doe@example.com');
-      const org = await user.org;
-      expect(org).toBeDefined();
-      expect(org.paymentPlan).toEqual(PaymentPlan.BUILD_IN_PRIVATE);
-    });
-    it('should throw an error if the plan is not provided', async () => {
-      const signUpDto = {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        password: 'testtesttest',
-        productName: 'Test Product',
-        plan: 'invalid' as PaymentPlan,
-      };
-      await expect(service.signUp(signUpDto)).rejects.toThrow();
     });
   });
 

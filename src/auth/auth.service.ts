@@ -54,7 +54,6 @@ export class AuthService {
       await this.orgsService.getByInvitationTokenOrCreateWithNameAndPlan(
         signUpDto.invitationToken,
         signUpDto.productName,
-        signUpDto.plan,
       );
 
     if (!org) {
