@@ -26,7 +26,6 @@ import { BipSettings } from '../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
 import { CreateOrUpdateIterationDto } from '../dtos';
 import { Timeline } from '../../common/timeline.enum';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { OrgsModule } from '../../orgs/orgs.module';
 
 describe('PublicService', () => {
@@ -163,7 +162,6 @@ describe('PublicService', () => {
         await orgsService.getByInvitationTokenOrCreateWithNameAndPlan(
           null,
           'Test Org',
-          PaymentPlan.BUILD_IN_PRIVATE,
         );
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
@@ -194,7 +192,6 @@ describe('PublicService', () => {
         await orgsService.getByInvitationTokenOrCreateWithNameAndPlan(
           null,
           'Test Org',
-          PaymentPlan.BUILD_IN_PRIVATE,
         );
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;

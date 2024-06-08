@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { Org } from './org.entity';
 import { OrgsMapper } from './orgs.mapper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PaymentPlan } from '../auth/payment.plan';
 import { StripeService } from '../stripe/stripe.service';
 
 @Injectable()
@@ -50,15 +49,14 @@ export class OrgsService {
   async getByInvitationTokenOrCreateWithNameAndPlan(
     invitationToken?: string,
     name?: string,
-    plan?: PaymentPlan,
   ): Promise<Org> {
-    this.validateGetOrCreateOrg(invitationToken, name, plan);
+    this.validateGetOrCreateOrg(invitationToken, name);
 
     if (invitationToken) {
       return await this.findOneByInvitationToken(invitationToken);
     }
 
-    return await this.createOrg(name, plan);
+    return await this.createOrg(name);
   }
 
   async saveStripeSubscription(
@@ -74,26 +72,18 @@ export class OrgsService {
     await this.orgRepository.save(org);
   }
 
-  private async createOrg(name: string, plan: PaymentPlan) {
+  private async createOrg(name: string) {
     const org = new Org();
     org.name = name.trim();
     const stripeCustomer = await this.stripeService.createCustomer(org.name);
     org.stripeCustomerId = stripeCustomer.id;
-
-    if (plan) {
-      org.paymentPlan = plan;
-    }
 
     const savedOrg = await this.orgRepository.save(org);
     this.eventEmitter.emit('org.created', savedOrg);
     return savedOrg;
   }
 
-  private validateGetOrCreateOrg(
-    invitationToken: string,
-    name: string,
-    plan: PaymentPlan,
-  ) {
+  private validateGetOrCreateOrg(invitationToken: string, name: string) {
     if (!invitationToken && !name) {
       throw new Error('Invalid invitation token and name');
     }
@@ -108,10 +98,6 @@ export class OrgsService {
 
     if (name && (name.trim().length === 0 || name.trim().length > 50)) {
       throw new Error('Invalid name');
-    }
-
-    if (name && plan && !Object.values(PaymentPlan).includes(plan)) {
-      throw new Error('Invalid plan');
     }
   }
 }

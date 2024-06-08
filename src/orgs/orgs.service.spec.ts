@@ -82,7 +82,6 @@ describe('OrgsService', () => {
       const actual = await service.getByInvitationTokenOrCreateWithNameAndPlan(
         '',
         'Test org',
-        PaymentPlan.BUILD_IN_PRIVATE,
       );
       expect(actual.id).toBeDefined();
       expect(actual.id).not.toBeNull();
@@ -92,7 +91,6 @@ describe('OrgsService', () => {
       const actual = await service.getByInvitationTokenOrCreateWithNameAndPlan(
         '',
         'Test org',
-        PaymentPlan.BUILD_IN_PRIVATE,
       );
       expect(actual.paymentPlan).toEqual(PaymentPlan.BUILD_IN_PRIVATE);
     });
@@ -100,7 +98,6 @@ describe('OrgsService', () => {
       const actual = await service.getByInvitationTokenOrCreateWithNameAndPlan(
         '',
         'Test org',
-        PaymentPlan.BUILD_IN_PRIVATE,
       );
       expect(actual.stripeCustomerId).toBeDefined();
     });
