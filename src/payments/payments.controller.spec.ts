@@ -51,6 +51,7 @@ describe('PaymentsController', () => {
           'stripe-signature': 'test-signature',
         },
         body: {},
+        rawBody: 'test-raw-body',
       };
 
       jest.spyOn(paymentsService, 'constructEvent').mockReturnValue({
@@ -64,7 +65,7 @@ describe('PaymentsController', () => {
         },
       } as any);
 
-      const result = await controller.webhook(request);
+      const result = await controller.webhook(request as any);
       expect(result).toEqual({ received: true });
     });
   });
