@@ -79,6 +79,21 @@ describe('AuthService', () => {
         service.signIn('john@example.com', 'testtesttest'),
       ).rejects.toThrow(UnauthorizedException);
     });
+    it('should set the last signed in date', async () => {
+      const signUpDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'testtesttest',
+        productName: 'Test product',
+      };
+      await service.signUp(signUpDto);
+      const user = await usersService.findOneByEmail('john@example.com');
+      user.isActive = true;
+      await usersService.save(user);
+      await service.signIn('john@example.com', 'testtesttest');
+      const updatedUser = await usersService.findOneByEmail('john@example.com');
+      expect(updatedUser.lastSignedIn).toBeDefined();
+    });
   });
 
   describe('when signing in with invalid credentials', () => {
