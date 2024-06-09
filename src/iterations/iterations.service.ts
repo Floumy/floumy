@@ -125,10 +125,9 @@ export class IterationsService {
   }
 
   getIterationEndDate(iteration: Iteration) {
+    const startDate = iteration.actualStartDate || iteration.startDate;
     return new Date(
-      iteration.startDate.getTime() +
-        iteration.duration * 7 * 24 * 60 * 60 * 1000 -
-        1,
+      startDate.getTime() + iteration.duration * 7 * 24 * 60 * 60 * 1000 - 1,
     );
   }
 
@@ -143,14 +142,6 @@ export class IterationsService {
     await this.iterationRepository.remove(iteration);
   }
 
-  private async removeWorkItemsFromIteration(iteration: Iteration) {
-    const workItems = await iteration.workItems;
-    for (const workItem of workItems) {
-      workItem.iteration = Promise.resolve(null);
-      await this.workItemsRepository.save(workItem);
-    }
-  }
-
   async startIteration(orgId: string, id: string) {
     await this.completeActiveIterationIfExists(orgId);
 
@@ -161,24 +152,10 @@ export class IterationsService {
       },
     });
     iteration.actualStartDate = new Date();
+    iteration.endDate = this.getIterationEndDate(iteration);
     iteration.status = IterationStatus.ACTIVE;
     const savedIteration = await this.iterationRepository.save(iteration);
     return await IterationMapper.toDto(savedIteration);
-  }
-
-  private async completeActiveIterationIfExists(orgId: string) {
-    const activeIteration = await this.iterationRepository.findOneBy({
-      org: {
-        id: orgId,
-      },
-      status: IterationStatus.ACTIVE,
-    });
-
-    if (activeIteration) {
-      activeIteration.actualEndDate = new Date();
-      activeIteration.status = IterationStatus.COMPLETED;
-      await this.iterationRepository.save(activeIteration);
-    }
   }
 
   async findActiveIteration(orgId: string) {
@@ -207,13 +184,6 @@ export class IterationsService {
     iteration.velocity = await this.calculateIterationVelocity(iteration);
     const savedIteration = await this.iterationRepository.save(iteration);
     return await IterationMapper.toDto(savedIteration);
-  }
-
-  private async calculateIterationVelocity(iteration: Iteration) {
-    const workItems = await iteration.workItems;
-    return workItems
-      .filter((workItem) => workItem.estimation)
-      .reduce((sum, workItem) => sum + workItem.estimation, 0);
   }
 
   async list(orgId: string) {
@@ -285,5 +255,35 @@ export class IterationsService {
         startDate: 'ASC',
       },
     });
+  }
+
+  private async removeWorkItemsFromIteration(iteration: Iteration) {
+    const workItems = await iteration.workItems;
+    for (const workItem of workItems) {
+      workItem.iteration = Promise.resolve(null);
+      await this.workItemsRepository.save(workItem);
+    }
+  }
+
+  private async completeActiveIterationIfExists(orgId: string) {
+    const activeIteration = await this.iterationRepository.findOneBy({
+      org: {
+        id: orgId,
+      },
+      status: IterationStatus.ACTIVE,
+    });
+
+    if (activeIteration) {
+      activeIteration.actualEndDate = new Date();
+      activeIteration.status = IterationStatus.COMPLETED;
+      await this.iterationRepository.save(activeIteration);
+    }
+  }
+
+  private async calculateIterationVelocity(iteration: Iteration) {
+    const workItems = await iteration.workItems;
+    return workItems
+      .filter((workItem) => workItem.estimation)
+      .reduce((sum, workItem) => sum + workItem.estimation, 0);
   }
 }
