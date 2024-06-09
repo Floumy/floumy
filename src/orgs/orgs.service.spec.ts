@@ -5,6 +5,7 @@ import { UsersService } from '../users/users.service';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { setupTestingModule } from '../../test/test.utils';
 import { Repository } from 'typeorm';
+import { PaymentPlan } from '../auth/payment.plan';
 
 describe('OrgsService', () => {
   let service: OrgsService;
@@ -86,12 +87,15 @@ describe('OrgsService', () => {
       expect(actual.id).not.toBeNull();
       expect(actual.name).toEqual('Test org');
     });
-    it('should create a new org with a stripe customer', async () => {
+    it('should create an org with the default payment plan', async () => {
       const actual = await service.getByInvitationTokenOrCreateWithNameAndPlan(
         '',
         'Test org',
       );
-      expect(actual.stripeCustomerId).toBeDefined();
+      expect(actual.paymentPlan).toBeDefined();
+      expect(actual.paymentPlan).toEqual(PaymentPlan.TRIAL);
+      expect(actual.isSubscribed).toEqual(false);
+      expect(actual.nextPaymentDate).toBeNull();
     });
   });
 });

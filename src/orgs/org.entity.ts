@@ -35,8 +35,8 @@ export class Org {
   @Column({
     type: 'enum',
     enum: PaymentPlan,
-    default: null,
-    nullable: true,
+    default: PaymentPlan.TRIAL,
+    nullable: false,
   })
   paymentPlan: PaymentPlan;
   @Column({ default: false })

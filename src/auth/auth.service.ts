@@ -13,6 +13,7 @@ import { OrgsService } from '../orgs/orgs.service';
 export type AuthDto = {
   accessToken: string;
   refreshToken: string;
+  lastSignedIn: Date;
 };
 
 @Injectable()
@@ -43,10 +44,13 @@ export class AuthService {
       );
     }
     const refreshToken = await this.getOrCreateRefreshToken(user);
-    return {
+    const authData = {
       accessToken: await this.tokensService.generateAccessToken(user),
       refreshToken,
+      lastSignedIn: user.lastSignedIn,
     };
+    await this.updateLastSignedIn(user);
+    return authData;
   }
 
   async signUp(signUpDto: SignUpDto): Promise<void> {
@@ -195,5 +199,10 @@ export class AuthService {
 
   private async generateActivationToken() {
     return uuid();
+  }
+
+  private async updateLastSignedIn(user: User) {
+    user.lastSignedIn = new Date();
+    await this.usersService.save(user);
   }
 }

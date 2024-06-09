@@ -5,17 +5,17 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
-import { RefreshToken } from "../auth/refresh-token.entity";
-import { Org } from "../orgs/org.entity";
-import { WorkItem } from "../backlog/work-items/work-item.entity";
-import { Feature } from "../roadmap/features/feature.entity";
-import { Objective } from "../okrs/objective.entity";
+  UpdateDateColumn,
+} from 'typeorm';
+import { RefreshToken } from '../auth/refresh-token.entity';
+import { Org } from '../orgs/org.entity';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { Feature } from '../roadmap/features/feature.entity';
+import { Objective } from '../okrs/objective.entity';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column()
   name: string;
@@ -33,19 +33,26 @@ export class User {
   activationToken: string;
   @Column({ nullable: true })
   passwordResetToken: string;
-  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user, { cascade: true, lazy: true })
+  @Column({ nullable: true })
+  lastSignedIn: Date;
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
+    cascade: true,
+    lazy: true,
+  })
   refreshTokens: Promise<RefreshToken[]>;
-  @OneToMany(() => WorkItem, workItem => workItem.createdBy, { lazy: true })
+  @OneToMany(() => WorkItem, (workItem) => workItem.createdBy, { lazy: true })
   createdWorkItems: Promise<WorkItem[]>;
-  @OneToMany(() => WorkItem, workItem => workItem.assignedTo, { lazy: true })
+  @OneToMany(() => WorkItem, (workItem) => workItem.assignedTo, { lazy: true })
   assignedWorkItems: Promise<WorkItem[]>;
-  @OneToMany(() => Feature, feature => feature.createdBy, { lazy: true })
+  @OneToMany(() => Feature, (feature) => feature.createdBy, { lazy: true })
   createdFeatures: Promise<Feature[]>;
-  @OneToMany(() => Feature, feature => feature.assignedTo, { lazy: true })
+  @OneToMany(() => Feature, (feature) => feature.assignedTo, { lazy: true })
   assignedFeatures: Promise<Feature[]>;
-  @OneToMany(() => Objective, objective => objective.assignedTo, { lazy: true })
+  @OneToMany(() => Objective, (objective) => objective.assignedTo, {
+    lazy: true,
+  })
   assignedObjectives: any;
-  @ManyToOne(() => Org, org => org.users, { lazy: true })
+  @ManyToOne(() => Org, (org) => org.users, { lazy: true })
   org: Promise<Org>;
 
   constructor(name: string, email: string, password: string) {
