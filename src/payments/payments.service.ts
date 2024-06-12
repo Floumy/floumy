@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { OrgsService } from '../orgs/orgs.service';
 import { StripeService } from '../stripe/stripe.service';
 import Stripe from 'stripe';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class PaymentsService {
+  private static ONE_DAY_IN_MILLISECONDS = 86400000;
+
   constructor(
     private orgsService: OrgsService,
     private stripeService: StripeService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async handleWebhook(event: any) {
@@ -63,12 +67,37 @@ export class PaymentsService {
   async getSubscriptionStatus(
     orgId: string,
   ): Promise<{ hasActiveSubscriptions: boolean; nextPaymentDate: Date }> {
+    const cacheKey = `payment-check-${orgId}`;
+    const cachedResult = await this.cacheManager.get<{
+      hasActiveSubscriptions: boolean;
+      nextPaymentDate: Date;
+    }>(cacheKey);
+
+    if (cachedResult !== undefined) {
+      return cachedResult;
+    }
+
     const org = await this.orgsService.findOneById(orgId);
-    const activeSubscriptions =
-      await this.stripeService.listActiveSubscriptions(org.stripeCustomerId);
-    return {
+    const activeSubscriptions = org.stripeCustomerId
+      ? await this.stripeService.listActiveSubscriptions(org.stripeCustomerId)
+      : [];
+
+    const subscriptionStatus = {
       nextPaymentDate: org.nextPaymentDate,
       hasActiveSubscriptions: activeSubscriptions.length > 0,
     };
+
+    await this.cacheManager.set(
+      cacheKey,
+      subscriptionStatus,
+      PaymentsService.ONE_DAY_IN_MILLISECONDS,
+    );
+
+    return subscriptionStatus;
+  }
+
+  async hasActiveSubscription(orgId: string) {
+    const { hasActiveSubscriptions } = await this.getSubscriptionStatus(orgId);
+    return hasActiveSubscriptions;
   }
 }

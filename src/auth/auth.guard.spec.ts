@@ -3,7 +3,11 @@ import { TestingModule } from '@nestjs/testing';
 import { UsersModule } from '../users/users.module';
 import { AuthGuard } from './auth.guard';
 import { Reflector } from '@nestjs/core';
-import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  HttpException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { setupTestingModule } from '../../test/test.utils';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshToken } from './refresh-token.entity';
@@ -12,6 +16,7 @@ import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
 import { Repository } from 'typeorm';
 import { OrgsModule } from '../orgs/orgs.module';
+import { OrgsService } from '../orgs/orgs.service';
 
 describe('AuthGuard', () => {
   let tokensService: TokensService;
@@ -43,7 +48,17 @@ describe('AuthGuard', () => {
         };
       },
     } as unknown as Repository<User>;
-    const guard = new AuthGuard(tokensService, reflector, repository);
+    const orgsService = {
+      hasActiveSubscription: () => {
+        return true;
+      },
+    } as unknown as OrgsService;
+    const guard = new AuthGuard(
+      tokensService,
+      reflector,
+      repository,
+      orgsService,
+    );
     expect(guard).toBeInstanceOf(AuthGuard);
   });
 
@@ -61,7 +76,17 @@ describe('AuthGuard', () => {
         };
       },
     } as unknown as Repository<User>;
-    const guard = new AuthGuard(tokensService, reflector, repository);
+    const orgsService = {
+      hasActiveSubscription: () => {
+        return true;
+      },
+    } as unknown as OrgsService;
+    const guard = new AuthGuard(
+      tokensService,
+      reflector,
+      repository,
+      orgsService,
+    );
     const context = {
       getHandler: () => {},
       getClass: () => {},
@@ -84,7 +109,17 @@ describe('AuthGuard', () => {
         };
       },
     } as unknown as Repository<User>;
-    const guard = new AuthGuard(tokensService, reflector, repository);
+    const orgsService = {
+      hasActiveSubscription: () => {
+        return true;
+      },
+    } as unknown as OrgsService;
+    const guard = new AuthGuard(
+      tokensService,
+      reflector,
+      repository,
+      orgsService,
+    );
     const context = {
       getHandler: () => {},
       getClass: () => {},
@@ -107,7 +142,17 @@ describe('AuthGuard', () => {
         };
       },
     } as unknown as Repository<User>;
-    const guard = new AuthGuard(tokensService, reflector, repository);
+    const orgsService = {
+      hasActiveSubscription: () => {
+        return true;
+      },
+    } as unknown as OrgsService;
+    const guard = new AuthGuard(
+      tokensService,
+      reflector,
+      repository,
+      orgsService,
+    );
     const context = {
       switchToHttp: () => {
         return {
@@ -138,7 +183,17 @@ describe('AuthGuard', () => {
         };
       },
     } as unknown as Repository<User>;
-    const guard = new AuthGuard(tokensService, reflector, repository);
+    const orgsService = {
+      hasActiveSubscription: () => {
+        return true;
+      },
+    } as unknown as OrgsService;
+    const guard = new AuthGuard(
+      tokensService,
+      reflector,
+      repository,
+      orgsService,
+    );
     const context = {
       switchToHttp: () => {
         return {
@@ -169,7 +224,17 @@ describe('AuthGuard', () => {
         };
       },
     } as unknown as Repository<User>;
-    const guard = new AuthGuard(tokensService, reflector, repository);
+    const orgsService = {
+      hasActiveSubscription: () => {
+        return true;
+      },
+    } as unknown as OrgsService;
+    const guard = new AuthGuard(
+      tokensService,
+      reflector,
+      repository,
+      orgsService,
+    );
     const user = new User('John Doe', 'test@example.com', 'password');
     user.id = '1234';
     user.org = Promise.resolve({ id: '1234' } as Org);
@@ -203,7 +268,17 @@ describe('AuthGuard', () => {
         throw new Error();
       },
     } as unknown as Repository<User>;
-    const guard = new AuthGuard(tokensService, reflector, repository);
+    const orgsService = {
+      hasActiveSubscription: () => {
+        return true;
+      },
+    } as unknown as OrgsService;
+    const guard = new AuthGuard(
+      tokensService,
+      reflector,
+      repository,
+      orgsService,
+    );
     const context = {
       getHandler: () => {},
       getClass: () => {},
@@ -222,5 +297,44 @@ describe('AuthGuard', () => {
     await expect(guard.canActivate(context)).rejects.toThrow(
       UnauthorizedException,
     );
+  });
+  it('should return false when the org has no active subscription', async () => {
+    const reflector = {
+      getAllAndOverride: () => {
+        return false;
+      },
+    } as unknown as Reflector;
+    const repository = {
+      findOneByOrFail: () => {
+        throw new Error();
+      },
+    } as unknown as Repository<User>;
+    const orgsService = {
+      hasActiveSubscription: () => {
+        return false;
+      },
+    } as unknown as OrgsService;
+    const guard = new AuthGuard(
+      tokensService,
+      reflector,
+      repository,
+      orgsService,
+    );
+    const context = {
+      getHandler: () => {},
+      getClass: () => {},
+      switchToHttp: () => {
+        return {
+          getRequest: () => {
+            return {
+              headers: {
+                authorization: `Bearer invalid`,
+              },
+            };
+          },
+        };
+      },
+    } as ExecutionContext;
+    await expect(guard.canActivate(context)).rejects.toThrow(HttpException);
   });
 });

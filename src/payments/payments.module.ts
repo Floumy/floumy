@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { User } from '../users/user.entity';
     StripeModule,
     AuthModule,
     TypeOrmModule.forFeature([Org, User]),
+    CacheModule.register(),
   ],
   providers: [PaymentsService],
   controllers: [PaymentsController],
