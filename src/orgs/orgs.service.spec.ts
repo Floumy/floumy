@@ -98,4 +98,59 @@ describe('OrgsService', () => {
       expect(actual.nextPaymentDate).toBeNull();
     });
   });
+
+  describe('when verifying the active subscription', () => {
+    it('should return false when the org is on trial and was created more than 7 days ago', async () => {
+      const org = new Org();
+      org.paymentPlan = PaymentPlan.TRIAL;
+      org.createdAt = new Date();
+      org.createdAt.setDate(org.createdAt.getDate() - 8);
+      await orgsRepository.save(org);
+      const result = await service.hasActiveSubscription(org.id);
+      expect(result).toBe(false);
+    });
+    it('should return true when the org is on trial and was created less than 7 days ago', async () => {
+      const org = new Org();
+      org.paymentPlan = PaymentPlan.TRIAL;
+      org.createdAt = new Date();
+      org.createdAt.setDate(org.createdAt.getDate() - 6);
+      await orgsRepository.save(org);
+      const result = await service.hasActiveSubscription(org.id);
+      expect(result).toBe(true);
+    });
+    it('should return false when the org is not subscribed', async () => {
+      const org = new Org();
+      org.paymentPlan = PaymentPlan.TRIAL;
+      org.createdAt = new Date();
+      org.createdAt.setDate(org.createdAt.getDate() - 7);
+      org.isSubscribed = false;
+      await orgsRepository.save(org);
+      const result = await service.hasActiveSubscription(org.id);
+      expect(result).toBe(false);
+    });
+    it('should return false when the org is subscribed but the next payment date is in the past', async () => {
+      const org = new Org();
+      org.paymentPlan = PaymentPlan.TRIAL;
+      org.createdAt = new Date();
+      org.createdAt.setDate(org.createdAt.getDate() - 7);
+      org.isSubscribed = true;
+      org.nextPaymentDate = new Date();
+      org.nextPaymentDate.setDate(org.nextPaymentDate.getDate() - 1);
+      await orgsRepository.save(org);
+      const result = await service.hasActiveSubscription(org.id);
+      expect(result).toBe(false);
+    });
+    it('should return true when the org is subscribed and the next payment date is in the future', async () => {
+      const org = new Org();
+      org.paymentPlan = PaymentPlan.TRIAL;
+      org.createdAt = new Date();
+      org.createdAt.setDate(org.createdAt.getDate() - 7);
+      org.isSubscribed = true;
+      org.nextPaymentDate = new Date();
+      org.nextPaymentDate.setDate(org.nextPaymentDate.getDate() + 1);
+      await orgsRepository.save(org);
+      const result = await service.hasActiveSubscription(org.id);
+      expect(result).toBe(true);
+    });
+  });
 });
