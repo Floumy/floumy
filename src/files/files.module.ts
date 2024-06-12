@@ -13,6 +13,7 @@ import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { FeatureFile } from '../roadmap/features/feature-file.entity';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
+import { OrgsModule } from '../orgs/orgs.module';
 
 const s3ClientProvider = {
   provide: 'S3_CLIENT',
@@ -41,6 +42,7 @@ const s3ClientProvider = {
     ConfigModule,
     AuthModule,
     UsersModule,
+    OrgsModule,
     TypeOrmModule.forFeature([Org, File, WorkItemFile, FeatureFile, User]),
   ],
   exports: [FilesService],
