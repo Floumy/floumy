@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
-import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshToken } from './refresh-token.entity';
@@ -14,6 +13,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { User } from '../users/user.entity';
 import { RefreshTokensCleanerService } from './referesh-tokens-cleaner.service';
 import { OrgsModule } from '../orgs/orgs.module';
+import { BasicAuthGuard } from './basic-auth.guard';
 
 @Module({
   controllers: [AuthController],
@@ -22,10 +22,8 @@ import { OrgsModule } from '../orgs/orgs.module';
     ConfigService,
     TokensService,
     RefreshTokensCleanerService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
+    BasicAuthGuard,
+    AuthGuard,
   ],
   imports: [
     UsersModule,
@@ -38,6 +36,6 @@ import { OrgsModule } from '../orgs/orgs.module';
     TypeOrmModule.forFeature([RefreshToken, User]),
     OrgsModule,
   ],
-  exports: [AuthService, TokensService],
+  exports: [AuthService, TokensService, BasicAuthGuard],
 })
 export class AuthModule {}
