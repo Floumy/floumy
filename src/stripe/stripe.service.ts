@@ -32,21 +32,21 @@ export class StripeService {
   }
 
   async createCheckoutSession(
-    customerId: string,
+    orgId: string,
     priceId: string,
+    quantity: number,
   ): Promise<Stripe.Checkout.Session> {
     return this.stripe.checkout.sessions.create({
-      customer: customerId,
       payment_method_types: ['card'],
       line_items: [
         {
           price: priceId,
-          quantity: 1,
+          quantity: quantity,
         },
       ],
       mode: 'subscription',
-      subscription_data: {
-        trial_period_days: 7,
+      metadata: {
+        org: orgId,
       },
       success_url: this.configService.get('stripe.successUrl'),
       cancel_url: this.configService.get('stripe.cancelUrl'),

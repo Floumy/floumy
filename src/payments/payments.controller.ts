@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Post,
@@ -11,6 +12,7 @@ import Stripe from 'stripe';
 import { PaymentsService } from './payments.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
+import { BasicAuthGuard } from '../auth/basic-auth.guard';
 
 @Controller('payments')
 export class PaymentsController {
@@ -34,11 +36,18 @@ export class PaymentsController {
     return { received: true };
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Post('/checkout-session')
   async createCheckoutSession(@Req() request: any) {
     const org = request.user.org;
-    return { url: await this.paymentService.createCheckoutSessionUrl(org) };
+    const paymentPlan = request.body.paymentPlan;
+    if (!paymentPlan) {
+      throw new BadRequestException('Payment Plan is required');
+    }
+
+    return {
+      url: await this.paymentService.createCheckoutSessionUrl(org, paymentPlan),
+    };
   }
 
   @UseGuards(AuthGuard)
