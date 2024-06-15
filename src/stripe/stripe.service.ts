@@ -10,16 +10,6 @@ export class StripeService {
     private configService: ConfigService,
   ) {}
 
-  async createCustomer(name: string): Promise<{ id: string }> {
-    const stripeCustomer = await this.stripe.customers.create({
-      name,
-    });
-
-    return {
-      id: stripeCustomer?.id,
-    };
-  }
-
   getPriceIdByPaymentPlan(paymentPlan: PaymentPlan): string {
     switch (paymentPlan) {
       case PaymentPlan.BUILD_IN_PRIVATE:
@@ -33,10 +23,11 @@ export class StripeService {
 
   async createCheckoutSession(
     orgId: string,
+    paymentPlan: PaymentPlan,
     priceId: string,
     quantity: number,
   ): Promise<Stripe.Checkout.Session> {
-    return this.stripe.checkout.sessions.create({
+    return await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
@@ -47,6 +38,7 @@ export class StripeService {
       mode: 'subscription',
       metadata: {
         org: orgId,
+        plan: paymentPlan,
       },
       success_url: this.configService.get('stripe.successUrl'),
       cancel_url: this.configService.get('stripe.cancelUrl'),
@@ -63,7 +55,7 @@ export class StripeService {
     return subscriptions.data;
   }
 
-  constructWebhookEvent(requestBody: any, sig: any): Stripe.Event {
+  constructWebhookEvent(requestBody: string, sig: string): Stripe.Event {
     return this.stripe.webhooks.constructEvent(
       requestBody,
       sig,

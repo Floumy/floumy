@@ -45,6 +45,8 @@ export class Org {
   nextPaymentDate: Date;
   @Column({ default: null, nullable: true })
   stripeCustomerId: string;
+  @Column({ default: null, nullable: true })
+  stripeSubscriptionId: string;
   @OneToMany(() => Objective, (objective) => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })

@@ -22,12 +22,13 @@ export class PaymentsController {
   @Public()
   @Post('/webhook')
   async webhook(@Req() request: RawBodyRequest<Request>) {
-    const sig = request.headers['stripe-signature'];
-
+    const sig = request.headers['stripe-signature'].toString();
     let event: Stripe.Event;
-
     try {
-      event = this.paymentService.constructEvent(sig, request.rawBody);
+      event = this.paymentService.constructEvent(
+        sig,
+        request.rawBody.toString(),
+      );
     } catch (err) {
       return { error: `Webhook Error: ${err.message}` };
     }

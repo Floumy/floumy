@@ -18,43 +18,49 @@ export class PaymentsService {
   ) {}
 
   async handleWebhook(event: any) {
+    console.log(event);
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
-      const customerId = session.customer as string;
 
-      if (typeof session.subscription === 'object') {
-        await this.saveStripeSubscription(
-          customerId,
-          true,
-          session.subscription.current_period_end * 1000,
-        );
-      }
-    }
+      // One month from now
+      const nextPaymentDate = new Date();
+      nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
 
-    if (event.type === 'invoice.payment_succeeded') {
-      const invoice = event.data.object as Stripe.Invoice;
-      const customerId = invoice.customer as string;
-
-      await this.saveStripeSubscription(
-        customerId,
+      await this.saveSubscriptionDetailsForOrg(
+        session.metadata.org,
+        session.metadata.plan,
+        session.customer as string,
+        session.subscription as string,
         true,
-        invoice.next_payment_attempt * 1000,
+        nextPaymentDate,
       );
     }
 
-    if (event.type === 'invoice.payment_failed') {
-      const invoice = event.data.object as Stripe.Invoice;
-      const customerId = invoice.customer as string;
-
-      await this.saveStripeSubscription(
-        customerId,
-        false,
-        invoice.next_payment_attempt * 1000,
-      );
-    }
+    // TODO: Handle other events
+    // if (event.type === 'invoice.payment_succeeded') {
+    //   const invoice = event.data.object as Stripe.Invoice;
+    //   const customerId = invoice.customer as string;
+    //
+    //   await this.saveStripeSubscription(
+    //     customerId,
+    //     true,
+    //     invoice.next_payment_attempt * 1000,
+    //   );
+    // }
+    //
+    // if (event.type === 'invoice.payment_failed') {
+    //   const invoice = event.data.object as Stripe.Invoice;
+    //   const customerId = invoice.customer as string;
+    //
+    //   await this.saveStripeSubscription(
+    //     customerId,
+    //     false,
+    //     invoice.next_payment_attempt * 1000,
+    //   );
+    // }
   }
 
-  constructEvent(sig: any, requestBody: any) {
+  constructEvent(sig: string, requestBody: string) {
     return this.stripeService.constructWebhookEvent(requestBody, sig);
   }
 
@@ -67,6 +73,7 @@ export class PaymentsService {
     const usersCount = users.filter((user) => user.isActive).length;
     const stripeSession = await this.stripeService.createCheckoutSession(
       org.id,
+      paymentPlan,
       this.stripeService.getPriceIdByPaymentPlan(paymentPlan),
       usersCount,
     );
@@ -110,16 +117,20 @@ export class PaymentsService {
     return hasActiveSubscriptions;
   }
 
-  async saveStripeSubscription(
-    customerId: string,
+  async saveSubscriptionDetailsForOrg(
+    orgId: string,
+    plan: string,
+    stripeCustomerId: string,
+    stripeSubscriptionId: string,
     isSubscribed: boolean,
-    nextPaymentDate: number,
+    nextPaymentDate: Date,
   ) {
-    const org = await this.orgRepository.findOneByOrFail({
-      stripeCustomerId: customerId,
-    });
+    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    org.paymentPlan = plan as PaymentPlan;
     org.isSubscribed = isSubscribed;
-    org.nextPaymentDate = new Date(nextPaymentDate);
+    org.stripeCustomerId = stripeCustomerId;
+    org.stripeSubscriptionId = stripeSubscriptionId;
+    org.nextPaymentDate = nextPaymentDate;
     await this.orgRepository.save(org);
   }
 }
