@@ -13,6 +13,7 @@ import { PaymentsService } from './payments.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { BasicAuthGuard } from '../auth/basic-auth.guard';
+import { PaymentPlan } from '../auth/payment.plan';
 
 @Controller('payments')
 export class PaymentsController {
@@ -41,7 +42,12 @@ export class PaymentsController {
   async createCheckoutSession(@Req() request: any) {
     const org = request.user.org;
     const paymentPlan = request.body.paymentPlan;
-    if (!paymentPlan) {
+    if (
+      !paymentPlan ||
+      [PaymentPlan.BUILD_IN_PRIVATE, PaymentPlan.BUILD_IN_PUBLIC].indexOf(
+        paymentPlan,
+      ) === -1
+    ) {
       throw new BadRequestException('Payment Plan is required');
     }
 
