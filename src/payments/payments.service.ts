@@ -18,7 +18,6 @@ export class PaymentsService {
   ) {}
 
   async handleWebhook(event: any) {
-    console.log(event);
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
 

@@ -61,6 +61,10 @@ describe('PaymentsController', () => {
             subscription: {
               current_period_end: 1234567890,
             },
+            metadata: {
+              org: org.id,
+              plan: 'build-in-private',
+            },
           },
         },
       } as any);
