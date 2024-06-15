@@ -76,6 +76,9 @@ describe('PaymentsController', () => {
         user: {
           org,
         },
+        body: {
+          paymentPlan: 'build-in-public',
+        },
       };
 
       jest
