@@ -62,4 +62,8 @@ export class StripeService {
       this.configService.get('stripe.webhookSecret'),
     );
   }
+
+  async cancelSubscription(stripeSubscriptionId: string) {
+    await this.stripe.subscriptions.cancel(stripeSubscriptionId);
+  }
 }

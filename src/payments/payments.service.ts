@@ -1,7 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { StripeService } from '../stripe/stripe.service';
 import Stripe from 'stripe';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
 import { Repository } from 'typeorm';
@@ -9,11 +8,8 @@ import { PaymentPlan } from '../auth/payment.plan';
 
 @Injectable()
 export class PaymentsService {
-  private static ONE_DAY_IN_MILLISECONDS = 86400000;
-
   constructor(
     private stripeService: StripeService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectRepository(Org) private orgRepository: Repository<Org>,
   ) {}
 
@@ -79,43 +75,6 @@ export class PaymentsService {
     return stripeSession.url;
   }
 
-  async getSubscriptionStatus(
-    orgId: string,
-  ): Promise<{ hasActiveSubscriptions: boolean; nextPaymentDate: Date }> {
-    const cacheKey = `payment-check-${orgId}`;
-    const cachedResult = await this.cacheManager.get<{
-      hasActiveSubscriptions: boolean;
-      nextPaymentDate: Date;
-    }>(cacheKey);
-
-    if (cachedResult !== undefined) {
-      return cachedResult;
-    }
-
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
-    const activeSubscriptions = org.stripeCustomerId
-      ? await this.stripeService.listActiveSubscriptions(org.stripeCustomerId)
-      : [];
-
-    const subscriptionStatus = {
-      nextPaymentDate: org.nextPaymentDate,
-      hasActiveSubscriptions: activeSubscriptions.length > 0,
-    };
-
-    await this.cacheManager.set(
-      cacheKey,
-      subscriptionStatus,
-      PaymentsService.ONE_DAY_IN_MILLISECONDS,
-    );
-
-    return subscriptionStatus;
-  }
-
-  async hasActiveSubscription(orgId: string) {
-    const { hasActiveSubscriptions } = await this.getSubscriptionStatus(orgId);
-    return hasActiveSubscriptions;
-  }
-
   async saveSubscriptionDetailsForOrg(
     orgId: string,
     plan: string,
@@ -130,6 +89,13 @@ export class PaymentsService {
     org.stripeCustomerId = stripeCustomerId;
     org.stripeSubscriptionId = stripeSubscriptionId;
     org.nextPaymentDate = nextPaymentDate;
+    await this.orgRepository.save(org);
+  }
+
+  async cancelSubscription(orgId: string) {
+    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    await this.stripeService.cancelSubscription(org.stripeSubscriptionId);
+    org.isSubscribed = false;
     await this.orgRepository.save(org);
   }
 }

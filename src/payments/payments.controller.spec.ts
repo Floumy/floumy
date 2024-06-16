@@ -96,24 +96,20 @@ describe('PaymentsController', () => {
     });
   });
 
-  describe('hasActiveSubscription', () => {
-    it('should return the subscription status', async () => {
+  describe('cancelSubscription', () => {
+    it('should return undefined', async () => {
       const request = {
         user: {
           org,
         },
       };
 
-      jest.spyOn(paymentsService, 'getSubscriptionStatus').mockResolvedValue({
-        nextPaymentDate: new Date(),
-        hasActiveSubscriptions: true,
-      });
+      jest
+        .spyOn(paymentsService, 'cancelSubscription')
+        .mockResolvedValue(undefined);
 
-      const result = await controller.hasActiveSubscription(request);
-      expect(result).toEqual({
-        nextPaymentDate: expect.any(Date),
-        hasActiveSubscriptions: true,
-      });
+      const result = await controller.cancelSubscription(request);
+      expect(result.success).toBe(true);
     });
   });
 });
