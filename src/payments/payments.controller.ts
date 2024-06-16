@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Controller,
-  Get,
   Post,
   RawBodyRequest,
   Req,
@@ -10,10 +9,10 @@ import {
 import { Public } from '../auth/public.guard';
 import Stripe from 'stripe';
 import { PaymentsService } from './payments.service';
-import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { BasicAuthGuard } from '../auth/basic-auth.guard';
 import { PaymentPlan } from '../auth/payment.plan';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('payments')
 export class PaymentsController {
@@ -58,9 +57,10 @@ export class PaymentsController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('/subscriptions-details')
-  async hasActiveSubscription(@Req() request: any) {
+  @Post('/cancel-subscription')
+  async cancelSubscription(@Req() request: any) {
     const org = request.user.org;
-    return await this.paymentService.getSubscriptionStatus(org);
+    await this.paymentService.cancelSubscription(org);
+    return { success: true };
   }
 }
