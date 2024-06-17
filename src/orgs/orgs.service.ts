@@ -71,9 +71,8 @@ export class OrgsService {
     }
 
     return (
-      org.isSubscribed &&
-      org.nextPaymentDate &&
-      org.nextPaymentDate > new Date()
+      org.isSubscribed ||
+      (org.nextPaymentDate && org.nextPaymentDate > new Date())
     );
   }
 

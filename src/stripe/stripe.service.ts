@@ -66,4 +66,31 @@ export class StripeService {
   async cancelSubscription(stripeSubscriptionId: string) {
     await this.stripe.subscriptions.cancel(stripeSubscriptionId);
   }
+
+  async updateSubscriptionPlan(
+    subscriptionId: string,
+    oldPriceIdPaymentPlan: string,
+    newPriceIdByPaymentPlan: string,
+    quantity: number,
+  ) {
+    const existingSubscriptionItems = await this.stripe.subscriptionItems.list({
+      subscription: subscriptionId,
+    });
+    const oldSubscriptionItem = existingSubscriptionItems.data.find(
+      (item) => item.price.id === oldPriceIdPaymentPlan,
+    );
+    if (!oldSubscriptionItem) {
+      throw new Error('Subscription item not found');
+    }
+
+    await this.stripe.subscriptions.update(subscriptionId, {
+      items: [
+        {
+          id: oldSubscriptionItem.id,
+          price: newPriceIdByPaymentPlan,
+          quantity: quantity,
+        },
+      ],
+    });
+  }
 }

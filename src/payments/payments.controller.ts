@@ -1,7 +1,9 @@
 import {
   BadRequestException,
   Controller,
+  Delete,
   Post,
+  Put,
   RawBodyRequest,
   Req,
   UseGuards,
@@ -57,10 +59,18 @@ export class PaymentsController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/cancel-subscription')
+  @Delete('/subscription')
   async cancelSubscription(@Req() request: any) {
     const org = request.user.org;
     await this.paymentService.cancelSubscription(org);
+    return { success: true };
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('/subscription')
+  async updateSubscription(@Req() request: any) {
+    const org = request.user.org;
+    await this.paymentService.updateSubscription(org, request.body.paymentPlan);
     return { success: true };
   }
 }

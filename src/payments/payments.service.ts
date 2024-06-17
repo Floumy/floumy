@@ -98,4 +98,17 @@ export class PaymentsService {
     org.isSubscribed = false;
     await this.orgRepository.save(org);
   }
+
+  async updateSubscription(orgId: string, plan: PaymentPlan) {
+    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    const users = await org.users;
+    await this.stripeService.updateSubscriptionPlan(
+      org.stripeSubscriptionId,
+      this.stripeService.getPriceIdByPaymentPlan(org.paymentPlan),
+      this.stripeService.getPriceIdByPaymentPlan(plan),
+      users.length,
+    );
+    org.paymentPlan = plan;
+    await this.orgRepository.save(org);
+  }
 }
