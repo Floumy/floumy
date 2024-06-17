@@ -70,10 +70,11 @@ export class OrgsService {
       return true;
     }
 
-    return (
-      org.isSubscribed ||
-      (org.nextPaymentDate && org.nextPaymentDate > new Date())
-    );
+    if (org.isSubscribed && org.nextPaymentDate > new Date()) {
+      return true;
+    }
+
+    return org.nextPaymentDate > new Date();
   }
 
   private async createOrg(name: string) {
