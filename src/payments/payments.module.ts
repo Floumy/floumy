@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
+import { PaymentsEventHandler } from './payments.event-handler';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     TypeOrmModule.forFeature([Org, User]),
     CacheModule.register(),
   ],
-  providers: [PaymentsService],
+  providers: [PaymentsService, PaymentsEventHandler],
   controllers: [PaymentsController],
   exports: [PaymentsService],
 })

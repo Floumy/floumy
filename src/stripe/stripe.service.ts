@@ -69,28 +69,71 @@ export class StripeService {
 
   async updateSubscriptionPlan(
     subscriptionId: string,
-    oldPriceIdPaymentPlan: string,
-    newPriceIdByPaymentPlan: string,
+    oldPaymentPlanPriceId: string,
+    newPaymentPlanPriceId: string,
     quantity: number,
+  ) {
+    const oldSubscriptionItem = await this.getSubscriptionItem(
+      subscriptionId,
+      oldPaymentPlanPriceId,
+    );
+
+    await this.updateSubscriptionItem(
+      subscriptionId,
+      oldSubscriptionItem,
+      newPaymentPlanPriceId,
+      quantity,
+    );
+  }
+
+  async updateSubscriptionQuantity(
+    stripeSubscriptionId: string,
+    paymentPlanPriceId: string,
+    length: number,
+  ) {
+    const subscriptionItem = await this.getSubscriptionItem(
+      stripeSubscriptionId,
+      paymentPlanPriceId,
+    );
+
+    await this.updateSubscriptionItem(
+      stripeSubscriptionId,
+      subscriptionItem,
+      paymentPlanPriceId,
+      length,
+    );
+  }
+
+  private async updateSubscriptionItem(
+    subscriptionId: string,
+    subscriptionItem: Stripe.SubscriptionItem,
+    paymentPlanPriceId: string,
+    quantity: number,
+  ) {
+    await this.stripe.subscriptions.update(subscriptionId, {
+      items: [
+        {
+          id: subscriptionItem.id,
+          price: paymentPlanPriceId,
+          quantity: quantity,
+        },
+      ],
+    });
+  }
+
+  private async getSubscriptionItem(
+    subscriptionId: string,
+    paymentPlanPriceId: string,
   ) {
     const existingSubscriptionItems = await this.stripe.subscriptionItems.list({
       subscription: subscriptionId,
     });
     const oldSubscriptionItem = existingSubscriptionItems.data.find(
-      (item) => item.price.id === oldPriceIdPaymentPlan,
+      (item) => item.price.id === paymentPlanPriceId,
     );
     if (!oldSubscriptionItem) {
       throw new Error('Subscription item not found');
     }
-
-    await this.stripe.subscriptions.update(subscriptionId, {
-      items: [
-        {
-          id: oldSubscriptionItem.id,
-          price: newPriceIdByPaymentPlan,
-          quantity: quantity,
-        },
-      ],
-    });
+    return oldSubscriptionItem;
   }
 }
