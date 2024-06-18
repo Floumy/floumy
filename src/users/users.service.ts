@@ -8,6 +8,7 @@ import { OrgsService } from '../orgs/orgs.service';
 import { UserMapper } from './user.mapper';
 import { RefreshToken } from '../auth/refresh-token.entity';
 import { Org } from '../orgs/org.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +18,7 @@ export class UsersService {
     private refreshTokensRepository: Repository<RefreshToken>,
     private orgsService: OrgsService,
     private configService: ConfigService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async findOneByEmail(email: string): Promise<User | undefined> {
@@ -74,27 +76,6 @@ export class UsersService {
     }
   }
 
-  private async validateUser(name: string, email: string, password: string) {
-    if (!this.isNameValid(name)) throw new Error('Invalid name');
-    if (!this.isEmailValid(email)) throw new Error('Invalid email');
-    if (!this.isPasswordValid(password)) throw new Error('Invalid password');
-    if (await this.findOneByEmail(email))
-      throw new Error('Email already exists');
-  }
-
-  private isPasswordValid(password: string) {
-    return password !== '' && password.length >= 8;
-  }
-
-  private isEmailValid(email: string) {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$/;
-    return email !== '' && emailRegex.test(email);
-  }
-
-  private isNameValid(name: string) {
-    return name !== '' && name.length >= 2;
-  }
-
   async clear() {
     await this.usersRepository.clear();
   }
@@ -125,6 +106,35 @@ export class UsersService {
     user.isActive = false;
     await this.usersRepository.save(user);
     await this.removeRefreshTokensFor(user);
+
+    this.eventEmitter.emit('user.deactivated', user);
+  }
+
+  async findOneByPasswordResetToken(resetToken: string) {
+    return this.usersRepository.findOneByOrFail({
+      passwordResetToken: resetToken,
+    });
+  }
+
+  private async validateUser(name: string, email: string, password: string) {
+    if (!this.isNameValid(name)) throw new Error('Invalid name');
+    if (!this.isEmailValid(email)) throw new Error('Invalid email');
+    if (!this.isPasswordValid(password)) throw new Error('Invalid password');
+    if (await this.findOneByEmail(email))
+      throw new Error('Email already exists');
+  }
+
+  private isPasswordValid(password: string) {
+    return password !== '' && password.length >= 8;
+  }
+
+  private isEmailValid(email: string) {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$/;
+    return email !== '' && emailRegex.test(email);
+  }
+
+  private isNameValid(name: string) {
+    return name !== '' && name.length >= 2;
   }
 
   private async validateThatThereWillBeAtLeastOneActiveUser(user: User) {
@@ -140,11 +150,5 @@ export class UsersService {
     await Promise.all(
       refreshTokens.map((token) => this.refreshTokensRepository.remove(token)),
     );
-  }
-
-  async findOneByPasswordResetToken(resetToken: string) {
-    return this.usersRepository.findOneByOrFail({
-      passwordResetToken: resetToken,
-    });
   }
 }

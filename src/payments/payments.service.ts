@@ -111,4 +111,15 @@ export class PaymentsService {
     org.paymentPlan = plan;
     await this.orgRepository.save(org);
   }
+
+  async updateSubscriptionCount(orgId: string) {
+    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    const users = await org.users;
+    console.log(org);
+    await this.stripeService.updateSubscriptionQuantity(
+      org.stripeSubscriptionId,
+      this.stripeService.getPriceIdByPaymentPlan(org.paymentPlan),
+      users.filter((user) => user.isActive).length,
+    );
+  }
 }

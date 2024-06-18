@@ -9,6 +9,7 @@ import { SignUpDto } from './auth.dtos';
 import { v4 as uuid } from 'uuid';
 import { NotificationsService } from '../notifications/notifications.service';
 import { OrgsService } from '../orgs/orgs.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 export type AuthDto = {
   accessToken: string;
@@ -27,6 +28,7 @@ export class AuthService {
     private tokensService: TokensService,
     private notificationsService: NotificationsService,
     private orgsService: OrgsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async signIn(email: string, password: string): Promise<AuthDto> {
@@ -143,6 +145,8 @@ export class AuthService {
     user.isActive = true;
     user.activationToken = null;
     await this.usersService.save(user);
+
+    this.eventEmitter.emit('user.activated', user);
   }
 
   async requestPasswordReset(email: string) {
