@@ -104,6 +104,10 @@ export class StripeService {
     );
   }
 
+  async getInvoice(invoiceId: string) {
+    return await this.stripe.invoices.retrieve(invoiceId);
+  }
+
   private async updateSubscriptionItem(
     subscriptionId: string,
     subscriptionItem: Stripe.SubscriptionItem,

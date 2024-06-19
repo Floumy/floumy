@@ -9,13 +9,14 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PaymentsEventHandler } from './payments.event-handler';
+import { Invoice } from './invoice.entity';
 
 @Module({
   imports: [
     OrgsModule,
     StripeModule,
     AuthModule,
-    TypeOrmModule.forFeature([Org, User]),
+    TypeOrmModule.forFeature([Org, User, Invoice]),
     CacheModule.register(),
   ],
   providers: [PaymentsService, PaymentsEventHandler],
