@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   Delete,
+  Get,
   Post,
   Put,
   RawBodyRequest,
@@ -72,5 +73,12 @@ export class PaymentsController {
     const org = request.user.org;
     await this.paymentService.updateSubscription(org, request.body.paymentPlan);
     return { success: true };
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/invoices')
+  async getInvoices(@Req() request: any) {
+    const org = request.user.org;
+    return await this.paymentService.getInvoices(org);
   }
 }

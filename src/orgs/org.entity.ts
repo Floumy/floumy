@@ -17,6 +17,7 @@ import { Iteration } from '../iterations/Iteration.entity';
 import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
 import { PaymentPlan } from '../auth/payment.plan';
+import { Invoice } from '../payments/invoice.entity';
 
 @Entity()
 export class Org {
@@ -59,6 +60,8 @@ export class Org {
   workItems: Promise<WorkItem[]>;
   @OneToMany(() => Iteration, (iteration) => iteration.org, { lazy: true })
   iterations: Promise<Iteration[]>;
+  @OneToMany(() => Invoice, (invoice) => invoice.org, { lazy: true })
+  invoices: Promise<Invoice[]>;
   @OneToMany(() => File, (file) => file.org, { lazy: true })
   files: Promise<File[]>;
   @OneToOne(() => BipSettings, (bipSettings) => bipSettings.org, {
