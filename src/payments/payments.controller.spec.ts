@@ -9,6 +9,7 @@ import { UsersService } from '../users/users.service';
 import { PaymentsService } from './payments.service';
 import { StripeService } from '../stripe/stripe.service';
 import { OrgsModule } from '../orgs/orgs.module';
+import { Invoice } from './invoice.entity';
 
 describe('PaymentsController', () => {
   let controller: PaymentsController;
@@ -18,7 +19,7 @@ describe('PaymentsController', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User]), UsersModule, OrgsModule],
+      [TypeOrmModule.forFeature([Org, User, Invoice]), UsersModule, OrgsModule],
       [PaymentsService, StripeService],
       [PaymentsController],
     );
