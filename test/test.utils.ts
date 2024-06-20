@@ -85,6 +85,14 @@ export async function setupTestingModule(
         };
       }),
     },
+    invoices: {
+      retrieve: jest.fn().mockImplementation(() => {
+        return {
+          id: 'in_test',
+          invoice_pdf: 'https://stripe.com/invoice.pdf',
+        };
+      }),
+    },
   };
 
   const module: TestingModule = await Test.createTestingModule({

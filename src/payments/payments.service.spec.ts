@@ -5,6 +5,7 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { OrgsModule } from '../orgs/orgs.module';
 import { StripeModule } from '../stripe/stripe.module';
+import { Invoice } from './invoice.entity';
 
 describe('PaymentsService', () => {
   let service: PaymentsService;
@@ -13,7 +14,11 @@ describe('PaymentsService', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User]), OrgsModule, StripeModule],
+      [
+        TypeOrmModule.forFeature([Org, User, Invoice]),
+        OrgsModule,
+        StripeModule,
+      ],
       [PaymentsService],
     );
     service = module.get<PaymentsService>(PaymentsService);
