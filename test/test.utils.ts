@@ -18,6 +18,7 @@ import { OrgsService } from '../src/orgs/orgs.service';
 import { PaymentsService } from '../src/payments/payments.service';
 import { Org } from '../src/orgs/org.entity';
 import { TokensService } from '../src/auth/tokens.service';
+import { Invoice } from '../src/payments/invoice.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -101,7 +102,7 @@ export async function setupTestingModule(
       CacheModule.register(),
       jwtModule,
       typeOrmModule,
-      TypeOrmModule.forFeature([User, RefreshToken, Org]),
+      TypeOrmModule.forFeature([User, RefreshToken, Org, Invoice]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],
       }),
