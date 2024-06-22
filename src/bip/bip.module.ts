@@ -22,5 +22,6 @@ import { PublicService } from './public/public.service';
   ],
   providers: [BipService, PublicService],
   controllers: [BipController, PublicController],
+  exports: [BipService],
 })
 export class BipModule {}

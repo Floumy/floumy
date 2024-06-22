@@ -6,11 +6,13 @@ import { Org } from '../orgs/org.entity';
 import { Repository } from 'typeorm';
 import { PaymentPlan } from '../auth/payment.plan';
 import { Invoice } from './invoice.entity';
+import { BipService } from '../bip/bip.service';
 
 @Injectable()
 export class PaymentsService {
   constructor(
     private stripeService: StripeService,
+    private bipService: BipService,
     @InjectRepository(Org) private orgRepository: Repository<Org>,
     @InjectRepository(Invoice) private invoiceRepository: Repository<Invoice>,
   ) {}
@@ -137,6 +139,16 @@ export class PaymentsService {
     );
     org.paymentPlan = plan;
     await this.orgRepository.save(org);
+
+    if (plan === PaymentPlan.BUILD_IN_PRIVATE) {
+      await this.bipService.createOrUpdateSettings(orgId, {
+        isBuildInPublicEnabled: false,
+        isObjectivesPagePublic: false,
+        isRoadmapPagePublic: false,
+        isIterationsPagePublic: false,
+        isActiveIterationsPagePublic: false,
+      });
+    }
   }
 
   async updateSubscriptionCount(orgId: string) {

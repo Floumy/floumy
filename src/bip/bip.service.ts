@@ -18,6 +18,11 @@ export class BipService {
 
   async createOrUpdateSettings(orgId: string, settings: BipSettingsDto) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+
+    if (org.paymentPlan === 'build-in-private') {
+      throw new Error('Payment plan is Build In Private');
+    }
+
     let bipSettings = await org.bipSettings;
     if (!bipSettings) {
       bipSettings = new BipSettings();
