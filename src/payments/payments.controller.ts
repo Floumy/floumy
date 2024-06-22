@@ -54,25 +54,43 @@ export class PaymentsController {
       throw new BadRequestException('Payment Plan is required');
     }
 
-    return {
-      url: await this.paymentService.createCheckoutSessionUrl(org, paymentPlan),
-    };
+    try {
+      return {
+        url: await this.paymentService.createCheckoutSessionUrl(
+          org,
+          paymentPlan,
+        ),
+      };
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
   @UseGuards(AuthGuard)
   @Delete('/subscription')
   async cancelSubscription(@Req() request: any) {
-    const org = request.user.org;
-    await this.paymentService.cancelSubscription(org);
-    return { success: true };
+    try {
+      const org = request.user.org;
+      await this.paymentService.cancelSubscription(org);
+      return { success: true };
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
   @UseGuards(AuthGuard)
   @Put('/subscription')
   async updateSubscription(@Req() request: any) {
-    const org = request.user.org;
-    await this.paymentService.updateSubscription(org, request.body.paymentPlan);
-    return { success: true };
+    try {
+      const org = request.user.org;
+      await this.paymentService.updateSubscription(
+        org,
+        request.body.paymentPlan,
+      );
+      return { success: true };
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
   @UseGuards(AuthGuard)

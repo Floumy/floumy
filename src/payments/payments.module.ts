@@ -10,12 +10,14 @@ import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PaymentsEventHandler } from './payments.event-handler';
 import { Invoice } from './invoice.entity';
+import { BipModule } from '../bip/bip.module';
 
 @Module({
   imports: [
     OrgsModule,
     StripeModule,
     AuthModule,
+    BipModule,
     TypeOrmModule.forFeature([Org, User, Invoice]),
     CacheModule.register(),
   ],

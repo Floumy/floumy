@@ -19,6 +19,8 @@ import { PaymentsService } from '../src/payments/payments.service';
 import { Org } from '../src/orgs/org.entity';
 import { TokensService } from '../src/auth/tokens.service';
 import { Invoice } from '../src/payments/invoice.entity';
+import { BipService } from '../src/bip/bip.service';
+import { BipSettings } from '../src/bip/bip-settings.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -102,7 +104,7 @@ export async function setupTestingModule(
       CacheModule.register(),
       jwtModule,
       typeOrmModule,
-      TypeOrmModule.forFeature([User, RefreshToken, Org, Invoice]),
+      TypeOrmModule.forFeature([User, RefreshToken, Org, Invoice, BipSettings]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],
       }),
@@ -127,6 +129,7 @@ export async function setupTestingModule(
       NotificationsService,
       StripeService,
       OrgsService,
+      BipService,
       PaymentsService,
       TokensService,
     ],
