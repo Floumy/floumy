@@ -23,19 +23,7 @@ export class BipService {
       throw new Error('Payment plan is Build In Private');
     }
 
-    let bipSettings = await org.bipSettings;
-    if (!bipSettings) {
-      bipSettings = new BipSettings();
-    }
-    bipSettings.org = Promise.resolve(org);
-    bipSettings.isBuildInPublicEnabled = settings.isBuildInPublicEnabled;
-    bipSettings.isObjectivesPagePublic = settings.isObjectivesPagePublic;
-    bipSettings.isRoadmapPagePublic = settings.isRoadmapPagePublic;
-    bipSettings.isIterationsPagePublic = settings.isIterationsPagePublic;
-    bipSettings.isActiveIterationsPagePublic =
-      settings.isActiveIterationsPagePublic;
-    const updatedSettings = await this.bipSettingsRepository.save(bipSettings);
-    return BipSettingsMapper.toDto(updatedSettings);
+    return await this.createOrUpdateBuildInPublicSettings(org, settings);
   }
 
   async getSettings(orgId: string) {
@@ -59,5 +47,24 @@ export class BipService {
     const bipSettings = new BipSettings();
     bipSettings.org = Promise.resolve(org);
     await this.bipSettingsRepository.save(bipSettings);
+  }
+
+  async createOrUpdateBuildInPublicSettings(
+    org: Org,
+    settings: BipSettingsDto,
+  ) {
+    let bipSettings = await org.bipSettings;
+    if (!bipSettings) {
+      bipSettings = new BipSettings();
+    }
+    bipSettings.org = Promise.resolve(org);
+    bipSettings.isBuildInPublicEnabled = settings.isBuildInPublicEnabled;
+    bipSettings.isObjectivesPagePublic = settings.isObjectivesPagePublic;
+    bipSettings.isRoadmapPagePublic = settings.isRoadmapPagePublic;
+    bipSettings.isIterationsPagePublic = settings.isIterationsPagePublic;
+    bipSettings.isActiveIterationsPagePublic =
+      settings.isActiveIterationsPagePublic;
+    const updatedSettings = await this.bipSettingsRepository.save(bipSettings);
+    return BipSettingsMapper.toDto(updatedSettings);
   }
 }

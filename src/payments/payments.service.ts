@@ -141,7 +141,7 @@ export class PaymentsService {
     await this.orgRepository.save(org);
 
     if (plan === PaymentPlan.BUILD_IN_PRIVATE) {
-      await this.bipService.createOrUpdateSettings(orgId, {
+      await this.bipService.createOrUpdateBuildInPublicSettings(org, {
         isBuildInPublicEnabled: false,
         isObjectivesPagePublic: false,
         isRoadmapPagePublic: false,
