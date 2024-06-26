@@ -86,4 +86,16 @@ describe('OrgsController', () => {
       expect(result.members).toHaveLength(1);
     });
   });
+
+  describe('when patching the org', () => {
+    it('should return the patched org', async () => {
+      await controller.patchOrg(
+        { user: { org: org.id } },
+        { name: 'New Name' },
+      );
+
+      const result = await controller.getOrg({ user: { org: org.id } });
+      expect(result.name).toBe('New Name');
+    });
+  });
 });
