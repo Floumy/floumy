@@ -165,4 +165,15 @@ describe('OrgsService', () => {
       expect(result).toBe(true);
     });
   });
+
+  describe('when patching the org', () => {
+    it('should update the name of the org', async () => {
+      const org = new Org();
+      org.name = 'Old name';
+      await orgsRepository.save(org);
+      await service.patchOrg(org.id, { name: 'New name' });
+      const updatedOrg = await orgsRepository.findOneByOrFail({ id: org.id });
+      expect(updatedOrg.name).toEqual('New name');
+    });
+  });
 });

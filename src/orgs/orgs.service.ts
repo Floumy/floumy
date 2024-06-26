@@ -6,6 +6,7 @@ import { Org } from './org.entity';
 import { OrgsMapper } from './orgs.mapper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PaymentPlan } from '../auth/payment.plan';
+import { OrgPatchDto } from './dtos';
 
 @Injectable()
 export class OrgsService {
@@ -75,6 +76,14 @@ export class OrgsService {
     }
 
     return org.nextPaymentDate > new Date();
+  }
+
+  async patchOrg(orgId: string, orgPatchDto: OrgPatchDto) {
+    const org = await this.findOneById(orgId);
+    if (orgPatchDto.name) {
+      org.name = orgPatchDto.name;
+    }
+    await this.orgRepository.save(org);
   }
 
   private async createOrg(name: string) {
