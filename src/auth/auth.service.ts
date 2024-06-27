@@ -56,11 +56,10 @@ export class AuthService {
   }
 
   async signUp(signUpDto: SignUpDto): Promise<void> {
-    const org =
-      await this.orgsService.getByInvitationTokenOrCreateWithNameAndPlan(
-        signUpDto.invitationToken,
-        signUpDto.productName,
-      );
+    const org = await this.orgsService.getByInvitationTokenOrCreateWithName(
+      signUpDto.invitationToken,
+      signUpDto.productName,
+    );
 
     if (!org) {
       this.logger.error(

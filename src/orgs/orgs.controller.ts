@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -27,7 +28,11 @@ export class OrgsController {
   @HttpCode(200)
   @UseGuards(BasicAuthGuard)
   async patchOrg(@Request() request, @Body() orgPatchDto: OrgPatchDto) {
-    const org = request.user.org;
-    return await this.orgsService.patchOrg(org, orgPatchDto);
+    try {
+      const org = request.user.org;
+      return await this.orgsService.patchOrg(org, orgPatchDto);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }
