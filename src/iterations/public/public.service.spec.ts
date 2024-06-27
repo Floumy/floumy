@@ -159,7 +159,7 @@ describe('PublicService', () => {
   describe('when getting the active iteration', () => {
     it('should return the active iteration', async () => {
       const orgWithActiveIterations =
-        await orgsService.getByInvitationTokenOrCreateWithNameAndPlan(
+        await orgsService.getByInvitationTokenOrCreateWithName(
           null,
           'Test Org',
         );
@@ -189,7 +189,7 @@ describe('PublicService', () => {
     });
     it('should return null if there is no active iteration', async () => {
       const orgWithActiveIterations =
-        await orgsService.getByInvitationTokenOrCreateWithNameAndPlan(
+        await orgsService.getByInvitationTokenOrCreateWithName(
           null,
           'Test Org',
         );

@@ -46,7 +46,7 @@ export class OrgsService {
     return await this.orgRepository.findOneBy({ invitationToken });
   }
 
-  async getByInvitationTokenOrCreateWithNameAndPlan(
+  async getByInvitationTokenOrCreateWithName(
     invitationToken?: string,
     name?: string,
   ): Promise<Org> {
@@ -80,13 +80,22 @@ export class OrgsService {
 
   async patchOrg(orgId: string, orgPatchDto: OrgPatchDto) {
     const org = await this.findOneById(orgId);
+
+    this.validateOrgName(orgPatchDto.name);
+
+    if (org.name !== orgPatchDto.name) {
+      await this.validateOrgNameIsUnique(orgPatchDto.name);
+    }
+
     if (orgPatchDto.name) {
       org.name = orgPatchDto.name;
     }
+
     await this.orgRepository.save(org);
   }
 
   private async createOrg(name: string) {
+    await this.validateOrgNameIsUnique(name);
     const org = new Org();
     org.name = name.trim();
     org.paymentPlan = PaymentPlan.TRIAL;
@@ -95,6 +104,16 @@ export class OrgsService {
     const savedOrg = await this.orgRepository.save(org);
     this.eventEmitter.emit('org.created', savedOrg);
     return savedOrg;
+  }
+
+  private async validateOrgNameIsUnique(name: string) {
+    const org = await this.orgRepository
+      .createQueryBuilder()
+      .where('LOWER(name) = LOWER(:name)', { name })
+      .getOne();
+    if (org) {
+      throw new Error('Name already exists');
+    }
   }
 
   private validateGetOrCreateOrg(invitationToken: string, name: string) {
@@ -110,6 +129,10 @@ export class OrgsService {
       throw new Error('Invalid invitation token');
     }
 
+    this.validateOrgName(name);
+  }
+
+  private validateOrgName(name: string) {
     if (name && (name.trim().length === 0 || name.trim().length > 50)) {
       throw new Error('Invalid name');
     }
