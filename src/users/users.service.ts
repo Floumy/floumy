@@ -9,6 +9,7 @@ import { UserMapper } from './user.mapper';
 import { RefreshToken } from '../auth/refresh-token.entity';
 import { Org } from '../orgs/org.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PatchUserDto } from './dtos';
 
 @Injectable()
 export class UsersService {
@@ -114,6 +115,14 @@ export class UsersService {
     return this.usersRepository.findOneByOrFail({
       passwordResetToken: resetToken,
     });
+  }
+
+  async patch(userId: string, patchCurrentUserDto: PatchUserDto) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    if (patchCurrentUserDto.name && patchCurrentUserDto.name.trim().length >= 2)
+      user.name = patchCurrentUserDto.name;
+    const savedUser = await this.usersRepository.save(user);
+    return UserMapper.toDto(savedUser);
   }
 
   private async validateUser(name: string, email: string, password: string) {

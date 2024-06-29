@@ -1,4 +1,4 @@
-import { User } from "./user.entity";
+import { User } from './user.entity';
 
 export class UserMapper {
   static toDto(user: User) {
@@ -8,7 +8,7 @@ export class UserMapper {
       email: user.email,
       isActive: user.isActive,
       createdAt: user.createdAt,
-      updatedAt: user.updatedAt
+      updatedAt: user.updatedAt,
     };
   }
 }

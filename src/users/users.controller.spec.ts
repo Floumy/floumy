@@ -41,4 +41,19 @@ describe('UsersController', () => {
       expect(currentUser).toBeDefined();
     });
   });
+
+  describe('when patching the current user', () => {
+    it('should return the user', async () => {
+      const currentUser = await controller.patchCurrentUser(
+        {
+          user: { sub: user.id },
+        },
+        {
+          name: 'New Name',
+        },
+      );
+      expect(currentUser).toBeDefined();
+      expect(currentUser.name).toEqual('New Name');
+    });
+  });
 });
