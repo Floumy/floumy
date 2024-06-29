@@ -161,4 +161,17 @@ describe('UsersService', () => {
       expect(foundUser.isActive).toBe(false);
     });
   });
+  describe("when patching a user's name", () => {
+    it('should update the user name', async () => {
+      const user = await service.createUserWithOrg(
+        'Test User',
+        'test@example.com',
+        'testtesttest',
+      );
+      const newName = 'New Name';
+      await service.patch(user.id, { name: newName });
+      const foundUser = await service.findOne(user.id);
+      expect(foundUser.name).toEqual(newName);
+    });
+  });
 });
