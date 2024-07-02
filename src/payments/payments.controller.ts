@@ -93,7 +93,7 @@ export class PaymentsController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Get('/invoices')
   async getInvoices(@Req() request: any) {
     const org = request.user.org;
