@@ -2,8 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { CreateOrUpdateIterationDto } from './dtos';
 import { Iteration } from './Iteration.entity';
 import {
+  And,
   IsNull,
   LessThan,
+  LessThanOrEqual,
   MoreThan,
   MoreThanOrEqual,
   Repository,
@@ -221,11 +223,23 @@ export class IterationsService {
     switch (timeline) {
       case Timeline.THIS_QUARTER:
       case Timeline.NEXT_QUARTER: {
-        const { startDate } =
+        const { startDate, endDate } =
           TimelineService.getStartAndEndDatesByTimelineValue(
             timeline.valueOf(),
           );
-        where.startDate = MoreThanOrEqual(startDate);
+        where = [
+          {
+            org: { id: orgId },
+            startDate: And(
+              MoreThanOrEqual(startDate),
+              LessThanOrEqual(endDate),
+            ),
+          },
+          {
+            org: { id: orgId },
+            endDate: And(MoreThanOrEqual(startDate), LessThanOrEqual(endDate)),
+          },
+        ];
         break;
       }
       case Timeline.LATER: {
