@@ -104,14 +104,19 @@ export class OkrsService {
       (status) => status === okrDto.status,
     );
 
-    if (okrDto.timeline) {
+    // We need to update the timeline only if it's not 'past' and it's not the same as the current one (if it exists)
+    if (okrDto.timeline && okrDto.timeline !== 'past') {
       TimelineService.validateTimeline(okrDto.timeline);
       const objectiveDates = TimelineService.getStartAndEndDatesByTimelineValue(
         okrDto.timeline,
       );
       objective.startDate = objectiveDates.startDate;
       objective.endDate = objectiveDates.endDate;
-    } else if (objective.startDate && objective.endDate) {
+    } else if (
+      okrDto.timeline !== 'past' &&
+      objective.startDate &&
+      objective.endDate
+    ) {
       objective.startDate = null;
       objective.endDate = null;
     }
@@ -154,18 +159,6 @@ export class OkrsService {
     );
 
     return await OKRMapper.toDTO(objective, keyResults);
-  }
-
-  private async updateObjectiveProgress(objective: Objective) {
-    const keyResults = await objective.keyResults;
-    if (keyResults.length === 0) {
-      objective.progress = 0;
-    } else {
-      objective.progress =
-        keyResults.reduce((acc, keyResult) => acc + keyResult.progress, 0) /
-        keyResults.length;
-    }
-    await this.objectiveRepository.save(objective);
   }
 
   async patchKeyResult(
@@ -223,22 +216,6 @@ export class OkrsService {
     return await KeyResultMapper.toListDTO(keyResults);
   }
 
-  private async removeKeyResultsAssociations(orgId: string, id: string) {
-    const keyResults = await this.keyResultRepository.findBy({
-      objective: { id, org: { id: orgId } },
-    });
-    for (const keyResult of keyResults) {
-      await this.removeKeyResultAssociations(keyResult.id);
-    }
-  }
-
-  private async removeKeyResultAssociations(id: string) {
-    await this.featureRepository.update(
-      { keyResult: { id } },
-      { keyResult: null },
-    );
-  }
-
   async deleteKeyResult(
     orgId: string,
     objectiveId: string,
@@ -276,26 +253,6 @@ export class OkrsService {
     const savedKeyResult = await this.keyResultRepository.save(keyResult);
     await this.updateObjectiveProgress(await keyResult.objective);
     return await KeyResultMapper.toDTO(savedKeyResult);
-  }
-
-  private validateCreateOrUpdateKeyResult(
-    updateKeyResultDto: CreateOrUpdateKeyResultDto,
-  ) {
-    if (!updateKeyResultDto.title)
-      throw new Error('Key Result title is required');
-    if (
-      updateKeyResultDto.progress === undefined ||
-      updateKeyResultDto.progress === null
-    )
-      throw new Error('Key Result progress is required');
-    if (!updateKeyResultDto.status)
-      throw new Error('Key Result status is required');
-    if (
-      !Object.values(OKRStatus).find(
-        (status) => status === updateKeyResultDto.status,
-      )
-    )
-      throw new Error('Key Result status is invalid');
   }
 
   async createKeyResult(
@@ -363,6 +320,54 @@ export class OkrsService {
     return await this.objectiveRepository.find({
       where: { org: { id: orgId }, startDate, endDate },
     });
+  }
+
+  private async updateObjectiveProgress(objective: Objective) {
+    const keyResults = await objective.keyResults;
+    if (keyResults.length === 0) {
+      objective.progress = 0;
+    } else {
+      objective.progress =
+        keyResults.reduce((acc, keyResult) => acc + keyResult.progress, 0) /
+        keyResults.length;
+    }
+    await this.objectiveRepository.save(objective);
+  }
+
+  private async removeKeyResultsAssociations(orgId: string, id: string) {
+    const keyResults = await this.keyResultRepository.findBy({
+      objective: { id, org: { id: orgId } },
+    });
+    for (const keyResult of keyResults) {
+      await this.removeKeyResultAssociations(keyResult.id);
+    }
+  }
+
+  private async removeKeyResultAssociations(id: string) {
+    await this.featureRepository.update(
+      { keyResult: { id } },
+      { keyResult: null },
+    );
+  }
+
+  private validateCreateOrUpdateKeyResult(
+    updateKeyResultDto: CreateOrUpdateKeyResultDto,
+  ) {
+    if (!updateKeyResultDto.title)
+      throw new Error('Key Result title is required');
+    if (
+      updateKeyResultDto.progress === undefined ||
+      updateKeyResultDto.progress === null
+    )
+      throw new Error('Key Result progress is required');
+    if (!updateKeyResultDto.status)
+      throw new Error('Key Result status is required');
+    if (
+      !Object.values(OKRStatus).find(
+        (status) => status === updateKeyResultDto.status,
+      )
+    )
+      throw new Error('Key Result status is invalid');
   }
 
   private async listPastObjectives(orgId: string) {
