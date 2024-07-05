@@ -97,7 +97,7 @@ describe('IterationsService', () => {
       });
       expect(iteration).toBeDefined();
       expect(iteration.id).toBeDefined();
-      expect(iteration.title).toEqual('Iteration CW1-CW2 2020');
+      expect(iteration.title).toEqual('Sprint CW1-CW2 2020');
       expect(iteration.goal).toEqual('Test Iteration');
       expect(iteration.startDate).toEqual('2020-01-01');
       expect(iteration.duration).toEqual(1);
@@ -111,7 +111,7 @@ describe('IterationsService', () => {
         startDate: '2023-12-22',
         duration: 1,
       });
-      expect(iteration.title).toEqual('Iteration CW51-CW52 2023');
+      expect(iteration.title).toEqual('Sprint CW51-CW52 2023');
     });
     it('should set the status to planned', async () => {
       const iteration = await service.create(org.id, {
@@ -131,7 +131,7 @@ describe('IterationsService', () => {
       });
       const iterations = await service.listWithWorkItems(org.id);
       expect(iterations[0].id).toBeDefined();
-      expect(iterations[0].title).toEqual('Iteration CW1-CW2 2020');
+      expect(iterations[0].title).toEqual('Sprint CW1-CW2 2020');
       expect(iterations[0].goal).toEqual('Test Iteration');
       expect(iterations[0].startDate).toEqual('2020-01-01');
       expect(iterations[0].endDate).toEqual('2020-01-07');
@@ -149,7 +149,7 @@ describe('IterationsService', () => {
       });
       const foundIteration = await service.get(org.id, iteration.id);
       expect(foundIteration.id).toBeDefined();
-      expect(foundIteration.title).toEqual('Iteration CW1-CW2 2020');
+      expect(foundIteration.title).toEqual('Sprint CW1-CW2 2020');
       expect(foundIteration.goal).toEqual('Test Iteration');
       expect(foundIteration.startDate).toEqual('2020-01-01');
       expect(foundIteration.endDate).toEqual('2020-01-07');
@@ -171,7 +171,7 @@ describe('IterationsService', () => {
         duration: 2,
       });
       expect(updatedIteration.id).toBeDefined();
-      expect(updatedIteration.title).toEqual('Iteration CW1-CW3 2020');
+      expect(updatedIteration.title).toEqual('Sprint CW1-CW3 2020');
       expect(updatedIteration.goal).toEqual('Updated Test Iteration');
       expect(updatedIteration.startDate).toEqual('2020-01-01');
       expect(updatedIteration.endDate).toEqual('2020-01-14');
