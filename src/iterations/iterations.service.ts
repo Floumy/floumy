@@ -120,7 +120,7 @@ export class IterationsService {
   }
 
   getIterationTitle(iteration: Iteration) {
-    return `Iteration ${this.getIterationCalendarWeekNumbersForTitle(
+    return `Sprint ${this.getIterationCalendarWeekNumbersForTitle(
       iteration.startDate,
       iteration.endDate,
     )} ${iteration.startDate.getFullYear()}`;
