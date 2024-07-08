@@ -18,6 +18,7 @@ import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
 import { PaymentPlan } from '../auth/payment.plan';
 import { Invoice } from '../payments/invoice.entity';
+import { FeedItem } from '../feed/feed-item.entity';
 
 @Entity()
 export class Org {
@@ -67,5 +68,7 @@ export class Org {
   @OneToOne(() => BipSettings, (bipSettings) => bipSettings.org, {
     lazy: true,
   })
+  @OneToMany(() => FeedItem, (feedItem) => feedItem.org, { lazy: true })
+  feedItems: Promise<FeedItem[]>;
   bipSettings: Promise<BipSettings>;
 }
