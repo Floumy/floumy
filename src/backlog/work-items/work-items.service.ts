@@ -44,30 +44,11 @@ export class WorkItemsService {
     const feature = await savedWorkItem.feature;
     await this.updateFeatureProgress(feature);
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
-    this.eventEmitter.emit('workItem.created', savedWorkItem);
+    this.eventEmitter.emit(
+      'workItem.created',
+      await WorkItemMapper.toDto(savedWorkItem),
+    );
     return WorkItemMapper.toDto(savedWorkItem);
-  }
-
-  private async setWorkItemsFiles(
-    workItem: WorkItem,
-    workItemDto: CreateUpdateWorkItemDto,
-    savedWorkItem: WorkItem,
-  ) {
-    workItem.workItemFiles = Promise.resolve([]);
-    await this.workItemFilesRepository.delete({
-      workItem: { id: workItem.id },
-    });
-    if (workItemDto.files && workItemDto.files.length > 0) {
-      const files = await this.filesRepository.findBy(workItemDto.files);
-      const workItemFiles = files.map((file) => {
-        const workItemFile = new WorkItemFile();
-        workItemFile.file = Promise.resolve(file); // Assign the file entity directly
-        workItemFile.workItem = Promise.resolve(savedWorkItem); // Assign the workItem entity directly
-        return workItemFile;
-      });
-      await this.workItemFilesRepository.save(workItemFiles);
-      workItem.workItemFiles = Promise.resolve(workItemFiles);
-    }
   }
 
   async listWorkItems(orgId: string, page: number = 1, limit: number = 0) {
@@ -111,6 +92,7 @@ export class WorkItemsService {
       id,
       org: { id: orgId },
     });
+    const previous = await WorkItemMapper.toDto(workItem);
     const oldFeature = await workItem.feature;
     await this.setWorkItemData(workItem, workItemDto, orgId);
     const savedWorkItem = await this.workItemsRepository.save(workItem);
@@ -120,8 +102,124 @@ export class WorkItemsService {
       await this.updateFeatureProgress(newFeature);
     }
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
-    this.eventEmitter.emit('workItem.updated', savedWorkItem);
+    const current = await WorkItemMapper.toDto(savedWorkItem);
+    this.eventEmitter.emit('workItem.updated', {
+      previous,
+      current,
+    });
+    return current;
+  }
+
+  async deleteWorkItem(orgId: string, id: string) {
+    const workItem = await this.workItemsRepository.findOneByOrFail({
+      id,
+      org: { id: orgId },
+    });
+
+    await this.deleteWorkItemFiles(orgId, workItem.id);
+
+    const feature = await workItem.feature;
+
+    await this.workItemsRepository.remove(workItem);
+
+    if (feature) {
+      await this.updateFeatureProgress(feature);
+    }
+    this.eventEmitter.emit(
+      'workItem.deleted',
+      await WorkItemMapper.toDto(workItem),
+    );
+  }
+
+  removeFeatureFromWorkItems(orgId: string, id: string) {
+    return this.workItemsRepository.update(
+      { org: { id: orgId }, feature: { id } },
+      { feature: null },
+    );
+  }
+
+  async listOpenWorkItemsWithoutIterations(orgId: string) {
+    const workItems = await this.workItemsRepository
+      .createQueryBuilder('workItem')
+      .where('workItem.orgId = :orgId', { orgId })
+      .andWhere('workItem.status NOT IN (:closedStatus, :doneStatus)', {
+        closedStatus: WorkItemStatus.CLOSED,
+        doneStatus: WorkItemStatus.DONE,
+      })
+      .andWhere('workItem.iterationId IS NULL')
+      .getMany();
+    return await WorkItemMapper.toListDto(workItems);
+  }
+
+  async patchWorkItem(
+    orgId: string,
+    workItemId: string,
+    workItemPatchDto: WorkItemPatchDto,
+  ) {
+    const workItem = await this.workItemsRepository.findOneByOrFail({
+      id: workItemId,
+      org: { id: orgId },
+    });
+    const currentIteration = await workItem.iteration;
+
+    await this.updateIteration(
+      workItem,
+      workItemPatchDto,
+      orgId,
+      currentIteration,
+    );
+    this.updateStatusAndCompletionDate(workItem, workItemPatchDto);
+    this.updatePriority(workItem, workItemPatchDto);
+
+    const savedWorkItem = await this.workItemsRepository.save(workItem);
+    await this.updateFeatureProgress(await savedWorkItem.feature);
+    this.eventEmitter.emit('workItem.updated', {
+      previous: workItem,
+      current: savedWorkItem,
+    });
     return WorkItemMapper.toDto(savedWorkItem);
+  }
+
+  async searchWorkItems(
+    orgId: string,
+    search: string,
+    page: number = 1,
+    limit: number = 0,
+  ) {
+    if (!search) return [];
+
+    if (this.isReference(search)) {
+      return await this.searchWorkItemsByReference(orgId, search, page, limit);
+    }
+
+    return await this.searchWorkItemsByTitleOrDescription(
+      orgId,
+      search,
+      page,
+      limit,
+    );
+  }
+
+  private async setWorkItemsFiles(
+    workItem: WorkItem,
+    workItemDto: CreateUpdateWorkItemDto,
+    savedWorkItem: WorkItem,
+  ) {
+    workItem.workItemFiles = Promise.resolve([]);
+    await this.workItemFilesRepository.delete({
+      workItem: { id: workItem.id },
+    });
+    if (workItemDto.files && workItemDto.files.length > 0) {
+      const files = await this.filesRepository.findBy(workItemDto.files);
+      const workItemFiles = files.map((file) => {
+        const workItemFile = new WorkItemFile();
+        workItemFile.file = Promise.resolve(file); // Assign the file entity directly
+        workItemFile.workItem = Promise.resolve(savedWorkItem); // Assign the workItem entity directly
+        return workItemFile;
+      });
+      await this.workItemFilesRepository.save(workItemFiles);
+      workItem.workItemFiles = Promise.resolve(workItemFiles);
+    }
   }
 
   private async setWorkItemData(
@@ -169,44 +267,6 @@ export class WorkItemsService {
     }
   }
 
-  async deleteWorkItem(orgId: string, id: string) {
-    const workItem = await this.workItemsRepository.findOneByOrFail({
-      id,
-      org: { id: orgId },
-    });
-
-    await this.deleteWorkItemFiles(orgId, workItem.id);
-
-    const feature = await workItem.feature;
-
-    await this.workItemsRepository.remove(workItem);
-
-    if (feature) {
-      await this.updateFeatureProgress(feature);
-    }
-    this.eventEmitter.emit('workItem.deleted', workItem);
-  }
-
-  removeFeatureFromWorkItems(orgId: string, id: string) {
-    return this.workItemsRepository.update(
-      { org: { id: orgId }, feature: { id } },
-      { feature: null },
-    );
-  }
-
-  async listOpenWorkItemsWithoutIterations(orgId: string) {
-    const workItems = await this.workItemsRepository
-      .createQueryBuilder('workItem')
-      .where('workItem.orgId = :orgId', { orgId })
-      .andWhere('workItem.status NOT IN (:closedStatus, :doneStatus)', {
-        closedStatus: WorkItemStatus.CLOSED,
-        doneStatus: WorkItemStatus.DONE,
-      })
-      .andWhere('workItem.iterationId IS NULL')
-      .getMany();
-    return await WorkItemMapper.toListDto(workItems);
-  }
-
   private async updateFeatureProgress(feature: Feature) {
     if (!feature) return;
 
@@ -224,32 +284,6 @@ export class WorkItemsService {
       feature.progress = (completedWorkItems.length / workItems.length) * 100;
       await this.featuresRepository.save(feature);
     }
-  }
-
-  async patchWorkItem(
-    orgId: string,
-    workItemId: string,
-    workItemPatchDto: WorkItemPatchDto,
-  ) {
-    const workItem = await this.workItemsRepository.findOneByOrFail({
-      id: workItemId,
-      org: { id: orgId },
-    });
-    const currentIteration = await workItem.iteration;
-
-    await this.updateIteration(
-      workItem,
-      workItemPatchDto,
-      orgId,
-      currentIteration,
-    );
-    this.updateStatusAndCompletionDate(workItem, workItemPatchDto);
-    this.updatePriority(workItem, workItemPatchDto);
-
-    const savedWorkItem = await this.workItemsRepository.save(workItem);
-    await this.updateFeatureProgress(await savedWorkItem.feature);
-    this.eventEmitter.emit('workItem.updated', savedWorkItem);
-    return WorkItemMapper.toDto(savedWorkItem);
   }
 
   private async updateIteration(
@@ -304,26 +338,6 @@ export class WorkItemsService {
       const file = await workItemFile.file;
       await this.filesService.deleteFile(orgId, file.id);
     }
-  }
-
-  async searchWorkItems(
-    orgId: string,
-    search: string,
-    page: number = 1,
-    limit: number = 0,
-  ) {
-    if (!search) return [];
-
-    if (this.isReference(search)) {
-      return await this.searchWorkItemsByReference(orgId, search, page, limit);
-    }
-
-    return await this.searchWorkItemsByTitleOrDescription(
-      orgId,
-      search,
-      page,
-      limit,
-    );
   }
 
   private isReference(search: string) {

@@ -23,6 +23,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { BipModule } from './bip/bip.module';
 import { PaymentsModule } from './payments/payments.module';
 import { StripeModule } from './stripe/stripe.module';
+import { FeedModule } from './feed/feed.module';
 import stripeConfig from './config/stripe.config';
 
 @Module({
@@ -84,6 +85,7 @@ import stripeConfig from './config/stripe.config';
     NotificationsModule,
     BipModule,
     PaymentsModule,
+    FeedModule,
   ],
   providers: [AppService],
 })

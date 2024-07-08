@@ -6,6 +6,7 @@ import { WorkItemStatus } from './work-item-status.enum';
 import { WorkItemsStatusStats } from './work-items-status-stats.entity';
 import { WorkItem } from './work-item.entity';
 import { Injectable } from '@nestjs/common';
+import { WorkItemDto } from './dtos';
 
 @Injectable()
 export class WorkItemsEventHandler {
@@ -19,9 +20,12 @@ export class WorkItemsEventHandler {
   ) {}
 
   @OnEvent('workItem.created')
-  async handleWorkItemCreated(event: WorkItem) {
+  async handleWorkItemCreated(event: WorkItemDto) {
     const workItemStatusStats = new WorkItemsStatusStats();
-    workItemStatusStats.workItem = Promise.resolve(event);
+    const workItem = await this.workItemsRepository.findOne({
+      where: { id: event.id },
+    });
+    workItemStatusStats.workItem = Promise.resolve(workItem);
     workItemStatusStats[WorkItemStatus[event.status]] = 0;
     const workItemStatusLog = new WorkItemsStatusLog();
     workItemStatusLog.workItemId = event.id;
@@ -32,29 +36,33 @@ export class WorkItemsEventHandler {
   }
 
   @OnEvent('workItem.deleted')
-  async handleWorkItemDeleted(event: WorkItem) {
+  async handleWorkItemDeleted(event: WorkItemDto) {
     await this.workItemStatusRepository.delete({ workItem: { id: event.id } });
     await this.workItemsStatusLogRepository.delete({ workItemId: event.id });
   }
 
   @OnEvent('workItem.updated')
-  async handleWorkItemUpdated(event: WorkItem) {
+  async handleWorkItemUpdated(event: {
+    previous: WorkItemDto;
+    current: WorkItemDto;
+  }) {
+    const workItem = event.current;
     const previousStatusLog = await this.workItemsStatusLogRepository.findOne({
-      where: { workItemId: event.id },
+      where: { workItemId: workItem.id },
       order: { timestamp: 'DESC' },
     });
     const workItemStatusLog = new WorkItemsStatusLog();
-    workItemStatusLog.workItemId = event.id;
-    workItemStatusLog.status = event.status;
-    workItemStatusLog.timestamp = event.updatedAt;
+    workItemStatusLog.workItemId = workItem.id;
+    workItemStatusLog.status = workItem.status;
+    workItemStatusLog.timestamp = workItem.updatedAt;
     await this.workItemsStatusLogRepository.save(workItemStatusLog);
     if (!previousStatusLog) {
       return;
     }
     const timeSpentInStatus =
-      event.updatedAt.getTime() - previousStatusLog.timestamp.getTime();
+      workItem.updatedAt.getTime() - previousStatusLog.timestamp.getTime();
     await this.updateWorkItemStatusStats(
-      event.id,
+      workItem.id,
       previousStatusLog.status,
       timeSpentInStatus,
     );
