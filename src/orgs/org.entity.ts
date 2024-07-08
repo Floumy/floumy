@@ -65,10 +65,12 @@ export class Org {
   invoices: Promise<Invoice[]>;
   @OneToMany(() => File, (file) => file.org, { lazy: true })
   files: Promise<File[]>;
+
+  @OneToMany(() => FeedItem, (feedItem) => feedItem.org, { lazy: true })
+  feedItems: Promise<FeedItem[]>;
+
   @OneToOne(() => BipSettings, (bipSettings) => bipSettings.org, {
     lazy: true,
   })
-  @OneToMany(() => FeedItem, (feedItem) => feedItem.org, { lazy: true })
-  feedItems: Promise<FeedItem[]>;
   bipSettings: Promise<BipSettings>;
 }
