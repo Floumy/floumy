@@ -20,10 +20,10 @@ export class FeedItem {
   entityId: string;
   @Column()
   action: string;
-  @Column()
-  content: string;
+  @Column({ type: 'json' })
+  content: any;
   @ManyToOne(() => User, (user) => user.feedItems, { lazy: false })
-  user: string;
+  user: Promise<User>;
   @ManyToOne(() => Org, (org) => org.feedItems, { lazy: false })
   org: Promise<Org>;
   @CreateDateColumn()

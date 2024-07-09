@@ -115,7 +115,7 @@ export class WorkItemsService {
       id,
       org: { id: orgId },
     });
-
+    const deletedWorkItem = await WorkItemMapper.toDto(workItem);
     await this.deleteWorkItemFiles(orgId, workItem.id);
 
     const feature = await workItem.feature;
@@ -125,10 +125,7 @@ export class WorkItemsService {
     if (feature) {
       await this.updateFeatureProgress(feature);
     }
-    this.eventEmitter.emit(
-      'workItem.deleted',
-      await WorkItemMapper.toDto(workItem),
-    );
+    this.eventEmitter.emit('workItem.deleted', deletedWorkItem);
   }
 
   removeFeatureFromWorkItems(orgId: string, id: string) {
