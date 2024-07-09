@@ -37,8 +37,10 @@ export default class WorkItemMapper {
     const iteration = await workItem.iteration;
     const createdBy = await workItem.createdBy;
     const assignedTo = await workItem.assignedTo;
+    const org = await workItem.org;
     return {
       id: workItem.id,
+      org: org ? { id: org.id } : undefined,
       reference: `WI-${workItem.sequenceNumber}`,
       title: workItem.title,
       description: workItem.description,
