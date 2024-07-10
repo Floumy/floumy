@@ -41,4 +41,19 @@ describe('FeedController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+
+  describe('when listing feed items', () => {
+    it('should return the paginated list of feed items', async () => {
+      const result = await controller.listFeedItems(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        1,
+        10,
+      );
+      expect(result).toEqual([]);
+    });
+  });
 });
