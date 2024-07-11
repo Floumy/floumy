@@ -6,9 +6,15 @@ import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
 import { FeedItem } from './feed-item.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from '../auth/auth.module';
+import { OrgsModule } from '../orgs/orgs.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Org, FeedItem])],
+  imports: [
+    AuthModule,
+    OrgsModule,
+    TypeOrmModule.forFeature([User, Org, FeedItem]),
+  ],
   providers: [FeedService, FeedEventHandler],
   controllers: [FeedController],
 })
