@@ -157,6 +157,7 @@ export class WorkItemsService {
       id: workItemId,
       org: { id: orgId },
     });
+    const previous = await WorkItemMapper.toDto(workItem);
     const currentIteration = await workItem.iteration;
 
     await this.updateIteration(
@@ -170,11 +171,12 @@ export class WorkItemsService {
 
     const savedWorkItem = await this.workItemsRepository.save(workItem);
     await this.updateFeatureProgress(await savedWorkItem.feature);
+    const current = await WorkItemMapper.toDto(savedWorkItem);
     this.eventEmitter.emit('workItem.updated', {
-      previous: workItem,
-      current: savedWorkItem,
+      previous,
+      current,
     });
-    return WorkItemMapper.toDto(savedWorkItem);
+    return current;
   }
 
   async searchWorkItems(
