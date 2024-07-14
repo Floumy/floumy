@@ -53,7 +53,10 @@ export class BipService {
     org: Org,
     settings: BipSettingsDto,
   ) {
-    let bipSettings = await org.bipSettings;
+    let bipSettings = await this.bipSettingsRepository.findOneBy({
+      org: { id: org.id },
+    });
+
     if (!bipSettings) {
       bipSettings = new BipSettings();
     }
