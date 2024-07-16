@@ -117,4 +117,50 @@ describe('FeedEventHandler', () => {
       expect(feedItem.content).toEqual(event);
     });
   });
+
+  describe('handleOKRCreated', () => {
+    it('should create a feed item when an OKR is created', async () => {
+      const event = {
+        objective: {
+          id: uuid(),
+          org: { id: org.id },
+        },
+      } as any;
+
+      await handler.handleOKRCreated(event);
+
+      const feedItem = await feedItemRepository.findOne({
+        where: { entityId: event.id },
+      });
+      expect(feedItem).toBeDefined();
+      expect(feedItem.title).toBe('OKR Created');
+      expect(feedItem.entity).toBe('okr');
+      expect(feedItem.entityId).toBe(event.objective.id);
+      expect(feedItem.action).toBe('created');
+      expect(feedItem.content).toEqual(event);
+    });
+  });
+
+  describe('handleOKRDeleted', () => {
+    it('should create a feed item when an OKR is deleted', async () => {
+      const event = {
+        objective: {
+          id: uuid(),
+          org: { id: org.id },
+        },
+      } as any;
+
+      await handler.handleOKRDeleted(event);
+
+      const feedItem = await feedItemRepository.findOne({
+        where: { entityId: event.id },
+      });
+      expect(feedItem).toBeDefined();
+      expect(feedItem.title).toBe('OKR Deleted');
+      expect(feedItem.entity).toBe('okr');
+      expect(feedItem.entityId).toBe(event.objective.id);
+      expect(feedItem.action).toBe('deleted');
+      expect(feedItem.content).toEqual(event);
+    });
+  });
 });

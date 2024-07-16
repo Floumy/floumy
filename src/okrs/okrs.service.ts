@@ -10,6 +10,14 @@ import { TimelineService } from '../common/timeline.service';
 import { Feature } from '../roadmap/features/feature.entity';
 import { User } from '../users/user.entity';
 import { Timeline } from '../common/timeline.enum';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+  CreateOrUpdateKeyResultDto,
+  CreateOrUpdateOKRDto,
+  ObjectiveDto,
+  PatchKeyResultDto,
+  UpdateObjectiveDto,
+} from './dtos';
 
 @Injectable()
 export class OkrsService {
@@ -23,6 +31,7 @@ export class OkrsService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private orgsService: OrgsService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createObjective(orgId: string, objective: ObjectiveDto) {
@@ -48,7 +57,8 @@ export class OkrsService {
         }),
       );
     }
-    return await this.objectiveRepository.save(newObjective);
+    await this.objectiveRepository.save(newObjective);
+    return this.objectiveRepository.findOneByOrFail({ id: newObjective.id });
   }
 
   async createKeyResultFor(objective: Objective, title: string) {
@@ -137,11 +147,13 @@ export class OkrsService {
   }
 
   async delete(orgId: string, id: string) {
+    const okr = await this.get(orgId, id);
     await this.removeKeyResultsAssociations(orgId, id);
     await this.keyResultRepository.delete({
       objective: { id, org: { id: orgId } },
     });
     await this.objectiveRepository.delete({ id, org: { id: orgId } });
+    this.eventEmitter.emit('okr.deleted', okr);
   }
 
   async create(orgId: string, okrDto: CreateOrUpdateOKRDto) {
@@ -149,8 +161,11 @@ export class OkrsService {
       TimelineService.validateTimeline(okrDto.objective.timeline);
     }
     const objective = await this.createObjective(orgId, okrDto.objective);
-    if (!okrDto.keyResults || okrDto.keyResults.length === 0)
-      return await OKRMapper.toDTO(objective, []);
+    if (!okrDto.keyResults || okrDto.keyResults.length === 0) {
+      const savedOkr = await OKRMapper.toDTO(objective, []);
+      this.eventEmitter.emit('okr.created', savedOkr);
+      return savedOkr;
+    }
 
     const keyResults = await Promise.all(
       okrDto.keyResults.map((keyResult) =>
@@ -158,7 +173,9 @@ export class OkrsService {
       ),
     );
 
-    return await OKRMapper.toDTO(objective, keyResults);
+    const savedOkr = await OKRMapper.toDTO(objective, keyResults);
+    this.eventEmitter.emit('okr.created', savedOkr);
+    return savedOkr;
   }
 
   async patchKeyResult(

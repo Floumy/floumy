@@ -8,8 +8,8 @@ export interface FeatureDto {
   progress: number;
   workItemsCount: number;
   workItems: WorkItemDto[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   keyResult: KeyResultDto;
   milestone: MilestoneDto;
 }
