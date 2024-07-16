@@ -2,6 +2,7 @@ import { Milestone } from '../milestone.entity';
 import { MilestoneDto } from '../dtos';
 import { TimelineService } from '../../../common/timeline.service';
 import { Feature } from '../../features/feature.entity';
+import { FeatureDto } from '../../../okrs/dtos';
 
 export class PublicMilestoneMapper {
   static async toDto(milestone: Milestone): Promise<MilestoneDto> {

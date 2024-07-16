@@ -1,13 +1,22 @@
 import { KeyResult } from './key-result.entity';
 import { Objective } from './objective.entity';
 import { TimelineService } from '../common/timeline.service';
+import { FeatureDto, KeyResultDto, OKRDto } from './dtos';
 
 export class OKRMapper {
-  static async toDTO(objective: Objective, keyResults: KeyResult[]) {
+  static async toDTO(
+    objective: Objective,
+    keyResults: KeyResult[],
+  ): Promise<OKRDto> {
     const assignedTo = await objective.assignedTo;
+    const org = await objective.org;
     return {
       objective: {
         id: objective.id,
+        org: {
+          id: org.id,
+          name: org.name,
+        },
         reference: `O-${objective.sequenceNumber}`,
         title: objective.title,
         progress: parseFloat(objective.progress?.toFixed(2)),

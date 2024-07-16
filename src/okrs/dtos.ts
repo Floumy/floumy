@@ -1,41 +1,41 @@
-interface ObjectiveDto {
+export interface ObjectiveDto {
   title: string;
   timeline?: string;
   assignedTo?: string;
 }
 
-interface CreateOrUpdateKRDto {
+export interface CreateOrUpdateKRDto {
   id?: string;
   title: string;
   progress?: number;
   status?: string;
 }
 
-interface UpdateObjectiveDto {
+export interface UpdateObjectiveDto {
   title: string;
   status: string;
   timeline?: string;
   assignedTo?: string;
 }
 
-interface CreateOrUpdateOKRDto {
+export interface CreateOrUpdateOKRDto {
   objective: ObjectiveDto;
   keyResults?: CreateOrUpdateKRDto[];
 }
 
-interface PatchKeyResultDto {
+export interface PatchKeyResultDto {
   title?: string;
   progress?: number;
   status?: string;
 }
 
-interface CreateOrUpdateKeyResultDto {
+export interface CreateOrUpdateKeyResultDto {
   title: string;
   progress: number;
   status: string;
 }
 
-interface FeatureDto {
+export interface FeatureDto {
   id: string;
   reference: string;
   title: string;
@@ -49,7 +49,7 @@ interface FeatureDto {
   updatedAt: Date;
 }
 
-interface WorkItemDto {
+export interface WorkItemDto {
   id: string;
   title: string;
   description: string;
@@ -62,7 +62,7 @@ interface WorkItemDto {
   updatedAt: Date;
 }
 
-interface KeyResultDto {
+export interface KeyResultDto {
   features: FeatureDto[];
   id: string;
   reference: string;
@@ -72,4 +72,28 @@ interface KeyResultDto {
   createdAt: Date;
   updatedAt: Date;
   status: string;
+}
+
+export interface OKRDto {
+  objective: {
+    id: string;
+    org: {
+      id: string;
+      name: string;
+    };
+    reference: string;
+    title: string;
+    progress: number;
+    createdAt: Date;
+    updatedAt: Date;
+    status: string;
+    timeline: string;
+    startDate: Date;
+    endDate: Date;
+    assignedTo: {
+      id: string;
+      name: string;
+    };
+  };
+  keyResults: KeyResultDto[];
 }
