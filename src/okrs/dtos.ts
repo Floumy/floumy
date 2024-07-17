@@ -62,8 +62,19 @@ export interface WorkItemDto {
   updatedAt: Date;
 }
 
+export interface OrgDto {
+  id: string;
+  name: string;
+}
+
 export interface KeyResultDto {
   features: FeatureDto[];
+  org: OrgDto;
+  objective: {
+    id: string;
+    reference: string;
+    title: string;
+  };
   id: string;
   reference: string;
   title: string;

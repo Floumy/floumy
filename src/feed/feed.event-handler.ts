@@ -6,7 +6,7 @@ import { FeedItem } from './feed-item.entity';
 import { WorkItemDto } from '../backlog/work-items/dtos';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
-import { OKRDto } from '../okrs/dtos';
+import { KeyResultDto, OKRDto } from '../okrs/dtos';
 
 @Injectable()
 export class FeedEventHandler {
@@ -101,6 +101,69 @@ export class FeedEventHandler {
     feedItem.entity = 'okr';
     feedItem.entityId = event.objective.id;
     feedItem.action = 'deleted';
+    feedItem.content = event;
+    await this.feedItemRepository.save(feedItem);
+  }
+
+  @OnEvent('okr.updated')
+  async handleOKRUpdated(event: { previous: OKRDto; current: OKRDto }) {
+    const feedItem = new FeedItem();
+    const org = await this.orgRepository.findOneByOrFail({
+      id: event.current.objective.org.id,
+    });
+    feedItem.org = Promise.resolve(org);
+    feedItem.title = 'OKR Updated';
+    feedItem.entity = 'okr';
+    feedItem.entityId = event.current.objective.id;
+    feedItem.action = 'updated';
+    feedItem.content = event;
+    await this.feedItemRepository.save(feedItem);
+  }
+
+  @OnEvent('keyResult.created')
+  async handleKeyResultCreated(event: KeyResultDto) {
+    const feedItem = new FeedItem();
+    const org = await this.orgRepository.findOneByOrFail({
+      id: event.org.id,
+    });
+    feedItem.org = Promise.resolve(org);
+    feedItem.title = 'Key Result Created';
+    feedItem.entity = 'keyResult';
+    feedItem.entityId = event.id;
+    feedItem.action = 'created';
+    feedItem.content = event;
+    await this.feedItemRepository.save(feedItem);
+  }
+
+  @OnEvent('keyResult.deleted')
+  async handleKeyResultDeleted(event: KeyResultDto) {
+    const feedItem = new FeedItem();
+    const org = await this.orgRepository.findOneByOrFail({
+      id: event.org.id,
+    });
+    feedItem.org = Promise.resolve(org);
+    feedItem.title = 'Key Result Deleted';
+    feedItem.entity = 'keyResult';
+    feedItem.entityId = event.id;
+    feedItem.action = 'deleted';
+    feedItem.content = event;
+    await this.feedItemRepository.save(feedItem);
+  }
+
+  @OnEvent('keyResult.updated')
+  async handleKeyResultUpdated(event: {
+    previous: KeyResultDto;
+    current: KeyResultDto;
+  }) {
+    const feedItem = new FeedItem();
+    const org = await this.orgRepository.findOneByOrFail({
+      id: event.current.org.id,
+    });
+    feedItem.org = Promise.resolve(org);
+    feedItem.title = 'Key Result Updated';
+    feedItem.entity = 'keyResult';
+    feedItem.entityId = event.current.id;
+    feedItem.action = 'updated';
     feedItem.content = event;
     await this.feedItemRepository.save(feedItem);
   }

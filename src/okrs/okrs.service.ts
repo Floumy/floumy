@@ -108,6 +108,10 @@ export class OkrsService {
       id,
       org: { id: orgId },
     });
+    const originalObjective = await OKRMapper.toDTO(
+      objective,
+      await objective.keyResults,
+    );
 
     objective.title = okrDto.title;
     objective.status = Object.values(OKRStatus).find(
@@ -143,7 +147,15 @@ export class OkrsService {
     }
 
     const savedObjective = await this.objectiveRepository.save(objective);
-    return OKRMapper.toDTO(savedObjective, await savedObjective.keyResults);
+    const updatedOkr = await OKRMapper.toDTO(
+      savedObjective,
+      await savedObjective.keyResults,
+    );
+    this.eventEmitter.emit('okr.updated', {
+      previous: originalObjective,
+      current: updatedOkr,
+    });
+    return updatedOkr;
   }
 
   async delete(orgId: string, id: string) {
@@ -189,6 +201,8 @@ export class OkrsService {
       objective: { id: objectiveId, org: { id: orgId } },
     });
 
+    const originalKeyResult = await KeyResultMapper.toDTO(keyResult);
+
     if (updateKeyResultDto.title) {
       keyResult.title = updateKeyResultDto.title;
     }
@@ -208,7 +222,12 @@ export class OkrsService {
 
     const savedKeyResult = await this.keyResultRepository.save(keyResult);
     await this.updateObjectiveProgress(await keyResult.objective);
-    return await KeyResultMapper.toDTO(savedKeyResult);
+    const updatedKeyResult = await KeyResultMapper.toDTO(savedKeyResult);
+    this.eventEmitter.emit('keyResult.updated', {
+      previous: originalKeyResult,
+      current: updatedKeyResult,
+    });
+    return updatedKeyResult;
   }
 
   async getKeyResultBy(id: string) {
@@ -238,6 +257,9 @@ export class OkrsService {
     objectiveId: string,
     keyResultId: string,
   ) {
+    const keyResult = await this.getKeyResult(orgId, objectiveId, keyResultId);
+    const originalKeyResult = await KeyResultMapper.toDTO(keyResult);
+
     await this.removeKeyResultAssociations(keyResultId);
     await this.keyResultRepository.delete({
       id: keyResultId,
@@ -246,6 +268,8 @@ export class OkrsService {
     await this.updateObjectiveProgress(
       await this.objectiveRepository.findOneBy({ id: objectiveId }),
     );
+
+    this.eventEmitter.emit('keyResult.deleted', originalKeyResult);
   }
 
   async updateKeyResult(
@@ -258,8 +282,8 @@ export class OkrsService {
       id: keyResultId,
       objective: { id: objectiveId, org: { id: orgId } },
     });
-
     this.validateCreateOrUpdateKeyResult(updateKeyResultDto);
+    const originalKeyResult = await KeyResultMapper.toDTO(keyResult);
 
     keyResult.title = updateKeyResultDto.title;
     keyResult.progress = updateKeyResultDto.progress;
@@ -269,7 +293,11 @@ export class OkrsService {
 
     const savedKeyResult = await this.keyResultRepository.save(keyResult);
     await this.updateObjectiveProgress(await keyResult.objective);
-    return await KeyResultMapper.toDTO(savedKeyResult);
+    const updatedKeyResult = await KeyResultMapper.toDTO(savedKeyResult);
+    this.eventEmitter.emit('keyResult.updated', {
+      previous: originalKeyResult,
+      current: updatedKeyResult,
+    });
   }
 
   async createKeyResult(
@@ -295,7 +323,9 @@ export class OkrsService {
       id: keyResult.id,
     });
     await this.updateObjectiveProgress(objective);
-    return await KeyResultMapper.toDTO(savedKeyResult);
+    const createdKeyResult = await KeyResultMapper.toDTO(savedKeyResult);
+    this.eventEmitter.emit('keyResult.created', createdKeyResult);
+    return createdKeyResult;
   }
 
   async getKeyResultDetail(
