@@ -106,10 +106,20 @@ export class KeyResultMapper {
   static async toDTO(keyResult: KeyResult): Promise<KeyResultDto> {
     const objective = await keyResult.objective;
     const features = await keyResult.features;
+    const org = await objective.org;
     return {
       id: keyResult.id,
       reference: `KR-${keyResult.sequenceNumber}`,
       title: keyResult.title,
+      objective: {
+        id: objective.id,
+        reference: `O-${objective.sequenceNumber}`,
+        title: objective.title,
+      },
+      org: {
+        id: org.id,
+        name: org.name,
+      },
       progress: keyResult.progress
         ? parseFloat(keyResult.progress?.toFixed(2))
         : 0,

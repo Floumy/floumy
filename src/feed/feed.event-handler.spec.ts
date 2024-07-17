@@ -163,4 +163,104 @@ describe('FeedEventHandler', () => {
       expect(feedItem.content).toEqual(event);
     });
   });
+
+  describe('handleOKRUpdated', () => {
+    it('should create a feed item when an OKR is updated', async () => {
+      const event = {
+        previous: {
+          objective: {
+            id: uuid(),
+            org: { id: org.id },
+          },
+        },
+        current: {
+          objective: {
+            id: uuid(),
+            org: { id: org.id },
+          },
+        },
+      } as any;
+
+      await handler.handleOKRUpdated(event);
+
+      const feedItem = await feedItemRepository.findOne({
+        where: { entityId: event.id },
+      });
+      expect(feedItem).toBeDefined();
+      expect(feedItem.title).toBe('OKR Updated');
+      expect(feedItem.entity).toBe('okr');
+      expect(feedItem.entityId).toBe(event.current.objective.id);
+      expect(feedItem.action).toBe('updated');
+      expect(feedItem.content).toEqual(event);
+    });
+  });
+
+  describe('handleKeyResultCreated', () => {
+    it('should create a feed item when a key result is created', async () => {
+      const event = {
+        org: { id: org.id },
+        id: uuid(),
+      } as any;
+
+      await handler.handleKeyResultCreated(event);
+
+      const feedItem = await feedItemRepository.findOne({
+        where: { entityId: event.id },
+      });
+      expect(feedItem).toBeDefined();
+      expect(feedItem.title).toBe('Key Result Created');
+      expect(feedItem.entity).toBe('keyResult');
+      expect(feedItem.entityId).toBe(event.id);
+      expect(feedItem.action).toBe('created');
+      expect(feedItem.content).toEqual(event);
+    });
+  });
+
+  describe('handleKeyResultUpdated', () => {
+    it('should create a feed item when a key result is updated', async () => {
+      const event = {
+        previous: {
+          org: { id: org.id },
+          id: uuid(),
+        },
+        current: {
+          org: { id: org.id },
+          id: uuid(),
+        },
+      } as any;
+
+      await handler.handleKeyResultUpdated(event);
+
+      const feedItem = await feedItemRepository.findOne({
+        where: { entityId: event.id },
+      });
+      expect(feedItem).toBeDefined();
+      expect(feedItem.title).toBe('Key Result Updated');
+      expect(feedItem.entity).toBe('keyResult');
+      expect(feedItem.entityId).toBe(event.current.id);
+      expect(feedItem.action).toBe('updated');
+      expect(feedItem.content).toEqual(event);
+    });
+  });
+
+  describe('handleKeyResultDeleted', () => {
+    it('should create a feed item when a key result is deleted', async () => {
+      const event = {
+        org: { id: org.id },
+        id: uuid(),
+      } as any;
+
+      await handler.handleKeyResultDeleted(event);
+
+      const feedItem = await feedItemRepository.findOne({
+        where: { entityId: event.id },
+      });
+      expect(feedItem).toBeDefined();
+      expect(feedItem.title).toBe('Key Result Deleted');
+      expect(feedItem.entity).toBe('keyResult');
+      expect(feedItem.entityId).toBe(event.id);
+      expect(feedItem.action).toBe('deleted');
+      expect(feedItem.content).toEqual(event);
+    });
+  });
 });
