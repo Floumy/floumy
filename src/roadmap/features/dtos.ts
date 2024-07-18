@@ -21,6 +21,10 @@ export interface PatchFeatureDto {
 
 export interface FeatureDto {
   id: string;
+  org: {
+    id: string;
+    name: string;
+  };
   reference: string;
   title: string;
   description?: string;

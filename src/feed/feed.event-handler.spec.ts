@@ -263,4 +263,72 @@ describe('FeedEventHandler', () => {
       expect(feedItem.content).toEqual(event);
     });
   });
+
+  describe('handleFeatureCreated', () => {
+    it('should create a feed item when a feature is created', async () => {
+      const event = {
+        org: { id: org.id },
+        id: uuid(),
+      } as any;
+
+      await handler.handleFeatureCreated(event);
+
+      const feedItem = await feedItemRepository.findOne({
+        where: { entityId: event.id },
+      });
+      expect(feedItem).toBeDefined();
+      expect(feedItem.title).toBe('Feature Created');
+      expect(feedItem.entity).toBe('feature');
+      expect(feedItem.entityId).toBe(event.id);
+      expect(feedItem.action).toBe('created');
+      expect(feedItem.content).toEqual(event);
+    });
+  });
+
+  describe('handleFeatureUpdated', () => {
+    it('should create a feed item when a feature is updated', async () => {
+      const event = {
+        previous: {
+          org: { id: org.id },
+          id: uuid(),
+        },
+        current: {
+          org: { id: org.id },
+          id: uuid(),
+        },
+      } as any;
+
+      await handler.handleFeatureUpdated(event);
+
+      const feedItem = await feedItemRepository.findOne({
+        where: { entityId: event.id },
+      });
+      expect(feedItem).toBeDefined();
+      expect(feedItem.title).toBe('Feature Updated');
+      expect(feedItem.entity).toBe('feature');
+      expect(feedItem.entityId).toBe(event.current.id);
+      expect(feedItem.action).toBe('updated');
+      expect(feedItem.content).toEqual(event);
+    });
+  });
+  describe('handleFeatureDeleted', () => {
+    it('should create a feed item when a feature is deleted', async () => {
+      const event = {
+        org: { id: org.id },
+        id: uuid(),
+      } as any;
+
+      await handler.handleFeatureDeleted(event);
+
+      const feedItem = await feedItemRepository.findOne({
+        where: { entityId: event.id },
+      });
+      expect(feedItem).toBeDefined();
+      expect(feedItem.title).toBe('Feature Deleted');
+      expect(feedItem.entity).toBe('feature');
+      expect(feedItem.entityId).toBe(event.id);
+      expect(feedItem.action).toBe('deleted');
+      expect(feedItem.content).toEqual(event);
+    });
+  });
 });

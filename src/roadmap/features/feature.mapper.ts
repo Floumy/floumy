@@ -5,8 +5,13 @@ export class FeatureMapper {
   static async toDto(feature: Feature): Promise<FeatureDto> {
     const createdBy = await feature.createdBy;
     const assignedTo = await feature.assignedTo;
+    const org = await feature.org;
     const featureDto = {
       id: feature.id,
+      org: {
+        id: org.id,
+        name: org.name,
+      },
       reference: `F-${feature.sequenceNumber}`,
       title: feature.title,
       description: feature.description,
