@@ -7,6 +7,7 @@ import { WorkItemDto } from '../backlog/work-items/dtos';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { KeyResultDto, OKRDto } from '../okrs/dtos';
+import { FeatureDto } from '../roadmap/features/dtos';
 
 @Injectable()
 export class FeedEventHandler {
@@ -162,6 +163,54 @@ export class FeedEventHandler {
     feedItem.org = Promise.resolve(org);
     feedItem.title = 'Key Result Updated';
     feedItem.entity = 'keyResult';
+    feedItem.entityId = event.current.id;
+    feedItem.action = 'updated';
+    feedItem.content = event;
+    await this.feedItemRepository.save(feedItem);
+  }
+
+  @OnEvent('feature.created')
+  async handleFeatureCreated(event: FeatureDto) {
+    const feedItem = new FeedItem();
+    const org = await this.orgRepository.findOneByOrFail({
+      id: event.org.id,
+    });
+    feedItem.org = Promise.resolve(org);
+    feedItem.title = 'Feature Created';
+    feedItem.entity = 'feature';
+    feedItem.entityId = event.id;
+    feedItem.action = 'created';
+    feedItem.content = event;
+    await this.feedItemRepository.save(feedItem);
+  }
+
+  @OnEvent('feature.deleted')
+  async handleFeatureDeleted(event: FeatureDto) {
+    const feedItem = new FeedItem();
+    const org = await this.orgRepository.findOneByOrFail({
+      id: event.org.id,
+    });
+    feedItem.org = Promise.resolve(org);
+    feedItem.title = 'Feature Deleted';
+    feedItem.entity = 'feature';
+    feedItem.entityId = event.id;
+    feedItem.action = 'deleted';
+    feedItem.content = event;
+    await this.feedItemRepository.save(feedItem);
+  }
+
+  @OnEvent('feature.updated')
+  async handleFeatureUpdated(event: {
+    previous: FeatureDto;
+    current: FeatureDto;
+  }) {
+    const feedItem = new FeedItem();
+    const org = await this.orgRepository.findOneByOrFail({
+      id: event.current.org.id,
+    });
+    feedItem.org = Promise.resolve(org);
+    feedItem.title = 'Feature Updated';
+    feedItem.entity = 'feature';
     feedItem.entityId = event.current.id;
     feedItem.action = 'updated';
     feedItem.content = event;

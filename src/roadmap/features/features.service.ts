@@ -13,6 +13,7 @@ import { File } from '../../files/file.entity';
 import { User } from '../../users/user.entity';
 import { FilesService } from '../../files/files.service';
 import { Org } from '../../orgs/org.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class FeaturesService {
@@ -26,6 +27,7 @@ export class FeaturesService {
     private featureFilesRepository: Repository<FeatureFile>,
     @InjectRepository(File) private filesRepository: Repository<File>,
     private filesService: FilesService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async createFeature(userId: string, featureDto: CreateUpdateFeatureDto) {
@@ -60,63 +62,9 @@ export class FeaturesService {
       await this.addFeatureFiles(featureDto, feature);
     }
 
-    return await FeatureMapper.toDto(savedFeature);
-  }
-
-  private async setFeatureKeyResult(
-    featureDto: CreateUpdateFeatureDto,
-    org: Org,
-    feature: Feature,
-  ) {
-    if (featureDto.keyResult) {
-      const keyResult = await this.okrsService.getKeyResultByOrgId(
-        org.id,
-        featureDto.keyResult,
-      );
-      feature.keyResult = Promise.resolve(keyResult);
-    }
-  }
-
-  private async setFeatureAssignedTo(
-    featureDto: CreateUpdateFeatureDto,
-    org: Org,
-    feature: Feature,
-  ) {
-    if (featureDto.assignedTo) {
-      const assignedTo = await this.userRepository.findOneByOrFail({
-        id: featureDto.assignedTo,
-        org: { id: org.id },
-      });
-      if (assignedTo) {
-        feature.assignedTo = Promise.resolve(assignedTo);
-      }
-    }
-  }
-
-  private async addFeatureFiles(
-    featureDto: CreateUpdateFeatureDto,
-    feature: Feature,
-  ) {
-    const files = await this.filesRepository.findBy({
-      id: In(featureDto.files.map((file) => file.id)),
-    });
-    await this.featureFilesRepository.delete({ feature: { id: feature.id } });
-    const featureFiles = files.map((file) => {
-      const featureFile = new FeatureFile();
-      featureFile.feature = Promise.resolve(feature);
-      featureFile.file = Promise.resolve(file);
-      return featureFile;
-    });
-    await this.featureFilesRepository.save(featureFiles);
-    feature.featureFiles = Promise.resolve(featureFiles);
-  }
-
-  private validateFeature(featureDto: CreateUpdateFeatureDto) {
-    if (!featureDto.title) throw new Error('Feature title is required');
-    if (!featureDto.priority) throw new Error('Feature priority is required');
-    if (!featureDto.status) throw new Error('Feature status is required');
-    if (!Object.values(Priority).includes(featureDto.priority))
-      throw new Error('Invalid priority');
+    const createdFeature = await FeatureMapper.toDto(savedFeature);
+    this.eventEmitter.emit('feature.created', createdFeature);
+    return createdFeature;
   }
 
   async listFeatures(orgId: string, page: number = 1, limit: number = 0) {
@@ -176,6 +124,7 @@ export class FeaturesService {
       org: { id: orgId },
       id: id,
     });
+    const originalFeature = await FeatureMapper.toDto(feature);
 
     feature.title = updateFeatureDto.title;
     feature.description = updateFeatureDto.description;
@@ -191,7 +140,123 @@ export class FeaturesService {
     await this.updateFeatureAssignedTo(updateFeatureDto, orgId, feature);
 
     const savedFeature = await this.featuresRepository.save(feature);
-    return await FeatureMapper.toDto(savedFeature);
+    const updatedFeature = await FeatureMapper.toDto(savedFeature);
+    this.eventEmitter.emit('feature.updated', {
+      previous: originalFeature,
+      current: updatedFeature,
+    });
+    return updatedFeature;
+  }
+
+  async deleteFeature(orgId: string, id: string) {
+    const feature = await this.featuresRepository.findOneByOrFail({
+      org: { id: orgId },
+      id: id,
+    });
+    const deletedFeature = await FeatureMapper.toDto(feature);
+    await this.deleteFeatureFiles(orgId, feature.id);
+    await this.workItemsService.removeFeatureFromWorkItems(orgId, id);
+    await this.featuresRepository.remove(feature);
+    this.eventEmitter.emit('feature.deleted', deletedFeature);
+  }
+
+  async patchFeature(
+    orgId: string,
+    featureId: string,
+    patchFeatureDto: PatchFeatureDto,
+  ) {
+    const feature = await this.featuresRepository.findOneByOrFail({
+      org: { id: orgId },
+      id: featureId,
+    });
+    const originalFeature = await FeatureMapper.toDto(feature);
+    this.patchFeatureStatus(patchFeatureDto, feature);
+    this.patchFeaturePriority(patchFeatureDto, feature);
+    await this.patchFeatureMilestone(patchFeatureDto, orgId, feature);
+    await this.patchFeatureKeyResult(patchFeatureDto, orgId, feature);
+    const savedFeature = await this.featuresRepository.save(feature);
+    const updatedFeature = await FeatureMapper.toDto(savedFeature);
+    this.eventEmitter.emit('feature.updated', {
+      previous: originalFeature,
+      current: updatedFeature,
+    });
+    return updatedFeature;
+  }
+
+  async searchFeatures(
+    orgId: string,
+    search: string,
+    page: number = 1,
+    limit: number = 0,
+  ) {
+    if (!search) return [];
+
+    if (this.isReference(search)) {
+      return await this.searchFeaturesByReference(orgId, search, page, limit);
+    }
+
+    return await this.searchFeaturesByTitleOrDescription(
+      orgId,
+      search,
+      page,
+      limit,
+    );
+  }
+
+  private async setFeatureKeyResult(
+    featureDto: CreateUpdateFeatureDto,
+    org: Org,
+    feature: Feature,
+  ) {
+    if (featureDto.keyResult) {
+      const keyResult = await this.okrsService.getKeyResultByOrgId(
+        org.id,
+        featureDto.keyResult,
+      );
+      feature.keyResult = Promise.resolve(keyResult);
+    }
+  }
+
+  private async setFeatureAssignedTo(
+    featureDto: CreateUpdateFeatureDto,
+    org: Org,
+    feature: Feature,
+  ) {
+    if (featureDto.assignedTo) {
+      const assignedTo = await this.userRepository.findOneByOrFail({
+        id: featureDto.assignedTo,
+        org: { id: org.id },
+      });
+      if (assignedTo) {
+        feature.assignedTo = Promise.resolve(assignedTo);
+      }
+    }
+  }
+
+  private async addFeatureFiles(
+    featureDto: CreateUpdateFeatureDto,
+    feature: Feature,
+  ) {
+    const files = await this.filesRepository.findBy({
+      id: In(featureDto.files.map((file) => file.id)),
+    });
+    await this.featureFilesRepository.delete({ feature: { id: feature.id } });
+    const featureFiles = files.map((file) => {
+      const featureFile = new FeatureFile();
+      featureFile.feature = Promise.resolve(feature);
+      featureFile.file = Promise.resolve(file);
+      return featureFile;
+    });
+    await this.featureFilesRepository.save(featureFiles);
+    feature.featureFiles = Promise.resolve(featureFiles);
+  }
+
+  private validateFeature(featureDto: CreateUpdateFeatureDto) {
+    if (!featureDto.title) throw new Error('Feature title is required');
+    if (!featureDto.priority) throw new Error('Feature priority is required');
+    if (!featureDto.status) throw new Error('Feature status is required');
+    if (!Object.values(Priority).includes(featureDto.priority))
+      throw new Error('Invalid priority');
   }
 
   private async updateFeatureAssignedTo(
@@ -251,33 +316,6 @@ export class FeaturesService {
     } else {
       feature.keyResult = Promise.resolve(null);
     }
-  }
-
-  async deleteFeature(orgId: string, id: string) {
-    const feature = await this.featuresRepository.findOneByOrFail({
-      org: { id: orgId },
-      id: id,
-    });
-    await this.deleteFeatureFiles(orgId, feature.id);
-    await this.workItemsService.removeFeatureFromWorkItems(orgId, id);
-    await this.featuresRepository.remove(feature);
-  }
-
-  async patchFeature(
-    orgId: string,
-    featureId: string,
-    patchFeatureDto: PatchFeatureDto,
-  ) {
-    const feature = await this.featuresRepository.findOneByOrFail({
-      org: { id: orgId },
-      id: featureId,
-    });
-    this.patchFeatureStatus(patchFeatureDto, feature);
-    this.patchFeaturePriority(patchFeatureDto, feature);
-    await this.patchFeatureMilestone(patchFeatureDto, orgId, feature);
-    await this.patchFeatureKeyResult(patchFeatureDto, orgId, feature);
-    const savedFeature = await this.featuresRepository.save(feature);
-    return await FeatureMapper.toDto(savedFeature);
   }
 
   private async patchFeatureKeyResult(
@@ -345,26 +383,6 @@ export class FeaturesService {
       const file = await featureFile.file;
       await this.filesService.deleteFile(orgId, file.id);
     }
-  }
-
-  async searchFeatures(
-    orgId: string,
-    search: string,
-    page: number = 1,
-    limit: number = 0,
-  ) {
-    if (!search) return [];
-
-    if (this.isReference(search)) {
-      return await this.searchFeaturesByReference(orgId, search, page, limit);
-    }
-
-    return await this.searchFeaturesByTitleOrDescription(
-      orgId,
-      search,
-      page,
-      limit,
-    );
   }
 
   private isReference(search: string) {
