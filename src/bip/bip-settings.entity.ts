@@ -26,6 +26,8 @@ export class BipSettings {
   isIterationsPagePublic: boolean;
   @Column({ default: false })
   isActiveIterationsPagePublic: boolean;
+  @Column({ default: false })
+  isFeedPagePublic: boolean;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
