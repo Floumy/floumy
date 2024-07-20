@@ -46,6 +46,7 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
+        isFeedPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, settings);
       const updatedSettings = await service.getSettings(org.id);
@@ -63,6 +64,7 @@ describe('BipService', () => {
         isRoadmapPagePublic: false,
         isIterationsPagePublic: false,
         isActiveIterationsPagePublic: false,
+        isFeedPagePublic: false,
       });
     });
     it('should not override existing settings', async () => {
@@ -72,6 +74,7 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
+        isFeedPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, settings);
       await service.createSettings(org);
@@ -85,6 +88,7 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
+        isFeedPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, settings);
       await expect(service.createSettings(org)).resolves.not.toThrow();

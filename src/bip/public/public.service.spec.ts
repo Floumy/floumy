@@ -51,6 +51,7 @@ describe('PublicService', () => {
         isRoadmapPagePublic: false,
         isIterationsPagePublic: false,
         isActiveIterationsPagePublic: false,
+        isFeedPagePublic: false,
       });
     });
   });
