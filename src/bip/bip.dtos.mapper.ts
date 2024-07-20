@@ -8,6 +8,7 @@ export class BipSettingsMapper {
       isRoadmapPagePublic: bipSettings.isRoadmapPagePublic,
       isIterationsPagePublic: bipSettings.isIterationsPagePublic,
       isActiveIterationsPagePublic: bipSettings.isActiveIterationsPagePublic,
+      isFeedPagePublic: bipSettings.isFeedPagePublic,
     };
   }
 }
