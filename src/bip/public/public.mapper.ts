@@ -8,6 +8,7 @@ export class PublicMapper {
       isRoadmapPagePublic: bipSettings.isRoadmapPagePublic,
       isIterationsPagePublic: bipSettings.isIterationsPagePublic,
       isActiveIterationsPagePublic: bipSettings.isActiveIterationsPagePublic,
+      isFeedPagePublic: bipSettings.isFeedPagePublic,
     };
   }
 }

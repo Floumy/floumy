@@ -147,6 +147,7 @@ export class PaymentsService {
         isRoadmapPagePublic: false,
         isIterationsPagePublic: false,
         isActiveIterationsPagePublic: false,
+        isFeedPagePublic: false,
       });
     }
   }

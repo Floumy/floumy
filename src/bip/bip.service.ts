@@ -67,6 +67,7 @@ export class BipService {
     bipSettings.isIterationsPagePublic = settings.isIterationsPagePublic;
     bipSettings.isActiveIterationsPagePublic =
       settings.isActiveIterationsPagePublic;
+    bipSettings.isFeedPagePublic = settings.isFeedPagePublic;
     const updatedSettings = await this.bipSettingsRepository.save(bipSettings);
     return BipSettingsMapper.toDto(updatedSettings);
   }
