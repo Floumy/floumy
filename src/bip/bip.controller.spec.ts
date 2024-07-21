@@ -52,6 +52,7 @@ describe('BipController', () => {
           isRoadmapPagePublic: true,
           isIterationsPagePublic: true,
           isActiveIterationsPagePublic: true,
+          isFeedPagePublic: true,
         },
       );
       expect(updatedSettings).toEqual({
@@ -60,6 +61,7 @@ describe('BipController', () => {
         isRoadmapPagePublic: true,
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
+        isFeedPagePublic: true,
       });
     });
   });
@@ -78,6 +80,7 @@ describe('BipController', () => {
           isRoadmapPagePublic: true,
           isIterationsPagePublic: true,
           isActiveIterationsPagePublic: true,
+          isFeedPagePublic: true,
         },
       );
       const settings = await controller.getSettings({
@@ -91,6 +94,7 @@ describe('BipController', () => {
         isRoadmapPagePublic: true,
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
+        isFeedPagePublic: true,
       });
     });
   });
