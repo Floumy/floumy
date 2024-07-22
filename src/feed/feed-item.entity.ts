@@ -16,7 +16,7 @@ export class FeedItem {
   title: string;
   @Column()
   entity: string;
-  @Column()
+  @Column({ nullable: true })
   entityId: string;
   @Column()
   action: string;
