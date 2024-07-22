@@ -1,9 +1,11 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  Post,
   Query,
   Request,
   UseGuards,
@@ -28,6 +30,23 @@ export class FeedController {
         request.user.org,
         page,
         limit,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async createFeedItem(
+    @Request() request,
+    @Body() textFeedItem: { text: string },
+  ) {
+    try {
+      return await this.feedService.createTextFeedItem(
+        request.user.sub,
+        request.user.org,
+        textFeedItem,
       );
     } catch (e) {
       throw new BadRequestException(e.message);

@@ -66,4 +66,33 @@ describe('FeedService', () => {
       expect(result[0].content).toEqual({ id: '1' });
     });
   });
+
+  describe('when creating a text feed item', () => {
+    it('should create a feed item', async () => {
+      const result = await service.createTextFeedItem(user.id, org.id, {
+        text: 'Test Text Feed Item',
+      });
+      expect(result).toBeDefined();
+      expect(result.id).toBeDefined();
+      expect(result.title).toEqual('Text Feed Item Created');
+      expect(result.entity).toEqual('text');
+      expect(result.entityId).toEqual(null);
+      expect(result.action).toEqual('created');
+      expect(result.content).toEqual({ text: 'Test Text Feed Item' });
+    });
+    it('should throw an error if the user is not part of the org', async () => {
+      await expect(
+        service.createTextFeedItem('invalid-id', org.id, {
+          text: 'Test Text Feed Item',
+        }),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the item does not have a text field', async () => {
+      await expect(
+        service.createTextFeedItem(user.id, org.id, {
+          tex: 'Test Text Feed Item',
+        } as any),
+      ).rejects.toThrow();
+    });
+  });
 });
