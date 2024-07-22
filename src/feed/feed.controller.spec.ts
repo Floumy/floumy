@@ -56,4 +56,20 @@ describe('FeedController', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('when creating a text feed item', () => {
+    it('should create a text feed item', async () => {
+      const result = await controller.createFeedItem(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        {
+          text: 'Test Text Feed Item',
+        },
+      );
+      expect(result).toBeDefined();
+    });
+  });
 });
