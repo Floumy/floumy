@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { FeedItemMapper } from './mappers';
+import { FeedItemDto } from './dtos';
 
 @Injectable()
 export class FeedService {
@@ -15,7 +16,11 @@ export class FeedService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
 
-  async listFeedItems(orgId: string, page: number, limit: number) {
+  async listFeedItems(
+    orgId: string,
+    page: number,
+    limit: number,
+  ): Promise<FeedItemDto[]> {
     const feedItems = await this.feedItemRepository.find({
       where: { org: { id: orgId } },
       take: limit,
@@ -29,7 +34,7 @@ export class FeedService {
     userId: string,
     orgId: string,
     textFeedItem: { text: string },
-  ) {
+  ): Promise<FeedItemDto> {
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const org = await user.org;
     if (org.id !== orgId) {

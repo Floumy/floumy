@@ -97,5 +97,27 @@ describe('PublicService', () => {
       await bipRepository.save(bipSettings);
       await expect(service.listFeedItems(newOrg.id, 1, 10)).rejects.toThrow();
     });
+    it('should filter out assignedTo from the feed items', async () => {
+      const feedItem = new FeedItem();
+      feedItem.org = Promise.resolve(org);
+      feedItem.user = Promise.resolve(user);
+      feedItem.title = 'Test Feed Item';
+      feedItem.entity = 'workItem';
+      feedItem.entityId = '1';
+      feedItem.action = 'created';
+      feedItem.content = { id: '1', assignedTo: { id: '2' } };
+
+      await feedItemRepository.save(feedItem);
+
+      const result = await service.listFeedItems(org.id, 1, 10);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toEqual('Test Feed Item');
+      expect(result[0].entity).toEqual('workItem');
+      expect(result[0].entityId).toEqual('1');
+      expect(result[0].action).toEqual('created');
+      expect(result[0].content).toEqual({ id: '1' });
+      expect(result[0].content.assignedTo).toBeUndefined();
+    });
   });
 });
