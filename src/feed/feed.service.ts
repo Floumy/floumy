@@ -4,6 +4,7 @@ import { FeedItem } from './feed-item.entity';
 import { Repository } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
+import { FeedItemMapper } from './mappers';
 
 @Injectable()
 export class FeedService {
@@ -15,12 +16,13 @@ export class FeedService {
   ) {}
 
   async listFeedItems(orgId: string, page: number, limit: number) {
-    return this.feedItemRepository.find({
+    const feedItems = await this.feedItemRepository.find({
       where: { org: { id: orgId } },
       take: limit,
       skip: (page - 1) * limit,
       order: { createdAt: 'DESC' },
     });
+    return feedItems.map(FeedItemMapper.toDto);
   }
 
   async createTextFeedItem(
@@ -42,6 +44,7 @@ export class FeedService {
     feedItem.entity = 'text';
     feedItem.action = 'created';
     feedItem.content = textFeedItem;
-    return await this.feedItemRepository.save(feedItem);
+    const savedFeedItem = await this.feedItemRepository.save(feedItem);
+    return FeedItemMapper.toDto(savedFeedItem);
   }
 }
