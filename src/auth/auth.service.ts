@@ -5,11 +5,12 @@ import { RefreshToken } from './refresh-token.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TokensService } from './tokens.service';
-import { SignUpDto } from './auth.dtos';
+import { OrgSignUpDto } from './auth.dtos';
 import { v4 as uuid } from 'uuid';
 import { NotificationsService } from '../notifications/notifications.service';
 import { OrgsService } from '../orgs/orgs.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Org } from '../orgs/org.entity';
 
 export type AuthDto = {
   accessToken: string;
@@ -55,7 +56,7 @@ export class AuthService {
     return authData;
   }
 
-  async signUp(signUpDto: SignUpDto): Promise<void> {
+  async orgSignUp(signUpDto: OrgSignUpDto): Promise<void> {
     const org = await this.orgsService.getByInvitationTokenOrCreateWithName(
       signUpDto.invitationToken,
       signUpDto.productName,
@@ -70,26 +71,20 @@ export class AuthService {
       );
     }
 
-    const user = await this.usersService.createUser(
+    await this.createUserAndSendActivationEmail(
       signUpDto.name,
       signUpDto.email,
       signUpDto.password,
       org,
     );
+  }
 
-    try {
-      const activationToken = await this.generateActivationToken();
-      await this.notificationsService.sendActivationEmail(
-        user.name,
-        user.email,
-        activationToken,
-      );
-      user.activationToken = activationToken;
-      await this.usersService.save(user);
-    } catch (e) {
-      this.logger.error(e.message);
-      throw new Error('The activation email could not be sent');
-    }
+  async signUp(signUpDto: OrgSignUpDto): Promise<void> {
+    await this.createUserAndSendActivationEmail(
+      signUpDto.name,
+      signUpDto.email,
+      signUpDto.password,
+    );
   }
 
   async refreshToken(refreshToken: string) {
@@ -177,6 +172,29 @@ export class AuthService {
     user.password = await this.usersService.encryptPassword(newPassword);
     user.passwordResetToken = null;
     await this.usersService.save(user);
+  }
+
+  private async createUserAndSendActivationEmail(
+    name: string,
+    email: string,
+    password: string,
+    org?: Org,
+  ) {
+    const user = await this.usersService.createUser(name, email, password, org);
+
+    try {
+      const activationToken = await this.generateActivationToken();
+      await this.notificationsService.sendActivationEmail(
+        user.name,
+        user.email,
+        activationToken,
+      );
+      user.activationToken = activationToken;
+      await this.usersService.save(user);
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new Error('The activation email could not be sent');
+    }
   }
 
   private async getOrCreateRefreshToken(user: User) {
