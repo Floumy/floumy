@@ -26,11 +26,20 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
-  async createUser(name: string, email: string, password: string, org: Org) {
+  async createUser(
+    name: string,
+    email: string,
+    password: string,
+    org: Org = null,
+  ) {
     await this.validateUser(name, email, password);
     const hashedPassword = await this.encryptPassword(password);
     const user = new User(name, email, hashedPassword);
-    user.org = Promise.resolve(org);
+
+    if (org) {
+      user.org = Promise.resolve(org);
+    }
+
     return await this.usersRepository.save(user);
   }
 

@@ -56,7 +56,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('john@example.com');
       user.isActive = true;
       await usersService.save(user);
@@ -74,7 +74,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       await expect(
         service.signIn('john@example.com', 'testtesttest'),
       ).rejects.toThrow(UnauthorizedException);
@@ -86,7 +86,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('john@example.com');
       user.isActive = true;
       await usersService.save(user);
@@ -107,7 +107,7 @@ describe('AuthService', () => {
   describe('when signing up with invalid credentials', () => {
     it('should throw an error', () => {
       expect(
-        service.signUp({ name: '', password: '', email: '' }),
+        service.orgSignUp({ name: '', password: '', email: '' }),
       ).rejects.toThrow();
     });
   });
@@ -120,7 +120,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       expect(emailServiceMock.sendEmail).toHaveBeenCalled();
     });
     it('should store the activation token in the database', async () => {
@@ -130,7 +130,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('test@example.com');
       expect(user.activationToken).toBeDefined();
     });
@@ -141,7 +141,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test Product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('testing@example.com');
       const org = await user.org;
       expect(org).toBeDefined();
@@ -158,7 +158,7 @@ describe('AuthService', () => {
         productName: 'Test product',
       };
 
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('test@example.com');
       user.isActive = true;
       await usersService.save(user);
@@ -180,7 +180,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('test@example.com');
       user.isActive = true;
       await usersService.save(user);
@@ -216,7 +216,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('john@example.com');
       user.isActive = true;
       await usersService.save(user);
@@ -239,7 +239,7 @@ describe('AuthService', () => {
           password: 'testtesttest',
           productName: 'Test product',
         };
-        await service.signUp(signUpDto);
+        await service.orgSignUp(signUpDto);
         const user = await usersService.findOneByEmail(signUpDto.email);
         await service.activateAccount(user.activationToken);
         const activatedUser = await usersService.findOneByEmail(
@@ -261,7 +261,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       await service.requestPasswordReset(signUpDto.email);
       expect(emailServiceMock.sendEmail).toHaveBeenCalled();
     });
@@ -275,7 +275,7 @@ describe('AuthService', () => {
         password: 'testtesttest',
         productName: 'Test product',
       };
-      await service.signUp(signUpDto);
+      await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail(signUpDto.email);
       user.passwordResetToken = 'test';
       await usersService.save(user);
@@ -284,6 +284,22 @@ describe('AuthService', () => {
         signUpDto.email,
       );
       expect(userWithNewPassword.password).not.toEqual(user.password);
+    });
+  });
+  describe('when signing up without an org', () => {
+    it('should not create an org', async () => {
+      const signUpDto = {
+        name: 'John Doe',
+        email: 'test@example.com',
+        password: 'testtesttest',
+      };
+
+      await service.signUp(signUpDto);
+
+      const user = await usersService.findOneByEmail('test@example.com');
+
+      expect(user.name).toEqual('John Doe');
+      expect(await user.org).toBeNull();
     });
   });
 });

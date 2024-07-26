@@ -55,7 +55,7 @@ export class User {
     lazy: true,
   })
   assignedObjectives: any;
-  @ManyToOne(() => Org, (org) => org.users, { lazy: true })
+  @ManyToOne(() => Org, (org) => org.users, { lazy: true, nullable: true })
   org: Promise<Org>;
 
   constructor(name: string, email: string, password: string) {

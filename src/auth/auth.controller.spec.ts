@@ -45,7 +45,7 @@ describe('AuthController', () => {
 
   describe('when signing in with valid credentials', () => {
     it('should return an access token', async () => {
-      await controller.signUp({
+      await controller.orgSignUp({
         name: 'John Doe',
         email: 'john@example.com',
         password: 'testtesttest',
@@ -75,7 +75,7 @@ describe('AuthController', () => {
 
   describe('when refreshing an access token', () => {
     it('should return a new access token and a new refresh token', async () => {
-      await controller.signUp({
+      await controller.orgSignUp({
         name: 'Test User',
         email: 'test@example.com',
         password: 'testtesttest',
@@ -112,7 +112,7 @@ describe('AuthController', () => {
         password: 'testtesttest',
         productName: 'Test Product',
       };
-      await controller.signUp(signUpDto);
+      await controller.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail(signUpDto.email);
       await controller.activateAccount({
         activationToken: user.activationToken,
@@ -130,7 +130,7 @@ describe('AuthController', () => {
         password: 'testtesttest',
         productName: 'Test Product',
       };
-      await controller.signUp(signUpDto);
+      await controller.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail(signUpDto.email);
       await controller.requestPasswordReset({ email: user.email });
       const updatedUser = await usersService.findOneByEmail(signUpDto.email);
@@ -146,7 +146,7 @@ describe('AuthController', () => {
         password: 'testtesttest',
         productName: 'Test Product',
       };
-      await controller.signUp(signUpDto);
+      await controller.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail(signUpDto.email);
       await controller.requestPasswordReset({ email: user.email });
       const updatedUser = await usersService.findOneByEmail(signUpDto.email);

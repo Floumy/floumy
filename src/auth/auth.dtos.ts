@@ -3,12 +3,18 @@ export interface SignInDto {
   password: string;
 }
 
-export interface SignUpDto {
+export interface OrgSignUpDto {
   name: string;
   email: string;
   password: string;
   invitationToken?: string;
   productName?: string;
+}
+
+export interface SignUpDto {
+  name: string;
+  email: string;
+  password: string;
 }
 
 export interface RefreshTokenDto {

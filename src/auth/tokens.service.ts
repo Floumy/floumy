@@ -11,12 +11,13 @@ export class TokensService {
   ) {}
 
   async generateAccessToken(user: User) {
+    const org = await user.org;
     return await this.jwtService.signAsync(
       {
         sub: user.id,
         name: user.name,
         email: user.email,
-        org: (await user.org).id,
+        org: org ? org.id : null,
       },
       {
         expiresIn: this.configService.get('jwt.accessToken.expiresIn'),
@@ -31,7 +32,7 @@ export class TokensService {
         sub: user.id,
         name: user.name,
         email: user.email,
-        org: (await user.org).id,
+        org: (await user.org)?.id,
       },
       {
         expiresIn: this.configService.get('jwt.refreshToken.expiresIn'),

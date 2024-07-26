@@ -13,7 +13,12 @@ import {
 import { AuthDto, AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { Public } from './public.guard';
-import { RefreshTokenDto, SignInDto, SignUpDto } from './auth.dtos';
+import {
+  OrgSignUpDto,
+  RefreshTokenDto,
+  SignInDto,
+  SignUpDto,
+} from './auth.dtos';
 
 @Controller('auth')
 export class AuthController {
@@ -32,6 +37,18 @@ export class AuthController {
   @Get('profile')
   getProfile(@Request() request): string {
     return request.user;
+  }
+
+  @Public()
+  @Post('org/sign-up')
+  @HttpCode(HttpStatus.CREATED)
+  async orgSignUp(@Body() signUpDto: OrgSignUpDto) {
+    try {
+      return await this.authService.orgSignUp(signUpDto);
+    } catch (e) {
+      this.logger.error(e.message);
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Public()
