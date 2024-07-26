@@ -59,6 +59,9 @@ export class BasicAuthGuard implements CanActivate {
       this.userDetails = await this.tokenService.verifyAccessToken(token);
       await this.usersRepository.findOneByOrFail({
         id: this.userDetails.sub,
+        org: {
+          id: this.userDetails.org,
+        },
         isActive: true,
       });
       request['user'] = this.userDetails;
