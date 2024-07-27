@@ -212,11 +212,13 @@ describe('PublicService', () => {
       expect(result).toBeNull();
     });
     it('should throw an error if the org does not have build in public enabled', async () => {
+      const newOrg = await orgsService.createForUser(user);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = false;
-      bipSettings.org = Promise.resolve(org);
+      bipSettings.isIterationsPagePublic = true;
+      bipSettings.org = Promise.resolve(newOrg);
       await bipSettingsRepository.save(bipSettings);
-      await expect(service.getActiveIteration(org.id)).rejects.toThrow();
+      await expect(service.getActiveIteration(newOrg.id)).rejects.toThrow();
     });
     it('should throw an error if the org does not exist', async () => {
       const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
@@ -225,12 +227,13 @@ describe('PublicService', () => {
       ).rejects.toThrow();
     });
     it('should throw an error if the org does not have active iterations page public enabled', async () => {
+      const newOrg = await orgsService.createForUser(user);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveIterationsPagePublic = false;
-      bipSettings.org = Promise.resolve(org);
+      bipSettings.org = Promise.resolve(newOrg);
       await bipSettingsRepository.save(bipSettings);
-      await expect(service.getActiveIteration(org.id)).rejects.toThrow();
+      await expect(service.getActiveIteration(newOrg.id)).rejects.toThrow();
     });
   });
 });

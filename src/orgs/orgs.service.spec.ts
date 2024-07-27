@@ -91,7 +91,7 @@ describe('OrgsService', () => {
         'Test org',
       );
       expect(actual.paymentPlan).toBeDefined();
-      expect(actual.paymentPlan).toEqual(PaymentPlan.TRIAL);
+      expect(actual.paymentPlan).toEqual(PaymentPlan.FREE);
       expect(actual.isSubscribed).toEqual(false);
       expect(actual.nextPaymentDate).toBeNull();
     });
