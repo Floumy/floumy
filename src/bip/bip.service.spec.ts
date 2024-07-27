@@ -59,12 +59,12 @@ describe('BipService', () => {
       await service.createSettings(org);
       const settings = await service.getSettings(org.id);
       expect(settings).toEqual({
-        isBuildInPublicEnabled: false,
-        isObjectivesPagePublic: false,
-        isRoadmapPagePublic: false,
-        isIterationsPagePublic: false,
-        isActiveIterationsPagePublic: false,
-        isFeedPagePublic: false,
+        isBuildInPublicEnabled: true,
+        isObjectivesPagePublic: true,
+        isRoadmapPagePublic: true,
+        isIterationsPagePublic: true,
+        isActiveIterationsPagePublic: true,
+        isFeedPagePublic: true,
       });
     });
     it('should not override existing settings', async () => {

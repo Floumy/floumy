@@ -46,12 +46,12 @@ describe('PublicController', () => {
     it('should return the public settings', async () => {
       const settings = await controller.getPublicSettings(org.id);
       expect(settings).toEqual({
-        isBuildInPublicEnabled: false,
-        isObjectivesPagePublic: false,
-        isRoadmapPagePublic: false,
-        isIterationsPagePublic: false,
-        isActiveIterationsPagePublic: false,
-        isFeedPagePublic: false,
+        isBuildInPublicEnabled: true,
+        isObjectivesPagePublic: true,
+        isRoadmapPagePublic: true,
+        isIterationsPagePublic: true,
+        isActiveIterationsPagePublic: true,
+        isFeedPagePublic: true,
       });
     });
     it('should throw an error if the org does not exist', async () => {
