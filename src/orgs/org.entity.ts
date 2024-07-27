@@ -37,10 +37,10 @@ export class Org {
   @Column({
     type: 'enum',
     enum: PaymentPlan,
-    default: PaymentPlan.TRIAL,
+    default: PaymentPlan.FREE,
     nullable: false,
   })
-  paymentPlan: PaymentPlan;
+  paymentPlan: PaymentPlan = PaymentPlan.FREE;
   @Column({ default: false })
   isSubscribed: boolean;
   @Column({ default: null, nullable: true })

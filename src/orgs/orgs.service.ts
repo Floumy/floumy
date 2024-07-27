@@ -98,7 +98,7 @@ export class OrgsService {
     await this.validateOrgNameIsUnique(name);
     const org = new Org();
     org.name = name.trim();
-    org.paymentPlan = PaymentPlan.TRIAL;
+    org.paymentPlan = PaymentPlan.FREE;
     org.isSubscribed = false;
     org.nextPaymentDate = null;
     const savedOrg = await this.orgRepository.save(org);
