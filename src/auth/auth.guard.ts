@@ -1,7 +1,6 @@
 import {
   CanActivate,
   ExecutionContext,
-  HttpException,
   Injectable,
   Logger,
   UnauthorizedException,
@@ -41,13 +40,6 @@ export class AuthGuard extends BasicAuthGuard implements CanActivate {
     if (!org) {
       this.logger.error('No org found for user');
       throw new UnauthorizedException();
-    }
-
-    const hasActiveSubscription =
-      await this.orgsService.hasActiveSubscription(org);
-    if (!hasActiveSubscription) {
-      this.logger.error('No active subscription found for org');
-      throw new HttpException('No active subscription found', 402);
     }
 
     return true;
