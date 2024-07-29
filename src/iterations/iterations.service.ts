@@ -75,7 +75,7 @@ export class IterationsService {
         },
       },
       order: {
-        startDate: 'ASC',
+        startDate: 'DESC',
       },
     });
     return await Promise.all(
@@ -196,7 +196,7 @@ export class IterationsService {
         },
       },
       order: {
-        startDate: 'ASC',
+        startDate: 'DESC',
       },
     });
     return await Promise.all(
@@ -266,7 +266,7 @@ export class IterationsService {
     return await this.iterationRepository.find({
       where,
       order: {
-        startDate: 'ASC',
+        startDate: 'DESC',
       },
     });
   }

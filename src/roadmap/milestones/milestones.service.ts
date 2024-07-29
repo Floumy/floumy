@@ -31,15 +31,6 @@ export class MilestonesService {
     return await MilestoneMapper.toDto(savedMilestone);
   }
 
-  private validateMilestone(createMilestoneDto: CreateUpdateMilestoneDto) {
-    if (!createMilestoneDto.title)
-      throw new Error('Milestone title is required');
-    if (!createMilestoneDto.dueDate)
-      throw new Error('Milestone due date is required');
-    if (!/^\d{4}-\d{2}-\d{2}$/.exec(createMilestoneDto.dueDate))
-      throw new Error('Invalid due date');
-  }
-
   async findOneById(orgId: string, id: string) {
     return await this.milestoneRepository.findOneByOrFail({
       org: { id: orgId },
@@ -51,7 +42,7 @@ export class MilestonesService {
     return MilestoneMapper.toListDto(
       await this.milestoneRepository.find({
         where: { org: { id: orgId } },
-        order: { dueDate: 'ASC' },
+        order: { dueDate: 'DESC' },
       }),
     );
   }
@@ -59,7 +50,7 @@ export class MilestonesService {
   async listMilestonesWithFeatures(orgId: string) {
     const milestones = await this.milestoneRepository.find({
       where: { org: { id: orgId } },
-      order: { dueDate: 'ASC' },
+      order: { dueDate: 'DESC' },
       relations: ['features'],
     });
     return await MilestoneMapper.toListWithFeaturesDto(milestones);
@@ -143,8 +134,20 @@ export class MilestonesService {
 
     const milestones = await this.milestoneRepository.find({
       where,
+      order: {
+        dueDate: 'DESC',
+      },
     });
 
     return await Promise.all(milestones.map(MilestoneMapper.toDto));
+  }
+
+  private validateMilestone(createMilestoneDto: CreateUpdateMilestoneDto) {
+    if (!createMilestoneDto.title)
+      throw new Error('Milestone title is required');
+    if (!createMilestoneDto.dueDate)
+      throw new Error('Milestone due date is required');
+    if (!/^\d{4}-\d{2}-\d{2}$/.exec(createMilestoneDto.dueDate))
+      throw new Error('Invalid due date');
   }
 }
