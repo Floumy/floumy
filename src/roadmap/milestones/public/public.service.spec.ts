@@ -124,14 +124,14 @@ describe('PublicService', () => {
         Timeline.THIS_QUARTER,
       );
       expect(milestones).toBeDefined();
+      expect(milestones[0].title).toBe(milestone2.title);
+      expect(milestones[0].features.length).toBe(1);
+      expect(milestones[0].features[0].title).toBe('Feature 3');
       expect(milestones.length).toBe(2);
-      expect(milestones[0].title).toBe(milestone1.title);
-      expect(milestones[0].features.length).toBe(2);
-      expect(milestones[0].features[0].title).toBe('Feature 1');
-      expect(milestones[0].features[1].title).toBe('Feature 2');
-      expect(milestones[1].title).toBe(milestone2.title);
-      expect(milestones[1].features.length).toBe(1);
-      expect(milestones[1].features[0].title).toBe('Feature 3');
+      expect(milestones[1].title).toBe(milestone1.title);
+      expect(milestones[1].features.length).toBe(2);
+      expect(milestones[1].features[0].title).toBe('Feature 1');
+      expect(milestones[1].features[1].title).toBe('Feature 2');
     });
   });
 
