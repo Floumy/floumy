@@ -18,6 +18,7 @@ import { Iteration } from '../../iterations/Iteration.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { User } from '../../users/user.entity';
 import { WorkItemsStatusStats } from './work-items-status-stats.entity';
+import { WorkItemComment } from './work-item-comment.entity';
 
 @Entity()
 export class WorkItem {
@@ -75,6 +76,12 @@ export class WorkItem {
     lazy: true,
   })
   iteration: Promise<Iteration>;
+  @OneToMany(
+    () => WorkItemComment,
+    (workItemComment) => workItemComment.workItem,
+    { lazy: true },
+  )
+  comments: Promise<WorkItemComment[]>;
   @OneToMany(() => WorkItemFile, (workItemFile) => workItemFile.workItem)
   workItemFiles: Promise<WorkItemFile[]>;
   @OneToOne(
