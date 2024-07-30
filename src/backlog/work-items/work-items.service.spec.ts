@@ -25,6 +25,7 @@ import { WorkItemFile } from './work-item-file.entity';
 import { FeatureFile } from '../../roadmap/features/feature-file.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
+import { WorkItemComment } from './work-item-comment.entity';
 
 describe('WorkItemsService', () => {
   let usersService: UsersService;
@@ -32,6 +33,8 @@ describe('WorkItemsService', () => {
   let featuresService: FeaturesService;
   let iterationService: IterationsService;
   let filesRepository: Repository<File>;
+  let workItemCommentsRepository: Repository<WorkItemComment>;
+  let workItemsRepository: Repository<WorkItem>;
   let service: WorkItemsService;
   let org: Org;
   let user: User;
@@ -53,6 +56,7 @@ describe('WorkItemsService', () => {
           File,
           FeatureFile,
           WorkItemFile,
+          WorkItemComment,
         ]),
       ],
       [
@@ -74,6 +78,12 @@ describe('WorkItemsService', () => {
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     filesRepository = module.get<Repository<File>>(getRepositoryToken(File));
+    workItemCommentsRepository = module.get<Repository<WorkItemComment>>(
+      getRepositoryToken(WorkItemComment),
+    );
+    workItemsRepository = module.get<Repository<WorkItem>>(
+      getRepositoryToken(WorkItem),
+    );
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -1196,6 +1206,40 @@ describe('WorkItemsService', () => {
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual(Priority.HIGH);
       expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
+    });
+  });
+
+  describe('when listing the comments of a work item', () => {
+    it('should return the list of comments of the work item', async () => {
+      const workItem = new WorkItem();
+      workItem.title = 'my work item';
+      workItem.description = 'my work item description';
+      workItem.priority = Priority.HIGH;
+      workItem.type = WorkItemType.USER_STORY;
+      workItem.status = WorkItemStatus.PLANNED;
+      workItem.org = Promise.resolve(org);
+      workItem.createdBy = Promise.resolve(user);
+      const savedWorkItem = await workItemsRepository.save(workItem);
+
+      const comment1 = new WorkItemComment();
+      comment1.content = 'my comment 1';
+      comment1.createdBy = Promise.resolve(user);
+      comment1.workItem = Promise.resolve(savedWorkItem);
+      comment1.org = Promise.resolve(org);
+      await workItemCommentsRepository.save(comment1);
+
+      const comment2 = new WorkItemComment();
+      comment2.content = 'my comment 2';
+      comment2.createdBy = Promise.resolve(user);
+      comment2.workItem = Promise.resolve(savedWorkItem);
+      comment2.org = Promise.resolve(org);
+      await workItemCommentsRepository.save(comment2);
+
+      const comments = await service.listWorkItemComments(org.id, workItem.id);
+      expect(comments).toBeDefined();
+      expect(comments.length).toEqual(2);
+      expect(comments[0].content).toEqual('my comment 1');
+      expect(comments[1].content).toEqual('my comment 2');
     });
   });
 });

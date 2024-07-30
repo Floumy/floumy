@@ -12,6 +12,7 @@ import { WorkItemFile } from './work-item-file.entity';
 import { User } from '../../users/user.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FilesService } from '../../files/files.service';
+import { CommentMapper } from '../../comments/mappers';
 
 @Injectable()
 export class WorkItemsService {
@@ -197,6 +198,15 @@ export class WorkItemsService {
       page,
       limit,
     );
+  }
+
+  async listWorkItemComments(orgId: string, workItemId: string) {
+    const workItem = await this.workItemsRepository.findOneByOrFail({
+      id: workItemId,
+      org: { id: orgId },
+    });
+    const comments = await workItem.comments;
+    return await CommentMapper.toDtoList(comments);
   }
 
   private async setWorkItemsFiles(

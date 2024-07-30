@@ -22,6 +22,7 @@ import { FilesModule } from '../files/files.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PublicService } from './work-items/public/public.service';
 import { PublicController } from './work-items/public/public.controller';
+import { WorkItemComment } from './work-items/work-item-comment.entity';
 
 @Module({
   controllers: [WorkItemsController, PublicController],
@@ -41,6 +42,7 @@ import { PublicController } from './work-items/public/public.controller';
       User,
       WorkItemsStatusLog,
       WorkItemsStatusStats,
+      WorkItemComment,
     ]),
     OrgsModule,
     OkrsModule,
