@@ -26,6 +26,7 @@ import { FeatureFile } from '../../roadmap/features/feature-file.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { WorkItemComment } from './work-item-comment.entity';
+import { PaymentPlan } from '../../auth/payment.plan';
 
 describe('WorkItemsService', () => {
   let usersService: UsersService;
@@ -36,6 +37,8 @@ describe('WorkItemsService', () => {
   let workItemCommentsRepository: Repository<WorkItemComment>;
   let workItemsRepository: Repository<WorkItem>;
   let service: WorkItemsService;
+  let orgsRepository: Repository<Org>;
+  let usersRepository: Repository<User>;
   let org: Org;
   let user: User;
 
@@ -84,6 +87,8 @@ describe('WorkItemsService', () => {
     workItemsRepository = module.get<Repository<WorkItem>>(
       getRepositoryToken(WorkItem),
     );
+    orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
+    usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -95,6 +100,22 @@ describe('WorkItemsService', () => {
   afterEach(async () => {
     await cleanup();
   });
+
+  async function getTestPremiumOrgAndUser() {
+    const premiumOrg = new Org();
+    premiumOrg.name = 'Premium Org';
+    premiumOrg.paymentPlan = PaymentPlan.PREMIUM;
+    const org = await orgsRepository.save(premiumOrg);
+
+    const premiumUser = new User(
+      'Premium User',
+      'premium@example.com',
+      'testtesttest',
+    );
+    premiumUser.org = Promise.resolve(org);
+    const user = await usersRepository.save(premiumUser);
+    return { org, user };
+  }
 
   describe('when creating a work item', () => {
     it('should return the created work item', async () => {
@@ -1209,8 +1230,52 @@ describe('WorkItemsService', () => {
     });
   });
 
+  describe('when creating a work item comment', () => {
+    it('should create the work item comment', async () => {
+      const { org, user } = await getTestPremiumOrgAndUser();
+
+      const workItem = await service.createWorkItem(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        type: WorkItemType.BUG,
+        status: WorkItemStatus.PLANNED,
+      });
+
+      const comment = await service.createWorkItemComment(
+        user.id,
+        org.id,
+        workItem.id,
+        {
+          content: 'my comment',
+        },
+      );
+      expect(comment).toBeDefined();
+      expect(comment.content).toEqual('my comment');
+      expect(comment.createdBy.id).toEqual(user.id);
+      expect(comment.createdBy.name).toEqual(user.name);
+    });
+    it('should throw an error if the org is not premium', async () => {
+      const workItem = await service.createWorkItem(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        type: WorkItemType.BUG,
+        status: WorkItemStatus.PLANNED,
+      });
+
+      expect(
+        service.createWorkItemComment(user.id, org.id, workItem.id, {
+          content: 'my comment',
+        }),
+      ).rejects.toThrowError('You need to upgrade to premium to add comments');
+    });
+  });
+
   describe('when listing the comments of a work item', () => {
     it('should return the list of comments of the work item', async () => {
+      const { org, user } = await getTestPremiumOrgAndUser();
+
       const workItem = new WorkItem();
       workItem.title = 'my work item';
       workItem.description = 'my work item description';
@@ -1240,6 +1305,21 @@ describe('WorkItemsService', () => {
       expect(comments.length).toEqual(2);
       expect(comments[0].content).toEqual('my comment 1');
       expect(comments[1].content).toEqual('my comment 2');
+    });
+    it('should throw an error if the org is not premium', async () => {
+      const workItem = await service.createWorkItem(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        type: WorkItemType.BUG,
+        status: WorkItemStatus.PLANNED,
+      });
+
+      expect(
+        service.listWorkItemComments(org.id, workItem.id),
+      ).rejects.toThrowError(
+        'You need to upgrade to premium to access comments',
+      );
     });
   });
 });
