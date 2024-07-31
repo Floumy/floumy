@@ -13,6 +13,9 @@ import { User } from '../../users/user.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FilesService } from '../../files/files.service';
 import { CommentMapper } from '../../comments/mappers';
+import { CreateCommentDto } from '../../comments/dtos';
+import { PaymentPlan } from '../../auth/payment.plan';
+import { WorkItemComment } from './work-item-comment.entity';
 
 @Injectable()
 export class WorkItemsService {
@@ -26,6 +29,8 @@ export class WorkItemsService {
     @InjectRepository(File) private filesRepository: Repository<File>,
     @InjectRepository(WorkItemFile)
     private workItemFilesRepository: Repository<WorkItemFile>,
+    @InjectRepository(WorkItemComment)
+    private workItemCommentsRepository: Repository<WorkItemComment>,
     private filesService: FilesService,
     private eventEmitter: EventEmitter2,
   ) {}
@@ -205,8 +210,35 @@ export class WorkItemsService {
       id: workItemId,
       org: { id: orgId },
     });
+    const org = await workItem.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to access comments');
+    }
     const comments = await workItem.comments;
     return await CommentMapper.toDtoList(comments);
+  }
+
+  async createWorkItemComment(
+    userId: string,
+    orgId: string,
+    workItemId: string,
+    createCommentDto: CreateCommentDto,
+  ) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    const workItem = await this.workItemsRepository.findOneByOrFail({
+      id: workItemId,
+      org: { id: orgId },
+    });
+    const org = await workItem.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to add comments');
+    }
+    const comment = new WorkItemComment();
+    comment.content = createCommentDto.content;
+    comment.createdBy = Promise.resolve(user);
+    comment.org = Promise.resolve(org);
+    const savedComment = await this.workItemCommentsRepository.save(comment);
+    return CommentMapper.toDto(savedComment);
   }
 
   private async setWorkItemsFiles(
