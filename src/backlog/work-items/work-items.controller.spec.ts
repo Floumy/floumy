@@ -657,7 +657,7 @@ describe('WorkItemsController', () => {
           status: WorkItemStatus.PLANNED,
         },
       );
-      const comment = await controller.createComment(
+      await controller.createComment(
         {
           user: {
             sub: premiumOrgUser.id,
