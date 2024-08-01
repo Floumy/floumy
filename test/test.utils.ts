@@ -21,6 +21,7 @@ import { TokensService } from '../src/auth/tokens.service';
 import { Invoice } from '../src/payments/invoice.entity';
 import { BipService } from '../src/bip/bip.service';
 import { BipSettings } from '../src/bip/bip-settings.entity';
+import { WorkItemComment } from '../src/backlog/work-items/work-item-comment.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -104,7 +105,14 @@ export async function setupTestingModule(
       CacheModule.register(),
       jwtModule,
       typeOrmModule,
-      TypeOrmModule.forFeature([User, RefreshToken, Org, Invoice, BipSettings]),
+      TypeOrmModule.forFeature([
+        User,
+        RefreshToken,
+        Org,
+        Invoice,
+        BipSettings,
+        WorkItemComment,
+      ]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],
       }),
