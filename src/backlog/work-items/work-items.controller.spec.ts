@@ -28,6 +28,7 @@ import { FeatureFile } from '../../roadmap/features/feature-file.entity';
 import { User } from '../../users/user.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
+import { PaymentPlan } from '../../auth/payment.plan';
 
 describe('WorkItemsController', () => {
   let controller: WorkItemsController;
@@ -37,6 +38,8 @@ describe('WorkItemsController', () => {
   let featureService: FeaturesService;
   let iterationsService: IterationsService;
   let fileRepository: Repository<File>;
+  let orgsRepository: Repository<Org>;
+  let usersRepository: Repository<User>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -81,11 +84,29 @@ describe('WorkItemsController', () => {
     featureService = module.get<FeaturesService>(FeaturesService);
     iterationsService = module.get<IterationsService>(IterationsService);
     fileRepository = module.get<Repository<File>>(getRepositoryToken(File));
+    orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
+    usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
   afterEach(async () => {
     await cleanup();
   });
+
+  async function getTestPremiumOrgAndUser() {
+    const premiumOrg = new Org();
+    premiumOrg.name = 'Premium Org';
+    premiumOrg.paymentPlan = PaymentPlan.PREMIUM;
+    const org = await orgsRepository.save(premiumOrg);
+
+    const premiumUser = new User(
+      'Premium User',
+      'premium@example.com',
+      'testtesttest',
+    );
+    premiumUser.org = Promise.resolve(org);
+    const user = await usersRepository.save(premiumUser);
+    return { org, user };
+  }
 
   describe('when creating a work item', () => {
     it('should return the created work item', async () => {
@@ -577,6 +598,93 @@ describe('WorkItemsController', () => {
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
       expect(workItems[0].status).toEqual('planned');
+    });
+  });
+  describe('when adding a comment to a work item', () => {
+    it('should return the comment', async () => {
+      const { org: premiumOrg, user: premiumOrgUser } =
+        await getTestPremiumOrgAndUser();
+      const workItem = await controller.create(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+          },
+        },
+        {
+          title: 'my work item',
+          description: 'my work item description',
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      const comment = await controller.createComment(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+        {
+          content: 'my comment',
+        },
+      );
+
+      expect(comment.id).toBeDefined();
+      expect(comment.content).toEqual('my comment');
+      expect(comment.createdBy.id).toEqual(premiumOrgUser.id);
+      expect(comment.createdBy.name).toEqual(premiumOrgUser.name);
+      expect(comment.createdAt).toBeDefined();
+      expect(comment.updatedAt).toBeDefined();
+    });
+  });
+  describe('when listing comments of a work item', () => {
+    it('should return the comments', async () => {
+      const { org: premiumOrg, user: premiumOrgUser } =
+        await getTestPremiumOrgAndUser();
+      const workItem = await controller.create(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+          },
+        },
+        {
+          title: 'my work item',
+          description: 'my work item description',
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      const comment = await controller.createComment(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+        {
+          content: 'my comment',
+        },
+      );
+      const comments = await controller.listComments(
+        {
+          user: {
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+      );
+
+      expect(comments.length).toEqual(1);
+      expect(comments[0].id).toBeDefined();
+      expect(comments[0].content).toEqual('my comment');
+      expect(comments[0].createdBy.id).toEqual(premiumOrgUser.id);
+      expect(comments[0].createdBy.name).toEqual(premiumOrgUser.name);
+      expect(comments[0].createdAt).toBeDefined();
+      expect(comments[0].updatedAt).toBeDefined();
     });
   });
 });
