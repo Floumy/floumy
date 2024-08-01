@@ -237,6 +237,7 @@ export class WorkItemsService {
     comment.content = createCommentDto.content;
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
+    comment.workItem = Promise.resolve(workItem);
     const savedComment = await this.workItemCommentsRepository.save(comment);
     return CommentMapper.toDto(savedComment);
   }

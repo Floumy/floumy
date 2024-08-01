@@ -59,25 +59,6 @@ export class OrgsService {
     return await this.createOrg(name);
   }
 
-  async hasActiveSubscription(orgId: string) {
-    const org = await this.findOneById(orgId);
-
-    const isTrial = org.paymentPlan === PaymentPlan.TRIAL;
-    // The subscription is active if the org is trial and it was created 7 days ago
-    if (
-      isTrial &&
-      org.createdAt.getTime() + 7 * 24 * 60 * 60 * 1000 > Date.now()
-    ) {
-      return true;
-    }
-
-    if (org.isSubscribed && org.nextPaymentDate > new Date()) {
-      return true;
-    }
-
-    return org.nextPaymentDate > new Date();
-  }
-
   async patchOrg(orgId: string, orgPatchDto: OrgPatchDto) {
     const org = await this.findOneById(orgId);
 
