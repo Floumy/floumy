@@ -173,4 +173,21 @@ export class WorkItemsController {
       throw new BadRequestException(e.message);
     }
   }
+
+  @Delete(':id/comments/:commentId')
+  async deleteComment(
+    @Request() request,
+    @Param('id') workItemId: string,
+    @Param('commentId') commentId: string,
+  ) {
+    try {
+      await this.workItemsService.deleteWorkItemComment(
+        request.user.sub,
+        workItemId,
+        commentId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }

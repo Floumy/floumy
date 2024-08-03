@@ -242,6 +242,19 @@ export class WorkItemsService {
     return CommentMapper.toDto(savedComment);
   }
 
+  async deleteWorkItemComment(
+    userId: string,
+    workItemId: string,
+    commentId: string,
+  ) {
+    const comment = await this.workItemCommentsRepository.findOneByOrFail({
+      id: commentId,
+      workItem: { id: workItemId },
+      createdBy: { id: userId },
+    });
+    await this.workItemCommentsRepository.remove(comment);
+  }
+
   private async setWorkItemsFiles(
     workItem: WorkItem,
     workItemDto: CreateUpdateWorkItemDto,
