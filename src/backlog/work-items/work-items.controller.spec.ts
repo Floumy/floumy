@@ -29,6 +29,7 @@ import { User } from '../../users/user.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { PaymentPlan } from '../../auth/payment.plan';
+import { uuid } from 'uuidv4';
 
 describe('WorkItemsController', () => {
   let controller: WorkItemsController;
@@ -685,6 +686,99 @@ describe('WorkItemsController', () => {
       expect(comments[0].createdBy.name).toEqual(premiumOrgUser.name);
       expect(comments[0].createdAt).toBeDefined();
       expect(comments[0].updatedAt).toBeDefined();
+    });
+  });
+  describe('when deleting a work item comment', () => {
+    it('should delete the comment', async () => {
+      const { org: premiumOrg, user: premiumOrgUser } =
+        await getTestPremiumOrgAndUser();
+      const workItem = await controller.create(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+          },
+        },
+        {
+          title: 'my work item',
+          description: 'my work item description',
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      const comment = await controller.createComment(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+        {
+          content: 'my comment',
+        },
+      );
+      await controller.deleteComment(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+          },
+        },
+        workItem.id,
+        comment.id,
+      );
+      const comments = await controller.listComments(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+          },
+        },
+        workItem.id,
+      );
+
+      expect(comments.length).toEqual(0);
+    });
+    it('should throw an error if another user tries to delete it', async () => {
+      const { org: premiumOrg, user: premiumOrgUser } =
+        await getTestPremiumOrgAndUser();
+      const workItem = await controller.create(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+          },
+        },
+        {
+          title: 'my work item',
+          description: 'my work item description',
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      const comment = await controller.createComment(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+        {
+          content: 'my comment',
+        },
+      );
+
+      await expect(
+        controller.deleteComment(
+          {
+            user: {
+              sub: uuid(),
+            },
+          },
+          workItem.id,
+          comment.id,
+        ),
+      ).rejects.toThrow();
     });
   });
 });

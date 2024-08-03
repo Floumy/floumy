@@ -1315,11 +1315,43 @@ describe('WorkItemsService', () => {
         status: WorkItemStatus.PLANNED,
       });
 
-      expect(
+      await expect(
         service.listWorkItemComments(org.id, workItem.id),
       ).rejects.toThrowError(
         'You need to upgrade to premium to access comments',
       );
+    });
+  });
+  describe('when deleting a work item comment', () => {
+    it('should delete the work item comment', async () => {
+      const { org, user } = await getTestPremiumOrgAndUser();
+
+      const workItem = new WorkItem();
+      workItem.title = 'my work item';
+      workItem.description = 'my work item description';
+      workItem.priority = Priority.HIGH;
+      workItem.type = WorkItemType.USER_STORY;
+      workItem.status = WorkItemStatus.PLANNED;
+      workItem.org = Promise.resolve(org);
+      workItem.createdBy = Promise.resolve(user);
+      const savedWorkItem = await workItemsRepository.save(workItem);
+
+      const comment = new WorkItemComment();
+      comment.content = 'my comment';
+      comment.createdBy = Promise.resolve(user);
+      comment.workItem = Promise.resolve(savedWorkItem);
+      comment.org = Promise.resolve(org);
+      const savedComment = await workItemCommentsRepository.save(comment);
+
+      await service.deleteWorkItemComment(
+        user.id,
+        workItem.id,
+        savedComment.id,
+      );
+
+      await expect(
+        workItemCommentsRepository.findOneByOrFail({ id: savedComment.id }),
+      ).rejects.toThrow(EntityNotFoundError);
     });
   });
 });
