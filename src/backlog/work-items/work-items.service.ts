@@ -13,7 +13,7 @@ import { User } from '../../users/user.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FilesService } from '../../files/files.service';
 import { CommentMapper } from '../../comments/mappers';
-import { CreateCommentDto } from '../../comments/dtos';
+import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { PaymentPlan } from '../../auth/payment.plan';
 import { WorkItemComment } from './work-item-comment.entity';
 
@@ -222,7 +222,7 @@ export class WorkItemsService {
     userId: string,
     orgId: string,
     workItemId: string,
-    createCommentDto: CreateCommentDto,
+    createCommentDto: CreateUpdateCommentDto,
   ) {
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const workItem = await this.workItemsRepository.findOneByOrFail({
@@ -253,6 +253,29 @@ export class WorkItemsService {
       createdBy: { id: userId },
     });
     await this.workItemCommentsRepository.remove(comment);
+  }
+
+  async updateWorkItemComment(
+    userId: string,
+    workItemId: string,
+    commentId: string,
+    createCommentDto: CreateUpdateCommentDto,
+  ) {
+    const workItem = await this.workItemsRepository.findOneByOrFail({
+      id: workItemId,
+    });
+    const org = await workItem.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to add comments');
+    }
+    const comment = await this.workItemCommentsRepository.findOneByOrFail({
+      id: commentId,
+      workItem: { id: workItemId },
+      createdBy: { id: userId },
+    });
+    comment.content = createCommentDto.content;
+    const savedComment = await this.workItemCommentsRepository.save(comment);
+    return await CommentMapper.toDto(savedComment);
   }
 
   private async setWorkItemsFiles(

@@ -781,4 +781,55 @@ describe('WorkItemsController', () => {
       ).rejects.toThrow();
     });
   });
+  describe('when updating a work item comment', () => {
+    it('should update the comment', async () => {
+      const { org: premiumOrg, user: premiumOrgUser } =
+        await getTestPremiumOrgAndUser();
+      const workItem = await controller.create(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+          },
+        },
+        {
+          title: 'my work item',
+          description: 'my work item description',
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      const comment = await controller.createComment(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+        {
+          content: 'my comment',
+        },
+      );
+      const updatedComment = await controller.updateComment(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+          },
+        },
+        workItem.id,
+        comment.id,
+        {
+          content: 'my updated comment',
+        },
+      );
+
+      expect(updatedComment.id).toEqual(comment.id);
+      expect(updatedComment.content).toEqual('my updated comment');
+      expect(updatedComment.createdBy.id).toEqual(premiumOrgUser.id);
+      expect(updatedComment.createdBy.name).toEqual(premiumOrgUser.name);
+      expect(updatedComment.createdAt).toBeDefined();
+      expect(updatedComment.updatedAt).toBeDefined();
+    });
+  });
 });

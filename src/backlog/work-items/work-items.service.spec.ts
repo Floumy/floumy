@@ -1354,4 +1354,37 @@ describe('WorkItemsService', () => {
       ).rejects.toThrow(EntityNotFoundError);
     });
   });
+  describe('when updating a work item comment', () => {
+    it('should update the work item comment', async () => {
+      const { org, user } = await getTestPremiumOrgAndUser();
+
+      const workItem = new WorkItem();
+      workItem.title = 'my work item';
+      workItem.description = 'my work item description';
+      workItem.priority = Priority.HIGH;
+      workItem.type = WorkItemType.USER_STORY;
+      workItem.status = WorkItemStatus.PLANNED;
+      workItem.org = Promise.resolve(org);
+      workItem.createdBy = Promise.resolve(user);
+      const savedWorkItem = await workItemsRepository.save(workItem);
+
+      const comment = new WorkItemComment();
+      comment.content = 'my comment';
+      comment.createdBy = Promise.resolve(user);
+      comment.workItem = Promise.resolve(savedWorkItem);
+      comment.org = Promise.resolve(org);
+      const savedComment = await workItemCommentsRepository.save(comment);
+
+      const updatedComment = await service.updateWorkItemComment(
+        user.id,
+        workItem.id,
+        savedComment.id,
+        {
+          content: 'my updated comment',
+        },
+      );
+      expect(updatedComment).toBeDefined();
+      expect(updatedComment.content).toEqual('my updated comment');
+    });
+  });
 });
