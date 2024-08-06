@@ -9,6 +9,6 @@ export interface CommentDto {
   };
 }
 
-export interface CreateCommentDto {
+export interface CreateUpdateCommentDto {
   content: string;
 }

@@ -18,7 +18,7 @@ import {
 import { AuthGuard } from '../../auth/auth.guard';
 import { WorkItemsService } from './work-items.service';
 import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from './dtos';
-import { CreateCommentDto } from '../../comments/dtos';
+import { CreateUpdateCommentDto } from '../../comments/dtos';
 
 @Controller('work-items')
 @UseGuards(AuthGuard)
@@ -148,7 +148,7 @@ export class WorkItemsController {
   async createComment(
     @Request() request,
     @Param('id') id: string,
-    @Body() createCommentDto: CreateCommentDto,
+    @Body() createCommentDto: CreateUpdateCommentDto,
   ) {
     try {
       return await this.workItemsService.createWorkItemComment(
@@ -185,6 +185,25 @@ export class WorkItemsController {
         request.user.sub,
         workItemId,
         commentId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Put(':id/comments/:commentId')
+  async updateComment(
+    @Request() request,
+    @Param('id') workItemId: string,
+    @Param('commentId') commentId: string,
+    @Body() updateCommentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.workItemsService.updateWorkItemComment(
+        request.user.sub,
+        workItemId,
+        commentId,
+        updateCommentDto,
       );
     } catch (e) {
       throw new BadRequestException(e.message);
