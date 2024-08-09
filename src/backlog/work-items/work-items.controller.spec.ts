@@ -670,14 +670,7 @@ describe('WorkItemsController', () => {
           content: 'my comment',
         },
       );
-      const comments = await controller.listComments(
-        {
-          user: {
-            org: premiumOrg.id,
-          },
-        },
-        workItem.id,
-      );
+      const comments = await controller.listComments(workItem.id);
 
       expect(comments.length).toEqual(1);
       expect(comments[0].id).toBeDefined();
@@ -727,14 +720,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         comment.id,
       );
-      const comments = await controller.listComments(
-        {
-          user: {
-            sub: premiumOrgUser.id,
-          },
-        },
-        workItem.id,
-      );
+      const comments = await controller.listComments(workItem.id);
 
       expect(comments.length).toEqual(0);
     });

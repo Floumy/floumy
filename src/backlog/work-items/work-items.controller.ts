@@ -19,6 +19,7 @@ import { AuthGuard } from '../../auth/auth.guard';
 import { WorkItemsService } from './work-items.service';
 import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from './dtos';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
+import { Public } from '../../auth/public.guard';
 
 @Controller('work-items')
 @UseGuards(AuthGuard)
@@ -163,12 +164,10 @@ export class WorkItemsController {
   }
 
   @Get(':id/comments')
-  async listComments(@Request() request, @Param('id') id: string) {
+  @Public()
+  async listComments(@Param('id') id: string) {
     try {
-      return await this.workItemsService.listWorkItemComments(
-        request.user.org,
-        id,
-      );
+      return await this.workItemsService.listWorkItemComments(id);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

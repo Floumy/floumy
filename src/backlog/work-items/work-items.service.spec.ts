@@ -1300,7 +1300,7 @@ describe('WorkItemsService', () => {
       comment2.org = Promise.resolve(org);
       await workItemCommentsRepository.save(comment2);
 
-      const comments = await service.listWorkItemComments(org.id, workItem.id);
+      const comments = await service.listWorkItemComments(workItem.id);
       expect(comments).toBeDefined();
       expect(comments.length).toEqual(2);
       expect(comments[0].content).toEqual('my comment 1');
@@ -1316,7 +1316,7 @@ describe('WorkItemsService', () => {
       });
 
       await expect(
-        service.listWorkItemComments(org.id, workItem.id),
+        service.listWorkItemComments(workItem.id),
       ).rejects.toThrowError(
         'You need to upgrade to premium to access comments',
       );
