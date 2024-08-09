@@ -205,10 +205,9 @@ export class WorkItemsService {
     );
   }
 
-  async listWorkItemComments(orgId: string, workItemId: string) {
+  async listWorkItemComments(workItemId: string) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id: workItemId,
-      org: { id: orgId },
     });
     const org = await workItem.org;
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {
