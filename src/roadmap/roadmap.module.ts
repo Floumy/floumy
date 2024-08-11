@@ -24,6 +24,7 @@ import { PublicService as MilestonesPublicService } from './milestones/public/pu
 import { PublicController as FeaturesPublicController } from './features/public/public.controller';
 import { PublicService as FeaturesPublicService } from './features/public/public.service';
 import { StripeModule } from '../stripe/stripe.module';
+import { FeatureComment } from './features/feature-comment.entity';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { StripeModule } from '../stripe/stripe.module';
       File,
       FeatureFile,
       User,
+      FeatureComment,
     ]),
     OrgsModule,
     OkrsModule,
