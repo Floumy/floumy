@@ -17,6 +17,8 @@ import {
 import { FeaturesService } from './features.service';
 import { CreateUpdateFeatureDto, PatchFeatureDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
+import { CreateUpdateCommentDto } from '../../comments/dtos';
+import { Public } from '../../auth/public.guard';
 
 @Controller('features')
 @UseGuards(AuthGuard)
@@ -140,6 +142,70 @@ export class FeaturesController {
       );
     } catch (e) {
       throw new BadRequestException();
+    }
+  }
+
+  @Post(':id/comments')
+  async addComment(
+    @Request() request,
+    @Param('id') id: string,
+    @Body() createCommentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.featuresService.createFeatureComment(
+        request.user.sub,
+        request.user.org,
+        id,
+        createCommentDto,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get(':id/comments')
+  @Public()
+  async listComments(@Param('id') id: string) {
+    try {
+      return await this.featuresService.listFeatureComments(id);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete(':id/comments/:commentId')
+  async deleteComment(
+    @Request() request,
+    @Param('id') featureId: string,
+    @Param('commentId') commentId: string,
+  ) {
+    try {
+      await this.featuresService.deleteFeatureComment(
+        request.user.sub,
+        featureId,
+        commentId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Put(':id/comments/:commentId')
+  async updateComment(
+    @Request() request,
+    @Param('id') featureId: string,
+    @Param('commentId') commentId: string,
+    @Body() updateCommentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.featuresService.updateFeatureComment(
+        request.user.sub,
+        featureId,
+        commentId,
+        updateCommentDto,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
     }
   }
 }

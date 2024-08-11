@@ -14,6 +14,10 @@ import { User } from '../../users/user.entity';
 import { FilesService } from '../../files/files.service';
 import { Org } from '../../orgs/org.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PaymentPlan } from '../../auth/payment.plan';
+import { CommentMapper } from '../../comments/mappers';
+import { CreateUpdateCommentDto } from '../../comments/dtos';
+import { FeatureComment } from './feature-comment.entity';
 
 @Injectable()
 export class FeaturesService {
@@ -28,6 +32,9 @@ export class FeaturesService {
     @InjectRepository(File) private filesRepository: Repository<File>,
     private filesService: FilesService,
     private eventEmitter: EventEmitter2,
+    @InjectRepository(FeatureComment)
+    private featureCommentsRepository: Repository<FeatureComment>,
+    @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
   async createFeature(userId: string, featureDto: CreateUpdateFeatureDto) {
@@ -201,6 +208,78 @@ export class FeaturesService {
       page,
       limit,
     );
+  }
+
+  async listFeatureComments(featureId: string) {
+    const feature = await this.featuresRepository.findOneByOrFail({
+      id: featureId,
+    });
+    const org = await feature.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to access comments');
+    }
+    const comments = await feature.comments;
+    return await CommentMapper.toDtoList(comments);
+  }
+
+  async createFeatureComment(
+    userId: string,
+    orgId: string,
+    featureId: string,
+    createCommentDto: CreateUpdateCommentDto,
+  ) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    const feature = await this.featuresRepository.findOneByOrFail({
+      id: featureId,
+      org: { id: orgId },
+    });
+    const org = await feature.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to add comments');
+    }
+    const comment = new FeatureComment();
+    comment.content = createCommentDto.content;
+    comment.createdBy = Promise.resolve(user);
+    comment.org = Promise.resolve(org);
+    comment.feature = Promise.resolve(feature);
+    const savedComment = await this.featureCommentsRepository.save(comment);
+    return CommentMapper.toDto(savedComment);
+  }
+
+  async deleteFeatureComment(
+    userId: string,
+    featureId: string,
+    commentId: string,
+  ) {
+    const comment = await this.featureCommentsRepository.findOneByOrFail({
+      id: commentId,
+      feature: { id: featureId },
+      createdBy: { id: userId },
+    });
+    await this.featureCommentsRepository.remove(comment);
+  }
+
+  async updateFeatureComment(
+    userId: string,
+    featureId: string,
+    commentId: string,
+    createCommentDto: CreateUpdateCommentDto,
+  ) {
+    const feature = await this.featuresRepository.findOneByOrFail({
+      id: featureId,
+    });
+    const org = await feature.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to add comments');
+    }
+    const comment = await this.featureCommentsRepository.findOneByOrFail({
+      id: commentId,
+      feature: { id: featureId },
+      createdBy: { id: userId },
+    });
+    comment.content = createCommentDto.content;
+    const savedComment = await this.featureCommentsRepository.save(comment);
+    return await CommentMapper.toDto(savedComment);
   }
 
   private async setFeatureKeyResult(
