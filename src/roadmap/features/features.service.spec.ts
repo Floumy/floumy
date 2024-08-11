@@ -2,7 +2,7 @@ import { FeaturesService } from './features.service';
 import { OkrsService } from '../../okrs/okrs.service';
 import { OrgsService } from '../../orgs/orgs.service';
 import { setupTestingModule } from '../../../test/test.utils';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../../okrs/objective.entity';
 import { Org } from '../../orgs/org.entity';
 import { KeyResult } from '../../okrs/key-result.entity';
@@ -23,6 +23,9 @@ import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { FeatureFile } from './feature-file.entity';
+import { FeatureComment } from './feature-comment.entity';
+import { Repository } from 'typeorm';
+import { PaymentPlan } from '../../auth/payment.plan';
 
 describe('FeaturesService', () => {
   let usersService: UsersService;
@@ -32,6 +35,7 @@ describe('FeaturesService', () => {
   let okrsService: OkrsService;
   let orgsService: OrgsService;
   let filesService: FilesService;
+  let orgRepository: Repository<Org>;
   let user: User;
   let org: Org;
 
@@ -52,6 +56,7 @@ describe('FeaturesService', () => {
           File,
           WorkItemFile,
           FeatureFile,
+          FeatureComment,
         ]),
       ],
       [
@@ -73,6 +78,7 @@ describe('FeaturesService', () => {
     milestonesService = module.get<MilestonesService>(MilestonesService);
     workItemsService = module.get<WorkItemsService>(WorkItemsService);
     filesService = module.get<FilesService>(FilesService);
+    orgRepository = module.get(getRepositoryToken(Org));
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -1038,6 +1044,194 @@ describe('FeaturesService', () => {
       expect(features[0].priority).toEqual(Priority.LOW);
       expect(features[0].createdAt).toBeDefined();
       expect(features[0].updatedAt).toBeDefined();
+    });
+  });
+
+  describe('when listing feature comments', () => {
+    it('should return a list of comments if the org is premium', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgRepository.save(org);
+      const feature = await service.createFeature(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      await service.createFeatureComment(user.id, org.id, feature.id, {
+        content: 'Test comment',
+      });
+      const comments = await service.listFeatureComments(feature.id);
+      expect(comments).toBeDefined();
+      expect(comments.length).toEqual(1);
+      expect(comments[0].content).toEqual('Test comment');
+    });
+
+    it('should throw an error if the org is not premium', async () => {
+      const feature = await service.createFeature(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      await expect(
+        service.listFeatureComments(feature.id),
+      ).rejects.toThrowError(
+        'You need to upgrade to premium to access comments',
+      );
+    });
+  });
+
+  describe('when creating a feature comment', () => {
+    it('should create a comment if the org is premium', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgRepository.save(org);
+      const feature = await service.createFeature(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      const comment = await service.createFeatureComment(
+        user.id,
+        org.id,
+        feature.id,
+        {
+          content: 'Test comment',
+        },
+      );
+      expect(comment).toBeDefined();
+      expect(comment.content).toEqual('Test comment');
+    });
+
+    it('should throw an error if the org is not premium', async () => {
+      const feature = await service.createFeature(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      await expect(
+        service.createFeatureComment(user.id, org.id, feature.id, {
+          content: 'Test comment',
+        }),
+      ).rejects.toThrowError('You need to upgrade to premium to add comments');
+    });
+  });
+
+  describe('when deleting a feature comment', () => {
+    it('should delete the comment if it exists', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgRepository.save(org);
+      const feature = await service.createFeature(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      const comment = await service.createFeatureComment(
+        user.id,
+        org.id,
+        feature.id,
+        {
+          content: 'Test comment',
+        },
+      );
+      await service.deleteFeatureComment(user.id, feature.id, comment.id);
+      await expect(service.listFeatureComments(feature.id)).resolves.toEqual(
+        [],
+      );
+    });
+
+    it('should throw an error if the comment does not exist', async () => {
+      const feature = await service.createFeature(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      await expect(
+        service.deleteFeatureComment(
+          user.id,
+          feature.id,
+          'non-existent-comment-id',
+        ),
+      ).rejects.toThrowError();
+    });
+  });
+
+  describe('when updating a feature comment', () => {
+    it('should update the comment if it exists and the org is premium', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgRepository.save(org);
+      const feature = await service.createFeature(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      const comment = await service.createFeatureComment(
+        user.id,
+        org.id,
+        feature.id,
+        {
+          content: 'Test comment',
+        },
+      );
+      const updatedComment = await service.updateFeatureComment(
+        user.id,
+        feature.id,
+        comment.id,
+        {
+          content: 'Updated comment',
+        },
+      );
+      expect(updatedComment).toBeDefined();
+      expect(updatedComment.content).toEqual('Updated comment');
+    });
+
+    it('should throw an error if the org is not premium', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgRepository.save(org);
+      const feature = await service.createFeature(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      const comment = await service.createFeatureComment(
+        user.id,
+        org.id,
+        feature.id,
+        {
+          content: 'Test comment',
+        },
+      );
+      org.paymentPlan = PaymentPlan.FREE;
+      await orgRepository.save(org);
+      await expect(
+        service.updateFeatureComment(user.id, feature.id, comment.id, {
+          content: 'Updated comment',
+        }),
+      ).rejects.toThrowError('You need to upgrade to premium to add comments');
+    });
+
+    it('should throw an error if the comment does not exist', async () => {
+      const feature = await service.createFeature(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+      });
+      await expect(
+        service.updateFeatureComment(
+          user.id,
+          feature.id,
+          'non-existent-comment-id',
+          {
+            content: 'Updated comment',
+          },
+        ),
+      ).rejects.toThrowError();
     });
   });
 });

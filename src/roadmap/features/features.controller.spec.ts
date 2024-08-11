@@ -1,7 +1,7 @@
 import { FeaturesController } from './features.controller';
 import { OrgsService } from '../../orgs/orgs.service';
 import { setupTestingModule } from '../../../test/test.utils';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Org } from '../../orgs/org.entity';
 import { KeyResult } from '../../okrs/key-result.entity';
 import { OkrsService } from '../../okrs/okrs.service';
@@ -24,10 +24,14 @@ import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
+import { FeatureComment } from './feature-comment.entity';
+import { Repository } from 'typeorm';
+import { PaymentPlan } from '../../auth/payment.plan';
 
 describe('FeaturesController', () => {
   let controller: FeaturesController;
   let milestoneService: MilestonesService;
+  let orgsRepository: Repository<Org>;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
@@ -46,6 +50,7 @@ describe('FeaturesController', () => {
           FeatureFile,
           WorkItem,
           WorkItemFile,
+          FeatureComment,
         ]),
         UsersModule,
         BacklogModule,
@@ -66,6 +71,7 @@ describe('FeaturesController', () => {
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
     milestoneService = module.get<MilestonesService>(MilestonesService);
+    orgsRepository = module.get(getRepositoryToken(Org));
 
     user = await usersService.createUserWithOrg(
       'Test User',
@@ -434,6 +440,154 @@ describe('FeaturesController', () => {
       expect(features[0].priority).toEqual(Priority.HIGH);
       expect(features[0].createdAt).toBeDefined();
       expect(features[0].updatedAt).toBeDefined();
+    });
+  });
+  describe('when listing feature comments', () => {
+    it('should return the list of comments', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureResponse = await controller.create(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      await controller.addComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        featureResponse.id,
+        {
+          content: 'my comment',
+        },
+      );
+      const comments = await controller.listComments(featureResponse.id);
+      expect(comments[0].content).toEqual('my comment');
+      expect(comments[0].createdAt).toBeDefined();
+    });
+  });
+  describe('when adding a comment to a feature', () => {
+    it('should return the newly added comment', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureResponse = await controller.create(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const comment = await controller.addComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        featureResponse.id,
+        {
+          content: 'my comment',
+        },
+      );
+      expect(comment.content).toEqual('my comment');
+      expect(comment.createdAt).toBeDefined();
+    });
+  });
+  describe('when deleting a comment from a feature', () => {
+    it('should delete it successfully', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureResponse = await controller.create(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const comment = await controller.addComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        featureResponse.id,
+        {
+          content: 'my comment',
+        },
+      );
+      await controller.deleteComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        featureResponse.id,
+        comment.id,
+      );
+    });
+  });
+  describe('when updating a comment from a feature', () => {
+    it('should return the updated comment', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureResponse = await controller.create(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const comment = await controller.addComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        featureResponse.id,
+        {
+          content: 'my comment',
+        },
+      );
+      const updatedComment = await controller.updateComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        featureResponse.id,
+        comment.id,
+        {
+          content: 'my updated comment',
+        },
+      );
+      expect(updatedComment.content).toEqual('my updated comment');
+      expect(updatedComment.createdAt).toBeDefined();
     });
   });
 });

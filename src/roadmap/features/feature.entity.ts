@@ -15,6 +15,7 @@ import { Milestone } from '../milestones/milestone.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { FeatureFile } from './feature-file.entity';
 import { User } from '../../users/user.entity';
+import { FeatureComment } from './feature-comment.entity';
 
 @Entity()
 export class Feature {
@@ -64,4 +65,8 @@ export class Feature {
   workItems: Promise<WorkItem[]>;
   @OneToMany(() => FeatureFile, (featureFile) => featureFile.feature)
   featureFiles: Promise<FeatureFile[]>;
+  @OneToMany(() => FeatureComment, (featureComment) => featureComment.feature, {
+    lazy: true,
+  })
+  comments: Promise<FeatureComment[]>;
 }
