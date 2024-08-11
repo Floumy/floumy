@@ -22,6 +22,7 @@ import { Invoice } from '../src/payments/invoice.entity';
 import { BipService } from '../src/bip/bip.service';
 import { BipSettings } from '../src/bip/bip-settings.entity';
 import { WorkItemComment } from '../src/backlog/work-items/work-item-comment.entity';
+import { FeatureComment } from '../src/roadmap/features/feature-comment.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -112,6 +113,7 @@ export async function setupTestingModule(
         Invoice,
         BipSettings,
         WorkItemComment,
+        FeatureComment,
       ]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],
