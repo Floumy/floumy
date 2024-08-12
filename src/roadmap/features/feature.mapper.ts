@@ -1,11 +1,19 @@
 import { Feature } from './feature.entity';
 import { FeatureDto, FeaturesListDto } from './dtos';
+import { PaymentPlan } from '../../auth/payment.plan';
+import { CommentMapper } from '../../comments/mappers';
 
 export class FeatureMapper {
   static async toDto(feature: Feature): Promise<FeatureDto> {
     const createdBy = await feature.createdBy;
     const assignedTo = await feature.assignedTo;
     const org = await feature.org;
+
+    let comments = [];
+    if (org.paymentPlan === PaymentPlan.PREMIUM) {
+      comments = await feature.comments;
+    }
+
     const featureDto = {
       id: feature.id,
       org: {
@@ -20,6 +28,7 @@ export class FeatureMapper {
       progress: feature.progress,
       workItemsCount: feature.workItemsCount,
       workItems: (await feature.workItems).map(WorkItemMapper.toDto),
+      comments: await CommentMapper.toDtoList(comments),
       files: await Promise.all(
         (await feature.featureFiles).map(async (featureFile) => {
           const file = await featureFile.file;
