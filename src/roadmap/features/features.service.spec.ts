@@ -1057,7 +1057,7 @@ describe('FeaturesService', () => {
         priority: Priority.HIGH,
         status: FeatureStatus.PLANNED,
       });
-      await service.createFeatureComment(user.id, org.id, feature.id, {
+      await service.createFeatureComment(user.id, feature.id, {
         content: 'Test comment',
       });
       const comments = await service.listFeatureComments(feature.id);
@@ -1091,14 +1091,9 @@ describe('FeaturesService', () => {
         priority: Priority.HIGH,
         status: FeatureStatus.PLANNED,
       });
-      const comment = await service.createFeatureComment(
-        user.id,
-        org.id,
-        feature.id,
-        {
-          content: 'Test comment',
-        },
-      );
+      const comment = await service.createFeatureComment(user.id, feature.id, {
+        content: 'Test comment',
+      });
       expect(comment).toBeDefined();
       expect(comment.content).toEqual('Test comment');
     });
@@ -1111,7 +1106,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.PLANNED,
       });
       await expect(
-        service.createFeatureComment(user.id, org.id, feature.id, {
+        service.createFeatureComment(user.id, feature.id, {
           content: 'Test comment',
         }),
       ).rejects.toThrowError('You need to upgrade to premium to add comments');
@@ -1128,14 +1123,9 @@ describe('FeaturesService', () => {
         priority: Priority.HIGH,
         status: FeatureStatus.PLANNED,
       });
-      const comment = await service.createFeatureComment(
-        user.id,
-        org.id,
-        feature.id,
-        {
-          content: 'Test comment',
-        },
-      );
+      const comment = await service.createFeatureComment(user.id, feature.id, {
+        content: 'Test comment',
+      });
       await service.deleteFeatureComment(user.id, feature.id, comment.id);
       await expect(service.listFeatureComments(feature.id)).resolves.toEqual(
         [],
@@ -1169,14 +1159,9 @@ describe('FeaturesService', () => {
         priority: Priority.HIGH,
         status: FeatureStatus.PLANNED,
       });
-      const comment = await service.createFeatureComment(
-        user.id,
-        org.id,
-        feature.id,
-        {
-          content: 'Test comment',
-        },
-      );
+      const comment = await service.createFeatureComment(user.id, feature.id, {
+        content: 'Test comment',
+      });
       const updatedComment = await service.updateFeatureComment(
         user.id,
         feature.id,
@@ -1198,14 +1183,9 @@ describe('FeaturesService', () => {
         priority: Priority.HIGH,
         status: FeatureStatus.PLANNED,
       });
-      const comment = await service.createFeatureComment(
-        user.id,
-        org.id,
-        feature.id,
-        {
-          content: 'Test comment',
-        },
-      );
+      const comment = await service.createFeatureComment(user.id, feature.id, {
+        content: 'Test comment',
+      });
       org.paymentPlan = PaymentPlan.FREE;
       await orgRepository.save(org);
       await expect(

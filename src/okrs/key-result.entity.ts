@@ -11,6 +11,7 @@ import { Objective } from './objective.entity';
 import { Org } from '../orgs/org.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 import { OKRStatus } from './okrstatus.enum';
+import { KeyResultComment } from './key-result-comment.entity';
 
 @Entity()
 export class KeyResult {
@@ -44,4 +45,12 @@ export class KeyResult {
   objective: Promise<Objective>;
   @OneToMany(() => Feature, (feature) => feature.keyResult, { lazy: true })
   features: Promise<Feature[]>;
+  @OneToMany(
+    () => KeyResultComment,
+    (keyResultComment) => keyResultComment.keyResult,
+    {
+      lazy: true,
+    },
+  )
+  comments: Promise<KeyResultComment[]>;
 }
