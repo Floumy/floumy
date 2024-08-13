@@ -154,7 +154,6 @@ export class FeaturesController {
     try {
       return await this.featuresService.createFeatureComment(
         request.user.sub,
-        request.user.org,
         id,
         createCommentDto,
       );

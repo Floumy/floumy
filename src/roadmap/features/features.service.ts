@@ -224,14 +224,12 @@ export class FeaturesService {
 
   async createFeatureComment(
     userId: string,
-    orgId: string,
     featureId: string,
     createCommentDto: CreateUpdateCommentDto,
   ) {
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const feature = await this.featuresRepository.findOneByOrFail({
       id: featureId,
-      org: { id: orgId },
     });
     const org = await feature.org;
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {

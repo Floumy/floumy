@@ -12,15 +12,24 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { PublicController } from './public/public.controller';
 import { PublicService } from './public/public.service';
 import { Org } from '../orgs/org.entity';
+import { CommentsService } from './comments/comments.service';
+import { KeyResultComment } from './key-result-comment.entity';
 
 @Module({
   imports: [
     CacheModule.register(),
-    TypeOrmModule.forFeature([Objective, KeyResult, Feature, User, Org]),
+    TypeOrmModule.forFeature([
+      Objective,
+      KeyResult,
+      Feature,
+      User,
+      Org,
+      KeyResultComment,
+    ]),
     OrgsModule,
     AuthModule,
   ],
-  providers: [OkrsService, PublicService],
+  providers: [OkrsService, PublicService, CommentsService],
   controllers: [OkrsController, PublicController],
   exports: [OkrsService],
 })
