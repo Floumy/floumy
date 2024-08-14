@@ -17,6 +17,7 @@ import { CommentsService } from './comments.service';
 describe('CommentsService', () => {
   let okrsService: OkrsService;
   let orgsRepository: Repository<Org>;
+  let usersService: UsersService;
   let service: CommentsService;
   let user: User;
   let org: Org;
@@ -40,7 +41,7 @@ describe('CommentsService', () => {
     cleanup = dbCleanup;
     okrsService = module.get<OkrsService>(OkrsService);
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
-    const usersService = module.get<UsersService>(UsersService);
+    usersService = module.get<UsersService>(UsersService);
     const orgsService = module.get<OrgsService>(OrgsService);
     service = module.get<CommentsService>(CommentsService);
     user = await usersService.createUserWithOrg(
@@ -103,6 +104,181 @@ describe('CommentsService', () => {
       await expect(
         service.addCommentToKeyResult(keyResult.id, user.id, 'Test Comment'),
       ).rejects.toThrowError('You need to upgrade to premium to add comments');
+    });
+  });
+  describe('when updating a comment for a key result', () => {
+    it('should update the comment', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      const keyResult = await okrsService.createKeyResult(
+        org.id,
+        objective.id,
+        {
+          title: 'Test Key Result',
+          progress: 0,
+          status: OKRStatus.ON_TRACK,
+        },
+      );
+      const comment = await service.addCommentToKeyResult(
+        keyResult.id,
+        user.id,
+        'Test Comment',
+      );
+      const updatedComment = await service.updateComment(
+        user.id,
+        comment.id,
+        'Updated Comment',
+      );
+      expect(updatedComment).toBeDefined();
+      expect(updatedComment.id).toEqual(comment.id);
+      expect(updatedComment.content).toEqual('Updated Comment');
+      expect(updatedComment.createdBy.id).toEqual(user.id);
+    });
+    it('should validate that the user is the creator of the comment', async () => {
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      const keyResult = await okrsService.createKeyResult(
+        org.id,
+        objective.id,
+        {
+          title: 'Test Key Result',
+          progress: 0,
+          status: OKRStatus.ON_TRACK,
+        },
+      );
+      const comment = await service.addCommentToKeyResult(
+        keyResult.id,
+        user.id,
+        'Test Comment',
+      );
+
+      const otherUser = await usersService.createUserWithOrg(
+        'Other User',
+        'otheruser@example.com',
+        'testtesttest',
+      );
+
+      await expect(
+        service.updateComment(otherUser.id, comment.id, 'Updated Comment'),
+      ).rejects.toThrow();
+    });
+    it('should validate that the comment org is premium', async () => {
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      const keyResult = await okrsService.createKeyResult(
+        org.id,
+        objective.id,
+        {
+          title: 'Test Key Result',
+          progress: 0,
+          status: OKRStatus.ON_TRACK,
+        },
+      );
+      const comment = await service.addCommentToKeyResult(
+        keyResult.id,
+        user.id,
+        'Test Comment',
+      );
+
+      org.paymentPlan = PaymentPlan.FREE;
+      await orgsRepository.save(org);
+
+      await expect(
+        service.updateComment(user.id, comment.id, 'Updated Comment'),
+      ).rejects.toThrowError(
+        'You need to upgrade to premium to update comments',
+      );
+    });
+  });
+  describe('when deleting a comment for a key result', () => {
+    it('should delete the comment', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      const keyResult = await okrsService.createKeyResult(
+        org.id,
+        objective.id,
+        {
+          title: 'Test Key Result',
+          progress: 0,
+          status: OKRStatus.ON_TRACK,
+        },
+      );
+      const comment = await service.addCommentToKeyResult(
+        keyResult.id,
+        user.id,
+        'Test Comment',
+      );
+      await service.deleteComment(user.id, comment.id);
+      await expect(
+        service.updateComment(user.id, comment.id, 'update'),
+      ).rejects.toThrow();
+    });
+    it('should validate that the user is the creator of the comment', async () => {
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      const keyResult = await okrsService.createKeyResult(
+        org.id,
+        objective.id,
+        {
+          title: 'Test Key Result',
+          progress: 0,
+          status: OKRStatus.ON_TRACK,
+        },
+      );
+      const comment = await service.addCommentToKeyResult(
+        keyResult.id,
+        user.id,
+        'Test Comment',
+      );
+
+      const otherUser = await usersService.createUserWithOrg(
+        'Other User',
+        'otherUser@example.com',
+        'testtesttest',
+      );
+
+      await expect(
+        service.deleteComment(otherUser.id, comment.id),
+      ).rejects.toThrow();
+    });
+    it('should validate that the comment org is premium', async () => {
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      const keyResult = await okrsService.createKeyResult(
+        org.id,
+        objective.id,
+        {
+          title: 'Test Key Result',
+          progress: 0,
+          status: OKRStatus.ON_TRACK,
+        },
+      );
+      const comment = await service.addCommentToKeyResult(
+        keyResult.id,
+        user.id,
+        'Test Comment',
+      );
+
+      org.paymentPlan = PaymentPlan.FREE;
+      await orgsRepository.save(org);
+
+      await expect(
+        service.deleteComment(user.id, comment.id),
+      ).rejects.toThrowError(
+        'You need to upgrade to premium to delete comments',
+      );
     });
   });
 });
