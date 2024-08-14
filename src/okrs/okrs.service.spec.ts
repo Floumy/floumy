@@ -17,6 +17,7 @@ describe('OkrsService', () => {
   let orgsService: OrgsService;
   let featuresRepository: Repository<Feature>;
   let usersService: UsersService;
+  let org: Org;
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
@@ -31,6 +32,8 @@ describe('OkrsService', () => {
     featuresRepository = module.get<Repository<Feature>>(
       getRepositoryToken(Feature),
     );
+    const user = new User('Test User', 'testuser@example.com', 'testtesttest');
+    org = await orgsService.createForUser(user);
   });
 
   afterEach(async () => {
