@@ -18,8 +18,7 @@ import {
   PatchKeyResultDto,
   UpdateObjectiveDto,
 } from './dtos';
-import { KeyResultComment } from './key-result-comment.entity';
-import { PaymentPlan } from '../auth/payment.plan';
+import { CommentsService } from './comments/comments.service';
 
 @Injectable()
 export class OkrsService {
@@ -32,8 +31,7 @@ export class OkrsService {
     private featureRepository: Repository<Feature>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(KeyResultComment)
-    private keyResultCommentRepository: Repository<KeyResultComment>,
+    private commentsService: CommentsService,
     private orgsService: OrgsService,
     private eventEmitter: EventEmitter2,
   ) {}
@@ -371,33 +369,6 @@ export class OkrsService {
     return await this.objectiveRepository.find({
       where: { org: { id: orgId }, startDate, endDate },
     });
-  }
-
-  async addCommentToKeyResult(
-    keyResultId: string,
-    userId: string,
-    content: string,
-  ) {
-    const keyResult = await this.keyResultRepository.findOneByOrFail({
-      id: keyResultId,
-    });
-
-    const org = await keyResult.org;
-
-    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
-
-    const user = await this.usersRepository.findOneByOrFail({
-      id: userId,
-    });
-
-    const comment = new KeyResultComment();
-    comment.content = content;
-    comment.keyResult = Promise.resolve(keyResult);
-    comment.createdBy = Promise.resolve(user);
-    await this.keyResultCommentRepository.save(comment);
-    return comment;
   }
 
   private async updateObjectiveProgress(objective: Objective) {
