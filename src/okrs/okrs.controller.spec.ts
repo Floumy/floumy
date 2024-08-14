@@ -1,9 +1,8 @@
 import { OkrsController } from './okrs.controller';
 import { setupTestingModule } from '../../test/test.utils';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from './objective.entity';
 import { OkrsService } from './okrs.service';
-import { User } from '../users/user.entity';
 import { OrgsService } from '../orgs/orgs.service';
 import { Org } from '../orgs/org.entity';
 import { TokensService } from '../auth/tokens.service';
@@ -11,21 +10,40 @@ import { KeyResult } from './key-result.entity';
 import { NotFoundException } from '@nestjs/common';
 import { Feature } from '../roadmap/features/feature.entity';
 import { Timeline } from '../common/timeline.enum';
+import { Repository } from 'typeorm';
+import { PaymentPlan } from '../auth/payment.plan';
+import { UsersService } from '../users/users.service';
+import { User } from '../users/user.entity';
 
 describe('OkrsController', () => {
   let controller: OkrsController;
+  let orgsRepository: Repository<Org>;
   let orgsService: OrgsService;
+  let usersService: UsersService;
+  let org: Org;
+  let user: User;
+
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature])],
-      [OkrsService, OrgsService, TokensService],
+      [OkrsService, OrgsService, TokensService, UsersService],
       [OkrsController],
     );
     cleanup = dbCleanup;
     controller = module.get<OkrsController>(OkrsController);
+    orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
+    usersService = module.get<UsersService>(UsersService);
     orgsService = module.get<OrgsService>(OrgsService);
+    user = await usersService.createUserWithOrg(
+      'Test User',
+      'test@example.com',
+      'testtesttest',
+    );
+    org = await orgsService.createForUser(user);
+    org.paymentPlan = PaymentPlan.PREMIUM;
+    await orgsRepository.save(org);
   });
 
   afterEach(async () => {
@@ -36,14 +54,8 @@ describe('OkrsController', () => {
     expect(controller).toBeDefined();
   });
 
-  async function createTestOrg() {
-    const user = new User('Test User', 'test@example.com', 'testtesttest');
-    return await orgsService.createForUser(user);
-  }
-
   describe('when creating an OKR', () => {
     it('should return the created OKR', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -59,7 +71,6 @@ describe('OkrsController', () => {
       expect(okr.objective.title).toEqual('My OKR');
     });
     it('should validate the OKR', async () => {
-      const org = await createTestOrg();
       await expect(
         controller.create(
           {
@@ -76,7 +87,6 @@ describe('OkrsController', () => {
       ).rejects.toThrow();
     });
     it('should validate the timeline when it exists', async () => {
-      const org = await createTestOrg();
       await expect(
         controller.create(
           {
@@ -94,7 +104,6 @@ describe('OkrsController', () => {
       ).rejects.toThrow();
     });
     it('should store the timeline when it exists', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -114,7 +123,6 @@ describe('OkrsController', () => {
 
   describe('when listing OKRs', () => {
     it('should return an empty array', async () => {
-      const org = await createTestOrg();
       const okrs = await controller.list({
         user: {
           org: org.id,
@@ -123,7 +131,6 @@ describe('OkrsController', () => {
       expect(okrs).toEqual([]);
     });
     it('should return an array of OKRs', async () => {
-      const org = await createTestOrg();
       await controller.create(
         {
           user: {
@@ -151,7 +158,6 @@ describe('OkrsController', () => {
 
   describe('when getting an OKR', () => {
     it('should return the OKR', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -175,7 +181,6 @@ describe('OkrsController', () => {
 
   describe('when deleting an OKR', () => {
     it('should delete the OKR', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -202,7 +207,6 @@ describe('OkrsController', () => {
       ).rejects.toThrow();
     });
     it('should delete the OKR and its key results', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -237,7 +241,6 @@ describe('OkrsController', () => {
 
   describe('when creating an OKR with key results', () => {
     it('should return the created OKR with key results', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -264,7 +267,6 @@ describe('OkrsController', () => {
 
   describe('when updating Key Results Progress', () => {
     it('should update the Key Result Progress', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -302,8 +304,12 @@ describe('OkrsController', () => {
       expect(okr2.keyResults[0].progress).toEqual(0.5);
     });
     it('should not update the Key Result Progress if the Key Result does not belong to the OKR', async () => {
-      const org = await createTestOrg();
-      const org2 = await createTestOrg();
+      const otherUser = await usersService.createUserWithOrg(
+        'Test User',
+        'testotheruser@example.com',
+        'testtesttest',
+      );
+      const org2 = await orgsService.createForUser(otherUser);
       const okr = await controller.create(
         {
           user: {
@@ -337,7 +343,6 @@ describe('OkrsController', () => {
       ).rejects.toThrow();
     });
     it('should update the Objective Progress', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -375,7 +380,6 @@ describe('OkrsController', () => {
       expect(okr2.objective.progress).toEqual(0.17);
     });
     it('should update the key result status', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -416,7 +420,6 @@ describe('OkrsController', () => {
 
   describe('when getting the key results list', () => {
     it('should return the key results list', async () => {
-      const org = await createTestOrg();
       await controller.create(
         {
           user: {
@@ -448,7 +451,6 @@ describe('OkrsController', () => {
   });
   describe('when deleting a key result', () => {
     it('should delete the key result', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -477,7 +479,6 @@ describe('OkrsController', () => {
   });
   describe('when updating a key result', () => {
     it('should update the key result', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -515,7 +516,6 @@ describe('OkrsController', () => {
   });
   describe('when creating a key result', () => {
     it('should create the key result', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -552,7 +552,6 @@ describe('OkrsController', () => {
   });
   describe('When getting a key result', () => {
     it('should return the key result', async () => {
-      const org = await createTestOrg();
       const okr = await controller.create(
         {
           user: {
@@ -580,7 +579,6 @@ describe('OkrsController', () => {
   });
   describe('when listing the okrs for a timeline', () => {
     it('should return the okrs for the timeline', async () => {
-      const org = await createTestOrg();
       await controller.create(
         {
           user: {
@@ -604,6 +602,136 @@ describe('OkrsController', () => {
       );
       expect(okrs.length).toEqual(1);
       expect(okrs[0].title).toEqual('My OKR');
+    });
+  });
+  describe('when adding a comment to a key result', () => {
+    it('should add a comment to the key result', async () => {
+      const okr = await controller.create(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        {
+          objective: {
+            title: 'Test Objective',
+          },
+          keyResults: [
+            {
+              title: 'Test Key Result',
+              progress: 0,
+              status: 'on-track',
+            },
+          ],
+        },
+      );
+      const comment = await controller.addCommentToKeyResult(
+        okr.keyResults[0].id,
+        {
+          user: {
+            org: org.id,
+            sub: user.id,
+          },
+        },
+        {
+          content: 'Test Comment',
+        },
+      );
+      expect(comment).toBeDefined();
+      expect((await comment.keyResult).id).toEqual(okr.keyResults[0].id);
+      expect((await comment.createdBy).id).toEqual(user.id);
+      expect(comment.content).toEqual('Test Comment');
+    });
+  });
+  describe('when updating a comment for a key result', () => {
+    it('should update the comment', async () => {
+      const okr = await controller.create(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        {
+          objective: {
+            title: 'Test Objective',
+          },
+          keyResults: [
+            {
+              title: 'Test Key Result',
+              progress: 0,
+              status: 'on-track',
+            },
+          ],
+        },
+      );
+      const comment = await controller.addCommentToKeyResult(
+        okr.keyResults[0].id,
+        {
+          user: {
+            sub: user.id,
+            org: org.id,
+          },
+        },
+        {
+          content: 'Test Comment',
+        },
+      );
+      const updatedComment = await controller.updateComment(
+        comment.id,
+        {
+          user: {
+            org: org.id,
+            sub: user.id,
+          },
+        },
+        {
+          content: 'Updated Comment',
+        },
+      );
+      expect(updatedComment.content).toEqual('Updated Comment');
+    });
+  });
+  describe('when deleting a comment for a key result', () => {
+    it('should delete the comment', async () => {
+      const okr = await controller.create(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        {
+          objective: {
+            title: 'Test Objective',
+          },
+          keyResults: [
+            {
+              title: 'Test Key Result',
+              progress: 0,
+              status: 'on-track',
+            },
+          ],
+        },
+      );
+      const comment = await controller.addCommentToKeyResult(
+        okr.keyResults[0].id,
+        {
+          user: {
+            sub: user.id,
+            org: org.id,
+          },
+        },
+        {
+          content: 'Test Comment',
+        },
+      );
+      await expect(
+        controller.deleteComment(comment.id, {
+          user: {
+            org: org.id,
+            sub: user.id,
+          },
+        }),
+      ).resolves.not.toThrow();
     });
   });
 });

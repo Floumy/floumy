@@ -23,11 +23,16 @@ import {
   PatchKeyResultDto,
   UpdateObjectiveDto,
 } from './dtos';
+import { CommentsService } from './comments/comments.service';
+import { CreateUpdateCommentDto } from '../comments/dtos';
 
 @Controller('okrs')
 @UseGuards(AuthGuard)
 export class OkrsController {
-  constructor(private okrsService: OkrsService) {}
+  constructor(
+    private okrsService: OkrsService,
+    private commentsService: CommentsService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -182,11 +187,55 @@ export class OkrsController {
     }
   }
 
+  @Get(':objectiveId/key-results/:keyResultId/comments')
+  @HttpCode(HttpStatus.OK)
+  async addCommentToKeyResult(
+    @Param('keyResultId') keyResultId: string,
+    @Request() request,
+    @Body() commentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.commentsService.addCommentToKeyResult(
+        keyResultId,
+        request.user.sub,
+        commentDto.content,
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
   @Get('timeline/:timeline')
   async listForTimeline(
     @Request() request,
     @Param('timeline') timeline: Timeline,
   ) {
     return await this.okrsService.listForTimeline(request.user.org, timeline);
+  }
+
+  @Put(':objectiveId/key-results/:keyResultId/comments/:commentId')
+  async updateComment(
+    @Param('commentId') commentId: string,
+    @Request() request,
+    @Body() commentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.commentsService.updateComment(
+        request.user.sub,
+        commentId,
+        commentDto.content,
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Delete(':objectiveId/key-results/:keyResultId/comments/:commentId')
+  deleteComment(@Param('commentId') commentId: string, @Request() request) {
+    try {
+      return this.commentsService.deleteComment(request.user.sub, commentId);
+    } catch (e) {
+      throw new BadRequestException();
+    }
   }
 }
