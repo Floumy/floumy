@@ -25,6 +25,7 @@ import { WorkItemComment } from '../src/backlog/work-items/work-item-comment.ent
 import { FeatureComment } from '../src/roadmap/features/feature-comment.entity';
 import { KeyResultComment } from '../src/okrs/key-result-comment.entity';
 import { CommentsService } from '../src/okrs/comments/comments.service';
+import { KeyResult } from '../src/okrs/key-result.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -117,6 +118,7 @@ export async function setupTestingModule(
         WorkItemComment,
         FeatureComment,
         KeyResultComment,
+        KeyResult,
       ]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],
