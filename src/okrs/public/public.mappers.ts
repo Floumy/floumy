@@ -4,6 +4,8 @@ import { TimelineService } from '../../common/timeline.service';
 import { KeyResult } from '../key-result.entity';
 import { Feature } from '../../roadmap/features/feature.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
+import { PaymentPlan } from '../../auth/payment.plan';
+import { CommentMapper } from '../../comments/mappers';
 
 export class PublicOkrMapper {
   static toDTO(objective: Objective): ObjectiveDto {
@@ -47,6 +49,13 @@ export class PublicOkrMapper {
 
   static async toKeyResultDto(keyResult: KeyResult) {
     const features = (await keyResult.features) || [];
+    const org = await keyResult.org;
+    let comments = [];
+
+    if (org?.paymentPlan === PaymentPlan.PREMIUM) {
+      comments = await keyResult.comments;
+    }
+
     return {
       id: keyResult.id,
       reference: `KR-${keyResult.sequenceNumber}`,
@@ -56,6 +65,7 @@ export class PublicOkrMapper {
       createdAt: keyResult.createdAt,
       updatedAt: keyResult.updatedAt,
       features: await Promise.all(features.map(PublicOkrMapper.toFeatureDto)),
+      comments: await CommentMapper.toDtoList(comments),
     };
   }
 

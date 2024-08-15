@@ -187,7 +187,15 @@ export class OkrsController {
     }
   }
 
-  @Get(':objectiveId/key-results/:keyResultId/comments')
+  @Get('timeline/:timeline')
+  async listForTimeline(
+    @Request() request,
+    @Param('timeline') timeline: Timeline,
+  ) {
+    return await this.okrsService.listForTimeline(request.user.org, timeline);
+  }
+
+  @Post('/key-results/:keyResultId/comments')
   @HttpCode(HttpStatus.OK)
   async addCommentToKeyResult(
     @Param('keyResultId') keyResultId: string,
@@ -205,15 +213,7 @@ export class OkrsController {
     }
   }
 
-  @Get('timeline/:timeline')
-  async listForTimeline(
-    @Request() request,
-    @Param('timeline') timeline: Timeline,
-  ) {
-    return await this.okrsService.listForTimeline(request.user.org, timeline);
-  }
-
-  @Put(':objectiveId/key-results/:keyResultId/comments/:commentId')
+  @Put('/key-results/:keyResultId/comments/:commentId')
   async updateComment(
     @Param('commentId') commentId: string,
     @Request() request,
@@ -230,7 +230,7 @@ export class OkrsController {
     }
   }
 
-  @Delete(':objectiveId/key-results/:keyResultId/comments/:commentId')
+  @Delete('/key-results/:keyResultId/comments/:commentId')
   deleteComment(@Param('commentId') commentId: string, @Request() request) {
     try {
       return this.commentsService.deleteComment(request.user.sub, commentId);
