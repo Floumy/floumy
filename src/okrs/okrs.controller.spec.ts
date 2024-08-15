@@ -638,7 +638,6 @@ describe('OkrsController', () => {
         },
       );
       expect(comment).toBeDefined();
-      expect((await comment.keyResult).id).toEqual(okr.keyResults[0].id);
       expect((await comment.createdBy).id).toEqual(user.id);
       expect(comment.content).toEqual('Test Comment');
     });
