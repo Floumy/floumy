@@ -335,7 +335,7 @@ export class OkrsService {
     objectiveId: string,
     keyResultId: string,
   ) {
-    return await KeyResultMapper.toDTO(
+    return await KeyResultMapper.toDtoWithComments(
       await this.getKeyResult(orgId, objectiveId, keyResultId),
     );
   }

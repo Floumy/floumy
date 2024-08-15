@@ -43,7 +43,7 @@ export class CommentsService {
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
     await this.keyResultCommentRepository.save(comment);
-    return comment;
+    return CommentMapper.toDto(comment);
   }
 
   async updateComment(userId: string, commentId: string, content: string) {
