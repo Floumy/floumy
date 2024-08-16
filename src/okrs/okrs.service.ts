@@ -85,7 +85,7 @@ export class OkrsService {
 
   async get(orgId: any, id: string) {
     const { objective, keyResults } = await this.getObjectiveDetails(id, orgId);
-    return await OKRMapper.toDTO(objective, keyResults);
+    return await OKRMapper.toDTOWithComments(objective, keyResults);
   }
 
   async getObjectiveDetails(id: string, orgId: any) {
