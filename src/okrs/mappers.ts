@@ -42,6 +42,24 @@ export class OKRMapper {
     };
   }
 
+  static async toDTOWithComments(objective, keyResults) {
+    const dto = await OKRMapper.toDTO(objective, keyResults);
+    const org = await objective.org;
+
+    let comments = [];
+    if (org.paymentPlan === PaymentPlan.PREMIUM) {
+      comments = await objective.comments;
+    }
+
+    return {
+      objective: {
+        ...dto.objective,
+        comments: await CommentMapper.toDtoList(comments),
+      },
+      keyResults: dto.keyResults,
+    };
+  }
+
   static async toListDTO(objectives: Objective[]) {
     return await Promise.all(objectives.map(OKRMapper.toListItemDto));
   }
