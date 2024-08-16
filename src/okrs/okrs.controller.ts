@@ -220,7 +220,7 @@ export class OkrsController {
     @Body() commentDto: CreateUpdateCommentDto,
   ) {
     try {
-      return await this.commentsService.updateComment(
+      return await this.commentsService.updateKeyResultComment(
         request.user.sub,
         commentId,
         commentDto.content,
@@ -233,7 +233,10 @@ export class OkrsController {
   @Delete('/key-results/:keyResultId/comments/:commentId')
   deleteComment(@Param('commentId') commentId: string, @Request() request) {
     try {
-      return this.commentsService.deleteComment(request.user.sub, commentId);
+      return this.commentsService.deleteKeyResultComment(
+        request.user.sub,
+        commentId,
+      );
     } catch (e) {
       throw new BadRequestException();
     }

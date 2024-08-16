@@ -11,6 +11,7 @@ import { Org } from '../orgs/org.entity';
 import { KeyResult } from './key-result.entity';
 import { OKRStatus } from './okrstatus.enum';
 import { User } from '../users/user.entity';
+import { ObjectiveComment } from './objective-comment.entity';
 
 @Entity()
 export class Objective {
@@ -48,4 +49,12 @@ export class Objective {
   keyResults: Promise<KeyResult[]>;
   @ManyToOne(() => User, (user) => user.assignedObjectives, { lazy: true })
   assignedTo: Promise<User>;
+  @OneToMany(
+    () => ObjectiveComment,
+    (objectiveComment) => objectiveComment.objective,
+    {
+      lazy: true,
+    },
+  )
+  comments: Promise<ObjectiveComment[]>;
 }

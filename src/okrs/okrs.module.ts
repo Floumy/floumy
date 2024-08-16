@@ -14,6 +14,7 @@ import { PublicService } from './public/public.service';
 import { Org } from '../orgs/org.entity';
 import { CommentsService } from './comments/comments.service';
 import { KeyResultComment } from './key-result-comment.entity';
+import { ObjectiveComment } from './objective-comment.entity';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { KeyResultComment } from './key-result-comment.entity';
       User,
       Org,
       KeyResultComment,
+      ObjectiveComment,
     ]),
     OrgsModule,
     AuthModule,
