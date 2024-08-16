@@ -214,7 +214,7 @@ export class OkrsController {
   }
 
   @Put('/key-results/:keyResultId/comments/:commentId')
-  async updateComment(
+  async updateKeyResultComment(
     @Param('commentId') commentId: string,
     @Request() request,
     @Body() commentDto: CreateUpdateCommentDto,
@@ -231,9 +231,64 @@ export class OkrsController {
   }
 
   @Delete('/key-results/:keyResultId/comments/:commentId')
-  deleteComment(@Param('commentId') commentId: string, @Request() request) {
+  deleteKeyResultComment(
+    @Param('commentId') commentId: string,
+    @Request() request,
+  ) {
     try {
       return this.commentsService.deleteKeyResultComment(
+        request.user.sub,
+        commentId,
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Post(':objectiveId/comments')
+  @HttpCode(HttpStatus.CREATED)
+  async addCommentToObjective(
+    @Param('objectiveId') objectiveId: string,
+    @Request() resquest,
+    @Body() commentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.commentsService.addCommentToObjective(
+        objectiveId,
+        resquest.user.sub,
+        commentDto.content,
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Put(':objectiveId/comments/:commentId')
+  @HttpCode(HttpStatus.OK)
+  async updateObjectiveComment(
+    @Param('commentId') commentId: string,
+    @Request() request,
+    @Body() commentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.commentsService.updateObjectiveComment(
+        request.user.sub,
+        commentId,
+        commentDto.content,
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Delete(':objectiveId/comments/:commentId')
+  @HttpCode(HttpStatus.OK)
+  deleteObjectiveComment(
+    @Param('commentId') commentId: string,
+    @Request() request,
+  ) {
+    try {
+      return this.commentsService.deleteObjectiveComment(
         request.user.sub,
         commentId,
       );
