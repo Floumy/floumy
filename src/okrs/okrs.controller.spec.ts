@@ -675,7 +675,7 @@ describe('OkrsController', () => {
           content: 'Test Comment',
         },
       );
-      const updatedComment = await controller.updateComment(
+      const updatedComment = await controller.updateKeyResultComment(
         comment.id,
         {
           user: {
@@ -724,7 +724,136 @@ describe('OkrsController', () => {
         },
       );
       await expect(
-        controller.deleteComment(comment.id, {
+        controller.deleteKeyResultComment(comment.id, {
+          user: {
+            org: org.id,
+            sub: user.id,
+          },
+        }),
+      ).resolves.not.toThrow();
+    });
+  });
+  describe('when adding a comment to an objective', () => {
+    it('should add a comment to the objective', async () => {
+      const okr = await controller.create(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        {
+          objective: {
+            title: 'Test Objective',
+          },
+          keyResults: [
+            {
+              title: 'Test Key Result',
+              progress: 0,
+              status: 'on-track',
+            },
+          ],
+        },
+      );
+      const comment = await controller.addCommentToObjective(
+        okr.objective.id,
+        {
+          user: {
+            org: org.id,
+            sub: user.id,
+          },
+        },
+        {
+          content: 'Test Comment',
+        },
+      );
+      expect(comment).toBeDefined();
+      expect((await comment.createdBy).id).toEqual(user.id);
+      expect(comment.content).toEqual('Test Comment');
+    });
+  });
+  describe('when updating a comment for an objective', () => {
+    it('should update the comment', async () => {
+      const okr = await controller.create(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        {
+          objective: {
+            title: 'Test Objective',
+          },
+          keyResults: [
+            {
+              title: 'Test Key Result',
+              progress: 0,
+              status: 'on-track',
+            },
+          ],
+        },
+      );
+      const comment = await controller.addCommentToObjective(
+        okr.objective.id,
+        {
+          user: {
+            sub: user.id,
+            org: org.id,
+          },
+        },
+        {
+          content: 'Test Comment',
+        },
+      );
+      const updatedComment = await controller.updateObjectiveComment(
+        comment.id,
+        {
+          user: {
+            org: org.id,
+            sub: user.id,
+          },
+        },
+        {
+          content: 'Updated Comment',
+        },
+      );
+      expect(updatedComment.content).toEqual('Updated Comment');
+    });
+  });
+  describe('when deleting a comment for an objective', () => {
+    it('should delete the comment', async () => {
+      const okr = await controller.create(
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        {
+          objective: {
+            title: 'Test Objective',
+          },
+          keyResults: [
+            {
+              title: 'Test Key Result',
+              progress: 0,
+              status: 'on-track',
+            },
+          ],
+        },
+      );
+      const comment = await controller.addCommentToObjective(
+        okr.objective.id,
+        {
+          user: {
+            sub: user.id,
+            org: org.id,
+          },
+        },
+        {
+          content: 'Test Comment',
+        },
+      );
+      await expect(
+        controller.deleteObjectiveComment(comment.id, {
           user: {
             org: org.id,
             sub: user.id,
