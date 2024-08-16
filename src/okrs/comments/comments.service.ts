@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { KeyResultComment } from '../key-result-comment.entity';
 import { User } from '../../users/user.entity';
 import { CommentMapper } from '../../comments/mappers';
+import { ObjectiveComment } from '../objective-comment.entity';
+import { Objective } from '../objective.entity';
 
 @Injectable()
 export class CommentsService {
@@ -16,6 +18,10 @@ export class CommentsService {
     private keyResultCommentRepository: Repository<KeyResultComment>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(ObjectiveComment)
+    private objectiveCommentRepository: Repository<ObjectiveComment>,
+    @InjectRepository(Objective)
+    private objectiveRepository: Repository<Objective>,
   ) {}
 
   async addCommentToKeyResult(
@@ -46,7 +52,11 @@ export class CommentsService {
     return CommentMapper.toDto(comment);
   }
 
-  async updateComment(userId: string, commentId: string, content: string) {
+  async updateKeyResultComment(
+    userId: string,
+    commentId: string,
+    content: string,
+  ) {
     const comment = await this.keyResultCommentRepository.findOneByOrFail({
       id: commentId,
       createdBy: { id: userId },
@@ -65,7 +75,7 @@ export class CommentsService {
     return CommentMapper.toDto(comment);
   }
 
-  async deleteComment(userId: string, commentInd: string) {
+  async deleteKeyResultComment(userId: string, commentInd: string) {
     const comment = await this.keyResultCommentRepository.findOneByOrFail({
       id: commentInd,
       createdBy: { id: userId },
@@ -78,5 +88,71 @@ export class CommentsService {
     }
 
     await this.keyResultCommentRepository.remove(comment);
+  }
+
+  async addCommentToObjective(
+    objectiveId: string,
+    userId: string,
+    content: string,
+  ) {
+    const objective = await this.objectiveRepository.findOneByOrFail({
+      id: objectiveId,
+    });
+
+    const org = await objective.org;
+
+    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to add comments');
+    }
+
+    const user = await this.usersRepository.findOneByOrFail({
+      id: userId,
+    });
+
+    const comment = new ObjectiveComment();
+    comment.content = content;
+    comment.objective = Promise.resolve(objective);
+    comment.createdBy = Promise.resolve(user);
+    comment.org = Promise.resolve(org);
+    await this.objectiveCommentRepository.save(comment);
+    return CommentMapper.toDto(comment);
+  }
+
+  async updateObjectiveComment(
+    userId: string,
+    commentId: string,
+    content: string,
+  ) {
+    const comment = await this.objectiveCommentRepository.findOneByOrFail({
+      id: commentId,
+      createdBy: { id: userId },
+    });
+
+    const org = await comment.org;
+
+    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to update comments');
+    }
+
+    comment.content = content;
+
+    await this.objectiveCommentRepository.save(comment);
+
+    return CommentMapper.toDto(comment);
+  }
+
+  async deleteObjectiveComment(userId: string, commentId: string) {
+    const comment = await this.objectiveCommentRepository.findOneByOrFail({
+      id: commentId,
+      createdBy: { id: userId },
+    });
+
+    const org = await comment.org;
+
+    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to delete comments');
+    }
+
+    await this.objectiveCommentRepository.remove(comment);
   }
 }

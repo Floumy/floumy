@@ -26,6 +26,7 @@ import { FeatureComment } from '../src/roadmap/features/feature-comment.entity';
 import { KeyResultComment } from '../src/okrs/key-result-comment.entity';
 import { CommentsService } from '../src/okrs/comments/comments.service';
 import { KeyResult } from '../src/okrs/key-result.entity';
+import { ObjectiveComment } from '../src/okrs/objective-comment.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -118,6 +119,7 @@ export async function setupTestingModule(
         WorkItemComment,
         FeatureComment,
         KeyResultComment,
+        ObjectiveComment,
         KeyResult,
       ]),
       ConfigModule.forRoot({
