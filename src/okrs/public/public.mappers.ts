@@ -25,6 +25,13 @@ export class PublicOkrMapper {
   }
 
   static async toDetailDto(objective: Objective, keyResults: KeyResult[]) {
+    const org = await objective.org;
+
+    let comments = [];
+    if (org?.paymentPlan === PaymentPlan.PREMIUM) {
+      comments = await objective.comments;
+    }
+
     return {
       objective: {
         id: objective.id,
@@ -36,6 +43,7 @@ export class PublicOkrMapper {
         ),
         progress: parseFloat(objective.progress.toFixed(2)),
         status: objective.status,
+        comments: await CommentMapper.toDtoList(comments),
         startDate: objective.startDate,
         endDate: objective.endDate,
         createdAt: objective.createdAt,
