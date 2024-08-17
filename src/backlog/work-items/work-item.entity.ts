@@ -79,7 +79,7 @@ export class WorkItem {
   @OneToMany(
     () => WorkItemComment,
     (workItemComment) => workItemComment.workItem,
-    { lazy: true },
+    { lazy: true, cascade: true, onDelete: 'CASCADE' },
   )
   comments: Promise<WorkItemComment[]>;
   @OneToMany(() => WorkItemFile, (workItemFile) => workItemFile.workItem)
