@@ -4,6 +4,9 @@ import { Comment } from '../../comments/comment-entity';
 
 @Entity()
 export class WorkItemComment extends Comment {
-  @ManyToOne(() => WorkItem, (workItem) => workItem.comments, { lazy: true })
+  @ManyToOne(() => WorkItem, (workItem) => workItem.comments, {
+    lazy: true,
+    onDelete: 'CASCADE',
+  })
   workItem: Promise<WorkItem>;
 }
