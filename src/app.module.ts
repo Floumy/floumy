@@ -24,6 +24,7 @@ import { BipModule } from './bip/bip.module';
 import { PaymentsModule } from './payments/payments.module';
 import { StripeModule } from './stripe/stripe.module';
 import { FeedModule } from './feed/feed.module';
+import { FeatureRequestsModule } from './feature-requests/feature-requests.module';
 import stripeConfig from './config/stripe.config';
 
 @Module({
@@ -86,6 +87,7 @@ import stripeConfig from './config/stripe.config';
     BipModule,
     PaymentsModule,
     FeedModule,
+    FeatureRequestsModule,
   ],
   providers: [AppService],
 })

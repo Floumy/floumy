@@ -19,6 +19,7 @@ import { BipSettings } from '../bip/bip-settings.entity';
 import { PaymentPlan } from '../auth/payment.plan';
 import { Invoice } from '../payments/invoice.entity';
 import { FeedItem } from '../feed/feed-item.entity';
+import { FeatureRequest } from '../feature-requests/feature-request.entity';
 
 @Entity()
 export class Org {
@@ -59,6 +60,10 @@ export class Org {
   milestones: Promise<Milestone[]>;
   @OneToMany(() => WorkItem, (workItem) => workItem.org, { lazy: true })
   workItems: Promise<WorkItem[]>;
+  @OneToMany(() => FeatureRequest, (featureRequest) => featureRequest.org, {
+    lazy: true,
+  })
+  featureRequests: Promise<FeatureRequest[]>;
   @OneToMany(() => Iteration, (iteration) => iteration.org, { lazy: true })
   iterations: Promise<Iteration[]>;
   @OneToMany(() => Invoice, (invoice) => invoice.org, { lazy: true })

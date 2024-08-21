@@ -13,6 +13,7 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 import { Objective } from '../okrs/objective.entity';
 import { FeedItem } from '../feed/feed-item.entity';
+import { FeatureRequest } from '../feature-requests/feature-request.entity';
 
 @Entity()
 export class User {
@@ -51,6 +52,14 @@ export class User {
   assignedFeatures: Promise<Feature[]>;
   @OneToMany(() => FeedItem, (feedItem) => feedItem.user, { lazy: true })
   feedItems: Promise<FeedItem[]>;
+  @OneToMany(
+    () => FeatureRequest,
+    (featureRequest) => featureRequest.createdBy,
+    {
+      lazy: true,
+    },
+  )
+  createdFeatureRequests: Promise<FeatureRequest[]>;
   @OneToMany(() => Objective, (objective) => objective.assignedTo, {
     lazy: true,
   })
