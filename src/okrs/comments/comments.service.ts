@@ -39,6 +39,10 @@ export class CommentsService {
       throw new Error('You need to upgrade to premium to add comments');
     }
 
+    if (!content || content.trim() === '') {
+      throw new Error('Comment content is required');
+    }
+
     const user = await this.usersRepository.findOneByOrFail({
       id: userId,
     });
@@ -66,6 +70,10 @@ export class CommentsService {
 
     if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
       throw new Error('You need to upgrade to premium to update comments');
+    }
+
+    if (!content || content.trim() === '') {
+      throw new Error('Comment content is required');
     }
 
     comment.content = content;
@@ -105,6 +113,10 @@ export class CommentsService {
       throw new Error('You need to upgrade to premium to add comments');
     }
 
+    if (!content || content.trim() === '') {
+      throw new Error('Comment content is required');
+    }
+
     const user = await this.usersRepository.findOneByOrFail({
       id: userId,
     });
@@ -132,6 +144,10 @@ export class CommentsService {
 
     if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
       throw new Error('You need to upgrade to premium to update comments');
+    }
+
+    if (!content || content.trim() === '') {
+      throw new Error('Comment content is required');
     }
 
     comment.content = content;
