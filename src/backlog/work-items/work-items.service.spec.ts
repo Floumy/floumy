@@ -1270,6 +1270,23 @@ describe('WorkItemsService', () => {
         }),
       ).rejects.toThrowError('You need to upgrade to premium to add comments');
     });
+    it('should throw an error if the comment content is empty', async () => {
+      const { org, user } = await getTestPremiumOrgAndUser();
+
+      const workItem = await service.createWorkItem(user.id, {
+        title: 'Test title',
+        description: 'A test description',
+        priority: Priority.HIGH,
+        type: WorkItemType.BUG,
+        status: WorkItemStatus.PLANNED,
+      });
+
+      await expect(
+        service.createWorkItemComment(user.id, org.id, workItem.id, {
+          content: '',
+        }),
+      ).rejects.toThrowError('Comment content is required');
+    });
   });
 
   describe('when listing the comments of a work item', () => {
@@ -1385,6 +1402,32 @@ describe('WorkItemsService', () => {
       );
       expect(updatedComment).toBeDefined();
       expect(updatedComment.content).toEqual('my updated comment');
+    });
+    it('should throw an error if the comment is empty', async () => {
+      const { org, user } = await getTestPremiumOrgAndUser();
+
+      const workItem = new WorkItem();
+      workItem.title = 'my work item';
+      workItem.description = 'my work item description';
+      workItem.priority = Priority.HIGH;
+      workItem.type = WorkItemType.USER_STORY;
+      workItem.status = WorkItemStatus.PLANNED;
+      workItem.org = Promise.resolve(org);
+      workItem.createdBy = Promise.resolve(user);
+      const savedWorkItem = await workItemsRepository.save(workItem);
+
+      const comment = new WorkItemComment();
+      comment.content = 'my comment';
+      comment.createdBy = Promise.resolve(user);
+      comment.workItem = Promise.resolve(savedWorkItem);
+      comment.org = Promise.resolve(org);
+      const savedComment = await workItemCommentsRepository.save(comment);
+
+      await expect(
+        service.updateWorkItemComment(user.id, workItem.id, savedComment.id, {
+          content: '',
+        }),
+      ).rejects.toThrowError('Comment content is required');
     });
   });
 });

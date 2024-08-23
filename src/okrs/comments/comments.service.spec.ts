@@ -104,6 +104,23 @@ describe('CommentsService', () => {
         service.addCommentToKeyResult(keyResult.id, user.id, 'Test Comment'),
       ).rejects.toThrowError('You need to upgrade to premium to add comments');
     });
+    it('should throw an error if the comment content is empty', async () => {
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      const keyResult = await okrsService.createKeyResult(
+        org.id,
+        objective.id,
+        {
+          title: 'Test Key Result',
+          progress: 0,
+          status: OKRStatus.ON_TRACK,
+        },
+      );
+      await expect(
+        service.addCommentToKeyResult(keyResult.id, user.id, ''),
+      ).rejects.toThrowError('Comment content is required');
+    });
   });
   describe('when updating a comment for a key result', () => {
     it('should update the comment', async () => {
@@ -197,6 +214,29 @@ describe('CommentsService', () => {
       ).rejects.toThrowError(
         'You need to upgrade to premium to update comments',
       );
+    });
+    it('should throw an error if the comment content is empty', async () => {
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      const keyResult = await okrsService.createKeyResult(
+        org.id,
+        objective.id,
+        {
+          title: 'Test Key Result',
+          progress: 0,
+          status: OKRStatus.ON_TRACK,
+        },
+      );
+      const comment = await service.addCommentToKeyResult(
+        keyResult.id,
+        user.id,
+        'Test Comment',
+      );
+
+      await expect(
+        service.updateKeyResultComment(user.id, comment.id, ''),
+      ).rejects.toThrowError('Comment content is required');
     });
   });
   describe('when deleting a comment for a key result', () => {
@@ -308,6 +348,14 @@ describe('CommentsService', () => {
         service.addCommentToObjective(objective.id, user.id, 'Test Comment'),
       ).rejects.toThrowError('You need to upgrade to premium to add comments');
     });
+    it('should throw an error if the comment content is empty', async () => {
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      await expect(
+        service.addCommentToObjective(objective.id, user.id, ''),
+      ).rejects.toThrowError('Comment content is required');
+    });
   });
   describe('when updating a comment for an objective', () => {
     it('should update the comment', async () => {
@@ -331,6 +379,19 @@ describe('CommentsService', () => {
       expect(updatedComment.id).toEqual(comment.id);
       expect(updatedComment.content).toEqual('Updated Comment');
       expect(updatedComment.createdBy.id).toEqual(user.id);
+    });
+    it('should validate that the comment content is not empty', async () => {
+      const objective = await okrsService.createObjective(org.id, {
+        title: 'Test Objective',
+      });
+      const comment = await service.addCommentToObjective(
+        objective.id,
+        user.id,
+        'Test Comment',
+      );
+      await expect(
+        service.updateObjectiveComment(user.id, comment.id, ''),
+      ).rejects.toThrowError('Comment content is required');
     });
   });
   describe('when deleting a comment for an objective', () => {

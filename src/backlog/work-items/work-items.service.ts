@@ -232,6 +232,9 @@ export class WorkItemsService {
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {
       throw new Error('You need to upgrade to premium to add comments');
     }
+    if (!createCommentDto.content || createCommentDto.content.trim() === '') {
+      throw new Error('Comment content is required');
+    }
     const comment = new WorkItemComment();
     comment.content = createCommentDto.content;
     comment.createdBy = Promise.resolve(user);
@@ -266,6 +269,9 @@ export class WorkItemsService {
     const org = await workItem.org;
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {
       throw new Error('You need to upgrade to premium to add comments');
+    }
+    if (!createCommentDto.content || createCommentDto.content.trim() === '') {
+      throw new Error('Comment content is required');
     }
     const comment = await this.workItemCommentsRepository.findOneByOrFail({
       id: commentId,

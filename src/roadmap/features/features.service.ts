@@ -235,6 +235,9 @@ export class FeaturesService {
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {
       throw new Error('You need to upgrade to premium to add comments');
     }
+    if (!createCommentDto.content || createCommentDto.content.trim() === '') {
+      throw new Error('Comment content is required');
+    }
     const comment = new FeatureComment();
     comment.content = createCommentDto.content;
     comment.createdBy = Promise.resolve(user);
@@ -269,6 +272,9 @@ export class FeaturesService {
     const org = await feature.org;
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {
       throw new Error('You need to upgrade to premium to add comments');
+    }
+    if (!createCommentDto.content || createCommentDto.content.trim() === '') {
+      throw new Error('Comment content is required');
     }
     const comment = await this.featureCommentsRepository.findOneByOrFail({
       id: commentId,
