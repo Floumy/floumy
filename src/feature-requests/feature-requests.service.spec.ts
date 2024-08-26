@@ -9,13 +9,14 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
+import { uuid } from 'uuidv4';
 
 describe('FeatureRequestsService', () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
   let service: FeatureRequestsService;
   let orgsRepository: Repository<Org>;
-  let usersRepository: Repository<User>;
+  let featureRequestsRepository: Repository<FeatureRequest>;
   let org: Org;
   let user: User;
 
@@ -38,7 +39,9 @@ describe('FeatureRequestsService', () => {
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
-    usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    featureRequestsRepository = module.get<Repository<FeatureRequest>>(
+      getRepositoryToken(FeatureRequest),
+    );
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -71,8 +74,8 @@ describe('FeatureRequestsService', () => {
       expect(featureRequest.status).toEqual(FeatureRequestStatus.PLANNED);
       expect(featureRequest.estimation).toBeNull();
       expect(featureRequest.completedAt).toBeNull();
-      expect(await featureRequest.org).toBeDefined();
-      expect(await featureRequest.createdBy).toBeDefined();
+      expect(featureRequest.org).toBeDefined();
+      expect(featureRequest.createdBy).toBeDefined();
     });
 
     it('should create a new feature request only if the org is premium', () => {
@@ -87,6 +90,46 @@ describe('FeatureRequestsService', () => {
           description: 'Test Description',
         }),
       ).rejects.toThrow();
+    });
+  });
+
+  describe('when listing feature requests', () => {
+    it('should return all feature requests for the org', async () => {
+      await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request 1',
+        description: 'Test Description 1',
+      });
+      await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request 2',
+        description: 'Test Description 2',
+      });
+
+      const featureRequests = await service.listFeatureRequests(org.id);
+      expect(featureRequests).toHaveLength(2);
+      expect(featureRequests[0].title).toEqual('Test Feature Request 2');
+      expect(featureRequests[1].title).toEqual('Test Feature Request 1');
+    });
+    it('should return an empty array if there are no feature requests', async () => {
+      const featureRequests = await service.listFeatureRequests(org.id);
+      expect(featureRequests).toHaveLength(0);
+    });
+    it('should return an empty array if the org does not exist', async () => {
+      const featureRequests = await service.listFeatureRequests(uuid());
+      expect(featureRequests).toHaveLength(0);
+    });
+    it('should return the feature requests in pages', async () => {
+      await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request 1',
+        description: 'Test Description 1',
+      });
+      await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request 2',
+        description: 'Test Description 2',
+      });
+
+      const featureRequests = await service.listFeatureRequests(org.id, 1, 1);
+      expect(featureRequests).toHaveLength(1);
+      expect(featureRequests[0].title).toEqual('Test Feature Request 2');
     });
   });
 });
