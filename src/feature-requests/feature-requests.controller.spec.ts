@@ -66,4 +66,23 @@ describe('FeatureRequestsController', () => {
       expect(result.description).toBe(createFeatureRequestDto.description);
     });
   });
+  describe('when listing feature requests', () => {
+    it('should return a list of feature requests', async () => {
+      const createFeatureRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      await controller.addFeatureRequest(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        createFeatureRequestDto,
+      );
+      const result = await controller.listFeatureRequests(org.id);
+      expect(result.length).toBe(1);
+      expect(result[0].title).toBe(createFeatureRequestDto.title);
+      expect(result[0].description).toBe(createFeatureRequestDto.description);
+    });
+  });
 });
