@@ -9,6 +9,19 @@ export class CreateFeatureRequestDto {
   description: string;
 }
 
+export class UpdateFeatureRequestDto {
+  @IsNotEmpty()
+  title: string;
+
+  @IsNotEmpty()
+  description: string;
+
+  @IsNotEmpty()
+  status: FeatureRequestStatus;
+
+  estimation: number;
+}
+
 export interface UserDto {
   id: string;
   email: string;
@@ -28,4 +41,6 @@ export interface FeatureRequestDto {
   status: FeatureRequestStatus;
   estimation: number;
   completedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
