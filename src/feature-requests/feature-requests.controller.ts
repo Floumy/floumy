@@ -5,11 +5,12 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { CreateFeatureRequestDto } from './dtos';
+import { CreateFeatureRequestDto, UpdateFeatureRequestDto } from './dtos';
 import { FeatureRequestsService } from './feature-requests.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Public } from '../auth/public.guard';
@@ -48,6 +49,42 @@ export class FeatureRequestsController {
         orgId,
         page,
         limit,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get(':featureRequestId')
+  @Public()
+  async getFeatureRequestById(
+    @Param('orgId') orgId: string,
+    @Param('featureRequestId') featureRequestId: string,
+  ) {
+    try {
+      return await this.featureRequestsService.getFeatureRequestById(
+        orgId,
+        featureRequestId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Put(':featureRequestId')
+  @UseGuards(AuthGuard)
+  async updateFeatureRequest(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('featureRequestId') featureRequestId: string,
+    @Body() updateFeatureRequestDto: UpdateFeatureRequestDto,
+  ) {
+    try {
+      return await this.featureRequestsService.updateFeatureRequest(
+        request.user.sub,
+        orgId,
+        featureRequestId,
+        updateFeatureRequestDto,
       );
     } catch (e) {
       throw new BadRequestException(e.message);

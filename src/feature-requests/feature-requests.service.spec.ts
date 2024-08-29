@@ -132,4 +132,119 @@ describe('FeatureRequestsService', () => {
       expect(featureRequests[0].title).toEqual('Test Feature Request 2');
     });
   });
+
+  describe('when getting a feature request by id', () => {
+    it('should return the feature request', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+
+      const foundFeatureRequest = await service.getFeatureRequestById(
+        org.id,
+        featureRequest.id,
+      );
+      expect(foundFeatureRequest).toBeDefined();
+      expect(foundFeatureRequest.id).toEqual(featureRequest.id);
+      expect(foundFeatureRequest.title).toEqual('Test Feature Request');
+      expect(foundFeatureRequest.description).toEqual('Test Description');
+    });
+    it('should throw an error if the feature request does not exist', async () => {
+      await expect(
+        service.getFeatureRequestById(org.id, uuid()),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the feature request does not belong to the org', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+
+      const otherOrg = await orgsService.createForUser(user);
+      await orgsRepository.save(otherOrg);
+
+      await expect(
+        service.getFeatureRequestById(otherOrg.id, featureRequest.id),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('when updating a feature request', () => {
+    it('should update the feature request', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+
+      const updatedFeatureRequest = await service.updateFeatureRequest(
+        user.id,
+        org.id,
+        featureRequest.id,
+        {
+          title: 'Updated Feature Request',
+          description: 'Updated Description',
+          status: FeatureRequestStatus.IN_PROGRESS,
+          estimation: 5,
+        },
+      );
+
+      expect(updatedFeatureRequest).toBeDefined();
+      expect(updatedFeatureRequest.id).toEqual(featureRequest.id);
+      expect(updatedFeatureRequest.title).toEqual('Updated Feature Request');
+      expect(updatedFeatureRequest.description).toEqual('Updated Description');
+      expect(updatedFeatureRequest.status).toEqual(
+        FeatureRequestStatus.IN_PROGRESS,
+      );
+      expect(updatedFeatureRequest.estimation).toEqual(5);
+    });
+    it('should throw an error if the feature request does not exist', async () => {
+      await expect(
+        service.updateFeatureRequest(user.id, org.id, uuid(), {
+          title: 'Updated Feature Request',
+          description: 'Updated Description',
+          status: FeatureRequestStatus.IN_PROGRESS,
+          estimation: 5,
+        }),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the feature request does not belong to the org', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+
+      const otherOrg = await orgsService.createForUser(user);
+      await orgsRepository.save(otherOrg);
+
+      await expect(
+        service.updateFeatureRequest(user.id, otherOrg.id, featureRequest.id, {
+          title: 'Updated Feature Request',
+          description: 'Updated Description',
+          status: FeatureRequestStatus.IN_PROGRESS,
+          estimation: 5,
+        }),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the user does not belong to the org', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+
+      const otherUser = await usersService.createUserWithOrg(
+        'Other User',
+        'otheruser@exmaple.com',
+        'testtesttest',
+      );
+
+      await expect(
+        service.updateFeatureRequest(otherUser.id, org.id, featureRequest.id, {
+          title: 'Updated Feature Request',
+          description: 'Updated Description',
+          status: FeatureRequestStatus.IN_PROGRESS,
+          estimation: 5,
+        }),
+      ).rejects.toThrow();
+    });
+  });
 });

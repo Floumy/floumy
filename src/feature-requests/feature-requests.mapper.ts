@@ -22,6 +22,8 @@ export class FeatureRequestsMapper {
       status: featureRequest.status,
       estimation: featureRequest.estimation,
       completedAt: featureRequest.completedAt,
+      createdAt: featureRequest.createdAt,
+      updatedAt: featureRequest.updatedAt,
     };
   }
 }
