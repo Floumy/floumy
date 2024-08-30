@@ -16,7 +16,6 @@ describe('FeatureRequestsService', () => {
   let orgsService: OrgsService;
   let service: FeatureRequestsService;
   let orgsRepository: Repository<Org>;
-  let featureRequestsRepository: Repository<FeatureRequest>;
   let org: Org;
   let user: User;
 
@@ -39,9 +38,6 @@ describe('FeatureRequestsService', () => {
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
-    featureRequestsRepository = module.get<Repository<FeatureRequest>>(
-      getRepositoryToken(FeatureRequest),
-    );
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -71,7 +67,7 @@ describe('FeatureRequestsService', () => {
       expect(featureRequest.id).toBeDefined();
       expect(featureRequest.title).toEqual('Test Feature Request');
       expect(featureRequest.description).toEqual('Test Description');
-      expect(featureRequest.status).toEqual(FeatureRequestStatus.PLANNED);
+      expect(featureRequest.status).toEqual(FeatureRequestStatus.PENDING);
       expect(featureRequest.estimation).toBeNull();
       expect(featureRequest.completedAt).toBeNull();
       expect(featureRequest.org).toBeDefined();

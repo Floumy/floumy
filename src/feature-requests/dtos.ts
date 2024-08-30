@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 
 export class CreateFeatureRequestDto {
@@ -19,6 +19,7 @@ export class UpdateFeatureRequestDto {
   @IsNotEmpty()
   status: FeatureRequestStatus;
 
+  @IsOptional()
   estimation: number;
 }
 
