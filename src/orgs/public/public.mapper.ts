@@ -6,6 +6,7 @@ export class PublicMapper {
     return {
       id: org.id,
       name: org.name,
+      paymentPlan: org.paymentPlan,
       createdAt: org.createdAt,
       updatedAt: org.updatedAt,
     };

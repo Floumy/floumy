@@ -53,6 +53,12 @@ export class FeatureRequestsService {
     page: number = 1,
     limit: number = 0,
   ) {
+    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade your plan to view feature requests');
+    }
+
     const featureRequests = await this.featureRequestRepository.find({
       where: { org: { id: orgId } },
       take: limit,
@@ -69,6 +75,12 @@ export class FeatureRequestsService {
     orgId: string,
     featureRequestId: string,
   ): Promise<FeatureRequestDto> {
+    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade your plan to view feature requests');
+    }
+
     const featureRequest = await this.featureRequestRepository.findOneOrFail({
       where: {
         id: featureRequestId,
@@ -84,6 +96,13 @@ export class FeatureRequestsService {
     featureRequestId: string,
     updateFeatureRequestDto: UpdateFeatureRequestDto,
   ): Promise<FeatureRequestDto> {
+    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error(
+        'You need to upgrade your plan to update a feature request',
+      );
+    }
+
     const featureRequest = await this.featureRequestRepository.findOneOrFail({
       where: {
         id: featureRequestId,
@@ -117,6 +136,13 @@ export class FeatureRequestsService {
     orgId: string,
     featureRequestId: string,
   ) {
+    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error(
+        'You need to upgrade your plan to delete a feature request',
+      );
+    }
+
     const featureRequest = await this.featureRequestRepository.findOneOrFail({
       where: {
         id: featureRequestId,
