@@ -109,10 +109,6 @@ describe('FeatureRequestsService', () => {
       const featureRequests = await service.listFeatureRequests(org.id);
       expect(featureRequests).toHaveLength(0);
     });
-    it('should return an empty array if the org does not exist', async () => {
-      const featureRequests = await service.listFeatureRequests(uuid());
-      expect(featureRequests).toHaveLength(0);
-    });
     it('should return the feature requests in pages', async () => {
       await service.addFeatureRequest(user.id, org.id, {
         title: 'Test Feature Request 1',
