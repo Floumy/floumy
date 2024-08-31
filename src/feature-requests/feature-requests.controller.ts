@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -85,6 +86,24 @@ export class FeatureRequestsController {
         orgId,
         featureRequestId,
         updateFeatureRequestDto,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete(':featureRequestId')
+  @UseGuards(AuthGuard)
+  async deleteFeatureRequest(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('featureRequestId') featureRequestId: string,
+  ) {
+    try {
+      return await this.featureRequestsService.deleteFeatureRequest(
+        request.user.sub,
+        orgId,
+        featureRequestId,
       );
     } catch (e) {
       throw new BadRequestException(e.message);

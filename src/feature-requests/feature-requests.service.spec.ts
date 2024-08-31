@@ -243,4 +243,36 @@ describe('FeatureRequestsService', () => {
       ).rejects.toThrow();
     });
   });
+  describe('when deleting a feature request', () => {
+    it('should delete the feature request', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+
+      await service.deleteFeatureRequest(user.id, org.id, featureRequest.id);
+
+      await expect(
+        service.getFeatureRequestById(org.id, featureRequest.id),
+      ).rejects.toThrow();
+    });
+  });
+  it('should throw an error if the feature request does not exist', async () => {
+    await expect(
+      service.deleteFeatureRequest(user.id, org.id, uuid()),
+    ).rejects.toThrow();
+  });
+  it('should throw an error if the feature request does not belong to the org', async () => {
+    const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+      title: 'Test Feature Request',
+      description: 'Test Description',
+    });
+
+    const otherOrg = await orgsService.createForUser(user);
+    await orgsRepository.save(otherOrg);
+
+    await expect(
+      service.deleteFeatureRequest(user.id, otherOrg.id, featureRequest.id),
+    ).rejects.toThrow();
+  });
 });

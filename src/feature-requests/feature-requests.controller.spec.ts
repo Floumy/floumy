@@ -140,4 +140,29 @@ describe('FeatureRequestsController', () => {
       expect(result.description).toBe(updateFeatureRequestDto.description);
     });
   });
+  describe('when deleting a feature request', () => {
+    it('should delete the feature request', async () => {
+      const createFeatureRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      const { id } = await controller.addFeatureRequest(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        createFeatureRequestDto,
+      );
+      await controller.deleteFeatureRequest(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        id,
+      );
+      await expect(
+        controller.getFeatureRequestById(org.id, id),
+      ).rejects.toThrow();
+    });
+  });
 });
