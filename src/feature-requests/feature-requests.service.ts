@@ -111,4 +111,26 @@ export class FeatureRequestsService {
       await this.featureRequestRepository.save(featureRequest);
     return await FeatureRequestsMapper.toFeatureRequestDto(savedFeature);
   }
+
+  async deleteFeatureRequest(
+    userId: string,
+    orgId: string,
+    featureRequestId: string,
+  ) {
+    const featureRequest = await this.featureRequestRepository.findOneOrFail({
+      where: {
+        id: featureRequestId,
+        org: { id: orgId },
+      },
+    });
+
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    const featureRequestOrg = await featureRequest.org;
+    const userOrg = await user.org;
+    if (featureRequestOrg.id !== userOrg.id) {
+      throw new Error('You are not allowed to delete this feature request');
+    }
+
+    await this.featureRequestRepository.remove(featureRequest);
+  }
 }
