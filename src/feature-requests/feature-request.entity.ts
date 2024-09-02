@@ -3,12 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
+import { FeatureRequestVote } from './feature-request-vote.entity';
 
 @Entity()
 export class FeatureRequest {
@@ -28,6 +30,20 @@ export class FeatureRequest {
     nullable: true,
   })
   estimation: number;
+
+  @Column({ default: 1 })
+  votesCount: number;
+
+  @OneToMany(
+    () => FeatureRequestVote,
+    (featureRequestVote) => featureRequestVote.featureRequest,
+    {
+      lazy: true,
+      onDelete: 'CASCADE',
+    },
+  )
+  votes: Promise<FeatureRequestVote[]>;
+
   @Column({
     nullable: true,
   })

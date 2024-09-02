@@ -14,6 +14,7 @@ import { Feature } from '../roadmap/features/feature.entity';
 import { Objective } from '../okrs/objective.entity';
 import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { FeatureRequestVote } from '../feature-requests/feature-request-vote.entity';
 
 @Entity()
 export class User {
@@ -60,6 +61,16 @@ export class User {
     },
   )
   createdFeatureRequests: Promise<FeatureRequest[]>;
+
+  @OneToMany(
+    () => FeatureRequestVote,
+    (featureRequestVote) => featureRequestVote.user,
+    {
+      lazy: true,
+    },
+  )
+  featureRequestVotes: Promise<FeatureRequestVote[]>;
+
   @OneToMany(() => Objective, (objective) => objective.assignedTo, {
     lazy: true,
   })
