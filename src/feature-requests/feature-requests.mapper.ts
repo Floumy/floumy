@@ -19,6 +19,7 @@ export class FeatureRequestsMapper {
         id: org.id,
         name: org.name,
       },
+      votesCount: featureRequest.votesCount,
       status: featureRequest.status,
       estimation: featureRequest.estimation,
       completedAt: featureRequest.completedAt,
