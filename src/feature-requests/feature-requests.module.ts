@@ -7,6 +7,7 @@ import { Org } from '../orgs/org.entity';
 import { OrgsModule } from '../orgs/orgs.module';
 import { AuthModule } from '../auth/auth.module';
 import { FeatureRequest } from './feature-request.entity';
+import { FeatureRequestVoteService } from './feature-request-votes.service';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { FeatureRequest } from './feature-request.entity';
     OrgsModule,
     AuthModule,
   ],
-  providers: [FeatureRequestsService],
+  providers: [FeatureRequestsService, FeatureRequestVoteService],
   controllers: [FeatureRequestsController],
 })
 export class FeatureRequestsModule {}

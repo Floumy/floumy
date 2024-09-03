@@ -41,6 +41,7 @@ export interface FeatureRequestDto {
   org: OrgDto;
   status: FeatureRequestStatus;
   estimation: number;
+  votesCount: number;
   completedAt: Date;
   createdAt: Date;
   updatedAt: Date;
