@@ -147,4 +147,69 @@ describe('FeatureRequestVotesService', () => {
       expect(featureRequest.votesCount).toEqual(1);
     });
   });
+  describe('when downvoting a feature request', () => {
+    it('should downvote the feature request', async () => {
+      const featureRequest = await featureRequestService.addFeatureRequest(
+        user.id,
+        org.id,
+        {
+          title: 'Test Feature Request',
+          description: 'Test Description',
+        },
+      );
+      await service.downvoteFeatureRequest(user.id, org.id, featureRequest.id);
+      const featureRequestVote =
+        await featureRequestVotesRepository.findOneByOrFail({
+          user: { id: user.id },
+          featureRequest: { id: featureRequest.id },
+        });
+      expect(featureRequestVote.vote).toEqual(-1);
+
+      const updatedFeatureRequest =
+        await featureRequestService.getFeatureRequestById(
+          org.id,
+          featureRequest.id,
+        );
+      expect(updatedFeatureRequest.votesCount).toEqual(0);
+    });
+    it('should throw an error if the feature request does not exist', async () => {
+      await expect(
+        service.downvoteFeatureRequest(user.id, org.id, uuid()),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the feature request does not belong to the org', async () => {
+      const featureRequest = await featureRequestService.addFeatureRequest(
+        user.id,
+        org.id,
+        {
+          title: 'Test Feature Request',
+          description: 'Test Description',
+        },
+      );
+
+      const otherOrg = await orgsService.createForUser(user);
+      await orgsRepository.save(otherOrg);
+
+      await expect(
+        service.downvoteFeatureRequest(user.id, otherOrg.id, featureRequest.id),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the org is not on the premium plan', async () => {
+      const featureRequest = await featureRequestService.addFeatureRequest(
+        user.id,
+        org.id,
+        {
+          title: 'Test Feature Request',
+          description: 'Test Description',
+        },
+      );
+      org.paymentPlan = PaymentPlan.FREE;
+      await orgsRepository.save(org);
+      await expect(
+        service.downvoteFeatureRequest(user.id, org.id, featureRequest.id),
+      ).rejects.toThrow(
+        'You need to upgrade your plan to downvote a feature request',
+      );
+    });
+  });
 });
