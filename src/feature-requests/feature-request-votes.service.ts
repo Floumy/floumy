@@ -101,4 +101,17 @@ export class FeatureRequestVoteService {
     featureRequest.votesCount--;
     await this.featureRequestRepository.save(featureRequest);
   }
+
+  async voteOnFeatureRequest(
+    userId: string,
+    orgId: string,
+    featureRequestId: string,
+    vote: number,
+  ) {
+    if (vote === 1) {
+      await this.upvoteFeatureRequest(userId, orgId, featureRequestId);
+    } else if (vote === -1) {
+      await this.downvoteFeatureRequest(userId, orgId, featureRequestId);
+    }
+  }
 }
