@@ -11,6 +11,8 @@ import { FeatureRequestsService } from './feature-requests.service';
 import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
+import { FeatureRequestVoteService } from './feature-request-votes.service';
+import { FeatureRequestVote } from './feature-request-vote.entity';
 
 describe('FeatureRequestsController', () => {
   let controller: FeatureRequestsController;
@@ -21,8 +23,16 @@ describe('FeatureRequestsController', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User, FeatureRequest]), UsersModule],
-      [FeatureRequestsService],
+      [
+        TypeOrmModule.forFeature([
+          Org,
+          User,
+          FeatureRequest,
+          FeatureRequestVote,
+        ]),
+        UsersModule,
+      ],
+      [FeatureRequestsService, FeatureRequestVoteService],
       [FeatureRequestsController],
     );
     cleanup = dbCleanup;
@@ -163,6 +173,62 @@ describe('FeatureRequestsController', () => {
       await expect(
         controller.getFeatureRequestById(org.id, id),
       ).rejects.toThrow();
+    });
+  });
+  describe('when upvoting a feature request', () => {
+    it('should upvote the feature request', async () => {
+      const createFeatureRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      const { id } = await controller.addFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        createFeatureRequestDto,
+      );
+      await controller.upvoteFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        id,
+      );
+      const featureRequest = await controller.getFeatureRequestById(org.id, id);
+      expect(featureRequest.votesCount).toEqual(1);
+    });
+  });
+  describe('when downvoting a feature request', () => {
+    it('should downvote the feature request', async () => {
+      const createFeatureRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      const { id } = await controller.addFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        createFeatureRequestDto,
+      );
+      await controller.downvoteFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        id,
+      );
+      const featureRequest = await controller.getFeatureRequestById(org.id, id);
+      expect(featureRequest.votesCount).toEqual(0);
     });
   });
 });

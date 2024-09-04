@@ -10,6 +10,7 @@ import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { uuid } from 'uuidv4';
+import { FeatureRequestVote } from './feature-request-vote.entity';
 
 describe('FeatureRequestsService', () => {
   let usersService: UsersService;
@@ -29,6 +30,7 @@ describe('FeatureRequestsService', () => {
           User,
           FeatureRequestsService,
           FeatureRequest,
+          FeatureRequestVote,
         ]),
       ],
       [FeatureRequestsService, UsersService, OrgsService],

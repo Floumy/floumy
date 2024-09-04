@@ -102,16 +102,20 @@ export class FeatureRequestVoteService {
     await this.featureRequestRepository.save(featureRequest);
   }
 
-  async voteOnFeatureRequest(
-    userId: string,
-    orgId: string,
-    featureRequestId: string,
-    vote: number,
-  ) {
-    if (vote === 1) {
-      await this.upvoteFeatureRequest(userId, orgId, featureRequestId);
-    } else if (vote === -1) {
-      await this.downvoteFeatureRequest(userId, orgId, featureRequestId);
-    }
+  async getVotes(userId: string, orgId: string) {
+    const votes = await this.featureRequestVoteRepository.find({
+      where: {
+        user: { id: userId },
+        featureRequest: {
+          org: { id: orgId },
+        },
+      },
+    });
+
+    return votes.map((vote) => ({
+      id: vote.id,
+      vote: vote.vote,
+      createdAt: vote.createdAt,
+    }));
   }
 }

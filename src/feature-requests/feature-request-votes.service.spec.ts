@@ -212,8 +212,8 @@ describe('FeatureRequestVotesService', () => {
       );
     });
   });
-  describe('when voting on a feature request', () => {
-    it('should upvote the feature request', async () => {
+  describe('when getting my votes', () => {
+    it('should return my votes', async () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
@@ -224,55 +224,17 @@ describe('FeatureRequestVotesService', () => {
       );
 
       await service.upvoteFeatureRequest(user.id, org.id, featureRequest.id);
-
-      await service.voteOnFeatureRequest(user.id, org.id, featureRequest.id, 1);
-
-      const featureRequestVote =
-        await featureRequestVotesRepository.findOneByOrFail({
-          user: { id: user.id },
-          featureRequest: { id: featureRequest.id },
-        });
-
-      const updatedFeatureRequest =
-        await featureRequestService.getFeatureRequestById(
-          org.id,
-          featureRequest.id,
-        );
-      expect(featureRequestVote.vote).toEqual(1);
-      expect(updatedFeatureRequest.votesCount).toEqual(2);
-    });
-    it('should downvote the feature request', async () => {
-      const featureRequest = await featureRequestService.addFeatureRequest(
-        user.id,
-        org.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
-
       await service.downvoteFeatureRequest(user.id, org.id, featureRequest.id);
 
-      await service.voteOnFeatureRequest(
-        user.id,
-        org.id,
-        featureRequest.id,
-        -1,
-      );
+      const votes = await service.getVotes(user.id, org.id);
 
-      const featureRequestVote =
-        await featureRequestVotesRepository.findOneByOrFail({
-          user: { id: user.id },
-          featureRequest: { id: featureRequest.id },
-        });
+      expect(votes.length).toEqual(1);
+      expect(votes[0].vote).toEqual(-1);
+    });
+    it('should return an empty array if there are no votes', async () => {
+      const votes = await service.getVotes(user.id, org.id);
 
-      const updatedFeatureRequest =
-        await featureRequestService.getFeatureRequestById(
-          org.id,
-          featureRequest.id,
-        );
-      expect(featureRequestVote.vote).toEqual(-1);
-      expect(updatedFeatureRequest.votesCount).toEqual(0);
+      expect(votes.length).toEqual(0);
     });
   });
 });
