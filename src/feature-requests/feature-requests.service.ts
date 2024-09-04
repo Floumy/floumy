@@ -12,6 +12,7 @@ import { Org } from '../orgs/org.entity';
 import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequestsMapper } from './feature-requests.mapper';
 import { FeatureRequestStatus } from './feature-request-status.enum';
+import { FeatureRequestVote } from './feature-request-vote.entity';
 
 @Injectable()
 export class FeatureRequestsService {
@@ -22,6 +23,8 @@ export class FeatureRequestsService {
     private usersRepository: Repository<User>,
     @InjectRepository(Org)
     private orgsRepository: Repository<Org>,
+    @InjectRepository(FeatureRequestVote)
+    private featureRequestVotesRepository: Repository<FeatureRequestVote>,
   ) {}
 
   async addFeatureRequest(
@@ -42,10 +45,17 @@ export class FeatureRequestsService {
     featureRequest.description = createFeatureRequestDto.description;
     featureRequest.createdBy = Promise.resolve(user);
     featureRequest.org = Promise.resolve(org);
-
-    const savedFeature =
+    featureRequest.votesCount = 1;
+    const savedFeatureRequest =
       await this.featureRequestRepository.save(featureRequest);
-    return await FeatureRequestsMapper.toFeatureRequestDto(savedFeature);
+
+    const featureRequestVote = new FeatureRequestVote();
+    featureRequestVote.user = Promise.resolve(user);
+    featureRequestVote.featureRequest = Promise.resolve(savedFeatureRequest);
+    featureRequestVote.vote = 1;
+    await this.featureRequestVotesRepository.save(featureRequestVote);
+
+    return await FeatureRequestsMapper.toFeatureRequestDto(savedFeatureRequest);
   }
 
   async listFeatureRequests(

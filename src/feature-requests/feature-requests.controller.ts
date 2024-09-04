@@ -15,10 +15,14 @@ import { CreateFeatureRequestDto, UpdateFeatureRequestDto } from './dtos';
 import { FeatureRequestsService } from './feature-requests.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Public } from '../auth/public.guard';
+import { FeatureRequestVoteService } from './feature-request-votes.service';
 
 @Controller('orgs/:orgId/feature-requests')
 export class FeatureRequestsController {
-  constructor(private featureRequestsService: FeatureRequestsService) {}
+  constructor(
+    private featureRequestsService: FeatureRequestsService,
+    private featureRequestVoteService: FeatureRequestVoteService,
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard)
@@ -101,6 +105,42 @@ export class FeatureRequestsController {
   ) {
     try {
       return await this.featureRequestsService.deleteFeatureRequest(
+        request.user.sub,
+        orgId,
+        featureRequestId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Post(':featureRequestId/upvote')
+  @UseGuards(AuthGuard)
+  async upvoteFeatureRequest(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('featureRequestId') featureRequestId: string,
+  ) {
+    try {
+      return await this.featureRequestVoteService.upvoteFeatureRequest(
+        request.user.sub,
+        orgId,
+        featureRequestId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Post(':featureRequestId/downvote')
+  @UseGuards(AuthGuard)
+  async downvoteFeatureRequest(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('featureRequestId') featureRequestId: string,
+  ) {
+    try {
+      return await this.featureRequestVoteService.downvoteFeatureRequest(
         request.user.sub,
         orgId,
         featureRequestId,
