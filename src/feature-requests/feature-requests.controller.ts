@@ -149,4 +149,17 @@ export class FeatureRequestsController {
       throw new BadRequestException(e.message);
     }
   }
+
+  @Get('my-votes')
+  @UseGuards(AuthGuard)
+  async getMyVotes(@Request() request, @Param('orgId') orgId: string) {
+    try {
+      return await this.featureRequestVoteService.getVotes(
+        request.user.sub,
+        orgId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }
