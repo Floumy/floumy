@@ -112,10 +112,16 @@ export class FeatureRequestVoteService {
       },
     });
 
-    return votes.map((vote) => ({
-      id: vote.id,
-      vote: vote.vote,
-      createdAt: vote.createdAt,
-    }));
+    return await Promise.all(
+      votes.map(async (vote) => {
+        const featureRequest = await vote.featureRequest;
+        return {
+          id: vote.id,
+          featureRequestId: featureRequest.id,
+          vote: vote.vote,
+          createdAt: vote.createdAt,
+        };
+      }),
+    );
   }
 }
