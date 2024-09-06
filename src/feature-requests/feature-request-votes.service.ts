@@ -117,7 +117,9 @@ export class FeatureRequestVoteService {
         const featureRequest = await vote.featureRequest;
         return {
           id: vote.id,
-          featureRequestId: featureRequest.id,
+          featureRequest: {
+            id: featureRequest.id,
+          },
           vote: vote.vote,
           createdAt: vote.createdAt,
         };
