@@ -73,7 +73,7 @@ export class FeatureRequestsService {
       where: { org: { id: orgId } },
       take: limit,
       skip: (page - 1) * limit,
-      order: { createdAt: 'DESC' },
+      order: { votesCount: 'DESC', createdAt: 'DESC' },
     });
 
     return Promise.all(
