@@ -16,6 +16,7 @@ import { FeatureRequestsService } from './feature-requests.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Public } from '../auth/public.guard';
 import { FeatureRequestVoteService } from './feature-request-votes.service';
+import { CreateUpdateCommentDto } from '../comments/dtos';
 
 @Controller('orgs/:orgId/feature-requests')
 export class FeatureRequestsController {
@@ -157,6 +158,56 @@ export class FeatureRequestsController {
         request.user.sub,
         orgId,
         featureRequestId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get(':featureRequestId/comments')
+  @Public()
+  async listFeatureRequestComments(
+    @Param('featureRequestId') featureRequestId: string,
+  ) {
+    try {
+      return await this.featureRequestsService.listFeatureRequestComments(
+        featureRequestId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Post(':featureRequestId/comments')
+  @UseGuards(AuthGuard)
+  async addFeatureRequestComment(
+    @Request() request,
+    @Param('featureRequestId') featureRequestId: string,
+    @Body() createCommentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.featureRequestsService.createFeatureRequestComment(
+        request.user.sub,
+        featureRequestId,
+        createCommentDto,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete(':featureRequestId/comments/:commentId')
+  @UseGuards(AuthGuard)
+  async deleteFeatureRequestComment(
+    @Request() request,
+    @Param('featureRequestId') featureRequestId: string,
+    @Param('commentId') commentId: string,
+  ) {
+    try {
+      return await this.featureRequestsService.deleteFeatureRequestComment(
+        request.user.sub,
+        featureRequestId,
+        commentId,
       );
     } catch (e) {
       throw new BadRequestException(e.message);

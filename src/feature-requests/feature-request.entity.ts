@@ -11,6 +11,7 @@ import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { FeatureRequestVote } from './feature-request-vote.entity';
+import { FeatureRequestComment } from './feature-request-comment.entity';
 
 @Entity()
 export class FeatureRequest {
@@ -56,4 +57,10 @@ export class FeatureRequest {
   createdBy: Promise<User>;
   @ManyToOne(() => Org, (org) => org.featureRequests, { lazy: false })
   org: Promise<Org>;
+  @OneToMany(() => FeatureRequestComment, (comment) => comment.featureRequest, {
+    lazy: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  comments: Promise<FeatureRequestComment[]>;
 }

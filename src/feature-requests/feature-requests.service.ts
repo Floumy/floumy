@@ -13,18 +13,23 @@ import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequestsMapper } from './feature-requests.mapper';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { FeatureRequestVote } from './feature-request-vote.entity';
+import { CommentMapper } from '../comments/mappers';
+import { CreateUpdateCommentDto } from '../comments/dtos';
+import { FeatureRequestComment } from './feature-request-comment.entity';
 
 @Injectable()
 export class FeatureRequestsService {
   constructor(
     @InjectRepository(FeatureRequest)
-    private featureRequestRepository: Repository<FeatureRequest>,
+    private featureRequestsRepository: Repository<FeatureRequest>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     @InjectRepository(Org)
     private orgsRepository: Repository<Org>,
     @InjectRepository(FeatureRequestVote)
     private featureRequestVotesRepository: Repository<FeatureRequestVote>,
+    @InjectRepository(FeatureRequestComment)
+    private featureRequestCommentsRepository: Repository<FeatureRequestComment>,
   ) {}
 
   async addFeatureRequest(
@@ -47,7 +52,7 @@ export class FeatureRequestsService {
     featureRequest.org = Promise.resolve(org);
     featureRequest.votesCount = 1;
     const savedFeatureRequest =
-      await this.featureRequestRepository.save(featureRequest);
+      await this.featureRequestsRepository.save(featureRequest);
 
     const featureRequestVote = new FeatureRequestVote();
     featureRequestVote.user = Promise.resolve(user);
@@ -69,7 +74,7 @@ export class FeatureRequestsService {
       throw new Error('You need to upgrade your plan to view feature requests');
     }
 
-    const featureRequests = await this.featureRequestRepository.find({
+    const featureRequests = await this.featureRequestsRepository.find({
       where: { org: { id: orgId } },
       take: limit,
       skip: (page - 1) * limit,
@@ -91,7 +96,7 @@ export class FeatureRequestsService {
       throw new Error('You need to upgrade your plan to view feature requests');
     }
 
-    const featureRequest = await this.featureRequestRepository.findOneOrFail({
+    const featureRequest = await this.featureRequestsRepository.findOneOrFail({
       where: {
         id: featureRequestId,
         org: { id: orgId },
@@ -113,7 +118,7 @@ export class FeatureRequestsService {
       );
     }
 
-    const featureRequest = await this.featureRequestRepository.findOneOrFail({
+    const featureRequest = await this.featureRequestsRepository.findOneOrFail({
       where: {
         id: featureRequestId,
         org: { id: orgId },
@@ -137,7 +142,7 @@ export class FeatureRequestsService {
     }
 
     const savedFeature =
-      await this.featureRequestRepository.save(featureRequest);
+      await this.featureRequestsRepository.save(featureRequest);
     return await FeatureRequestsMapper.toFeatureRequestDto(savedFeature);
   }
 
@@ -153,7 +158,7 @@ export class FeatureRequestsService {
       );
     }
 
-    const featureRequest = await this.featureRequestRepository.findOneOrFail({
+    const featureRequest = await this.featureRequestsRepository.findOneOrFail({
       where: {
         id: featureRequestId,
         org: { id: orgId },
@@ -167,6 +172,94 @@ export class FeatureRequestsService {
       throw new Error('You are not allowed to delete this feature request');
     }
 
-    await this.featureRequestRepository.remove(featureRequest);
+    await this.featureRequestsRepository.remove(featureRequest);
+  }
+
+  async listFeatureRequestComments(featureRequestId: string) {
+    const featureRequest = await this.featureRequestsRepository.findOneByOrFail(
+      {
+        id: featureRequestId,
+      },
+    );
+    const org = await featureRequest.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to access comments');
+    }
+    const comments = await featureRequest.comments;
+    return await CommentMapper.toDtoList(comments);
+  }
+
+  async createFeatureRequestComment(
+    userId: string,
+    featureRequestId: string,
+    createCommentDto: CreateUpdateCommentDto,
+  ) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    const featureRequest = await this.featureRequestsRepository.findOneByOrFail(
+      {
+        id: featureRequestId,
+      },
+    );
+    const org = await featureRequest.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to add comments');
+    }
+    if (!createCommentDto.content || createCommentDto.content.trim() === '') {
+      throw new Error('Comment content is required');
+    }
+    const comment = new FeatureRequestComment();
+    comment.content = createCommentDto.content;
+    comment.createdBy = Promise.resolve(user);
+    comment.org = Promise.resolve(org);
+    comment.featureRequest = Promise.resolve(featureRequest);
+    const savedComment =
+      await this.featureRequestCommentsRepository.save(comment);
+    return CommentMapper.toDto(savedComment);
+  }
+
+  async deleteFeatureRequestComment(
+    userId: string,
+    featureRequestId: string,
+    commentId: string,
+  ) {
+    const comment = await this.featureRequestCommentsRepository.findOneByOrFail(
+      {
+        id: commentId,
+        featureRequest: { id: featureRequestId },
+        createdBy: { id: userId },
+      },
+    );
+    await this.featureRequestCommentsRepository.remove(comment);
+  }
+
+  async updateFeatureRequestComment(
+    userId: string,
+    featureRequestId: string,
+    commentId: string,
+    createCommentDto: CreateUpdateCommentDto,
+  ) {
+    const featureRequest = await this.featureRequestsRepository.findOneByOrFail(
+      {
+        id: featureRequestId,
+      },
+    );
+    const org = await featureRequest.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to add comments');
+    }
+    if (!createCommentDto.content || createCommentDto.content.trim() === '') {
+      throw new Error('Comment content is required');
+    }
+    const comment = await this.featureRequestCommentsRepository.findOneByOrFail(
+      {
+        id: commentId,
+        featureRequest: { id: featureRequestId },
+        createdBy: { id: userId },
+      },
+    );
+    comment.content = createCommentDto.content;
+    const savedComment =
+      await this.featureRequestCommentsRepository.save(comment);
+    return await CommentMapper.toDto(savedComment);
   }
 }
