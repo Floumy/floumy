@@ -231,4 +231,107 @@ describe('FeatureRequestsController', () => {
       expect(featureRequest.votesCount).toEqual(0);
     });
   });
+  describe('when adding a comment', () => {
+    it('should add a comment', async () => {
+      const createFeatureRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      const { id } = await controller.addFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        createFeatureRequestDto,
+      );
+      const comment = await controller.addFeatureRequestComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        id,
+        {
+          content: 'Test Comment',
+        },
+      );
+      expect(comment).toBeDefined();
+      expect(comment.createdBy.id).toEqual(user.id);
+      expect(comment.content).toEqual('Test Comment');
+    });
+  });
+  describe('when listing comments', () => {
+    it('should return the list of comments', async () => {
+      const createFeatureRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      const { id } = await controller.addFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        createFeatureRequestDto,
+      );
+      await controller.addFeatureRequestComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        id,
+        {
+          content: 'Test Comment',
+        },
+      );
+      const comments = await controller.listFeatureRequestComments(id);
+      expect(comments).toBeDefined();
+      expect(comments.length).toEqual(1);
+      expect(comments[0].content).toEqual('Test Comment');
+    });
+  });
+  describe('when deleting a comment', () => {
+    it('should delete the comment', async () => {
+      const createFeatureRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      const { id } = await controller.addFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        createFeatureRequestDto,
+      );
+      const comment = await controller.addFeatureRequestComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        id,
+        {
+          content: 'Test Comment',
+        },
+      );
+      await controller.deleteFeatureRequestComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        id,
+        comment.id,
+      );
+      const comments = await controller.listFeatureRequestComments(id);
+      expect(comments).toBeDefined();
+      expect(comments.length).toEqual(0);
+    });
+  });
 });

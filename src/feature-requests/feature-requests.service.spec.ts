@@ -11,6 +11,7 @@ import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { uuid } from 'uuidv4';
 import { FeatureRequestVote } from './feature-request-vote.entity';
+import { FeatureRequestComment } from './feature-request-comment.entity';
 
 describe('FeatureRequestsService', () => {
   let usersService: UsersService;
@@ -28,9 +29,9 @@ describe('FeatureRequestsService', () => {
         TypeOrmModule.forFeature([
           Org,
           User,
-          FeatureRequestsService,
           FeatureRequest,
           FeatureRequestVote,
+          FeatureRequestComment,
         ]),
       ],
       [FeatureRequestsService, UsersService, OrgsService],
@@ -322,5 +323,104 @@ describe('FeatureRequestsService', () => {
     ).rejects.toThrow(
       'You need to upgrade your plan to delete a feature request',
     );
+  });
+  describe('when listing feature request comments', () => {
+    it('should return the list of comments of the feature request', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+      await service.createFeatureRequestComment(user.id, featureRequest.id, {
+        content: 'Test Comment',
+      });
+      const comments = await service.listFeatureRequestComments(
+        featureRequest.id,
+      );
+      expect(comments).toHaveLength(1);
+      expect(comments[0].content).toEqual('Test Comment');
+    });
+    it('should throw an error if the org is not premium', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+      org.paymentPlan = PaymentPlan.FREE;
+      await orgsRepository.save(org);
+      await expect(
+        service.listFeatureRequestComments(featureRequest.id),
+      ).rejects.toThrowError(
+        'You need to upgrade to premium to access comments',
+      );
+    });
+  });
+  describe('when adding a comment to a feature request', () => {
+    it('should add a comment to the feature request', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+      const comment = await service.createFeatureRequestComment(
+        user.id,
+        featureRequest.id,
+        {
+          content: 'Test Comment',
+        },
+      );
+      expect(comment).toBeDefined();
+      expect((await comment.createdBy).id).toEqual(user.id);
+      expect(comment.content).toEqual('Test Comment');
+    });
+  });
+  describe('when updating a comment for a feature request', () => {
+    it('should update the comment', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+      const comment = await service.createFeatureRequestComment(
+        user.id,
+        featureRequest.id,
+        {
+          content: 'Test Comment',
+        },
+      );
+      const updatedComment = await service.updateFeatureRequestComment(
+        user.id,
+        featureRequest.id,
+        comment.id,
+        {
+          content: 'Updated Comment',
+        },
+      );
+      expect(updatedComment).toBeDefined();
+      expect(updatedComment.id).toEqual(comment.id);
+      expect(updatedComment.content).toEqual('Updated Comment');
+    });
+  });
+  describe('when deleting a comment for a feature request', () => {
+    it('should delete the comment', async () => {
+      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
+      const comment = await service.createFeatureRequestComment(
+        user.id,
+        featureRequest.id,
+        {
+          content: 'Test Comment',
+        },
+      );
+      await service.deleteFeatureRequestComment(
+        user.id,
+        featureRequest.id,
+        comment.id,
+      );
+      const result = await service.listFeatureRequestComments(
+        featureRequest.id,
+      );
+      expect(result).toHaveLength(0);
+    });
   });
 });

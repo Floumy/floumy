@@ -9,10 +9,17 @@ import { AuthModule } from '../auth/auth.module';
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestVoteService } from './feature-request-votes.service';
 import { FeatureRequestVote } from './feature-request-vote.entity';
+import { FeatureRequestComment } from './feature-request-comment.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Org, FeatureRequest, FeatureRequestVote]),
+    TypeOrmModule.forFeature([
+      User,
+      Org,
+      FeatureRequest,
+      FeatureRequestVote,
+      FeatureRequestComment,
+    ]),
     OrgsModule,
     AuthModule,
   ],
