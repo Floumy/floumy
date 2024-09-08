@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { KeyResult } from '../key-result.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -35,10 +34,6 @@ export class CommentsService {
 
     const org = await keyResult.org;
 
-    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
-
     if (!content || content.trim() === '') {
       throw new Error('Comment content is required');
     }
@@ -66,12 +61,6 @@ export class CommentsService {
       createdBy: { id: userId },
     });
 
-    const org = await comment.org;
-
-    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to update comments');
-    }
-
     if (!content || content.trim() === '') {
       throw new Error('Comment content is required');
     }
@@ -89,12 +78,6 @@ export class CommentsService {
       createdBy: { id: userId },
     });
 
-    const org = await comment.org;
-
-    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to delete comments');
-    }
-
     await this.keyResultCommentRepository.remove(comment);
   }
 
@@ -108,10 +91,6 @@ export class CommentsService {
     });
 
     const org = await objective.org;
-
-    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
 
     if (!content || content.trim() === '') {
       throw new Error('Comment content is required');
@@ -140,12 +119,6 @@ export class CommentsService {
       createdBy: { id: userId },
     });
 
-    const org = await comment.org;
-
-    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to update comments');
-    }
-
     if (!content || content.trim() === '') {
       throw new Error('Comment content is required');
     }
@@ -162,12 +135,6 @@ export class CommentsService {
       id: commentId,
       createdBy: { id: userId },
     });
-
-    const org = await comment.org;
-
-    if (org?.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to delete comments');
-    }
 
     await this.objectiveCommentRepository.remove(comment);
   }

@@ -1,4 +1,3 @@
-import { PaymentPlan } from '../../../auth/payment.plan';
 import { CommentMapper } from '../../../comments/mappers';
 
 export class PublicWorkItemMapper {
@@ -6,10 +5,8 @@ export class PublicWorkItemMapper {
     const feature = await workItem.feature;
     const iteration = await workItem.iteration;
     const org = await workItem.org;
-    let comments = [];
-    if (org && org.paymentPlan === PaymentPlan.PREMIUM) {
-      comments = await workItem.comments;
-    }
+    const comments = await workItem.comments;
+
     return {
       id: workItem.id,
       reference: `WI-${workItem.sequenceNumber}`,

@@ -164,20 +164,6 @@ export class FeatureRequestsController {
     }
   }
 
-  @Get(':featureRequestId/comments')
-  @Public()
-  async listFeatureRequestComments(
-    @Param('featureRequestId') featureRequestId: string,
-  ) {
-    try {
-      return await this.featureRequestsService.listFeatureRequestComments(
-        featureRequestId,
-      );
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
-  }
-
   @Post(':featureRequestId/comments')
   @UseGuards(AuthGuard)
   async addFeatureRequestComment(
@@ -190,6 +176,26 @@ export class FeatureRequestsController {
         request.user.sub,
         featureRequestId,
         createCommentDto,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Put(':featureRequestId/comments/:commentId')
+  @UseGuards(AuthGuard)
+  async updateFeatureRequestComment(
+    @Request() request,
+    @Param('featureRequestId') featureRequestId: string,
+    @Param('commentId') commentId: string,
+    @Body() updateCommentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.featureRequestsService.updateFeatureRequestComment(
+        request.user.sub,
+        featureRequestId,
+        commentId,
+        updateCommentDto,
       );
     } catch (e) {
       throw new BadRequestException(e.message);

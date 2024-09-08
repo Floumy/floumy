@@ -2,17 +2,12 @@ import { Milestone } from '../../milestones/milestone.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
 import { Feature } from '../feature.entity';
-import { PaymentPlan } from '../../../auth/payment.plan';
 import { CommentMapper } from '../../../comments/mappers';
 
 export class FeatureMapper {
   static async toDto(feature: Feature) {
     const workItems = (await feature.workItems) || [];
-    const org = await feature.org;
-    let comments = [];
-    if (org.paymentPlan === PaymentPlan.PREMIUM) {
-      comments = await feature.comments;
-    }
+    const comments = await feature.comments;
 
     return {
       id: feature.id,

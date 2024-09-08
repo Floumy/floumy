@@ -1323,21 +1323,6 @@ describe('WorkItemsService', () => {
       expect(comments[0].content).toEqual('my comment 1');
       expect(comments[1].content).toEqual('my comment 2');
     });
-    it('should throw an error if the org is not premium', async () => {
-      const workItem = await service.createWorkItem(user.id, {
-        title: 'Test title',
-        description: 'A test description',
-        priority: Priority.HIGH,
-        type: WorkItemType.BUG,
-        status: WorkItemStatus.PLANNED,
-      });
-
-      await expect(
-        service.listWorkItemComments(workItem.id),
-      ).rejects.toThrowError(
-        'You need to upgrade to premium to access comments',
-      );
-    });
   });
   describe('when deleting a work item comment', () => {
     it('should delete the work item comment', async () => {

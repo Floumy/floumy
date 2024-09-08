@@ -1,6 +1,5 @@
 import { Feature } from './feature.entity';
 import { FeatureDto, FeaturesListDto } from './dtos';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { CommentMapper } from '../../comments/mappers';
 
 export class FeatureMapper {
@@ -8,11 +7,7 @@ export class FeatureMapper {
     const createdBy = await feature.createdBy;
     const assignedTo = await feature.assignedTo;
     const org = await feature.org;
-
-    let comments = [];
-    if (org.paymentPlan === PaymentPlan.PREMIUM) {
-      comments = await feature.comments;
-    }
+    const comments = await feature.comments;
 
     const featureDto = {
       id: feature.id,

@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { FeatureRequestStatus } from './feature-request-status.enum';
+import { CommentDto } from '../comments/dtos';
 
 export class CreateFeatureRequestDto {
   @IsNotEmpty()
@@ -45,4 +46,5 @@ export interface FeatureRequestDto {
   completedAt: Date;
   createdAt: Date;
   updatedAt: Date;
+  comments: CommentDto[];
 }

@@ -175,20 +175,6 @@ export class FeatureRequestsService {
     await this.featureRequestsRepository.remove(featureRequest);
   }
 
-  async listFeatureRequestComments(featureRequestId: string) {
-    const featureRequest = await this.featureRequestsRepository.findOneByOrFail(
-      {
-        id: featureRequestId,
-      },
-    );
-    const org = await featureRequest.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to access comments');
-    }
-    const comments = await featureRequest.comments;
-    return await CommentMapper.toDtoList(comments);
-  }
-
   async createFeatureRequestComment(
     userId: string,
     featureRequestId: string,

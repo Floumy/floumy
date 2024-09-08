@@ -324,37 +324,6 @@ describe('FeatureRequestsService', () => {
       'You need to upgrade your plan to delete a feature request',
     );
   });
-  describe('when listing feature request comments', () => {
-    it('should return the list of comments of the feature request', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
-      await orgsRepository.save(org);
-      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
-        title: 'Test Feature Request',
-        description: 'Test Description',
-      });
-      await service.createFeatureRequestComment(user.id, featureRequest.id, {
-        content: 'Test Comment',
-      });
-      const comments = await service.listFeatureRequestComments(
-        featureRequest.id,
-      );
-      expect(comments).toHaveLength(1);
-      expect(comments[0].content).toEqual('Test Comment');
-    });
-    it('should throw an error if the org is not premium', async () => {
-      const featureRequest = await service.addFeatureRequest(user.id, org.id, {
-        title: 'Test Feature Request',
-        description: 'Test Description',
-      });
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-      await expect(
-        service.listFeatureRequestComments(featureRequest.id),
-      ).rejects.toThrowError(
-        'You need to upgrade to premium to access comments',
-      );
-    });
-  });
   describe('when adding a comment to a feature request', () => {
     it('should add a comment to the feature request', async () => {
       const featureRequest = await service.addFeatureRequest(user.id, org.id, {
@@ -417,10 +386,11 @@ describe('FeatureRequestsService', () => {
         featureRequest.id,
         comment.id,
       );
-      const result = await service.listFeatureRequestComments(
+      const result = await service.getFeatureRequestById(
+        org.id,
         featureRequest.id,
       );
-      expect(result).toHaveLength(0);
+      expect(result.comments).toHaveLength(0);
     });
   });
 });

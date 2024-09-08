@@ -2,7 +2,6 @@ import { KeyResult } from './key-result.entity';
 import { Objective } from './objective.entity';
 import { TimelineService } from '../common/timeline.service';
 import { FeatureDto, KeyResultDto, OKRDto } from './dtos';
-import { PaymentPlan } from '../auth/payment.plan';
 import { CommentMapper } from '../comments/mappers';
 
 export class OKRMapper {
@@ -44,12 +43,7 @@ export class OKRMapper {
 
   static async toDTOWithComments(objective, keyResults) {
     const dto = await OKRMapper.toDTO(objective, keyResults);
-    const org = await objective.org;
-
-    let comments = [];
-    if (org.paymentPlan === PaymentPlan.PREMIUM) {
-      comments = await objective.comments;
-    }
+    const comments = await objective.comments;
 
     return {
       objective: {
@@ -157,12 +151,7 @@ export class KeyResultMapper {
 
   static async toDtoWithComments(keyResult) {
     const dto = await KeyResultMapper.toDTO(keyResult);
-    const org = await keyResult.org;
-
-    let comments = [];
-    if (org.paymentPlan === PaymentPlan.PREMIUM) {
-      comments = await keyResult.comments;
-    }
+    const comments = await keyResult.comments;
 
     return {
       ...dto,
