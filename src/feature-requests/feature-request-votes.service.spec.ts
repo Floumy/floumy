@@ -11,6 +11,7 @@ import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestVoteService } from './feature-request-votes.service';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { uuid } from 'uuidv4';
+import { FeatureRequestComment } from './feature-request-comment.entity';
 
 describe('FeatureRequestVotesService', () => {
   let usersService: UsersService;
@@ -33,6 +34,7 @@ describe('FeatureRequestVotesService', () => {
           FeatureRequestsService,
           FeatureRequestVote,
           FeatureRequest,
+          FeatureRequestComment,
         ]),
       ],
       [

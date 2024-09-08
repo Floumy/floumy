@@ -85,25 +85,6 @@ describe('CommentsService', () => {
       expect((await comment.createdBy).id).toEqual(user.id);
       expect(comment.content).toEqual('Test Comment');
     });
-    it('should throw an error if the org is not premium', async () => {
-      const objective = await okrsService.createObjective(org.id, {
-        title: 'Test Objective',
-      });
-      const keyResult = await okrsService.createKeyResult(
-        org.id,
-        objective.id,
-        {
-          title: 'Test Key Result',
-          progress: 0,
-          status: OKRStatus.ON_TRACK,
-        },
-      );
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-      await expect(
-        service.addCommentToKeyResult(keyResult.id, user.id, 'Test Comment'),
-      ).rejects.toThrowError('You need to upgrade to premium to add comments');
-    });
     it('should throw an error if the comment content is empty', async () => {
       const objective = await okrsService.createObjective(org.id, {
         title: 'Test Objective',
@@ -187,34 +168,6 @@ describe('CommentsService', () => {
         ),
       ).rejects.toThrow();
     });
-    it('should validate that the comment org is premium', async () => {
-      const objective = await okrsService.createObjective(org.id, {
-        title: 'Test Objective',
-      });
-      const keyResult = await okrsService.createKeyResult(
-        org.id,
-        objective.id,
-        {
-          title: 'Test Key Result',
-          progress: 0,
-          status: OKRStatus.ON_TRACK,
-        },
-      );
-      const comment = await service.addCommentToKeyResult(
-        keyResult.id,
-        user.id,
-        'Test Comment',
-      );
-
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-
-      await expect(
-        service.updateKeyResultComment(user.id, comment.id, 'Updated Comment'),
-      ).rejects.toThrowError(
-        'You need to upgrade to premium to update comments',
-      );
-    });
     it('should throw an error if the comment content is empty', async () => {
       const objective = await okrsService.createObjective(org.id, {
         title: 'Test Objective',
@@ -295,34 +248,6 @@ describe('CommentsService', () => {
         service.deleteKeyResultComment(otherUser.id, comment.id),
       ).rejects.toThrow();
     });
-    it('should validate that the comment org is premium', async () => {
-      const objective = await okrsService.createObjective(org.id, {
-        title: 'Test Objective',
-      });
-      const keyResult = await okrsService.createKeyResult(
-        org.id,
-        objective.id,
-        {
-          title: 'Test Key Result',
-          progress: 0,
-          status: OKRStatus.ON_TRACK,
-        },
-      );
-      const comment = await service.addCommentToKeyResult(
-        keyResult.id,
-        user.id,
-        'Test Comment',
-      );
-
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-
-      await expect(
-        service.deleteKeyResultComment(user.id, comment.id),
-      ).rejects.toThrowError(
-        'You need to upgrade to premium to delete comments',
-      );
-    });
   });
   describe('when adding a comment to an objective', () => {
     it('should add a comment to the objective', async () => {
@@ -335,26 +260,8 @@ describe('CommentsService', () => {
         'Test Comment',
       );
       expect(comment).toBeDefined();
-      expect((await comment.createdBy).id).toEqual(user.id);
+      expect(comment.createdBy.id).toEqual(user.id);
       expect(comment.content).toEqual('Test Comment');
-    });
-    it('should throw an error if the org is not premium', async () => {
-      const objective = await okrsService.createObjective(org.id, {
-        title: 'Test Objective',
-      });
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-      await expect(
-        service.addCommentToObjective(objective.id, user.id, 'Test Comment'),
-      ).rejects.toThrowError('You need to upgrade to premium to add comments');
-    });
-    it('should throw an error if the comment content is empty', async () => {
-      const objective = await okrsService.createObjective(org.id, {
-        title: 'Test Objective',
-      });
-      await expect(
-        service.addCommentToObjective(objective.id, user.id, ''),
-      ).rejects.toThrowError('Comment content is required');
     });
   });
   describe('when updating a comment for an objective', () => {

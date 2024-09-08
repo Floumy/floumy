@@ -1,5 +1,6 @@
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestDto } from './dtos';
+import { CommentMapper } from '../comments/mappers';
 
 export class FeatureRequestsMapper {
   static async toFeatureRequestDto(
@@ -7,6 +8,8 @@ export class FeatureRequestsMapper {
   ): Promise<FeatureRequestDto> {
     const org = await featureRequest.org;
     const createdBy = await featureRequest.createdBy;
+    const comments = await featureRequest.comments;
+
     return {
       id: featureRequest.id,
       title: featureRequest.title,
@@ -25,6 +28,7 @@ export class FeatureRequestsMapper {
       completedAt: featureRequest.completedAt,
       createdAt: featureRequest.createdAt,
       updatedAt: featureRequest.updatedAt,
+      comments: await CommentMapper.toDtoList(comments),
     };
   }
 }

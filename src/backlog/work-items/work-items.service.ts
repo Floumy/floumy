@@ -209,10 +209,6 @@ export class WorkItemsService {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id: workItemId,
     });
-    const org = await workItem.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to access comments');
-    }
     const comments = await workItem.comments;
     return await CommentMapper.toDtoList(comments);
   }

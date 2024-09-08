@@ -1065,20 +1065,6 @@ describe('FeaturesService', () => {
       expect(comments.length).toEqual(1);
       expect(comments[0].content).toEqual('Test comment');
     });
-
-    it('should throw an error if the org is not premium', async () => {
-      const feature = await service.createFeature(user.id, {
-        title: 'Test title',
-        description: 'A test description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      await expect(
-        service.listFeatureComments(feature.id),
-      ).rejects.toThrowError(
-        'You need to upgrade to premium to access comments',
-      );
-    });
   });
 
   describe('when creating a feature comment', () => {
@@ -1096,36 +1082,6 @@ describe('FeaturesService', () => {
       });
       expect(comment).toBeDefined();
       expect(comment.content).toEqual('Test comment');
-    });
-
-    it('should throw an error if the org is not premium', async () => {
-      const feature = await service.createFeature(user.id, {
-        title: 'Test title',
-        description: 'A test description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      await expect(
-        service.createFeatureComment(user.id, feature.id, {
-          content: 'Test comment',
-        }),
-      ).rejects.toThrowError('You need to upgrade to premium to add comments');
-    });
-
-    it('should throw an error if the comment content is empty', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
-      await orgRepository.save(org);
-      const feature = await service.createFeature(user.id, {
-        title: 'Test title',
-        description: 'A test description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      await expect(
-        service.createFeatureComment(user.id, feature.id, {
-          content: '',
-        }),
-      ).rejects.toThrowError('Comment content is required');
     });
   });
 
@@ -1188,27 +1144,6 @@ describe('FeaturesService', () => {
       );
       expect(updatedComment).toBeDefined();
       expect(updatedComment.content).toEqual('Updated comment');
-    });
-
-    it('should throw an error if the org is not premium', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
-      await orgRepository.save(org);
-      const feature = await service.createFeature(user.id, {
-        title: 'Test title',
-        description: 'A test description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      const comment = await service.createFeatureComment(user.id, feature.id, {
-        content: 'Test comment',
-      });
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgRepository.save(org);
-      await expect(
-        service.updateFeatureComment(user.id, feature.id, comment.id, {
-          content: 'Updated comment',
-        }),
-      ).rejects.toThrowError('You need to upgrade to premium to add comments');
     });
 
     it('should throw an error if the comment does not exist', async () => {

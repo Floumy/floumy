@@ -14,7 +14,6 @@ import { User } from '../../users/user.entity';
 import { FilesService } from '../../files/files.service';
 import { Org } from '../../orgs/org.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { CommentMapper } from '../../comments/mappers';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { FeatureComment } from './feature-comment.entity';
@@ -214,10 +213,7 @@ export class FeaturesService {
     const feature = await this.featuresRepository.findOneByOrFail({
       id: featureId,
     });
-    const org = await feature.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to access comments');
-    }
+
     const comments = await feature.comments;
     return await CommentMapper.toDtoList(comments);
   }
@@ -231,10 +227,9 @@ export class FeaturesService {
     const feature = await this.featuresRepository.findOneByOrFail({
       id: featureId,
     });
+
     const org = await feature.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
+
     if (!createCommentDto.content || createCommentDto.content.trim() === '') {
       throw new Error('Comment content is required');
     }
@@ -266,13 +261,6 @@ export class FeaturesService {
     commentId: string,
     createCommentDto: CreateUpdateCommentDto,
   ) {
-    const feature = await this.featuresRepository.findOneByOrFail({
-      id: featureId,
-    });
-    const org = await feature.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
     if (!createCommentDto.content || createCommentDto.content.trim() === '') {
       throw new Error('Comment content is required');
     }

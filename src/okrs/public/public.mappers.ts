@@ -4,7 +4,6 @@ import { TimelineService } from '../../common/timeline.service';
 import { KeyResult } from '../key-result.entity';
 import { Feature } from '../../roadmap/features/feature.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { CommentMapper } from '../../comments/mappers';
 
 export class PublicOkrMapper {
@@ -26,11 +25,7 @@ export class PublicOkrMapper {
 
   static async toDetailDto(objective: Objective, keyResults: KeyResult[]) {
     const org = await objective.org;
-
-    let comments = [];
-    if (org?.paymentPlan === PaymentPlan.PREMIUM) {
-      comments = await objective.comments;
-    }
+    const comments = await objective.comments;
 
     return {
       objective: {
@@ -57,12 +52,7 @@ export class PublicOkrMapper {
 
   static async toKeyResultDto(keyResult: KeyResult) {
     const features = (await keyResult.features) || [];
-    const org = await keyResult.org;
-    let comments = [];
-
-    if (org?.paymentPlan === PaymentPlan.PREMIUM) {
-      comments = await keyResult.comments;
-    }
+    const comments = await keyResult.comments;
 
     return {
       id: keyResult.id,
