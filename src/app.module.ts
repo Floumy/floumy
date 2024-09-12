@@ -25,6 +25,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { StripeModule } from './stripe/stripe.module';
 import { FeedModule } from './feed/feed.module';
 import { FeatureRequestsModule } from './feature-requests/feature-requests.module';
+import { IssuesModule } from './issues/issues.module';
 import stripeConfig from './config/stripe.config';
 
 @Module({
@@ -88,6 +89,7 @@ import stripeConfig from './config/stripe.config';
     PaymentsModule,
     FeedModule,
     FeatureRequestsModule,
+    IssuesModule,
   ],
   providers: [AppService],
 })

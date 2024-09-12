@@ -20,6 +20,7 @@ import { PaymentPlan } from '../auth/payment.plan';
 import { Invoice } from '../payments/invoice.entity';
 import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Issue } from '../issues/issue.entity';
 
 @Entity()
 export class Org {
@@ -78,4 +79,7 @@ export class Org {
     lazy: true,
   })
   bipSettings: Promise<BipSettings>;
+
+  @OneToMany(() => Issue, (issue) => issue.org, { lazy: true })
+  issues: Promise<Issue[]>;
 }
