@@ -17,6 +17,7 @@ import { IssuesService } from './issues.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { IssueDto } from './dtos';
 import { Public } from '../auth/public.guard';
+import { CreateUpdateCommentDto } from '../comments/dtos';
 
 @Controller('/orgs/:orgId/issues')
 export class IssuesController {
@@ -104,6 +105,62 @@ export class IssuesController {
         request.user.sub,
         orgId,
         issueId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Post(':issueId/comments')
+  @UseGuards(AuthGuard)
+  async addIssueComment(
+    @Request() request,
+    @Param('issueId') issueId: string,
+    @Body() createCommentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.issuesService.createIssueComment(
+        request.user.sub,
+        issueId,
+        createCommentDto,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Put(':issueId/comments/:commentId')
+  @UseGuards(AuthGuard)
+  async updateIssueComment(
+    @Request() request,
+    @Param('issueId') issueId: string,
+    @Param('commentId') commentId: string,
+    @Body() updateCommentDto: CreateUpdateCommentDto,
+  ) {
+    try {
+      return await this.issuesService.updateIssueComment(
+        request.user.sub,
+        issueId,
+        commentId,
+        updateCommentDto,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete(':issueId/comments/:commentId')
+  @UseGuards(AuthGuard)
+  async deleteIssueComment(
+    @Request() request,
+    @Param('issueId') issueId: string,
+    @Param('commentId') commentId: string,
+  ) {
+    try {
+      return await this.issuesService.deleteIssueComment(
+        request.user.sub,
+        issueId,
+        commentId,
       );
     } catch (e) {
       throw new BadRequestException(e.message);

@@ -10,6 +10,7 @@ import { UsersService } from '../users/users.service';
 import { IssuesService } from './issues.service';
 import { PaymentPlan } from '../auth/payment.plan';
 import { Issue } from './issue.entity';
+import { IssueComment } from './issue-comment.entity';
 
 describe('IssuesController', () => {
   let controller: IssuesController;
@@ -20,7 +21,7 @@ describe('IssuesController', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User, Issue]), UsersModule],
+      [TypeOrmModule.forFeature([Org, User, Issue, IssueComment]), UsersModule],
       [IssuesService],
       [IssuesController],
     );
@@ -161,6 +162,105 @@ describe('IssuesController', () => {
         id,
       );
       await expect(controller.getIssueById(org.id, id)).rejects.toThrow();
+    });
+  });
+
+  describe('when adding a comment to an issue', () => {
+    it('should add a comment to the issue', async () => {
+      const createIssueDto = {
+        title: 'Test Issue',
+        description: 'This is a test issue',
+      };
+      const { id } = await controller.addIssue(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        createIssueDto,
+      );
+      const comment = await controller.addIssueComment(
+        {
+          user: { sub: user.id },
+        },
+        id,
+        {
+          content: 'Test Comment',
+        },
+      );
+      expect(comment).toBeDefined();
+      expect((await comment.createdBy).id).toEqual(user.id);
+      expect(comment.content).toEqual('Test Comment');
+    });
+  });
+
+  describe('when updating a comment for an issue', () => {
+    it('should update the comment', async () => {
+      const createIssueDto = {
+        title: 'Test Issue',
+        description: 'This is a test issue',
+      };
+      const { id } = await controller.addIssue(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        createIssueDto,
+      );
+      const comment = await controller.addIssueComment(
+        {
+          user: { sub: user.id },
+        },
+        id,
+        {
+          content: 'Test Comment',
+        },
+      );
+      const updatedComment = await controller.updateIssueComment(
+        {
+          user: { sub: user.id },
+        },
+        id,
+        comment.id,
+        {
+          content: 'Updated Comment',
+        },
+      );
+      expect(updatedComment).toBeDefined();
+      expect((await updatedComment.createdBy).id).toEqual(user.id);
+      expect(updatedComment.content).toEqual('Updated Comment');
+    });
+  });
+  describe('when deleting a comment for an issue', () => {
+    it('should delete the comment', async () => {
+      const createIssueDto = {
+        title: 'Test Issue',
+        description: 'This is a test issue',
+      };
+      const { id } = await controller.addIssue(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        createIssueDto,
+      );
+      const comment = await controller.addIssueComment(
+        {
+          user: { sub: user.id },
+        },
+        id,
+        {
+          content: 'Test Comment',
+        },
+      );
+      await controller.deleteIssueComment(
+        {
+          user: { sub: user.id },
+        },
+        id,
+        comment.id,
+      );
+      const result = await controller.getIssueById(org.id, id);
+      expect(result.comments.length).toEqual(0);
     });
   });
 });
