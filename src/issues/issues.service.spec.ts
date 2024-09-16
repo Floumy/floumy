@@ -8,6 +8,7 @@ import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Issue } from './issue.entity';
 import { PaymentPlan } from '../auth/payment.plan';
+import { IssueComment } from './issue-comment.entity';
 
 describe('IssuesService', () => {
   let usersService: UsersService;
@@ -21,7 +22,7 @@ describe('IssuesService', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User, Issue])],
+      [TypeOrmModule.forFeature([Org, User, Issue, IssueComment])],
       [IssuesService, UsersService, OrgsService],
     );
     cleanup = dbCleanup;
@@ -294,6 +295,62 @@ describe('IssuesService', () => {
       await expect(
         service.deleteIssue(user.id, org.id, issue.id),
       ).rejects.toThrow('You need to upgrade your plan to delete an issue');
+    });
+  });
+
+  describe('when adding a comment to an issue', () => {
+    it('should add a comment to the issue', async () => {
+      const issue = await service.addIssue(user.id, org.id, {
+        title: 'Test Issue',
+        description: 'Test Description',
+      });
+      const comment = await service.createIssueComment(user.id, issue.id, {
+        content: 'Test Comment',
+      });
+      expect(comment).toBeDefined();
+      expect((await comment.createdBy).id).toEqual(user.id);
+      expect(comment.content).toEqual('Test Comment');
+    });
+  });
+
+  describe('when updating a comment for an issue', () => {
+    it('should update the comment', async () => {
+      const issue = await service.addIssue(user.id, org.id, {
+        title: 'Test Issue',
+        description: 'Test Description',
+      });
+      const comment = await service.createIssueComment(user.id, issue.id, {
+        content: 'Test Comment',
+      });
+      const updatedComment = await service.updateIssueComment(
+        user.id,
+        issue.id,
+        comment.id,
+        {
+          content: 'Updated Comment',
+        },
+      );
+      expect(updatedComment).toBeDefined();
+      expect(updatedComment.id).toEqual(comment.id);
+      expect(updatedComment.content).toEqual('Updated Comment');
+    });
+  });
+
+  describe('when deleting a comment for an issue', () => {
+    it('should delete the comment', async () => {
+      const issue = await service.addIssue(user.id, org.id, {
+        title: 'Test Issue',
+        description: 'Test Description',
+      });
+      const comment = await service.createIssueComment(user.id, issue.id, {
+        content: 'Test Comment',
+      });
+      await service.deleteIssueComment(user.id, issue.id, comment.id);
+      await expect(
+        service.updateIssueComment(user.id, issue.id, comment.id, {
+          content: 'Updated Comment',
+        }),
+      ).rejects.toThrow();
     });
   });
 });

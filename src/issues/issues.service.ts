@@ -6,6 +6,10 @@ import { Issue } from './issue.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import { IssueMapper } from './issue.mapper';
+import { CreateUpdateCommentDto } from '../comments/dtos';
+import { PaymentPlan } from '../auth/payment.plan';
+import { IssueComment } from './issue-comment.entity';
+import { CommentMapper } from '../comments/mappers';
 
 @Injectable()
 export class IssuesService {
@@ -16,6 +20,8 @@ export class IssuesService {
     private usersRepository: Repository<User>,
     @InjectRepository(Issue)
     private issuesRepository: Repository<Issue>,
+    @InjectRepository(IssueComment)
+    private issueCommentsRepository: Repository<IssueComment>,
   ) {}
 
   async addIssue(userId: string, orgId: string, issueDto: IssueDto) {
@@ -30,7 +36,7 @@ export class IssuesService {
     issue.org = Promise.resolve(org);
     issue.createdBy = Promise.resolve(user);
     const savedIssue = await this.issuesRepository.save(issue);
-    return IssueMapper.toDto(savedIssue);
+    return await IssueMapper.toDto(savedIssue);
   }
 
   async listIssues(orgId: string, page: number = 1, limit: number = 0) {
@@ -44,7 +50,7 @@ export class IssuesService {
       skip: (page - 1) * limit,
       order: { createdAt: 'DESC' },
     });
-    return issues.map(IssueMapper.toDto);
+    return await Promise.all(issues.map(IssueMapper.toDto));
   }
 
   async getIssueById(orgId: string, issueId: string) {
@@ -56,7 +62,7 @@ export class IssuesService {
       id: issueId,
       org: { id: orgId },
     });
-    return IssueMapper.toDto(issue);
+    return await IssueMapper.toDto(issue);
   }
 
   async updateIssue(
@@ -82,7 +88,7 @@ export class IssuesService {
     issue.title = issueDto.title;
     issue.description = issueDto.description;
     const savedIssue = await this.issuesRepository.save(issue);
-    return IssueMapper.toDto(savedIssue);
+    return await IssueMapper.toDto(savedIssue);
   }
 
   async deleteIssue(userId: string, orgId: string, issueId: string) {
@@ -102,5 +108,65 @@ export class IssuesService {
     }
 
     await this.issuesRepository.remove(issue);
+  }
+
+  async createIssueComment(
+    userId: string,
+    issueId: string,
+    createCommentDto: CreateUpdateCommentDto,
+  ) {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    const issue = await this.issuesRepository.findOneByOrFail({
+      id: issueId,
+    });
+    const org = await issue.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to add comments');
+    }
+    if (!createCommentDto.content || createCommentDto.content.trim() === '') {
+      throw new Error('Comment content is required');
+    }
+    const comment = new IssueComment();
+    comment.content = createCommentDto.content;
+    comment.createdBy = Promise.resolve(user);
+    comment.org = Promise.resolve(org);
+    comment.issue = Promise.resolve(issue);
+    const savedComment = await this.issueCommentsRepository.save(comment);
+    return CommentMapper.toDto(savedComment);
+  }
+
+  async deleteIssueComment(userId: string, issueId: string, commentId: string) {
+    const comment = await this.issueCommentsRepository.findOneByOrFail({
+      id: commentId,
+      issue: { id: issueId },
+      createdBy: { id: userId },
+    });
+    await this.issueCommentsRepository.remove(comment);
+  }
+
+  async updateIssueComment(
+    userId: string,
+    issueId: string,
+    commentId: string,
+    updateCommentDto: CreateUpdateCommentDto,
+  ) {
+    const issue = await this.issuesRepository.findOneByOrFail({
+      id: issueId,
+    });
+    const org = await issue.org;
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade to premium to update comments');
+    }
+    if (!updateCommentDto.content || updateCommentDto.content.trim() === '') {
+      throw new Error('Comment content is required');
+    }
+    const comment = await this.issueCommentsRepository.findOneByOrFail({
+      id: commentId,
+      issue: { id: issueId },
+      createdBy: { id: userId },
+    });
+    comment.content = updateCommentDto.content;
+    const savedComment = await this.issueCommentsRepository.save(comment);
+    return await CommentMapper.toDto(savedComment);
   }
 }
