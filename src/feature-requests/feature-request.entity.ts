@@ -12,6 +12,7 @@ import { Org } from '../orgs/org.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { FeatureRequestComment } from './feature-request-comment.entity';
+import { Feature } from '../roadmap/features/feature.entity';
 
 @Entity()
 export class FeatureRequest {
@@ -63,4 +64,10 @@ export class FeatureRequest {
     onDelete: 'CASCADE',
   })
   comments: Promise<FeatureRequestComment[]>;
+  @OneToMany(() => Feature, (feature) => feature.featureRequest, {
+    lazy: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  features: Promise<Feature[]>;
 }

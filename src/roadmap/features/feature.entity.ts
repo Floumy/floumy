@@ -16,6 +16,7 @@ import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { FeatureFile } from './feature-file.entity';
 import { User } from '../../users/user.entity';
 import { FeatureComment } from './feature-comment.entity';
+import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 
 @Entity()
 export class Feature {
@@ -69,4 +70,12 @@ export class Feature {
     lazy: true,
   })
   comments: Promise<FeatureComment[]>;
+  @ManyToOne(
+    () => FeatureRequest,
+    (featureRequest) => featureRequest.features,
+    {
+      lazy: true,
+    },
+  )
+  featureRequest: Promise<FeatureRequest>;
 }
