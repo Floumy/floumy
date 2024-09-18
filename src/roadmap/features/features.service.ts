@@ -17,6 +17,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CommentMapper } from '../../comments/mappers';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { FeatureComment } from './feature-comment.entity';
+import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 
 @Injectable()
 export class FeaturesService {
@@ -34,6 +35,8 @@ export class FeaturesService {
     @InjectRepository(FeatureComment)
     private featureCommentsRepository: Repository<FeatureComment>,
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(FeatureRequest)
+    private featureRequestsRepository: Repository<FeatureRequest>,
   ) {}
 
   async createFeature(userId: string, featureDto: CreateUpdateFeatureDto) {
@@ -57,6 +60,15 @@ export class FeaturesService {
         featureDto.milestone,
       );
       feature.milestone = Promise.resolve(milestone);
+    }
+
+    if (featureDto.featureRequest) {
+      const featureRequest =
+        await this.featureRequestsRepository.findOneByOrFail({
+          org: { id: org.id },
+          id: featureDto.featureRequest,
+        });
+      feature.featureRequest = Promise.resolve(featureRequest);
     }
 
     await this.featuresRepository.save(feature);
