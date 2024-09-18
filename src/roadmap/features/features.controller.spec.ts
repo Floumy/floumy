@@ -27,6 +27,9 @@ import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { FeatureComment } from './feature-comment.entity';
 import { Repository } from 'typeorm';
 import { PaymentPlan } from '../../auth/payment.plan';
+import { FeatureRequest } from '../../feature-requests/feature-request.entity';
+import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
+import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
 
 describe('FeaturesController', () => {
   let controller: FeaturesController;
@@ -51,6 +54,9 @@ describe('FeaturesController', () => {
           WorkItem,
           WorkItemFile,
           FeatureComment,
+          FeatureRequest,
+          FeatureRequestComment,
+          FeatureRequestVote,
         ]),
         UsersModule,
         BacklogModule,
