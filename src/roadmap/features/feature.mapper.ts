@@ -8,6 +8,7 @@ export class FeatureMapper {
     const assignedTo = await feature.assignedTo;
     const org = await feature.org;
     const comments = await feature.comments;
+    const featureRequest = await feature.featureRequest;
 
     const featureDto = {
       id: feature.id,
@@ -24,6 +25,12 @@ export class FeatureMapper {
       workItemsCount: feature.workItemsCount,
       workItems: (await feature.workItems).map(WorkItemMapper.toDto),
       comments: await CommentMapper.toDtoList(comments),
+      featureRequest: featureRequest
+        ? {
+            id: featureRequest.id,
+            title: featureRequest.title,
+          }
+        : null,
       files: await Promise.all(
         (await feature.featureFiles).map(async (featureFile) => {
           const file = await featureFile.file;

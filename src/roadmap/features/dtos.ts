@@ -41,6 +41,10 @@ export interface FeatureDto {
     id: string;
     title: string;
   };
+  featureRequest?: {
+    id: string;
+    title: string;
+  };
   files?: {
     id: string;
     name: string;

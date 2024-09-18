@@ -26,16 +26,21 @@ import { FeatureFile } from './feature-file.entity';
 import { FeatureComment } from './feature-comment.entity';
 import { Repository } from 'typeorm';
 import { PaymentPlan } from '../../auth/payment.plan';
+import { FeatureRequest } from '../../feature-requests/feature-request.entity';
+import { FeatureRequestsService } from '../../feature-requests/feature-requests.service';
+import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
+import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
 
 describe('FeaturesService', () => {
   let usersService: UsersService;
   let service: FeaturesService;
   let workItemsService: WorkItemsService;
   let milestonesService: MilestonesService;
+  let featureRequestsService: FeatureRequestsService;
   let okrsService: OkrsService;
   let orgsService: OrgsService;
   let filesService: FilesService;
-  let orgRepository: Repository<Org>;
+  let orgsRepository: Repository<Org>;
   let user: User;
   let org: Org;
 
@@ -57,6 +62,9 @@ describe('FeaturesService', () => {
           WorkItemFile,
           FeatureFile,
           FeatureComment,
+          FeatureRequest,
+          FeatureRequestComment,
+          FeatureRequestVote,
         ]),
       ],
       [
@@ -68,6 +76,7 @@ describe('FeaturesService', () => {
         WorkItemsService,
         FilesService,
         FilesStorageRepository,
+        FeatureRequestsService,
       ],
     );
     cleanup = dbCleanup;
@@ -78,13 +87,16 @@ describe('FeaturesService', () => {
     milestonesService = module.get<MilestonesService>(MilestonesService);
     workItemsService = module.get<WorkItemsService>(WorkItemsService);
     filesService = module.get<FilesService>(FilesService);
-    orgRepository = module.get(getRepositoryToken(Org));
+    orgsRepository = module.get(getRepositoryToken(Org));
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    featureRequestsService = module.get<FeatureRequestsService>(
+      FeatureRequestsService,
+    );
   });
 
   afterEach(async () => {
@@ -252,6 +264,28 @@ describe('FeaturesService', () => {
       expect(feature.assignedTo).toBeDefined();
       expect(feature.assignedTo.id).toEqual(otherUser.id);
       expect(feature.assignedTo.name).toEqual(otherUser.name);
+    });
+    it('should update the feature request', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureRequest = await featureRequestsService.addFeatureRequest(
+        user.id,
+        org.id,
+        {
+          title: 'My Feature Request',
+          description: 'My Feature Request Description',
+        },
+      );
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.PLANNED,
+        featureRequest: featureRequest.id,
+      });
+
+      expect(feature.featureRequest).toBeDefined();
+      expect(feature.featureRequest.id).toEqual(featureRequest.id);
     });
   });
   describe('when listing features', () => {
@@ -1050,7 +1084,7 @@ describe('FeaturesService', () => {
   describe('when listing feature comments', () => {
     it('should return a list of comments if the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
-      await orgRepository.save(org);
+      await orgsRepository.save(org);
       const feature = await service.createFeature(user.id, {
         title: 'Test title',
         description: 'A test description',
@@ -1070,7 +1104,7 @@ describe('FeaturesService', () => {
   describe('when creating a feature comment', () => {
     it('should create a comment if the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
-      await orgRepository.save(org);
+      await orgsRepository.save(org);
       const feature = await service.createFeature(user.id, {
         title: 'Test title',
         description: 'A test description',
@@ -1088,7 +1122,7 @@ describe('FeaturesService', () => {
   describe('when deleting a feature comment', () => {
     it('should delete the comment if it exists', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
-      await orgRepository.save(org);
+      await orgsRepository.save(org);
       const feature = await service.createFeature(user.id, {
         title: 'Test title',
         description: 'A test description',
@@ -1124,7 +1158,7 @@ describe('FeaturesService', () => {
   describe('when updating a feature comment', () => {
     it('should update the comment if it exists and the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
-      await orgRepository.save(org);
+      await orgsRepository.save(org);
       const feature = await service.createFeature(user.id, {
         title: 'Test title',
         description: 'A test description',
@@ -1167,7 +1201,7 @@ describe('FeaturesService', () => {
 
     it('should throw an error if the comment content is empty', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
-      await orgRepository.save(org);
+      await orgsRepository.save(org);
       const feature = await service.createFeature(user.id, {
         title: 'Test title',
         description: 'A test description',
