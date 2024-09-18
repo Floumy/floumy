@@ -2,6 +2,7 @@ import { Priority } from '../../common/priority.enum';
 import { FeatureStatus } from './featurestatus.enum';
 
 export interface CreateUpdateFeatureDto {
+  featureRequest?: string;
   title: string;
   priority: Priority;
   status: FeatureStatus;
