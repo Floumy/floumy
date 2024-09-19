@@ -151,6 +151,8 @@ export class FeaturesService {
 
     await this.updateFeatureKeyResult(updateFeatureDto, orgId, feature);
 
+    await this.updateFeatureFeatureRequest(updateFeatureDto, orgId, feature);
+
     await this.updateFeatureMilestone(updateFeatureDto, orgId, feature);
 
     await this.updateFeatureFiles(updateFeatureDto, feature);
@@ -192,6 +194,7 @@ export class FeaturesService {
     this.patchFeaturePriority(patchFeatureDto, feature);
     await this.patchFeatureMilestone(patchFeatureDto, orgId, feature);
     await this.patchFeatureKeyResult(patchFeatureDto, orgId, feature);
+    await this.patchFeatureFeatureRequest(patchFeatureDto, orgId, feature);
     const savedFeature = await this.featuresRepository.save(feature);
     const updatedFeature = await FeatureMapper.toDto(savedFeature);
     this.eventEmitter.emit('feature.updated', {
@@ -536,5 +539,41 @@ export class FeaturesService {
     const features = await this.featuresRepository.query(query, params);
 
     return await FeatureMapper.toListDtoWithoutAssignees(features);
+  }
+
+  private async updateFeatureFeatureRequest(
+    updateFeatureDto: CreateUpdateFeatureDto,
+    orgId: string,
+    feature: Feature,
+  ) {
+    if (updateFeatureDto.featureRequest) {
+      const featureRequest =
+        await this.featureRequestsRepository.findOneByOrFail({
+          org: { id: orgId },
+          id: updateFeatureDto.featureRequest,
+        });
+      feature.featureRequest = Promise.resolve(featureRequest);
+    } else {
+      feature.featureRequest = Promise.resolve(null);
+    }
+  }
+
+  private async patchFeatureFeatureRequest(
+    patchFeatureDto: PatchFeatureDto,
+    orgId: string,
+    feature: Feature,
+  ) {
+    if (patchFeatureDto.featureRequest === null) {
+      feature.featureRequest = Promise.resolve(null);
+    } else if (patchFeatureDto.featureRequest) {
+      const featureRequest =
+        await this.featureRequestsRepository.findOneByOrFail({
+          org: { id: orgId },
+          id: patchFeatureDto.featureRequest,
+        });
+      feature.featureRequest = Promise.resolve(featureRequest);
+    } else {
+      feature.featureRequest = Promise.resolve(null);
+    }
   }
 }

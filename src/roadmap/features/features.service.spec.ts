@@ -686,6 +686,107 @@ describe('FeaturesService', () => {
       expect(updatedFeature.files[0].id).toEqual(file.id);
       expect(updatedFeature.files[0].name).toEqual(file.name);
     });
+    it('should update the feature request', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureRequest = await featureRequestsService.addFeatureRequest(
+        user.id,
+        org.id,
+        {
+          title: 'My Feature Request',
+          description: 'My Feature Request Description',
+        },
+      );
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        featureRequest: featureRequest.id,
+      });
+      expect(updatedFeature.title).toEqual('my feature');
+      expect(updatedFeature.description).toEqual('my feature description');
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
+      expect(updatedFeature.featureRequest).toBeDefined();
+      expect(updatedFeature.featureRequest.id).toEqual(featureRequest.id);
+      expect(updatedFeature.featureRequest.title).toEqual(featureRequest.title);
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it('should update the feature request to null', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureRequest = await featureRequestsService.addFeatureRequest(
+        user.id,
+        org.id,
+        {
+          title: 'My Feature Request',
+          description: 'My Feature Request Description',
+        },
+      );
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        featureRequest: featureRequest.id,
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        featureRequest: null,
+      });
+      expect(updatedFeature.title).toEqual('my feature');
+      expect(updatedFeature.description).toEqual('my feature description');
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
+      expect(updatedFeature.featureRequest).toBeNull();
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it('should not update the feature request if the update is for another field', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureRequest = await featureRequestsService.addFeatureRequest(
+        user.id,
+        org.id,
+        {
+          title: 'My Feature Request',
+          description: 'My Feature Request Description',
+        },
+      );
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        featureRequest: featureRequest.id,
+      });
+      expect(updatedFeature.title).toEqual('my feature');
+      expect(updatedFeature.description).toEqual('my feature description');
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
+      expect(updatedFeature.featureRequest).toBeDefined();
+      expect(updatedFeature.featureRequest.id).toEqual(featureRequest.id);
+      expect(updatedFeature.featureRequest.title).toEqual(featureRequest.title);
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
   });
   describe('when deleting a feature', () => {
     it('should delete the feature', async () => {
@@ -1016,6 +1117,98 @@ describe('FeaturesService', () => {
       expect(updatedFeature.keyResult.title).toEqual(
         objective.keyResults[0].title,
       );
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it('should update the feature request', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureRequest = await featureRequestsService.addFeatureRequest(
+        user.id,
+        org.id,
+        {
+          title: 'My Feature Request',
+          description: 'My Feature Request Description',
+        },
+      );
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+      });
+      const updatedFeature = await service.patchFeature(org.id, feature.id, {
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        featureRequest: featureRequest.id,
+      });
+      expect(updatedFeature.title).toEqual('my feature');
+      expect(updatedFeature.description).toEqual('my feature description');
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
+      expect(updatedFeature.featureRequest).toBeDefined();
+      expect(updatedFeature.featureRequest.id).toEqual(featureRequest.id);
+      expect(updatedFeature.featureRequest.title).toEqual(featureRequest.title);
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it('should update the feature request to null', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      await featureRequestsService.addFeatureRequest(user.id, org.id, {
+        title: 'My Feature Request',
+        description: 'My Feature Request Description',
+      });
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+      });
+      const updatedFeature = await service.updateFeature(org.id, feature.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        featureRequest: null,
+      });
+      expect(updatedFeature.title).toEqual('my feature');
+      expect(updatedFeature.description).toEqual('my feature description');
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
+      expect(updatedFeature.featureRequest).toBeNull();
+      expect(updatedFeature.createdAt).toBeDefined();
+      expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it('should not update the feature request if the update is for another field', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureRequest = await featureRequestsService.addFeatureRequest(
+        user.id,
+        org.id,
+        {
+          title: 'My Feature Request',
+          description: 'My Feature Request Description',
+        },
+      );
+      const feature = await service.createFeature(user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+      });
+      const updatedFeature = await service.patchFeature(org.id, feature.id, {
+        priority: Priority.LOW,
+        status: FeatureStatus.PLANNED,
+        featureRequest: featureRequest.id,
+      });
+      expect(updatedFeature.title).toEqual('my feature');
+      expect(updatedFeature.description).toEqual('my feature description');
+      expect(updatedFeature.priority).toEqual(Priority.LOW);
+      expect(updatedFeature.status).toEqual(FeatureStatus.PLANNED);
+      expect(updatedFeature.featureRequest).toBeDefined();
+      expect(updatedFeature.featureRequest.id).toEqual(featureRequest.id);
+      expect(updatedFeature.featureRequest.title).toEqual(featureRequest.title);
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });

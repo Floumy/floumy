@@ -18,6 +18,7 @@ export interface PatchFeatureDto {
   status?: FeatureStatus;
   milestone?: string;
   keyResult?: string;
+  featureRequest?: string;
 }
 
 export interface FeatureDto {
