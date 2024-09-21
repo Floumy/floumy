@@ -3,13 +3,15 @@ import { KeyResult } from '../../../okrs/key-result.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
 import { Feature } from '../feature.entity';
 import { CommentMapper } from '../../../comments/mappers';
+import { PaymentPlan } from '../../../auth/payment.plan';
 
 export class FeatureMapper {
   static async toDto(feature: Feature) {
     const workItems = (await feature.workItems) || [];
     const comments = await feature.comments;
-
-    return {
+    const org = await feature.org;
+    const featureRequest = await feature.featureRequest;
+    const mappedFeature = {
       id: feature.id,
       reference: `F-${feature.sequenceNumber}`,
       title: feature.title,
@@ -26,7 +28,17 @@ export class FeatureMapper {
       updatedAt: feature.updatedAt,
       keyResult: this.mapKeyResultToKeyResultDto(await feature.keyResult),
       milestone: this.mapMilestoneToMilestoneDto(await feature.milestone),
+      featureRequest: undefined,
     };
+    if (org.paymentPlan === PaymentPlan.PREMIUM) {
+      mappedFeature.featureRequest = featureRequest
+        ? {
+            id: featureRequest.id,
+            title: featureRequest.title,
+          }
+        : null;
+    }
+    return mappedFeature;
   }
 
   static mapWorkItemToWorkItemDto(workItem: WorkItem) {
