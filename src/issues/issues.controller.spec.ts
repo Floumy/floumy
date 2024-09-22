@@ -11,6 +11,8 @@ import { IssuesService } from './issues.service';
 import { PaymentPlan } from '../auth/payment.plan';
 import { Issue } from './issue.entity';
 import { IssueComment } from './issue-comment.entity';
+import { IssueStatus } from './issue-status.enum';
+import { Priority } from '../common/priority.enum';
 
 describe('IssuesController', () => {
   let controller: IssuesController;
@@ -127,6 +129,8 @@ describe('IssuesController', () => {
       const updateIssueDto = {
         title: 'Updated Issue',
         description: 'This is an updated issue',
+        status: IssueStatus.IN_PROGRESS,
+        priority: Priority.HIGH,
       };
       const result = await controller.updateIssue(
         {
@@ -138,6 +142,8 @@ describe('IssuesController', () => {
       );
       expect(result.title).toBe(updateIssueDto.title);
       expect(result.description).toBe(updateIssueDto.description);
+      expect(result.status).toBe(updateIssueDto.status);
+      expect(result.priority).toBe(updateIssueDto.priority);
     });
   });
 

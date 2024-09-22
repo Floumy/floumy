@@ -8,6 +8,8 @@ export class IssueMapper {
       id: issue.id,
       title: issue.title,
       description: issue.description,
+      status: issue.status,
+      priority: issue.priority,
       comments: await CommentMapper.toDtoList(comments),
       createdAt: issue.createdAt,
       updatedAt: issue.updatedAt,

@@ -9,6 +9,8 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Issue } from './issue.entity';
 import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
+import { IssueStatus } from './issue-status.enum';
+import { Priority } from '../common/priority.enum';
 
 describe('IssuesService', () => {
   let usersService: UsersService;
@@ -59,6 +61,8 @@ describe('IssuesService', () => {
       expect(issue.id).toBeDefined();
       expect(issue.title).toEqual('Test Issue');
       expect(issue.description).toEqual('Test Description');
+      expect(issue.status).toEqual(IssueStatus.SUBMITTED);
+      expect(issue.priority).toEqual(Priority.MEDIUM);
     });
 
     it('should create a new issue only if the org is premium', () => {
@@ -182,6 +186,8 @@ describe('IssuesService', () => {
         {
           title: 'Updated Issue',
           description: 'Updated Description',
+          status: IssueStatus.IN_PROGRESS,
+          priority: Priority.HIGH,
         },
       );
 
@@ -189,6 +195,8 @@ describe('IssuesService', () => {
       expect(updatedIssue.id).toEqual(issue.id);
       expect(updatedIssue.title).toEqual('Updated Issue');
       expect(updatedIssue.description).toEqual('Updated Description');
+      expect(updatedIssue.status).toEqual(IssueStatus.IN_PROGRESS);
+      expect(updatedIssue.priority).toEqual(Priority.HIGH);
     });
 
     it('should throw an error if the issue does not exist', async () => {
@@ -196,6 +204,8 @@ describe('IssuesService', () => {
         service.updateIssue(user.id, org.id, 'some-invalid-id', {
           title: 'Updated Issue',
           description: 'Updated Description',
+          status: IssueStatus.IN_PROGRESS,
+          priority: Priority.HIGH,
         }),
       ).rejects.toThrow();
     });
@@ -213,6 +223,8 @@ describe('IssuesService', () => {
         service.updateIssue(user.id, otherOrg.id, issue.id, {
           title: 'Updated Issue',
           description: 'Updated Description',
+          status: IssueStatus.IN_PROGRESS,
+          priority: Priority.HIGH,
         }),
       ).rejects.toThrow();
     });
@@ -233,6 +245,8 @@ describe('IssuesService', () => {
         service.updateIssue(otherUser.id, org.id, issue.id, {
           title: 'Updated Issue',
           description: 'Updated Description',
+          status: IssueStatus.IN_PROGRESS,
+          priority: Priority.HIGH,
         }),
       ).rejects.toThrow();
     });
@@ -248,6 +262,8 @@ describe('IssuesService', () => {
         service.updateIssue(user.id, org.id, issue.id, {
           title: 'Updated Issue',
           description: 'Updated Description',
+          status: IssueStatus.IN_PROGRESS,
+          priority: Priority.HIGH,
         }),
       ).rejects.toThrow('You need to upgrade your plan to update an issue');
     });

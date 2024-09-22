@@ -19,6 +19,7 @@ import { WorkItemFile } from './work-item-file.entity';
 import { User } from '../../users/user.entity';
 import { WorkItemsStatusStats } from './work-items-status-stats.entity';
 import { WorkItemComment } from './work-item-comment.entity';
+import { Issue } from '../../issues/issue.entity';
 
 @Entity()
 export class WorkItem {
@@ -91,4 +92,6 @@ export class WorkItem {
   )
   @JoinColumn()
   workItemsStatusStats: Promise<WorkItemsStatusStats>;
+  @ManyToOne(() => Issue, (issue) => issue.workItems, { lazy: true })
+  issue: Promise<Issue>;
 }
