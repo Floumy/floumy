@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IssueDto } from './dtos';
+import { IssueDto, UpdateIssueDto } from './dtos';
 import { Repository } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { Issue } from './issue.entity';
@@ -69,7 +69,7 @@ export class IssuesService {
     userId: string,
     orgId: string,
     issueId: any,
-    issueDto: IssueDto,
+    issueDto: UpdateIssueDto,
   ) {
     const issue = await this.issuesRepository.findOneByOrFail({
       id: issueId,
@@ -87,6 +87,8 @@ export class IssuesService {
     }
     issue.title = issueDto.title;
     issue.description = issueDto.description;
+    issue.status = issueDto.status;
+    issue.priority = issueDto.priority;
     const savedIssue = await this.issuesRepository.save(issue);
     return await IssueMapper.toDto(savedIssue);
   }

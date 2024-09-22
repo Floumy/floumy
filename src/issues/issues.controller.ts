@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { IssuesService } from './issues.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { IssueDto } from './dtos';
+import { IssueDto, UpdateIssueDto } from './dtos';
 import { Public } from '../auth/public.guard';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 
@@ -78,7 +78,7 @@ export class IssuesController {
     @Request() request,
     @Param('orgId') orgId: string,
     @Param('issueId') issueId: string,
-    @Body() issueDto: IssueDto,
+    @Body() issueDto: UpdateIssueDto,
   ) {
     try {
       return await this.issuesService.updateIssue(
