@@ -16,3 +16,17 @@ export class IssueMapper {
     };
   }
 }
+
+export class IssueListItemMapper {
+  static async toListItemDto(issue: Issue) {
+    return {
+      id: issue.id,
+      title: issue.title,
+      description: issue.description,
+      status: issue.status,
+      priority: issue.priority,
+      createdAt: issue.createdAt,
+      updatedAt: issue.updatedAt,
+    };
+  }
+}

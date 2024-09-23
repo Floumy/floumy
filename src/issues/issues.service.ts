@@ -5,7 +5,7 @@ import { Org } from '../orgs/org.entity';
 import { Issue } from './issue.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
-import { IssueMapper } from './issue.mapper';
+import { IssueListItemMapper, IssueMapper } from './issue.mapper';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
@@ -44,13 +44,28 @@ export class IssuesService {
     if (org.paymentPlan !== 'premium') {
       throw new Error('You need to upgrade your plan to view issues');
     }
-    const issues = await this.issuesRepository.find({
-      where: { org: { id: orgId } },
-      take: limit,
-      skip: (page - 1) * limit,
-      order: { createdAt: 'DESC' },
-    });
-    return await Promise.all(issues.map(IssueMapper.toDto));
+
+    let query = `
+        SELECT *
+        FROM issue
+        WHERE issue."orgId" = $1
+        ORDER BY CASE
+                     WHEN issue."priority" = 'high' THEN 1
+                     WHEN issue."priority" = 'medium' THEN 2
+                     WHEN issue."priority" = 'low' THEN 3
+                     ELSE 4
+                     END,
+                 issue."createdAt" DESC
+    `;
+    let params = [orgId] as any[];
+    if (limit > 0) {
+      query += ' OFFSET $2 LIMIT $3';
+      const offset = (page - 1) * limit;
+      params = [orgId, offset, limit];
+    }
+
+    const issues = await this.issuesRepository.query(query, params);
+    return await Promise.all(issues.map(IssueListItemMapper.toListItemDto));
   }
 
   async getIssueById(orgId: string, issueId: string) {
