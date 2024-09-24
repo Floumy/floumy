@@ -350,4 +350,42 @@ describe('FeatureRequestsController', () => {
       expect(updatedComment.content).toEqual('Updated Comment');
     });
   });
+  describe('when searching feature requests', () => {
+    it('should return the feature requests', async () => {
+      await controller.addFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        {
+          title: 'My Feature Request',
+          description: 'My Feature Request Description',
+        },
+      );
+      await controller.addFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        {
+          title: 'My Other Feature Request',
+          description: 'My Other Feature Request Description',
+        },
+      );
+
+      const featureRequests = await controller.search(
+        org.id,
+        'my feature request',
+      );
+      expect(featureRequests).toHaveLength(1);
+      expect(featureRequests[0].title).toEqual('My Feature Request');
+      expect(featureRequests[0].description).toEqual(
+        'My Feature Request Description',
+      );
+    });
+  });
 });

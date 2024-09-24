@@ -81,9 +81,7 @@ export class FeatureRequestsService {
       order: { votesCount: 'DESC', createdAt: 'DESC' },
     });
 
-    return Promise.all(
-      featureRequests.map(FeatureRequestsMapper.toFeatureRequestDto),
-    );
+    return FeatureRequestsMapper.toListDto(featureRequests);
   }
 
   async getFeatureRequestById(
@@ -247,5 +245,32 @@ export class FeatureRequestsService {
     const savedComment =
       await this.featureRequestCommentsRepository.save(comment);
     return await CommentMapper.toDto(savedComment);
+  }
+
+  async searchFeatureRequestsByTitleOrDescription(
+    orgId: string,
+    search: string,
+    page: number,
+    limit: number,
+  ) {
+    let query = `
+        SELECT *
+        FROM feature_request
+        WHERE feature_request."orgId" = $1
+          AND (feature_request.title ILIKE $2 OR feature_request.description ILIKE $2)
+        ORDER BY feature_request."votesCount" DESC,
+                 feature_request."createdAt" DESC
+    `;
+    let params = [orgId, `%${search}%`] as any[];
+
+    if (limit > 0) {
+      query += ' OFFSET $3 LIMIT $4';
+      const offset = (page - 1) * limit;
+      params = [orgId, `%${search}%`, offset, limit];
+    }
+
+    const workItems = await this.featureRequestsRepository.query(query, params);
+
+    return FeatureRequestsMapper.toListDto(workItems);
   }
 }

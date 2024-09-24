@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -24,6 +26,26 @@ export class FeatureRequestsController {
     private featureRequestsService: FeatureRequestsService,
     private featureRequestVoteService: FeatureRequestVoteService,
   ) {}
+
+  @Get('/search')
+  @HttpCode(HttpStatus.OK)
+  async search(
+    @Param('orgId') orgId: string,
+    @Query('q') query: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 0,
+  ) {
+    try {
+      return await this.featureRequestsService.searchFeatureRequestsByTitleOrDescription(
+        orgId,
+        query,
+        page,
+        limit,
+      );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
 
   @Get('my-votes')
   @UseGuards(AuthGuard)
