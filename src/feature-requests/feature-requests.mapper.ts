@@ -34,4 +34,22 @@ export class FeatureRequestsMapper {
       features: await Promise.all(features.map(FeatureMapper.toDto)),
     };
   }
+
+  static async toListDto(featureRequests: FeatureRequest[]) {
+    return await Promise.all(featureRequests.map(this.toListItemDto));
+  }
+
+  static async toListItemDto(featureRequest: FeatureRequest) {
+    return {
+      id: featureRequest.id,
+      title: featureRequest.title,
+      description: featureRequest.description,
+      votesCount: featureRequest.votesCount,
+      status: featureRequest.status,
+      estimation: featureRequest.estimation,
+      completedAt: featureRequest.completedAt,
+      createdAt: featureRequest.createdAt,
+      updatedAt: featureRequest.updatedAt,
+    };
+  }
 }

@@ -393,4 +393,29 @@ describe('FeatureRequestsService', () => {
       expect(result.comments).toHaveLength(0);
     });
   });
+  describe('when searching feature requests', () => {
+    it('should return the feature requests', async () => {
+      await service.addFeatureRequest(user.id, org.id, {
+        title: 'My Feature Request',
+        description: 'My Feature Request Description',
+      });
+      await service.addFeatureRequest(user.id, org.id, {
+        title: 'My Other Feature Request',
+        description: 'My Other Feature Request Description',
+      });
+
+      const featureRequests =
+        await service.searchFeatureRequestsByTitleOrDescription(
+          org.id,
+          'my feature request',
+          1,
+          1,
+        );
+      expect(featureRequests).toHaveLength(1);
+      expect(featureRequests[0].title).toEqual('My Feature Request');
+      expect(featureRequests[0].description).toEqual(
+        'My Feature Request Description',
+      );
+    });
+  });
 });
