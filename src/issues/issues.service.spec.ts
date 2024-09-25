@@ -369,4 +369,22 @@ describe('IssuesService', () => {
       ).rejects.toThrow();
     });
   });
+
+  describe('when searching issues', () => {
+    it('should return the issues', async () => {
+      await service.addIssue(user.id, org.id, {
+        title: 'My Issue',
+        description: 'My Issue Description',
+      });
+      await service.addIssue(user.id, org.id, {
+        title: 'My Other Issue',
+        description: 'My Other Issue Description',
+      });
+
+      const issues = await service.searchIssues(org.id, 'my issue', 1, 1);
+      expect(issues).toHaveLength(1);
+      expect(issues[0].title).toEqual('My Issue');
+      expect(issues[0].description).toEqual('My Issue Description');
+    });
+  });
 });

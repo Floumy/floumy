@@ -269,4 +269,33 @@ describe('IssuesController', () => {
       expect(result.comments.length).toEqual(0);
     });
   });
+  describe('when searching issues', () => {
+    it('should return the issues', async () => {
+      await controller.addIssue(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        {
+          title: 'My Issue',
+          description: 'My Issue Description',
+        },
+      );
+      await controller.addIssue(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        {
+          title: 'My Other Issue',
+          description: 'My Other Issue Description',
+        },
+      );
+
+      const issues = await controller.search(org.id, 'my issue', 1, 1);
+      expect(issues).toHaveLength(1);
+      expect(issues[0].title).toEqual('My Issue');
+      expect(issues[0].description).toEqual('My Issue Description');
+    });
+  });
 });
