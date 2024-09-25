@@ -57,6 +57,21 @@ export class IssuesController {
     }
   }
 
+  @Get('search')
+  @HttpCode(HttpStatus.OK)
+  async search(
+    @Param('orgId') orgId: string,
+    @Query('q') query: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 0,
+  ) {
+    try {
+      return await this.issuesService.searchIssues(orgId, query, page, limit);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
   @Get(':issueId')
   @HttpCode(HttpStatus.OK)
   @Public()

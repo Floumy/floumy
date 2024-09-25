@@ -41,7 +41,8 @@ export class IssuesService {
 
   async listIssues(orgId: string, page: number = 1, limit: number = 0) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    if (org.paymentPlan !== 'premium') {
+
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
       throw new Error('You need to upgrade your plan to view issues');
     }
 
@@ -185,5 +186,40 @@ export class IssuesService {
     comment.content = updateCommentDto.content;
     const savedComment = await this.issueCommentsRepository.save(comment);
     return await CommentMapper.toDto(savedComment);
+  }
+
+  async searchIssues(
+    orgId: string,
+    search: string,
+    page: number = 1,
+    limit: number = 0,
+  ) {
+    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      throw new Error('You need to upgrade your plan to search issues');
+    }
+
+    let query = `
+        SELECT *
+        FROM issue
+        WHERE issue."orgId" = $1
+          AND (issue.title ILIKE $2 OR issue.description ILIKE $2)
+        ORDER BY CASE
+                     WHEN issue."priority" = 'high' THEN 1
+                     WHEN issue."priority" = 'medium' THEN 2
+                     WHEN issue."priority" = 'low' THEN 3
+                     ELSE 4
+                     END,
+                 issue."createdAt" DESC
+    `;
+    let params = [orgId, `%${search}%`] as any[];
+
+    if (limit > 0) {
+      query += ' OFFSET $3 LIMIT $4';
+      const offset = (page - 1) * limit;
+      params = [orgId, `%${search}%`, offset, limit];
+    }
+    const issues = await this.issuesRepository.query(query, params);
+    return await Promise.all(issues.map(IssueListItemMapper.toListItemDto));
   }
 }
