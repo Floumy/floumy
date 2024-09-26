@@ -16,6 +16,7 @@ import { CommentMapper } from '../../comments/mappers';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { PaymentPlan } from '../../auth/payment.plan';
 import { WorkItemComment } from './work-item-comment.entity';
+import { Issue } from '../../issues/issue.entity';
 
 @Injectable()
 export class WorkItemsService {
@@ -33,6 +34,7 @@ export class WorkItemsService {
     private workItemCommentsRepository: Repository<WorkItemComment>,
     private filesService: FilesService,
     private eventEmitter: EventEmitter2,
+    @InjectRepository(Issue) private issuesRepository: Repository<Issue>,
   ) {}
 
   async createWorkItem(userId: string, workItemDto: CreateUpdateWorkItemDto) {
@@ -343,6 +345,15 @@ export class WorkItemsService {
       workItem.assignedTo = Promise.resolve(assignedTo);
     } else if (await workItem.assignedTo) {
       workItem.assignedTo = Promise.resolve(null);
+    }
+    if (workItemDto.issue) {
+      const issue = await this.issuesRepository.findOneByOrFail({
+        id: workItemDto.issue,
+        org: { id: orgId },
+      });
+      workItem.issue = Promise.resolve(issue);
+    } else if (await workItem.issue) {
+      workItem.issue = Promise.resolve(null);
     }
   }
 

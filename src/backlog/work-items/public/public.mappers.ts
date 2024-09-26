@@ -6,6 +6,7 @@ export class PublicWorkItemMapper {
     const iteration = await workItem.iteration;
     const org = await workItem.org;
     const comments = await workItem.comments;
+    const issue = await workItem.issue;
 
     return {
       id: workItem.id,
@@ -21,6 +22,7 @@ export class PublicWorkItemMapper {
       iteration: iteration
         ? { id: iteration.id, title: iteration.title }
         : null,
+      issue: issue ? { id: issue.id, title: issue.title } : null,
       comments: await CommentMapper.toDtoList(comments),
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,

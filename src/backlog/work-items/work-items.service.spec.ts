@@ -27,6 +27,7 @@ import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { WorkItemComment } from './work-item-comment.entity';
 import { PaymentPlan } from '../../auth/payment.plan';
+import { IssuesService } from '../../issues/issues.service';
 
 describe('WorkItemsService', () => {
   let usersService: UsersService;
@@ -41,6 +42,7 @@ describe('WorkItemsService', () => {
   let usersRepository: Repository<User>;
   let org: Org;
   let user: User;
+  let issuesService: IssuesService;
 
   let cleanup: () => Promise<void>;
 
@@ -72,6 +74,7 @@ describe('WorkItemsService', () => {
         IterationsService,
         FilesService,
         FilesStorageRepository,
+        IssuesService,
       ],
     );
     cleanup = dbCleanup;
@@ -89,6 +92,7 @@ describe('WorkItemsService', () => {
     );
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
     usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    issuesService = module.get<IssuesService>(IssuesService);
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -217,6 +221,24 @@ describe('WorkItemsService', () => {
       expect(workItem.files.length).toEqual(2);
       expect(workItem.files[0].id).toEqual(savedFile1.id);
       expect(workItem.files[1].id).toEqual(savedFile2.id);
+    });
+    it('should create a work item with an issue', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const issue = await issuesService.addIssue(user.id, org.id, {
+        title: 'My Issue',
+        description: 'My Issue Description',
+      });
+      const workItem = await service.createWorkItem(user.id, {
+        title: 'my work item',
+        description: 'my work item description',
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        issue: issue.id,
+        status: WorkItemStatus.PLANNED,
+      });
+      expect(workItem.issue).toBeDefined();
+      expect(workItem.issue.id).toEqual(issue.id);
     });
   });
   describe('when listing work items', () => {
@@ -611,6 +633,65 @@ describe('WorkItemsService', () => {
       expect(
         filesRepository.findOneByOrFail({ id: savedFile2.id }),
       ).rejects.toThrow(EntityNotFoundError);
+    });
+    it('should update the issue', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const issue = await issuesService.addIssue(user.id, org.id, {
+        title: 'My Issue',
+        description: 'My Issue Description',
+      });
+      const workItem = await service.createWorkItem(user.id, {
+        title: 'my work item',
+        description: 'my work item description',
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        issue: issue.id,
+        status: WorkItemStatus.PLANNED,
+      });
+      const updatedWorkItem = await service.updateWorkItem(
+        org.id,
+        workItem.id,
+        {
+          title: 'my work item updated',
+          description: 'my work item description updated',
+          priority: Priority.LOW,
+          type: WorkItemType.BUG,
+          issue: issue.id,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      expect(updatedWorkItem.issue).toBeDefined();
+      expect(updatedWorkItem.issue.id).toEqual(issue.id);
+    });
+    it('should update the issue to null', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const issue = await issuesService.addIssue(user.id, org.id, {
+        title: 'My Issue',
+        description: 'My Issue Description',
+      });
+      const workItem = await service.createWorkItem(user.id, {
+        title: 'my work item',
+        description: 'my work item description',
+        priority: Priority.HIGH,
+        type: WorkItemType.USER_STORY,
+        issue: issue.id,
+        status: WorkItemStatus.PLANNED,
+      });
+      const updatedWorkItem = await service.updateWorkItem(
+        org.id,
+        workItem.id,
+        {
+          title: 'my work item updated',
+          description: 'my work item description updated',
+          priority: Priority.LOW,
+          type: WorkItemType.BUG,
+          issue: null,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      expect(updatedWorkItem.issue).toBeUndefined();
     });
   });
   describe('when listing open work items', () => {

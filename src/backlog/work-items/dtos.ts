@@ -12,6 +12,7 @@ export interface CreateUpdateWorkItemDto {
   feature?: string;
   iteration?: string;
   assignedTo?: string;
+  issue?: string;
   files?: { id: string }[];
 }
 
@@ -42,6 +43,10 @@ export interface WorkItemDto {
     size: number;
     type: string;
   }[];
+  issue?: {
+    id: string;
+    title: string;
+  };
   createdBy: UserDto;
   assignedTo: UserDto;
   createdAt: Date;
