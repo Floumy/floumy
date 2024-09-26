@@ -37,6 +37,7 @@ export default class WorkItemMapper {
     const iteration = await workItem.iteration;
     const createdBy = await workItem.createdBy;
     const assignedTo = await workItem.assignedTo;
+    const issue = await workItem.issue;
     const org = await workItem.org;
     return {
       id: workItem.id,
@@ -63,6 +64,12 @@ export default class WorkItemMapper {
       ),
       createdBy: createdBy ? UserMapper.toDto(createdBy) : undefined,
       assignedTo: assignedTo ? UserMapper.toDto(assignedTo) : undefined,
+      issue: issue
+        ? {
+            id: issue.id,
+            title: issue.title,
+          }
+        : undefined,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt,

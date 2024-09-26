@@ -31,6 +31,8 @@ import { Objective } from '../src/okrs/objective.entity';
 import { FeatureRequestComment } from '../src/feature-requests/feature-request-comment.entity';
 import { FeatureRequestVote } from '../src/feature-requests/feature-request-vote.entity';
 import { FeatureRequest } from '../src/feature-requests/feature-request.entity';
+import { Issue } from '../src/issues/issue.entity';
+import { IssueComment } from '../src/issues/issue-comment.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -129,6 +131,8 @@ export async function setupTestingModule(
         FeatureRequest,
         FeatureRequestVote,
         FeatureRequestComment,
+        Issue,
+        IssueComment,
       ]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],
