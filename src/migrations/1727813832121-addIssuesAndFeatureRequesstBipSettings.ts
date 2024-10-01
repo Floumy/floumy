@@ -1,0 +1,19 @@
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class AddIssuesAndFeatureRequesstBipSettings1727813832121
+  implements MigrationInterface
+{
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`ALTER TABLE "bip_settings"
+        ADD "isIssuesPagePublic" boolean NOT NULL DEFAULT false`);
+    await queryRunner.query(`ALTER TABLE "bip_settings"
+        ADD "isFeatureRequestsPagePublic" boolean NOT NULL DEFAULT false`);
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`ALTER TABLE "bip_settings"
+        DROP COLUMN "isIssuesPagePublic"`);
+    await queryRunner.query(`ALTER TABLE "bip_settings"
+        DROP COLUMN "isFeatureRequestsPagePublic"`);
+  }
+}
