@@ -5,4 +5,6 @@ export interface BipSettingsDto {
   isIterationsPagePublic: boolean;
   isActiveIterationsPagePublic: boolean;
   isFeedPagePublic: boolean;
+  isIssuesPagePublic: boolean;
+  isFeatureRequestsPagePublic: boolean;
 }

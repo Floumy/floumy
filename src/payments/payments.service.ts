@@ -148,6 +148,8 @@ export class PaymentsService {
         isIterationsPagePublic: false,
         isActiveIterationsPagePublic: false,
         isFeedPagePublic: false,
+        isIssuesPagePublic: false,
+        isFeatureRequestsPagePublic: false,
       });
     }
   }
