@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BipSettingsMapper } from './bip.dtos.mapper';
 import { Org } from '../orgs/org.entity';
 import { OnEvent } from '@nestjs/event-emitter';
+import { PaymentPlan } from '../auth/payment.plan';
 
 @Injectable()
 export class BipService {
@@ -68,9 +69,16 @@ export class BipService {
     bipSettings.isActiveIterationsPagePublic =
       settings.isActiveIterationsPagePublic;
     bipSettings.isFeedPagePublic = settings.isFeedPagePublic;
-    bipSettings.isIssuesPagePublic = settings.isIssuesPagePublic;
-    bipSettings.isFeatureRequestsPagePublic =
-      settings.isFeatureRequestsPagePublic;
+
+    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
+      bipSettings.isIssuesPagePublic = false;
+      bipSettings.isFeatureRequestsPagePublic = false;
+    } else {
+      bipSettings.isIssuesPagePublic = settings.isIssuesPagePublic;
+      bipSettings.isFeatureRequestsPagePublic =
+        settings.isFeatureRequestsPagePublic;
+    }
+
     const updatedSettings = await this.bipSettingsRepository.save(bipSettings);
     return BipSettingsMapper.toDto(updatedSettings);
   }
