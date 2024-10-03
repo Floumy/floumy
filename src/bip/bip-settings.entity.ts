@@ -28,10 +28,10 @@ export class BipSettings {
   isActiveIterationsPagePublic: boolean = true;
   @Column({ default: true })
   isFeedPagePublic: boolean = true;
-  @Column({ default: true })
-  isIssuesPagePublic: boolean = true;
-  @Column({ default: true })
-  isFeatureRequestsPagePublic: boolean = true;
+  @Column({ default: false })
+  isIssuesPagePublic: boolean = false;
+  @Column({ default: false })
+  isFeatureRequestsPagePublic: boolean = false;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
