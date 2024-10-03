@@ -64,8 +64,8 @@ describe('BipController', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
-        isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
+        isIssuesPagePublic: false,
+        isFeatureRequestsPagePublic: false,
       });
     });
   });
@@ -101,8 +101,8 @@ describe('BipController', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
-        isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
+        isIssuesPagePublic: false,
+        isFeatureRequestsPagePublic: false,
       });
     });
   });

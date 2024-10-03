@@ -52,6 +52,8 @@ describe('PublicController', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
+        isIssuesPagePublic: false,
+        isFeatureRequestsPagePublic: false,
       });
     });
     it('should throw an error if the org does not exist', async () => {

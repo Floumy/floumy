@@ -52,6 +52,8 @@ describe('PublicService', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
+        isIssuesPagePublic: false,
+        isFeatureRequestsPagePublic: false,
       });
     });
   });

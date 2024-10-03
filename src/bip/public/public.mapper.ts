@@ -9,6 +9,8 @@ export class PublicMapper {
       isIterationsPagePublic: bipSettings.isIterationsPagePublic,
       isActiveIterationsPagePublic: bipSettings.isActiveIterationsPagePublic,
       isFeedPagePublic: bipSettings.isFeedPagePublic,
+      isIssuesPagePublic: bipSettings.isIssuesPagePublic,
+      isFeatureRequestsPagePublic: bipSettings.isFeatureRequestsPagePublic,
     };
   }
 }
