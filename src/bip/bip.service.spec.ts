@@ -4,9 +4,11 @@ import { OrgsService } from '../orgs/orgs.service';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { setupTestingModule } from '../../test/test.utils';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { TokensService } from '../auth/tokens.service';
 import { BipSettings } from './bip-settings.entity';
+import { PaymentPlan } from '../auth/payment.plan';
+import { Repository } from 'typeorm';
 
 describe('BipService', () => {
   let service: BipService;
@@ -14,6 +16,7 @@ describe('BipService', () => {
   let usersService: UsersService;
   let user: User;
   let org: Org;
+  let orgsRepository: Repository<Org>;
 
   let cleanup: () => Promise<void>;
 
@@ -26,6 +29,7 @@ describe('BipService', () => {
     service = module.get<BipService>(BipService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
+    orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -40,6 +44,23 @@ describe('BipService', () => {
 
   describe('updateSettings', () => {
     it('should update the settings', async () => {
+      const settings = {
+        isBuildInPublicEnabled: true,
+        isObjectivesPagePublic: true,
+        isRoadmapPagePublic: true,
+        isIterationsPagePublic: true,
+        isActiveIterationsPagePublic: true,
+        isFeedPagePublic: true,
+        isIssuesPagePublic: false,
+        isFeatureRequestsPagePublic: false,
+      };
+      await service.createOrUpdateSettings(org.id, settings);
+      const updatedSettings = await service.getSettings(org.id);
+      expect(updatedSettings).toEqual(settings);
+    });
+    it('should update the settings if the org is premium', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
       const settings = {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
@@ -67,6 +88,22 @@ describe('BipService', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
+        isIssuesPagePublic: false,
+        isFeatureRequestsPagePublic: false,
+      });
+    });
+    it('should create the default building in public settings on org created event when the org is premium', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      await service.createSettings(org);
+      const settings = await service.getSettings(org.id);
+      expect(settings).toEqual({
+        isBuildInPublicEnabled: true,
+        isObjectivesPagePublic: true,
+        isRoadmapPagePublic: true,
+        isIterationsPagePublic: true,
+        isActiveIterationsPagePublic: true,
+        isFeedPagePublic: true,
         isIssuesPagePublic: true,
         isFeatureRequestsPagePublic: true,
       });
@@ -79,8 +116,8 @@ describe('BipService', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
-        isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
+        isIssuesPagePublic: false,
+        isFeatureRequestsPagePublic: false,
       };
       await service.createOrUpdateSettings(org.id, settings);
       await service.createSettings(org);

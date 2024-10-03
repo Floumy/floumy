@@ -46,6 +46,12 @@ export class BipService {
     }
 
     const bipSettings = new BipSettings();
+
+    if (org.paymentPlan === PaymentPlan.PREMIUM) {
+      bipSettings.isIssuesPagePublic = true;
+      bipSettings.isFeatureRequestsPagePublic = true;
+    }
+
     bipSettings.org = Promise.resolve(org);
     await this.bipSettingsRepository.save(bipSettings);
   }
