@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
@@ -99,7 +98,6 @@ import { APP_FILTER } from '@nestjs/core';
       provide: APP_FILTER,
       useClass: SentryGlobalFilter,
     },
-    AppService,
   ],
 })
 export class AppModule {}
