@@ -22,7 +22,7 @@
     "test-db:down": "docker stop test-db && docker rm test-db",
     "typeorm": "typeorm-ts-node-commonjs",
     "stripe:forward": "stripe listen --forward-to localhost:8080/payments/webhook",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org floumy --project node-nestjs ./dist && sentry-cli sourcemaps upload --org floumy --project node-nestjs ./dist"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org floumy --project floumy-api ./dist && sentry-cli sourcemaps upload --org floumy --project floumy-api ./dist"
   },
   "dependencies": {
     "@nestjs/cache-manager": "^2.2.1",
