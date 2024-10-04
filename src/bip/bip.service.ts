@@ -12,9 +12,9 @@ import { PaymentPlan } from '../auth/payment.plan';
 export class BipService {
   constructor(
     @InjectRepository(BipSettings)
-    private bipSettingsRepository: Repository<BipSettings>,
+    private readonly bipSettingsRepository: Repository<BipSettings>,
     @InjectRepository(Org)
-    private orgRepository: Repository<Org>,
+    private readonly orgRepository: Repository<Org>,
   ) {}
 
   async createOrUpdateSettings(orgId: string, settings: BipSettingsDto) {
