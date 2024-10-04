@@ -27,9 +27,12 @@ import { FeedModule } from './feed/feed.module';
 import { FeatureRequestsModule } from './feature-requests/feature-requests.module';
 import { IssuesModule } from './issues/issues.module';
 import stripeConfig from './config/stripe.config';
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     CacheModule.register(),
     ConfigModule.forRoot({
       load: [
@@ -91,6 +94,12 @@ import stripeConfig from './config/stripe.config';
     FeatureRequestsModule,
     IssuesModule,
   ],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+    AppService,
+  ],
 })
 export class AppModule {}

@@ -6,7 +6,7 @@
   "private": true,
   "license": "Proprietary",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && npm run sentry:sourcemaps",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "NODE_ENV=development nest start",
     "start:dev": "NODE_ENV=development nest start --watch",
@@ -21,7 +21,8 @@
     "test-db:up": "[ -z \"$(docker ps -a -q -f name=test-db)\" ] && docker run --name test-db -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -e POSTGRES_DB=testdb -p 5455:5432 -d postgres:13 || echo 'Container test-db already exists'",
     "test-db:down": "docker stop test-db && docker rm test-db",
     "typeorm": "typeorm-ts-node-commonjs",
-    "stripe:forward": "stripe listen --forward-to localhost:8080/payments/webhook"
+    "stripe:forward": "stripe listen --forward-to localhost:8080/payments/webhook",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org floumy --project node-nestjs ./dist && sentry-cli sourcemaps upload --org floumy --project node-nestjs ./dist"
   },
   "dependencies": {
     "@nestjs/cache-manager": "^2.2.1",
@@ -33,6 +34,9 @@
     "@nestjs/platform-express": "^10.3.0",
     "@nestjs/schedule": "^4.0.1",
     "@nestjs/typeorm": "^10.0.0",
+    "@sentry/cli": "^2.36.6",
+    "@sentry/nestjs": "^8.33.1",
+    "@sentry/profiling-node": "^8.33.1",
     "@types/stripe-v3": "^3.1.33",
     "aws-sdk": "^2.1541.0",
     "bcrypt": "^5.1.1",
