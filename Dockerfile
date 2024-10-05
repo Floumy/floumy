@@ -1,6 +1,11 @@
 # Stage 1: Build the application
 FROM node:20.11.1 AS builder
 
+# Build argument for Sentry token
+ARG SENTRY_AUTH_TOKEN
+
+ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+
 # Set the working directory
 WORKDIR /usr/src/app
 
