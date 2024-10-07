@@ -114,6 +114,7 @@ export class FeaturesService {
       .createQueryBuilder('feature')
       .leftJoinAndSelect('feature.org', 'org')
       .leftJoinAndSelect('feature.milestone', 'milestone')
+      .leftJoinAndSelect('feature.assignedTo', 'assignedTo')
       .where('org.id = :orgId', { orgId })
       .andWhere('milestone.id IS NULL')
       .andWhere('feature.status not in (:...status)', {
