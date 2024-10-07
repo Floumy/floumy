@@ -146,6 +146,8 @@ export class WorkItemsService {
   async listOpenWorkItemsWithoutIterations(orgId: string) {
     const workItems = await this.workItemsRepository
       .createQueryBuilder('workItem')
+      .leftJoinAndSelect('workItem.feature', 'feature')
+      .leftJoinAndSelect('workItem.assignedTo', 'assignedTo')
       .where('workItem.orgId = :orgId', { orgId })
       .andWhere('workItem.status NOT IN (:closedStatus, :doneStatus)', {
         closedStatus: WorkItemStatus.CLOSED,
