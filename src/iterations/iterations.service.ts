@@ -268,6 +268,12 @@ export class IterationsService {
       order: {
         startDate: 'DESC',
       },
+      relations: [
+        'workItems',
+        'workItems.feature',
+        'workItems.feature.milestone',
+        'workItems.assignedTo',
+      ],
     });
   }
 
