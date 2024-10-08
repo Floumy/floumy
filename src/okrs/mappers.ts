@@ -3,6 +3,7 @@ import { Objective } from './objective.entity';
 import { TimelineService } from '../common/timeline.service';
 import { FeatureDto, KeyResultDto, OKRDto } from './dtos';
 import { CommentMapper } from '../comments/mappers';
+import { Feature } from '../roadmap/features/feature.entity';
 
 export class OKRMapper {
   static async toDTO(
@@ -83,7 +84,7 @@ export class OKRMapper {
 }
 
 class FeatureMapper {
-  static async toDTO(feature): Promise<FeatureDto> {
+  static async toDTO(feature: Feature): Promise<FeatureDto> {
     return {
       id: feature.id,
       reference: `F-${feature.sequenceNumber}`,
@@ -120,7 +121,7 @@ export class KeyResultMapper {
   static async toDTO(keyResult: KeyResult): Promise<KeyResultDto> {
     const objective = await keyResult.objective;
     const features = await keyResult.features;
-    const org = await objective.org;
+    const org = await keyResult.org;
 
     return {
       id: keyResult.id,
