@@ -24,7 +24,7 @@ import {
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('sign-in')
