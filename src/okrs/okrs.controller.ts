@@ -30,8 +30,8 @@ import { CreateUpdateCommentDto } from '../comments/dtos';
 @UseGuards(AuthGuard)
 export class OkrsController {
   constructor(
-    private okrsService: OkrsService,
-    private commentsService: CommentsService,
+    private readonly okrsService: OkrsService,
+    private readonly commentsService: CommentsService,
   ) {}
 
   @Post()
@@ -231,12 +231,12 @@ export class OkrsController {
   }
 
   @Delete('/key-results/:keyResultId/comments/:commentId')
-  deleteKeyResultComment(
+  async deleteKeyResultComment(
     @Param('commentId') commentId: string,
     @Request() request,
   ) {
     try {
-      return this.commentsService.deleteKeyResultComment(
+      return await this.commentsService.deleteKeyResultComment(
         request.user.sub,
         commentId,
       );
@@ -283,12 +283,12 @@ export class OkrsController {
 
   @Delete(':objectiveId/comments/:commentId')
   @HttpCode(HttpStatus.OK)
-  deleteObjectiveComment(
+  async deleteObjectiveComment(
     @Param('commentId') commentId: string,
     @Request() request,
   ) {
     try {
-      return this.commentsService.deleteObjectiveComment(
+      return await this.commentsService.deleteObjectiveComment(
         request.user.sub,
         commentId,
       );

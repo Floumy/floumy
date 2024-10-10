@@ -10,7 +10,6 @@ import { TokensService } from './tokens.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import { Repository } from 'typeorm';
-import { OrgsService } from '../orgs/orgs.service';
 import { BasicAuthGuard } from './basic-auth.guard';
 
 @Injectable()
@@ -21,7 +20,6 @@ export class AuthGuard extends BasicAuthGuard implements CanActivate {
     protected tokenService: TokensService,
     protected reflector: Reflector,
     @InjectRepository(User) protected usersRepository: Repository<User>,
-    private orgsService: OrgsService,
   ) {
     super(tokenService, reflector, usersRepository);
   }
