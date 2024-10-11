@@ -24,7 +24,6 @@ export class PublicOkrMapper {
   }
 
   static async toDetailDto(objective: Objective, keyResults: KeyResult[]) {
-    const org = await objective.org;
     const comments = await objective.comments;
 
     return {

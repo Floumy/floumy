@@ -18,7 +18,6 @@ import {
   PatchKeyResultDto,
   UpdateObjectiveDto,
 } from './dtos';
-import { CommentsService } from './comments/comments.service';
 
 @Injectable()
 export class OkrsService {
@@ -31,7 +30,6 @@ export class OkrsService {
     private featureRepository: Repository<Feature>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private commentsService: CommentsService,
     private orgsService: OrgsService,
     private eventEmitter: EventEmitter2,
   ) {}
