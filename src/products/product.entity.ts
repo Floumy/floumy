@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -16,42 +17,23 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Iteration } from '../iterations/Iteration.entity';
 import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
-import { PaymentPlan } from '../auth/payment.plan';
-import { Invoice } from '../payments/invoice.entity';
 import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
-import { Product } from '../products/product.entity';
+import { Org } from '../orgs/org.entity';
 
 @Entity()
-export class Org {
+export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column()
   name: string;
-  @Column({ unique: true, default: () => 'uuid_generate_v4()' })
-  invitationToken: string;
   @OneToMany(() => User, (user) => user.org, { lazy: true })
   users: Promise<User[]>;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @Column({
-    type: 'enum',
-    enum: PaymentPlan,
-    default: PaymentPlan.FREE,
-    nullable: false,
-  })
-  paymentPlan: PaymentPlan = PaymentPlan.FREE;
-  @Column({ default: false })
-  isSubscribed: boolean;
-  @Column({ default: null, nullable: true })
-  nextPaymentDate: Date;
-  @Column({ default: null, nullable: true })
-  stripeCustomerId: string;
-  @Column({ default: null, nullable: true })
-  stripeSubscriptionId: string;
   @OneToMany(() => Objective, (objective) => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })
@@ -68,20 +50,16 @@ export class Org {
   featureRequests: Promise<FeatureRequest[]>;
   @OneToMany(() => Iteration, (iteration) => iteration.org, { lazy: true })
   iterations: Promise<Iteration[]>;
-  @OneToMany(() => Invoice, (invoice) => invoice.org, { lazy: true })
-  invoices: Promise<Invoice[]>;
   @OneToMany(() => File, (file) => file.org, { lazy: true })
   files: Promise<File[]>;
-
   @OneToMany(() => FeedItem, (feedItem) => feedItem.org, { lazy: true })
   feedItems: Promise<FeedItem[]>;
-
   @OneToOne(() => BipSettings, (bipSettings) => bipSettings.org, {
     lazy: true,
   })
   bipSettings: Promise<BipSettings>;
   @OneToMany(() => Issue, (issue) => issue.org, { lazy: true })
   issues: Promise<Issue[]>;
-  @OneToMany(() => Product, (product) => product.org, { lazy: true })
-  products: Promise<Product[]>;
+  @ManyToOne(() => Org, (org) => org.products, { lazy: true })
+  org: Promise<Org>;
 }
