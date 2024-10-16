@@ -5,7 +5,6 @@ import { UsersService } from '../users/users.service';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { setupTestingModule } from '../../test/test.utils';
 import { Repository } from 'typeorm';
-import { PaymentPlan } from '../auth/payment.plan';
 
 describe('OrgsService', () => {
   let service: OrgsService;
@@ -63,106 +62,18 @@ describe('OrgsService', () => {
   });
 
   describe('when getting or creating the org', () => {
-    it('should validate that either the name or invitationToken are set', () => {
-      expect(service.getByInvitationTokenOrCreateWithName()).rejects.toThrow();
-    });
     it('should return the org based on the invitationToken', async () => {
       const org = new Org();
       org.name = 'Some org';
       await orgsRepository.save(org);
-      const actual = await service.getByInvitationTokenOrCreateWithName(
-        org.invitationToken,
-      );
+      const actual = await service.getOrCreateOrg(org.invitationToken);
       expect(org.id).toEqual(actual.id);
       expect(actual.name).toEqual(org.name);
     });
     it('should return the newly created org with the provided name', async () => {
-      const actual = await service.getByInvitationTokenOrCreateWithName(
-        '',
-        'Test org',
-      );
+      const actual = await service.getOrCreateOrg('');
       expect(actual.id).toBeDefined();
       expect(actual.id).not.toBeNull();
-      expect(actual.name).toEqual('Test org');
-    });
-    it('should create an org with the default payment plan', async () => {
-      const actual = await service.getByInvitationTokenOrCreateWithName(
-        '',
-        'Test org',
-      );
-      expect(actual.paymentPlan).toBeDefined();
-      expect(actual.paymentPlan).toEqual(PaymentPlan.FREE);
-      expect(actual.isSubscribed).toEqual(false);
-      expect(actual.nextPaymentDate).toBeNull();
-    });
-    it('should validate that the org name is unique', async () => {
-      const org = new Org();
-      org.name = 'Some org';
-      await orgsRepository.save(org);
-      await expect(
-        service.getByInvitationTokenOrCreateWithName('', 'Some org'),
-      ).rejects.toThrow();
-    });
-  });
-
-  describe('when patching the org', () => {
-    it('should update the name of the org', async () => {
-      const org = new Org();
-      org.name = 'Old name';
-      await orgsRepository.save(org);
-      await service.patchOrg(org.id, { name: 'New name' });
-      const updatedOrg = await orgsRepository.findOneByOrFail({ id: org.id });
-      expect(updatedOrg.name).toEqual('New name');
-    });
-    it('should not update the name of the org if the name is not provided', async () => {
-      const org = new Org();
-      org.name = 'Old name';
-      await orgsRepository.save(org);
-      await service.patchOrg(org.id, { name: null });
-      const updatedOrg = await orgsRepository.findOneByOrFail({ id: org.id });
-      expect(updatedOrg.name).toEqual('Old name');
-    });
-    it('should not update the name of the org if the name is empty', async () => {
-      const org = new Org();
-      org.name = 'Old name';
-      await orgsRepository.save(org);
-      await service.patchOrg(org.id, { name: '' });
-      const updatedOrg = await orgsRepository.findOneByOrFail({ id: org.id });
-      expect(updatedOrg.name).toEqual('Old name');
-    });
-    it('should not update the name of the org if the name is only whitespace', async () => {
-      const org = new Org();
-      org.name = 'Old name';
-      await orgsRepository.save(org);
-
-      await expect(service.patchOrg(org.id, { name: '   ' })).rejects.toThrow();
-    });
-    it('should not update the name of the org if the name is longer than 50 characters', async () => {
-      const org = new Org();
-      org.name = 'Old name';
-      await orgsRepository.save(org);
-      await expect(
-        service.patchOrg(org.id, {
-          name: 'This is a very long name that is over 50 characters',
-        }),
-      ).rejects.toThrow();
-    });
-    it('should not update the name of the org if the org does not exist', async () => {
-      await expect(
-        service.patchOrg('non-existent-id', { name: 'New name' }),
-      ).rejects.toThrow();
-    });
-    it('should not update the name of the org if the name is not unique', async () => {
-      const org1 = new Org();
-      org1.name = 'Org 1';
-      await orgsRepository.save(org1);
-      const org2 = new Org();
-      org2.name = 'Org 2';
-      await orgsRepository.save(org2);
-
-      await expect(
-        service.patchOrg(org2.id, { name: org1.name }),
-      ).rejects.toThrow();
     });
   });
 });

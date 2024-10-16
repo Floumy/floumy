@@ -6,12 +6,13 @@ import { Org } from './org.entity';
 import { OrgsMapper } from './orgs.mapper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PaymentPlan } from '../auth/payment.plan';
-import { OrgPatchDto } from './dtos';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class OrgsService {
   constructor(
     @InjectRepository(Org) private orgRepository: Repository<Org>,
+    @InjectRepository(Product) private productRepository: Repository<Product>,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -25,12 +26,13 @@ export class OrgsService {
     const org = new Org();
     org.users = Promise.resolve([user]);
     const savedOrg = await this.orgRepository.save(org);
+    const product = new Product();
+    product.name = 'Default Product';
+    product.org = Promise.resolve(savedOrg);
+    product.users = Promise.resolve([user]);
+    await this.productRepository.save(product);
     this.eventEmitter.emit('org.created', savedOrg);
     return savedOrg;
-  }
-
-  async clear() {
-    await this.orgRepository.clear();
   }
 
   findOneById(orgId: string) {
@@ -46,76 +48,25 @@ export class OrgsService {
     return await this.orgRepository.findOneBy({ invitationToken });
   }
 
-  async getByInvitationTokenOrCreateWithName(
-    invitationToken?: string,
-    name?: string,
-  ): Promise<Org> {
-    this.validateGetOrCreateOrg(invitationToken, name);
+  async getOrCreateOrg(invitationToken?: string): Promise<Org> {
+    if (invitationToken && invitationToken.trim().length === 0) {
+      throw new Error('Invalid invitation token');
+    }
 
     if (invitationToken) {
       return await this.findOneByInvitationToken(invitationToken);
     }
 
-    return await this.createOrg(name);
+    return await this.createOrg();
   }
 
-  async patchOrg(orgId: string, orgPatchDto: OrgPatchDto) {
-    const org = await this.findOneById(orgId);
-
-    this.validateOrgName(orgPatchDto.name);
-
-    if (org.name !== orgPatchDto.name) {
-      await this.validateOrgNameIsUnique(orgPatchDto.name);
-    }
-
-    if (orgPatchDto.name) {
-      org.name = orgPatchDto.name;
-    }
-
-    await this.orgRepository.save(org);
-  }
-
-  private async createOrg(name: string) {
-    await this.validateOrgNameIsUnique(name);
+  private async createOrg() {
     const org = new Org();
-    org.name = name.trim();
     org.paymentPlan = PaymentPlan.FREE;
     org.isSubscribed = false;
     org.nextPaymentDate = null;
     const savedOrg = await this.orgRepository.save(org);
     this.eventEmitter.emit('org.created', savedOrg);
     return savedOrg;
-  }
-
-  private async validateOrgNameIsUnique(name: string) {
-    const org = await this.orgRepository
-      .createQueryBuilder()
-      .where('LOWER(name) = LOWER(:name)', { name })
-      .getOne();
-    if (org) {
-      throw new Error('Name already exists');
-    }
-  }
-
-  private validateGetOrCreateOrg(invitationToken: string, name: string) {
-    if (!invitationToken && !name) {
-      throw new Error('Invalid invitation token and name');
-    }
-
-    if (invitationToken && name) {
-      throw new Error('Invalid invitation token and name');
-    }
-
-    if (invitationToken && invitationToken.trim().length === 0) {
-      throw new Error('Invalid invitation token');
-    }
-
-    this.validateOrgName(name);
-  }
-
-  private validateOrgName(name: string) {
-    if (name && (name.trim().length === 0 || name.trim().length > 50)) {
-      throw new Error('Invalid name');
-    }
   }
 }
