@@ -28,6 +28,7 @@ import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { WorkItemComment } from './work-item-comment.entity';
 import { PaymentPlan } from '../../auth/payment.plan';
 import { IssuesService } from '../../issues/issues.service';
+import { Product } from '../../products/product.entity';
 
 describe('WorkItemsService', () => {
   let usersService: UsersService;
@@ -43,6 +44,7 @@ describe('WorkItemsService', () => {
   let org: Org;
   let user: User;
   let issuesService: IssuesService;
+  let product: Product;
 
   let cleanup: () => Promise<void>;
 
@@ -99,6 +101,7 @@ describe('WorkItemsService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
   });
 
   afterEach(async () => {
@@ -123,7 +126,7 @@ describe('WorkItemsService', () => {
 
   describe('when creating a work item', () => {
     it('should return the created work item', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -149,7 +152,7 @@ describe('WorkItemsService', () => {
       expect(workItem.createdBy.name).toEqual(user.name);
     });
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -243,7 +246,7 @@ describe('WorkItemsService', () => {
   });
   describe('when listing work items', () => {
     it('should return the list of work items', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -266,18 +269,26 @@ describe('WorkItemsService', () => {
       expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
     });
     it('should return the list of work items paginated', async () => {
-      const feature1 = await featuresService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      const feature2 = await featuresService.createFeature(user.id, {
-        title: 'my other feature',
-        description: 'my other feature description',
-        priority: Priority.MEDIUM,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature1 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const feature2 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my other feature',
+          description: 'my other feature description',
+          priority: Priority.MEDIUM,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       await service.createWorkItem(user.id, {
         title: 'my work item',
         description: 'my work item description',
@@ -305,7 +316,7 @@ describe('WorkItemsService', () => {
   });
   describe('when getting a work item', () => {
     it('should return the work item', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -331,18 +342,26 @@ describe('WorkItemsService', () => {
   });
   describe('when updating a work item', () => {
     it('should return the updated work item', async () => {
-      const feature1 = await featuresService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      const feature2 = await featuresService.createFeature(user.id, {
-        title: 'my other feature',
-        description: 'my other feature description',
-        priority: Priority.MEDIUM,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature1 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const feature2 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my other feature',
+          description: 'my other feature description',
+          priority: Priority.MEDIUM,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       const workItem = await service.createWorkItem(user.id, {
         title: 'my work item',
         description: 'my work item description',
@@ -370,7 +389,7 @@ describe('WorkItemsService', () => {
       expect(foundWorkItem.feature.title).toEqual('my other feature');
     });
     it('should remove the association with the feature if the feature is not provided', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -574,7 +593,7 @@ describe('WorkItemsService', () => {
   });
   describe('when deleting a work item', () => {
     it('should delete the work item', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -696,18 +715,26 @@ describe('WorkItemsService', () => {
   });
   describe('when listing open work items', () => {
     it('should return the list of open work items', async () => {
-      const feature1 = await featuresService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      const feature2 = await featuresService.createFeature(user.id, {
-        title: 'my other feature',
-        description: 'my other feature description',
-        priority: Priority.MEDIUM,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature1 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const feature2 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my other feature',
+          description: 'my other feature description',
+          priority: Priority.MEDIUM,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       await service.createWorkItem(user.id, {
         title: 'my work item',
         description: 'my work item description',
@@ -750,18 +777,26 @@ describe('WorkItemsService', () => {
         startDate: '2020-01-01',
         duration: 7,
       });
-      const feature1 = await featuresService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      const feature2 = await featuresService.createFeature(user.id, {
-        title: 'my other feature',
-        description: 'my other feature description',
-        priority: Priority.MEDIUM,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature1 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const feature2 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my other feature',
+          description: 'my other feature description',
+          priority: Priority.MEDIUM,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       await service.createWorkItem(user.id, {
         title: 'my work item',
         description: 'my work item description',
@@ -796,7 +831,7 @@ describe('WorkItemsService', () => {
   });
   describe('when creating a work item with a feature', () => {
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -824,7 +859,7 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(50);
     });
     it('should update the feature workItemsCount', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -854,7 +889,7 @@ describe('WorkItemsService', () => {
   });
   describe('when updating a work item with a feature', () => {
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -899,7 +934,7 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(50);
     });
     it('should update the feature workItemsCount', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -945,18 +980,26 @@ describe('WorkItemsService', () => {
       expect(foundFeature.workItemsCount).toEqual(1);
     });
     it('should update the feature progress and count when changing the feature of a work item', async () => {
-      const feature1 = await featuresService.createFeature(user.id, {
-        title: 'my feature 1',
-        description: 'my feature description 1',
-        priority: Priority.HIGH,
-        status: FeatureStatus.IN_PROGRESS,
-      });
-      const feature2 = await featuresService.createFeature(user.id, {
-        title: 'my feature 2',
-        description: 'my feature description 2',
-        priority: Priority.HIGH,
-        status: FeatureStatus.IN_PROGRESS,
-      });
+      const feature1 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my feature 1',
+          description: 'my feature description 1',
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS,
+        },
+      );
+      const feature2 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my feature 2',
+          description: 'my feature description 2',
+          priority: Priority.HIGH,
+          status: FeatureStatus.IN_PROGRESS,
+        },
+      );
       const workItem1 = await service.createWorkItem(user.id, {
         title: 'my work item 1',
         description: 'my work item description 1',
@@ -1009,7 +1052,7 @@ describe('WorkItemsService', () => {
   });
   describe('when deleting a work item with a feature', () => {
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -1039,7 +1082,7 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(0);
     });
     it('should update the feature workItemsCount', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -1071,7 +1114,7 @@ describe('WorkItemsService', () => {
   });
   describe('when closing a work item', () => {
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.MEDIUM,
@@ -1150,7 +1193,7 @@ describe('WorkItemsService', () => {
       expect(foundWorkItem.status).toEqual(WorkItemStatus.IN_PROGRESS);
     });
     it('should update the feature progress when changing the status to DONE', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         status: FeatureStatus.IN_PROGRESS,
@@ -1172,7 +1215,7 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(100);
     });
     it('should update the feature progress when changing the status to CLOSED', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         status: FeatureStatus.IN_PROGRESS,
@@ -1194,7 +1237,7 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(100);
     });
     it('should update the feature progress when changing the status to IN_PROGRESS', async () => {
-      const feature = await featuresService.createFeature(user.id, {
+      const feature = await featuresService.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         status: FeatureStatus.IN_PROGRESS,
@@ -1233,18 +1276,26 @@ describe('WorkItemsService', () => {
   });
   describe('when searching work items', () => {
     it('should return the work items that match the search query', async () => {
-      const feature1 = await featuresService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      const feature2 = await featuresService.createFeature(user.id, {
-        title: 'my other feature',
-        description: 'my other feature description',
-        priority: Priority.MEDIUM,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature1 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const feature2 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my other feature',
+          description: 'my other feature description',
+          priority: Priority.MEDIUM,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       await service.createWorkItem(user.id, {
         title: 'my work item',
         description: 'my work item description',
@@ -1270,18 +1321,26 @@ describe('WorkItemsService', () => {
       expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
     });
     it('should return the work items that match the search query for the reference', async () => {
-      const feature1 = await featuresService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
-      const feature2 = await featuresService.createFeature(user.id, {
-        title: 'my other feature',
-        description: 'my other feature description',
-        priority: Priority.MEDIUM,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature1 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      const feature2 = await featuresService.createFeature(
+        user.id,
+        product.id,
+        {
+          title: 'my other feature',
+          description: 'my other feature description',
+          priority: Priority.MEDIUM,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       const workItem = await service.createWorkItem(user.id, {
         title: 'my work item',
         description: 'my work item description',

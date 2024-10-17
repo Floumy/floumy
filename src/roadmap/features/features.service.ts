@@ -18,6 +18,7 @@ import { CommentMapper } from '../../comments/mappers';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { FeatureComment } from './feature-comment.entity';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
+import { Product } from '../../products/product.entity';
 
 @Injectable()
 export class FeaturesService {
@@ -37,12 +38,20 @@ export class FeaturesService {
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(FeatureRequest)
     private featureRequestsRepository: Repository<FeatureRequest>,
+    @InjectRepository(Product) private productsRepository: Repository<Product>,
   ) {}
 
-  async createFeature(userId: string, featureDto: CreateUpdateFeatureDto) {
+  async createFeature(
+    userId: string,
+    productId: string,
+    featureDto: CreateUpdateFeatureDto,
+  ) {
     if (!userId) throw new Error('User id is required');
     this.validateFeature(featureDto);
     const user = await this.userRepository.findOneByOrFail({ id: userId });
+    const product = await this.productsRepository.findOneByOrFail({
+      id: productId,
+    });
     const org = await user.org;
     const feature = new Feature();
     feature.title = featureDto.title;
@@ -51,6 +60,7 @@ export class FeaturesService {
     feature.status = featureDto.status;
     feature.org = Promise.resolve(org);
     feature.createdBy = Promise.resolve(user);
+    feature.product = Promise.resolve(product);
     await this.setFeatureAssignedTo(featureDto, org, feature);
     await this.setFeatureKeyResult(featureDto, org, feature);
 

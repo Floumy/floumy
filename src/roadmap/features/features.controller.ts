@@ -20,17 +20,22 @@ import { AuthGuard } from '../../auth/auth.guard';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
 
-@Controller('features')
+@Controller('/products/:productId/features')
 @UseGuards(AuthGuard)
 export class FeaturesController {
   constructor(private featuresService: FeaturesService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Request() request, @Body() featureDto: CreateUpdateFeatureDto) {
+  async create(
+    @Request() request,
+    @Param('productId') productId: string,
+    @Body() featureDto: CreateUpdateFeatureDto,
+  ) {
     try {
       return await this.featuresService.createFeature(
         request.user.sub,
+        productId,
         featureDto,
       );
     } catch (e) {
