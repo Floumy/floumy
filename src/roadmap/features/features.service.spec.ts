@@ -30,6 +30,7 @@ import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { FeatureRequestsService } from '../../feature-requests/feature-requests.service';
 import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
 import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
+import { Product } from '../../products/product.entity';
 
 describe('FeaturesService', () => {
   let usersService: UsersService;
@@ -43,6 +44,7 @@ describe('FeaturesService', () => {
   let orgsRepository: Repository<Org>;
   let user: User;
   let org: Org;
+  let product: Product;
 
   let cleanup: () => Promise<void>;
 
@@ -94,6 +96,7 @@ describe('FeaturesService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     featureRequestsService = module.get<FeatureRequestsService>(
       FeatureRequestsService,
     );
@@ -109,7 +112,7 @@ describe('FeaturesService', () => {
 
   describe('when creating a feature', () => {
     it('should return a feature', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -122,7 +125,7 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the org does not exist', async () => {
       await expect(
-        service.createFeature('non-existent-org', {
+        service.createFeature('non-existent-org', product.id, {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
@@ -132,7 +135,7 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the title is not provided', async () => {
       await expect(
-        service.createFeature(user.id, {
+        service.createFeature(user.id, product.id, {
           title: '',
           description: 'my feature description',
           priority: Priority.HIGH,
@@ -142,7 +145,7 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the priority is not provided', async () => {
       await expect(
-        service.createFeature(user.id, {
+        service.createFeature(user.id, product.id, {
           title: 'my feature',
           description: 'my feature description',
           priority: null,
@@ -161,7 +164,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -174,7 +177,7 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the key result does not exist', async () => {
       await expect(
-        service.createFeature(user.id, {
+        service.createFeature(user.id, product.id, {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
@@ -200,7 +203,7 @@ describe('FeaturesService', () => {
         'testtesttest',
       );
       await expect(
-        service.createFeature(otherUser.id, {
+        service.createFeature(otherUser.id, product.id, {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
@@ -215,7 +218,7 @@ describe('FeaturesService', () => {
         description: 'my milestone description',
         dueDate: '2020-01-01',
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -234,7 +237,7 @@ describe('FeaturesService', () => {
         mimetype: 'text/plain',
       } as any);
 
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -254,7 +257,7 @@ describe('FeaturesService', () => {
         'testtesttest',
         org.invitationToken,
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -276,7 +279,7 @@ describe('FeaturesService', () => {
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -300,7 +303,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      await service.createFeature(user.id, {
+      await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -325,14 +328,14 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      await service.createFeature(user.id, {
+      await service.createFeature(user.id, product.id, {
         title: 'my feature 1',
         description: 'my feature description',
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
         status: FeatureStatus.PLANNED,
       });
-      await service.createFeature(user.id, {
+      await service.createFeature(user.id, product.id, {
         title: 'my feature 2',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -346,7 +349,7 @@ describe('FeaturesService', () => {
   });
   describe('when listing features without milestone', () => {
     it('should return a list of features', async () => {
-      await service.createFeature(user.id, {
+      await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -365,7 +368,7 @@ describe('FeaturesService', () => {
         description: 'my milestone description',
         dueDate: '2020-01-01',
       });
-      await service.createFeature(user.id, {
+      await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -376,13 +379,13 @@ describe('FeaturesService', () => {
       expect(features.length).toEqual(0);
     });
     it('should not return features that are closed or completed', async () => {
-      await service.createFeature(user.id, {
+      await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
         status: FeatureStatus.CLOSED,
       });
-      await service.createFeature(user.id, {
+      await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -394,7 +397,7 @@ describe('FeaturesService', () => {
   });
   describe('when getting a feature', () => {
     it('should return a feature', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -423,7 +426,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -443,7 +446,7 @@ describe('FeaturesService', () => {
         description: 'my milestone description',
         dueDate: '2020-01-01',
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -458,7 +461,7 @@ describe('FeaturesService', () => {
   });
   describe('when updating a feature', () => {
     it('should return a feature', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -491,7 +494,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -516,7 +519,7 @@ describe('FeaturesService', () => {
         description: 'my milestone description',
         dueDate: '2020-01-01',
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -540,7 +543,7 @@ describe('FeaturesService', () => {
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -565,7 +568,7 @@ describe('FeaturesService', () => {
         'testtesttest',
         org.invitationToken,
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -589,7 +592,7 @@ describe('FeaturesService', () => {
         'testtesttest',
         org.invitationToken,
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -612,7 +615,7 @@ describe('FeaturesService', () => {
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -641,7 +644,7 @@ describe('FeaturesService', () => {
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -667,7 +670,7 @@ describe('FeaturesService', () => {
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -697,7 +700,7 @@ describe('FeaturesService', () => {
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -731,7 +734,7 @@ describe('FeaturesService', () => {
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -764,7 +767,7 @@ describe('FeaturesService', () => {
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -790,7 +793,7 @@ describe('FeaturesService', () => {
   });
   describe('when deleting a feature', () => {
     it('should delete the feature', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -802,7 +805,7 @@ describe('FeaturesService', () => {
       ).rejects.toThrowError();
     });
     it('should remove the association between features and work items', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -830,7 +833,7 @@ describe('FeaturesService', () => {
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -845,7 +848,7 @@ describe('FeaturesService', () => {
   });
   describe('when patching a feature', () => {
     it('should update the status', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -861,7 +864,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should update the priority', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -882,7 +885,7 @@ describe('FeaturesService', () => {
         description: 'my milestone description',
         dueDate: '2020-01-01',
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -901,7 +904,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should throw an error if the milestone does not exist', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -926,7 +929,7 @@ describe('FeaturesService', () => {
         description: 'my milestone description',
         dueDate: '2020-01-01',
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -944,7 +947,7 @@ describe('FeaturesService', () => {
         description: 'my milestone description',
         dueDate: '2020-01-01',
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -967,7 +970,7 @@ describe('FeaturesService', () => {
         description: 'my milestone description',
         dueDate: '2020-01-01',
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         milestone: milestone.id,
@@ -997,7 +1000,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1018,7 +1021,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should throw an error if the key result does not exist', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1048,7 +1051,7 @@ describe('FeaturesService', () => {
           'testtesttest',
         ),
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1071,7 +1074,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         keyResult: objective.keyResults[0].id,
@@ -1099,7 +1102,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         keyResult: objective.keyResults[0].id,
@@ -1131,7 +1134,7 @@ describe('FeaturesService', () => {
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1159,7 +1162,7 @@ describe('FeaturesService', () => {
         title: 'My Feature Request',
         description: 'My Feature Request Description',
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1191,7 +1194,7 @@ describe('FeaturesService', () => {
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1215,7 +1218,7 @@ describe('FeaturesService', () => {
   });
   describe('when searching features', () => {
     it('should return a list of features', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1230,13 +1233,13 @@ describe('FeaturesService', () => {
       expect(features[0].updatedAt).toBeDefined();
     });
     it('should return the features paginated', async () => {
-      await service.createFeature(user.id, {
+      await service.createFeature(user.id, product.id, {
         title: 'my feature 1',
         description: 'my feature description',
         priority: Priority.LOW,
         status: FeatureStatus.PLANNED,
       });
-      await service.createFeature(user.id, {
+      await service.createFeature(user.id, product.id, {
         title: 'my feature 2',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1257,7 +1260,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'my feature',
         description: 'my feature description',
         keyResult: objective.keyResults[0].id,
@@ -1278,7 +1281,7 @@ describe('FeaturesService', () => {
     it('should return a list of comments if the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1298,7 +1301,7 @@ describe('FeaturesService', () => {
     it('should create a comment if the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1316,7 +1319,7 @@ describe('FeaturesService', () => {
     it('should delete the comment if it exists', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1332,7 +1335,7 @@ describe('FeaturesService', () => {
     });
 
     it('should throw an error if the comment does not exist', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1352,7 +1355,7 @@ describe('FeaturesService', () => {
     it('should update the comment if it exists and the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1374,7 +1377,7 @@ describe('FeaturesService', () => {
     });
 
     it('should throw an error if the comment does not exist', async () => {
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1395,7 +1398,7 @@ describe('FeaturesService', () => {
     it('should throw an error if the comment content is empty', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(user.id, {
+      const feature = await service.createFeature(user.id, product.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,

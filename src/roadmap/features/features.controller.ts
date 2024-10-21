@@ -20,7 +20,7 @@ import { AuthGuard } from '../../auth/auth.guard';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
 
-@Controller('/products/:productId/features')
+@Controller('/orgs/:orgId/products/:productId/features')
 @UseGuards(AuthGuard)
 export class FeaturesController {
   constructor(private featuresService: FeaturesService) {}

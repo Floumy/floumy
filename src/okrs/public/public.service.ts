@@ -14,15 +14,43 @@ export class PublicService {
     private okrsService: OkrsService,
   ) {}
 
-  async listObjectives(orgId: string, timeline: Timeline) {
+  async listObjectives(orgId: string, productId: string, timeline: Timeline) {
     await this.validateOrgHasBuildingInPublicEnabled(orgId);
 
     const objectives = await this.okrsService.listObjectivesForTimeline(
       orgId,
+      productId,
       timeline,
     );
 
     return objectives.map(PublicOkrMapper.toDTO);
+  }
+
+  async getObjective(orgId: string, productId: string, okrId: string) {
+    await this.validateOrgHasBuildingInPublicEnabled(orgId);
+
+    const { objective, keyResults } =
+      await this.okrsService.getObjectiveDetails(okrId, orgId, productId);
+
+    return await PublicOkrMapper.toDetailDto(objective, keyResults);
+  }
+
+  async getKeyResult(
+    orgId: string,
+    productId: string,
+    objectiveId: string,
+    keyResultId: string,
+  ) {
+    await this.validateOrgHasBuildingInPublicEnabled(orgId);
+
+    const keyResult = await this.okrsService.getKeyResult(
+      orgId,
+      productId,
+      objectiveId,
+      keyResultId,
+    );
+
+    return PublicOkrMapper.toKeyResultDto(keyResult);
   }
 
   private async validateOrgHasBuildingInPublicEnabled(orgId: string) {
@@ -35,26 +63,5 @@ export class PublicService {
     if (!bipSettings?.isBuildInPublicEnabled) {
       throw new Error('Building in public is not enabled');
     }
-  }
-
-  async getObjective(orgId: string, okrId: string) {
-    await this.validateOrgHasBuildingInPublicEnabled(orgId);
-
-    const { objective, keyResults } =
-      await this.okrsService.getObjectiveDetails(okrId, orgId);
-
-    return await PublicOkrMapper.toDetailDto(objective, keyResults);
-  }
-
-  async getKeyResult(orgId: string, objectiveId: string, keyResultId: string) {
-    await this.validateOrgHasBuildingInPublicEnabled(orgId);
-
-    const keyResult = await this.okrsService.getKeyResult(
-      orgId,
-      objectiveId,
-      keyResultId,
-    );
-
-    return PublicOkrMapper.toKeyResultDto(keyResult);
   }
 }

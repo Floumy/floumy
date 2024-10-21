@@ -12,6 +12,7 @@ import {
   Post,
   Put,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { OkrsService } from './okrs.service';
@@ -26,7 +27,7 @@ import {
 import { CommentsService } from './comments/comments.service';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 
-@Controller('okrs')
+@Controller('/org/:orgId/products/:productId/okrs')
 @UseGuards(AuthGuard)
 export class OkrsController {
   constructor(
@@ -36,10 +37,20 @@ export class OkrsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Request() request, @Body() okrDto: CreateOrUpdateOKRDto) {
-    const { org: orgId } = request.user;
+  async create(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Body() okrDto: CreateOrUpdateOKRDto,
+  ) {
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      return await this.okrsService.create(orgId, okrDto);
+      return await this.okrsService.create(orgId, productId, okrDto);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -47,9 +58,18 @@ export class OkrsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async list(@Request() request) {
-    const { org: orgId } = request.user;
-    return await this.okrsService.list(orgId);
+  async list(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+  ) {
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.okrsService.list(orgId, productId);
   }
 
   @Get('key-results')
@@ -61,10 +81,19 @@ export class OkrsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async get(@Param('id') id: string, @Request() request) {
-    const { org: orgId } = request.user;
+  async get(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Param('id') id: string,
+    @Request() request,
+  ) {
+    const { org: userOrgId } = request.user;
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      return await this.okrsService.get(orgId, id);
+      return await this.okrsService.get(orgId, productId, id);
     } catch (e) {
       throw new NotFoundException();
     }
@@ -72,23 +101,41 @@ export class OkrsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Param('id') id: string, @Request() request) {
-    const { org: orgId } = request.user;
-    await this.okrsService.delete(orgId, id);
+  async delete(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Param('id') id: string,
+    @Request() request,
+  ) {
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
+    await this.okrsService.delete(orgId, productId, id);
   }
 
   @Patch(':objectiveId/key-results/:keyResultId')
   @HttpCode(HttpStatus.OK)
   async patchKeyResult(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('objectiveId') objectiveId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
     @Body() updateKeyResultDto: PatchKeyResultDto,
   ) {
-    const { org: orgId } = request.user;
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.okrsService.patchKeyResult(
         orgId,
+        productId,
         objectiveId,
         keyResultId,
         updateKeyResultDto,
@@ -101,14 +148,22 @@ export class OkrsController {
   @Put('objective/:objectiveId')
   @HttpCode(HttpStatus.OK)
   async updateObjective(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('objectiveId') objectiveId: string,
     @Request() request,
     @Body() updateObjectiveDto: UpdateObjectiveDto,
   ) {
-    const { org: orgId } = request.user;
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.okrsService.updateObjective(
         orgId,
+        productId,
         objectiveId,
         updateObjectiveDto,
       );
@@ -120,15 +175,23 @@ export class OkrsController {
   @Put(':objectiveId/key-results/:keyResultId')
   @HttpCode(HttpStatus.OK)
   async updateKeyResult(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('objectiveId') objectiveId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
     @Body() updateKeyResultDto: CreateOrUpdateKeyResultDto,
   ) {
-    const { org: orgId } = request.user;
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.okrsService.updateKeyResult(
         orgId,
+        productId,
         objectiveId,
         keyResultId,
         updateKeyResultDto,
@@ -141,12 +204,24 @@ export class OkrsController {
   @Delete(':objectiveId/key-results/:keyResultId')
   @HttpCode(HttpStatus.OK)
   async deleteKeyResult(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('objectiveId') objectiveId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
   ) {
-    const { org: orgId } = request.user;
-    await this.okrsService.deleteKeyResult(orgId, objectiveId, keyResultId);
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
+    await this.okrsService.deleteKeyResult(
+      orgId,
+      productId,
+      objectiveId,
+      keyResultId,
+    );
   }
 
   @Post(':objectiveId/key-results')
@@ -171,14 +246,22 @@ export class OkrsController {
   @Get(':objectiveId/key-results/:keyResultId')
   @HttpCode(HttpStatus.OK)
   async getKeyResult(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('objectiveId') objectiveId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
   ) {
-    const { org: orgId } = request.user;
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.okrsService.getKeyResultDetail(
         orgId,
+        productId,
         objectiveId,
         keyResultId,
       );
@@ -189,21 +272,33 @@ export class OkrsController {
 
   @Get('timeline/:timeline')
   async listForTimeline(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Param('timeline') timeline: Timeline,
   ) {
-    return await this.okrsService.listForTimeline(request.user.org, timeline);
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.okrsService.listForTimeline(orgId, productId, timeline);
   }
 
   @Post('/key-results/:keyResultId/comments')
   @HttpCode(HttpStatus.OK)
   async addCommentToKeyResult(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
     @Body() commentDto: CreateUpdateCommentDto,
   ) {
     try {
       return await this.commentsService.addCommentToKeyResult(
+        orgId,
+        productId,
         keyResultId,
         request.user.sub,
         commentDto.content,
@@ -215,12 +310,16 @@ export class OkrsController {
 
   @Put('/key-results/:keyResultId/comments/:commentId')
   async updateKeyResultComment(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('commentId') commentId: string,
     @Request() request,
     @Body() commentDto: CreateUpdateCommentDto,
   ) {
     try {
       return await this.commentsService.updateKeyResultComment(
+        orgId,
+        productId,
         request.user.sub,
         commentId,
         commentDto.content,
@@ -232,11 +331,15 @@ export class OkrsController {
 
   @Delete('/key-results/:keyResultId/comments/:commentId')
   async deleteKeyResultComment(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('commentId') commentId: string,
     @Request() request,
   ) {
     try {
       return await this.commentsService.deleteKeyResultComment(
+        orgId,
+        productId,
         request.user.sub,
         commentId,
       );
@@ -248,12 +351,16 @@ export class OkrsController {
   @Post(':objectiveId/comments')
   @HttpCode(HttpStatus.CREATED)
   async addCommentToObjective(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('objectiveId') objectiveId: string,
     @Request() resquest,
     @Body() commentDto: CreateUpdateCommentDto,
   ) {
     try {
       return await this.commentsService.addCommentToObjective(
+        orgId,
+        productId,
         objectiveId,
         resquest.user.sub,
         commentDto.content,
@@ -266,12 +373,16 @@ export class OkrsController {
   @Put(':objectiveId/comments/:commentId')
   @HttpCode(HttpStatus.OK)
   async updateObjectiveComment(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('commentId') commentId: string,
     @Request() request,
     @Body() commentDto: CreateUpdateCommentDto,
   ) {
     try {
       return await this.commentsService.updateObjectiveComment(
+        orgId,
+        productId,
         request.user.sub,
         commentId,
         commentDto.content,
@@ -284,11 +395,15 @@ export class OkrsController {
   @Delete(':objectiveId/comments/:commentId')
   @HttpCode(HttpStatus.OK)
   async deleteObjectiveComment(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('commentId') commentId: string,
     @Request() request,
   ) {
     try {
       return await this.commentsService.deleteObjectiveComment(
+        orgId,
+        productId,
         request.user.sub,
         commentId,
       );
