@@ -136,9 +136,9 @@ export class WorkItemsService {
     this.eventEmitter.emit('workItem.deleted', deletedWorkItem);
   }
 
-  removeFeatureFromWorkItems(orgId: string, id: string) {
+  removeFeatureFromWorkItems(orgId: string, productId: string, id: string) {
     return this.workItemsRepository.update(
-      { org: { id: orgId }, feature: { id } },
+      { org: { id: orgId }, feature: { id }, product: { id: productId } },
       { feature: null },
     );
   }

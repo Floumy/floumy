@@ -273,10 +273,15 @@ export class OkrsService {
     return await this.keyResultRepository.findOneByOrFail({ id });
   }
 
-  async getKeyResultByOrgId(orgId: string, id: string) {
+  async getKeyResultByOrgAndProduct(
+    orgId: string,
+    productId: string,
+    id: string,
+  ) {
     return await this.keyResultRepository.findOneByOrFail({
       id,
       org: { id: orgId },
+      product: { id: productId },
     });
   }
 

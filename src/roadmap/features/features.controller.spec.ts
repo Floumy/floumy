@@ -30,6 +30,7 @@ import { PaymentPlan } from '../../auth/payment.plan';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
 import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
+import { Product } from '../../products/product.entity';
 
 describe('FeaturesController', () => {
   let controller: FeaturesController;
@@ -38,6 +39,7 @@ describe('FeaturesController', () => {
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
+  let product: Product;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -85,6 +87,7 @@ describe('FeaturesController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
   });
 
   afterEach(async () => {
@@ -98,9 +101,12 @@ describe('FeaturesController', () => {
   describe('when creating a feature', () => {
     it('should return 201', async () => {
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -119,9 +125,12 @@ describe('FeaturesController', () => {
     it('should return 400 if title is missing', async () => {
       try {
         await controller.create(
+          org.id,
+          product.id,
           {
             user: {
               sub: user.id,
+              org: org.id,
             },
           },
           {
@@ -139,9 +148,12 @@ describe('FeaturesController', () => {
   describe('when getting features', () => {
     it('should return 200', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -151,7 +163,7 @@ describe('FeaturesController', () => {
           status: FeatureStatus.PLANNED,
         },
       );
-      const features = await controller.list({
+      const features = await controller.list(org.id, product.id, {
         user: {
           org: org.id,
         },
@@ -165,9 +177,12 @@ describe('FeaturesController', () => {
     });
     it('should return features paginated', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -178,9 +193,12 @@ describe('FeaturesController', () => {
         },
       );
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -191,6 +209,8 @@ describe('FeaturesController', () => {
         },
       );
       const features = await controller.list(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -205,9 +225,12 @@ describe('FeaturesController', () => {
   describe('when getting features without milestone', () => {
     it('should return 200', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -217,11 +240,15 @@ describe('FeaturesController', () => {
           status: FeatureStatus.PLANNED,
         },
       );
-      const features = await controller.listWithoutMilestone({
-        user: {
-          org: org.id,
+      const features = await controller.listWithoutMilestone(
+        org.id,
+        product.id,
+        {
+          user: {
+            org: org.id,
+          },
         },
-      });
+      );
       expect(features[0].title).toEqual('my feature');
       expect(features[0].priority).toEqual(Priority.HIGH);
       expect(features[0].createdAt).toBeDefined();
@@ -231,9 +258,12 @@ describe('FeaturesController', () => {
   describe('when getting a feature', () => {
     it('should return 200', async () => {
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -244,6 +274,8 @@ describe('FeaturesController', () => {
         },
       );
       const feature = await controller.get(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -260,9 +292,12 @@ describe('FeaturesController', () => {
   describe('when updating a feature', () => {
     it('should return 200', async () => {
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -273,6 +308,8 @@ describe('FeaturesController', () => {
         },
       );
       const feature = await controller.update(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -296,9 +333,12 @@ describe('FeaturesController', () => {
   describe('when deleting a feature', () => {
     it('should return 200', async () => {
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -309,6 +349,8 @@ describe('FeaturesController', () => {
         },
       );
       await controller.delete(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -321,9 +363,12 @@ describe('FeaturesController', () => {
   describe('when patching the feature', () => {
     it('should update the status', async () => {
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -334,6 +379,8 @@ describe('FeaturesController', () => {
         },
       );
       const feature = await controller.patch(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -352,9 +399,12 @@ describe('FeaturesController', () => {
     });
     it('should update the priority', async () => {
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -365,6 +415,8 @@ describe('FeaturesController', () => {
         },
       );
       const feature = await controller.patch(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -388,9 +440,12 @@ describe('FeaturesController', () => {
         dueDate: '2020-01-01',
       });
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -401,6 +456,8 @@ describe('FeaturesController', () => {
         },
       );
       const feature = await controller.patch(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -422,9 +479,12 @@ describe('FeaturesController', () => {
   describe('when searching features', () => {
     it('should return 200', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -435,6 +495,8 @@ describe('FeaturesController', () => {
         },
       );
       const features = await controller.search(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -453,9 +515,12 @@ describe('FeaturesController', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -469,6 +534,7 @@ describe('FeaturesController', () => {
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         featureResponse.id,
@@ -486,9 +552,12 @@ describe('FeaturesController', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -502,6 +571,7 @@ describe('FeaturesController', () => {
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         featureResponse.id,
@@ -518,9 +588,12 @@ describe('FeaturesController', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -534,6 +607,7 @@ describe('FeaturesController', () => {
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         featureResponse.id,
@@ -545,6 +619,7 @@ describe('FeaturesController', () => {
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         featureResponse.id,
@@ -557,9 +632,12 @@ describe('FeaturesController', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -573,6 +651,7 @@ describe('FeaturesController', () => {
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         featureResponse.id,
@@ -584,6 +663,7 @@ describe('FeaturesController', () => {
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         featureResponse.id,

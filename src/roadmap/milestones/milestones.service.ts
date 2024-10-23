@@ -31,9 +31,10 @@ export class MilestonesService {
     return await MilestoneMapper.toDto(savedMilestone);
   }
 
-  async findOneById(orgId: string, id: string) {
+  async findOneById(orgId: string, productId: string, id: string) {
     return await this.milestoneRepository.findOneByOrFail({
       org: { id: orgId },
+      product: { id: productId },
       id: id,
     });
   }

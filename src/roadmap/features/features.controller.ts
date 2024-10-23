@@ -12,6 +12,7 @@ import {
   Put,
   Query,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { FeaturesService } from './features.service';
@@ -28,14 +29,20 @@ export class FeaturesController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @Request() request,
+    @Param('orgId') orgId: string,
     @Param('productId') productId: string,
+    @Request() request,
     @Body() featureDto: CreateUpdateFeatureDto,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.featuresService.createFeature(
-        request.user.sub,
+        orgId,
         productId,
+        request.user.sub,
         featureDto,
       );
     } catch (e) {
@@ -46,13 +53,24 @@ export class FeaturesController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async list(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.listFeatures(orgId, page, limit);
+      return await this.featuresService.listFeatures(
+        orgId,
+        productId,
+        page,
+        limit,
+      );
     } catch (e) {
       throw new BadRequestException();
     }
@@ -61,15 +79,22 @@ export class FeaturesController {
   @Get('/search')
   @HttpCode(HttpStatus.OK)
   async search(
-    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request: any,
     @Query('q') query: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       const { org: orgId } = request.user;
       return await this.featuresService.searchFeatures(
         orgId,
+        productId,
         query,
         page,
         limit,
@@ -81,10 +106,21 @@ export class FeaturesController {
 
   @Get('/without-milestone')
   @HttpCode(HttpStatus.OK)
-  async listWithoutMilestone(@Request() request) {
+  async listWithoutMilestone(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.listFeaturesWithoutMilestone(orgId);
+      return await this.featuresService.listFeaturesWithoutMilestone(
+        orgId,
+        productId,
+      );
     } catch (e) {
       throw new BadRequestException();
     }
@@ -92,10 +128,19 @@ export class FeaturesController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async get(@Request() request, @Param('id') id: string) {
+  async get(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.getFeature(orgId, id);
+      return await this.featuresService.getFeature(orgId, productId, id);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -104,14 +149,21 @@ export class FeaturesController {
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   async update(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() updateFeatureDto: CreateUpdateFeatureDto,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       const { org: orgId } = request.user;
       return await this.featuresService.updateFeature(
         orgId,
+        productId,
         id,
         updateFeatureDto,
       );
@@ -122,10 +174,19 @@ export class FeaturesController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Request() request, @Param('id') id: string) {
+  async delete(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       const { org: orgId } = request.user;
-      await this.featuresService.deleteFeature(orgId, id);
+      await this.featuresService.deleteFeature(orgId, productId, id);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -134,14 +195,21 @@ export class FeaturesController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async patch(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() patchFeatureDto: PatchFeatureDto,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       const { org: orgId } = request.user;
       return await this.featuresService.patchFeature(
         orgId,
+        productId,
         id,
         patchFeatureDto,
       );

@@ -5,14 +5,15 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
-import { Org } from "../../orgs/org.entity";
-import { Feature } from "../features/feature.entity";
+  UpdateDateColumn,
+} from 'typeorm';
+import { Org } from '../../orgs/org.entity';
+import { Feature } from '../features/feature.entity';
+import { Product } from '../../products/product.entity';
 
 @Entity()
 export class Milestone {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column()
   title: string;
@@ -24,8 +25,10 @@ export class Milestone {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @ManyToOne(() => Org, org => org.milestones, { lazy: true })
+  @ManyToOne(() => Org, (org) => org.milestones, { lazy: true })
   org: Promise<Org>;
-  @OneToMany(() => Feature, feature => feature.milestone, { lazy: true })
+  @OneToMany(() => Feature, (feature) => feature.milestone, { lazy: true })
   features: Promise<Feature[]>;
+  @ManyToOne(() => Product, (product) => product.milestones, { lazy: true })
+  product: Promise<Product>;
 }
