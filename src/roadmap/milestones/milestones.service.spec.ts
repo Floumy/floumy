@@ -19,6 +19,7 @@ import { FeatureFile } from '../features/feature-file.entity';
 import { FilesModule } from '../../files/files.module';
 import { Timeline } from '../../common/timeline.enum';
 import { TimelineService } from '../../common/timeline.service';
+import { Product } from '../../products/product.entity';
 
 describe('MilestonesService', () => {
   let usersService: UsersService;
@@ -27,6 +28,7 @@ describe('MilestonesService', () => {
   let featuresService: FeaturesService;
   let user: User;
   let org: Org;
+  let product: Product;
 
   let cleanup: () => Promise<void>;
 
@@ -67,6 +69,7 @@ describe('MilestonesService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
   });
 
   afterEach(async () => {
@@ -79,7 +82,7 @@ describe('MilestonesService', () => {
 
   describe('when creating a milestone', () => {
     it('should return a milestone', async () => {
-      const milestone = await service.createMilestone(org.id, {
+      const milestone = await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
@@ -91,7 +94,7 @@ describe('MilestonesService', () => {
     });
     it('should throw an error if title is missing', async () => {
       await expect(
-        service.createMilestone(org.id, {
+        service.createMilestone(org.id, product.id, {
           title: '',
           description: 'my milestone',
           dueDate: '2020-01-01',
@@ -100,7 +103,7 @@ describe('MilestonesService', () => {
     });
     it('should throw an error if dueDate is missing', async () => {
       await expect(
-        service.createMilestone(org.id, {
+        service.createMilestone(org.id, product.id, {
           title: 'my milestone',
           description: 'my milestone',
           dueDate: '',
@@ -109,7 +112,7 @@ describe('MilestonesService', () => {
     });
     it('should throw an error if dueDate is invalid', async () => {
       await expect(
-        service.createMilestone(org.id, {
+        service.createMilestone(org.id, product.id, {
           title: 'my milestone',
           description: 'my milestone',
           dueDate: '2020-01',
@@ -119,12 +122,12 @@ describe('MilestonesService', () => {
   });
   describe('when listing milestones', () => {
     it('should return the milestones', async () => {
-      await service.createMilestone(org.id, {
+      await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      const milestones = await service.listMilestones(org.id);
+      const milestones = await service.listMilestones(org.id, product.id);
       expect(milestones.length).toEqual(1);
       expect(milestones[0].id).toBeDefined();
       expect(milestones[0].title).toEqual('my milestone');
@@ -133,12 +136,15 @@ describe('MilestonesService', () => {
   });
   describe('when listing milestones with features', () => {
     it('should return the milestones', async () => {
-      await service.createMilestone(org.id, {
+      await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      const milestones = await service.listMilestonesWithFeatures(org.id);
+      const milestones = await service.listMilestonesWithFeatures(
+        org.id,
+        product.id,
+      );
       expect(milestones.length).toEqual(1);
       expect(milestones[0].id).toBeDefined();
       expect(milestones[0].title).toEqual('my milestone');
@@ -147,24 +153,27 @@ describe('MilestonesService', () => {
       expect(milestones[0].timeline).toEqual('past');
     });
     it('should return the milestones with features', async () => {
-      const milestone = await service.createMilestone(org.id, {
+      const milestone = await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      await service.createMilestone(org.id, {
+      await service.createMilestone(org.id, product.id, {
         title: 'my milestone 2',
         description: 'my milestone 2',
         dueDate: '2020-01-01',
       });
-      await featuresService.createFeature(user.id, {
+      await featuresService.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
         milestone: milestone.id,
         status: FeatureStatus.PLANNED,
       });
-      const milestones = await service.listMilestonesWithFeatures(org.id);
+      const milestones = await service.listMilestonesWithFeatures(
+        org.id,
+        product.id,
+      );
       expect(milestones.length).toEqual(2);
       expect(milestones[0].id).toBeDefined();
       expect(milestones[0].title).toEqual('my milestone');
@@ -185,12 +194,16 @@ describe('MilestonesService', () => {
   });
   describe('when getting a milestone', () => {
     it('should return the milestone', async () => {
-      const milestone = await service.createMilestone(org.id, {
+      const milestone = await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      const foundMilestone = await service.get(org.id, milestone.id);
+      const foundMilestone = await service.get(
+        org.id,
+        product.id,
+        milestone.id,
+      );
       expect(foundMilestone.id).toEqual(milestone.id);
       expect(foundMilestone.title).toEqual(milestone.title);
       expect(foundMilestone.description).toEqual(milestone.description);
@@ -200,16 +213,21 @@ describe('MilestonesService', () => {
   });
   describe('when updating a milestone', () => {
     it('should return the milestone', async () => {
-      const milestone = await service.createMilestone(org.id, {
+      const milestone = await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      const updatedMilestone = await service.update(org.id, milestone.id, {
-        title: 'my milestone updated',
-        description: 'my milestone updated',
-        dueDate: '2020-01-02',
-      });
+      const updatedMilestone = await service.update(
+        org.id,
+        product.id,
+        milestone.id,
+        {
+          title: 'my milestone updated',
+          description: 'my milestone updated',
+          dueDate: '2020-01-02',
+        },
+      );
       expect(updatedMilestone.id).toEqual(milestone.id);
       expect(updatedMilestone.title).toEqual('my milestone updated');
       expect(updatedMilestone.description).toEqual('my milestone updated');
@@ -218,40 +236,55 @@ describe('MilestonesService', () => {
   });
   describe('when deleting a milestone', () => {
     it('should delete the milestone', async () => {
-      const milestone = await service.createMilestone(org.id, {
+      const milestone = await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      await service.delete(org.id, milestone.id);
-      await expect(service.get(org.id, milestone.id)).rejects.toThrow();
+      await service.delete(org.id, product.id, milestone.id);
+      await expect(
+        service.get(org.id, product.id, milestone.id),
+      ).rejects.toThrow();
     });
     it('should not delete the features but remove the milestone reference', async () => {
-      const milestone = await service.createMilestone(org.id, {
+      const milestone = await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      const feature = await featuresService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        milestone: milestone.id,
-        status: FeatureStatus.PLANNED,
-      });
-      await service.delete(org.id, milestone.id);
-      const foundFeature = await featuresService.getFeature(org.id, feature.id);
+      const feature = await featuresService.createFeature(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          milestone: milestone.id,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      await service.delete(org.id, product.id, milestone.id);
+      const foundFeature = await featuresService.getFeature(
+        org.id,
+        product.id,
+        feature.id,
+      );
       expect(foundFeature.milestone).toBeUndefined();
     });
   });
   describe('when listing milestones for a timeline', () => {
     it('should return the milestones for the past timeline', async () => {
-      await service.createMilestone(org.id, {
+      await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      const milestones = await service.listForTimeline(org.id, Timeline.PAST);
+      const milestones = await service.listForTimeline(
+        org.id,
+        product.id,
+        Timeline.PAST,
+      );
       expect(milestones.length).toEqual(1);
       expect(milestones[0].id).toBeDefined();
       expect(milestones[0].title).toEqual('my milestone');
@@ -263,13 +296,14 @@ describe('MilestonesService', () => {
         Timeline.THIS_QUARTER.valueOf(),
       ).endDate;
       dueDate.setDate(dueDate.getDate() - 1);
-      await service.createMilestone(org.id, {
+      await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: dueDate.toISOString().split('T')[0],
       });
       const milestones = await service.listForTimeline(
         org.id,
+        product.id,
         Timeline.THIS_QUARTER,
       );
       expect(milestones.length).toEqual(1);
@@ -279,13 +313,14 @@ describe('MilestonesService', () => {
         Timeline.NEXT_QUARTER.valueOf(),
       ).endDate;
       dueDate.setDate(dueDate.getDate() - 10);
-      await service.createMilestone(org.id, {
+      await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: dueDate.toISOString().split('T')[0],
       });
       const milestones = await service.listForTimeline(
         org.id,
+        product.id,
         Timeline.NEXT_QUARTER,
       );
       expect(milestones.length).toEqual(1);
@@ -295,12 +330,16 @@ describe('MilestonesService', () => {
         TimelineService.getCurrentQuarter() + 3,
       );
       dueDate.setDate(dueDate.getDate() + 10);
-      await service.createMilestone(org.id, {
+      await service.createMilestone(org.id, product.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: dueDate.toISOString().split('T')[0],
       });
-      const milestones = await service.listForTimeline(org.id, Timeline.LATER);
+      const milestones = await service.listForTimeline(
+        org.id,
+        product.id,
+        Timeline.LATER,
+      );
       expect(milestones.length).toEqual(1);
       expect(milestones[0].id).toBeDefined();
       expect(milestones[0].title).toEqual('my milestone');

@@ -434,11 +434,15 @@ describe('FeaturesController', () => {
       expect(feature.updatedAt).toBeDefined();
     });
     it('should update the milestone', async () => {
-      const milestone = await milestoneService.createMilestone(org.id, {
-        title: 'my milestone',
-        description: 'my milestone description',
-        dueDate: '2020-01-01',
-      });
+      const milestone = await milestoneService.createMilestone(
+        org.id,
+        product.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
       const featureResponse = await controller.create(
         org.id,
         product.id,

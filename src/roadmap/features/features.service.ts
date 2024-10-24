@@ -589,7 +589,7 @@ export class FeaturesService {
     let params = [orgId, productId, `%${search}%`] as any[];
 
     if (limit > 0) {
-      query += ' OFFSET $3 LIMIT $4';
+      query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
       params = [orgId, productId, `%${search}%`, offset, limit];
     }

@@ -7,6 +7,7 @@ import { OrgsService } from '../../orgs/orgs.service';
 import { MilestoneMapper } from './milestone.mapper';
 import { Timeline } from '../../common/timeline.enum';
 import { TimelineService } from '../../common/timeline.service';
+import { Product } from '../../products/product.entity';
 
 @Injectable()
 export class MilestonesService {
@@ -14,19 +15,25 @@ export class MilestonesService {
     @InjectRepository(Milestone)
     private milestoneRepository: Repository<Milestone>,
     private orgsService: OrgsService,
+    @InjectRepository(Product) private productsRepository: Repository<Product>,
   ) {}
 
   async createMilestone(
     orgId: string,
+    productId: string,
     createMilestoneDto: CreateUpdateMilestoneDto,
   ) {
     this.validateMilestone(createMilestoneDto);
     const org = await this.orgsService.findOneById(orgId);
+    const product = await this.productsRepository.findOneByOrFail({
+      id: productId,
+    });
     const milestone = new Milestone();
     milestone.title = createMilestoneDto.title;
     milestone.description = createMilestoneDto.description;
     milestone.dueDate = new Date(createMilestoneDto.dueDate);
     milestone.org = Promise.resolve(org);
+    milestone.product = Promise.resolve(product);
     const savedMilestone = await this.milestoneRepository.save(milestone);
     return await MilestoneMapper.toDto(savedMilestone);
   }
@@ -39,27 +46,28 @@ export class MilestonesService {
     });
   }
 
-  async listMilestones(orgId: string) {
+  async listMilestones(orgId: string, productId: string) {
     return MilestoneMapper.toListDto(
       await this.milestoneRepository.find({
-        where: { org: { id: orgId } },
+        where: { org: { id: orgId }, product: { id: productId } },
         order: { dueDate: 'DESC' },
       }),
     );
   }
 
-  async listMilestonesWithFeatures(orgId: string) {
+  async listMilestonesWithFeatures(orgId: string, productId: string) {
     const milestones = await this.milestoneRepository.find({
-      where: { org: { id: orgId } },
+      where: { org: { id: orgId }, product: { id: productId } },
       order: { dueDate: 'DESC' },
       relations: ['features'],
     });
     return await MilestoneMapper.toListWithFeaturesDto(milestones);
   }
 
-  async get(orgId: string, id: string) {
+  async get(orgId: string, productId: string, id: string) {
     const milestone = await this.milestoneRepository.findOneByOrFail({
       org: { id: orgId },
+      product: { id: productId },
       id: id,
     });
     return await MilestoneMapper.toDto(milestone);
@@ -67,12 +75,14 @@ export class MilestonesService {
 
   async update(
     orgId: string,
+    productId: string,
     id: string,
     updateMilestoneDto: CreateUpdateMilestoneDto,
   ) {
     this.validateMilestone(updateMilestoneDto);
     const milestone = await this.milestoneRepository.findOneByOrFail({
       org: { id: orgId },
+      product: { id: productId },
       id: id,
     });
     milestone.title = updateMilestoneDto.title;
@@ -82,9 +92,10 @@ export class MilestonesService {
     return await MilestoneMapper.toDto(savedMilestone);
   }
 
-  async delete(orgId: string, id: string) {
+  async delete(orgId: string, productId: string, id: string) {
     const milestone = await this.milestoneRepository.findOneByOrFail({
       org: { id: orgId },
+      product: { id: productId },
       id: id,
     });
     const features = await milestone.features;
@@ -93,9 +104,10 @@ export class MilestonesService {
     await this.milestoneRepository.remove(milestone);
   }
 
-  async listForTimeline(orgId: string, timeline: Timeline) {
+  async listForTimeline(orgId: string, productId: string, timeline: Timeline) {
     let where = {
       org: { id: orgId },
+      product: { id: productId },
     } as any;
 
     switch (timeline) {
@@ -118,6 +130,7 @@ export class MilestonesService {
         where = [
           {
             org: { id: orgId },
+            product: { id: productId },
             dueDate: MoreThan(nextQuarterEndDate),
           },
           { org: { id: orgId }, dueDate: IsNull() },

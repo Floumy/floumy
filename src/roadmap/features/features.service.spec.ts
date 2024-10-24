@@ -213,11 +213,15 @@ describe('FeaturesService', () => {
       ).rejects.toThrowError();
     });
     it('should create a feature with a milestone', async () => {
-      const milestone = await milestonesService.createMilestone(org.id, {
-        title: 'my milestone',
-        description: 'my milestone description',
-        dueDate: '2020-01-01',
-      });
+      const milestone = await milestonesService.createMilestone(
+        org.id,
+        product.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
       const feature = await service.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
@@ -366,11 +370,15 @@ describe('FeaturesService', () => {
       expect(features[0].updatedAt).toBeDefined();
     });
     it('should not return features with a milestone', async () => {
-      const milestone = await milestonesService.createMilestone(org.id, {
-        title: 'my milestone',
-        description: 'my milestone description',
-        dueDate: '2020-01-01',
-      });
+      const milestone = await milestonesService.createMilestone(
+        org.id,
+        product.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
       await service.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
@@ -458,11 +466,15 @@ describe('FeaturesService', () => {
       );
     });
     it('should return the feature with the milestone', async () => {
-      const milestone = await milestonesService.createMilestone(org.id, {
-        title: 'my milestone',
-        description: 'my milestone description',
-        dueDate: '2020-01-01',
-      });
+      const milestone = await milestonesService.createMilestone(
+        org.id,
+        product.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
       const feature = await service.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
@@ -545,11 +557,15 @@ describe('FeaturesService', () => {
       );
     });
     it('should update the feature with a milestone', async () => {
-      const milestone = await milestonesService.createMilestone(org.id, {
-        title: 'my milestone',
-        description: 'my milestone description',
-        dueDate: '2020-01-01',
-      });
+      const milestone = await milestonesService.createMilestone(
+        org.id,
+        product.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
       const feature = await service.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
@@ -971,11 +987,15 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should update the milestone', async () => {
-      const milestone = await milestonesService.createMilestone(org.id, {
-        title: 'my milestone',
-        description: 'my milestone description',
-        dueDate: '2020-01-01',
-      });
+      const milestone = await milestonesService.createMilestone(
+        org.id,
+        product.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
       const feature = await service.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
@@ -1020,11 +1040,16 @@ describe('FeaturesService', () => {
           'testtesttest',
         ),
       );
-      const milestone = await milestonesService.createMilestone(otherOrg.id, {
-        title: 'my milestone',
-        description: 'my milestone description',
-        dueDate: '2020-01-01',
-      });
+      const otherOrgProduct = (await otherOrg.products)[0];
+      const milestone = await milestonesService.createMilestone(
+        otherOrg.id,
+        otherOrgProduct.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
       const feature = await service.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
@@ -1038,11 +1063,15 @@ describe('FeaturesService', () => {
       ).rejects.toThrowError();
     });
     it('should update milestones to null', async () => {
-      const milestone = await milestonesService.createMilestone(org.id, {
-        title: 'my milestone',
-        description: 'my milestone description',
-        dueDate: '2020-01-01',
-      });
+      const milestone = await milestonesService.createMilestone(
+        org.id,
+        product.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
       const feature = await service.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
@@ -1066,11 +1095,15 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should not update the milestone if the update is for another field', async () => {
-      const milestone = await milestonesService.createMilestone(org.id, {
-        title: 'my milestone',
-        description: 'my milestone description',
-        dueDate: '2020-01-01',
-      });
+      const milestone = await milestonesService.createMilestone(
+        org.id,
+        product.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
       const feature = await service.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
