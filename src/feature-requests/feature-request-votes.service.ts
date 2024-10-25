@@ -102,12 +102,13 @@ export class FeatureRequestVoteService {
     await this.featureRequestRepository.save(featureRequest);
   }
 
-  async getVotes(userId: string, orgId: string) {
+  async getVotes(userId: string, orgId: string, productId: string) {
     const votes = await this.featureRequestVoteRepository.find({
       where: {
         user: { id: userId },
         featureRequest: {
           org: { id: orgId },
+          product: { id: productId },
         },
       },
     });
