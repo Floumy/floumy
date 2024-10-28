@@ -13,6 +13,7 @@ import { uuid } from 'uuidv4';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { FeatureRequestComment } from './feature-request-comment.entity';
 
+// TODO: Fix this test
 describe('FeatureRequestsService', () => {
   let usersService: UsersService;
   let orgsService: OrgsService;

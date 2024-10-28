@@ -11,7 +11,6 @@ import {
   Put,
   Query,
   Request,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { CreateFeatureRequestDto, UpdateFeatureRequestDto } from './dtos';
@@ -57,10 +56,6 @@ export class FeatureRequestsController {
     @Param('orgId') orgId: string,
     @Param('productId') productId: string,
   ) {
-    if (orgId !== request.user.org) {
-      throw new UnauthorizedException();
-    }
-
     try {
       return await this.featureRequestVoteService.getVotes(
         request.user.sub,
@@ -80,10 +75,6 @@ export class FeatureRequestsController {
     @Param('productId') productId: string,
     @Body() createFeatureRequestDto: CreateFeatureRequestDto,
   ) {
-    if (orgId !== request.user.org) {
-      throw new UnauthorizedException();
-    }
-
     try {
       return await this.featureRequestsService.addFeatureRequest(
         request.user.sub,
@@ -139,6 +130,7 @@ export class FeatureRequestsController {
   async updateFeatureRequest(
     @Request() request,
     @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('featureRequestId') featureRequestId: string,
     @Body() updateFeatureRequestDto: UpdateFeatureRequestDto,
   ) {
@@ -146,6 +138,7 @@ export class FeatureRequestsController {
       return await this.featureRequestsService.updateFeatureRequest(
         request.user.sub,
         orgId,
+        productId,
         featureRequestId,
         updateFeatureRequestDto,
       );
@@ -159,12 +152,14 @@ export class FeatureRequestsController {
   async deleteFeatureRequest(
     @Request() request,
     @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('featureRequestId') featureRequestId: string,
   ) {
     try {
       return await this.featureRequestsService.deleteFeatureRequest(
         request.user.sub,
         orgId,
+        productId,
         featureRequestId,
       );
     } catch (e) {
@@ -177,12 +172,14 @@ export class FeatureRequestsController {
   async upvoteFeatureRequest(
     @Request() request,
     @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('featureRequestId') featureRequestId: string,
   ) {
     try {
       return await this.featureRequestVoteService.upvoteFeatureRequest(
         request.user.sub,
         orgId,
+        productId,
         featureRequestId,
       );
     } catch (e) {
@@ -195,12 +192,14 @@ export class FeatureRequestsController {
   async downvoteFeatureRequest(
     @Request() request,
     @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('featureRequestId') featureRequestId: string,
   ) {
     try {
       return await this.featureRequestVoteService.downvoteFeatureRequest(
         request.user.sub,
         orgId,
+        productId,
         featureRequestId,
       );
     } catch (e) {
@@ -212,11 +211,15 @@ export class FeatureRequestsController {
   @UseGuards(AuthGuard)
   async addFeatureRequestComment(
     @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('featureRequestId') featureRequestId: string,
     @Body() createCommentDto: CreateUpdateCommentDto,
   ) {
     try {
       return await this.featureRequestsService.createFeatureRequestComment(
+        orgId,
+        productId,
         request.user.sub,
         featureRequestId,
         createCommentDto,
@@ -229,6 +232,8 @@ export class FeatureRequestsController {
   @Put(':featureRequestId/comments/:commentId')
   @UseGuards(AuthGuard)
   async updateFeatureRequestComment(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Param('featureRequestId') featureRequestId: string,
     @Param('commentId') commentId: string,
@@ -236,6 +241,8 @@ export class FeatureRequestsController {
   ) {
     try {
       return await this.featureRequestsService.updateFeatureRequestComment(
+        orgId,
+        productId,
         request.user.sub,
         featureRequestId,
         commentId,
@@ -249,12 +256,14 @@ export class FeatureRequestsController {
   @Delete(':featureRequestId/comments/:commentId')
   @UseGuards(AuthGuard)
   async deleteFeatureRequestComment(
+    @Param('orgId') orgId: string,
     @Request() request,
     @Param('featureRequestId') featureRequestId: string,
     @Param('commentId') commentId: string,
   ) {
     try {
       return await this.featureRequestsService.deleteFeatureRequestComment(
+        orgId,
         request.user.sub,
         featureRequestId,
         commentId,

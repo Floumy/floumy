@@ -117,6 +117,7 @@ export class FeatureRequestsService {
   async updateFeatureRequest(
     userId: string,
     orgId: string,
+    productId: string,
     featureRequestId: string,
     updateFeatureRequestDto: UpdateFeatureRequestDto,
   ): Promise<FeatureRequestDto> {
@@ -131,6 +132,7 @@ export class FeatureRequestsService {
       where: {
         id: featureRequestId,
         org: { id: orgId },
+        product: { id: productId },
       },
     });
 
@@ -158,6 +160,7 @@ export class FeatureRequestsService {
   async deleteFeatureRequest(
     userId: string,
     orgId: string,
+    productId: string,
     featureRequestId: string,
   ) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
@@ -171,6 +174,7 @@ export class FeatureRequestsService {
       where: {
         id: featureRequestId,
         org: { id: orgId },
+        product: { id: productId },
       },
     });
 
@@ -185,6 +189,8 @@ export class FeatureRequestsService {
   }
 
   async createFeatureRequestComment(
+    orgId: string,
+    productId: string,
     userId: string,
     featureRequestId: string,
     createCommentDto: CreateUpdateCommentDto,
@@ -193,6 +199,8 @@ export class FeatureRequestsService {
     const featureRequest = await this.featureRequestsRepository.findOneByOrFail(
       {
         id: featureRequestId,
+        org: { id: orgId },
+        product: { id: productId },
       },
     );
     const org = await featureRequest.org;
@@ -213,6 +221,7 @@ export class FeatureRequestsService {
   }
 
   async deleteFeatureRequestComment(
+    orgId: string,
     userId: string,
     featureRequestId: string,
     commentId: string,
@@ -222,12 +231,15 @@ export class FeatureRequestsService {
         id: commentId,
         featureRequest: { id: featureRequestId },
         createdBy: { id: userId },
+        org: { id: orgId },
       },
     );
     await this.featureRequestCommentsRepository.remove(comment);
   }
 
   async updateFeatureRequestComment(
+    orgId: string,
+    productId: string,
     userId: string,
     featureRequestId: string,
     commentId: string,
@@ -236,6 +248,8 @@ export class FeatureRequestsService {
     const featureRequest = await this.featureRequestsRepository.findOneByOrFail(
       {
         id: featureRequestId,
+        org: { id: orgId },
+        product: { id: productId },
       },
     );
     const org = await featureRequest.org;
