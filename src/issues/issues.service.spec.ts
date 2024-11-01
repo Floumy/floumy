@@ -11,13 +11,17 @@ import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
 import { IssueStatus } from './issue-status.enum';
 import { Priority } from '../common/priority.enum';
+import { Product } from '../products/product.entity';
 
+// TODO: Fix this test
 describe('IssuesService', () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
   let service: IssuesService;
   let orgsRepository: Repository<Org>;
+  let productsRepository: Repository<Product>;
   let org: Org;
+  let product: Product;
   let user: User;
 
   let cleanup: () => Promise<void>;
@@ -32,6 +36,9 @@ describe('IssuesService', () => {
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
+    productsRepository = module.get<Repository<Product>>(
+      getRepositoryToken(Product),
+    );
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -40,6 +47,10 @@ describe('IssuesService', () => {
     org = await orgsService.createForUser(user);
     org.paymentPlan = PaymentPlan.PREMIUM;
     await orgsRepository.save(org);
+    product = new Product();
+    product.name = 'Test Product';
+    product.org = Promise.resolve(org);
+    await productsRepository.save(product);
   });
 
   afterEach(async () => {

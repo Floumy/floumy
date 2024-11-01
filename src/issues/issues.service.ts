@@ -10,6 +10,7 @@ import { CreateUpdateCommentDto } from '../comments/dtos';
 import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
 import { CommentMapper } from '../comments/mappers';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class IssuesService {
@@ -22,10 +23,20 @@ export class IssuesService {
     private issuesRepository: Repository<Issue>,
     @InjectRepository(IssueComment)
     private issueCommentsRepository: Repository<IssueComment>,
+    @InjectRepository(Product)
+    private productsRepository: Repository<Product>,
   ) {}
 
-  async addIssue(userId: string, orgId: string, issueDto: IssueDto) {
+  async addIssue(
+    userId: string,
+    orgId: string,
+    productId: string,
+    issueDto: IssueDto,
+  ) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+    const product = await this.productsRepository.findOneByOrFail({
+      id: productId,
+    });
     if (org.paymentPlan !== 'premium') {
       throw new Error('You need to upgrade your plan to add issues');
     }
@@ -34,12 +45,18 @@ export class IssuesService {
     issue.title = issueDto.title;
     issue.description = issueDto.description;
     issue.org = Promise.resolve(org);
+    issue.product = Promise.resolve(product);
     issue.createdBy = Promise.resolve(user);
     const savedIssue = await this.issuesRepository.save(issue);
     return await IssueMapper.toDto(savedIssue);
   }
 
-  async listIssues(orgId: string, page: number = 1, limit: number = 0) {
+  async listIssues(
+    orgId: string,
+    productId: string,
+    page: number = 1,
+    limit: number = 0,
+  ) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
 
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {
@@ -50,6 +67,7 @@ export class IssuesService {
         SELECT *
         FROM issue
         WHERE issue."orgId" = $1
+          AND issue."productId" = $2
         ORDER BY CASE
                      WHEN issue."priority" = 'high' THEN 1
                      WHEN issue."priority" = 'medium' THEN 2
@@ -58,9 +76,9 @@ export class IssuesService {
                      END,
                  issue."createdAt" DESC
     `;
-    let params = [orgId] as any[];
+    let params = [orgId, productId] as any[];
     if (limit > 0) {
-      query += ' OFFSET $2 LIMIT $3';
+      query += ' OFFSET $3 LIMIT $4';
       const offset = (page - 1) * limit;
       params = [orgId, offset, limit];
     }
@@ -69,7 +87,7 @@ export class IssuesService {
     return await Promise.all(issues.map(IssueListItemMapper.toListItemDto));
   }
 
-  async getIssueById(orgId: string, issueId: string) {
+  async getIssueById(orgId: string, productId: string, issueId: string) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
     if (org.paymentPlan !== 'premium') {
       throw new Error('You need to upgrade your plan to view issues');
@@ -77,6 +95,7 @@ export class IssuesService {
     const issue = await this.issuesRepository.findOneByOrFail({
       id: issueId,
       org: { id: orgId },
+      product: { id: productId },
     });
     return await IssueMapper.toDto(issue);
   }
@@ -84,12 +103,14 @@ export class IssuesService {
   async updateIssue(
     userId: string,
     orgId: string,
+    productId: string,
     issueId: any,
     issueDto: UpdateIssueDto,
   ) {
     const issue = await this.issuesRepository.findOneByOrFail({
       id: issueId,
       org: { id: orgId },
+      product: { id: productId },
     });
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const createdBy = await issue.createdBy;
@@ -109,10 +130,16 @@ export class IssuesService {
     return await IssueMapper.toDto(savedIssue);
   }
 
-  async deleteIssue(userId: string, orgId: string, issueId: string) {
+  async deleteIssue(
+    userId: string,
+    orgId: string,
+    productId: string,
+    issueId: string,
+  ) {
     const issue = await this.issuesRepository.findOneByOrFail({
       id: issueId,
       org: { id: orgId },
+      product: { id: productId },
     });
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const createdBy = await issue.createdBy;
@@ -190,6 +217,7 @@ export class IssuesService {
 
   async searchIssues(
     orgId: string,
+    productId: string,
     search: string,
     page: number = 1,
     limit: number = 0,
@@ -203,7 +231,8 @@ export class IssuesService {
         SELECT *
         FROM issue
         WHERE issue."orgId" = $1
-          AND (issue.title ILIKE $2 OR issue.description ILIKE $2)
+          AND issue."productId" = $2
+          AND (issue.title ILIKE $3 OR issue.description ILIKE $3)
         ORDER BY CASE
                      WHEN issue."priority" = 'high' THEN 1
                      WHEN issue."priority" = 'medium' THEN 2
@@ -212,12 +241,12 @@ export class IssuesService {
                      END,
                  issue."createdAt" DESC
     `;
-    let params = [orgId, `%${search}%`] as any[];
+    let params = [orgId, productId, `%${search}%`] as any[];
 
     if (limit > 0) {
-      query += ' OFFSET $3 LIMIT $4';
+      query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, `%${search}%`, offset, limit];
+      params = [orgId, productId, `%${search}%`, offset, limit];
     }
     const issues = await this.issuesRepository.query(query, params);
     return await Promise.all(issues.map(IssueListItemMapper.toListItemDto));
