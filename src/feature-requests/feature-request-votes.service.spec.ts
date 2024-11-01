@@ -12,8 +12,8 @@ import { FeatureRequestVoteService } from './feature-request-votes.service';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { uuid } from 'uuidv4';
 import { FeatureRequestComment } from './feature-request-comment.entity';
+import { Product } from '../products/product.entity';
 
-// TODO: Fix this test
 describe('FeatureRequestVotesService', () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
@@ -21,7 +21,9 @@ describe('FeatureRequestVotesService', () => {
   let featureRequestService: FeatureRequestsService;
   let orgsRepository: Repository<Org>;
   let featureRequestVotesRepository: Repository<FeatureRequestVote>;
+  let productsRepository: Repository<Product>;
   let org: Org;
+  let product: Product;
   let user: User;
 
   let cleanup: () => Promise<void>;
@@ -56,6 +58,9 @@ describe('FeatureRequestVotesService', () => {
     featureRequestVotesRepository = module.get<Repository<FeatureRequestVote>>(
       getRepositoryToken(FeatureRequestVote),
     );
+    productsRepository = module.get<Repository<Product>>(
+      getRepositoryToken(Product),
+    );
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -64,6 +69,10 @@ describe('FeatureRequestVotesService', () => {
     org = await orgsService.createForUser(user);
     org.paymentPlan = PaymentPlan.PREMIUM;
     await orgsRepository.save(org);
+    product = new Product();
+    product.name = 'Test Product';
+    product.org = Promise.resolve(org);
+    await productsRepository.save(product);
   });
 
   afterEach(async () => {
@@ -79,12 +88,18 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
         },
       );
-      await service.upvoteFeatureRequest(user.id, org.id, featureRequest.id);
+      await service.upvoteFeatureRequest(
+        user.id,
+        org.id,
+        product.id,
+        featureRequest.id,
+      );
       const featureRequestVote =
         await featureRequestVotesRepository.findOneByOrFail({
           user: { id: user.id },
@@ -94,13 +109,14 @@ describe('FeatureRequestVotesService', () => {
     });
     it('should throw an error if the feature request does not exist', async () => {
       await expect(
-        service.upvoteFeatureRequest(user.id, org.id, uuid()),
+        service.upvoteFeatureRequest(user.id, org.id, product.id, uuid()),
       ).rejects.toThrow();
     });
     it('should throw an error if the feature request does not belong to the org', async () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -111,13 +127,19 @@ describe('FeatureRequestVotesService', () => {
       await orgsRepository.save(otherOrg);
 
       await expect(
-        service.upvoteFeatureRequest(user.id, otherOrg.id, featureRequest.id),
+        service.upvoteFeatureRequest(
+          user.id,
+          otherOrg.id,
+          uuid(),
+          featureRequest.id,
+        ),
       ).rejects.toThrow();
     });
     it('should throw an error if the org is not on the premium plan', async () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -126,7 +148,12 @@ describe('FeatureRequestVotesService', () => {
       org.paymentPlan = PaymentPlan.FREE;
       await orgsRepository.save(org);
       await expect(
-        service.upvoteFeatureRequest(user.id, org.id, featureRequest.id),
+        service.upvoteFeatureRequest(
+          user.id,
+          org.id,
+          product.id,
+          featureRequest.id,
+        ),
       ).rejects.toThrow(
         'You need to upgrade your plan to upvote a feature request',
       );
@@ -135,12 +162,18 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
         },
       );
-      await service.upvoteFeatureRequest(user.id, org.id, featureRequest.id);
+      await service.upvoteFeatureRequest(
+        user.id,
+        org.id,
+        product.id,
+        featureRequest.id,
+      );
       const featureRequestVote =
         await featureRequestVotesRepository.findOneByOrFail({
           user: { id: user.id },
@@ -155,12 +188,18 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
         },
       );
-      await service.downvoteFeatureRequest(user.id, org.id, featureRequest.id);
+      await service.downvoteFeatureRequest(
+        user.id,
+        org.id,
+        product.id,
+        featureRequest.id,
+      );
       const featureRequestVote =
         await featureRequestVotesRepository.findOneByOrFail({
           user: { id: user.id },
@@ -171,19 +210,21 @@ describe('FeatureRequestVotesService', () => {
       const updatedFeatureRequest =
         await featureRequestService.getFeatureRequestById(
           org.id,
+          product.id,
           featureRequest.id,
         );
       expect(updatedFeatureRequest.votesCount).toEqual(0);
     });
     it('should throw an error if the feature request does not exist', async () => {
       await expect(
-        service.downvoteFeatureRequest(user.id, org.id, uuid()),
+        service.downvoteFeatureRequest(user.id, org.id, uuid(), uuid()),
       ).rejects.toThrow();
     });
     it('should throw an error if the feature request does not belong to the org', async () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -192,15 +233,25 @@ describe('FeatureRequestVotesService', () => {
 
       const otherOrg = await orgsService.createForUser(user);
       await orgsRepository.save(otherOrg);
+      const otherOrgProduct = new Product();
+      otherOrgProduct.name = 'Test Product';
+      otherOrgProduct.org = Promise.resolve(otherOrg);
+      await productsRepository.save(otherOrgProduct);
 
       await expect(
-        service.downvoteFeatureRequest(user.id, otherOrg.id, featureRequest.id),
+        service.downvoteFeatureRequest(
+          user.id,
+          otherOrg.id,
+          otherOrgProduct.id,
+          featureRequest.id,
+        ),
       ).rejects.toThrow();
     });
     it('should throw an error if the org is not on the premium plan', async () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -209,7 +260,12 @@ describe('FeatureRequestVotesService', () => {
       org.paymentPlan = PaymentPlan.FREE;
       await orgsRepository.save(org);
       await expect(
-        service.downvoteFeatureRequest(user.id, org.id, featureRequest.id),
+        service.downvoteFeatureRequest(
+          user.id,
+          org.id,
+          product.id,
+          featureRequest.id,
+        ),
       ).rejects.toThrow(
         'You need to upgrade your plan to downvote a feature request',
       );
@@ -220,22 +276,33 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
         },
       );
 
-      await service.upvoteFeatureRequest(user.id, org.id, featureRequest.id);
-      await service.downvoteFeatureRequest(user.id, org.id, featureRequest.id);
+      await service.upvoteFeatureRequest(
+        user.id,
+        org.id,
+        product.id,
+        featureRequest.id,
+      );
+      await service.downvoteFeatureRequest(
+        user.id,
+        org.id,
+        product.id,
+        featureRequest.id,
+      );
 
-      const votes = await service.getVotes(user.id, org.id);
+      const votes = await service.getVotes(user.id, org.id, product.id);
 
       expect(votes.length).toEqual(1);
       expect(votes[0].vote).toEqual(-1);
     });
     it('should return an empty array if there are no votes', async () => {
-      const votes = await service.getVotes(user.id, org.id);
+      const votes = await service.getVotes(user.id, org.id, product.id);
 
       expect(votes.length).toEqual(0);
     });
