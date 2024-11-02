@@ -26,19 +26,10 @@ export class PublicService {
     );
   }
 
-  private async validateOrgHasBuildInPublicEnabled(orgId: string) {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    const bipSettings = await org.bipSettings;
-
-    if (!bipSettings || bipSettings.isBuildInPublicEnabled === false) {
-      throw new Error('Building in public is not enabled');
-    }
-  }
-
   async getIterationById(orgId: string, iterationId: string) {
     await this.validateOrgHasBuildInPublicEnabled(orgId);
 
-    const iteration = await this.iterationsService.findIterationByOrgIdAndId(
+    const iteration = await this.iterationsService.findIteration(
       orgId,
       iterationId,
     );
@@ -58,5 +49,14 @@ export class PublicService {
 
     const iteration = await this.iterationsService.findActiveIteration(orgId);
     return iteration ? await IterationMapper.toDto(iteration) : null;
+  }
+
+  private async validateOrgHasBuildInPublicEnabled(orgId: string) {
+    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+    const bipSettings = await org.bipSettings;
+
+    if (!bipSettings || bipSettings.isBuildInPublicEnabled === false) {
+      throw new Error('Building in public is not enabled');
+    }
   }
 }

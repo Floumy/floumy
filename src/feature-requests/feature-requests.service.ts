@@ -57,6 +57,7 @@ export class FeatureRequestsService {
     featureRequest.votesCount = 1;
     const product = await this.productsRepository.findOneByOrFail({
       id: productId,
+      org: { id: orgId },
     });
     featureRequest.product = Promise.resolve(product);
     const savedFeatureRequest =

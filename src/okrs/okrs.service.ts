@@ -48,6 +48,7 @@ export class OkrsService {
 
     const product = await this.productsRepository.findOneByOrFail({
       id: productId,
+      org: { id: orgId },
     });
 
     const newObjective = new Objective();

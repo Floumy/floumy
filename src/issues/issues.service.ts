@@ -36,6 +36,7 @@ export class IssuesService {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
     const product = await this.productsRepository.findOneByOrFail({
       id: productId,
+      org: { id: orgId },
     });
     if (org.paymentPlan !== 'premium') {
       throw new Error('You need to upgrade your plan to add issues');

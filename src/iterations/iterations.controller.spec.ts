@@ -27,6 +27,7 @@ import { User } from '../users/user.entity';
 import { FilesService } from '../files/files.service';
 import { FilesStorageRepository } from '../files/files-storage.repository';
 import { Timeline } from '../common/timeline.enum';
+import { Product } from '../products/product.entity';
 
 describe('IterationsController', () => {
   let controller: IterationsController;
@@ -34,6 +35,7 @@ describe('IterationsController', () => {
   let org: Org;
   let user: User;
   let workItemService: WorkItemsService;
+  let product: Product;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -76,6 +78,7 @@ describe('IterationsController', () => {
     );
     org = await orgsService.createForUser(user);
     workItemService = module.get<WorkItemsService>(WorkItemsService);
+    product = (await org.products)[0];
   });
 
   afterEach(async () => {
@@ -89,6 +92,8 @@ describe('IterationsController', () => {
   describe('when creating a new iteration', () => {
     it('should create a new iteration', async () => {
       const iteration = await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -107,6 +112,8 @@ describe('IterationsController', () => {
   describe('when listing iterations', () => {
     it('should list iterations', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -116,9 +123,13 @@ describe('IterationsController', () => {
           duration: 1,
         },
       );
-      const iterations = await controller.listWithWorkItems({
-        user: { org: org.id },
-      });
+      const iterations = await controller.listWithWorkItems(
+        org.id,
+        product.id,
+        {
+          user: { org: org.id },
+        },
+      );
       expect(iterations.length).toEqual(1);
       expect(iterations[0].goal).toEqual('Goal 1');
       expect(iterations[0].startDate).toEqual('2020-01-01');
@@ -130,6 +141,8 @@ describe('IterationsController', () => {
     it('should list iterations for a timeline', async () => {
       const currentDateAsString = new Date().toISOString().split('T')[0];
       await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -140,6 +153,8 @@ describe('IterationsController', () => {
         },
       );
       const iterations = await controller.listForTimeline(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -155,6 +170,8 @@ describe('IterationsController', () => {
   describe('when getting an iteration', () => {
     it('should get an iteration', async () => {
       const iteration = await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -165,6 +182,8 @@ describe('IterationsController', () => {
         },
       );
       const foundIteration = await controller.get(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -179,6 +198,8 @@ describe('IterationsController', () => {
   describe('when updating an iteration', () => {
     it('should update an iteration', async () => {
       const iteration = await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -189,6 +210,8 @@ describe('IterationsController', () => {
         },
       );
       const updatedIteration = await controller.update(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -207,6 +230,8 @@ describe('IterationsController', () => {
   describe('when deleting an iteration', () => {
     it('should delete an iteration', async () => {
       const iteration = await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -217,14 +242,20 @@ describe('IterationsController', () => {
         },
       );
       await controller.delete(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
         iteration.id,
       );
-      const iterations = await controller.listWithWorkItems({
-        user: { org: org.id },
-      });
+      const iterations = await controller.listWithWorkItems(
+        org.id,
+        product.id,
+        {
+          user: { org: org.id },
+        },
+      );
       expect(iterations.length).toEqual(0);
     });
   });
@@ -232,6 +263,8 @@ describe('IterationsController', () => {
     it('should start an iteration', async () => {
       const startDate = new Date().toISOString().split('T')[0];
       const iteration = await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -242,6 +275,8 @@ describe('IterationsController', () => {
         },
       );
       const startedIteration = await controller.startIteration(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -258,6 +293,8 @@ describe('IterationsController', () => {
     it('should return the active iteration', async () => {
       const startDate = new Date().toISOString().split('T')[0];
       const iteration = await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -276,14 +313,20 @@ describe('IterationsController', () => {
         iteration: iteration.id,
       });
       await controller.startIteration(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
         iteration.id,
       );
-      const activeIteration = await controller.getActiveIteration({
-        user: { org: org.id },
-      });
+      const activeIteration = await controller.getActiveIteration(
+        org.id,
+        product.id,
+        {
+          user: { org: org.id },
+        },
+      );
       expect(activeIteration.goal).toEqual('Goal 1');
       expect(activeIteration.startDate).toEqual(startDate);
       expect(activeIteration.duration).toEqual(1);
@@ -295,6 +338,8 @@ describe('IterationsController', () => {
     it('should complete an iteration', async () => {
       const startDate = new Date().toISOString().split('T')[0];
       const iteration = await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -305,12 +350,16 @@ describe('IterationsController', () => {
         },
       );
       await controller.startIteration(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
         iteration.id,
       );
       const completedIteration = await controller.completeIteration(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -326,6 +375,8 @@ describe('IterationsController', () => {
     it('should return the iterations list without work items', async () => {
       const startDate = new Date().toISOString().split('T')[0];
       const iteration = await controller.create(
+        org.id,
+        product.id,
         {
           user: { org: org.id },
         },
@@ -335,7 +386,7 @@ describe('IterationsController', () => {
           duration: 1,
         },
       );
-      const iterationsList = await controller.list({
+      const iterationsList = await controller.list(org.id, product.id, {
         user: { org: org.id },
       });
       expect(iterationsList.length).toEqual(1);

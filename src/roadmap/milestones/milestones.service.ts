@@ -27,6 +27,7 @@ export class MilestonesService {
     const org = await this.orgsService.findOneById(orgId);
     const product = await this.productsRepository.findOneByOrFail({
       id: productId,
+      org: { id: orgId },
     });
     const milestone = new Milestone();
     milestone.title = createMilestoneDto.title;

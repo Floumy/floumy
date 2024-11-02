@@ -17,6 +17,7 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { IterationStatus } from './iteration-status.enum';
 import { Timeline } from '../common/timeline.enum';
 import { TimelineService } from '../common/timeline.service';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class IterationsService {
@@ -26,6 +27,7 @@ export class IterationsService {
     @InjectRepository(WorkItem)
     private workItemsRepository: Repository<WorkItem>,
     @InjectRepository(Org) private orgRepository: Repository<Org>,
+    @InjectRepository(Product) private productsRepository: Repository<Product>,
   ) {}
 
   getWeekNumber(d: Date): number {
@@ -51,8 +53,16 @@ export class IterationsService {
     return `CW${startWeekNumber}-CW${endWeekNumber}`;
   }
 
-  async create(orgId: string, iterationDto: CreateOrUpdateIterationDto) {
+  async create(
+    orgId: string,
+    productId: string,
+    iterationDto: CreateOrUpdateIterationDto,
+  ) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    const product = await this.productsRepository.findOneByOrFail({
+      id: productId,
+      org: { id: orgId },
+    });
     const iteration = new Iteration();
     iteration.goal = iterationDto.goal;
     iteration.startDate = new Date(iterationDto.startDate);
@@ -63,15 +73,19 @@ export class IterationsService {
     iteration.endDate.setUTCHours(23, 59, 59, 999);
     iteration.title = this.getIterationTitle(iteration);
     iteration.org = Promise.resolve(org);
+    iteration.product = Promise.resolve(product);
     const savedIteration = await this.iterationRepository.save(iteration);
     return await IterationMapper.toDto(savedIteration);
   }
 
-  async listWithWorkItems(orgId: string) {
+  async listWithWorkItems(orgId: string, productId: string) {
     const iterations = await this.iterationRepository.find({
       where: {
         org: {
           id: orgId,
+        },
+        product: {
+          id: productId,
         },
       },
       order: {
@@ -83,22 +97,26 @@ export class IterationsService {
     );
   }
 
-  async findIterationByOrgIdAndId(orgId: string, iterationId: string) {
+  async findIteration(orgId: string, productId: string, iterationId: string) {
     return await this.iterationRepository.findOneByOrFail({
       id: iterationId,
       org: {
         id: orgId,
       },
+      product: {
+        id: productId,
+      },
     });
   }
 
-  async get(orgId: string, id: string) {
-    const iteration = await this.findIterationByOrgIdAndId(orgId, id);
+  async get(orgId: string, productId: string, id: string) {
+    const iteration = await this.findIteration(orgId, productId, id);
     return await IterationMapper.toDto(iteration);
   }
 
   async update(
     orgId: string,
+    productId: string,
     id: string,
     updateIterationDto: CreateOrUpdateIterationDto,
   ) {
@@ -106,6 +124,9 @@ export class IterationsService {
       id,
       org: {
         id: orgId,
+      },
+      product: {
+        id: productId,
       },
     });
     iteration.goal = updateIterationDto.goal;
@@ -133,24 +154,30 @@ export class IterationsService {
     );
   }
 
-  async delete(orgId: string, id: string) {
+  async delete(orgId: string, productId: string, id: string) {
     const iteration = await this.iterationRepository.findOneByOrFail({
       id,
       org: {
         id: orgId,
+      },
+      product: {
+        id: productId,
       },
     });
     await this.removeWorkItemsFromIteration(iteration);
     await this.iterationRepository.remove(iteration);
   }
 
-  async startIteration(orgId: string, id: string) {
+  async startIteration(orgId: string, productId: string, id: string) {
     await this.completeActiveIterationIfExists(orgId);
 
     const iteration = await this.iterationRepository.findOneByOrFail({
       id,
       org: {
         id: orgId,
+      },
+      product: {
+        id: productId,
       },
     });
     iteration.actualStartDate = new Date();
@@ -160,25 +187,31 @@ export class IterationsService {
     return await IterationMapper.toDto(savedIteration);
   }
 
-  async findActiveIteration(orgId: string) {
+  async findActiveIteration(orgId: string, productId: string) {
     return await this.iterationRepository.findOneBy({
       org: {
         id: orgId,
+      },
+      product: {
+        id: productId,
       },
       status: IterationStatus.ACTIVE,
     });
   }
 
-  async getActiveIteration(orgId: string) {
-    const iteration = await this.findActiveIteration(orgId);
+  async getActiveIteration(orgId: string, productId: string) {
+    const iteration = await this.findActiveIteration(orgId, productId);
     return iteration ? await IterationMapper.toDto(iteration) : null;
   }
 
-  async completeIteration(orgId: string, id: string) {
+  async completeIteration(orgId: string, productId: string, id: string) {
     const iteration = await this.iterationRepository.findOneByOrFail({
       id,
       org: {
         id: orgId,
+      },
+      product: {
+        id: productId,
       },
     });
     iteration.actualEndDate = new Date();
@@ -188,11 +221,14 @@ export class IterationsService {
     return await IterationMapper.toDto(savedIteration);
   }
 
-  async list(orgId: string) {
+  async list(orgId: string, productId: string) {
     const iterations = await this.iterationRepository.find({
       where: {
         org: {
           id: orgId,
+        },
+        product: {
+          id: productId,
         },
       },
       order: {
@@ -204,8 +240,12 @@ export class IterationsService {
     );
   }
 
-  async listForTimeline(orgId: string, timeline: Timeline) {
-    const iterations = await this.findIterationsForTimeline(orgId, timeline);
+  async listForTimeline(orgId: string, productId: string, timeline: Timeline) {
+    const iterations = await this.findIterationsForTimeline(
+      orgId,
+      productId,
+      timeline,
+    );
     return await Promise.all(
       iterations.map((iteration) => IterationMapper.toDto(iteration)),
     );
@@ -213,11 +253,15 @@ export class IterationsService {
 
   async findIterationsForTimeline(
     orgId: string,
+    productId: string,
     timeline: Timeline | Timeline.THIS_QUARTER | Timeline.NEXT_QUARTER,
   ) {
     let where = {
       org: {
         id: orgId,
+      },
+      product: {
+        id: productId,
       },
     } as any;
     switch (timeline) {
@@ -230,6 +274,7 @@ export class IterationsService {
         where = [
           {
             org: { id: orgId },
+            product: { id: productId },
             startDate: And(
               MoreThanOrEqual(startDate),
               LessThanOrEqual(endDate),
@@ -237,6 +282,7 @@ export class IterationsService {
           },
           {
             org: { id: orgId },
+            product: { id: productId },
             endDate: And(MoreThanOrEqual(startDate), LessThanOrEqual(endDate)),
           },
         ];
@@ -249,9 +295,14 @@ export class IterationsService {
         where = [
           {
             org: { id: orgId },
+            product: { id: productId },
             startDate: MoreThan(nextQuarterEndDate),
           },
-          { org: { id: orgId }, startDate: IsNull() },
+          {
+            org: { id: orgId },
+            product: { id: productId },
+            startDate: IsNull(),
+          },
         ];
         break;
       }
