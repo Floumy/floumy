@@ -80,7 +80,7 @@ export class IssuesService {
     if (limit > 0) {
       query += ' OFFSET $3 LIMIT $4';
       const offset = (page - 1) * limit;
-      params = [orgId, offset, limit];
+      params = [orgId, productId, offset, limit];
     }
 
     const issues = await this.issuesRepository.query(query, params);

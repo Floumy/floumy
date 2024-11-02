@@ -13,7 +13,6 @@ import { IssueStatus } from './issue-status.enum';
 import { Priority } from '../common/priority.enum';
 import { Product } from '../products/product.entity';
 
-// TODO: Fix this test
 describe('IssuesService', () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
@@ -63,7 +62,7 @@ describe('IssuesService', () => {
 
   describe('when adding a new issue', () => {
     it('should create a new issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -83,7 +82,7 @@ describe('IssuesService', () => {
       });
 
       expect(
-        service.addIssue(user.id, freeOrg.id, {
+        service.addIssue(user.id, freeOrg.id, product.id, {
           title: 'Test Issue',
           description: 'Test Description',
         }),
@@ -93,37 +92,37 @@ describe('IssuesService', () => {
 
   describe('when listing issues', () => {
     it('should return all issues for the org', async () => {
-      await service.addIssue(user.id, org.id, {
+      await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue 1',
         description: 'Test Description 1',
       });
-      await service.addIssue(user.id, org.id, {
+      await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue 2',
         description: 'Test Description 2',
       });
 
-      const issues = await service.listIssues(org.id);
+      const issues = await service.listIssues(org.id, product.id);
       expect(issues).toHaveLength(2);
       expect(issues[0].title).toEqual('Test Issue 2');
       expect(issues[1].title).toEqual('Test Issue 1');
     });
 
     it('should return an empty array if there are no issues', async () => {
-      const issues = await service.listIssues(org.id);
+      const issues = await service.listIssues(org.id, product.id);
       expect(issues).toHaveLength(0);
     });
 
     it('should return the issues in pages', async () => {
-      await service.addIssue(user.id, org.id, {
+      await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue 1',
         description: 'Test Description 1',
       });
-      await service.addIssue(user.id, org.id, {
+      await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue 2',
         description: 'Test Description 2',
       });
 
-      const issues = await service.listIssues(org.id, 1, 1);
+      const issues = await service.listIssues(org.id, product.id, 1, 1);
       expect(issues).toHaveLength(1);
       expect(issues[0].title).toEqual('Test Issue 2');
     });
@@ -134,18 +133,24 @@ describe('IssuesService', () => {
         paymentPlan: PaymentPlan.FREE,
       });
 
-      await expect(service.listIssues(freeOrg.id)).rejects.toThrow();
+      await expect(
+        service.listIssues(freeOrg.id, product.id),
+      ).rejects.toThrow();
     });
   });
 
   describe('when getting an issue by id', () => {
     it('should return the issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
 
-      const foundIssue = await service.getIssueById(org.id, issue.id);
+      const foundIssue = await service.getIssueById(
+        org.id,
+        product.id,
+        issue.id,
+      );
       expect(foundIssue).toBeDefined();
       expect(foundIssue.id).toEqual(issue.id);
       expect(foundIssue.title).toEqual('Test Issue');
@@ -154,12 +159,12 @@ describe('IssuesService', () => {
 
     it('should throw an error if the issue does not exist', async () => {
       await expect(
-        service.getIssueById(org.id, 'some-invalid-id'),
+        service.getIssueById(org.id, product.id, 'some-invalid-id'),
       ).rejects.toThrow();
     });
 
     it('should throw an error if the issue does not belong to the org', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -168,24 +173,26 @@ describe('IssuesService', () => {
       await orgsRepository.save(otherOrg);
 
       await expect(
-        service.getIssueById(otherOrg.id, issue.id),
+        service.getIssueById(otherOrg.id, product.id, issue.id),
       ).rejects.toThrow();
     });
 
     it('should throw an error if the org is not on the premium plan', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
       org.paymentPlan = PaymentPlan.FREE;
       await orgsRepository.save(org);
-      await expect(service.getIssueById(org.id, issue.id)).rejects.toThrow();
+      await expect(
+        service.getIssueById(org.id, product.id, issue.id),
+      ).rejects.toThrow();
     });
   });
 
   describe('when updating an issue', () => {
     it('should update the issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -193,6 +200,7 @@ describe('IssuesService', () => {
       const updatedIssue = await service.updateIssue(
         user.id,
         org.id,
+        product.id,
         issue.id,
         {
           title: 'Updated Issue',
@@ -212,7 +220,7 @@ describe('IssuesService', () => {
 
     it('should throw an error if the issue does not exist', async () => {
       await expect(
-        service.updateIssue(user.id, org.id, 'some-invalid-id', {
+        service.updateIssue(user.id, org.id, product.id, 'some-invalid-id', {
           title: 'Updated Issue',
           description: 'Updated Description',
           status: IssueStatus.IN_PROGRESS,
@@ -222,7 +230,7 @@ describe('IssuesService', () => {
     });
 
     it('should throw an error if the issue does not belong to the org', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -231,7 +239,7 @@ describe('IssuesService', () => {
       await orgsRepository.save(otherOrg);
 
       await expect(
-        service.updateIssue(user.id, otherOrg.id, issue.id, {
+        service.updateIssue(user.id, otherOrg.id, product.id, issue.id, {
           title: 'Updated Issue',
           description: 'Updated Description',
           status: IssueStatus.IN_PROGRESS,
@@ -241,7 +249,7 @@ describe('IssuesService', () => {
     });
 
     it('should throw an error if the user does not belong to the org', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -253,7 +261,7 @@ describe('IssuesService', () => {
       );
 
       await expect(
-        service.updateIssue(otherUser.id, org.id, issue.id, {
+        service.updateIssue(otherUser.id, org.id, product.id, issue.id, {
           title: 'Updated Issue',
           description: 'Updated Description',
           status: IssueStatus.IN_PROGRESS,
@@ -263,14 +271,14 @@ describe('IssuesService', () => {
     });
 
     it('should throw an error if the org is not on the premium plan', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
       org.paymentPlan = PaymentPlan.FREE;
       await orgsRepository.save(org);
       await expect(
-        service.updateIssue(user.id, org.id, issue.id, {
+        service.updateIssue(user.id, org.id, product.id, issue.id, {
           title: 'Updated Issue',
           description: 'Updated Description',
           status: IssueStatus.IN_PROGRESS,
@@ -282,24 +290,26 @@ describe('IssuesService', () => {
 
   describe('when deleting an issue', () => {
     it('should delete the issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
 
-      await service.deleteIssue(user.id, org.id, issue.id);
+      await service.deleteIssue(user.id, org.id, product.id, issue.id);
 
-      await expect(service.getIssueById(org.id, issue.id)).rejects.toThrow();
+      await expect(
+        service.getIssueById(org.id, product.id, issue.id),
+      ).rejects.toThrow();
     });
 
     it('should throw an error if the issue does not exist', async () => {
       await expect(
-        service.deleteIssue(user.id, org.id, 'some-invalid-id'),
+        service.deleteIssue(user.id, org.id, product.id, 'some-invalid-id'),
       ).rejects.toThrow();
     });
 
     it('should throw an error if the issue does not belong to the org', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -308,26 +318,26 @@ describe('IssuesService', () => {
       await orgsRepository.save(otherOrg);
 
       await expect(
-        service.deleteIssue(user.id, otherOrg.id, issue.id),
+        service.deleteIssue(user.id, otherOrg.id, product.id, issue.id),
       ).rejects.toThrow();
     });
 
     it('should throw an error if the org is not on the premium plan', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
       org.paymentPlan = PaymentPlan.FREE;
       await orgsRepository.save(org);
       await expect(
-        service.deleteIssue(user.id, org.id, issue.id),
+        service.deleteIssue(user.id, org.id, product.id, issue.id),
       ).rejects.toThrow('You need to upgrade your plan to delete an issue');
     });
   });
 
   describe('when adding a comment to an issue', () => {
     it('should add a comment to the issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -342,7 +352,7 @@ describe('IssuesService', () => {
 
   describe('when updating a comment for an issue', () => {
     it('should update the comment', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -365,7 +375,7 @@ describe('IssuesService', () => {
 
   describe('when deleting a comment for an issue', () => {
     it('should delete the comment', async () => {
-      const issue = await service.addIssue(user.id, org.id, {
+      const issue = await service.addIssue(user.id, org.id, product.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -383,16 +393,22 @@ describe('IssuesService', () => {
 
   describe('when searching issues', () => {
     it('should return the issues', async () => {
-      await service.addIssue(user.id, org.id, {
+      await service.addIssue(user.id, org.id, product.id, {
         title: 'My Issue',
         description: 'My Issue Description',
       });
-      await service.addIssue(user.id, org.id, {
+      await service.addIssue(user.id, org.id, product.id, {
         title: 'My Other Issue',
         description: 'My Other Issue Description',
       });
 
-      const issues = await service.searchIssues(org.id, 'my issue', 1, 1);
+      const issues = await service.searchIssues(
+        org.id,
+        product.id,
+        'my issue',
+        1,
+        1,
+      );
       expect(issues).toHaveLength(1);
       expect(issues[0].title).toEqual('My Issue');
       expect(issues[0].description).toEqual('My Issue Description');
