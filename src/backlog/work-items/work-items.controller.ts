@@ -13,6 +13,7 @@ import {
   Put,
   Query,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../../auth/auth.guard';
@@ -21,7 +22,7 @@ import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from './dtos';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
 
-@Controller('work-items')
+@Controller('/orgs/:orgId/products/:productId/work-items')
 @UseGuards(AuthGuard)
 export class WorkItemsController {
   constructor(private workItemsService: WorkItemsService) {}
@@ -29,11 +30,19 @@ export class WorkItemsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Body() workItemDto: CreateUpdateWorkItemDto,
   ): Promise<WorkItemDto> {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.workItemsService.createWorkItem(
+        orgId,
+        productId,
         request.user.sub,
         workItemDto,
       );
@@ -45,13 +54,20 @@ export class WorkItemsController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async list(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.workItemsService.listWorkItems(
-        request.user.org,
+        orgId,
+        productId,
         page,
         limit,
       );
@@ -63,15 +79,21 @@ export class WorkItemsController {
   @Get('/search')
   @HttpCode(HttpStatus.OK)
   async search(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Query('q') query: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      const { org: orgId } = request.user;
       return await this.workItemsService.searchWorkItems(
         orgId,
+        productId,
         query,
         page,
         limit,
@@ -83,17 +105,35 @@ export class WorkItemsController {
 
   @Get('open')
   @HttpCode(HttpStatus.OK)
-  async listOpenWithoutIterations(@Request() request) {
+  async listOpenWithoutIterations(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     return await this.workItemsService.listOpenWorkItemsWithoutIterations(
-      request.user.org,
+      orgId,
+      productId,
     );
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  async get(@Request() request, @Param('id') id: string) {
+  async get(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      return await this.workItemsService.getWorkItem(request.user.org, id);
+      return await this.workItemsService.getWorkItem(orgId, productId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -102,13 +142,20 @@ export class WorkItemsController {
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   async update(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() workItemDto: CreateUpdateWorkItemDto,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.workItemsService.updateWorkItem(
-        request.user.org,
+        orgId,
+        productId,
         id,
         workItemDto,
       );
@@ -119,9 +166,18 @@ export class WorkItemsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Request() request, @Param('id') id: string) {
+  async delete(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      await this.workItemsService.deleteWorkItem(request.user.org, id);
+      await this.workItemsService.deleteWorkItem(orgId, productId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -130,13 +186,20 @@ export class WorkItemsController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async patch(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() workItemDto: WorkItemPatchDto,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.workItemsService.patchWorkItem(
-        request.user.org,
+        orgId,
+        productId,
         id,
         workItemDto,
       );
@@ -147,14 +210,21 @@ export class WorkItemsController {
 
   @Post(':id/comments')
   async createComment(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() createCommentDto: CreateUpdateCommentDto,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.workItemsService.createWorkItemComment(
         request.user.sub,
-        request.user.org,
+        orgId,
+        productId,
         id,
         createCommentDto,
       );
@@ -165,9 +235,17 @@ export class WorkItemsController {
 
   @Get(':id/comments')
   @Public()
-  async listComments(@Param('id') id: string) {
+  async listComments(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Param('id') id: string,
+  ) {
     try {
-      return await this.workItemsService.listWorkItemComments(id);
+      return await this.workItemsService.listWorkItemComments(
+        orgId,
+        productId,
+        id,
+      );
     } catch (e) {
       throw new BadRequestException(e.message);
     }

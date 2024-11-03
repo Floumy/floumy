@@ -17,6 +17,7 @@ import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { PaymentPlan } from '../../auth/payment.plan';
 import { WorkItemComment } from './work-item-comment.entity';
 import { Issue } from '../../issues/issue.entity';
+import { Product } from '../../products/product.entity';
 
 @Injectable()
 export class WorkItemsService {
@@ -35,14 +36,25 @@ export class WorkItemsService {
     private filesService: FilesService,
     private eventEmitter: EventEmitter2,
     @InjectRepository(Issue) private issuesRepository: Repository<Issue>,
+    @InjectRepository(Product) private productsRepository: Repository<Product>,
   ) {}
 
-  async createWorkItem(userId: string, workItemDto: CreateUpdateWorkItemDto) {
+  async createWorkItem(
+    orgId: string,
+    productId: string,
+    userId: string,
+    workItemDto: CreateUpdateWorkItemDto,
+  ) {
     if (!userId) throw new Error('User id is required');
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    const product = await this.productsRepository.findOneByOrFail({
+      id: productId,
+      org: { id: orgId },
+    });
     const org = await user.org;
     const workItem = new WorkItem();
     workItem.createdBy = Promise.resolve(user);
+    workItem.product = Promise.resolve(product);
     await this.setWorkItemData(workItem, workItemDto, org.id);
     workItem.org = Promise.resolve(org);
     await this.workItemsRepository.save(workItem);
@@ -59,11 +71,17 @@ export class WorkItemsService {
     return WorkItemMapper.toDto(savedWorkItem);
   }
 
-  async listWorkItems(orgId: string, page: number = 1, limit: number = 0) {
+  async listWorkItems(
+    orgId: string,
+    productId: string,
+    page: number = 1,
+    limit: number = 0,
+  ) {
     let query = `
         SELECT *
         FROM work_item
         WHERE work_item."orgId" = $1
+          AND work_item."productId" = $2
         ORDER BY CASE
                      WHEN work_item."priority" = 'high' THEN 1
                      WHEN work_item."priority" = 'medium' THEN 2
@@ -72,33 +90,36 @@ export class WorkItemsService {
                      END,
                  work_item."createdAt" DESC
     `;
-    let params = [orgId] as any[];
+    let params = [orgId, productId] as any[];
     if (limit > 0) {
-      query += ' OFFSET $2 LIMIT $3';
+      query += ' OFFSET $3 LIMIT $4';
       const offset = (page - 1) * limit;
-      params = [orgId, offset, limit];
+      params = [orgId, productId, offset, limit];
     }
 
     const workItems = await this.workItemsRepository.query(query, params);
     return WorkItemMapper.toSimpleListDto(workItems);
   }
 
-  async getWorkItem(orgId: string, id: string) {
+  async getWorkItem(orgId: string, productId: string, id: string) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id,
       org: { id: orgId },
+      product: { id: productId },
     });
     return WorkItemMapper.toDto(workItem);
   }
 
   async updateWorkItem(
     orgId: string,
+    productId: string,
     id: string,
     workItemDto: CreateUpdateWorkItemDto,
   ) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id,
       org: { id: orgId },
+      product: { id: productId },
     });
     const previous = await WorkItemMapper.toDto(workItem);
     const oldFeature = await workItem.feature;
@@ -118,10 +139,11 @@ export class WorkItemsService {
     return current;
   }
 
-  async deleteWorkItem(orgId: string, id: string) {
+  async deleteWorkItem(orgId: string, productId: string, id: string) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id,
       org: { id: orgId },
+      product: { id: productId },
     });
     const deletedWorkItem = await WorkItemMapper.toDto(workItem);
     await this.deleteWorkItemFiles(orgId, workItem.id);
@@ -143,12 +165,13 @@ export class WorkItemsService {
     );
   }
 
-  async listOpenWorkItemsWithoutIterations(orgId: string) {
+  async listOpenWorkItemsWithoutIterations(orgId: string, productId: string) {
     const workItems = await this.workItemsRepository
       .createQueryBuilder('workItem')
       .leftJoinAndSelect('workItem.feature', 'feature')
       .leftJoinAndSelect('workItem.assignedTo', 'assignedTo')
       .where('workItem.orgId = :orgId', { orgId })
+      .andWhere('workItem.productId = :productId', { productId })
       .andWhere('workItem.status NOT IN (:closedStatus, :doneStatus)', {
         closedStatus: WorkItemStatus.CLOSED,
         doneStatus: WorkItemStatus.DONE,
@@ -160,12 +183,14 @@ export class WorkItemsService {
 
   async patchWorkItem(
     orgId: string,
+    productId: string,
     workItemId: string,
     workItemPatchDto: WorkItemPatchDto,
   ) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id: workItemId,
       org: { id: orgId },
+      product: { id: productId },
     });
     const previous = await WorkItemMapper.toDto(workItem);
     const currentIteration = await workItem.iteration;
@@ -191,6 +216,7 @@ export class WorkItemsService {
 
   async searchWorkItems(
     orgId: string,
+    productId: string,
     search: string,
     page: number = 1,
     limit: number = 0,
@@ -198,20 +224,33 @@ export class WorkItemsService {
     if (!search) return [];
 
     if (this.isReference(search)) {
-      return await this.searchWorkItemsByReference(orgId, search, page, limit);
+      return await this.searchWorkItemsByReference(
+        orgId,
+        productId,
+        search,
+        page,
+        limit,
+      );
     }
 
     return await this.searchWorkItemsByTitleOrDescription(
       orgId,
+      productId,
       search,
       page,
       limit,
     );
   }
 
-  async listWorkItemComments(workItemId: string) {
+  async listWorkItemComments(
+    orgId: string,
+    productId: string,
+    workItemId: string,
+  ) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id: workItemId,
+      org: { id: orgId },
+      product: { id: productId },
     });
     const comments = await workItem.comments;
     return await CommentMapper.toDtoList(comments);
@@ -220,6 +259,7 @@ export class WorkItemsService {
   async createWorkItemComment(
     userId: string,
     orgId: string,
+    productId: string,
     workItemId: string,
     createCommentDto: CreateUpdateCommentDto,
   ) {
@@ -227,6 +267,7 @@ export class WorkItemsService {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id: workItemId,
       org: { id: orgId },
+      product: { id: productId },
     });
     const org = await workItem.org;
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {
@@ -438,6 +479,7 @@ export class WorkItemsService {
 
   private async searchWorkItemsByTitleOrDescription(
     orgId: string,
+    productId: string,
     search: string,
     page: number,
     limit: number,
@@ -446,7 +488,8 @@ export class WorkItemsService {
         SELECT *
         FROM work_item
         WHERE work_item."orgId" = $1
-          AND (work_item.title ILIKE $2 OR work_item.description ILIKE $2)
+          AND work_item."productId" = $2
+          AND (work_item.title ILIKE $3 OR work_item.description ILIKE $3)
         ORDER BY CASE
                      WHEN work_item."priority" = 'high' THEN 1
                      WHEN work_item."priority" = 'medium' THEN 2
@@ -455,12 +498,12 @@ export class WorkItemsService {
                      END,
                  work_item."createdAt" DESC
     `;
-    let params = [orgId, `%${search}%`] as any[];
+    let params = [orgId, productId, `%${search}%`] as any[];
 
     if (limit > 0) {
-      query += ' OFFSET $3 LIMIT $4';
+      query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, `%${search}%`, offset, limit];
+      params = [orgId, productId, `%${search}%`, offset, limit];
     }
 
     const workItems = await this.workItemsRepository.query(query, params);
@@ -470,6 +513,7 @@ export class WorkItemsService {
 
   private async searchWorkItemsByReference(
     orgId: string,
+    productId: string,
     search: string,
     page: number,
     limit: number,
@@ -478,7 +522,8 @@ export class WorkItemsService {
         SELECT *
         FROM work_item
         WHERE work_item."orgId" = $1
-          AND CAST(work_item."sequenceNumber" AS TEXT) LIKE $2
+          AND work_item."productId" = $2
+          AND CAST(work_item."sequenceNumber" AS TEXT) LIKE $3
         ORDER BY CASE
                      WHEN work_item."priority" = 'high' THEN 1
                      WHEN work_item."priority" = 'medium' THEN 2
@@ -489,12 +534,12 @@ export class WorkItemsService {
     `;
 
     const referenceSequenceNumber = search.split('-')[1];
-    let params = [orgId, `${referenceSequenceNumber}%`] as any[];
+    let params = [orgId, productId, `${referenceSequenceNumber}%`] as any[];
 
     if (limit > 0) {
-      query += ' OFFSET $3 LIMIT $4';
+      query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, `${referenceSequenceNumber}%`, offset, limit];
+      params = [orgId, productId, `${referenceSequenceNumber}%`, offset, limit];
     }
 
     const workItems = await this.workItemsRepository.query(query, params);

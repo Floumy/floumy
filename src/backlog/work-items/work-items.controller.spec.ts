@@ -30,17 +30,20 @@ import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { PaymentPlan } from '../../auth/payment.plan';
 import { uuid } from 'uuidv4';
+import { Product } from '../../products/product.entity';
 
 describe('WorkItemsController', () => {
-  let controller: WorkItemsController;
-  let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
+  let product: Product;
+  let controller: WorkItemsController;
+  let cleanup: () => Promise<void>;
   let featureService: FeaturesService;
   let iterationsService: IterationsService;
   let fileRepository: Repository<File>;
   let orgsRepository: Repository<Org>;
   let usersRepository: Repository<User>;
+  let productsRepository: Repository<Product>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -82,11 +85,15 @@ describe('WorkItemsController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     featureService = module.get<FeaturesService>(FeaturesService);
     iterationsService = module.get<IterationsService>(IterationsService);
     fileRepository = module.get<Repository<File>>(getRepositoryToken(File));
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
     usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    productsRepository = module.get<Repository<Product>>(
+      getRepositoryToken(Product),
+    );
   });
 
   afterEach(async () => {
@@ -106,21 +113,34 @@ describe('WorkItemsController', () => {
     );
     premiumUser.org = Promise.resolve(org);
     const user = await usersRepository.save(premiumUser);
-    return { org, user };
+    const product = new Product();
+    product.name = 'Test Product';
+    product.org = Promise.resolve(premiumOrg);
+    await productsRepository.save(product);
+
+    return { org, user, product };
   }
 
   describe('when creating a work item', () => {
     it('should return the created work item', async () => {
-      const feature = await featureService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature = await featureService.createFeature(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       const workItemResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -163,6 +183,8 @@ describe('WorkItemsController', () => {
       const file1 = await fileRepository.save(file1Entity);
       const file2 = await fileRepository.save(file2Entity);
       const workItemResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
@@ -201,16 +223,24 @@ describe('WorkItemsController', () => {
   });
   describe('when listing work items', () => {
     it('should return the list of work items', async () => {
-      const feature = await featureService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature = await featureService.createFeature(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -222,7 +252,7 @@ describe('WorkItemsController', () => {
           status: WorkItemStatus.PLANNED,
         },
       );
-      const workItems = await controller.list({
+      const workItems = await controller.list(org.id, product.id, {
         user: {
           org: org.id,
         },
@@ -241,16 +271,24 @@ describe('WorkItemsController', () => {
   });
   describe('when getting a work item', () => {
     it('should return the work item', async () => {
-      const feature = await featureService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature = await featureService.createFeature(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       const workItem = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -263,6 +301,8 @@ describe('WorkItemsController', () => {
         },
       );
       const workItemResponse = await controller.get(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -286,16 +326,24 @@ describe('WorkItemsController', () => {
   });
   describe('when updating a work item', () => {
     it('should return the updated work item', async () => {
-      const feature = await featureService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature = await featureService.createFeature(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       const workItem = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -308,6 +356,8 @@ describe('WorkItemsController', () => {
         },
       );
       const workItemResponse = await controller.update(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -355,13 +405,20 @@ describe('WorkItemsController', () => {
       file2Entity.org = Promise.resolve(org);
       const file1 = await fileRepository.save(file1Entity);
       const file2 = await fileRepository.save(file2Entity);
-      const feature = await featureService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature = await featureService.createFeature(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       const workItem = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
@@ -377,6 +434,8 @@ describe('WorkItemsController', () => {
         },
       );
       const workItemResponse = await controller.update(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -415,16 +474,24 @@ describe('WorkItemsController', () => {
   });
   describe('when deleting a work item', () => {
     it('should delete the work item', async () => {
-      const feature = await featureService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature = await featureService.createFeature(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       const workItem = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -437,6 +504,8 @@ describe('WorkItemsController', () => {
         },
       );
       await controller.delete(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -444,7 +513,7 @@ describe('WorkItemsController', () => {
         },
         workItem.id,
       );
-      const workItems = await controller.list({
+      const workItems = await controller.list(org.id, product.id, {
         user: {
           org: org.id,
         },
@@ -455,16 +524,24 @@ describe('WorkItemsController', () => {
   });
   describe('when getting open work items', () => {
     it('should return the open work items', async () => {
-      const feature = await featureService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature = await featureService.createFeature(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -476,11 +553,15 @@ describe('WorkItemsController', () => {
           status: WorkItemStatus.PLANNED,
         },
       );
-      const workItems = await controller.listOpenWithoutIterations({
-        user: {
-          org: org.id,
+      const workItems = await controller.listOpenWithoutIterations(
+        org.id,
+        product.id,
+        {
+          user: {
+            org: org.id,
+          },
         },
-      });
+      );
 
       expect(workItems.length).toEqual(1);
       expect(workItems[0].id).toBeDefined();
@@ -496,9 +577,12 @@ describe('WorkItemsController', () => {
   describe('when patching a work item', () => {
     it('should update the iteration', async () => {
       const workItem = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -509,12 +593,14 @@ describe('WorkItemsController', () => {
           status: WorkItemStatus.PLANNED,
         },
       );
-      const iteration = await iterationsService.create(org.id, {
+      const iteration = await iterationsService.create(org.id, product.id, {
         goal: 'my iteration description',
         startDate: '2019-01-01',
         duration: 2,
       });
       const updatedWorkItem = await controller.patch(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -530,9 +616,12 @@ describe('WorkItemsController', () => {
     });
     it('should update the status', async () => {
       const workItem = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -544,6 +633,8 @@ describe('WorkItemsController', () => {
         },
       );
       const updatedWorkItem = await controller.patch(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -560,16 +651,24 @@ describe('WorkItemsController', () => {
   });
   describe('when searching work items', () => {
     it('should return the work items', async () => {
-      const feature = await featureService.createFeature(user.id, {
-        title: 'my feature',
-        description: 'my feature description',
-        priority: Priority.HIGH,
-        status: FeatureStatus.PLANNED,
-      });
+      const feature = await featureService.createFeature(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -582,6 +681,8 @@ describe('WorkItemsController', () => {
         },
       );
       const workItems = await controller.search(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -603,12 +704,18 @@ describe('WorkItemsController', () => {
   });
   describe('when adding a comment to a work item', () => {
     it('should return the comment', async () => {
-      const { org: premiumOrg, user: premiumOrgUser } =
-        await getTestPremiumOrgAndUser();
+      const {
+        org: premiumOrg,
+        user: premiumOrgUser,
+        product,
+      } = await getTestPremiumOrgAndUser();
       const workItem = await controller.create(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
+            org: premiumOrg.id,
           },
         },
         {
@@ -620,6 +727,8 @@ describe('WorkItemsController', () => {
         },
       );
       const comment = await controller.createComment(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
@@ -642,12 +751,18 @@ describe('WorkItemsController', () => {
   });
   describe('when listing comments of a work item', () => {
     it('should return the comments', async () => {
-      const { org: premiumOrg, user: premiumOrgUser } =
-        await getTestPremiumOrgAndUser();
+      const {
+        org: premiumOrg,
+        user: premiumOrgUser,
+        product,
+      } = await getTestPremiumOrgAndUser();
       const workItem = await controller.create(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
+            org: premiumOrg.id,
           },
         },
         {
@@ -659,6 +774,8 @@ describe('WorkItemsController', () => {
         },
       );
       await controller.createComment(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
@@ -670,7 +787,11 @@ describe('WorkItemsController', () => {
           content: 'my comment',
         },
       );
-      const comments = await controller.listComments(workItem.id);
+      const comments = await controller.listComments(
+        premiumOrg.id,
+        product.id,
+        workItem.id,
+      );
 
       expect(comments.length).toEqual(1);
       expect(comments[0].id).toBeDefined();
@@ -683,12 +804,18 @@ describe('WorkItemsController', () => {
   });
   describe('when deleting a work item comment', () => {
     it('should delete the comment', async () => {
-      const { org: premiumOrg, user: premiumOrgUser } =
-        await getTestPremiumOrgAndUser();
+      const {
+        org: premiumOrg,
+        user: premiumOrgUser,
+        product,
+      } = await getTestPremiumOrgAndUser();
       const workItem = await controller.create(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
+            org: premiumOrg.id,
           },
         },
         {
@@ -700,6 +827,8 @@ describe('WorkItemsController', () => {
         },
       );
       const comment = await controller.createComment(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
@@ -720,17 +849,27 @@ describe('WorkItemsController', () => {
         workItem.id,
         comment.id,
       );
-      const comments = await controller.listComments(workItem.id);
+      const comments = await controller.listComments(
+        premiumOrg.id,
+        product.id,
+        workItem.id,
+      );
 
       expect(comments.length).toEqual(0);
     });
     it('should throw an error if another user tries to delete it', async () => {
-      const { org: premiumOrg, user: premiumOrgUser } =
-        await getTestPremiumOrgAndUser();
+      const {
+        org: premiumOrg,
+        user: premiumOrgUser,
+        product,
+      } = await getTestPremiumOrgAndUser();
       const workItem = await controller.create(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
+            org: premiumOrg.id,
           },
         },
         {
@@ -742,6 +881,8 @@ describe('WorkItemsController', () => {
         },
       );
       const comment = await controller.createComment(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
@@ -759,6 +900,7 @@ describe('WorkItemsController', () => {
           {
             user: {
               sub: uuid(),
+              org: org.id,
             },
           },
           workItem.id,
@@ -769,12 +911,18 @@ describe('WorkItemsController', () => {
   });
   describe('when updating a work item comment', () => {
     it('should update the comment', async () => {
-      const { org: premiumOrg, user: premiumOrgUser } =
-        await getTestPremiumOrgAndUser();
+      const {
+        org: premiumOrg,
+        user: premiumOrgUser,
+        product,
+      } = await getTestPremiumOrgAndUser();
       const workItem = await controller.create(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
+            org: premiumOrg.id,
           },
         },
         {
@@ -786,6 +934,8 @@ describe('WorkItemsController', () => {
         },
       );
       const comment = await controller.createComment(
+        premiumOrg.id,
+        product.id,
         {
           user: {
             sub: premiumOrgUser.id,
