@@ -17,6 +17,7 @@ describe('OkrsService', () => {
   let service: OkrsService;
   let orgsService: OrgsService;
   let featuresRepository: Repository<Feature>;
+  let productsRepository: Repository<Product>;
   let usersService: UsersService;
   let org: Org;
   let product: Product;
@@ -34,6 +35,9 @@ describe('OkrsService', () => {
     featuresRepository = module.get<Repository<Feature>>(
       getRepositoryToken(Feature),
     );
+    productsRepository = module.get<Repository<Product>>(
+      getRepositoryToken(Product),
+    );
     const user = new User('Test User', 'testuser@example.com', 'testtesttest');
     org = await orgsService.createForUser(user);
     product = (await org.products)[0];
@@ -49,7 +53,12 @@ describe('OkrsService', () => {
 
   async function createTestOrg() {
     const user = new User('Test User', 'test@example.com', 'testtesttest');
-    return await orgsService.createForUser(user);
+    const org = await orgsService.createForUser(user);
+    const product = new Product();
+    product.name = 'Test Product';
+    product.org = Promise.resolve(org);
+    await productsRepository.save(product);
+    return { org, user, product };
   }
 
   describe('when creating an objective', () => {
@@ -80,7 +89,7 @@ describe('OkrsService', () => {
     });
 
     it('should assign the objective to the org', async () => {
-      const testOrg = await createTestOrg();
+      const { org: testOrg, product } = await createTestOrg();
       const objective = await service.createObjective(testOrg.id, product.id, {
         title: 'Test Objective',
       });
@@ -106,6 +115,10 @@ describe('OkrsService', () => {
         'testtesttest',
       );
       const org = await user.org;
+      const product = new Product();
+      product.name = 'Test Product';
+      product.org = Promise.resolve(org);
+      await productsRepository.save(product);
       const objective = await service.createObjective(org.id, product.id, {
         title: 'Test Objective',
         assignedTo: user.id,
@@ -196,6 +209,10 @@ describe('OkrsService', () => {
       'testtesttest',
     );
     const org = await user.org;
+    const product = new Product();
+    product.name = 'Test Product';
+    product.org = Promise.resolve(org);
+    await productsRepository.save(product);
     const objective = await service.createObjective(org.id, product.id, {
       title: 'Test Objective',
     });
@@ -218,6 +235,10 @@ describe('OkrsService', () => {
       'testtesttest',
     );
     const org = await user.org;
+    const product = new Product();
+    product.name = 'Test Product';
+    product.org = Promise.resolve(org);
+    await productsRepository.save(product);
     const objective = await service.createObjective(org.id, product.id, {
       title: 'Test Objective',
     });
