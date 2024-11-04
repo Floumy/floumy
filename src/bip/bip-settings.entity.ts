@@ -37,6 +37,7 @@ export class BipSettings {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  // TODO: Implement this relationship
   @OneToOne(() => Product, (product) => product.bipSettings, { lazy: false })
   @JoinColumn()
   product: Promise<Product>;
