@@ -30,6 +30,7 @@ export class OrgsService {
     const product = new Product();
     product.name = 'Default Product';
     product.org = Promise.resolve(savedOrg);
+    product.users = Promise.resolve([user]);
     await this.productRepository.save(product);
 
     this.eventEmitter.emit('org.created', savedOrg);

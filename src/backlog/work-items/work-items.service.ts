@@ -146,7 +146,7 @@ export class WorkItemsService {
       product: { id: productId },
     });
     const deletedWorkItem = await WorkItemMapper.toDto(workItem);
-    await this.deleteWorkItemFiles(orgId, workItem.id);
+    await this.deleteWorkItemFiles(orgId, productId, workItem.id);
 
     const feature = await workItem.feature;
 
@@ -463,13 +463,17 @@ export class WorkItemsService {
     }
   }
 
-  private async deleteWorkItemFiles(orgId: string, workItemId: string) {
+  private async deleteWorkItemFiles(
+    orgId: string,
+    productId: string,
+    workItemId: string,
+  ) {
     const workItemFiles = await this.workItemFilesRepository.find({
       where: { workItem: { id: workItemId } },
     });
     for (const workItemFile of workItemFiles) {
       const file = await workItemFile.file;
-      await this.filesService.deleteFile(orgId, file.id);
+      await this.filesService.deleteFile(orgId, productId, file.id);
     }
   }
 

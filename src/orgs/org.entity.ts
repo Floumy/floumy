@@ -82,6 +82,7 @@ export class Org {
   bipSettings: Promise<BipSettings>;
   @OneToMany(() => Issue, (issue) => issue.org, { lazy: true })
   issues: Promise<Issue[]>;
+
   @OneToMany(() => Product, (product) => product.org, { lazy: true })
   products: Promise<Product[]>;
 }

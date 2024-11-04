@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
+import { Product } from '../products/product.entity';
 
 @Entity()
 export class FeedItem {
@@ -28,4 +29,7 @@ export class FeedItem {
   org: Promise<Org>;
   @CreateDateColumn()
   createdAt: Date;
+  // TODO: Implement this relationship
+  @ManyToOne(() => Product, (product) => product.feedItems, { lazy: false })
+  product: Promise<Product>;
 }

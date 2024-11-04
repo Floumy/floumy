@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -10,6 +11,7 @@ import {
   Post,
   Request,
   Response,
+  UnauthorizedException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -19,7 +21,7 @@ import { FilesService } from './files.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Readable } from 'stream';
 
-@Controller('files')
+@Controller('/orgs/:orgId/products/:productId/files')
 @UseGuards(AuthGuard)
 export class FilesController {
   constructor(private filesService: FilesService) {}
@@ -27,6 +29,8 @@ export class FilesController {
   @Post('/')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 })],
@@ -35,18 +39,32 @@ export class FilesController {
     file: Express.Multer.File,
     @Request() request,
   ) {
-    return await this.filesService.uploadFile(request.user.org, file);
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.filesService.uploadFile(orgId, productId, file);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
   @Get('/:id')
   @Header('Access-Control-Expose-Headers', 'Content-Disposition')
   async getFile(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('id') fileId: string,
     @Request() request,
     @Response() response,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      const file = await this.filesService.getFile(request.user.org, fileId);
+      const file = await this.filesService.getFile(orgId, productId, fileId);
       response.setHeader('Content-Type', file.object.ContentType);
       response.setHeader(
         'Content-Disposition',
@@ -65,7 +83,16 @@ export class FilesController {
   }
 
   @Delete('/:id')
-  async deleteFile(@Param('id') fileId: string, @Request() request) {
-    await this.filesService.deleteFile(request.user.org, fileId);
+  async deleteFile(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Param('id') fileId: string,
+    @Request() request,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    await this.filesService.deleteFile(orgId, productId, fileId);
   }
 }
