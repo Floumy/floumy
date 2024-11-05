@@ -19,6 +19,7 @@ describe('PublicService', () => {
   let okrsService: OkrsService;
   let orgsRepository: Repository<Org>;
   let bipSettingsRepository: Repository<BipSettings>;
+  let productsRepository: Repository<Product>;
   let org: Org;
   let product: Product;
   let cleanup: () => Promise<void>;
@@ -44,7 +45,7 @@ describe('PublicService', () => {
     bipSettingsRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
-    const productsRepository = module.get<Repository<Product>>(
+    productsRepository = module.get<Repository<Product>>(
       getRepositoryToken(Product),
     );
     org = new Org();
@@ -145,12 +146,16 @@ describe('PublicService', () => {
       const newOrg = new Org();
       newOrg.name = 'Test Org 2';
       await orgsRepository.save(newOrg);
+      const newOrgProduct = new Product();
+      newOrgProduct.name = 'Test Product';
+      newOrgProduct.org = Promise.resolve(newOrg);
+      await productsRepository.save(newOrgProduct);
       const newOrgBipSettings = new BipSettings();
       newOrgBipSettings.isBuildInPublicEnabled = false;
       newOrgBipSettings.org = Promise.resolve(newOrg);
       newOrgBipSettings.product = Promise.resolve(product);
       await bipSettingsRepository.save(newOrgBipSettings);
-      const okr = await okrsService.create(newOrg.id, product.id, {
+      const okr = await okrsService.create(newOrg.id, newOrgProduct.id, {
         objective: {
           title: 'Objective 1',
           timeline: Timeline.THIS_QUARTER,
@@ -198,12 +203,16 @@ describe('PublicService', () => {
       const newOrg = new Org();
       newOrg.name = 'Test Org 2';
       await orgsRepository.save(newOrg);
+      const newOrgProduct = new Product();
+      newOrgProduct.name = 'Test Product';
+      newOrgProduct.org = Promise.resolve(newOrg);
+      await productsRepository.save(newOrgProduct);
       const newOrgBipSettings = new BipSettings();
       newOrgBipSettings.isBuildInPublicEnabled = false;
       newOrgBipSettings.org = Promise.resolve(newOrg);
       newOrgBipSettings.product = Promise.resolve(product);
       await bipSettingsRepository.save(newOrgBipSettings);
-      const okr = await okrsService.create(newOrg.id, product.id, {
+      const okr = await okrsService.create(newOrg.id, newOrgProduct.id, {
         objective: {
           title: 'Objective 1',
           timeline: Timeline.THIS_QUARTER,
