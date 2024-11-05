@@ -210,17 +210,26 @@ describe('IterationsService', () => {
         startDate: '2020-01-01',
         duration: 1,
       });
-      const workItem = await workItemsService.createWorkItem(user.id, {
-        title: 'Test Work Item',
-        description: 'Test Work Item Description',
-        priority: Priority.HIGH,
-        type: WorkItemType.BUG,
-        status: WorkItemStatus.PLANNED,
-        estimation: 1,
-        iteration: iteration.id,
-      });
+      const workItem = await workItemsService.createWorkItem(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'Test Work Item',
+          description: 'Test Work Item Description',
+          priority: Priority.HIGH,
+          type: WorkItemType.BUG,
+          status: WorkItemStatus.PLANNED,
+          estimation: 1,
+          iteration: iteration.id,
+        },
+      );
       await service.delete(org.id, product.id, iteration.id);
-      const workItems = await workItemsService.getWorkItem(org.id, workItem.id);
+      const workItems = await workItemsService.getWorkItem(
+        org.id,
+        product.id,
+        workItem.id,
+      );
       expect(workItems.iteration).toBeUndefined();
     });
   });
@@ -286,15 +295,20 @@ describe('IterationsService', () => {
         startDate: startDate,
         duration: 1,
       });
-      const workItem = await workItemsService.createWorkItem(user.id, {
-        title: 'Work Item 1',
-        description: 'Work Item 1',
-        priority: Priority.LOW,
-        type: WorkItemType.TECHNICAL_DEBT,
-        status: WorkItemStatus.PLANNED,
-        estimation: 1,
-        iteration: iteration.id,
-      });
+      const workItem = await workItemsService.createWorkItem(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'Work Item 1',
+          description: 'Work Item 1',
+          priority: Priority.LOW,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+          estimation: 1,
+          iteration: iteration.id,
+        },
+      );
       const startedIteration = await service.startIteration(
         org.id,
         product.id,
@@ -324,15 +338,20 @@ describe('IterationsService', () => {
         startDate: startDate,
         duration: 1,
       });
-      const workItem = await workItemsService.createWorkItem(user.id, {
-        title: 'Work Item 1',
-        description: 'Work Item 1',
-        priority: Priority.LOW,
-        type: WorkItemType.TECHNICAL_DEBT,
-        status: WorkItemStatus.PLANNED,
-        estimation: 1,
-        iteration: iteration.id,
-      });
+      const workItem = await workItemsService.createWorkItem(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'Work Item 1',
+          description: 'Work Item 1',
+          priority: Priority.LOW,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+          estimation: 1,
+          iteration: iteration.id,
+        },
+      );
       const startedIteration = await service.startIteration(
         org.id,
         product.id,
@@ -356,7 +375,7 @@ describe('IterationsService', () => {
         startDate: startDate,
         duration: 1,
       });
-      await workItemsService.createWorkItem(user.id, {
+      await workItemsService.createWorkItem(org.id, product.id, user.id, {
         title: 'Work Item 1',
         description: 'Work Item 1',
         priority: Priority.LOW,
@@ -384,7 +403,7 @@ describe('IterationsService', () => {
         startDate: startDate,
         duration: 1,
       });
-      await workItemsService.createWorkItem(user.id, {
+      await workItemsService.createWorkItem(org.id, product.id, user.id, {
         title: 'Work Item 1',
         description: 'Work Item 1',
         priority: Priority.LOW,
@@ -411,7 +430,7 @@ describe('IterationsService', () => {
         startDate: startDate,
         duration: 1,
       });
-      await workItemsService.createWorkItem(user.id, {
+      await workItemsService.createWorkItem(org.id, product.id, user.id, {
         title: 'Work Item 1',
         description: 'Work Item 1',
         priority: Priority.LOW,
@@ -420,7 +439,7 @@ describe('IterationsService', () => {
         estimation: 10,
         iteration: iteration.id,
       });
-      await workItemsService.createWorkItem(user.id, {
+      await workItemsService.createWorkItem(org.id, product.id, user.id, {
         title: 'Work Item 2',
         description: 'Work Item 2',
         priority: Priority.LOW,

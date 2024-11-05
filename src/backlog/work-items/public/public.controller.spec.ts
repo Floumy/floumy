@@ -29,12 +29,14 @@ import { Priority } from '../../../common/priority.enum';
 import { PublicService } from './public.service';
 import { WorkItemStatus } from '../work-item-status.enum';
 import { WorkItemType } from '../work-item-type.enum';
+import { Product } from '../../../products/product.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
+  let product: Product;
   let workItemsService: WorkItemsService;
 
   beforeEach(async () => {
@@ -52,6 +54,7 @@ describe('PublicController', () => {
           FeatureFile,
           WorkItemFile,
           BipSettings,
+          Product,
         ]),
         UsersModule,
       ],
@@ -80,9 +83,11 @@ describe('PublicController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
+    bipSettings.product = Promise.resolve(product);
     const bipRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
@@ -95,15 +100,24 @@ describe('PublicController', () => {
 
   describe('when getting a work item', () => {
     it('should return the work item', async () => {
-      const workItem = await workItemsService.createWorkItem(user.id, {
-        title: 'Test Feature',
-        description: 'Test Description',
-        priority: Priority.HIGH,
-        type: WorkItemType.BUG,
-        status: WorkItemStatus.DEPLOYED,
-        estimation: 5,
-      });
-      const result = await controller.getWorkItem(org.id, workItem.id);
+      const workItem = await workItemsService.createWorkItem(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'Test Feature',
+          description: 'Test Description',
+          priority: Priority.HIGH,
+          type: WorkItemType.BUG,
+          status: WorkItemStatus.DEPLOYED,
+          estimation: 5,
+        },
+      );
+      const result = await controller.getWorkItem(
+        org.id,
+        product.id,
+        workItem.id,
+      );
       expect(result).toBeDefined();
       expect(result.title).toEqual('Test Feature');
       expect(result.description).toEqual('Test Description');

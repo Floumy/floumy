@@ -304,7 +304,7 @@ describe('IterationsController', () => {
           duration: 1,
         },
       );
-      await workItemService.createWorkItem(user.id, {
+      await workItemService.createWorkItem(org.id, product.id, user.id, {
         title: 'Work Item 1',
         description: 'Work Item 1',
         priority: Priority.LOW,

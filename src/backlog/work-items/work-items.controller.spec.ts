@@ -173,6 +173,7 @@ describe('WorkItemsController', () => {
       file1Entity.size = 100;
       file1Entity.url = 'url1';
       file1Entity.org = Promise.resolve(org);
+      file1Entity.product = Promise.resolve(product);
       const file2Entity = new File();
       file2Entity.name = 'file2';
       file2Entity.path = 'path2';
@@ -180,6 +181,7 @@ describe('WorkItemsController', () => {
       file2Entity.size = 100;
       file2Entity.url = 'url2';
       file2Entity.org = Promise.resolve(org);
+      file2Entity.product = Promise.resolve(product);
       const file1 = await fileRepository.save(file1Entity);
       const file2 = await fileRepository.save(file2Entity);
       const workItemResponse = await controller.create(
@@ -188,6 +190,7 @@ describe('WorkItemsController', () => {
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {
@@ -396,6 +399,7 @@ describe('WorkItemsController', () => {
       file1Entity.size = 100;
       file1Entity.url = 'url1';
       file1Entity.org = Promise.resolve(org);
+      file1Entity.product = Promise.resolve(product);
       const file2Entity = new File();
       file2Entity.name = 'file2';
       file2Entity.path = 'path2';
@@ -403,6 +407,7 @@ describe('WorkItemsController', () => {
       file2Entity.size = 100;
       file2Entity.url = 'url2';
       file2Entity.org = Promise.resolve(org);
+      file2Entity.product = Promise.resolve(product);
       const file1 = await fileRepository.save(file1Entity);
       const file2 = await fileRepository.save(file2Entity);
       const feature = await featureService.createFeature(
@@ -422,6 +427,7 @@ describe('WorkItemsController', () => {
         {
           user: {
             sub: user.id,
+            org: org.id,
           },
         },
         {

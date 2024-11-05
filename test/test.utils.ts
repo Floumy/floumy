@@ -34,6 +34,7 @@ import { FeatureRequest } from '../src/feature-requests/feature-request.entity';
 import { Issue } from '../src/issues/issue.entity';
 import { IssueComment } from '../src/issues/issue-comment.entity';
 import { Product } from '../src/products/product.entity';
+import { Milestone } from '../src/roadmap/milestones/milestone.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -134,6 +135,7 @@ export async function setupTestingModule(
         FeatureRequestComment,
         Issue,
         IssueComment,
+        Milestone,
         Product,
       ]),
       ConfigModule.forRoot({

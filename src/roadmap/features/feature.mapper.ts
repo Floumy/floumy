@@ -9,12 +9,16 @@ export class FeatureMapper {
     const org = await feature.org;
     const comments = await feature.comments;
     const featureRequest = await feature.featureRequest;
+    const product = await feature.product;
 
     const featureDto = {
       id: feature.id,
       org: {
         id: org.id,
         name: org.name,
+      },
+      product: {
+        id: product.id,
       },
       reference: `F-${feature.sequenceNumber}`,
       title: feature.title,
