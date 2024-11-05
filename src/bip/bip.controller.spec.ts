@@ -9,12 +9,14 @@ import { TokensService } from '../auth/tokens.service';
 import { UsersService } from '../users/users.service';
 import { BipService } from './bip.service';
 import { BipSettings } from './bip-settings.entity';
+import { Product } from '../products/product.entity';
 
 describe('BipController', () => {
   let controller: BipController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
+  let product: Product;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -32,6 +34,7 @@ describe('BipController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
   });
 
   afterEach(async () => {
@@ -41,6 +44,8 @@ describe('BipController', () => {
   describe('when updating BIP settings', () => {
     it('should update BIP settings', async () => {
       const updatedSettings = await controller.createOrUpdateSettings(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -73,6 +78,8 @@ describe('BipController', () => {
   describe('when getting BIP settings', () => {
     it('should return BIP settings', async () => {
       await controller.createOrUpdateSettings(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,

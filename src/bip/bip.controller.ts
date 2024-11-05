@@ -4,15 +4,17 @@ import {
   Controller,
   Get,
   HttpCode,
+  Param,
   Put,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { BipSettingsDto } from './bip.dtos';
 import { AuthGuard } from '../auth/auth.guard';
 import { BipService } from './bip.service';
 
-@Controller('build-in-public')
+@Controller('/orgs/:orgId/products/:productId/build-in-public')
 @UseGuards(AuthGuard)
 export class BipController {
   constructor(private bipService: BipService) {}
@@ -20,12 +22,19 @@ export class BipController {
   @Put('settings')
   @HttpCode(200)
   async createOrUpdateSettings(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Body() settings: BipSettingsDto,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.bipService.createOrUpdateSettings(
-        request.user.org,
+        orgId,
+        productId,
         settings,
       );
     } catch (e) {

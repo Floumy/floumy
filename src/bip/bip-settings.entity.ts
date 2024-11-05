@@ -17,18 +17,18 @@ export class BipSettings {
   @OneToOne(() => Org, (org) => org.bipSettings, { lazy: false })
   @JoinColumn()
   org: Promise<Org>;
-  @Column({ default: true })
-  isBuildInPublicEnabled: boolean = true;
-  @Column({ default: true })
-  isObjectivesPagePublic: boolean = true;
-  @Column({ default: true })
-  isRoadmapPagePublic: boolean = true;
-  @Column({ default: true })
-  isIterationsPagePublic: boolean = true;
-  @Column({ default: true })
-  isActiveIterationsPagePublic: boolean = true;
-  @Column({ default: true })
-  isFeedPagePublic: boolean = true;
+  @Column({ default: false })
+  isBuildInPublicEnabled: boolean = false;
+  @Column({ default: false })
+  isObjectivesPagePublic: boolean = false;
+  @Column({ default: false })
+  isRoadmapPagePublic: boolean = false;
+  @Column({ default: false })
+  isIterationsPagePublic: boolean = false;
+  @Column({ default: false })
+  isActiveIterationsPagePublic: boolean = false;
+  @Column({ default: false })
+  isFeedPagePublic: boolean = false;
   @Column({ default: false })
   isIssuesPagePublic: boolean = false;
   @Column({ default: false })
@@ -37,7 +37,6 @@ export class BipSettings {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  // TODO: Implement this relationship
   @OneToOne(() => Product, (product) => product.bipSettings, { lazy: false })
   @JoinColumn()
   product: Promise<Product>;

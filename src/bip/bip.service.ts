@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BipSettingsMapper } from './bip.dtos.mapper';
 import { Org } from '../orgs/org.entity';
 import { OnEvent } from '@nestjs/event-emitter';
-import { PaymentPlan } from '../auth/payment.plan';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class BipService {
@@ -15,16 +15,27 @@ export class BipService {
     private readonly bipSettingsRepository: Repository<BipSettings>,
     @InjectRepository(Org)
     private readonly orgRepository: Repository<Org>,
+    @InjectRepository(Product)
+    private readonly productsRepository: Repository<Product>,
   ) {}
 
-  async createOrUpdateSettings(orgId: string, settings: BipSettingsDto) {
+  async createOrUpdateSettings(
+    orgId: string,
+    productId: string,
+    settings: BipSettingsDto,
+  ) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
 
-    if (org.paymentPlan === 'build-in-private') {
-      throw new Error('Payment plan is Build In Private');
-    }
+    const product = await this.productsRepository.findOneByOrFail({
+      id: productId,
+      org: { id: orgId },
+    });
 
-    return await this.createOrUpdateBuildInPublicSettings(org, settings);
+    return await this.createOrUpdateBuildInPublicSettings(
+      org,
+      product,
+      settings,
+    );
   }
 
   async getSettings(orgId: string) {
@@ -46,28 +57,28 @@ export class BipService {
     }
 
     const bipSettings = new BipSettings();
-
-    if (org.paymentPlan === PaymentPlan.PREMIUM) {
-      bipSettings.isIssuesPagePublic = true;
-      bipSettings.isFeatureRequestsPagePublic = true;
-    }
-
     bipSettings.org = Promise.resolve(org);
+    const product = (await org.products)[0];
+    // TODO: This is a temporary solution to set the product
+    bipSettings.product = Promise.resolve(product);
     await this.bipSettingsRepository.save(bipSettings);
   }
 
   async createOrUpdateBuildInPublicSettings(
     org: Org,
+    product: Product,
     settings: BipSettingsDto,
   ) {
     let bipSettings = await this.bipSettingsRepository.findOneBy({
       org: { id: org.id },
+      product: { id: product.id },
     });
 
     if (!bipSettings) {
       bipSettings = new BipSettings();
     }
     bipSettings.org = Promise.resolve(org);
+    bipSettings.product = Promise.resolve(product);
     bipSettings.isBuildInPublicEnabled = settings.isBuildInPublicEnabled;
     bipSettings.isObjectivesPagePublic = settings.isObjectivesPagePublic;
     bipSettings.isRoadmapPagePublic = settings.isRoadmapPagePublic;
@@ -75,16 +86,9 @@ export class BipService {
     bipSettings.isActiveIterationsPagePublic =
       settings.isActiveIterationsPagePublic;
     bipSettings.isFeedPagePublic = settings.isFeedPagePublic;
-
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      bipSettings.isIssuesPagePublic = false;
-      bipSettings.isFeatureRequestsPagePublic = false;
-    } else {
-      bipSettings.isIssuesPagePublic = settings.isIssuesPagePublic;
-      bipSettings.isFeatureRequestsPagePublic =
-        settings.isFeatureRequestsPagePublic;
-    }
-
+    bipSettings.isFeatureRequestsPagePublic =
+      settings.isFeatureRequestsPagePublic;
+    bipSettings.isIssuesPagePublic = settings.isIssuesPagePublic;
     const updatedSettings = await this.bipSettingsRepository.save(bipSettings);
     return BipSettingsMapper.toDto(updatedSettings);
   }

@@ -139,19 +139,6 @@ export class PaymentsService {
     );
     org.paymentPlan = plan;
     await this.orgRepository.save(org);
-
-    if (plan === PaymentPlan.BUILD_IN_PRIVATE) {
-      await this.bipService.createOrUpdateBuildInPublicSettings(org, {
-        isBuildInPublicEnabled: false,
-        isObjectivesPagePublic: false,
-        isRoadmapPagePublic: false,
-        isIterationsPagePublic: false,
-        isActiveIterationsPagePublic: false,
-        isFeedPagePublic: false,
-        isIssuesPagePublic: false,
-        isFeatureRequestsPagePublic: false,
-      });
-    }
   }
 
   async updateSubscriptionCount(orgId: string) {
