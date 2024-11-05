@@ -234,7 +234,7 @@ describe('FeaturesService', () => {
       expect(feature.milestone.title).toEqual(milestone.title);
     });
     it('should create a feature with files', async () => {
-      const file = await filesService.uploadFile(org.id, {
+      const file = await filesService.uploadFile(org.id, product.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
@@ -278,6 +278,7 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
@@ -589,7 +590,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.milestone.title).toEqual(milestone.title);
     });
     it('should update the feature with files', async () => {
-      const file = await filesService.uploadFile(org.id, {
+      const file = await filesService.uploadFile(org.id, product.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
@@ -676,7 +677,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.assignedTo).toBeUndefined();
     });
     it("should update the files of the feature if the update doesn't include files", async () => {
-      const file = await filesService.uploadFile(org.id, {
+      const file = await filesService.uploadFile(org.id, product.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
@@ -704,13 +705,13 @@ describe('FeaturesService', () => {
       expect(updatedFeature.files.length).toEqual(0);
     });
     it('should update the files of the feature if the update contains some files', async () => {
-      const file1 = await filesService.uploadFile(org.id, {
+      const file1 = await filesService.uploadFile(org.id, product.id, {
         originalname: 'my file 1',
         buffer: Buffer.from('file content'),
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const file2 = await filesService.uploadFile(org.id, {
+      const file2 = await filesService.uploadFile(org.id, product.id, {
         originalname: 'my file 2',
         buffer: Buffer.from('file content'),
         size: 100,
@@ -741,7 +742,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.files[0].name).toEqual(file2.name);
     });
     it('should update the files of the feature if the update contains the same files', async () => {
-      const file = await filesService.uploadFile(org.id, {
+      const file = await filesService.uploadFile(org.id, product.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
@@ -777,6 +778,7 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
@@ -816,6 +818,7 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
@@ -854,6 +857,7 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
@@ -908,23 +912,29 @@ describe('FeaturesService', () => {
         priority: Priority.HIGH,
         status: FeatureStatus.PLANNED,
       });
-      const workItem = await workItemsService.createWorkItem(user.id, {
-        title: 'my work item',
-        description: 'my work item description',
-        priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
-        feature: feature.id,
-        status: WorkItemStatus.PLANNED,
-      });
+      const workItem = await workItemsService.createWorkItem(
+        org.id,
+        product.id,
+        user.id,
+        {
+          title: 'my work item',
+          description: 'my work item description',
+          priority: Priority.HIGH,
+          type: WorkItemType.USER_STORY,
+          feature: feature.id,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
       await service.deleteFeature(org.id, product.id, feature.id);
       const foundWorkItem = await workItemsService.getWorkItem(
         org.id,
+        product.id,
         workItem.id,
       );
       expect(foundWorkItem.feature).toBeUndefined();
     });
     it("should remove the association between features and the feature's files", async () => {
-      const file = await filesService.uploadFile(org.id, {
+      const file = await filesService.uploadFile(org.id, product.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
@@ -939,7 +949,7 @@ describe('FeaturesService', () => {
       });
       await service.deleteFeature(org.id, product.id, feature.id);
       await expect(
-        filesService.getFile(org.id, file.id),
+        filesService.getFile(org.id, product.id, file.id),
       ).rejects.toThrowError();
     });
   });
@@ -1284,6 +1294,7 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
@@ -1318,10 +1329,15 @@ describe('FeaturesService', () => {
     it('should update the feature request to null', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      await featureRequestsService.addFeatureRequest(user.id, org.id, {
-        title: 'My Feature Request',
-        description: 'My Feature Request Description',
-      });
+      await featureRequestsService.addFeatureRequest(
+        user.id,
+        org.id,
+        product.id,
+        {
+          title: 'My Feature Request',
+          description: 'My Feature Request Description',
+        },
+      );
       const feature = await service.createFeature(org.id, product.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
@@ -1354,6 +1370,7 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
+        product.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',

@@ -61,6 +61,7 @@ export class Product {
     lazy: true,
   })
   featureRequests: Promise<FeatureRequest[]>;
+  // TODO: Implement this relationship
   @OneToMany(() => Iteration, (iteration) => iteration.product, { lazy: true })
   iterations: Promise<Iteration[]>;
   @OneToMany(() => File, (file) => file.product, { lazy: true })

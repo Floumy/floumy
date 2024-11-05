@@ -59,6 +59,7 @@ describe('FeaturesController', () => {
           FeatureRequest,
           FeatureRequestComment,
           FeatureRequestVote,
+          Product,
         ]),
         UsersModule,
         BacklogModule,

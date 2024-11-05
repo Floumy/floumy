@@ -26,6 +26,7 @@ import { BipSettings } from '../../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { PublicService } from './public.service';
+import { Product } from '../../../products/product.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
@@ -33,6 +34,7 @@ describe('PublicController', () => {
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
+  let product: Product;
   let orgsService: OrgsService;
   let usersService: UsersService;
 
@@ -84,9 +86,11 @@ describe('PublicController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
+    bipSettings.product = Promise.resolve(product);
     await bipRepository.save(bipSettings);
   });
 
@@ -99,8 +103,13 @@ describe('PublicController', () => {
       const feature = new Feature();
       feature.title = 'Test Feature';
       feature.org = Promise.resolve(org);
+      feature.product = Promise.resolve(product);
       await featuresRepository.save(feature);
-      const result = await controller.getFeature(org.id, feature.id);
+      const result = await controller.getFeature(
+        org.id,
+        product.id,
+        feature.id,
+      );
       expect(result).toBeDefined();
       expect(result.id).toEqual(feature.id);
     });
@@ -108,10 +117,11 @@ describe('PublicController', () => {
       const feature = new Feature();
       feature.title = 'Test Feature';
       feature.org = Promise.resolve(new Org());
+      feature.product = Promise.resolve(product);
       await featuresRepository.save(feature);
-      await expect(controller.getFeature(org.id, feature.id)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        controller.getFeature(org.id, product.id, feature.id),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

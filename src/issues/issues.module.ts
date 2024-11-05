@@ -8,10 +8,11 @@ import { OrgsModule } from '../orgs/orgs.module';
 import { AuthModule } from '../auth/auth.module';
 import { Issue } from './issue.entity';
 import { IssueComment } from './issue-comment.entity';
+import { Product } from '../products/product.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Org, Issue, IssueComment]),
+    TypeOrmModule.forFeature([User, Org, Issue, IssueComment, Product]),
     OrgsModule,
     AuthModule,
   ],

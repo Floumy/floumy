@@ -223,7 +223,7 @@ export class FeaturesService {
       id: id,
     });
     const deletedFeature = await FeatureMapper.toDto(feature);
-    await this.deleteFeatureFiles(orgId, feature.id);
+    await this.deleteFeatureFiles(orgId, productId, feature.id);
     await this.workItemsService.removeFeatureFromWorkItems(
       orgId,
       productId,
@@ -550,14 +550,18 @@ export class FeaturesService {
     }
   }
 
-  private async deleteFeatureFiles(orgId: string, id: string) {
+  private async deleteFeatureFiles(
+    orgId: string,
+    productId: string,
+    id: string,
+  ) {
     const featureFiles = await this.featureFilesRepository.findBy({
       feature: { id, org: { id: orgId } },
     });
 
     for (const featureFile of featureFiles) {
       const file = await featureFile.file;
-      await this.filesService.deleteFile(orgId, file.id);
+      await this.filesService.deleteFile(orgId, productId, file.id);
     }
   }
 
