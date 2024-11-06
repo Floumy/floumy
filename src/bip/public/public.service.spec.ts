@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BipSettings } from '../bip-settings.entity';
 import { TokensService } from '../../auth/tokens.service';
 import { BipService } from '../bip.service';
+import { Product } from '../../products/product.entity';
 
 describe('PublicService', () => {
   let service: PublicService;
@@ -15,6 +16,7 @@ describe('PublicService', () => {
   let usersService: UsersService;
   let user: User;
   let org: Org;
+  let product: Product;
   let bipService: BipService;
 
   let cleanup: () => Promise<void>;
@@ -35,6 +37,7 @@ describe('PublicService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     await bipService.createSettings(org);
   });
 
@@ -44,14 +47,14 @@ describe('PublicService', () => {
 
   describe('getPublicSettings', () => {
     it('should return the public settings', async () => {
-      const settings = await service.getPublicSettings(org.id);
+      const settings = await service.getPublicSettings(org.id, product.id);
       expect(settings).toEqual({
-        isBuildInPublicEnabled: true,
-        isObjectivesPagePublic: true,
-        isRoadmapPagePublic: true,
-        isIterationsPagePublic: true,
-        isActiveIterationsPagePublic: true,
-        isFeedPagePublic: true,
+        isBuildInPublicEnabled: false,
+        isObjectivesPagePublic: false,
+        isRoadmapPagePublic: false,
+        isIterationsPagePublic: false,
+        isActiveIterationsPagePublic: false,
+        isFeedPagePublic: false,
         isIssuesPagePublic: false,
         isFeatureRequestsPagePublic: false,
       });

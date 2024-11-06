@@ -11,9 +11,9 @@ export class PublicService {
     private bipSettingsRepository: Repository<BipSettings>,
   ) {}
 
-  async getPublicSettings(orgId: string) {
+  async getPublicSettings(orgId: string, productId: string) {
     const settings = await this.bipSettingsRepository.findOne({
-      where: { org: { id: orgId } },
+      where: { org: { id: orgId }, product: { id: productId } },
     });
 
     return PublicMapper.toPublicSettingsDto(settings);

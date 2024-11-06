@@ -10,6 +10,7 @@ import { TokensService } from '../../auth/tokens.service';
 import { UsersService } from '../../users/users.service';
 import { User } from '../../users/user.entity';
 import { PublicService } from './public.service';
+import { Product } from '../../products/product.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
@@ -17,6 +18,7 @@ describe('PublicController', () => {
   let org: Org;
   let user: User;
   let bipService: BipService;
+  let product: Product;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -34,6 +36,7 @@ describe('PublicController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     bipService = module.get<BipService>(BipService);
     await bipService.createSettings(org);
   });
@@ -44,21 +47,21 @@ describe('PublicController', () => {
 
   describe('when getting the public settings', () => {
     it('should return the public settings', async () => {
-      const settings = await controller.getPublicSettings(org.id);
+      const settings = await controller.getPublicSettings(org.id, product.id);
       expect(settings).toEqual({
-        isBuildInPublicEnabled: true,
-        isObjectivesPagePublic: true,
-        isRoadmapPagePublic: true,
-        isIterationsPagePublic: true,
-        isActiveIterationsPagePublic: true,
-        isFeedPagePublic: true,
+        isBuildInPublicEnabled: false,
+        isObjectivesPagePublic: false,
+        isRoadmapPagePublic: false,
+        isIterationsPagePublic: false,
+        isActiveIterationsPagePublic: false,
+        isFeedPagePublic: false,
         isIssuesPagePublic: false,
         isFeatureRequestsPagePublic: false,
       });
     });
     it('should throw an error if the org does not exist', async () => {
       await expect(
-        controller.getPublicSettings('invalid-id'),
+        controller.getPublicSettings('invalid-id', 'invalid-id'),
       ).rejects.toThrow();
     });
   });
