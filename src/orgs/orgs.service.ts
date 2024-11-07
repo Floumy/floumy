@@ -68,6 +68,10 @@ export class OrgsService {
     org.isSubscribed = false;
     org.nextPaymentDate = null;
     const savedOrg = await this.orgRepository.save(org);
+    const product = new Product();
+    product.name = 'Default Product';
+    product.org = Promise.resolve(savedOrg);
+    await this.productRepository.save(product);
     this.eventEmitter.emit('org.created', savedOrg);
     return savedOrg;
   }
