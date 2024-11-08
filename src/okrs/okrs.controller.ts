@@ -27,7 +27,7 @@ import {
 import { CommentsService } from './comments/comments.service';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 
-@Controller('/org/:orgId/products/:productId/okrs')
+@Controller('/orgs/:orgId/products/:productId/okrs')
 @UseGuards(AuthGuard)
 export class OkrsController {
   constructor(
