@@ -48,12 +48,6 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - minio-data:/data
-  mailcatcher:
-    image: schickling/mailcatcher
-    container_name: floumy-mailcatcher
-    ports:
-      - "1080:1080"
-      - "1025:1025"
 
 volumes:
   pgdata:
