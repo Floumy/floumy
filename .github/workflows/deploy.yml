@@ -32,6 +32,7 @@ jobs:
           tags: registry.digitalocean.com/floumy-registry/api:latest
           build-args: |
             SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+        file: ./api/Dockerfile
 
       - name: Deploy to Droplet
         uses: appleboy/ssh-action@master
