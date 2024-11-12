@@ -1,0 +1,20 @@
+/* LoadingBar.css */
+@keyframes loadingAnimation {
+    0% {
+        transform: translateX(-100%);
+    }
+    50% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.loadingBar {
+    height: 100%;
+    width: 100%;
+    background-color: #27a2ff;
+    position: absolute;
+    animation: loadingAnimation 1s linear infinite;
+}

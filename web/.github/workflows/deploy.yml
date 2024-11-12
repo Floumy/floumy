@@ -1,0 +1,42 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Log in to DigitalOcean Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: registry.digitalocean.com
+          username: _token
+          password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          build-args: |
+            REACT_APP_API_URL=https://api.floumy.com
+          tags: registry.digitalocean.com/floumy-registry/web-app:latest
+
+      - name: Deploy to Droplet
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          script: |
+            doctl registry login
+            docker pull registry.digitalocean.com/floumy-registry/web-app:latest
+            docker stop web-app || true
+            docker rm web-app || true
+            docker run -d --restart=always --name web-app -p 3000:80 registry.digitalocean.com/floumy-registry/web-app:latest
+            docker image prune -f
