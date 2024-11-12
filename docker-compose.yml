@@ -1,0 +1,50 @@
+name: floumy
+
+services:
+  api:
+    image: node:20.11.1
+    container_name: floumy-api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api:/app
+    entrypoint: sleep infinity
+    working_dir: /app
+
+  db:
+    image: postgres:17
+    container_name: floumy-db
+    environment:
+      POSTGRES_USER: floumy
+      POSTGRES_PASSWORD: floumy
+      POSTGRES_DB: floumy
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  minio:
+    image: minio/minio:latest
+    container_name: floumy-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: 
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: miniopass
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+  mailcatcher:
+    image: schickling/mailcatcher
+    container_name: floumy-mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+volumes:
+  pgdata:
+  minio-data:
