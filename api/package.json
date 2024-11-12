@@ -13,13 +13,11 @@
     "start:debug": "NODE_ENV=development nest start --debug --watch",
     "start:prod": "NODE_ENV=production node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "npm run test-db:up && jest --runInBand && npm run test-db:down",
+    "test": "jest --runInBand",
     "test:watch": "jest --watch --runInBand",
-    "test:cov": "npm run test-db:up && jest --coverage --runInBand && npm run test-db:down",
+    "test:cov": "jest --coverage --runInBand",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "npm run test-db:up && jest --config ./test/jest-e2e.json --runInBand && npm run test-db:down",
-    "test-db:up": "[ -z \"$(docker ps -a -q -f name=test-db)\" ] && docker run --name test-db -e POSTGRES_USER=testuser -e POSTGRES_PASSWORD=testpass -e POSTGRES_DB=testdb -p 5455:5432 -d postgres:13 || echo 'Container test-db already exists'",
-    "test-db:down": "docker stop test-db && docker rm test-db",
+    "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
     "typeorm": "typeorm-ts-node-commonjs",
     "stripe:forward": "stripe listen --forward-to localhost:8080/payments/webhook",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org floumy --project floumy-api ./dist && sentry-cli sourcemaps upload --org floumy --project floumy-api ./dist"
@@ -101,6 +99,7 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": ["dotenv/config"]
   }
 }
