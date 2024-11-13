@@ -13,14 +13,15 @@ import {
 import { BipSettingsDto } from './bip.dtos';
 import { AuthGuard } from '../auth/auth.guard';
 import { BipService } from './bip.service';
+import { Public } from '../auth/public.guard';
 
 @Controller('/orgs/:orgId/products/:productId/build-in-public')
-@UseGuards(AuthGuard)
 export class BipController {
   constructor(private bipService: BipService) {}
 
   @Put('settings')
   @HttpCode(200)
+  @UseGuards(AuthGuard)
   async createOrUpdateSettings(
     @Param('orgId') orgId: string,
     @Param('productId') productId: string,
@@ -44,9 +45,13 @@ export class BipController {
 
   @Get('settings')
   @HttpCode(200)
-  async getSettings(@Request() request) {
+  @Public()
+  async getSettings(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+  ) {
     try {
-      return await this.bipService.getSettings(request.user.org);
+      return await this.bipService.getSettings(orgId, productId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

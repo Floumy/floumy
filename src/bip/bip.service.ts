@@ -38,9 +38,10 @@ export class BipService {
     );
   }
 
-  async getSettings(orgId: string) {
-    const bipSettings = await this.bipSettingsRepository.findOneByOrFail({
+  async getSettings(orgId: string, productId: string) {
+    const bipSettings = await this.bipSettingsRepository.findOneBy({
       org: { id: orgId },
+      product: { id: productId },
     });
     return BipSettingsMapper.toDto(bipSettings);
   }

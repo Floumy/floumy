@@ -9,8 +9,6 @@ import { UsersModule } from '../users/users.module';
 import { OrgsModule } from '../orgs/orgs.module';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
-import { PublicController } from './public/public.controller';
-import { PublicService } from './public/public.service';
 import { Product } from '../products/product.entity';
 
 @Module({
@@ -21,8 +19,8 @@ import { Product } from '../products/product.entity';
     UsersModule,
     OrgsModule,
   ],
-  providers: [BipService, PublicService],
-  controllers: [BipController, PublicController],
+  providers: [BipService],
+  controllers: [BipController],
   exports: [BipService],
 })
 export class BipModule {}

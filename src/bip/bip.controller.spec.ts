@@ -96,11 +96,7 @@ describe('BipController', () => {
           isFeatureRequestsPagePublic: true,
         },
       );
-      const settings = await controller.getSettings({
-        user: {
-          org: org.id,
-        },
-      });
+      const settings = await controller.getSettings(org.id, product.id);
       expect(settings).toEqual({
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,

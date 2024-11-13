@@ -58,7 +58,7 @@ describe('BipService', () => {
         isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, product.id, settings);
-      const updatedSettings = await service.getSettings(org.id);
+      const updatedSettings = await service.getSettings(org.id, product.id);
       expect(updatedSettings).toEqual(settings);
     });
     it('should update the settings if the org is premium', async () => {
@@ -75,7 +75,7 @@ describe('BipService', () => {
         isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, product.id, settings);
-      const updatedSettings = await service.getSettings(org.id);
+      const updatedSettings = await service.getSettings(org.id, product.id);
       expect(updatedSettings).toEqual(settings);
     });
   });
@@ -83,7 +83,7 @@ describe('BipService', () => {
   describe('createSettings', () => {
     it('should create the default building in public settings on org created event', async () => {
       await service.createSettings(org);
-      const settings = await service.getSettings(org.id);
+      const settings = await service.getSettings(org.id, product.id);
       expect(settings).toEqual({
         isBuildInPublicEnabled: false,
         isObjectivesPagePublic: false,
@@ -99,7 +99,7 @@ describe('BipService', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       await service.createSettings(org);
-      const settings = await service.getSettings(org.id);
+      const settings = await service.getSettings(org.id, product.id);
       expect(settings).toEqual({
         isBuildInPublicEnabled: false,
         isObjectivesPagePublic: false,
@@ -124,7 +124,7 @@ describe('BipService', () => {
       };
       await service.createOrUpdateSettings(org.id, product.id, settings);
       await service.createSettings(org);
-      const updatedSettings = await service.getSettings(org.id);
+      const updatedSettings = await service.getSettings(org.id, product.id);
       expect(updatedSettings).toEqual(settings);
     });
     it('should not throw an error if settings already exist', async () => {
