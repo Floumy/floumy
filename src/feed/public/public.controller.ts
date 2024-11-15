@@ -5,7 +5,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Public()
 @UseInterceptors(CacheInterceptor)
-@Controller('/public/orgs/:orgId/products/:productId/feed')
+@Controller('public/orgs/:orgId/products/:productId/feed')
 export class PublicController {
   constructor(private readonly publicFeedService: PublicService) {}
 

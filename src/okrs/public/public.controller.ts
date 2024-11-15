@@ -10,7 +10,7 @@ import { PublicService } from './public.service';
 import { Public } from '../../auth/public.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-@Controller('/public/orgs/:orgId/products/:productId/okrs')
+@Controller('public/orgs/:orgId/products/:productId/okrs')
 @Public()
 @UseInterceptors(CacheInterceptor)
 export class PublicController {

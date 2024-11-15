@@ -10,7 +10,7 @@ import { Timeline } from '../../../common/timeline.enum';
 import { Public } from '../../../auth/public.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-@Controller('orgs/:orgId/products/:productId/milestones')
+@Controller('public/orgs/:orgId/products/:productId/milestones')
 @Public()
 @UseInterceptors(CacheInterceptor)
 export class PublicController {
