@@ -62,6 +62,16 @@ export class OrgsService {
     return await this.createOrg();
   }
 
+  async patchOrg(orgId: string, name: string) {
+    const org = await this.findOneById(orgId);
+    org.name = name;
+    const product = new Product();
+    product.name = name;
+    await this.productRepository.save(product);
+    await this.orgRepository.save(org);
+    return org;
+  }
+
   private async createOrg() {
     const org = new Org();
     org.paymentPlan = PaymentPlan.FREE;
