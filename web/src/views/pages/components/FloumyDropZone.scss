@@ -1,0 +1,83 @@
+.floumy-drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  p {
+    margin: 0;
+  }
+
+  &:hover {
+    border-color: #aaa;
+  }
+
+  &.active {
+    border-color: #aaa;
+  }
+
+  .floumy-drop-zone__icon {
+    font-size: 50px;
+    color: #ccc;
+  }
+
+  .floumy-drop-zone__text {
+    font-size: 20px;
+    color: #ccc;
+  }
+}
+
+.floumy-files-list {
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    // Display list horizontally
+    li {
+      display: inline-block;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #FFFFFF;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      width: 200px;
+
+      .filename-container {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        .filename {
+          margin-right: 5px;
+        }
+
+        .btn-remove {
+          font-size: 12px;
+          color: #666;
+          cursor: pointer;
+          transition: all 0.3s ease-in-out;
+        }
+      }
+
+      &:hover {
+        background-color: #F5F5F5;
+      }
+
+      .floumy-files-list__icon {
+        font-size: 20px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
