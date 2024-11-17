@@ -40,6 +40,7 @@ import { Product } from '../products/product.entity';
       File,
       FeatureFile,
       User,
+      Feature,
       FeatureComment,
       FeatureRequest,
       Product,

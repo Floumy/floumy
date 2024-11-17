@@ -11,6 +11,7 @@ import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
 import { CommentMapper } from '../comments/mappers';
 import { Product } from '../products/product.entity';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
 
 @Injectable()
 export class IssuesService {
@@ -25,6 +26,8 @@ export class IssuesService {
     private issueCommentsRepository: Repository<IssueComment>,
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
+    @InjectRepository(WorkItem)
+    private workItemsRepository: Repository<WorkItem>,
   ) {}
 
   async addIssue(
@@ -151,6 +154,13 @@ export class IssuesService {
     const org = await issue.org;
     if (org.paymentPlan !== 'premium') {
       throw new Error('You need to upgrade your plan to delete an issue');
+    }
+
+    // Remove the issue from the work items
+    const workItems = await issue.workItems;
+    for (const workItem of workItems) {
+      workItem.issue = null;
+      await this.workItemsRepository.save(workItem);
     }
 
     await this.issuesRepository.remove(issue);

@@ -13,6 +13,7 @@ import { uuid } from 'uuidv4';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { FeatureRequestComment } from './feature-request-comment.entity';
 import { Product } from '../products/product.entity';
+import { Feature } from '../roadmap/features/feature.entity';
 
 describe('FeatureRequestsService', () => {
   let usersService: UsersService;
@@ -20,6 +21,8 @@ describe('FeatureRequestsService', () => {
   let service: FeatureRequestsService;
   let orgsRepository: Repository<Org>;
   let productsRepository: Repository<Product>;
+  let featuresRepository: Repository<Feature>;
+  let featureRequestsRepository: Repository<FeatureRequest>;
   let org: Org;
   let product: Product;
   let user: User;
@@ -32,6 +35,7 @@ describe('FeatureRequestsService', () => {
         TypeOrmModule.forFeature([
           Org,
           User,
+          Feature,
           FeatureRequest,
           FeatureRequestVote,
           FeatureRequestComment,
@@ -46,6 +50,12 @@ describe('FeatureRequestsService', () => {
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
     productsRepository = module.get<Repository<Product>>(
       getRepositoryToken(Product),
+    );
+    featuresRepository = module.get<Repository<Feature>>(
+      getRepositoryToken(Feature),
+    );
+    featureRequestsRepository = module.get<Repository<FeatureRequest>>(
+      getRepositoryToken(FeatureRequest),
     );
     user = await usersService.createUserWithOrg(
       'Test User',
@@ -452,6 +462,31 @@ describe('FeatureRequestsService', () => {
     ).rejects.toThrow(
       'You need to upgrade your plan to delete a feature request',
     );
+  });
+  it('should remove the feature request from the features', async () => {
+    const featureRequest = new FeatureRequest();
+    featureRequest.title = 'Test Feature Request';
+    featureRequest.description = 'Test Description';
+    featureRequest.org = Promise.resolve(org);
+    featureRequest.product = Promise.resolve(product);
+    await featureRequestsRepository.save(featureRequest);
+    const feature = new Feature();
+    feature.title = 'Test Feature';
+    feature.description = 'Test Description';
+    feature.org = Promise.resolve(org);
+    feature.product = Promise.resolve(product);
+    feature.featureRequest = Promise.resolve(featureRequest);
+    await featuresRepository.save(feature);
+    await service.deleteFeatureRequest(
+      user.id,
+      org.id,
+      product.id,
+      featureRequest.id,
+    );
+    const features = await featuresRepository.find({
+      where: { featureRequest: { id: featureRequest.id } },
+    });
+    expect(features.length).toEqual(0);
   });
   describe('when adding a comment to a feature request', () => {
     it('should add a comment to the feature request', async () => {

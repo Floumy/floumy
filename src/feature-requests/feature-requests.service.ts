@@ -17,6 +17,7 @@ import { CommentMapper } from '../comments/mappers';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 import { FeatureRequestComment } from './feature-request-comment.entity';
 import { Product } from '../products/product.entity';
+import { Feature } from '../roadmap/features/feature.entity';
 
 @Injectable()
 export class FeatureRequestsService {
@@ -33,6 +34,8 @@ export class FeatureRequestsService {
     private featureRequestCommentsRepository: Repository<FeatureRequestComment>,
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
+    @InjectRepository(Feature)
+    private featuresRepository: Repository<Feature>,
   ) {}
 
   async addFeatureRequest(
@@ -184,6 +187,13 @@ export class FeatureRequestsService {
     const userOrg = await user.org;
     if (featureRequestOrg.id !== userOrg.id) {
       throw new Error('You are not allowed to delete this feature request');
+    }
+
+    // Remove the feature request from the features
+    const features = await featureRequest.features;
+    for (const feature of features) {
+      feature.featureRequest = null;
+      await this.featuresRepository.save(feature);
     }
 
     await this.featureRequestsRepository.remove(featureRequest);

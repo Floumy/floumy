@@ -12,6 +12,7 @@ import { IssueComment } from './issue-comment.entity';
 import { IssueStatus } from './issue-status.enum';
 import { Priority } from '../common/priority.enum';
 import { Product } from '../products/product.entity';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
 
 describe('IssuesService', () => {
   let usersService: UsersService;
@@ -19,6 +20,8 @@ describe('IssuesService', () => {
   let service: IssuesService;
   let orgsRepository: Repository<Org>;
   let productsRepository: Repository<Product>;
+  let workItemsRepository: Repository<WorkItem>;
+  let issuesRepository: Repository<Issue>;
   let org: Org;
   let product: Product;
   let user: User;
@@ -27,7 +30,7 @@ describe('IssuesService', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User, Issue, IssueComment])],
+      [TypeOrmModule.forFeature([Org, User, Issue, IssueComment, WorkItem])],
       [IssuesService, UsersService, OrgsService],
     );
     cleanup = dbCleanup;
@@ -38,6 +41,10 @@ describe('IssuesService', () => {
     productsRepository = module.get<Repository<Product>>(
       getRepositoryToken(Product),
     );
+    workItemsRepository = module.get<Repository<WorkItem>>(
+      getRepositoryToken(WorkItem),
+    );
+    issuesRepository = module.get<Repository<Issue>>(getRepositoryToken(Issue));
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -332,6 +339,28 @@ describe('IssuesService', () => {
       await expect(
         service.deleteIssue(user.id, org.id, product.id, issue.id),
       ).rejects.toThrow('You need to upgrade your plan to delete an issue');
+    });
+
+    it('should remove the issue from the work items', async () => {
+      const issue = new Issue();
+      issue.title = 'Test Issue';
+      issue.description = 'Test Description';
+      issue.org = Promise.resolve(org);
+      issue.product = Promise.resolve(product);
+      issue.createdBy = Promise.resolve(user);
+      await issuesRepository.save(issue);
+      const workItem = new WorkItem();
+      workItem.title = 'Test Work Item';
+      workItem.description = 'Test Work Item Description';
+      workItem.org = Promise.resolve(org);
+      workItem.product = Promise.resolve(product);
+      workItem.issue = Promise.resolve(issue);
+      await workItemsRepository.save(workItem);
+      await service.deleteIssue(user.id, org.id, product.id, issue.id);
+      const workItems = await workItemsRepository.find({
+        where: { issue: { id: issue.id } },
+      });
+      expect(workItems.length).toEqual(0);
     });
   });
 
