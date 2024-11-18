@@ -185,9 +185,9 @@ export function getFeatureTitle(item) {
   return `${item.content.reference}: ${item.content.title}`;
 }
 
-export async function addTextFeedItem(feedItemText) {
+export async function addTextFeedItem(orgId, productId, feedItemText) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/feed`, { text: feedItemText });
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/feed`, { text: feedItemText });
     return response.data;
   } catch (e) {
     throw new Error(e.message);

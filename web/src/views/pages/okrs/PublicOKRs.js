@@ -13,6 +13,7 @@ import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
 
 function PublicOKRs() {
+  const { orgId, productId } = useParams();
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get("timeline") || "this-quarter";
@@ -27,7 +28,6 @@ function PublicOKRs() {
   };
   const [okrs, setOKRs] = useState([okrTemplate]);
   const [isLoading, setIsLoading] = useState(false);
-  const { orgId } = useParams();
 
   useEffect(() => {
     document.title = "Floumy | OKRs";
@@ -35,7 +35,7 @@ function PublicOKRs() {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const okrs = await listPublicObjectives(orgId, timelineQueryFilter);
+        const okrs = await listPublicObjectives(orgId, productId, timelineQueryFilter);
         setOKRs(okrs
           .sort((a, b) => a.createdAt < b.createdAt ? 1 : -1));
       } catch (e) {
@@ -46,7 +46,7 @@ function PublicOKRs() {
     }
 
     fetchData();
-  }, [orgId, timelineQueryFilter]);
+  }, [orgId, productId, timelineQueryFilter]);
 
   return (
     <>
@@ -118,12 +118,14 @@ function PublicOKRs() {
                         {okr.id !== 0 &&
                           <>
                             <td>
-                              <Link to={`/public/org/${orgId}/okrs/detail/${okr.id}`} className={"okr-detail"}>
+                              <Link to={`/public/orgs/${orgId}/products/${productId}/okrs/detail/${okr.id}`}
+                                    className={"okr-detail"}>
                                 {okr.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
-                              <Link to={`/public/org/${orgId}/okrs/detail/${okr.id}`} className={"okr-detail"}>
+                              <Link to={`/public/orgs/${orgId}/products/${productId}/okrs/detail/${okr.id}`}
+                                    className={"okr-detail"}>
                                 {okr.title}
                               </Link>
                             </td>

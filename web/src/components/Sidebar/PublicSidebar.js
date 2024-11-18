@@ -27,6 +27,7 @@ import { Col, Collapse, Nav, Navbar, NavbarBrand, NavItem, NavLink, Row } from "
 
 function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, buildingInPublicSettings }) {
   // makes the sidenav normal on hover (actually when mouse enters on it)
+  const productId = org ? org.products[0].id : "";
   const onMouseEnterSidenav = () => {
     if (!document.body.classList.contains("g-sidenav-pinned")) {
       document.body.classList.add("g-sidenav-show");
@@ -99,7 +100,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             <Nav navbar>
               {buildingInPublicSettings.isIssuesPagePublic && <NavItem className="d-none d-md-block">
                 <NavLink
-                  to={`/public/org/${org.id}/issues`}
+                  to={`/public/orgs/${org.id}/products/${productId}/issues`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >
@@ -111,7 +112,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
                 <Row style={{ maxWidth: "100%" }}>
                   <Col xs={7}>
                     <NavLink
-                      to={`/public/org/${org.id}/feature-requests`}
+                      to={`/public/orgs/${org.id}/products/${productId}/feature-requests`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -134,7 +135,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
           <Nav className="mb-md-3" navbar>
             {buildingInPublicSettings.isFeedPagePublic && <NavItem>
               <NavLink
-                to={`/public/org/${org.id}/feed`}
+                to={`/public/orgs/${org.id}/products/${productId}/feed`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -144,7 +145,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isObjectivesPagePublic && <NavItem>
               <NavLink
-                to={`/public/org/${org.id}/objectives`}
+                to={`/public/orgs/${org.id}/products/${productId}/objectives`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -154,7 +155,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isRoadmapPagePublic && <NavItem>
               <NavLink
-                to={`/public/org/${org.id}/roadmap`}
+                to={`/public/orgs/${org.id}/products/${productId}/roadmap`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -164,7 +165,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isIterationsPagePublic && <NavItem>
               <NavLink
-                to={`/public/org/${org.id}/iterations`}
+                to={`/public/orgs/${org.id}/products/${productId}/iterations`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -174,7 +175,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isActiveIterationsPagePublic && <NavItem>
               <NavLink
-                to={`/public/org/${org.id}/active-iteration`}
+                to={`/public/orgs/${org.id}/products/${productId}/active-iteration`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >

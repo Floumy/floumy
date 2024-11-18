@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import DeleteWarning from "../components/DeleteWarning";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
@@ -12,6 +12,8 @@ import FeaturesList from "../features/FeaturesList";
 import { addFeature } from "../../../services/roadmap/roadmap.service";
 
 export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelete }) {
+  const { orgId, productId } = useParams();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
@@ -69,7 +71,7 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
 
   async function handleAddFeature(featureRequestId, feature) {
     feature.featureRequest = featureRequestId;
-    const savedFeature = await addFeature(feature);
+    const savedFeature = await addFeature(orgId, productId, feature);
     featureRequest.features.push(savedFeature);
     featureRequest.features.sort(sortFeatures);
   }

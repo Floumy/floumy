@@ -17,7 +17,7 @@ import useFeatureComments from "../../../hooks/useFeatureComments";
 export function PublicDetailFeature() {
   const [feature, setFeature] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { orgId, featureId } = useParams();
+  const { orgId, productId, featureId } = useParams();
   const {
     addComment,
     updateComment,
@@ -28,7 +28,7 @@ export function PublicDetailFeature() {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const feature = await getPublicFeature(orgId, featureId);
+        const feature = await getPublicFeature(orgId, productId, featureId);
         setFeature(feature);
       } catch (e) {
         console.error(e.message);
@@ -38,7 +38,7 @@ export function PublicDetailFeature() {
     }
 
     fetchData();
-  }, [orgId, featureId]);
+  }, [orgId, productId, featureId]);
 
   return (
     <>

@@ -1,11 +1,11 @@
 import api from "../api/api.service";
 
-export async function uploadFile(file, onUploadProgress) {
+export async function uploadFile(orgId, productId, file, onUploadProgress) {
   try {
     if (!file) return;
     const formData = new FormData();
     formData.append("file", file);
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/files/`, formData, {
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/files/`, formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       },
@@ -19,9 +19,9 @@ export async function uploadFile(file, onUploadProgress) {
   }
 }
 
-export async function downloadFile(id) {
+export async function downloadFile(orgId, productId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/files/${id}`, {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/files/${id}`, {
       responseType: "blob"
     });
     const file = new Blob(
@@ -48,9 +48,9 @@ export async function downloadFile(id) {
   }
 }
 
-export async function deleteFile(id) {
+export async function deleteFile(orgId, productId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/files/${id}`);
+    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/files/${id}`);
   } catch (e) {
     throw new Error(e.message);
   }

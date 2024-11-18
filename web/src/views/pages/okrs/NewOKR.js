@@ -14,30 +14,34 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 // nodejs library that concatenates classes
 // reactstrap components
-import { Container, Row } from 'reactstrap';
+import { Container, Row } from "reactstrap";
 // core components
-import SimpleHeader from 'components/Headers/SimpleHeader.js';
-import { addOKR } from '../../../services/okrs/okrs.service';
-import CreateUpdateDeleteOKR from './CreateUpdateDeleteOKR';
+import SimpleHeader from "components/Headers/SimpleHeader.js";
+import { addOKR } from "../../../services/okrs/okrs.service";
+import CreateUpdateDeleteOKR from "./CreateUpdateDeleteOKR";
+import { useParams } from "react-router-dom";
 
 function NewOKR() {
+  const { orgId, productId } = useParams();
+
   useEffect(() => {
-    document.title = 'Floumy | OKR';
+    document.title = "Floumy | OKR";
   }, []);
+
   return (
     <>
       <SimpleHeader
         headerButtons={[
           {
-            name: 'Back',
-            shortcut: '←',
+            name: "Back",
+            shortcut: "←",
             action: () => {
               window.history.back();
-            },
-          },
+            }
+          }
         ]}
       />
       <Container className="mt--6" fluid>
@@ -45,13 +49,13 @@ function NewOKR() {
           <div className="col">
             <div className="card-wrapper">
               <CreateUpdateDeleteOKR onSubmit={async (values) => {
-                await addOKR({
+                await addOKR(orgId, productId, {
                   objective: {
                     title: values.objective,
                     timeline: values.timeline,
-                    assignedTo: values.assignedTo,
+                    assignedTo: values.assignedTo
                   },
-                  keyResults: values.keyResults,
+                  keyResults: values.keyResults
                 });
               }} />
             </div>

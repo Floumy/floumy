@@ -5,7 +5,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import classnames from "classnames";
 import InputError from "../../../components/Errors/InputError";
-import { getOrg, patchOrg, setCurrentOrg } from "../../../services/org/orgs.service";
+import { getOrg, patchCurrentOrg, setCurrentOrg } from "../../../services/org/orgs.service";
 import { toast } from "react-toastify";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 
@@ -39,7 +39,7 @@ function Product() {
 
   async function handleSubmit(values) {
     setProductName(values.productName);
-    await patchOrg({ name: values.productName });
+    await patchCurrentOrg({ name: values.productName });
     await setCurrentOrg();
     toast.success("Product name saved");
 

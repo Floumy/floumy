@@ -30,11 +30,11 @@ import { toast } from "react-toastify";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 
 export default function FeatureRequests({ isPublic = false }) {
+  const { orgId, productId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [featureRequests, setFeatureRequests] = useState([]);
   const [hasMoreFeatureRequests, setHasMoreFeatureRequests] = useState(true);
   const [featureRequestVotesMap, setFeatureRequestVotesMap] = useState({});
-  const { orgId } = useParams();
   const navigate = useNavigate();
   const context = isPublic ? "public" : "admin";
   const [page, setPage] = useState(1);
@@ -59,9 +59,9 @@ export default function FeatureRequests({ isPublic = false }) {
     try {
       let featureRequestsData;
       if (searchTerm) {
-        featureRequestsData = await searchFeatureRequests(orgId, searchTerm, page, 50);
+        featureRequestsData = await searchFeatureRequests(orgId, productId, searchTerm, page, 50);
       } else {
-        featureRequestsData = await listFeatureRequests(orgId, page, 50);
+        featureRequestsData = await listFeatureRequests(orgId, productId, page, 50);
       }
       if (featureRequestsData.length === 0) {
         setHasMoreFeatureRequests(false);
@@ -85,7 +85,7 @@ export default function FeatureRequests({ isPublic = false }) {
 
   async function fetchCurrentUserFeatureRequestVotes() {
     if (await isAuthenticated()) {
-      const featureRequestVotes = await listCurrentUserFeatureRequestVotes(orgId);
+      const featureRequestVotes = await listCurrentUserFeatureRequestVotes(orgId, productId);
       let featureRequestVotesMap = {};
       featureRequestVotes.forEach(featureRequestVote => {
         featureRequestVotesMap[featureRequestVote.featureRequest.id] = featureRequestVote.vote;
@@ -105,12 +105,48 @@ export default function FeatureRequests({ isPublic = false }) {
     setPage(page + 1);
   }
 
-  function getDetailPage(context, orgId, featureRequestId) {
+  function getDetailPage(context, orgId, productId, featureRequestId) {
     if (context === "admin") {
-      return `/admin/org/${orgId}/feature-requests/edit/${featureRequestId}/`;
+      return `/admin/orgs/${orgId}/products/${productId}/feature-requests/edit/${featureRequestId}/`;
     }
 
-    return `/public/org/${orgId}/feature-requests/${featureRequestId}/`;
+    return `/public/orgs/${orgId}/products/${productId}/feature-requests/${featureRequestId}/`;
+  }
+
+  function upVote(featureRequest) {
+    return async () => {
+      if (featureRequestVotesMap[featureRequest.id] === 1) {
+        return;
+      }
+      await upvoteFeatureRequest(orgId, productId, featureRequest.id);
+      featureRequestVotesMap[featureRequest.id] = 1;
+      setFeatureRequestVotesMap({ ...featureRequestVotesMap });
+      featureRequests.forEach(fr => {
+        if (fr.id === featureRequest.id) {
+          fr.votesCount++;
+        }
+      });
+      setFeatureRequests([...featureRequests]);
+      toast.success("You voted up the feature request");
+    };
+  }
+
+  function downVote(featureRequest) {
+    return async () => {
+      if (featureRequestVotesMap[featureRequest.id] === -1) {
+        return;
+      }
+      await downvoteFeatureRequest(orgId, productId, featureRequest.id);
+      featureRequestVotesMap[featureRequest.id] = -1;
+      setFeatureRequestVotesMap({ ...featureRequestVotesMap });
+      featureRequests.forEach(fr => {
+        if (fr.id === featureRequest.id) {
+          fr.votesCount--;
+        }
+      });
+      setFeatureRequests([...featureRequests]);
+      toast.success("You voted down the feature request");
+    };
   }
 
   return (
@@ -123,7 +159,7 @@ export default function FeatureRequests({ isPublic = false }) {
             shortcut: "r",
             id: "new-feature-request",
             action: () => {
-              navigate(`/${context}/org/${orgId}/feature-requests/new`);
+              navigate(`/${context}/orgs/${orgId}/products/${productId}/feature-requests/new`);
             }
           }
         ]}
@@ -185,21 +221,7 @@ export default function FeatureRequests({ isPublic = false }) {
                                tabIndex="0"
                                aria-pressed="false"
                                aria-expanded="false"
-                               onClick={async () => {
-                                 if (featureRequestVotesMap[featureRequest.id] === 1) {
-                                   return;
-                                 }
-                                 await upvoteFeatureRequest(orgId, featureRequest.id);
-                                 featureRequestVotesMap[featureRequest.id] = 1;
-                                 setFeatureRequestVotesMap({ ...featureRequestVotesMap });
-                                 featureRequests.forEach(fr => {
-                                   if (fr.id === featureRequest.id) {
-                                     fr.votesCount++;
-                                   }
-                                 });
-                                 setFeatureRequests([...featureRequests]);
-                                 toast.success("You voted up the feature request");
-                               }}
+                               onClick={upVote(featureRequest)}
                             />
                             <span className="px-3">{featureRequest.votesCount}</span>
                             <i className="fa fa-arrow-down" style={{
@@ -210,26 +232,12 @@ export default function FeatureRequests({ isPublic = false }) {
                                tabIndex="0"
                                aria-pressed="false"
                                aria-expanded="false"
-                               onClick={async () => {
-                                 if (featureRequestVotesMap[featureRequest.id] === -1) {
-                                   return;
-                                 }
-                                 await downvoteFeatureRequest(orgId, featureRequest.id);
-                                 featureRequestVotesMap[featureRequest.id] = -1;
-                                 setFeatureRequestVotesMap({ ...featureRequestVotesMap });
-                                 featureRequests.forEach(fr => {
-                                   if (fr.id === featureRequest.id) {
-                                     fr.votesCount--;
-                                   }
-                                 });
-                                 setFeatureRequests([...featureRequests]);
-                                 toast.success("You voted down the feature request");
-                               }}
+                               onClick={downVote(featureRequest)}
                             />
                           </div>
                         </td>
                         <td className="title-cell" style={{ maxWidth: "300px" }}>
-                          <Link to={getDetailPage(context, orgId, featureRequest.id)}>
+                          <Link to={getDetailPage(context, orgId, productId, featureRequest.id)}>
                             {featureRequest.title}
                           </Link>
                         </td>

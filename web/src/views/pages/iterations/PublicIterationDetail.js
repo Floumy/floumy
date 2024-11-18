@@ -17,7 +17,6 @@ function PublicIterationDetail(
   }
 ) {
   const [workItems, setWorkItems] = useState([]);
-  const [iterationStatus, setIterationStatus] = useState(iteration?.status);
 
   useEffect(() => {
     document.title = "Floumy | Sprint";
@@ -37,8 +36,8 @@ function PublicIterationDetail(
       <Card>
         <CardHeader>
           <h3 className="mb-0"><span className="mr-2">{iteration.title}</span>
-            {iterationStatus === "active" && <span className="badge badge-info">Active</span>}
-            {iterationStatus === "completed" && <span className="badge badge-success">Completed</span>}
+            {iteration.status === "active" && <span className="badge badge-info">Active</span>}
+            {iteration.status === "completed" && <span className="badge badge-success">Completed</span>}
             {iteration.status === "planned" &&
               <span className="badge badge-primary text-white">Planned</span>}
           </h3>

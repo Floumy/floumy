@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Col, Container, Row } from "reactstrap";
 import React, { useEffect, useState } from "react";
 import { listFeatures, searchFeatures } from "../../../services/roadmap/roadmap.service";
@@ -8,6 +8,7 @@ import FeaturesListCard from "./FeaturesListCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 function Features() {
+  const { orgId, productId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [features, setFeatures] = useState([]);
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function Features() {
   async function fetchData(page, features = []) {
     setIsLoading(true);
     try {
-      const featuresList = await listFeatures(page);
+      const featuresList = await listFeatures(orgId, productId, page);
       if (featuresList.length === 0) {
         setHasMoreFeatures(false);
       } else {
@@ -40,7 +41,7 @@ function Features() {
   async function searchFeaturesByText(searchText, page, features = []) {
     setIsLoading(true);
     try {
-      const response = await searchFeatures(searchText, page);
+      const response = await searchFeatures(orgId, productId, searchText, page);
       if (response.length === 0) {
         setHasMoreFeatures(false);
       } else {
@@ -82,7 +83,7 @@ function Features() {
           shortcut: "i",
           id: "new-feature",
           action: () => {
-            navigate("/admin/roadmap/features/new");
+            navigate(`/admin/orgs/${orgId}/products/${productId}/roadmap/features/new`);
           }
         }
       ]} />
