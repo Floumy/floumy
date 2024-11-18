@@ -35,7 +35,7 @@ export class NotificationsService {
         <body>
           <div class="container">
             <h2>Hey ${name.split(' ')[0]}! 🎉</h2>
-            <p>I’m Alex, founder of Floumy. Ready to stop messing around and start making things happen?</p>
+            <p>Ready to stop messing around and start making things happen?</p>
             <p><b>Hit the button below to get started:</b></p>
             <p><a href="${this.configService.get(
               'app.url',
@@ -55,7 +55,7 @@ export class NotificationsService {
       TextBody: `
         Hey ${name.split(' ')[0]}! 🎉
 
-        I’m Alex, founder of Floumy. Ready to stop messing around and start making things happen?
+        Ready to stop messing around and start making things happen?
     
         Hit the link to get started:
         ${this.configService.get(

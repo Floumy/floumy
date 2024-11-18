@@ -22,6 +22,7 @@ import { FeatureFile } from '../feature-file.entity';
 import { FilesStorageRepository } from '../../../files/files-storage.repository';
 import { BipSettings } from '../../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
+import { Product } from '../../../products/product.entity';
 
 describe('PublicService', () => {
   let usersService: UsersService;
@@ -29,9 +30,11 @@ describe('PublicService', () => {
   let orgsService: OrgsService;
   let user: User;
   let org: Org;
+  let product: Product;
   let featuresRepository: Repository<Feature>;
   let bipRepository: Repository<BipSettings>;
   let orgsRepository: Repository<Org>;
+  let productsRepository: Repository<Product>;
 
   let cleanup: () => Promise<void>;
 
@@ -51,6 +54,7 @@ describe('PublicService', () => {
           WorkItemFile,
           FeatureFile,
           BipSettings,
+          Product,
         ]),
       ],
       [
@@ -76,15 +80,20 @@ describe('PublicService', () => {
       getRepositoryToken(BipSettings),
     );
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
+    productsRepository = module.get<Repository<Product>>(
+      getRepositoryToken(Product),
+    );
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
+    bipSettings.product = Promise.resolve(product);
     await bipRepository.save(bipSettings);
   });
 
@@ -101,31 +110,42 @@ describe('PublicService', () => {
       const feature = new Feature();
       feature.title = 'Test Feature';
       feature.org = Promise.resolve(org);
+      feature.product = Promise.resolve(product);
       await featuresRepository.save(feature);
-      const actual = await service.getFeature(org.id, feature.id);
+      const actual = await service.getFeature(org.id, product.id, feature.id);
       expect(actual).toBeDefined();
     });
     it('should throw an error if the org is not public', async () => {
       const newOrg = new Org();
       await orgsRepository.save(newOrg);
+      const newProduct = new Product();
+      newProduct.name = 'Test Product';
+      newProduct.org = Promise.resolve(newOrg);
+      await productsRepository.save(newProduct);
       const bipSettings = new BipSettings();
+      bipSettings.org = Promise.resolve(newOrg);
+      bipSettings.product = Promise.resolve(newProduct);
       bipSettings.isBuildInPublicEnabled = false;
       bipSettings.org = Promise.resolve(newOrg);
       await bipRepository.save(bipSettings);
       const feature = new Feature();
       feature.title = 'Test Feature';
       feature.org = Promise.resolve(newOrg);
+      feature.product = Promise.resolve(newProduct);
       await featuresRepository.save(feature);
-      await expect(service.getFeature(newOrg.id, feature.id)).rejects.toThrow(
-        'Roadmap page is not public',
-      );
+      await expect(
+        service.getFeature(newOrg.id, newProduct.id, feature.id),
+      ).rejects.toThrow('Roadmap page is not public');
     });
     it('should throw an error if the feature does not belong to the org', async () => {
       const feature = new Feature();
       feature.title = 'Test Feature';
       feature.org = Promise.resolve(new Org());
+      feature.product = Promise.resolve(product);
       await featuresRepository.save(feature);
-      await expect(service.getFeature(org.id, feature.id)).rejects.toThrow();
+      await expect(
+        service.getFeature(org.id, product.id, feature.id),
+      ).rejects.toThrow();
     });
   });
 });

@@ -5,15 +5,17 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Query,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { AuthGuard } from '../auth/auth.guard';
 
-@Controller('feed')
+@Controller('/orgs/:orgId/products/:productId/feed')
 @UseGuards(AuthGuard)
 export class FeedController {
   constructor(private readonly feedService: FeedService) {}
@@ -21,13 +23,20 @@ export class FeedController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async listFeedItems(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.feedService.listFeedItems(
-        request.user.org,
+        orgId,
+        productId,
         page,
         limit,
       );
@@ -39,13 +48,20 @@ export class FeedController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createFeedItem(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Body() textFeedItem: { text: string },
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.feedService.createTextFeedItem(
         request.user.sub,
-        request.user.org,
+        orgId,
+        productId,
         textFeedItem,
       );
     } catch (e) {

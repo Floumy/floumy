@@ -15,6 +15,7 @@ import { Org } from '../orgs/org.entity';
 import { CommentsService } from './comments/comments.service';
 import { KeyResultComment } from './key-result-comment.entity';
 import { ObjectiveComment } from './objective-comment.entity';
+import { Product } from '../products/product.entity';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ObjectiveComment } from './objective-comment.entity';
       Org,
       KeyResultComment,
       ObjectiveComment,
+      Product,
     ]),
     OrgsModule,
     AuthModule,

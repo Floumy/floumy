@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { File } from './file.entity';
 import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { FeatureFile } from '../roadmap/features/feature-file.entity';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class FilesService {
@@ -20,14 +21,24 @@ export class FilesService {
     @InjectRepository(FeatureFile)
     private featureFilesRepository: Repository<FeatureFile>,
     private filesStorageRepository: FilesStorageRepository,
+    @InjectRepository(Product) private productsRepository: Repository<Product>,
   ) {}
 
-  async uploadFile(orgId: string, file: Express.Multer.File) {
+  async uploadFile(
+    orgId: string,
+    productId: string,
+    file: Express.Multer.File,
+  ) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
+    const product = await this.productsRepository.findOneByOrFail({
+      id: productId,
+      org: { id: orgId },
+    });
     const filePath = `${orgId}/${uuidV4()}-${file.originalname}`;
     await this.filesStorageRepository.storeObject(filePath, file.buffer);
     const fileEntity = new File();
     fileEntity.org = Promise.resolve(org);
+    fileEntity.product = Promise.resolve(product);
     fileEntity.name = file.originalname;
     fileEntity.path = filePath;
     fileEntity.size = file.size;
@@ -44,10 +55,11 @@ export class FilesService {
     };
   }
 
-  async getFile(orgId: string, fileId: string) {
+  async getFile(orgId: string, productId: string, fileId: string) {
     const file = await this.filesRepository.findOneByOrFail({
       id: fileId,
       org: { id: orgId },
+      product: { id: productId },
     });
     return {
       ...file,
@@ -55,10 +67,11 @@ export class FilesService {
     };
   }
 
-  async deleteFile(orgId: string, fileId: string) {
+  async deleteFile(orgId: string, productId: string, fileId: string) {
     const file = await this.filesRepository.findOneByOrFail({
       id: fileId,
       org: { id: orgId },
+      product: { id: productId },
     });
     await this.filesStorageRepository.deleteObject(file.path);
     await this.workItemFilesRepository.delete({ file: { id: file.id } });

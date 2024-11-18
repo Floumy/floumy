@@ -57,9 +57,8 @@ export class AuthService {
   }
 
   async orgSignUp(signUpDto: OrgSignUpDto): Promise<void> {
-    const org = await this.orgsService.getByInvitationTokenOrCreateWithName(
+    const org = await this.orgsService.getOrCreateOrg(
       signUpDto.invitationToken,
-      signUpDto.productName,
     );
 
     if (!org) {

@@ -15,5 +15,11 @@ export interface OrgDto {
   nextPaymentDate: Date;
   createdAt: Date;
   updatedAt: Date;
+  products: ProductDto[];
   members: MemberDto[];
+}
+
+export interface ProductDto {
+  id: string;
+  name: string;
 }

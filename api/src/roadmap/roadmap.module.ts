@@ -26,6 +26,7 @@ import { PublicService as FeaturesPublicService } from './features/public/public
 import { StripeModule } from '../stripe/stripe.module';
 import { FeatureComment } from './features/feature-comment.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Product } from '../products/product.entity';
 
 @Module({
   imports: [
@@ -39,8 +40,10 @@ import { FeatureRequest } from '../feature-requests/feature-request.entity';
       File,
       FeatureFile,
       User,
+      Feature,
       FeatureComment,
       FeatureRequest,
+      Product,
     ]),
     OrgsModule,
     OkrsModule,

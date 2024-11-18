@@ -33,6 +33,10 @@ import { FeatureRequestVote } from '../src/feature-requests/feature-request-vote
 import { FeatureRequest } from '../src/feature-requests/feature-request.entity';
 import { Issue } from '../src/issues/issue.entity';
 import { IssueComment } from '../src/issues/issue-comment.entity';
+import { Product } from '../src/products/product.entity';
+import { Milestone } from '../src/roadmap/milestones/milestone.entity';
+import { WorkItem } from '../src/backlog/work-items/work-item.entity';
+import { Feature } from '../src/roadmap/features/feature.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -133,6 +137,11 @@ export async function setupTestingModule(
         FeatureRequestComment,
         Issue,
         IssueComment,
+        WorkItem,
+        Feature,
+        Issue,
+        Milestone,
+        Product,
       ]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],

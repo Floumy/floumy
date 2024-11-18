@@ -8,7 +8,6 @@ export interface OrgSignUpDto {
   email: string;
   password: string;
   invitationToken?: string;
-  productName?: string;
 }
 
 export interface SignUpDto {

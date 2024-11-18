@@ -14,6 +14,7 @@ import { Repository } from 'typeorm';
 import { PaymentPlan } from '../auth/payment.plan';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
+import { Product } from '../products/product.entity';
 
 describe('OkrsController', () => {
   let controller: OkrsController;
@@ -22,6 +23,7 @@ describe('OkrsController', () => {
   let usersService: UsersService;
   let org: Org;
   let user: User;
+  let product: Product;
 
   let cleanup: () => Promise<void>;
 
@@ -43,6 +45,7 @@ describe('OkrsController', () => {
     );
     org = await orgsService.createForUser(user);
     org.paymentPlan = PaymentPlan.PREMIUM;
+    product = (await org.products)[0];
     await orgsRepository.save(org);
   });
 
@@ -57,6 +60,8 @@ describe('OkrsController', () => {
   describe('when creating an OKR', () => {
     it('should return the created OKR', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -73,6 +78,8 @@ describe('OkrsController', () => {
     it('should validate the OKR', async () => {
       await expect(
         controller.create(
+          org.id,
+          product.id,
           {
             user: {
               org: org.id,
@@ -89,6 +96,8 @@ describe('OkrsController', () => {
     it('should validate the timeline when it exists', async () => {
       await expect(
         controller.create(
+          org.id,
+          product.id,
           {
             user: {
               org: org.id,
@@ -105,6 +114,8 @@ describe('OkrsController', () => {
     });
     it('should store the timeline when it exists', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -123,7 +134,7 @@ describe('OkrsController', () => {
 
   describe('when listing OKRs', () => {
     it('should return an empty array', async () => {
-      const okrs = await controller.list({
+      const okrs = await controller.list(org.id, product.id, {
         user: {
           org: org.id,
         },
@@ -132,6 +143,8 @@ describe('OkrsController', () => {
     });
     it('should return an array of OKRs', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -143,7 +156,7 @@ describe('OkrsController', () => {
           },
         },
       );
-      const okrs = await controller.list({
+      const okrs = await controller.list(org.id, product.id, {
         user: {
           org: org.id,
         },
@@ -159,6 +172,8 @@ describe('OkrsController', () => {
   describe('when getting an OKR', () => {
     it('should return the OKR', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -170,7 +185,7 @@ describe('OkrsController', () => {
           },
         },
       );
-      const okr2 = await controller.get(okr.objective.id, {
+      const okr2 = await controller.get(org.id, product.id, okr.objective.id, {
         user: {
           org: org.id,
         },
@@ -182,6 +197,8 @@ describe('OkrsController', () => {
   describe('when deleting an OKR', () => {
     it('should delete the OKR', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -193,13 +210,13 @@ describe('OkrsController', () => {
           },
         },
       );
-      await controller.delete(okr.objective.id, {
+      await controller.delete(org.id, product.id, okr.objective.id, {
         user: {
           org: org.id,
         },
       });
       await expect(
-        controller.get(okr.objective.id, {
+        controller.get(org.id, product.id, okr.objective.id, {
           user: {
             org: org.id,
           },
@@ -208,6 +225,8 @@ describe('OkrsController', () => {
     });
     it('should delete the OKR and its key results', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -224,13 +243,13 @@ describe('OkrsController', () => {
           ],
         },
       );
-      await controller.delete(okr.objective.id, {
+      await controller.delete(org.id, product.id, okr.objective.id, {
         user: {
           org: org.id,
         },
       });
       await expect(
-        controller.get(okr.objective.id, {
+        controller.get(org.id, product.id, okr.objective.id, {
           user: {
             org: org.id,
           },
@@ -242,6 +261,8 @@ describe('OkrsController', () => {
   describe('when creating an OKR with key results', () => {
     it('should return the created OKR with key results', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -268,6 +289,8 @@ describe('OkrsController', () => {
   describe('when updating Key Results Progress', () => {
     it('should update the Key Result Progress', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -285,6 +308,8 @@ describe('OkrsController', () => {
         },
       );
       await controller.patchKeyResult(
+        org.id,
+        product.id,
         okr.objective.id,
         okr.keyResults[0].id,
         {
@@ -296,7 +321,7 @@ describe('OkrsController', () => {
           progress: 0.5,
         },
       );
-      const okr2 = await controller.get(okr.objective.id, {
+      const okr2 = await controller.get(org.id, product.id, okr.objective.id, {
         user: {
           org: org.id,
         },
@@ -311,6 +336,8 @@ describe('OkrsController', () => {
       );
       const org2 = await orgsService.createForUser(otherUser);
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -329,6 +356,8 @@ describe('OkrsController', () => {
       );
       await expect(
         controller.patchKeyResult(
+          org.id,
+          product.id,
           okr.objective.id,
           okr.keyResults[0].id,
           {
@@ -344,6 +373,8 @@ describe('OkrsController', () => {
     });
     it('should update the Objective Progress', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -361,6 +392,8 @@ describe('OkrsController', () => {
         },
       );
       await controller.patchKeyResult(
+        org.id,
+        product.id,
         okr.objective.id,
         okr.keyResults[0].id,
         {
@@ -372,7 +405,7 @@ describe('OkrsController', () => {
           progress: 0.5,
         },
       );
-      const okr2 = await controller.get(okr.objective.id, {
+      const okr2 = await controller.get(org.id, product.id, okr.objective.id, {
         user: {
           org: org.id,
         },
@@ -381,6 +414,8 @@ describe('OkrsController', () => {
     });
     it('should update the key result status', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -398,6 +433,8 @@ describe('OkrsController', () => {
         },
       );
       await controller.patchKeyResult(
+        org.id,
+        product.id,
         okr.objective.id,
         okr.keyResults[0].id,
         {
@@ -409,7 +446,7 @@ describe('OkrsController', () => {
           status: 'off-track',
         },
       );
-      const okr2 = await controller.get(okr.objective.id, {
+      const okr2 = await controller.get(org.id, product.id, okr.objective.id, {
         user: {
           org: org.id,
         },
@@ -421,6 +458,8 @@ describe('OkrsController', () => {
   describe('when getting the key results list', () => {
     it('should return the key results list', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -452,6 +491,8 @@ describe('OkrsController', () => {
   describe('when deleting a key result', () => {
     it('should delete the key result', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -464,12 +505,18 @@ describe('OkrsController', () => {
           keyResults: [{ title: 'My key result' }],
         },
       );
-      await controller.deleteKeyResult(okr.objective.id, okr.keyResults[0].id, {
-        user: {
-          org: org.id,
+      await controller.deleteKeyResult(
+        org.id,
+        product.id,
+        okr.objective.id,
+        okr.keyResults[0].id,
+        {
+          user: {
+            org: org.id,
+          },
         },
-      });
-      const okr2 = await controller.get(okr.objective.id, {
+      );
+      const okr2 = await controller.get(org.id, product.id, okr.objective.id, {
         user: {
           org: org.id,
         },
@@ -480,6 +527,8 @@ describe('OkrsController', () => {
   describe('when updating a key result', () => {
     it('should update the key result', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -493,6 +542,8 @@ describe('OkrsController', () => {
         },
       );
       await controller.updateKeyResult(
+        org.id,
+        product.id,
         okr.objective.id,
         okr.keyResults[0].id,
         {
@@ -506,7 +557,7 @@ describe('OkrsController', () => {
           status: 'off-track',
         },
       );
-      const okr2 = await controller.get(okr.objective.id, {
+      const okr2 = await controller.get(org.id, product.id, okr.objective.id, {
         user: {
           org: org.id,
         },
@@ -517,6 +568,8 @@ describe('OkrsController', () => {
   describe('when creating a key result', () => {
     it('should create the key result', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -541,7 +594,7 @@ describe('OkrsController', () => {
           status: 'off-track',
         },
       );
-      const okr2 = await controller.get(okr.objective.id, {
+      const okr2 = await controller.get(org.id, product.id, okr.objective.id, {
         user: {
           org: org.id,
         },
@@ -553,6 +606,8 @@ describe('OkrsController', () => {
   describe('When getting a key result', () => {
     it('should return the key result', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -566,6 +621,8 @@ describe('OkrsController', () => {
         },
       );
       const keyResult = await controller.getKeyResult(
+        org.id,
+        product.id,
         okr.objective.id,
         okr.keyResults[0].id,
         {
@@ -580,6 +637,8 @@ describe('OkrsController', () => {
   describe('when listing the okrs for a timeline', () => {
     it('should return the okrs for the timeline', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -593,6 +652,8 @@ describe('OkrsController', () => {
         },
       );
       const okrs = await controller.listForTimeline(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -607,6 +668,8 @@ describe('OkrsController', () => {
   describe('when adding a comment to a key result', () => {
     it('should add a comment to the key result', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -626,6 +689,8 @@ describe('OkrsController', () => {
         },
       );
       const comment = await controller.addCommentToKeyResult(
+        org.id,
+        product.id,
         okr.keyResults[0].id,
         {
           user: {
@@ -645,6 +710,8 @@ describe('OkrsController', () => {
   describe('when updating a comment for a key result', () => {
     it('should update the comment', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -664,6 +731,8 @@ describe('OkrsController', () => {
         },
       );
       const comment = await controller.addCommentToKeyResult(
+        org.id,
+        product.id,
         okr.keyResults[0].id,
         {
           user: {
@@ -676,6 +745,8 @@ describe('OkrsController', () => {
         },
       );
       const updatedComment = await controller.updateKeyResultComment(
+        org.id,
+        product.id,
         comment.id,
         {
           user: {
@@ -693,6 +764,8 @@ describe('OkrsController', () => {
   describe('when deleting a comment for a key result', () => {
     it('should delete the comment', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -712,6 +785,8 @@ describe('OkrsController', () => {
         },
       );
       const comment = await controller.addCommentToKeyResult(
+        org.id,
+        product.id,
         okr.keyResults[0].id,
         {
           user: {
@@ -724,7 +799,7 @@ describe('OkrsController', () => {
         },
       );
       await expect(
-        controller.deleteKeyResultComment(comment.id, {
+        controller.deleteKeyResultComment(org.id, product.id, comment.id, {
           user: {
             org: org.id,
             sub: user.id,
@@ -736,6 +811,8 @@ describe('OkrsController', () => {
   describe('when adding a comment to an objective', () => {
     it('should add a comment to the objective', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -755,6 +832,8 @@ describe('OkrsController', () => {
         },
       );
       const comment = await controller.addCommentToObjective(
+        org.id,
+        product.id,
         okr.objective.id,
         {
           user: {
@@ -774,6 +853,8 @@ describe('OkrsController', () => {
   describe('when updating a comment for an objective', () => {
     it('should update the comment', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -793,6 +874,8 @@ describe('OkrsController', () => {
         },
       );
       const comment = await controller.addCommentToObjective(
+        org.id,
+        product.id,
         okr.objective.id,
         {
           user: {
@@ -805,6 +888,8 @@ describe('OkrsController', () => {
         },
       );
       const updatedComment = await controller.updateObjectiveComment(
+        org.id,
+        product.id,
         comment.id,
         {
           user: {
@@ -822,6 +907,8 @@ describe('OkrsController', () => {
   describe('when deleting a comment for an objective', () => {
     it('should delete the comment', async () => {
       const okr = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -841,6 +928,8 @@ describe('OkrsController', () => {
         },
       );
       const comment = await controller.addCommentToObjective(
+        org.id,
+        product.id,
         okr.objective.id,
         {
           user: {
@@ -853,7 +942,7 @@ describe('OkrsController', () => {
         },
       );
       await expect(
-        controller.deleteObjectiveComment(comment.id, {
+        controller.deleteObjectiveComment(org.id, product.id, comment.id, {
           user: {
             org: org.id,
             sub: user.id,
