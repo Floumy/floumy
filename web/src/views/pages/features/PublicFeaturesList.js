@@ -11,12 +11,13 @@ import {
 } from "../../../services/utils/utils";
 import React, { useEffect, useState } from "react";
 
-function FeaturesList({
-                        orgId,
-                        features,
-                        headerClassName = "thead-light",
-                        showAssignedTo = false
-                      }) {
+function PublicFeaturesList({
+                              orgId,
+                              productId,
+                              features,
+                              headerClassName = "thead-light",
+                              showAssignedTo = false
+                            }) {
   const [sortedFeatures, setSortedFeatures] = useState([]);
 
   useEffect(() => {
@@ -51,13 +52,13 @@ function FeaturesList({
           {sortedFeatures.map((feature) => (
             <tr key={feature.id}>
               <td>
-                <Link to={`/public/org/${orgId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/public/orgs/${orgId}/products/${productId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.reference}
                 </Link>
               </td>
               <td className="title-cell">
-                <Link to={`/public/org/${orgId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/public/orgs/${orgId}/products/${productId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.title}
                 </Link>
@@ -106,4 +107,4 @@ function FeaturesList({
     </>);
 }
 
-export default FeaturesList;
+export default PublicFeaturesList;

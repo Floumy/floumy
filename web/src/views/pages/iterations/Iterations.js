@@ -5,7 +5,7 @@ import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import React, { useEffect, useState } from "react";
 import Select2 from "react-select2-wrapper";
 import WorkItemsList from "../backlog/WorkItemsList";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   listIterationsWithWorkItemsForTimeline,
   startIteration
@@ -16,6 +16,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import WorkItemsListCard from "../backlog/WorkItemsListCard";
 
 function Iterations() {
+  const { orgId, productId } = useParams();
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get("timeline");
@@ -38,7 +39,7 @@ function Iterations() {
     async function fetchIterations() {
       setIsLoadingIterations(true);
       try {
-        const iterations = await listIterationsWithWorkItemsForTimeline(timelineFilterValue);
+        const iterations = await listIterationsWithWorkItemsForTimeline(orgId, productId, timelineFilterValue);
         setIterations(iterations);
         const showItems = {};
         iterations.forEach(iteration => {
@@ -54,13 +55,13 @@ function Iterations() {
 
     fetchIterations();
 
-  }, [timelineFilterValue]);
+  }, [orgId, productId, timelineFilterValue]);
 
   useEffect(() => {
     async function fetchBacklogWorkItems() {
       try {
         setIsLoadingWorkItems(true);
-        const workItems = await listOpenWorkItems();
+        const workItems = await listOpenWorkItems(orgId, productId);
         const sortedWorkItems = sortByPriority(workItems);
         setBacklogWorkItems(sortedWorkItems);
       } catch (e) {
@@ -75,7 +76,7 @@ function Iterations() {
 
   async function start(iterationId) {
     try {
-      await startIteration(iterationId);
+      await startIteration(orgId, productId, iterationId);
       navigate("/admin/active-iteration");
     } catch (e) {
       console.error(e);
@@ -84,7 +85,7 @@ function Iterations() {
 
   async function handleAddWorkItemWithIteration(workItem, iterationId) {
     workItem.iteration = iterationId;
-    const savedWorkItem = await addWorkItem(workItem);
+    const savedWorkItem = await addWorkItem(orgId, productId, workItem);
     const workItems = iterations.find(iteration => iteration.id === iterationId).workItems;
     workItems.push(savedWorkItem);
     sortByPriority(workItems);
@@ -92,7 +93,7 @@ function Iterations() {
   }
 
   async function handleAddWorkItemToBacklog(workItem) {
-    const savedWorkItem = await addWorkItem(workItem);
+    const savedWorkItem = await addWorkItem(orgId, productId, workItem);
     backlogWorkItems.push(savedWorkItem);
     sortByPriority(backlogWorkItems);
     setBacklogWorkItems([...backlogWorkItems]);
@@ -263,7 +264,7 @@ function Iterations() {
             shortcut: "s",
             id: "new-iteration",
             action: () => {
-              navigate("/admin/iterations/new");
+              navigate(`/admin/orgs/${orgId}/products/${productId}/iterations/new`);
             }
           },
           {
@@ -271,7 +272,7 @@ function Iterations() {
             shortcut: "w",
             id: "new-work-item",
             action: () => {
-              navigate("/admin/work-item/new");
+              navigate(`/admin/orgs/${orgId}/products/${productId}/work-item/new`);
             }
           }
         ]
@@ -316,14 +317,16 @@ function Iterations() {
                       work items. They help you deliver incremental progress and adapt quickly to changes. Plan your
                       sprints to maintain a steady development pace and ensure continuous improvement.
                       <br />
-                      <Link to={"/admin/iterations/new"} className="text-blue font-weight-bold">Plan a Sprint</Link>
+                      <Link to={`/admin/orgs/${orgId}/products/${productId}/iterations/new`}
+                            className="text-blue font-weight-bold">Plan a Sprint</Link>
                     </p>
                     <h3>Work Items</h3>
                     <p>Work Items are the tasks and activities that need to be completed to develop your features.
                       They break down the work into manageable chunks, making it easier to track progress and stay
                       organized. Create work items to keep your team aligned and productive.
                       <br />
-                      <Link to={"/admin/work-item/new"} className="text-blue font-weight-bold">Create a Work
+                      <Link to={`/admin/orgs/${orgId}/products/${productId}/work-item/new`}
+                            className="text-blue font-weight-bold">Create a Work
                         Item</Link>
                     </p>
                   </div>
@@ -342,7 +345,8 @@ function Iterations() {
                             {!showWorkItems[iteration.id] && <i className="ni ni-bold-right" />}
                             {showWorkItems[iteration.id] && <i className="ni ni-bold-down" />}
                           </button>
-                          <Link to={`/admin/iterations/edit/${iteration.id}`} className="mr-2">
+                          <Link to={`/admin/orgs/${orgId}/products/${productId}/iterations/edit/${iteration.id}`}
+                                className="mr-2">
                             <span
                               className="text-muted">{formatDate(getIterationStartDate(iteration))} - {formatDate(getIterationEndDate(iteration))}</span> | {iteration.title}
                           </Link>

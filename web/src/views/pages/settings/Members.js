@@ -25,7 +25,7 @@ function Members() {
         const org = await getOrg();
         setMembers(org.members);
         const invitationToken = org.invitationToken;
-        const invitationLink = `${window.location.origin}/auth/org/sign-up?invitationToken=${invitationToken}`;
+        const invitationLink = `${window.location.origin}/auth/sign-up?invitationToken=${invitationToken}`;
         setInvitationLink(invitationLink);
       } catch (e) {
         console.error(e.message);

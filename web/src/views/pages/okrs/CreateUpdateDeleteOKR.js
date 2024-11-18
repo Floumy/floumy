@@ -7,11 +7,12 @@ import { deleteOKR } from "../../../services/okrs/okrs.service";
 import Select2 from "react-select2-wrapper";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import DeleteWarning from "../components/DeleteWarning";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getOrg } from "../../../services/org/orgs.service";
 
 function CreateUpdateDeleteOKR({ onSubmit, okr }) {
+  const { orgId, productId } = useParams();
   const [fields, setFields] = useState([{}]);
   const [timeline, setTimeline] = useState("this-quarter");
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +24,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
   const onDeleteOKR = async (id) => {
     setIsLoading(true);
     try {
-      await deleteOKR(id);
+      await deleteOKR(orgId, productId, id);
       navigate(-1);
       setTimeout(() => toast.success("The OKR has been deleted"), 100);
     } catch (e) {

@@ -21,7 +21,7 @@ function PublicActiveIteration() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeIteration, setActiveIteration] = useState(null);
   const [workItemsByStatus, setWorkItemsByStatus] = useState({});
-  const { orgId } = useParams();
+  const { orgId, productId } = useParams();
 
   const setWorkItemsGroupedByStatus = useCallback((workItems) => {
     const sortedWorkItemsByStatus = getWorkItemsGroupedByStatus(workItems);
@@ -34,7 +34,7 @@ function PublicActiveIteration() {
     async function fetchData() {
       try {
         setIsLoading(true);
-        const activeIteration = await getPublicActiveIteration(orgId);
+        const activeIteration = await getPublicActiveIteration(orgId, productId);
         setActiveIteration(activeIteration);
         if (activeIteration && activeIteration.workItems.length > 0) {
           setWorkItemsGroupedByStatus(activeIteration.workItems);
@@ -48,7 +48,7 @@ function PublicActiveIteration() {
     }
 
     fetchData();
-  }, [orgId, setWorkItemsGroupedByStatus]);
+  }, [orgId, productId, setWorkItemsGroupedByStatus]);
 
   return (
     <>

@@ -9,7 +9,7 @@ import NotFoundCard from "../components/NotFoundCard";
 import PublicIterationDetail from "./PublicIterationDetail";
 
 function PublicIteration() {
-  const { orgId, iterationId } = useParams();
+  const { orgId, productId, iterationId } = useParams();
   const [iteration, setIteration] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,7 +17,7 @@ function PublicIteration() {
     async function fetchIteration() {
       setIsLoading(true);
       try {
-        const iteration = await getPublicIteration(orgId, iterationId);
+        const iteration = await getPublicIteration(orgId, productId, iterationId);
         setIteration(iteration);
       } catch (e) {
         console.error(e);
@@ -27,7 +27,7 @@ function PublicIteration() {
     }
 
     fetchIteration();
-  }, [orgId, iterationId]);
+  }, [orgId, productId, iterationId]);
 
   return (
     <>

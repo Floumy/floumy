@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { listWorkItems, searchWorkItems } from "../../../services/backlog/backlog.service";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import { Container, Row } from "reactstrap";
@@ -14,11 +14,12 @@ function WorkItems() {
   const [page, setPage] = useState(1);
   const [hasMoreWorkItems, setHasMoreWorkItems] = useState(true);
   const [search, setSearch] = useState("");
+  const { orgId, productId } = useParams();
 
   async function fetchData(page, workItems = []) {
     setIsLoading(true);
     try {
-      const workItemsList = await listWorkItems(page, 50);
+      const workItemsList = await listWorkItems(orgId, productId, page, 50);
       if (workItemsList.length === 0) {
         setHasMoreWorkItems(false);
       } else {
@@ -59,7 +60,7 @@ function WorkItems() {
   async function searchWorkItemsByText(searchText, page, workItems = []) {
     setIsLoading(true);
     try {
-      const response = await searchWorkItems(searchText, page);
+      const response = await searchWorkItems(orgId, productId, searchText, page);
       if (response.length === 0) {
         setHasMoreWorkItems(false);
       } else {

@@ -50,7 +50,7 @@ import { getOrg } from "../../../services/org/orgs.service";
 import Comments from "../../../components/Comments/Comments";
 
 function DetailOKR() {
-  const { id } = useParams();
+  const { orgId, productId, id } = useParams();
   const [okr, setOKR] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [timeline, setTimeline] = useState("this-quarter");
@@ -79,7 +79,7 @@ function DetailOKR() {
 
     async function fetchAndSetOKR() {
       try {
-        const okr = await getOKR(id);
+        const okr = await getOKR(orgId, productId, id);
         setOKR(okr);
         setStatus(okr.objective.status);
         setTimeline(okr.objective.timeline);
@@ -135,7 +135,7 @@ function DetailOKR() {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      await updateObjective(okr.objective.id, {
+      await updateObjective(orgId, productId, okr.objective.id, {
         title: values.title,
         assignedTo,
         status,
@@ -153,7 +153,7 @@ function DetailOKR() {
   const handleDelete = async () => {
     try {
       setIsSubmitting(true);
-      await deleteOKR(okr.objective.id);
+      await deleteOKR(orgId, productId, okr.objective.id);
       navigate(-1);
       setTimeout(() => toast.success("The OKR has been deleted"), 100);
     } catch (e) {
@@ -173,7 +173,7 @@ function DetailOKR() {
         status: "on-track",
         progress: 0
       };
-      const savedKeyResult = await addKeyResult(okr.objective.id, keyResult);
+      const savedKeyResult = await addKeyResult(orgId, productId, okr.objective.id, keyResult);
       okr.keyResults.push(savedKeyResult);
       setOKR({ ...okr });
     } catch (e) {
@@ -194,7 +194,7 @@ function DetailOKR() {
 
   const handleAddComment = async (content) => {
     try {
-      const addedComment = await addObjectiveComment(okr.objective.id, content);
+      const addedComment = await addObjectiveComment(orgId, productId, okr.objective.id, content);
       okr.objective.comments.push(addedComment);
       setOKR({ ...okr });
       toast.success("The comment has been added");
@@ -205,7 +205,7 @@ function DetailOKR() {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await deleteObjectiveComment(okr.objective.id, commentId);
+      await deleteObjectiveComment(orgId, productId, okr.objective.id, commentId);
       okr.objective.comments = okr.objective.comments.filter(comment => comment.id !== commentId);
       setOKR({ ...okr });
       toast.success("The comment has been deleted");
@@ -216,7 +216,7 @@ function DetailOKR() {
 
   const handleUpdateComment = async (commentId, content) => {
     try {
-      const updatedComment = await updateObjectiveComment(okr.objective.id, commentId, content);
+      const updatedComment = await updateObjectiveComment(orgId, productId, okr.objective.id, commentId, content);
       okr.objective.comments = okr.objective.comments.map(comment => {
         if (comment.id === commentId) {
           return updatedComment;
@@ -423,12 +423,16 @@ function DetailOKR() {
                         {okr && okr.keyResults && okr.keyResults.map((keyResult) => (
                           <tr key={keyResult.id}>
                             <td>
-                              <Link to={`/admin/okrs/${id}/kr/detail/${keyResult.id}`} className={"okr-detail"}>
+                              <Link
+                                to={`/admin/orgs/${orgId}/products/${productId}/okrs/${id}/kr/detail/${keyResult.id}`}
+                                className={"okr-detail"}>
                                 {keyResult.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
-                              <Link to={`/admin/okrs/${id}/kr/detail/${keyResult.id}`} className={"okr-detail"}>
+                              <Link
+                                to={`/admin/orgs/${orgId}/products/${productId}/okrs/${id}/kr/detail/${keyResult.id}`}
+                                className={"okr-detail"}>
                                 {keyResult.title}
                               </Link>
                             </td>

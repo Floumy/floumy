@@ -18,6 +18,7 @@ import {
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 import { listKeyResults } from "../../services/okrs/okrs.service";
+import { useParams } from "react-router-dom";
 
 function FeaturesContextMenu({
                                menuId,
@@ -31,12 +32,13 @@ function FeaturesContextMenu({
   const [isLoadingKeyResults, setIsLoadingKeyResults] = useState(false);
   const [milestones, setMilestones] = useState([]);
   const [keyResults, setKeyResults] = useState([]);
+  const { productId, orgId } = useParams();
 
   useEffect(() => {
     async function fetchMilestones() {
       try {
         setIsLoadingMilestones(true);
-        const milestones = await listMilestones();
+        const milestones = await listMilestones(orgId, productId);
         setMilestones(milestones.filter((milestone) => new Date(milestone.dueDate) >= new Date()));
       } catch (e) {
         console.error("The milestones could not be loaded");
@@ -48,7 +50,7 @@ function FeaturesContextMenu({
     async function fetchKeyResults() {
       try {
         setIsLoadingKeyResults(true);
-        const keyResults = await listKeyResults();
+        const keyResults = await listKeyResults(orgId, productId);
         setKeyResults(keyResults.filter((keyResult) => keyResult.timeline !== "past"));
       } catch (e) {
         console.error("The key results could not be loaded");
@@ -78,7 +80,7 @@ function FeaturesContextMenu({
     try {
       event.preventDefault();
       for (const feature of props.features) {
-        await updateFeatureMilestone(feature.id, milestoneId);
+        await updateFeatureMilestone(orgId, productId, feature.id, milestoneId);
       }
       callChangeMilestoneCallbacks(milestoneId, props.features);
       toast.success("The features have been moved to the milestone");
@@ -104,7 +106,7 @@ function FeaturesContextMenu({
     try {
       event.preventDefault();
       for (const feature of props.features) {
-        await updateFeatureKeyResult(feature.id, keyResultId);
+        await updateFeatureKeyResult(orgId, productId, feature.id, keyResultId);
       }
       callChangeKeyResultCallbacks(keyResultId, props.features);
       toast.success("The features have been moved to the key result");
@@ -130,7 +132,7 @@ function FeaturesContextMenu({
     try {
       event.preventDefault();
       for (const feature of props.features) {
-        await updateFeatureStatus(feature.id, status);
+        await updateFeatureStatus(orgId, productId, feature.id, status);
       }
       callChangeStatusCallbacks(status, props.features);
       toast.success("The features have been updated");
@@ -156,7 +158,7 @@ function FeaturesContextMenu({
     try {
       event.preventDefault();
       for (const feature of props.features) {
-        await updateFeaturePriority(feature.id, priority);
+        await updateFeaturePriority(orgId, productId, feature.id, priority);
       }
       callChangePriorityCallbacks(priority, props.features);
       toast.success("The features have been updated");

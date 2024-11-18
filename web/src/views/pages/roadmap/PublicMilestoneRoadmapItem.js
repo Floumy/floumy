@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Col, Row } from "reactstrap";
 import PublicFeaturesList from "../features/PublicFeaturesList";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 function PublicMilestoneRoadmapItem({ orgId, milestone }) {
+  const { productId } = useParams();
   const [features, setFeatures] = useState([]);
   const [showFeatures, setShowFeatures] = useState(true);
   useEffect(() => {
@@ -25,7 +26,7 @@ function PublicMilestoneRoadmapItem({ orgId, milestone }) {
           {!showFeatures && <i className="ni ni-bold-right" />}
           {showFeatures && <i className="ni ni-bold-down" />}
         </button>
-        <Link to={`/public/org/${orgId}/milestones/detail/${milestone.id}`}>
+        <Link to={`/public/orgs/${orgId}/products/${productId}/milestones/detail/${milestone.id}`}>
           <span className="text-gray">{milestone.dueDate}</span> | {milestone.title} <span
           className="text-muted text-sm"></span>
         </Link>
@@ -51,6 +52,7 @@ function PublicMilestoneRoadmapItem({ orgId, milestone }) {
             <div hidden={!showFeatures}>
               <PublicFeaturesList
                 orgId={orgId}
+                productId={productId}
                 features={features}
                 headerClassName={"thead"}
               />

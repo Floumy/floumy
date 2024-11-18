@@ -3,10 +3,13 @@ import { Col, Container, Row } from "reactstrap";
 import React from "react";
 import CreateUpdateDeleteIteration from "./CreateUpdateDeleteIteration";
 import { addIteration } from "../../../services/iterations/iterations.service";
+import { useParams } from "react-router-dom";
 
 function NewIteration() {
+  const { orgId, productId } = useParams();
+
   const handleSubmit = async (iteration) => {
-    await addIteration(iteration);
+    await addIteration(orgId, productId, iteration);
   };
 
   return (

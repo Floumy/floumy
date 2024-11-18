@@ -11,16 +11,18 @@ import {
 import { formatHyphenatedString, priorityColor, workItemStatusColorClassName } from "../../services/utils/utils";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
+import { useParams } from "react-router-dom";
 
 function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onChangePriority, onChange }) {
   const [isLoadingIterations, setIsLoadingIterations] = useState(false);
   const [iterations, setIterations] = useState([]);
+  const { orgId, productId } = useParams();
 
   useEffect(() => {
     async function fetchIterations() {
       try {
         setIsLoadingIterations(true);
-        const iterations = await listIterations();
+        const iterations = await listIterations(orgId, productId);
         setIterations(iterations.filter((iteration) => (iteration.status === "active" || iteration.status === "planned")));
       } catch (e) {
         console.error("The iterations could not be loaded");
@@ -36,7 +38,7 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
     try {
       event.preventDefault();
       for (const workItem of props.workItems) {
-        await updateWorkItemIteration(workItem.id, iterationId);
+        await updateWorkItemIteration(orgId, productId, workItem.id, iterationId);
       }
       callChangeIterationCallbacks(iterationId, props.workItems);
       toast.success("The work items have been moved to the iteration");
@@ -62,7 +64,7 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
     try {
       event.preventDefault();
       for (const workItem of props.workItems) {
-        await updateWorkItemStatus(workItem.id, status);
+        await updateWorkItemStatus(orgId, productId, workItem.id, status);
       }
       callChangeStatusCallbacks(status, props.workItems);
       toast.success("The work items have been updated");
@@ -88,7 +90,7 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
     try {
       event.preventDefault();
       for (const workItem of props.workItems) {
-        await updateWorkItemPriority(workItem.id, priority);
+        await updateWorkItemPriority(orgId, productId, workItem.id, priority);
       }
       callChangePriorityCallbacks(priority, props.workItems);
       toast.success("The work items have been updated");

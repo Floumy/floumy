@@ -11,12 +11,13 @@ import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import DeleteWarning from "../components/DeleteWarning";
 import FloumyDropZone from "../components/FloumyDropZone";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CardHeaderDetails from "../components/CardHeaderDetails";
 import { getOrg } from "../../../services/org/orgs.service";
 import { listFeatureRequests } from "../../../services/feature-requests/feature-requests.service";
 
 function CreateUpdateDeleteFeature({ onSubmit, feature }) {
+  const { orgId, productId } = useParams();
   const [priority, setPriority] = useState("medium");
   const [descriptionText, setDescriptionText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,10 +38,9 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   const [featureRequest, setFeatureRequest] = useState("");
 
   const paymentPlan = localStorage.getItem("paymentPlan");
-  const { id: orgId } = JSON.parse(localStorage.getItem("currentOrg"));
 
   const fetchAndSetKeyResults = useCallback(async () => {
-    const keyResults = await listKeyResults();
+    const keyResults = await listKeyResults(orgId, productId);
     keyResults.push({ id: "", title: "None" });
     setKeyResults(keyResults);
     if (feature?.keyResult?.id) {
@@ -51,7 +51,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   }, [feature?.keyResult?.id]);
 
   const fetchAndSetMilestones = useCallback(async () => {
-    const milestones = await listMilestones();
+    const milestones = await listMilestones(orgId, productId);
     milestones.push({ id: "", title: "None" });
     setMilestones(milestones);
     if (feature?.milestone?.id) {
@@ -73,7 +73,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   }, [feature?.assignedTo?.id]);
 
   const fetchAndSetFeatureRequests = useCallback(async () => {
-    const featureRequests = await listFeatureRequests(orgId, 1, 0);
+    const featureRequests = await listFeatureRequests(orgId, productId, 1, 0);
     featureRequests.push({ id: "", title: "None" });
     setFeatureRequests(featureRequests);
     if (feature?.featureRequest?.id) {
@@ -175,7 +175,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
 
   const onDelete = async (id) => {
     try {
-      await deleteFeature(id);
+      await deleteFeature(orgId, productId, id);
       navigate(-1);
       setTimeout(() => toast.success("The feature has been deleted"), 100);
     } catch (e) {
