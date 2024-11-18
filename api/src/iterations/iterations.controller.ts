@@ -11,6 +11,7 @@ import {
   Post,
   Put,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
@@ -18,16 +19,25 @@ import { CreateOrUpdateIterationDto } from './dtos';
 import { IterationsService } from './iterations.service';
 import { Timeline } from '../common/timeline.enum';
 
-@Controller('iterations')
+@Controller('/orgs/:orgId/products/:productId/iterations')
 @UseGuards(AuthGuard)
 export class IterationsController {
   constructor(private iterationsService: IterationsService) {}
 
   @Post()
   @HttpCode(201)
-  async create(@Request() request, @Body() body: CreateOrUpdateIterationDto) {
+  async create(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Body() body: CreateOrUpdateIterationDto,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      return await this.iterationsService.create(request.user.org, body);
+      return await this.iterationsService.create(orgId, productId, body);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -35,21 +45,46 @@ export class IterationsController {
 
   @Get('with-work-items')
   @HttpCode(200)
-  async listWithWorkItems(@Request() request) {
-    return await this.iterationsService.listWithWorkItems(request.user.org);
+  async listWithWorkItems(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.iterationsService.listWithWorkItems(orgId, productId);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async list(@Request() request) {
-    return await this.iterationsService.list(request.user.org);
+  async list(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.iterationsService.list(orgId, productId);
   }
 
   @Post(':id/start')
   @HttpCode(200)
-  async startIteration(@Request() request, @Param('id') id: string) {
+  async startIteration(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      return await this.iterationsService.startIteration(request.user.org, id);
+      return await this.iterationsService.startIteration(orgId, productId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -57,16 +92,34 @@ export class IterationsController {
 
   @Get('active')
   @HttpCode(200)
-  async getActiveIteration(@Request() request) {
-    return await this.iterationsService.getActiveIteration(request.user.org);
+  async getActiveIteration(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.iterationsService.getActiveIteration(orgId, productId);
   }
 
   @Post(':id/complete')
   @HttpCode(200)
-  async completeIteration(@Request() request, @Param('id') id: string) {
+  async completeIteration(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.iterationsService.completeIteration(
-        request.user.org,
+        orgId,
+        productId,
         id,
       );
     } catch (e) {
@@ -76,9 +129,18 @@ export class IterationsController {
 
   @Get(':id')
   @HttpCode(200)
-  async get(@Request() request, @Param('id') id: string) {
+  async get(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      return await this.iterationsService.get(request.user.org, id);
+      return await this.iterationsService.get(orgId, productId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -87,12 +149,18 @@ export class IterationsController {
   @Put(':id')
   @HttpCode(200)
   async update(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() body: CreateOrUpdateIterationDto,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      return await this.iterationsService.update(request.user.org, id, body);
+      return await this.iterationsService.update(orgId, productId, id, body);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -100,9 +168,18 @@ export class IterationsController {
 
   @Delete(':id')
   @HttpCode(200)
-  async delete(@Request() request, @Param('id') id: string) {
+  async delete(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      return await this.iterationsService.delete(request.user.org, id);
+      return await this.iterationsService.delete(orgId, productId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -110,11 +187,18 @@ export class IterationsController {
 
   @Get('timeline/:timeline')
   async listForTimeline(
+    @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Request() request,
     @Param('timeline') timeline: Timeline,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     return await this.iterationsService.listForTimeline(
-      request.user.org,
+      orgId,
+      productId,
       timeline,
     );
   }

@@ -49,7 +49,6 @@ describe('AuthController', () => {
         name: 'John Doe',
         email: 'john@example.com',
         password: 'testtesttest',
-        productName: 'Test Product',
       });
       const user = await usersService.findOneByEmail('john@example.com');
       user.isActive = true;
@@ -79,7 +78,6 @@ describe('AuthController', () => {
         name: 'Test User',
         email: 'test@example.com',
         password: 'testtesttest',
-        productName: 'Test Product',
       });
 
       const user = await usersService.findOneByEmail('test@example.com');

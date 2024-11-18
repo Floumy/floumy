@@ -16,11 +16,13 @@ import { WorkItemsService } from '../backlog/work-items/work-items.service';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Iteration } from '../iterations/Iteration.entity';
 import { Feature } from '../roadmap/features/feature.entity';
+import { Product } from '../products/product.entity';
 
 describe('FilesController', () => {
   let controller: FilesController;
   let cleanup: () => Promise<void>;
   let org: Org;
+  let product: Product;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -51,6 +53,7 @@ describe('FilesController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
   });
 
   afterEach(async () => {
@@ -69,9 +72,14 @@ describe('FilesController', () => {
         mimetype: 'text/plain',
         buffer: Buffer.from('test'),
       };
-      const result = await controller.uploadFile(file as any, {
-        user: { org: org.id },
-      });
+      const result = await controller.uploadFile(
+        org.id,
+        product.id,
+        file as any,
+        {
+          user: { org: org.id },
+        },
+      );
       expect(result.id).toBeDefined();
       expect(result.name).toEqual('test.txt');
       expect(result.size).toEqual(4);
@@ -87,17 +95,30 @@ describe('FilesController', () => {
         mimetype: 'text/plain',
         buffer: Buffer.from('test'),
       };
-      const result = await controller.uploadFile(file as any, {
+      const result = await controller.uploadFile(
+        org.id,
+        product.id,
+        file as any,
+        {
+          user: { org: org.id },
+        },
+      );
+      await controller.deleteFile(org.id, product.id, result.id, {
         user: { org: org.id },
       });
-      await controller.deleteFile(result.id, { user: { org: org.id } });
 
       const response = {
         status: jest.fn().mockReturnValue({ send: jest.fn() }),
         send: jest.fn(),
       };
       const request = { user: { org: org.id } };
-      await controller.getFile(result.id, request, response);
+      await controller.getFile(
+        org.id,
+        product.id,
+        result.id,
+        request,
+        response,
+      );
       expect(response.status).toHaveBeenCalledWith(404);
     });
   });

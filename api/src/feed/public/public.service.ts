@@ -1,22 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { OrgsService } from '../../orgs/orgs.service';
 import { FeedService } from '../feed.service';
 import { FeedItemDto } from '../dtos';
+import { Product } from '../../products/product.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class PublicService {
   constructor(
     private readonly feedService: FeedService,
-    private readonly orgsService: OrgsService,
+    @InjectRepository(Product)
+    private readonly productsRepository: Repository<Product>,
   ) {}
 
   async listFeedItems(
-    orId: string,
+    orgId: string,
+    productId: string,
     page: number,
     limit: number,
   ): Promise<FeedItemDto[]> {
-    const org = await this.orgsService.findOneById(orId);
-    const bipSettings = await org.bipSettings;
+    const product = await this.productsRepository.findOneByOrFail({
+      id: productId,
+      org: { id: orgId },
+    });
+
+    const bipSettings = await product.bipSettings;
 
     if (
       bipSettings?.isBuildInPublicEnabled !== true ||
@@ -25,8 +33,14 @@ export class PublicService {
       throw new Error('Feed page is not public');
     }
 
-    const feedItems = await this.feedService.listFeedItems(org.id, page, limit);
-    // Remove assignedTo from the feed items if they
+    const feedItems = await this.feedService.listFeedItems(
+      orgId,
+      productId,
+      page,
+      limit,
+    );
+
+    // Remove assignedTo from the feed items
     return feedItems.map((item: FeedItemDto) => {
       delete item?.content?.assignedTo;
       delete item?.content?.current?.assignedTo;

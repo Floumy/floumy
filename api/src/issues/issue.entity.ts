@@ -13,6 +13,7 @@ import { IssueComment } from './issue-comment.entity';
 import { IssueStatus } from './issue-status.enum';
 import { Priority } from '../common/priority.enum';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { Product } from '../products/product.entity';
 
 @Entity()
 export class Issue {
@@ -46,4 +47,6 @@ export class Issue {
   comments: Promise<IssueComment[]>;
   @OneToMany(() => WorkItem, (workItem) => workItem.issue, { lazy: true })
   workItems: Promise<WorkItem[]>;
+  @ManyToOne(() => Product, (product) => product.issues, { lazy: false })
+  product: Promise<Product>;
 }

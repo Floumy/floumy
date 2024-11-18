@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { OrgsService } from '../orgs/orgs.service';
 import { UsersService } from '../users/users.service';
 import { v4 as uuid } from 'uuid';
+import { Product } from '../products/product.entity';
 
 describe('FeedEventHandler', () => {
   let cleanup: () => Promise<void>;
@@ -16,6 +17,7 @@ describe('FeedEventHandler', () => {
   let feedItemRepository: Repository<FeedItem>;
   let org: Org;
   let user: User;
+  let product: Product;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -34,6 +36,7 @@ describe('FeedEventHandler', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     cleanup = dbCleanup;
   });
 
@@ -48,6 +51,7 @@ describe('FeedEventHandler', () => {
   describe('handleWorkItemCreated', () => {
     it('should create a feed item when a work item is created', async () => {
       const event = {
+        product: { id: product.id },
         org: { id: org.id },
         createdBy: { id: user.id },
         id: uuid(),
@@ -71,11 +75,13 @@ describe('FeedEventHandler', () => {
     it('should create a feed item when a work item is updated', async () => {
       const event = {
         previous: {
+          product: { id: product.id },
           org: { id: org.id },
           createdBy: { id: user.id },
           id: uuid(),
         },
         current: {
+          product: { id: product.id },
           org: { id: org.id },
           createdBy: { id: user.id },
           id: uuid(),
@@ -99,6 +105,7 @@ describe('FeedEventHandler', () => {
   describe('handleWorkItemDeleted', () => {
     it('should create a feed item when a work item is deleted', async () => {
       const event = {
+        product: { id: product.id },
         org: { id: org.id },
         createdBy: { id: user.id },
         id: uuid(),
@@ -124,6 +131,7 @@ describe('FeedEventHandler', () => {
         objective: {
           id: uuid(),
           org: { id: org.id },
+          product: { id: product.id },
         },
       } as any;
 
@@ -147,6 +155,7 @@ describe('FeedEventHandler', () => {
         objective: {
           id: uuid(),
           org: { id: org.id },
+          product: { id: product.id },
         },
       } as any;
 
@@ -171,12 +180,14 @@ describe('FeedEventHandler', () => {
           objective: {
             id: uuid(),
             org: { id: org.id },
+            product: { id: product.id },
           },
         },
         current: {
           objective: {
             id: uuid(),
             org: { id: org.id },
+            product: { id: product.id },
           },
         },
       } as any;
@@ -198,6 +209,7 @@ describe('FeedEventHandler', () => {
   describe('handleKeyResultCreated', () => {
     it('should create a feed item when a key result is created', async () => {
       const event = {
+        product: { id: product.id },
         org: { id: org.id },
         id: uuid(),
       } as any;
@@ -221,10 +233,12 @@ describe('FeedEventHandler', () => {
       const event = {
         previous: {
           org: { id: org.id },
+          product: { id: product.id },
           id: uuid(),
         },
         current: {
           org: { id: org.id },
+          product: { id: product.id },
           id: uuid(),
         },
       } as any;
@@ -246,6 +260,7 @@ describe('FeedEventHandler', () => {
   describe('handleKeyResultDeleted', () => {
     it('should create a feed item when a key result is deleted', async () => {
       const event = {
+        product: { id: product.id },
         org: { id: org.id },
         id: uuid(),
       } as any;
@@ -267,6 +282,7 @@ describe('FeedEventHandler', () => {
   describe('handleFeatureCreated', () => {
     it('should create a feed item when a feature is created', async () => {
       const event = {
+        product: { id: product.id },
         org: { id: org.id },
         id: uuid(),
       } as any;
@@ -290,10 +306,12 @@ describe('FeedEventHandler', () => {
       const event = {
         previous: {
           org: { id: org.id },
+          product: { id: product.id },
           id: uuid(),
         },
         current: {
           org: { id: org.id },
+          product: { id: product.id },
           id: uuid(),
         },
       } as any;
@@ -314,6 +332,7 @@ describe('FeedEventHandler', () => {
   describe('handleFeatureDeleted', () => {
     it('should create a feed item when a feature is deleted', async () => {
       const event = {
+        product: { id: product.id },
         org: { id: org.id },
         id: uuid(),
       } as any;

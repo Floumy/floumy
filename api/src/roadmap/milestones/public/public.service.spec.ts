@@ -19,6 +19,7 @@ import { OkrsService } from '../../../okrs/okrs.service';
 import { BipSettings } from '../../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
 import { Timeline } from '../../../common/timeline.enum';
+import { Product } from '../../../products/product.entity';
 
 describe('PublicService', () => {
   let usersService: UsersService;
@@ -28,6 +29,7 @@ describe('PublicService', () => {
   let milestonesRepository: Repository<Milestone>;
   let user: User;
   let org: Org;
+  let product: Product;
   let bipRepository: Repository<BipSettings>;
 
   let cleanup: () => Promise<void>;
@@ -47,6 +49,7 @@ describe('PublicService', () => {
           File,
           FeatureFile,
           BipSettings,
+          Product,
         ]),
         BacklogModule,
         FilesModule,
@@ -79,10 +82,12 @@ describe('PublicService', () => {
       getRepositoryToken(Milestone),
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.isRoadmapPagePublic = true;
     bipSettings.org = Promise.resolve(org);
+    bipSettings.product = Promise.resolve(product);
     await bipRepository.save(bipSettings);
   });
 
@@ -93,6 +98,7 @@ describe('PublicService', () => {
   async function createMilestone(title: string, features: Feature[] = []) {
     const milestone = new Milestone();
     milestone.org = Promise.resolve(org);
+    milestone.product = Promise.resolve(product);
     milestone.title = title;
     milestone.description = 'Description';
     milestone.dueDate = new Date();
@@ -103,6 +109,7 @@ describe('PublicService', () => {
   async function createFeature(title: string) {
     const feature = new Feature();
     feature.org = Promise.resolve(org);
+    feature.product = Promise.resolve(product);
     feature.title = title;
     return await featuresRepository.save(feature);
   }
@@ -121,6 +128,7 @@ describe('PublicService', () => {
 
       const milestones = await service.listMilestones(
         org.id,
+        product.id,
         Timeline.THIS_QUARTER,
       );
       expect(milestones).toBeDefined();
@@ -139,12 +147,17 @@ describe('PublicService', () => {
     it('should return the milestone', async () => {
       const milestone = new Milestone();
       milestone.org = Promise.resolve(org);
+      milestone.product = Promise.resolve(product);
       milestone.title = 'test';
       milestone.description = 'test description';
       milestone.dueDate = new Date();
       await milestonesRepository.save(milestone);
 
-      const actual = await service.findMilestone(org.id, milestone.id);
+      const actual = await service.findMilestone(
+        org.id,
+        product.id,
+        milestone.id,
+      );
 
       expect(actual.id).toEqual(milestone.id);
     });

@@ -17,6 +17,7 @@ import { FeatureFile } from './feature-file.entity';
 import { User } from '../../users/user.entity';
 import { FeatureComment } from './feature-comment.entity';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
+import { Product } from '../../products/product.entity';
 
 @Entity()
 export class Feature {
@@ -54,6 +55,8 @@ export class Feature {
   sequenceNumber: number;
   @ManyToOne(() => Org, (org) => org.features, { lazy: true })
   org: Promise<Org>;
+  @ManyToOne(() => Product, (product) => product.features, { lazy: true })
+  product: Promise<Product>;
   @ManyToOne(() => User, (user) => user.createdFeatures, { lazy: true })
   createdBy: Promise<User>;
   @ManyToOne(() => User, (user) => user.assignedFeatures, { lazy: true })

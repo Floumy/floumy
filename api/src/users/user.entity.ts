@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -16,6 +17,7 @@ import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { FeatureRequestVote } from '../feature-requests/feature-request-vote.entity';
 import { Issue } from '../issues/issue.entity';
+import { Product } from '../products/product.entity';
 
 @Entity()
 export class User {
@@ -81,6 +83,9 @@ export class User {
   assignedObjectives: any;
   @ManyToOne(() => Org, (org) => org.users, { lazy: true, nullable: true })
   org: Promise<Org>;
+
+  @ManyToMany(() => Product, (product) => product.users, { lazy: true })
+  products: Promise<Product[]>;
 
   constructor(name: string, email: string, password: string) {
     this.name = name;
