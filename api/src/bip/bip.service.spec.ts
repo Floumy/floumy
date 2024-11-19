@@ -9,6 +9,7 @@ import { TokensService } from '../auth/tokens.service';
 import { BipSettings } from './bip-settings.entity';
 import { PaymentPlan } from '../auth/payment.plan';
 import { Repository } from 'typeorm';
+import { Product } from '../products/product.entity';
 
 describe('BipService', () => {
   let service: BipService;
@@ -16,6 +17,7 @@ describe('BipService', () => {
   let usersService: UsersService;
   let user: User;
   let org: Org;
+  let product: Product;
   let orgsRepository: Repository<Org>;
 
   let cleanup: () => Promise<void>;
@@ -36,6 +38,7 @@ describe('BipService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
   });
 
   afterEach(async () => {
@@ -51,11 +54,11 @@ describe('BipService', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
-        isIssuesPagePublic: false,
-        isFeatureRequestsPagePublic: false,
+        isIssuesPagePublic: true,
+        isFeatureRequestsPagePublic: true,
       };
-      await service.createOrUpdateSettings(org.id, settings);
-      const updatedSettings = await service.getSettings(org.id);
+      await service.createOrUpdateSettings(org.id, product.id, settings);
+      const updatedSettings = await service.getSettings(org.id, product.id);
       expect(updatedSettings).toEqual(settings);
     });
     it('should update the settings if the org is premium', async () => {
@@ -71,8 +74,8 @@ describe('BipService', () => {
         isIssuesPagePublic: true,
         isFeatureRequestsPagePublic: true,
       };
-      await service.createOrUpdateSettings(org.id, settings);
-      const updatedSettings = await service.getSettings(org.id);
+      await service.createOrUpdateSettings(org.id, product.id, settings);
+      const updatedSettings = await service.getSettings(org.id, product.id);
       expect(updatedSettings).toEqual(settings);
     });
   });
@@ -80,14 +83,14 @@ describe('BipService', () => {
   describe('createSettings', () => {
     it('should create the default building in public settings on org created event', async () => {
       await service.createSettings(org);
-      const settings = await service.getSettings(org.id);
+      const settings = await service.getSettings(org.id, product.id);
       expect(settings).toEqual({
-        isBuildInPublicEnabled: true,
-        isObjectivesPagePublic: true,
-        isRoadmapPagePublic: true,
-        isIterationsPagePublic: true,
-        isActiveIterationsPagePublic: true,
-        isFeedPagePublic: true,
+        isBuildInPublicEnabled: false,
+        isObjectivesPagePublic: false,
+        isRoadmapPagePublic: false,
+        isIterationsPagePublic: false,
+        isActiveIterationsPagePublic: false,
+        isFeedPagePublic: false,
         isIssuesPagePublic: false,
         isFeatureRequestsPagePublic: false,
       });
@@ -96,16 +99,16 @@ describe('BipService', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       await service.createSettings(org);
-      const settings = await service.getSettings(org.id);
+      const settings = await service.getSettings(org.id, product.id);
       expect(settings).toEqual({
-        isBuildInPublicEnabled: true,
-        isObjectivesPagePublic: true,
-        isRoadmapPagePublic: true,
-        isIterationsPagePublic: true,
-        isActiveIterationsPagePublic: true,
-        isFeedPagePublic: true,
-        isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
+        isBuildInPublicEnabled: false,
+        isObjectivesPagePublic: false,
+        isRoadmapPagePublic: false,
+        isIterationsPagePublic: false,
+        isActiveIterationsPagePublic: false,
+        isFeedPagePublic: false,
+        isIssuesPagePublic: false,
+        isFeatureRequestsPagePublic: false,
       });
     });
     it('should not override existing settings', async () => {
@@ -116,12 +119,12 @@ describe('BipService', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
-        isIssuesPagePublic: false,
-        isFeatureRequestsPagePublic: false,
+        isIssuesPagePublic: true,
+        isFeatureRequestsPagePublic: true,
       };
-      await service.createOrUpdateSettings(org.id, settings);
+      await service.createOrUpdateSettings(org.id, product.id, settings);
       await service.createSettings(org);
-      const updatedSettings = await service.getSettings(org.id);
+      const updatedSettings = await service.getSettings(org.id, product.id);
       expect(updatedSettings).toEqual(settings);
     });
     it('should not throw an error if settings already exist', async () => {
@@ -135,7 +138,7 @@ describe('BipService', () => {
         isIssuesPagePublic: true,
         isFeatureRequestsPagePublic: true,
       };
-      await service.createOrUpdateSettings(org.id, settings);
+      await service.createOrUpdateSettings(org.id, product.id, settings);
       await expect(service.createSettings(org)).resolves.not.toThrow();
     });
     it('should not throw an error if org does not exist', async () => {

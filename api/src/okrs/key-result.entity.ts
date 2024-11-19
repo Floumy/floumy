@@ -12,6 +12,7 @@ import { Org } from '../orgs/org.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 import { OKRStatus } from './okrstatus.enum';
 import { KeyResultComment } from './key-result-comment.entity';
+import { Product } from '../products/product.entity';
 
 @Entity()
 export class KeyResult {
@@ -53,4 +54,6 @@ export class KeyResult {
     },
   )
   comments: Promise<KeyResultComment[]>;
+  @ManyToOne(() => Product, (product) => product.keyResults, { lazy: true })
+  product: Promise<Product>;
 }

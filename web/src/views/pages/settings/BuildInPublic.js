@@ -5,11 +5,12 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getBuildInPublicSettings, updateBuildInPublicSettings } from "../../../services/bip/build-in-public.service";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { clearCache } from "../../../services/cache/cache.service";
 import { useBuildInPublic } from "../../../contexts/BuidInPublicContext";
 
 function BuildInPublic() {
+  const { orgId, productId } = useParams();
   const [isLoadingBuildInPublicSettings, setIsLoadingBuildInPublicSettings] = useState(false);
   const [isBuildInPublicEnabled, setIsBuildInPublicEnabled] = useState(false);
 
@@ -22,15 +23,13 @@ function BuildInPublic() {
     return `${protocol}//${host}${path}`;
   }
 
-  const currentOrg = JSON.parse(localStorage.getItem("currentOrg"));
-
   const paymentPlan = localStorage.getItem("paymentPlan");
 
   useEffect(() => {
     async function fetchData() {
       setIsLoadingBuildInPublicSettings(true);
       try {
-        const buildInPublicSettings = await getBuildInPublicSettings();
+        const buildInPublicSettings = await getBuildInPublicSettings(orgId, productId);
         setBuildInPublicSettings({
           isObjectivesPagePublic: buildInPublicSettings.isObjectivesPagePublic,
           isRoadmapPagePublic: buildInPublicSettings.isRoadmapPagePublic,
@@ -38,7 +37,8 @@ function BuildInPublic() {
           isActiveIterationsPagePublic: buildInPublicSettings.isActiveIterationsPagePublic,
           isFeedPagePublic: buildInPublicSettings.isFeedPagePublic,
           isIssuesPagePublic: buildInPublicSettings.isIssuesPagePublic,
-          isFeatureRequestsPagePublic: buildInPublicSettings.isFeatureRequestsPagePublic
+          isFeatureRequestsPagePublic: buildInPublicSettings.isFeatureRequestsPagePublic,
+          isBuildInPublicEnabled: buildInPublicSettings.isBuildInPublicEnabled
         });
         setIsBuildInPublicEnabled(buildInPublicSettings.isBuildInPublicEnabled);
       } catch (error) {
@@ -62,12 +62,15 @@ function BuildInPublic() {
           ...buildInPublicSettings,
           [page]: e.target.checked
         };
-        setBuildInPublicSettings(newSettings);
-        await updateBuildInPublicSettings({
+        setBuildInPublicSettings({
           ...newSettings,
           isBuildInPublicEnabled: isBuildInPublicEnabledBasedOnSettings(newSettings)
         });
-        clearCache(`${currentOrg.id}-settings`);
+        await updateBuildInPublicSettings(orgId, productId, {
+          ...newSettings,
+          isBuildInPublicEnabled: isBuildInPublicEnabledBasedOnSettings(newSettings)
+        });
+        clearCache(`${orgId}-settings`);
       } catch (error) {
         toast.error("Failed to update settings");
       }
@@ -78,21 +81,21 @@ function BuildInPublic() {
     setIsBuildInPublicEnabled(isBuildInPublicEnabledBasedOnSettings(buildInPublicSettings));
 
     if (buildInPublicSettings.isFeedPagePublic) {
-      setPublicLink(createUrl(`/public/org/${currentOrg.id}/feed`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/feed`));
     } else if (buildInPublicSettings.isObjectivesPagePublic) {
-      setPublicLink(createUrl(`/public/org/${currentOrg.id}/objectives`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/okrs`));
     } else if (buildInPublicSettings.isRoadmapPagePublic) {
-      setPublicLink(createUrl(`/public/org/${currentOrg.id}/roadmap`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/roadmap`));
     } else if (buildInPublicSettings.isIterationsPagePublic) {
-      setPublicLink(createUrl(`/public/org/${currentOrg.id}/iterations`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/iterations`));
     } else if (buildInPublicSettings.isActiveIterationsPagePublic) {
-      setPublicLink(createUrl(`/public/org/${currentOrg.id}/active-iteration`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/active-iteration`));
     } else if (buildInPublicSettings.isIssuesPagePublic) {
-      setPublicLink(createUrl(`/public/org/${currentOrg.id}/issues`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/issues`));
     } else if (buildInPublicSettings.isFeatureRequestsPagePublic) {
-      setPublicLink(createUrl(`/public/org/${currentOrg.id}/feature-requests`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/feature-requests`));
     }
-  }, [buildInPublicSettings, currentOrg.id]);
+  }, [buildInPublicSettings, orgId]);
 
   async function toggleBuildInPublic() {
     try {
@@ -105,10 +108,16 @@ function BuildInPublic() {
         isIssuesPagePublic: !isBuildInPublicEnabled,
         isFeatureRequestsPagePublic: !isBuildInPublicEnabled
       };
-      await updateBuildInPublicSettings({ ...settings, isBuildInPublicEnabled: !isBuildInPublicEnabled });
+      await updateBuildInPublicSettings(orgId, productId, {
+        ...settings,
+        isBuildInPublicEnabled: !isBuildInPublicEnabled
+      });
       setIsBuildInPublicEnabled(!isBuildInPublicEnabled);
-      setBuildInPublicSettings(settings);
-      clearCache(`${currentOrg.id}-settings`);
+      setBuildInPublicSettings({
+        ...settings,
+        isBuildInPublicEnabled: !isBuildInPublicEnabled
+      });
+      clearCache(`${orgId}-settings`);
       toast.success("Settings updated successfully");
     } catch (e) {
       toast.error("Failed to update settings");

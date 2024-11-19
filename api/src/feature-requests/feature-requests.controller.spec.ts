@@ -14,12 +14,14 @@ import { FeatureRequestStatus } from './feature-request-status.enum';
 import { FeatureRequestVoteService } from './feature-request-votes.service';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { FeatureRequestComment } from './feature-request-comment.entity';
+import { Product } from '../products/product.entity';
 
 describe('FeatureRequestsController', () => {
   let controller: FeatureRequestsController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
+  let product: Product;
   let orgsRepository: Repository<Org>;
 
   beforeEach(async () => {
@@ -49,6 +51,7 @@ describe('FeatureRequestsController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
     org.paymentPlan = PaymentPlan.PREMIUM;
     await orgsRepository.save(org);
@@ -73,6 +76,7 @@ describe('FeatureRequestsController', () => {
           user: { sub: user.id },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
       expect(result.title).toBe(createFeatureRequestDto.title);
@@ -90,9 +94,10 @@ describe('FeatureRequestsController', () => {
           user: { sub: user.id },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
-      const result = await controller.listFeatureRequests(org.id);
+      const result = await controller.listFeatureRequests(org.id, product.id);
       expect(result.length).toBe(1);
       expect(result[0].title).toBe(createFeatureRequestDto.title);
       expect(result[0].description).toBe(createFeatureRequestDto.description);
@@ -109,16 +114,21 @@ describe('FeatureRequestsController', () => {
           user: { sub: user.id },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
-      const result = await controller.getFeatureRequestById(org.id, id);
+      const result = await controller.getFeatureRequestById(
+        org.id,
+        product.id,
+        id,
+      );
       expect(result.title).toBe(createFeatureRequestDto.title);
       expect(result.description).toBe(createFeatureRequestDto.description);
     });
   });
   it('should throw an error if the org does not exist', async () => {
     await expect(
-      controller.getFeatureRequestById(org.id, 'non-existent-id'),
+      controller.getFeatureRequestById(org.id, product.id, 'non-existent-id'),
     ).rejects.toThrow();
   });
   describe('when updating a feature request', () => {
@@ -132,6 +142,7 @@ describe('FeatureRequestsController', () => {
           user: { sub: user.id },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
       const updateFeatureRequestDto = {
@@ -145,6 +156,7 @@ describe('FeatureRequestsController', () => {
           user: { sub: user.id },
         },
         org.id,
+        product.id,
         id,
         updateFeatureRequestDto,
       );
@@ -163,6 +175,7 @@ describe('FeatureRequestsController', () => {
           user: { sub: user.id },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
       await controller.deleteFeatureRequest(
@@ -170,10 +183,11 @@ describe('FeatureRequestsController', () => {
           user: { sub: user.id },
         },
         org.id,
+        product.id,
         id,
       );
       await expect(
-        controller.getFeatureRequestById(org.id, id),
+        controller.getFeatureRequestById(org.id, product.id, id),
       ).rejects.toThrow();
     });
   });
@@ -190,6 +204,7 @@ describe('FeatureRequestsController', () => {
           },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
       await controller.upvoteFeatureRequest(
@@ -199,9 +214,14 @@ describe('FeatureRequestsController', () => {
           },
         },
         org.id,
+        product.id,
         id,
       );
-      const featureRequest = await controller.getFeatureRequestById(org.id, id);
+      const featureRequest = await controller.getFeatureRequestById(
+        org.id,
+        product.id,
+        id,
+      );
       expect(featureRequest.votesCount).toEqual(1);
     });
   });
@@ -218,6 +238,7 @@ describe('FeatureRequestsController', () => {
           },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
       await controller.downvoteFeatureRequest(
@@ -227,9 +248,14 @@ describe('FeatureRequestsController', () => {
           },
         },
         org.id,
+        product.id,
         id,
       );
-      const featureRequest = await controller.getFeatureRequestById(org.id, id);
+      const featureRequest = await controller.getFeatureRequestById(
+        org.id,
+        product.id,
+        id,
+      );
       expect(featureRequest.votesCount).toEqual(0);
     });
   });
@@ -246,6 +272,7 @@ describe('FeatureRequestsController', () => {
           },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
       const comment = await controller.addFeatureRequestComment(
@@ -254,6 +281,8 @@ describe('FeatureRequestsController', () => {
             sub: user.id,
           },
         },
+        org.id,
+        product.id,
         id,
         {
           content: 'Test Comment',
@@ -277,6 +306,7 @@ describe('FeatureRequestsController', () => {
           },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
       const comment = await controller.addFeatureRequestComment(
@@ -285,12 +315,15 @@ describe('FeatureRequestsController', () => {
             sub: user.id,
           },
         },
+        org.id,
+        product.id,
         id,
         {
           content: 'Test Comment',
         },
       );
       await controller.deleteFeatureRequestComment(
+        org.id,
         {
           user: {
             sub: user.id,
@@ -301,6 +334,7 @@ describe('FeatureRequestsController', () => {
       );
       const featureRequestDto = await controller.getFeatureRequestById(
         org.id,
+        product.id,
         id,
       );
       expect(featureRequestDto.comments).toBeDefined();
@@ -320,6 +354,7 @@ describe('FeatureRequestsController', () => {
           },
         },
         org.id,
+        product.id,
         createFeatureRequestDto,
       );
       const comment = await controller.addFeatureRequestComment(
@@ -328,6 +363,8 @@ describe('FeatureRequestsController', () => {
             sub: user.id,
           },
         },
+        org.id,
+        product.id,
         id,
         {
           content: 'Test Comment',
@@ -337,6 +374,8 @@ describe('FeatureRequestsController', () => {
         content: 'Updated Comment',
       };
       const updatedComment = await controller.updateFeatureRequestComment(
+        org.id,
+        product.id,
         {
           user: {
             sub: user.id,
@@ -359,6 +398,7 @@ describe('FeatureRequestsController', () => {
           },
         },
         org.id,
+        product.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
@@ -371,6 +411,7 @@ describe('FeatureRequestsController', () => {
           },
         },
         org.id,
+        product.id,
         {
           title: 'My Other Feature Request',
           description: 'My Other Feature Request Description',
@@ -379,6 +420,7 @@ describe('FeatureRequestsController', () => {
 
       const featureRequests = await controller.search(
         org.id,
+        product.id,
         'my feature request',
       );
       expect(featureRequests).toHaveLength(1);

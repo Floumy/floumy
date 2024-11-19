@@ -7,7 +7,7 @@ import {
   workItemStatusColorClassName,
   workItemTypeIcon
 } from "../../../services/utils/utils";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import Select2 from "react-select2-wrapper";
 import { Field, Form, Formik } from "formik";
@@ -36,6 +36,7 @@ function WorkItemsList({
   const [selectedWorkItems, setSelectedWorkItems] = useState([]);
   const [lastSelectedWorkItem, setLastSelectedWorkItem] = useState(null);
   const { show } = useContextMenu({ id });
+  const { orgId, productId } = useParams();
 
   function handleContextMenu(event, workItem) {
     if (!enableContextMenu) {
@@ -166,19 +167,20 @@ function WorkItemsList({
         >
           <td>
             <Link className={"edit-work-item"} color={"muted"}
-                  to={`/admin/work-item/edit/${workItem.id}`}>
+                  to={`/admin/orgs/${orgId}/products/${productId}/work-item/edit/${workItem.id}`}>
               {workItem.reference}
             </Link>
           </td>
           <td className={"title-cell"}>{workItemTypeIcon(workItem.type)}
             <Link className={"edit-work-item"} color={"muted"}
-                  to={`/admin/work-item/edit/${workItem.id}`}>
+                  to={`/admin/orgs/${orgId}/products/${productId}/work-item/edit/${workItem.id}`}>
               {workItem.title}
             </Link>
           </td>
           {showFeature && <td className="title-cell">
             {workItem.feature && (
-              <Link to={`/admin/roadmap/features/detail/${workItem.feature.id}`} className="text-gray">
+              <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/features/detail/${workItem.feature.id}`}
+                    className="text-gray">
                 {workItem.feature.title}
               </Link>)}
             {!workItem.feature && "-"}

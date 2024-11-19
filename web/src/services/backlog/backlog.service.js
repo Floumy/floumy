@@ -1,128 +1,128 @@
 import api from "../api/api.service";
 
-export async function addWorkItem(workItem) {
+export async function addWorkItem(orgId, productId, workItem) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/work-items`, workItem);
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items`, workItem);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listWorkItems(page = 1, limit = 50) {
+export async function listWorkItems(orgId, productId, page = 1, limit = 50) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/work-items?page=${page}&limit=${limit}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items?page=${page}&limit=${limit}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function searchWorkItems(searchText, page = 1, limit = 50) {
+export async function searchWorkItems(orgId, productId, searchText, page = 1, limit = 50) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/work-items/search?q=${searchText}&page=${page}&limit=${limit}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/search?q=${searchText}&page=${page}&limit=${limit}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listOpenWorkItems() {
+export async function listOpenWorkItems(orgId, productId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/work-items/open`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/open`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function getWorkItem(id) {
+export async function getWorkItem(orgId, productId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/work-items/${id}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${id}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function getPublicWorkItem(orgId, workItemId) {
+export async function getPublicWorkItem(orgId, productId, workItemId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/work-items/${workItemId}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/products/${productId}/work-items/${workItemId}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateWorkItem(id, workItem) {
+export async function updateWorkItem(orgId, productId, id, workItem) {
   try {
-    await api.put(`${process.env.REACT_APP_API_URL}/work-items/${id}`, workItem);
+    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${id}`, workItem);
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function deleteWorkItem(id) {
+export async function deleteWorkItem(orgId, productId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/work-items/${id}`);
+    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${id}`);
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateWorkItemIteration(id, iterationId) {
+export async function updateWorkItemIteration(orgId, productId, id, iterationId) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/work-items/${id}`, { iteration: iterationId });
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${id}`, { iteration: iterationId });
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateWorkItemStatus(id, status) {
+export async function updateWorkItemStatus(orgId, productId, id, status) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/work-items/${id}`, { status: status });
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${id}`, { status: status });
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateWorkItemPriority(id, priority) {
+export async function updateWorkItemPriority(orgId, productId, id, priority) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/work-items/${id}`, { priority: priority });
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${id}`, { priority: priority });
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function addComment(workItemId, comment) {
+export async function addComment(orgId, productId, workItemId, comment) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/work-items/${workItemId}/comments`, { content: comment });
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${workItemId}/comments`, { content: comment });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateComment(workItemId, commentId, comment) {
+export async function updateComment(orgId, productId, workItemId, commentId, comment) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/work-items/${workItemId}/comments/${commentId}`, { content: comment });
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${workItemId}/comments/${commentId}`, { content: comment });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function deleteComment(workItemId, commentId) {
+export async function deleteComment(orgId, productId, workItemId, commentId) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/work-items/${workItemId}/comments/${commentId}`);
+    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${workItemId}/comments/${commentId}`);
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listComments(workItemId) {
+export async function listComments(orgId, productId, workItemId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/work-items/${workItemId}/comments`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/work-items/${workItemId}/comments`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);

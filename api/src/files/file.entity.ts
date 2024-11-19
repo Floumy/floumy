@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
+import { Product } from '../products/product.entity';
 
 @Entity()
 export class File {
@@ -41,4 +42,7 @@ export class File {
 
   @OneToOne(() => WorkItemFile)
   workItemFiles: Promise<WorkItemFile>;
+
+  @ManyToOne(() => Product, (product) => product.files, { lazy: false })
+  product: Promise<Product>;
 }

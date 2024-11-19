@@ -25,6 +25,7 @@ import { FilesStorageRepository } from '../../../files/files-storage.repository'
 import { BipSettings } from '../../../bip/bip-settings.entity';
 import { WorkItemStatus } from '../work-item-status.enum';
 import { Priority } from '../../../common/priority.enum';
+import { Product } from '../../../products/product.entity';
 
 describe('PublicService', () => {
   let usersService: UsersService;
@@ -34,6 +35,7 @@ describe('PublicService', () => {
   let orgsRepository: Repository<Org>;
   let workItemsRepository: Repository<WorkItem>;
   let user: User;
+  let product: Product;
   let service: PublicService;
 
   let cleanup: () => Promise<void>;
@@ -54,6 +56,7 @@ describe('PublicService', () => {
           FeatureFile,
           WorkItemFile,
           BipSettings,
+          Product,
         ]),
       ],
       [
@@ -86,10 +89,11 @@ describe('PublicService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-
+    product = (await org.products)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
+    bipSettings.product = Promise.resolve(product);
     await bipSettingsRepository.save(bipSettings);
   });
 
@@ -105,9 +109,10 @@ describe('PublicService', () => {
       workItem.priority = Priority.HIGH;
       workItem.status = WorkItemStatus.CLOSED;
       workItem.org = Promise.resolve(org);
+      workItem.product = Promise.resolve(product);
       await workItemsRepository.save(workItem);
       await orgsRepository.save(org);
-      await service.getWorkItem(org.id, workItem.id);
+      await service.getWorkItem(org.id, product.id, workItem.id);
     });
     it('should throw not found exception', async () => {
       const workItem = new WorkItem();
@@ -116,9 +121,12 @@ describe('PublicService', () => {
       workItem.priority = Priority.HIGH;
       workItem.status = WorkItemStatus.CLOSED;
       workItem.org = Promise.resolve(org);
+      workItem.product = Promise.resolve(product);
       await workItemsRepository.save(workItem);
       await orgsRepository.save(org);
-      await expect(service.getWorkItem(org.id, 'invalid_id')).rejects.toThrow();
+      await expect(
+        service.getWorkItem(org.id, product.id, 'invalid_id'),
+      ).rejects.toThrow();
     });
   });
 });

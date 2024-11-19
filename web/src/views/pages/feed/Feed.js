@@ -5,7 +5,7 @@ import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { formatDateWithTime } from "../../../services/utils/utils";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   addTextFeedItem,
   getFeatureTitle,
@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import AutoResizeTextArea from "../../../components/AutoResizeTextArea/AutoResizeTextArea";
 
 export default function Feed({ listFeedItems, getLinkUrl, showPageExplanation = true, showPostFeedItem = true }) {
+  const { orgId, productId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
   const [page, setPage] = useState(1);
@@ -28,7 +29,7 @@ export default function Feed({ listFeedItems, getLinkUrl, showPageExplanation = 
 
   useEffect(() => {
     setIsLoading(true);
-    listFeedItems(page).then((response) => {
+    listFeedItems(orgId, productId, page).then((response) => {
       setFeedItems([...feedItems, ...response]);
       setIsLoading(false);
     }).catch((error) => {
@@ -42,7 +43,7 @@ export default function Feed({ listFeedItems, getLinkUrl, showPageExplanation = 
     setIsLoading(true);
     const nextPage = page + 1;
     setPage(nextPage);
-    listFeedItems(nextPage)
+    listFeedItems(orgId, productId, nextPage)
       .then((response) => {
         if (response.length === 0) {
           setHasMoreFeedItems(false);
@@ -120,7 +121,7 @@ export default function Feed({ listFeedItems, getLinkUrl, showPageExplanation = 
 
   async function postFeedItem(postText) {
     try {
-      const feedItem = await addTextFeedItem(postText);
+      const feedItem = await addTextFeedItem(orgId, productId, postText);
       setFeedItems([feedItem, ...feedItems]);
       setPostText("");
     } catch (e) {

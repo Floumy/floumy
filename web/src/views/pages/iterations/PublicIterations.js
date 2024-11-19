@@ -19,7 +19,7 @@ function PublicIterations() {
   const [iterations, setIterations] = useState([]);
   const [showWorkItems, setShowWorkItems] = useState({});
   const navigate = useNavigate();
-  const { orgId } = useParams();
+  const { orgId, productId } = useParams();
 
   useEffect(() => {
     document.title = "Floumy | Sprints";
@@ -27,7 +27,7 @@ function PublicIterations() {
     async function fetchIterations() {
       setIsLoadingIterations(true);
       try {
-        const iterations = await listPublicIterationsWithWorkItemsForTimeline(orgId, timelineFilterValue);
+        const iterations = await listPublicIterationsWithWorkItemsForTimeline(orgId, productId, timelineFilterValue);
         setIterations(iterations);
         // Show all work items by default
         const displayWorkItems = {};
@@ -44,7 +44,7 @@ function PublicIterations() {
 
     fetchIterations();
 
-  }, [orgId, timelineFilterValue]);
+  }, [orgId, productId, timelineFilterValue]);
 
   function estimationTotal(workItems) {
     let total = 0;
@@ -114,7 +114,8 @@ function PublicIterations() {
                             {!showWorkItems[iteration.id] && <i className="ni ni-bold-right" />}
                             {showWorkItems[iteration.id] && <i className="ni ni-bold-down" />}
                           </button>
-                          <Link to={`/public/org/${orgId}/iterations/detail/${iteration.id}`} className="mr-2">
+                          <Link to={`/public/orgs/${orgId}/products/${productId}/iterations/detail/${iteration.id}`}
+                                className="mr-2">
                             <span
                               className="text-muted">{formatDate(getIterationStartDate(iteration))} - {formatDate(getIterationEndDate(iteration))}</span> | {iteration.title}
                           </Link>

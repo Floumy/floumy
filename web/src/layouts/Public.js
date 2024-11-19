@@ -22,7 +22,7 @@ import { publicRoutes } from "routes.js";
 import useLayoutHandler from "./useLayoutHandler";
 import useNavigationHotKey from "./useNavigationHotKey";
 import PublicSidebar from "../components/Sidebar/PublicSidebar";
-import { getPublicBuildInPublicSettings } from "../services/bip/build-in-public.service";
+import { getBuildInPublicSettings } from "../services/bip/build-in-public.service";
 import { getPublicOrg } from "../services/org/orgs.service";
 import PublicNavbar from "../components/Navbars/PublicNavbar";
 import Footer from "../components/Footers/Footer";
@@ -30,7 +30,9 @@ import Footer from "../components/Footers/Footer";
 function PublicLayout() {
   const { mainContentRef, location, getRoutes } = useLayoutHandler("public");
   const [sidenavOpen, setSidenavOpen] = React.useState(true);
-  const orgId = window.location.pathname.split("/")[3];
+  const urlSegments = window.location.pathname.split("/");
+  const orgId = urlSegments[3];
+  const productId = urlSegments[5];
   const [org, setOrg] = React.useState();
 
   const [buildInPublicSettings, setBuildInPublicSettings] = React.useState({
@@ -51,8 +53,8 @@ function PublicLayout() {
     return replace;
   }
 
-  useNavigationHotKey("r", `/public/org/${orgId}/feature-requests/new`, isNavigationReplace(), org?.paymentPlan === "premium");
-  useNavigationHotKey("f", `/public/org/${orgId}/feature-requests`, false, org?.paymentPlan === "premium");
+  useNavigationHotKey("r", `/public/orgs/${orgId}/products/${productId}/feature-requests/new`, isNavigationReplace(), org?.paymentPlan === "premium");
+  useNavigationHotKey("f", `/public/orgs/${orgId}/products/${productId}/feature-requests`, false, org?.paymentPlan === "premium");
   useNavigationHotKey("left", -1);
   useNavigationHotKey("right", 1);
 
@@ -65,7 +67,7 @@ function PublicLayout() {
         console.error(e.message);
         window.location.href = "/auth/sign-in";
       });
-    getPublicBuildInPublicSettings(orgId)
+    getBuildInPublicSettings(orgId, productId)
       .then((buildInPublicSettings) => {
         if (buildInPublicSettings.isBuildInPublicEnabled) {
           setBuildInPublicSettings(buildInPublicSettings);
@@ -77,7 +79,7 @@ function PublicLayout() {
         console.error(e.message);
         window.location.href = "/auth/sign-in";
       });
-  }, [orgId]);
+  }, [orgId, productId]);
 
   useEffect(() => {
     if (window.innerWidth < 1200) {

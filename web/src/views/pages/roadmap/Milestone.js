@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import FeaturesList from "../features/FeaturesList";
 import { Col, Row } from "reactstrap";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { addFeature } from "../../../services/roadmap/roadmap.service";
 
 function Milestone({ milestone, onFeatureChangeMilestone }) {
+  const { orgId, productId } = useParams();
   const [features, setFeatures] = useState([]);
   const [showFeatures, setShowFeatures] = useState(true);
   useEffect(() => {
@@ -26,7 +27,7 @@ function Milestone({ milestone, onFeatureChangeMilestone }) {
           {!showFeatures && <i className="ni ni-bold-right" />}
           {showFeatures && <i className="ni ni-bold-down" />}
         </button>
-        <Link to={`/admin/roadmap/milestones/edit/${milestone.id}`}>
+        <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/milestones/edit/${milestone.id}`}>
           <span className="text-gray">{milestone.dueDate}</span> | {milestone.title} <span
           className="text-muted text-sm"></span>
         </Link>

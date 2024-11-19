@@ -34,6 +34,8 @@ function Admin() {
   const { location, mainContentRef, getRoutes } = useLayoutHandler("admin");
   const [sidenavOpen, setSidenavOpen] = useState(true);
   const currentOrg = JSON.parse(localStorage.getItem("currentOrg"));
+  const orgId = currentOrg ? currentOrg.id : "";
+  const productId = currentOrg ? currentOrg.products[0].id : "";
 
   function isNavigationReplace() {
     let replace = false;
@@ -43,20 +45,20 @@ function Admin() {
     return replace;
   }
 
-  useNavigationHotKey("1", "/admin/feed");
-  useNavigationHotKey("2", "/admin/okrs");
-  useNavigationHotKey("3", "/admin/roadmap");
-  useNavigationHotKey("4", "/admin/iterations");
-  useNavigationHotKey("5", "/admin/active-iteration");
-  useNavigationHotKey("6", "/admin/work-items");
-  useNavigationHotKey("7", "/admin/features");
-  useNavigationHotKey("w", "/admin/work-item/new", isNavigationReplace());
-  useNavigationHotKey("i", "/admin/roadmap/features/new", isNavigationReplace());
-  useNavigationHotKey("m", "/admin/roadmap/milestones/new", isNavigationReplace());
-  useNavigationHotKey("s", "/admin/iterations/new", isNavigationReplace());
-  useNavigationHotKey("o", "/admin/okrs/new", isNavigationReplace());
-  useNavigationHotKey("r", `/admin/org/${currentOrg.id}/feature-requests/new`, isNavigationReplace(), currentOrg?.paymentPlan === "premium");
-  useNavigationHotKey("n", `/admin/org/${currentOrg.id}/issues/new`, false, currentOrg?.paymentPlan === "premium");
+  useNavigationHotKey("1", `/admin/orgs/${orgId}/products/${productId}/feed`);
+  useNavigationHotKey("2", `/admin/orgs/${orgId}/products/${productId}/okrs`);
+  useNavigationHotKey("3", `/admin/orgs/${orgId}/products/${productId}/roadmap`);
+  useNavigationHotKey("4", `/admin/orgs/${orgId}/products/${productId}/iterations`);
+  useNavigationHotKey("5", `/admin/orgs/${orgId}/products/${productId}/active-iteration`);
+  useNavigationHotKey("6", `/admin/orgs/${orgId}/products/${productId}/work-items`);
+  useNavigationHotKey("7", `/admin/orgs/${orgId}/products/${productId}/features`);
+  useNavigationHotKey("w", `/admin/orgs/${orgId}/products/${productId}/work-item/new`, isNavigationReplace());
+  useNavigationHotKey("i", `/admin/orgs/${orgId}/products/${productId}/roadmap/features/new`, isNavigationReplace());
+  useNavigationHotKey("m", `/admin/orgs/${orgId}/products/${productId}/roadmap/milestones/new`, isNavigationReplace());
+  useNavigationHotKey("s", `/admin/orgs/${orgId}/products/${productId}/iterations/new`, isNavigationReplace());
+  useNavigationHotKey("o", `/admin/orgs/${orgId}/products/${productId}/okrs/new`, isNavigationReplace());
+  useNavigationHotKey("r", `/admin/orgs/${orgId}/products/${productId}/feature-requests/new`, isNavigationReplace(), currentOrg?.paymentPlan === "premium");
+  useNavigationHotKey("n", `/admin/orgs/${orgId}/products/${productId}/issues/new`, false, currentOrg?.paymentPlan === "premium");
 
   useNavigationHotKey("left", -1);
   useNavigationHotKey("right", 1);
@@ -142,7 +144,7 @@ function Admin() {
 
   return (
     <>
-      <BuildInPublicProvider>
+      <BuildInPublicProvider orgId={orgId} productId={productId}>
         <Sidebar
           routes={routes}
           toggleSidenav={toggleSidenav}

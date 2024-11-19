@@ -27,6 +27,7 @@ import { BipSettings } from '../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
 import { Timeline } from '../../common/timeline.enum';
 import { PublicService } from './public.service';
+import { Product } from '../../products/product.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
@@ -36,6 +37,7 @@ describe('PublicController', () => {
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
+  let product: Product;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -52,6 +54,7 @@ describe('PublicController', () => {
           WorkItemFile,
           FeatureFile,
           BipSettings,
+          Product,
         ]),
         UsersModule,
       ],
@@ -83,9 +86,11 @@ describe('PublicController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
+    bipSettings.product = Promise.resolve(product);
     await bipSettingsRepository.save(bipSettings);
   });
 
@@ -99,13 +104,14 @@ describe('PublicController', () => {
 
   describe('When getting iterations for timeline', () => {
     it('should return a list of iterations', async () => {
-      await iterationsService.create(org.id, {
+      await iterationsService.create(org.id, product.id, {
         goal: 'Test Goal',
         startDate: new Date().toString(),
         duration: 1,
       });
       const result = await controller.listIterationsForTimeline(
         org.id,
+        product.id,
         Timeline.THIS_QUARTER,
       );
       expect(result.length).toBe(1);
@@ -114,12 +120,16 @@ describe('PublicController', () => {
 
   describe('When getting an iteration by id', () => {
     it('should return an iteration', async () => {
-      const iteration = await iterationsService.create(org.id, {
+      const iteration = await iterationsService.create(org.id, product.id, {
         goal: 'Test Goal',
         startDate: new Date().toString(),
         duration: 1,
       });
-      const result = await controller.getIterationById(org.id, iteration.id);
+      const result = await controller.getIterationById(
+        org.id,
+        product.id,
+        iteration.id,
+      );
       expect(result).toBeDefined();
     });
   });
@@ -127,14 +137,19 @@ describe('PublicController', () => {
   describe('When getting the active iteration', () => {
     it('should return an iteration', async () => {
       const orgWithActiveIteration = await orgsService.createForUser(user);
+      const productWithActiveIteration = (
+        await orgWithActiveIteration.products
+      )[0];
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveIterationsPagePublic = true;
       bipSettings.org = Promise.resolve(orgWithActiveIteration);
+      bipSettings.product = Promise.resolve(productWithActiveIteration);
       await bipSettingsRepository.save(bipSettings);
 
       const iteration = await iterationsService.create(
         orgWithActiveIteration.id,
+        productWithActiveIteration.id,
         {
           goal: 'Test Goal',
           startDate: new Date().toString(),
@@ -143,10 +158,12 @@ describe('PublicController', () => {
       );
       await iterationsService.startIteration(
         orgWithActiveIteration.id,
+        productWithActiveIteration.id,
         iteration.id,
       );
       const result = await controller.getActiveIteration(
         orgWithActiveIteration.id,
+        productWithActiveIteration.id,
       );
       expect(result).toBeDefined();
     });

@@ -9,12 +9,14 @@ import { TokensService } from '../auth/tokens.service';
 import { UsersService } from '../users/users.service';
 import { BipService } from './bip.service';
 import { BipSettings } from './bip-settings.entity';
+import { Product } from '../products/product.entity';
 
 describe('BipController', () => {
   let controller: BipController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
+  let product: Product;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -32,6 +34,7 @@ describe('BipController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
   });
 
   afterEach(async () => {
@@ -41,6 +44,8 @@ describe('BipController', () => {
   describe('when updating BIP settings', () => {
     it('should update BIP settings', async () => {
       const updatedSettings = await controller.createOrUpdateSettings(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -64,8 +69,8 @@ describe('BipController', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
-        isIssuesPagePublic: false,
-        isFeatureRequestsPagePublic: false,
+        isIssuesPagePublic: true,
+        isFeatureRequestsPagePublic: true,
       });
     });
   });
@@ -73,6 +78,8 @@ describe('BipController', () => {
   describe('when getting BIP settings', () => {
     it('should return BIP settings', async () => {
       await controller.createOrUpdateSettings(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -89,11 +96,7 @@ describe('BipController', () => {
           isFeatureRequestsPagePublic: true,
         },
       );
-      const settings = await controller.getSettings({
-        user: {
-          org: org.id,
-        },
-      });
+      const settings = await controller.getSettings(org.id, product.id);
       expect(settings).toEqual({
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
@@ -101,8 +104,8 @@ describe('BipController', () => {
         isIterationsPagePublic: true,
         isActiveIterationsPagePublic: true,
         isFeedPagePublic: true,
-        isIssuesPagePublic: false,
-        isFeatureRequestsPagePublic: false,
+        isIssuesPagePublic: true,
+        isFeatureRequestsPagePublic: true,
       });
     });
   });

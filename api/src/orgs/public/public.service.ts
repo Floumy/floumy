@@ -14,6 +14,6 @@ export class PublicService {
     if (bipSettings?.isBuildInPublicEnabled !== true) {
       throw new Error('Org is not public');
     }
-    return PublicMapper.toPublicOrg(org);
+    return await PublicMapper.toPublicOrg(org);
   }
 }

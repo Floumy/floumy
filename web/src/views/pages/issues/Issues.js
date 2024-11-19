@@ -24,11 +24,11 @@ import { toast } from "react-toastify";
 import IssueStats from "./IssueStats";
 
 export default function Issues({ isPublic = false }) {
+  const { orgId, productId } = useParams();
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const navigate = useNavigate();
   const context = window.location.pathname.includes("public") ? "public" : "admin";
-  const { orgId } = useParams();
   const [issues, setIssues] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -51,9 +51,9 @@ export default function Issues({ isPublic = false }) {
     try {
       let newIssues;
       if (searchTerm) {
-        newIssues = await searchIssues(orgId, searchTerm, pageNum, 50);
+        newIssues = await searchIssues(orgId, productId, searchTerm, pageNum, 50);
       } else {
-        newIssues = await listIssues(orgId, pageNum, 50);
+        newIssues = await listIssues(orgId, productId, pageNum, 50);
       }
       setIssues(prevIssues => isInitial ? newIssues : [...prevIssues, ...newIssues]);
       setHasMore(newIssues.length > 0);
@@ -97,11 +97,11 @@ export default function Issues({ isPublic = false }) {
 
   function navigateToDetailPage(issue) {
     if (isPublic) {
-      navigate(`/${context}/org/${orgId}/issues/${issue.id}`);
+      navigate(`/${context}/orgs/${orgId}/products/${productId}/issues/${issue.id}`);
       return;
     }
 
-    navigate(`/${context}/org/${orgId}/issues/edit/${issue.id}`);
+    navigate(`/${context}/orgs/${orgId}/products/${productId}/issues/edit/${issue.id}`);
   }
 
   return (
@@ -114,7 +114,7 @@ export default function Issues({ isPublic = false }) {
             shortcut: "n",
             id: "new-issue",
             action: () => {
-              navigate(`/${context}/org/${orgId}/issues/new`);
+              navigate(`/${context}/orgs/${orgId}/products/${productId}/issues/new`);
             }
           }
         ]}

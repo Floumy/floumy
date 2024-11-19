@@ -9,19 +9,18 @@ import { UsersModule } from '../users/users.module';
 import { OrgsModule } from '../orgs/orgs.module';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
-import { PublicController } from './public/public.controller';
-import { PublicService } from './public/public.service';
+import { Product } from '../products/product.entity';
 
 @Module({
   imports: [
     CacheModule.register(),
-    TypeOrmModule.forFeature([BipSettings, Org, User]),
+    TypeOrmModule.forFeature([BipSettings, Org, User, Product]),
     AuthModule,
     UsersModule,
     OrgsModule,
   ],
-  providers: [BipService, PublicService],
-  controllers: [BipController, PublicController],
+  providers: [BipService],
+  controllers: [BipController],
   exports: [BipService],
 })
 export class BipModule {}

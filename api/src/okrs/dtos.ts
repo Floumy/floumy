@@ -70,6 +70,9 @@ export interface OrgDto {
 export interface KeyResultDto {
   features: FeatureDto[];
   org: OrgDto;
+  product: {
+    id: string;
+  };
   objective: {
     id: string;
     reference: string;
@@ -91,6 +94,9 @@ export interface OKRDto {
     org: {
       id: string;
       name: string;
+    };
+    product: {
+      id: string;
     };
     reference: string;
     title: string;
