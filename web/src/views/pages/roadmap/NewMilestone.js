@@ -3,10 +3,13 @@ import { addMilestone } from "../../../services/roadmap/roadmap.service";
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import React from "react";
 import { Col, Container, Row } from "reactstrap";
+import { useParams } from "react-router-dom";
 
 function NewMilestone() {
+  const { orgId, productId } = useParams();
+
   const handleSubmit = async (milestone) => {
-    await addMilestone(milestone);
+    await addMilestone(orgId, productId, milestone);
   };
 
   return (

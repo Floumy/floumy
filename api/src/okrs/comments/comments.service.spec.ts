@@ -13,6 +13,7 @@ import { OrgsService } from '../../orgs/orgs.service';
 import { PaymentPlan } from '../../auth/payment.plan';
 import { OKRStatus } from '../okrstatus.enum';
 import { CommentsService } from './comments.service';
+import { Product } from '../../products/product.entity';
 
 describe('CommentsService', () => {
   let okrsService: OkrsService;
@@ -21,6 +22,7 @@ describe('CommentsService', () => {
   let service: CommentsService;
   let user: User;
   let org: Org;
+  let product: Product;
 
   let cleanup: () => Promise<void>;
 
@@ -34,6 +36,7 @@ describe('CommentsService', () => {
           Feature,
           User,
           KeyResultComment,
+          Product,
         ]),
       ],
       [OkrsService, UsersService, OrgsService, CommentsService],
@@ -51,6 +54,7 @@ describe('CommentsService', () => {
     );
     org = await orgsService.createForUser(user);
     org.paymentPlan = PaymentPlan.PREMIUM;
+    product = (await org.products)[0];
     await orgsRepository.save(org);
   });
 
@@ -64,7 +68,7 @@ describe('CommentsService', () => {
 
   describe('when adding a comment to a key result', () => {
     it('should add a comment to the key result', async () => {
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const keyResult = await okrsService.createKeyResult(
@@ -77,6 +81,8 @@ describe('CommentsService', () => {
         },
       );
       const comment = await service.addCommentToKeyResult(
+        org.id,
+        product.id,
         keyResult.id,
         user.id,
         'Test Comment',
@@ -86,7 +92,7 @@ describe('CommentsService', () => {
       expect(comment.content).toEqual('Test Comment');
     });
     it('should throw an error if the comment content is empty', async () => {
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const keyResult = await okrsService.createKeyResult(
@@ -99,7 +105,13 @@ describe('CommentsService', () => {
         },
       );
       await expect(
-        service.addCommentToKeyResult(keyResult.id, user.id, ''),
+        service.addCommentToKeyResult(
+          org.id,
+          product.id,
+          keyResult.id,
+          user.id,
+          '',
+        ),
       ).rejects.toThrowError('Comment content is required');
     });
   });
@@ -108,7 +120,7 @@ describe('CommentsService', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
 
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const keyResult = await okrsService.createKeyResult(
@@ -121,11 +133,15 @@ describe('CommentsService', () => {
         },
       );
       const comment = await service.addCommentToKeyResult(
+        org.id,
+        product.id,
         keyResult.id,
         user.id,
         'Test Comment',
       );
       const updatedComment = await service.updateKeyResultComment(
+        org.id,
+        product.id,
         user.id,
         comment.id,
         'Updated Comment',
@@ -136,7 +152,7 @@ describe('CommentsService', () => {
       expect(updatedComment.createdBy.id).toEqual(user.id);
     });
     it('should validate that the user is the creator of the comment', async () => {
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const keyResult = await okrsService.createKeyResult(
@@ -149,6 +165,8 @@ describe('CommentsService', () => {
         },
       );
       const comment = await service.addCommentToKeyResult(
+        org.id,
+        product.id,
         keyResult.id,
         user.id,
         'Test Comment',
@@ -162,6 +180,8 @@ describe('CommentsService', () => {
 
       await expect(
         service.updateKeyResultComment(
+          org.id,
+          product.id,
           otherUser.id,
           comment.id,
           'Updated Comment',
@@ -169,7 +189,7 @@ describe('CommentsService', () => {
       ).rejects.toThrow();
     });
     it('should throw an error if the comment content is empty', async () => {
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const keyResult = await okrsService.createKeyResult(
@@ -182,13 +202,21 @@ describe('CommentsService', () => {
         },
       );
       const comment = await service.addCommentToKeyResult(
+        org.id,
+        product.id,
         keyResult.id,
         user.id,
         'Test Comment',
       );
 
       await expect(
-        service.updateKeyResultComment(user.id, comment.id, ''),
+        service.updateKeyResultComment(
+          org.id,
+          product.id,
+          user.id,
+          comment.id,
+          '',
+        ),
       ).rejects.toThrowError('Comment content is required');
     });
   });
@@ -197,7 +225,7 @@ describe('CommentsService', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
 
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const keyResult = await okrsService.createKeyResult(
@@ -210,17 +238,30 @@ describe('CommentsService', () => {
         },
       );
       const comment = await service.addCommentToKeyResult(
+        org.id,
+        product.id,
         keyResult.id,
         user.id,
         'Test Comment',
       );
-      await service.deleteKeyResultComment(user.id, comment.id);
+      await service.deleteKeyResultComment(
+        org.id,
+        product.id,
+        user.id,
+        comment.id,
+      );
       await expect(
-        service.updateKeyResultComment(user.id, comment.id, 'update'),
+        service.updateKeyResultComment(
+          org.id,
+          product.id,
+          user.id,
+          comment.id,
+          'update',
+        ),
       ).rejects.toThrow();
     });
     it('should validate that the user is the creator of the comment', async () => {
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const keyResult = await okrsService.createKeyResult(
@@ -233,6 +274,8 @@ describe('CommentsService', () => {
         },
       );
       const comment = await service.addCommentToKeyResult(
+        org.id,
+        product.id,
         keyResult.id,
         user.id,
         'Test Comment',
@@ -245,16 +288,23 @@ describe('CommentsService', () => {
       );
 
       await expect(
-        service.deleteKeyResultComment(otherUser.id, comment.id),
+        service.deleteKeyResultComment(
+          org.id,
+          product.id,
+          otherUser.id,
+          comment.id,
+        ),
       ).rejects.toThrow();
     });
   });
   describe('when adding a comment to an objective', () => {
     it('should add a comment to the objective', async () => {
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const comment = await service.addCommentToObjective(
+        org.id,
+        product.id,
         objective.id,
         user.id,
         'Test Comment',
@@ -269,15 +319,19 @@ describe('CommentsService', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
 
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const comment = await service.addCommentToObjective(
+        org.id,
+        product.id,
         objective.id,
         user.id,
         'Test Comment',
       );
       const updatedComment = await service.updateObjectiveComment(
+        org.id,
+        product.id,
         user.id,
         comment.id,
         'Updated Comment',
@@ -288,16 +342,24 @@ describe('CommentsService', () => {
       expect(updatedComment.createdBy.id).toEqual(user.id);
     });
     it('should validate that the comment content is not empty', async () => {
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const comment = await service.addCommentToObjective(
+        org.id,
+        product.id,
         objective.id,
         user.id,
         'Test Comment',
       );
       await expect(
-        service.updateObjectiveComment(user.id, comment.id, ''),
+        service.updateObjectiveComment(
+          org.id,
+          product.id,
+          user.id,
+          comment.id,
+          '',
+        ),
       ).rejects.toThrowError('Comment content is required');
     });
   });
@@ -306,17 +368,30 @@ describe('CommentsService', () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
 
-      const objective = await okrsService.createObjective(org.id, {
+      const objective = await okrsService.createObjective(org.id, product.id, {
         title: 'Test Objective',
       });
       const comment = await service.addCommentToObjective(
+        org.id,
+        product.id,
         objective.id,
         user.id,
         'Test Comment',
       );
-      await service.deleteObjectiveComment(user.id, comment.id);
+      await service.deleteObjectiveComment(
+        org.id,
+        product.id,
+        user.id,
+        comment.id,
+      );
       await expect(
-        service.updateObjectiveComment(user.id, comment.id, 'update'),
+        service.updateObjectiveComment(
+          org.id,
+          product.id,
+          user.id,
+          comment.id,
+          'update',
+        ),
       ).rejects.toThrow();
     });
   });

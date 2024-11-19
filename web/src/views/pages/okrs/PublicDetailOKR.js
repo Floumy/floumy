@@ -42,14 +42,14 @@ import PublicShareButtons from "../../../components/PublicShareButtons/PublicSha
 import Comments from "../../../components/Comments/Comments";
 
 function PublicDetailOKR() {
-  const { orgId, okrId } = useParams();
+  const { orgId, productId, okrId } = useParams();
   const [okr, setOKR] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function fetchAndSetOKR() {
       try {
-        const okr = await getPublicOKR(orgId, okrId);
+        const okr = await getPublicOKR(orgId, productId, okrId);
         setOKR(okr);
       } catch (e) {
         toast.error("The OKR could not be loaded");
@@ -67,7 +67,7 @@ function PublicDetailOKR() {
 
   const handleAddComment = async (content) => {
     try {
-      const addedComment = await addObjectiveComment(okr.objective.id, content);
+      const addedComment = await addObjectiveComment(orgId, productId, okr.objective.id, content);
       okr.objective.comments.push(addedComment);
       setOKR({ ...okr });
       toast.success("The comment has been added");
@@ -78,7 +78,7 @@ function PublicDetailOKR() {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await deleteObjectiveComment(okr.objective.id, commentId);
+      await deleteObjectiveComment(orgId, productId, okr.objective.id, commentId);
       okr.objective.comments = okr.objective.comments.filter(comment => comment.id !== commentId);
       setOKR({ ...okr });
       toast.success("The comment has been deleted");
@@ -89,7 +89,7 @@ function PublicDetailOKR() {
 
   const handleUpdateComment = async (commentId, content) => {
     try {
-      const updatedComment = await updateObjectiveComment(okr.objective.id, commentId, content);
+      const updatedComment = await updateObjectiveComment(orgId, productId, okr.objective.id, commentId, content);
       okr.objective.comments = okr.objective.comments.map(comment => {
         if (comment.id === commentId) {
           return updatedComment;
@@ -225,14 +225,16 @@ function PublicDetailOKR() {
                         {okr && okr.keyResults && okr.keyResults.map((keyResult) => (
                           <tr key={keyResult.id}>
                             <td>
-                              <Link to={`/public/org/${orgId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
-                                    className={"okr-detail"}>
+                              <Link
+                                to={`/public/orgs/${orgId}/products/${productId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
+                                className={"okr-detail"}>
                                 {keyResult.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
-                              <Link to={`/public/org/${orgId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
-                                    className={"okr-detail"}>
+                              <Link
+                                to={`/public/orgs/${orgId}/products/${productId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
+                                className={"okr-detail"}>
                                 {keyResult.title}
                               </Link>
                             </td>

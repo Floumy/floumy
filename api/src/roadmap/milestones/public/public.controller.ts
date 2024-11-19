@@ -10,7 +10,7 @@ import { Timeline } from '../../../common/timeline.enum';
 import { Public } from '../../../auth/public.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-@Controller('orgs/:orgId/milestones')
+@Controller('public/orgs/:orgId/products/:productId/milestones')
 @Public()
 @UseInterceptors(CacheInterceptor)
 export class PublicController {
@@ -19,10 +19,15 @@ export class PublicController {
   @Get('/timeline/:timeline')
   async listMilestones(
     @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('timeline') timeline: Timeline,
   ) {
     try {
-      return await this.publicMilestonesService.listMilestones(orgId, timeline);
+      return await this.publicMilestonesService.listMilestones(
+        orgId,
+        productId,
+        timeline,
+      );
     } catch (e) {
       throw new NotFoundException();
     }
@@ -31,11 +36,13 @@ export class PublicController {
   @Get('/:milestoneId')
   async findMilestone(
     @Param('orgId') orgId: string,
+    @Param('productId') productId: string,
     @Param('milestoneId') milestoneId: string,
   ) {
     try {
       return await this.publicMilestonesService.findMilestone(
         orgId,
+        productId,
         milestoneId,
       );
     } catch (e) {

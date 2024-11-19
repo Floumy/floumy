@@ -88,13 +88,12 @@ describe('OrgsController', () => {
   });
 
   describe('when patching the org', () => {
-    it('should return the patched org', async () => {
-      await controller.patchOrg(
+    it('should return the org', async () => {
+      const result = await controller.patchOrg(
         { user: { org: org.id } },
         { name: 'New Name' },
       );
-
-      const result = await controller.getOrg({ user: { org: org.id } });
+      expect(result.id).toBe(org.id);
       expect(result.name).toBe('New Name');
     });
   });

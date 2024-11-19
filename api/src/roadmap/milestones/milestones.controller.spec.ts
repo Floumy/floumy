@@ -15,11 +15,13 @@ import { Timeline } from '../../common/timeline.enum';
 import { Feature } from '../features/feature.entity';
 import { BacklogModule } from '../../backlog/backlog.module';
 import { FilesModule } from '../../files/files.module';
+import { Product } from '../../products/product.entity';
 
 describe('MilestonesController', () => {
   let controller: MilestonesController;
   let cleanup: () => Promise<void>;
   let org: Org;
+  let product: Product;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -48,6 +50,7 @@ describe('MilestonesController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
+    product = (await org.products)[0];
   });
 
   afterEach(async () => {
@@ -61,6 +64,8 @@ describe('MilestonesController', () => {
   describe('when creating a milestone', () => {
     it('should return the milestone', async () => {
       const okrResponse = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -82,6 +87,8 @@ describe('MilestonesController', () => {
   describe('when listing milestones', () => {
     it('should return the milestones', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -93,7 +100,7 @@ describe('MilestonesController', () => {
           dueDate: '2020-01-01',
         },
       );
-      const milestones = await controller.list({
+      const milestones = await controller.list(org.id, product.id, {
         user: {
           org: org.id,
         },
@@ -108,6 +115,8 @@ describe('MilestonesController', () => {
   describe('when listing milestones with features', () => {
     it('should return the milestones', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -119,11 +128,15 @@ describe('MilestonesController', () => {
           dueDate: '2020-01-01',
         },
       );
-      const milestones = await controller.listMilestonesWithFeatures({
-        user: {
-          org: org.id,
+      const milestones = await controller.listMilestonesWithFeatures(
+        org.id,
+        product.id,
+        {
+          user: {
+            org: org.id,
+          },
         },
-      });
+      );
       expect(milestones.length).toEqual(1);
       expect(milestones[0].id).toBeDefined();
       expect(milestones[0].title).toEqual('my milestone');
@@ -133,6 +146,8 @@ describe('MilestonesController', () => {
   describe('when getting a milestone', () => {
     it('should return the milestone', async () => {
       const milestone = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -145,6 +160,8 @@ describe('MilestonesController', () => {
         },
       );
       const milestoneResponse = await controller.get(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -162,6 +179,8 @@ describe('MilestonesController', () => {
   describe('when updating a milestone', () => {
     it('should return the milestone', async () => {
       const milestone = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -174,6 +193,8 @@ describe('MilestonesController', () => {
         },
       );
       const milestoneResponse = await controller.update(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -196,6 +217,8 @@ describe('MilestonesController', () => {
   describe('when deleting a milestone', () => {
     it('deletes the milestone', async () => {
       const milestone = await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -208,6 +231,8 @@ describe('MilestonesController', () => {
         },
       );
       const milestoneResponse = await controller.delete(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -222,6 +247,8 @@ describe('MilestonesController', () => {
   describe('when listing milestones for a timeline', () => {
     it('should return the milestones', async () => {
       await controller.create(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,
@@ -234,6 +261,8 @@ describe('MilestonesController', () => {
         },
       );
       const milestones = await controller.listForTimeline(
+        org.id,
+        product.id,
         {
           user: {
             org: org.id,

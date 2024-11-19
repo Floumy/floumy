@@ -41,7 +41,7 @@ import InputError from "../../../components/Errors/InputError";
 import { setCurrentUser } from "../../../services/users/users.service";
 import { signIn } from "../../../services/auth/auth.service";
 import { getInputGroupErrorClass } from "./form-input-utils";
-import { setCurrentOrg } from "../../../services/org/orgs.service";
+import { getOrg, setCurrentOrg } from "../../../services/org/orgs.service";
 import { logoutUser } from "../../../services/api/api.service";
 
 function SignIn() {
@@ -51,7 +51,7 @@ function SignIn() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  let redirectTo = "/admin/dashboard";
+  let redirectTo;
   if (searchParams.has("redirectTo")) {
     redirectTo = decodeURI(searchParams.get("redirectTo"));
   }
@@ -67,11 +67,51 @@ function SignIn() {
   });
 
   useEffect(() => {
-    // If the user is already logged in, redirect to the dashboard
-    if (localStorage.getItem("currentUser") && localStorage.getItem("currentUserOrgId")) {
-      navigate("/admin/dashboard");
-    }
+    const redirectIfLoggedIn = async () => {
+      // If the user is already logged in, redirect to the dashboard
+      const currentOrgId = localStorage.getItem("currentUserOrgId");
+      const currentProductId = localStorage.getItem("currentProductId");
+      if (localStorage.getItem("currentUser") && currentOrgId && currentProductId) {
+        navigate(`/admin/orgs/${currentOrgId}/products/${currentProductId}/dashboard`);
+      }
+    };
+
+    redirectIfLoggedIn();
   });
+
+  const onLogin = async (values, { setSubmitting }) => {
+    try {
+      setError(null);
+      setSubmitting(true);
+
+      await signIn(values.email, values.password);
+      await setCurrentUser();
+      // TODO: Remove this when we have a proper way to handle it
+      await setCurrentOrg();
+      const currentOrg = await getOrg();
+
+      if (currentOrg.id) {
+
+        setSubmitting(false);
+
+        if (redirectTo) {
+          navigate(redirectTo);
+          return;
+        }
+
+        navigate(`/admin/orgs/${currentOrg.id}/products/${currentOrg.products[0].id}/dashboard`);
+        return;
+      }
+
+      // TODO: Remove this when we have a proper way to handle it
+      logoutUser();
+      setError("You are not a member of any organization.");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -90,33 +130,7 @@ function SignIn() {
                 <Formik
                   initialValues={{ email: "", password: "" }}
                   validationSchema={validationSchema}
-                  onSubmit={async (values, { setSubmitting }) => {
-                    try {
-                      setError(null);
-                      setSubmitting(true);
-
-                      await signIn(values.email, values.password);
-                      await setCurrentUser();
-                      const orgId = localStorage.getItem("currentUserOrgId");
-
-                      if (orgId) {
-                        await setCurrentOrg();
-
-                        setSubmitting(false);
-
-                        navigate(redirectTo);
-                        return;
-                      }
-
-                      // TODO: Remove this when we have a proper way to handle it
-                      logoutUser();
-                      setError("You are not a member of any organization.");
-                    } catch (e) {
-                      setError(e.message);
-                    } finally {
-                      setSubmitting(false);
-                    }
-                  }}
+                  onSubmit={onLogin}
                 >
                   {({ isSubmitting, errors, touched }) => (
                     <Form>

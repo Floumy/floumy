@@ -6,10 +6,10 @@ import { addFeatureRequest } from "../../../services/feature-requests/feature-re
 import { useParams } from "react-router-dom";
 
 export default function NewFeatureRequest() {
-  const { orgId } = useParams();
+  const { orgId, productId } = useParams();
 
   const handleSubmit = async (featureRequest) => {
-    await addFeatureRequest(orgId, featureRequest);
+    await addFeatureRequest(orgId, productId, featureRequest);
   };
 
   return (<>

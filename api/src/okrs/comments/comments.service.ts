@@ -24,12 +24,16 @@ export class CommentsService {
   ) {}
 
   async addCommentToKeyResult(
+    orgId: string,
+    productId: string,
     keyResultId: string,
     userId: string,
     content: string,
   ) {
     const keyResult = await this.keyResultRepository.findOneByOrFail({
       id: keyResultId,
+      org: { id: orgId },
+      product: { id: productId },
     });
 
     const org = await keyResult.org;
@@ -52,6 +56,8 @@ export class CommentsService {
   }
 
   async updateKeyResultComment(
+    orgId: string,
+    productId: string,
     userId: string,
     commentId: string,
     content: string,
@@ -59,6 +65,10 @@ export class CommentsService {
     const comment = await this.keyResultCommentRepository.findOneByOrFail({
       id: commentId,
       createdBy: { id: userId },
+      keyResult: {
+        org: { id: orgId },
+        product: { id: productId },
+      },
     });
 
     if (!content || content.trim() === '') {
@@ -72,22 +82,35 @@ export class CommentsService {
     return CommentMapper.toDto(comment);
   }
 
-  async deleteKeyResultComment(userId: string, commentInd: string) {
+  async deleteKeyResultComment(
+    orgId: string,
+    productId: string,
+    userId: string,
+    commentInd: string,
+  ) {
     const comment = await this.keyResultCommentRepository.findOneByOrFail({
       id: commentInd,
       createdBy: { id: userId },
+      keyResult: {
+        org: { id: orgId },
+        product: { id: productId },
+      },
     });
 
     await this.keyResultCommentRepository.remove(comment);
   }
 
   async addCommentToObjective(
+    orgId: string,
+    productId: string,
     objectiveId: string,
     userId: string,
     content: string,
   ) {
     const objective = await this.objectiveRepository.findOneByOrFail({
       id: objectiveId,
+      org: { id: orgId },
+      product: { id: productId },
     });
 
     const org = await objective.org;
@@ -110,6 +133,8 @@ export class CommentsService {
   }
 
   async updateObjectiveComment(
+    orgId: string,
+    productId: string,
     userId: string,
     commentId: string,
     content: string,
@@ -117,6 +142,10 @@ export class CommentsService {
     const comment = await this.objectiveCommentRepository.findOneByOrFail({
       id: commentId,
       createdBy: { id: userId },
+      objective: {
+        org: { id: orgId },
+        product: { id: productId },
+      },
     });
 
     if (!content || content.trim() === '') {
@@ -130,10 +159,19 @@ export class CommentsService {
     return CommentMapper.toDto(comment);
   }
 
-  async deleteObjectiveComment(userId: string, commentId: string) {
+  async deleteObjectiveComment(
+    orgId: string,
+    productId: string,
+    userId: string,
+    commentId: string,
+  ) {
     const comment = await this.objectiveCommentRepository.findOneByOrFail({
       id: commentId,
       createdBy: { id: userId },
+      objective: {
+        org: { id: orgId },
+        product: { id: productId },
+      },
     });
 
     await this.objectiveCommentRepository.remove(comment);

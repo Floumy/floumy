@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getBuildInPublicSettings } from "../services/bip/build-in-public.service";
 
-const BuildInPublicContext = createContext();
+const BuildInPublicContext = createContext({});
 
-export const BuildInPublicProvider = ({ children }) => {
+export const BuildInPublicProvider = ({ children, orgId, productId }) => {
+
   const [settings, setSettings] = useState({
     isObjectivesPagePublic: false,
     isRoadmapPagePublic: false,
@@ -18,14 +19,14 @@ export const BuildInPublicProvider = ({ children }) => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const fetchedSettings = await getBuildInPublicSettings();
+        const fetchedSettings = await getBuildInPublicSettings(orgId, productId);
         setSettings(fetchedSettings);
       } catch (error) {
         console.error("Failed to fetch build in public settings", error);
       }
     };
     fetchSettings();
-  }, []);
+  }, [orgId, productId]);
 
   const value = useMemo(() => ({ settings, setSettings }), [settings]);
 

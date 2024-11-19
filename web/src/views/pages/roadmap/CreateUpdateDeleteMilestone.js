@@ -7,11 +7,12 @@ import ReactDatetime from "react-datetime";
 import { addFeature, deleteMilestone } from "../../../services/roadmap/roadmap.service";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import DeleteWarning from "../components/DeleteWarning";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import FeaturesListCard from "../features/FeaturesListCard";
 
 function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: "", description: "", dueDate: "" } }) {
+  const { orgId, productId } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dueDate, setDueDate] = useState(milestone?.dueDate);
   const [isDueDateInvalid, setIsDueDateInvalid] = useState(false);
@@ -64,7 +65,7 @@ function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: ""
 
   const onDelete = async (id) => {
     try {
-      await deleteMilestone(id);
+      await deleteMilestone(orgId, productId, id);
       navigate(-1);
       setTimeout(() => toast.success("The milestone has been deleted"), 100);
     } catch (e) {
@@ -90,6 +91,15 @@ function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: ""
     }
 
     setFeatures(newFeatures);
+  }
+
+  function onAddFeature() {
+    return async (feature) => {
+      feature.milestone = milestone.id;
+      const savedFeature = await addFeature(orgId, productId, feature);
+      features.push(savedFeature);
+      setFeatures([...features]);
+    };
   }
 
   return (
@@ -224,12 +234,7 @@ function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: ""
         title="Initiatives"
         features={features}
         showAssignedTo={true}
-        onAddFeature={async (feature) => {
-          feature.milestone = milestone.id;
-          const savedFeature = await addFeature(feature);
-          features.push(savedFeature);
-          setFeatures([...features]);
-        }}
+        onAddFeature={onAddFeature()}
         onChangeMilestone={updateFeaturesMilestone}
       />}
     </>

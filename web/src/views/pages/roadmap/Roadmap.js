@@ -1,7 +1,7 @@
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import { Card, CardHeader, CardTitle, Col, Container, Row } from "reactstrap";
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Milestone from "./Milestone";
 import "./Roadmap.scss";
 import Select2 from "react-select2-wrapper";
@@ -17,6 +17,7 @@ import { sortByPriority } from "../../../services/utils/utils";
 import FeaturesListCard from "../features/FeaturesListCard";
 
 function Roadmap() {
+  const { orgId, productId } = useParams();
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get("timeline");
@@ -36,7 +37,7 @@ function Roadmap() {
     async function fetchFeatures() {
       setIsLoadingFeatures(true);
       try {
-        const features = await listFeaturesWithoutMilestone();
+        const features = await listFeaturesWithoutMilestone(orgId, productId);
         const sortedFeatures = sortByPriority(features);
         setFeatures(sortedFeatures);
       } catch (e) {
@@ -54,7 +55,7 @@ function Roadmap() {
     async function fetchMilestones() {
       setIsLoadingMilestones(true);
       try {
-        const milestones = await listMilestonesWithFeatures(timelineFilterValue);
+        const milestones = await listMilestonesWithFeatures(orgId, productId, timelineFilterValue);
         setMilestones(milestones);
       } catch (e) {
         console.error(e.message);
@@ -64,7 +65,7 @@ function Roadmap() {
     }
 
     fetchMilestones();
-  }, [timelineFilterValue]);
+  }, [orgId, productId, timelineFilterValue]);
 
   function updateFeaturesMilestone(updatedFeatures, newMilestoneId) {
     const previousMilestone = milestones.find(milestone => milestone.features.find(feature => feature.id === updatedFeatures[0].id));
@@ -120,6 +121,14 @@ function Roadmap() {
     setFeatures([...sortByPriority(updatedFeaturesList)]);
   }
 
+  function onAddFeature() {
+    return async (feature) => {
+      const savedFeature = await addFeature(orgId, productId, feature);
+      features.push(savedFeature);
+      setFeatures([...features]);
+    };
+  }
+
   return (
     <>
       {isLoadingMilestones && <InfiniteLoadingBar />}
@@ -129,7 +138,7 @@ function Roadmap() {
           shortcut: "m",
           id: "new-milestone",
           action: () => {
-            navigate("/admin/roadmap/milestones/new");
+            navigate(`/admin/orgs/${orgId}/products/${productId}/roadmap/milestones/new`);
           }
         },
         {
@@ -137,7 +146,7 @@ function Roadmap() {
           shortcut: "i",
           id: "new-feature",
           action: () => {
-            navigate("/admin/roadmap/features/new");
+            navigate(`/admin/orgs/${orgId}/products/${productId}/roadmap/features/new`);
           }
         }
       ]} />
@@ -186,7 +195,8 @@ function Roadmap() {
                       track major progress and ensure you're meeting key deadlines. Set milestones to celebrate your
                       accomplishments and keep your project on schedule.
                       <br />
-                      <Link to="/admin/roadmap/milestones/new" className="text-blue font-weight-bold">Set a
+                      <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/milestones/new`}
+                            className="text-blue font-weight-bold">Set a
                         Milestone</Link>
                     </p>
                     <h3>Initiatives</h3>
@@ -195,7 +205,8 @@ function Roadmap() {
                       towards a common objective. Define initiatives to prioritize efforts, allocate resources
                       effectively, and ensure your team is working towards the same strategic vision.
                       <br />
-                      <Link to="/admin/roadmap/features/new" className="text-blue font-weight-bold">Add an
+                      <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/features/new`}
+                            className="text-blue font-weight-bold">Add an
                         Initiative</Link>
                     </p>
                   </div>
@@ -209,11 +220,7 @@ function Roadmap() {
             <FeaturesListCard title="Initiatives Backlog"
                               features={features}
                               isLoading={isLoadingFeatures}
-                              onAddFeature={async (feature) => {
-                                const savedFeature = await addFeature(feature);
-                                features.push(savedFeature);
-                                setFeatures([...features]);
-                              }}
+                              onAddFeature={onAddFeature()}
                               onChangeMilestone={updateBacklogFeaturesMilestone}
                               onChangeStatus={updateBacklogFeaturesStatus} />
           </Col>

@@ -6,17 +6,20 @@ import { Spinner } from "reactstrap";
 import { deleteFile, downloadFile, uploadFile } from "../../../services/files/uploads.service";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
+import { useParams } from "react-router-dom";
 
 export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
+  const { orgId, productId } = useParams();
+
   const [files, setFiles] = useState(initialFiles.map(file => ({
     name: file.name,
     uploading: false,
-    uploadedFile: file,
+    uploadedFile: file
   })));
 
   const uploadFileSafely = async (file) => {
     try {
-      const uploadedFile = await uploadFile(file);
+      const uploadedFile = await uploadFile(orgId, productId, file);
       setFiles(prevFiles => prevFiles.map(f => f.name === file.name ? { ...f, uploading: false, uploadedFile } : f));
     } catch (e) {
       toast.error("An error occurred while uploading the file");
@@ -51,7 +54,7 @@ export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
   };
 
   const handleLargeFile = (file) => {
-    toast.error('There are files that are too large to be uploaded (50MB max)');
+    toast.error("There are files that are too large to be uploaded (50MB max)");
     setTimeout(() => {
       setFiles(prevFiles => prevFiles.filter(f => f.name !== file.name));
     }, 3000); // Delete the error message after 3 seconds
@@ -59,10 +62,10 @@ export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
 
   const removeFile = async fileId => {
     try {
-      await deleteFile(fileId);
+      await deleteFile(orgId, productId, fileId);
       setFiles(prevFiles => prevFiles.filter(file => file.uploadedFile.id !== fileId));
     } catch (e) {
-      toast.error('An error occurred while deleting the file');
+      toast.error("An error occurred while deleting the file");
     }
   };
 
@@ -74,18 +77,18 @@ export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
     onDrop,
     maxFiles: 5,
     onDropRejected: () => {
-      toast.error('You can only upload 5 files at a time');
-    },
+      toast.error("You can only upload 5 files at a time");
+    }
   });
 
   function formatFilename(filename) {
-    if (!filename) return '';
+    if (!filename) return "";
     if (filename.length <= 20) return filename;
-    return trimText(filename, 10) + '' + filename.substring(filename.lastIndexOf('.'));
+    return trimText(filename, 10) + "" + filename.substring(filename.lastIndexOf("."));
   }
 
   async function downloadUploadedFile(file) {
-    if (file.uploadedFile) await downloadFile(file.uploadedFile.id);
+    if (file.uploadedFile) await downloadFile(orgId, productId, file.uploadedFile.id);
   }
 
   return (
@@ -108,7 +111,7 @@ export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
                           onClick={async (e) => {
                             e.stopPropagation();
                             await removeFile(file.uploadedFile.id);
-                          }} type={'button'}>
+                          }} type={"button"}>
                     <i className="fas fa-trash" />
                   </button>}
                 <span className="filename">{formatFilename(file.name)}</span>
@@ -123,7 +126,7 @@ export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
 
 FloumyDropZone.propTypes = {
   onFilesChanged: PropTypes.func.isRequired,
-  initialFiles: PropTypes.array,
+  initialFiles: PropTypes.array
 };
 
 export default FloumyDropZone;

@@ -1,10 +1,12 @@
 import { useCallback } from "react";
 import { addFeatureComment, deleteFeatureComment, updateFeatureComment } from "../services/roadmap/roadmap.service";
+import { useParams } from "react-router-dom";
 
 function useFeatureComments(feature, setFeature, toast) {
+  const { orgId, productId } = useParams();
   const addComment = useCallback(async (comment) => {
     try {
-      const addedComment = await addFeatureComment(feature.id, comment);
+      const addedComment = await addFeatureComment(orgId, productId, feature.id, comment);
       setFeature((prevFeature) => ({
         ...prevFeature,
         comments: [...prevFeature.comments, addedComment]
@@ -13,11 +15,11 @@ function useFeatureComments(feature, setFeature, toast) {
     } catch (e) {
       toast.error("Failed to add comment");
     }
-  }, [feature?.id, setFeature, toast]);
+  }, [orgId, productId, feature?.id, setFeature, toast]);
 
   const updateComment = useCallback(async (commentId, content) => {
     try {
-      const updatedComment = await updateFeatureComment(feature.id, commentId, content);
+      const updatedComment = await updateFeatureComment(orgId, productId, feature.id, commentId, content);
       setFeature((prevFeature) => {
         const index = prevFeature.comments.findIndex((c) => c.id === updatedComment.id);
         const newComments = [...prevFeature.comments];
@@ -28,11 +30,11 @@ function useFeatureComments(feature, setFeature, toast) {
     } catch (e) {
       toast.error("Failed to update comment");
     }
-  }, [feature?.id, setFeature, toast]);
+  }, [orgId, productId, feature?.id, setFeature, toast]);
 
   const deleteComment = useCallback(async (commentId) => {
     try {
-      await deleteFeatureComment(feature.id, commentId);
+      await deleteFeatureComment(orgId, productId, feature.id, commentId);
       setFeature((prevFeature) => ({
         ...prevFeature,
         comments: prevFeature.comments.filter((c) => c.id !== commentId)
@@ -41,7 +43,7 @@ function useFeatureComments(feature, setFeature, toast) {
     } catch (e) {
       toast.error("Failed to delete comment");
     }
-  }, [feature?.id, setFeature, toast]);
+  }, [orgId, productId, feature?.id, setFeature, toast]);
 
   return { addComment, updateComment, deleteComment };
 }

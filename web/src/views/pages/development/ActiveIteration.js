@@ -3,7 +3,7 @@ import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import { Badge, Button, Card, CardBody, CardHeader, Col, Container, Row } from "reactstrap";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   formatDate,
   formatHyphenatedString,
@@ -17,6 +17,7 @@ import WorkItemsList from "../backlog/WorkItemsList";
 import { getWorkItemsGroupedByStatus } from "../../../services/utils/workItemUtils";
 
 function ActiveIteration() {
+  const { orgId, productId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [activeIteration, setActiveIteration] = useState(null);
@@ -33,7 +34,7 @@ function ActiveIteration() {
     async function fetchData() {
       try {
         setIsLoading(true);
-        const activeIteration = await getActiveIteration();
+        const activeIteration = await getActiveIteration(orgId, productId);
         setActiveIteration(activeIteration);
         if (activeIteration && activeIteration.workItems.length > 0) {
           setWorkItemsGroupedByStatus(activeIteration.workItems);
@@ -47,7 +48,7 @@ function ActiveIteration() {
     }
 
     fetchData();
-  }, [setWorkItemsGroupedByStatus]);
+  }, [orgId, productId, setWorkItemsGroupedByStatus]);
 
   function removeWorkItemsFromActiveIteration(workItems) {
     const newWorkItems = [];
@@ -103,7 +104,7 @@ function ActiveIteration() {
           shortcut: "w",
           id: "new-work-item",
           action: () => {
-            navigate("/admin/work-item/new");
+            navigate(`/admin/orgs/${orgId}/products/${productId}/work-item/new`);
           }
         }
       ]} />
@@ -129,7 +130,8 @@ function ActiveIteration() {
                       you focused on immediate priorities and ensure steady progress. Review your active sprint
                       regularly to stay on track and adjust as needed for optimal performance.
                       <br />
-                      <Link to={"/admin/iterations"} className="text-blue font-weight-bold">Manage the Active
+                      <Link to={`/admin/orgs/${orgId}/products/${productId}/iterations`}
+                            className="text-blue font-weight-bold">Manage the Active
                         Sprint</Link>
                     </p>
                   </div>
@@ -161,8 +163,9 @@ function ActiveIteration() {
                 <div className="pt-3">
                   {Object.keys(workItemsByStatus).length === 0 && !isLoading && (
                     <div className="text-center m-3">
-                      <h3 className="">No work items found in this sprint. Add them <Link to={"/admin/iterations"}
-                                                                                          className="text-blue">here</Link>
+                      <h3 className="">No work items found in this sprint. Add them <Link
+                        to={`/admin/orgs/${orgId}/products/${productId}/iterations`}
+                        className="text-blue">here</Link>
                       </h3>
                     </div>
                   )}

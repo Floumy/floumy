@@ -15,7 +15,7 @@ function PublicRoadmap() {
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get("timeline");
   const navigate = useNavigate();
-  const { orgId } = useParams();
+  const { orgId, productId } = useParams();
   const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || "this-quarter");
   const [milestones, setMilestones] = useState([]);
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
@@ -24,7 +24,7 @@ function PublicRoadmap() {
     async function fetchMilestones() {
       setIsLoadingMilestones(true);
       try {
-        const milestones = await listPublicMilestonesWithFeatures(orgId, timelineFilterValue);
+        const milestones = await listPublicMilestonesWithFeatures(orgId, productId, timelineFilterValue);
         setMilestones(milestones.sort((a, b) => {
           return new Date(a.dueDate) - new Date(b.dueDate);
         }));
@@ -36,7 +36,7 @@ function PublicRoadmap() {
     }
 
     fetchMilestones();
-  }, [orgId, timelineFilterValue]);
+  }, [orgId, productId, timelineFilterValue]);
 
   return (
     <>

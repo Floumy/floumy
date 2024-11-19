@@ -27,9 +27,12 @@ import ShortcutIcon from "../Shortcuts/ShortcutIcon";
 import { useBuildInPublic } from "../../contexts/BuidInPublicContext";
 
 function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
+  const { settings: buildInPublicSettings } = useBuildInPublic();
+  const isBuildInPublicEnabled = buildInPublicSettings.isBuildInPublicEnabled;
   const location = useLocation();
   const currentOrg = JSON.parse(localStorage.getItem("currentOrg"));
   const orgName = currentOrg ? currentOrg.name : "";
+  const productId = currentOrg ? currentOrg.products[0].id : "";
   const orgId = currentOrg ? currentOrg.id : "";
   const paymentPlan = localStorage.getItem("paymentPlan");
   const { settings: bipSettings } = useBuildInPublic();
@@ -114,10 +117,12 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
             {orgName && <h5 className="navbar-product-name text-light text-xl pb-3 text-break">
               {orgName}
             </h5>}
-            <a href={`/public/org/${orgId}/feed`} target="_blank"
-               className="nav-link text-green text-lg p-0 pb-4 no-visited no-active" rel="noreferrer">
-              <span className="nav-link-text">Build In Public<i className="fa fa-external-link px-2" /> </span>
-            </a>
+            {isBuildInPublicEnabled &&
+              <a href={`/public/orgs/${orgId}/products/${productId}/feed`} target="_blank"
+                 className="nav-link text-green text-lg p-0 pb-4 no-visited no-active" rel="noreferrer">
+                <span className="nav-link-text">Build In Public<i className="fa fa-external-link px-2" /> </span>
+              </a>
+            }
             {paymentPlan === "premium" && <div className="mb-3">
               <h6 className="navbar-heading p-0 text-muted">
                 <span className="docs-normal" style={{ whiteSpace: "nowrap" }}>Feedback</span>
@@ -127,7 +132,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                   <Row style={{ maxWidth: "100%", height: "47px" }}>
                     <Col xs={7}>
                       <NavLink
-                        to={`/admin/org/${orgId}/issues`}
+                        to={`/admin/orgs/${orgId}/products/${productId}/issues`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
@@ -156,7 +161,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                   <Row style={{ maxWidth: "100%", height: "47px" }}>
                     <Col xs={7}>
                       <NavLink
-                        to={`/admin/org/${orgId}/feature-requests`}
+                        to={`/admin/orgs/${orgId}/products/${productId}/feature-requests`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
@@ -192,7 +197,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                 <Row style={{ maxWidth: "100%", height: "47px" }}>
                   <Col xs={7}>
                     <NavLink
-                      to={"/admin/feed"}
+                      to={`/admin/orgs/${orgId}/products/${productId}/feed`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -223,7 +228,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                 <Row style={{ maxWidth: "100%", height: "47px" }}>
                   <Col xs={7}>
                     <NavLink
-                      to={"/admin/okrs"}
+                      to={`/admin/orgs/${orgId}/products/${productId}/okrs`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -254,7 +259,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                 <Row style={{ maxWidth: "100%", height: "47px" }}>
                   <Col xs={7}>
                     <NavLink
-                      to={"/admin/roadmap"}
+                      to={`/admin/orgs/${orgId}/products/${productId}/roadmap`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -285,7 +290,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                 <Row style={{ maxWidth: "100%", height: "47px" }}>
                   <Col xs={7}>
                     <NavLink
-                      to={"/admin/iterations"}
+                      to={`/admin/orgs/${orgId}/products/${productId}/iterations`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -316,7 +321,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                 <Row style={{ maxWidth: "100%", height: "47px" }}>
                   <Col xs={7}>
                     <NavLink
-                      to={"/admin/active-iteration"}
+                      to={`/admin/orgs/${orgId}/products/${productId}/active-iteration`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -347,7 +352,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                 <Row style={{ maxWidth: "100%" }}>
                   <Col xs={10}>
                     <NavLink
-                      to={"/admin/work-items"}
+                      to={`/admin/orgs/${orgId}/products/${productId}/work-items`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -365,7 +370,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                 <Row style={{ maxWidth: "100%" }}>
                   <Col xs={10}>
                     <NavLink
-                      to={"/admin/features"}
+                      to={`/admin/orgs/${orgId}/products/${productId}/features`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -389,7 +394,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
             <Nav className="mb-md-3" navbar>
               <NavItem>
                 <NavLink
-                  to={"/admin/build-in-public"}
+                  to={`/admin/orgs/${orgId}/products/${productId}/build-in-public`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >
@@ -399,7 +404,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
               </NavItem>
               <NavItem>
                 <NavLink
-                  to={"/admin/members"}
+                  to={`/admin/orgs/${orgId}/members`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >
@@ -409,7 +414,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
               </NavItem>
               <NavItem>
                 <NavLink
-                  to={"/admin/product"}
+                  to={`/admin/orgs/${orgId}/products/${productId}/product`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >

@@ -28,6 +28,7 @@ import { IssuesModule } from './issues/issues.module';
 import stripeConfig from './config/stripe.config';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { APP_FILTER } from '@nestjs/core';
     FeedModule,
     FeatureRequestsModule,
     IssuesModule,
+    ProductsModule,
   ],
   providers: [
     {
