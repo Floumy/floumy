@@ -108,7 +108,7 @@ describe('AuthController', () => {
         name: 'John Doe',
         email: 'test@example.com',
         password: 'testtesttest',
-        productName: 'Test Product',
+        projectName: 'Test Project',
       };
       await controller.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail(signUpDto.email);
@@ -126,7 +126,7 @@ describe('AuthController', () => {
         name: 'John Doe',
         email: 'john.doe@example.com',
         password: 'testtesttest',
-        productName: 'Test Product',
+        projectName: 'Test Project',
       };
       await controller.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail(signUpDto.email);
@@ -142,7 +142,7 @@ describe('AuthController', () => {
         name: 'John Doe',
         email: 'john.doe@example.com',
         password: 'testtesttest',
-        productName: 'Test Product',
+        projectName: 'Test Project',
       };
       await controller.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail(signUpDto.email);

@@ -12,7 +12,7 @@ export class OKRMapper {
   ): Promise<OKRDto> {
     const assignedTo = await objective.assignedTo;
     const org = await objective.org;
-    const product = await objective.product;
+    const project = await objective.project;
     return {
       objective: {
         id: objective.id,
@@ -20,8 +20,8 @@ export class OKRMapper {
           id: org.id,
           name: org.name,
         },
-        product: {
-          id: product.id,
+        project: {
+          id: project.id,
         },
         reference: `O-${objective.sequenceNumber}`,
         title: objective.title,
@@ -126,7 +126,7 @@ export class KeyResultMapper {
     const objective = await keyResult.objective;
     const features = await keyResult.features;
     const org = await keyResult.org;
-    const product = await keyResult.product;
+    const project = await keyResult.project;
 
     return {
       id: keyResult.id,
@@ -141,8 +141,8 @@ export class KeyResultMapper {
         id: org.id,
         name: org.name,
       },
-      product: {
-        id: product.id,
+      project: {
+        id: project.id,
       },
       progress: keyResult.progress
         ? parseFloat(keyResult.progress?.toFixed(2))

@@ -10,7 +10,7 @@ import { PublicService } from './public.service';
 import { Public } from '../../auth/public.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-@Controller('public/orgs/:orgId/products/:productId/okrs')
+@Controller('public/orgs/:orgId/projects/:projectId/okrs')
 @Public()
 @UseInterceptors(CacheInterceptor)
 export class PublicController {
@@ -19,13 +19,13 @@ export class PublicController {
   @Get('/timeline/:timeline')
   async listObjectives(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('timeline') timeline: Timeline,
   ) {
     try {
       return await this.publicOkrsService.listObjectives(
         orgId,
-        productId,
+        projectId,
         timeline,
       );
     } catch (e) {
@@ -36,11 +36,11 @@ export class PublicController {
   @Get('/:okrId')
   async getObjective(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('okrId') okrId: string,
   ) {
     try {
-      return await this.publicOkrsService.getObjective(orgId, productId, okrId);
+      return await this.publicOkrsService.getObjective(orgId, projectId, okrId);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -49,14 +49,14 @@ export class PublicController {
   @Get('/:okrId/key-results/:keyResultId')
   async getKeyResult(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('okrId') objectiveId: string,
     @Param('keyResultId') keyResultId: string,
   ) {
     try {
       return await this.publicOkrsService.getKeyResult(
         orgId,
-        productId,
+        projectId,
         objectiveId,
         keyResultId,
       );

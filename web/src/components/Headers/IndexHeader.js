@@ -53,7 +53,7 @@ function IndexHeader() {
                     <Button
                       className="my-2"
                       color="default"
-                      href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adpr-auth-navbar"
+                      href="https://www.creative-tim.com/project/argon-dashboard-pro-react?ref=adpr-auth-navbar"
                     >
                       Purchase now
                     </Button>

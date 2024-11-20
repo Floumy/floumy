@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BipSettingsMapper } from './bip.dtos.mapper';
 import { Org } from '../orgs/org.entity';
 import { OnEvent } from '@nestjs/event-emitter';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Injectable()
 export class BipService {
@@ -15,33 +15,33 @@ export class BipService {
     private readonly bipSettingsRepository: Repository<BipSettings>,
     @InjectRepository(Org)
     private readonly orgRepository: Repository<Org>,
-    @InjectRepository(Product)
-    private readonly productsRepository: Repository<Product>,
+    @InjectRepository(Project)
+    private readonly projectsRepository: Repository<Project>,
   ) {}
 
   async createOrUpdateSettings(
     orgId: string,
-    productId: string,
+    projectId: string,
     settings: BipSettingsDto,
   ) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
 
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
 
     return await this.createOrUpdateBuildInPublicSettings(
       org,
-      product,
+      project,
       settings,
     );
   }
 
-  async getSettings(orgId: string, productId: string) {
+  async getSettings(orgId: string, projectId: string) {
     const bipSettings = await this.bipSettingsRepository.findOneBy({
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     return BipSettingsMapper.toDto(bipSettings);
   }
@@ -59,27 +59,27 @@ export class BipService {
 
     const bipSettings = new BipSettings();
     bipSettings.org = Promise.resolve(org);
-    const product = (await org.products)[0];
-    // TODO: This is a temporary solution to set the product
-    bipSettings.product = Promise.resolve(product);
+    const project = (await org.projects)[0];
+    // TODO: This is a temporary solution to set the project
+    bipSettings.project = Promise.resolve(project);
     await this.bipSettingsRepository.save(bipSettings);
   }
 
   async createOrUpdateBuildInPublicSettings(
     org: Org,
-    product: Product,
+    project: Project,
     settings: BipSettingsDto,
   ) {
     let bipSettings = await this.bipSettingsRepository.findOneBy({
       org: { id: org.id },
-      product: { id: product.id },
+      project: { id: project.id },
     });
 
     if (!bipSettings) {
       bipSettings = new BipSettings();
     }
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     bipSettings.isBuildInPublicEnabled = settings.isBuildInPublicEnabled;
     bipSettings.isObjectivesPagePublic = settings.isObjectivesPagePublic;
     bipSettings.isRoadmapPagePublic = settings.isRoadmapPagePublic;

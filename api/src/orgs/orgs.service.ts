@@ -6,13 +6,13 @@ import { Org } from './org.entity';
 import { OrgsMapper } from './orgs.mapper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PaymentPlan } from '../auth/payment.plan';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Injectable()
 export class OrgsService {
   constructor(
     @InjectRepository(Org) private orgRepository: Repository<Org>,
-    @InjectRepository(Product) private productRepository: Repository<Product>,
+    @InjectRepository(Project) private projectRepository: Repository<Project>,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -27,11 +27,11 @@ export class OrgsService {
     org.users = Promise.resolve([user]);
     const savedOrg = await this.orgRepository.save(org);
 
-    const product = new Product();
-    product.name = 'Default Product';
-    product.org = Promise.resolve(savedOrg);
-    product.users = Promise.resolve([user]);
-    await this.productRepository.save(product);
+    const project = new Project();
+    project.name = 'Default Project';
+    project.org = Promise.resolve(savedOrg);
+    project.users = Promise.resolve([user]);
+    await this.projectRepository.save(project);
 
     this.eventEmitter.emit('org.created', savedOrg);
     return savedOrg;
@@ -65,9 +65,9 @@ export class OrgsService {
   async patchOrg(orgId: string, name: string) {
     const org = await this.findOneById(orgId);
     org.name = name;
-    const product = new Product();
-    product.name = name;
-    await this.productRepository.save(product);
+    const project = new Project();
+    project.name = name;
+    await this.projectRepository.save(project);
     await this.orgRepository.save(org);
     return org;
   }
@@ -78,10 +78,10 @@ export class OrgsService {
     org.isSubscribed = false;
     org.nextPaymentDate = null;
     const savedOrg = await this.orgRepository.save(org);
-    const product = new Product();
-    product.name = 'Default Product';
-    product.org = Promise.resolve(savedOrg);
-    await this.productRepository.save(product);
+    const project = new Project();
+    project.name = 'Default Project';
+    project.org = Promise.resolve(savedOrg);
+    await this.projectRepository.save(project);
     this.eventEmitter.emit('org.created', savedOrg);
     return savedOrg;
   }

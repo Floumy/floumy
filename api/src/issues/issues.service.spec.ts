@@ -11,7 +11,7 @@ import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
 import { IssueStatus } from './issue-status.enum';
 import { Priority } from '../common/priority.enum';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 
 describe('IssuesService', () => {
@@ -19,11 +19,11 @@ describe('IssuesService', () => {
   let orgsService: OrgsService;
   let service: IssuesService;
   let orgsRepository: Repository<Org>;
-  let productsRepository: Repository<Product>;
+  let projectsRepository: Repository<Project>;
   let workItemsRepository: Repository<WorkItem>;
   let issuesRepository: Repository<Issue>;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let user: User;
 
   let cleanup: () => Promise<void>;
@@ -38,8 +38,8 @@ describe('IssuesService', () => {
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
-    productsRepository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
+    projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
     );
     workItemsRepository = module.get<Repository<WorkItem>>(
       getRepositoryToken(WorkItem),
@@ -53,10 +53,10 @@ describe('IssuesService', () => {
     org = await orgsService.createForUser(user);
     org.paymentPlan = PaymentPlan.PREMIUM;
     await orgsRepository.save(org);
-    product = new Product();
-    product.name = 'Test Product';
-    product.org = Promise.resolve(org);
-    await productsRepository.save(product);
+    project = new Project();
+    project.name = 'Test Project';
+    project.org = Promise.resolve(org);
+    await projectsRepository.save(project);
   });
 
   afterEach(async () => {
@@ -69,7 +69,7 @@ describe('IssuesService', () => {
 
   describe('when adding a new issue', () => {
     it('should create a new issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -89,7 +89,7 @@ describe('IssuesService', () => {
       });
 
       expect(
-        service.addIssue(user.id, freeOrg.id, product.id, {
+        service.addIssue(user.id, freeOrg.id, project.id, {
           title: 'Test Issue',
           description: 'Test Description',
         }),
@@ -99,37 +99,37 @@ describe('IssuesService', () => {
 
   describe('when listing issues', () => {
     it('should return all issues for the org', async () => {
-      await service.addIssue(user.id, org.id, product.id, {
+      await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue 1',
         description: 'Test Description 1',
       });
-      await service.addIssue(user.id, org.id, product.id, {
+      await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue 2',
         description: 'Test Description 2',
       });
 
-      const issues = await service.listIssues(org.id, product.id);
+      const issues = await service.listIssues(org.id, project.id);
       expect(issues).toHaveLength(2);
       expect(issues[0].title).toEqual('Test Issue 2');
       expect(issues[1].title).toEqual('Test Issue 1');
     });
 
     it('should return an empty array if there are no issues', async () => {
-      const issues = await service.listIssues(org.id, product.id);
+      const issues = await service.listIssues(org.id, project.id);
       expect(issues).toHaveLength(0);
     });
 
     it('should return the issues in pages', async () => {
-      await service.addIssue(user.id, org.id, product.id, {
+      await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue 1',
         description: 'Test Description 1',
       });
-      await service.addIssue(user.id, org.id, product.id, {
+      await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue 2',
         description: 'Test Description 2',
       });
 
-      const issues = await service.listIssues(org.id, product.id, 1, 1);
+      const issues = await service.listIssues(org.id, project.id, 1, 1);
       expect(issues).toHaveLength(1);
       expect(issues[0].title).toEqual('Test Issue 2');
     });
@@ -141,21 +141,21 @@ describe('IssuesService', () => {
       });
 
       await expect(
-        service.listIssues(freeOrg.id, product.id),
+        service.listIssues(freeOrg.id, project.id),
       ).rejects.toThrow();
     });
   });
 
   describe('when getting an issue by id', () => {
     it('should return the issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
 
       const foundIssue = await service.getIssueById(
         org.id,
-        product.id,
+        project.id,
         issue.id,
       );
       expect(foundIssue).toBeDefined();
@@ -166,12 +166,12 @@ describe('IssuesService', () => {
 
     it('should throw an error if the issue does not exist', async () => {
       await expect(
-        service.getIssueById(org.id, product.id, 'some-invalid-id'),
+        service.getIssueById(org.id, project.id, 'some-invalid-id'),
       ).rejects.toThrow();
     });
 
     it('should throw an error if the issue does not belong to the org', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -180,26 +180,26 @@ describe('IssuesService', () => {
       await orgsRepository.save(otherOrg);
 
       await expect(
-        service.getIssueById(otherOrg.id, product.id, issue.id),
+        service.getIssueById(otherOrg.id, project.id, issue.id),
       ).rejects.toThrow();
     });
 
     it('should throw an error if the org is not on the premium plan', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
       org.paymentPlan = PaymentPlan.FREE;
       await orgsRepository.save(org);
       await expect(
-        service.getIssueById(org.id, product.id, issue.id),
+        service.getIssueById(org.id, project.id, issue.id),
       ).rejects.toThrow();
     });
   });
 
   describe('when updating an issue', () => {
     it('should update the issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -207,7 +207,7 @@ describe('IssuesService', () => {
       const updatedIssue = await service.updateIssue(
         user.id,
         org.id,
-        product.id,
+        project.id,
         issue.id,
         {
           title: 'Updated Issue',
@@ -227,7 +227,7 @@ describe('IssuesService', () => {
 
     it('should throw an error if the issue does not exist', async () => {
       await expect(
-        service.updateIssue(user.id, org.id, product.id, 'some-invalid-id', {
+        service.updateIssue(user.id, org.id, project.id, 'some-invalid-id', {
           title: 'Updated Issue',
           description: 'Updated Description',
           status: IssueStatus.IN_PROGRESS,
@@ -237,7 +237,7 @@ describe('IssuesService', () => {
     });
 
     it('should throw an error if the issue does not belong to the org', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -246,7 +246,7 @@ describe('IssuesService', () => {
       await orgsRepository.save(otherOrg);
 
       await expect(
-        service.updateIssue(user.id, otherOrg.id, product.id, issue.id, {
+        service.updateIssue(user.id, otherOrg.id, project.id, issue.id, {
           title: 'Updated Issue',
           description: 'Updated Description',
           status: IssueStatus.IN_PROGRESS,
@@ -256,7 +256,7 @@ describe('IssuesService', () => {
     });
 
     it('should throw an error if the user does not belong to the org', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -268,7 +268,7 @@ describe('IssuesService', () => {
       );
 
       await expect(
-        service.updateIssue(otherUser.id, org.id, product.id, issue.id, {
+        service.updateIssue(otherUser.id, org.id, project.id, issue.id, {
           title: 'Updated Issue',
           description: 'Updated Description',
           status: IssueStatus.IN_PROGRESS,
@@ -278,14 +278,14 @@ describe('IssuesService', () => {
     });
 
     it('should throw an error if the org is not on the premium plan', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
       org.paymentPlan = PaymentPlan.FREE;
       await orgsRepository.save(org);
       await expect(
-        service.updateIssue(user.id, org.id, product.id, issue.id, {
+        service.updateIssue(user.id, org.id, project.id, issue.id, {
           title: 'Updated Issue',
           description: 'Updated Description',
           status: IssueStatus.IN_PROGRESS,
@@ -297,26 +297,26 @@ describe('IssuesService', () => {
 
   describe('when deleting an issue', () => {
     it('should delete the issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
 
-      await service.deleteIssue(user.id, org.id, product.id, issue.id);
+      await service.deleteIssue(user.id, org.id, project.id, issue.id);
 
       await expect(
-        service.getIssueById(org.id, product.id, issue.id),
+        service.getIssueById(org.id, project.id, issue.id),
       ).rejects.toThrow();
     });
 
     it('should throw an error if the issue does not exist', async () => {
       await expect(
-        service.deleteIssue(user.id, org.id, product.id, 'some-invalid-id'),
+        service.deleteIssue(user.id, org.id, project.id, 'some-invalid-id'),
       ).rejects.toThrow();
     });
 
     it('should throw an error if the issue does not belong to the org', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -325,19 +325,19 @@ describe('IssuesService', () => {
       await orgsRepository.save(otherOrg);
 
       await expect(
-        service.deleteIssue(user.id, otherOrg.id, product.id, issue.id),
+        service.deleteIssue(user.id, otherOrg.id, project.id, issue.id),
       ).rejects.toThrow();
     });
 
     it('should throw an error if the org is not on the premium plan', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
       org.paymentPlan = PaymentPlan.FREE;
       await orgsRepository.save(org);
       await expect(
-        service.deleteIssue(user.id, org.id, product.id, issue.id),
+        service.deleteIssue(user.id, org.id, project.id, issue.id),
       ).rejects.toThrow('You need to upgrade your plan to delete an issue');
     });
 
@@ -346,17 +346,17 @@ describe('IssuesService', () => {
       issue.title = 'Test Issue';
       issue.description = 'Test Description';
       issue.org = Promise.resolve(org);
-      issue.product = Promise.resolve(product);
+      issue.project = Promise.resolve(project);
       issue.createdBy = Promise.resolve(user);
       await issuesRepository.save(issue);
       const workItem = new WorkItem();
       workItem.title = 'Test Work Item';
       workItem.description = 'Test Work Item Description';
       workItem.org = Promise.resolve(org);
-      workItem.product = Promise.resolve(product);
+      workItem.project = Promise.resolve(project);
       workItem.issue = Promise.resolve(issue);
       await workItemsRepository.save(workItem);
-      await service.deleteIssue(user.id, org.id, product.id, issue.id);
+      await service.deleteIssue(user.id, org.id, project.id, issue.id);
       const workItems = await workItemsRepository.find({
         where: { issue: { id: issue.id } },
       });
@@ -366,7 +366,7 @@ describe('IssuesService', () => {
 
   describe('when adding a comment to an issue', () => {
     it('should add a comment to the issue', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -381,7 +381,7 @@ describe('IssuesService', () => {
 
   describe('when updating a comment for an issue', () => {
     it('should update the comment', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -404,7 +404,7 @@ describe('IssuesService', () => {
 
   describe('when deleting a comment for an issue', () => {
     it('should delete the comment', async () => {
-      const issue = await service.addIssue(user.id, org.id, product.id, {
+      const issue = await service.addIssue(user.id, org.id, project.id, {
         title: 'Test Issue',
         description: 'Test Description',
       });
@@ -422,18 +422,18 @@ describe('IssuesService', () => {
 
   describe('when searching issues', () => {
     it('should return the issues', async () => {
-      await service.addIssue(user.id, org.id, product.id, {
+      await service.addIssue(user.id, org.id, project.id, {
         title: 'My Issue',
         description: 'My Issue Description',
       });
-      await service.addIssue(user.id, org.id, product.id, {
+      await service.addIssue(user.id, org.id, project.id, {
         title: 'My Other Issue',
         description: 'My Other Issue Description',
       });
 
       const issues = await service.searchIssues(
         org.id,
-        product.id,
+        project.id,
         'my issue',
         1,
         1,

@@ -29,14 +29,14 @@ import { Priority } from '../../../common/priority.enum';
 import { PublicService } from './public.service';
 import { WorkItemStatus } from '../work-item-status.enum';
 import { WorkItemType } from '../work-item-type.enum';
-import { Product } from '../../../products/product.entity';
+import { Project } from '../../../projects/project.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
-  let product: Product;
+  let project: Project;
   let workItemsService: WorkItemsService;
 
   beforeEach(async () => {
@@ -54,7 +54,7 @@ describe('PublicController', () => {
           FeatureFile,
           WorkItemFile,
           BipSettings,
-          Product,
+          Project,
         ]),
         UsersModule,
       ],
@@ -83,11 +83,11 @@ describe('PublicController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     const bipRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
@@ -102,7 +102,7 @@ describe('PublicController', () => {
     it('should return the work item', async () => {
       const workItem = await workItemsService.createWorkItem(
         org.id,
-        product.id,
+        project.id,
         user.id,
         {
           title: 'Test Feature',
@@ -115,7 +115,7 @@ describe('PublicController', () => {
       );
       const result = await controller.getWorkItem(
         org.id,
-        product.id,
+        project.id,
         workItem.id,
       );
       expect(result).toBeDefined();

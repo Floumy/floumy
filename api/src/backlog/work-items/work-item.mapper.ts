@@ -39,11 +39,11 @@ export default class WorkItemMapper {
     const assignedTo = await workItem.assignedTo;
     const issue = await workItem.issue;
     const org = await workItem.org;
-    const product = await workItem.product;
+    const project = await workItem.project;
     return {
       id: workItem.id,
       org: org ? { id: org.id } : undefined,
-      product: { id: product.id },
+      project: { id: project.id },
       reference: `WI-${workItem.sequenceNumber}`,
       title: workItem.title,
       description: workItem.description,

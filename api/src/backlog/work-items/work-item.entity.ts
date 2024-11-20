@@ -20,7 +20,7 @@ import { User } from '../../users/user.entity';
 import { WorkItemsStatusStats } from './work-items-status-stats.entity';
 import { WorkItemComment } from './work-item-comment.entity';
 import { Issue } from '../../issues/issue.entity';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 @Entity()
 export class WorkItem {
@@ -95,6 +95,6 @@ export class WorkItem {
   workItemsStatusStats: Promise<WorkItemsStatusStats>;
   @ManyToOne(() => Issue, (issue) => issue.workItems, { lazy: true })
   issue: Promise<Issue>;
-  @ManyToOne(() => Product, (product) => product.workItems, { lazy: true })
-  product: Promise<Product>;
+  @ManyToOne(() => Project, (project) => project.workItems, { lazy: true })
+  project: Promise<Project>;
 }

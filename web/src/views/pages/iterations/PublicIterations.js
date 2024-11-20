@@ -114,7 +114,7 @@ function PublicIterations() {
                             {!showWorkItems[iteration.id] && <i className="ni ni-bold-right" />}
                             {showWorkItems[iteration.id] && <i className="ni ni-bold-down" />}
                           </button>
-                          <Link to={`/public/orgs/${orgId}/products/${productId}/iterations/detail/${iteration.id}`}
+                          <Link to={`/public/orgs/${orgId}/projects/${productId}/iterations/detail/${iteration.id}`}
                                 className="mr-2">
                             <span
                               className="text-muted">{formatDate(getIterationStartDate(iteration))} - {formatDate(getIterationEndDate(iteration))}</span> | {iteration.title}

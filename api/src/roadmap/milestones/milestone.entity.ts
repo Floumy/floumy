@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Org } from '../../orgs/org.entity';
 import { Feature } from '../features/feature.entity';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 @Entity()
 export class Milestone {
@@ -29,6 +29,6 @@ export class Milestone {
   org: Promise<Org>;
   @OneToMany(() => Feature, (feature) => feature.milestone, { lazy: true })
   features: Promise<Feature[]>;
-  @ManyToOne(() => Product, (product) => product.milestones, { lazy: true })
-  product: Promise<Product>;
+  @ManyToOne(() => Project, (project) => project.milestones, { lazy: true })
+  project: Promise<Project>;
 }

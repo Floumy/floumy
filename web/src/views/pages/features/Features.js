@@ -83,7 +83,7 @@ function Features() {
           shortcut: "i",
           id: "new-feature",
           action: () => {
-            navigate(`/admin/orgs/${orgId}/products/${productId}/roadmap/features/new`);
+            navigate(`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/new`);
           }
         }
       ]} />

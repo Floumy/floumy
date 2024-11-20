@@ -10,7 +10,7 @@ import { CreateUpdateCommentDto } from '../comments/dtos';
 import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
 import { CommentMapper } from '../comments/mappers';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 
 @Injectable()
@@ -24,8 +24,8 @@ export class IssuesService {
     private issuesRepository: Repository<Issue>,
     @InjectRepository(IssueComment)
     private issueCommentsRepository: Repository<IssueComment>,
-    @InjectRepository(Product)
-    private productsRepository: Repository<Product>,
+    @InjectRepository(Project)
+    private projectsRepository: Repository<Project>,
     @InjectRepository(WorkItem)
     private workItemsRepository: Repository<WorkItem>,
   ) {}
@@ -33,12 +33,12 @@ export class IssuesService {
   async addIssue(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     issueDto: IssueDto,
   ) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
     if (org.paymentPlan !== 'premium') {
@@ -49,7 +49,7 @@ export class IssuesService {
     issue.title = issueDto.title;
     issue.description = issueDto.description;
     issue.org = Promise.resolve(org);
-    issue.product = Promise.resolve(product);
+    issue.project = Promise.resolve(project);
     issue.createdBy = Promise.resolve(user);
     const savedIssue = await this.issuesRepository.save(issue);
     return await IssueMapper.toDto(savedIssue);
@@ -57,7 +57,7 @@ export class IssuesService {
 
   async listIssues(
     orgId: string,
-    productId: string,
+    projectId: string,
     page: number = 1,
     limit: number = 0,
   ) {
@@ -71,7 +71,7 @@ export class IssuesService {
         SELECT *
         FROM issue
         WHERE issue."orgId" = $1
-          AND issue."productId" = $2
+          AND issue."projectId" = $2
         ORDER BY CASE
                      WHEN issue."priority" = 'high' THEN 1
                      WHEN issue."priority" = 'medium' THEN 2
@@ -80,18 +80,18 @@ export class IssuesService {
                      END,
                  issue."createdAt" DESC
     `;
-    let params = [orgId, productId] as any[];
+    let params = [orgId, projectId] as any[];
     if (limit > 0) {
       query += ' OFFSET $3 LIMIT $4';
       const offset = (page - 1) * limit;
-      params = [orgId, productId, offset, limit];
+      params = [orgId, projectId, offset, limit];
     }
 
     const issues = await this.issuesRepository.query(query, params);
     return await Promise.all(issues.map(IssueListItemMapper.toListItemDto));
   }
 
-  async getIssueById(orgId: string, productId: string, issueId: string) {
+  async getIssueById(orgId: string, projectId: string, issueId: string) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
     if (org.paymentPlan !== 'premium') {
       throw new Error('You need to upgrade your plan to view issues');
@@ -99,7 +99,7 @@ export class IssuesService {
     const issue = await this.issuesRepository.findOneByOrFail({
       id: issueId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     return await IssueMapper.toDto(issue);
   }
@@ -107,14 +107,14 @@ export class IssuesService {
   async updateIssue(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     issueId: any,
     issueDto: UpdateIssueDto,
   ) {
     const issue = await this.issuesRepository.findOneByOrFail({
       id: issueId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const createdBy = await issue.createdBy;
@@ -137,13 +137,13 @@ export class IssuesService {
   async deleteIssue(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     issueId: string,
   ) {
     const issue = await this.issuesRepository.findOneByOrFail({
       id: issueId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const createdBy = await issue.createdBy;
@@ -228,7 +228,7 @@ export class IssuesService {
 
   async searchIssues(
     orgId: string,
-    productId: string,
+    projectId: string,
     search: string,
     page: number = 1,
     limit: number = 0,
@@ -242,7 +242,7 @@ export class IssuesService {
         SELECT *
         FROM issue
         WHERE issue."orgId" = $1
-          AND issue."productId" = $2
+          AND issue."projectId" = $2
           AND (issue.title ILIKE $3 OR issue.description ILIKE $3)
         ORDER BY CASE
                      WHEN issue."priority" = 'high' THEN 1
@@ -252,12 +252,12 @@ export class IssuesService {
                      END,
                  issue."createdAt" DESC
     `;
-    let params = [orgId, productId, `%${search}%`] as any[];
+    let params = [orgId, projectId, `%${search}%`] as any[];
 
     if (limit > 0) {
       query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, productId, `%${search}%`, offset, limit];
+      params = [orgId, projectId, `%${search}%`, offset, limit];
     }
     const issues = await this.issuesRepository.query(query, params);
     return await Promise.all(issues.map(IssueListItemMapper.toListItemDto));

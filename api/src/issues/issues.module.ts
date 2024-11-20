@@ -8,7 +8,7 @@ import { OrgsModule } from '../orgs/orgs.module';
 import { AuthModule } from '../auth/auth.module';
 import { Issue } from './issue.entity';
 import { IssueComment } from './issue-comment.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 
 @Module({
@@ -18,7 +18,7 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
       Org,
       Issue,
       IssueComment,
-      Product,
+      Project,
       WorkItem,
     ]),
     OrgsModule,

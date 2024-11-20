@@ -19,7 +19,7 @@ import { OkrsService } from '../../../okrs/okrs.service';
 import { BipSettings } from '../../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
 import { Timeline } from '../../../common/timeline.enum';
-import { Product } from '../../../products/product.entity';
+import { Project } from '../../../projects/project.entity';
 
 describe('PublicService', () => {
   let usersService: UsersService;
@@ -29,7 +29,7 @@ describe('PublicService', () => {
   let milestonesRepository: Repository<Milestone>;
   let user: User;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let bipRepository: Repository<BipSettings>;
 
   let cleanup: () => Promise<void>;
@@ -49,7 +49,7 @@ describe('PublicService', () => {
           File,
           FeatureFile,
           BipSettings,
-          Product,
+          Project,
         ]),
         BacklogModule,
         FilesModule,
@@ -82,12 +82,12 @@ describe('PublicService', () => {
       getRepositoryToken(Milestone),
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.isRoadmapPagePublic = true;
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     await bipRepository.save(bipSettings);
   });
 
@@ -98,7 +98,7 @@ describe('PublicService', () => {
   async function createMilestone(title: string, features: Feature[] = []) {
     const milestone = new Milestone();
     milestone.org = Promise.resolve(org);
-    milestone.product = Promise.resolve(product);
+    milestone.project = Promise.resolve(project);
     milestone.title = title;
     milestone.description = 'Description';
     milestone.dueDate = new Date();
@@ -109,7 +109,7 @@ describe('PublicService', () => {
   async function createFeature(title: string) {
     const feature = new Feature();
     feature.org = Promise.resolve(org);
-    feature.product = Promise.resolve(product);
+    feature.project = Promise.resolve(project);
     feature.title = title;
     return await featuresRepository.save(feature);
   }
@@ -128,7 +128,7 @@ describe('PublicService', () => {
 
       const milestones = await service.listMilestones(
         org.id,
-        product.id,
+        project.id,
         Timeline.THIS_QUARTER,
       );
       expect(milestones).toBeDefined();
@@ -147,7 +147,7 @@ describe('PublicService', () => {
     it('should return the milestone', async () => {
       const milestone = new Milestone();
       milestone.org = Promise.resolve(org);
-      milestone.product = Promise.resolve(product);
+      milestone.project = Promise.resolve(project);
       milestone.title = 'test';
       milestone.description = 'test description';
       milestone.dueDate = new Date();
@@ -155,7 +155,7 @@ describe('PublicService', () => {
 
       const actual = await service.findMilestone(
         org.id,
-        product.id,
+        project.id,
         milestone.id,
       );
 

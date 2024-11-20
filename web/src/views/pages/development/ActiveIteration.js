@@ -104,7 +104,7 @@ function ActiveIteration() {
           shortcut: "w",
           id: "new-work-item",
           action: () => {
-            navigate(`/admin/orgs/${orgId}/products/${productId}/work-item/new`);
+            navigate(`/admin/orgs/${orgId}/projects/${productId}/work-item/new`);
           }
         }
       ]} />
@@ -130,7 +130,7 @@ function ActiveIteration() {
                       you focused on immediate priorities and ensure steady progress. Review your active sprint
                       regularly to stay on track and adjust as needed for optimal performance.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/products/${productId}/iterations`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${productId}/iterations`}
                             className="text-blue font-weight-bold">Manage the Active
                         Sprint</Link>
                     </p>
@@ -164,7 +164,7 @@ function ActiveIteration() {
                   {Object.keys(workItemsByStatus).length === 0 && !isLoading && (
                     <div className="text-center m-3">
                       <h3 className="">No work items found in this sprint. Add them <Link
-                        to={`/admin/orgs/${orgId}/products/${productId}/iterations`}
+                        to={`/admin/orgs/${orgId}/projects/${productId}/iterations`}
                         className="text-blue">here</Link>
                       </h3>
                     </div>

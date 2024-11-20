@@ -13,16 +13,16 @@ import { Issue } from './issue.entity';
 import { IssueComment } from './issue-comment.entity';
 import { IssueStatus } from './issue-status.enum';
 import { Priority } from '../common/priority.enum';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 describe('IssuesController', () => {
   let controller: IssuesController;
   let cleanup: () => Promise<void>;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let user: User;
   let orgsRepository: Repository<Org>;
-  let productsRepository: Repository<Product>;
+  let projectsRepository: Repository<Project>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -41,15 +41,15 @@ describe('IssuesController', () => {
     );
     org = await orgsService.createForUser(user);
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
-    productsRepository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
+    projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
     );
     org.paymentPlan = PaymentPlan.PREMIUM;
     await orgsRepository.save(org);
-    product = new Product();
-    product.name = 'Test Product';
-    product.org = Promise.resolve(org);
-    await productsRepository.save(product);
+    project = new Project();
+    project.name = 'Test Project';
+    project.org = Promise.resolve(org);
+    await projectsRepository.save(project);
   });
 
   afterEach(async () => {
@@ -71,7 +71,7 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         createIssueDto,
       );
       expect(result.title).toBe(createIssueDto.title);
@@ -90,10 +90,10 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         createIssueDto,
       );
-      const result = await controller.listIssues(org.id, product.id);
+      const result = await controller.listIssues(org.id, project.id);
       expect(result.length).toBe(1);
       expect(result[0].title).toBe(createIssueDto.title);
       expect(result[0].description).toBe(createIssueDto.description);
@@ -111,17 +111,17 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         createIssueDto,
       );
-      const result = await controller.getIssueById(org.id, product.id, id);
+      const result = await controller.getIssueById(org.id, project.id, id);
       expect(result.title).toBe(createIssueDto.title);
       expect(result.description).toBe(createIssueDto.description);
     });
 
     it('should throw an error if the org does not exist', async () => {
       await expect(
-        controller.getIssueById(org.id, product.id, 'non-existent-id'),
+        controller.getIssueById(org.id, project.id, 'non-existent-id'),
       ).rejects.toThrow();
     });
   });
@@ -137,7 +137,7 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         createIssueDto,
       );
       const updateIssueDto = {
@@ -151,7 +151,7 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         id,
         updateIssueDto,
       );
@@ -173,7 +173,7 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         createIssueDto,
       );
       await controller.deleteIssue(
@@ -181,11 +181,11 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         id,
       );
       await expect(
-        controller.getIssueById(org.id, product.id, id),
+        controller.getIssueById(org.id, project.id, id),
       ).rejects.toThrow();
     });
   });
@@ -201,7 +201,7 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         createIssueDto,
       );
       const comment = await controller.addIssueComment(
@@ -230,7 +230,7 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         createIssueDto,
       );
       const comment = await controller.addIssueComment(
@@ -268,7 +268,7 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         createIssueDto,
       );
       const comment = await controller.addIssueComment(
@@ -287,7 +287,7 @@ describe('IssuesController', () => {
         id,
         comment.id,
       );
-      const result = await controller.getIssueById(org.id, product.id, id);
+      const result = await controller.getIssueById(org.id, project.id, id);
       expect(result.comments.length).toEqual(0);
     });
   });
@@ -298,7 +298,7 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         {
           title: 'My Issue',
           description: 'My Issue Description',
@@ -309,7 +309,7 @@ describe('IssuesController', () => {
           user: { sub: user.id },
         },
         org.id,
-        product.id,
+        project.id,
         {
           title: 'My Other Issue',
           description: 'My Other Issue Description',
@@ -318,7 +318,7 @@ describe('IssuesController', () => {
 
       const issues = await controller.search(
         org.id,
-        product.id,
+        project.id,
         'my issue',
         1,
         1,

@@ -45,7 +45,7 @@ export class UsersService {
 
   /**
    * This method is used only by tests and will be removed in the future
-   * @deprecated Use createUser instead for production code
+   * @deprecated Use createUser instead for projection code
    * @param name
    * @param email
    * @param password

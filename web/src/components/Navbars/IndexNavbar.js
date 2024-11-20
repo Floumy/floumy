@@ -183,7 +183,7 @@ function AdminNavbar() {
                 <Button
                   className="btn-neutral btn-icon"
                   color="default"
-                  href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adpr-index-navbar"
+                  href="https://www.creative-tim.com/project/argon-dashboard-pro-react?ref=adpr-index-navbar"
                   target="_blank"
                 >
                   <span className="btn-inner--icon">

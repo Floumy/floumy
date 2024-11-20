@@ -9,7 +9,7 @@ import { PublicService } from './public.service';
 import { Public } from '../../../auth/public.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-@Controller('public/orgs/:orgId/products/:productId/features/')
+@Controller('public/orgs/:orgId/projects/:projectId/features/')
 @Public()
 @UseInterceptors(CacheInterceptor)
 export class PublicController {
@@ -18,13 +18,13 @@ export class PublicController {
   @Get('/:featureId')
   async getFeature(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('featureId') featureId: string,
   ) {
     try {
       return await this.publicFeaturesService.getFeature(
         orgId,
-        productId,
+        projectId,
         featureId,
       );
     } catch (e) {

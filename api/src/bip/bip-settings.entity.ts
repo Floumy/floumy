@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Org } from '../orgs/org.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Entity()
 export class BipSettings {
@@ -37,7 +37,7 @@ export class BipSettings {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @OneToOne(() => Product, (product) => product.bipSettings, { lazy: false })
+  @OneToOne(() => Project, (project) => project.bipSettings, { lazy: false })
   @JoinColumn()
-  product: Promise<Product>;
+  project: Promise<Project>;
 }

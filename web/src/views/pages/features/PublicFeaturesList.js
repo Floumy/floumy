@@ -52,13 +52,13 @@ function PublicFeaturesList({
           {sortedFeatures.map((feature) => (
             <tr key={feature.id}>
               <td>
-                <Link to={`/public/orgs/${orgId}/products/${productId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/public/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.reference}
                 </Link>
               </td>
               <td className="title-cell">
-                <Link to={`/public/orgs/${orgId}/products/${productId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/public/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.title}
                 </Link>

@@ -118,13 +118,13 @@ function PublicOKRs() {
                         {okr.id !== 0 &&
                           <>
                             <td>
-                              <Link to={`/public/orgs/${orgId}/products/${productId}/okrs/detail/${okr.id}`}
+                              <Link to={`/public/orgs/${orgId}/projects/${productId}/okrs/detail/${okr.id}`}
                                     className={"okr-detail"}>
                                 {okr.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
-                              <Link to={`/public/orgs/${orgId}/products/${productId}/okrs/detail/${okr.id}`}
+                              <Link to={`/public/orgs/${orgId}/projects/${productId}/okrs/detail/${okr.id}`}
                                     className={"okr-detail"}>
                                 {okr.title}
                               </Link>

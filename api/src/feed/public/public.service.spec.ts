@@ -10,19 +10,19 @@ import { FeedEventHandler } from '../feed.event-handler';
 import { UsersService } from '../../users/users.service';
 import { OrgsService } from '../../orgs/orgs.service';
 import { BipSettings } from '../../bip/bip-settings.entity';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 describe('PublicService', () => {
   let service: PublicService;
   let feedItemRepository: Repository<FeedItem>;
   let user: User;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let cleanup: () => Promise<void>;
   let bipRepository: Repository<BipSettings>;
   let orgsRepository: Repository<Org>;
   let usersService: UsersService;
-  let productRepository: Repository<Product>;
+  let projectRepository: Repository<Project>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -37,8 +37,8 @@ describe('PublicService', () => {
       getRepositoryToken(BipSettings),
     );
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
-    productRepository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
+    projectRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
     );
     const orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
@@ -48,12 +48,12 @@ describe('PublicService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.isFeedPagePublic = true;
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     await bipRepository.save(bipSettings);
     cleanup = dbCleanup;
   });
@@ -71,7 +71,7 @@ describe('PublicService', () => {
       const feedItem = new FeedItem();
       feedItem.org = Promise.resolve(org);
       feedItem.user = Promise.resolve(user);
-      feedItem.product = Promise.resolve(product);
+      feedItem.project = Promise.resolve(project);
       feedItem.title = 'Test Feed Item';
       feedItem.entity = 'workItem';
       feedItem.entityId = '1';
@@ -79,14 +79,14 @@ describe('PublicService', () => {
       feedItem.content = { id: '1' };
       await feedItemRepository.save(feedItem);
 
-      const result = await service.listFeedItems(org.id, product.id, 1, 10);
+      const result = await service.listFeedItems(org.id, project.id, 1, 10);
       expect(result).toHaveLength(1);
     });
     it('should return the paginated list of feed items', async () => {
       const feedItem = new FeedItem();
       feedItem.org = Promise.resolve(org);
       feedItem.user = Promise.resolve(user);
-      feedItem.product = Promise.resolve(product);
+      feedItem.project = Promise.resolve(project);
       feedItem.title = 'Test Feed Item';
       feedItem.entity = 'workItem';
       feedItem.entityId = '1';
@@ -94,30 +94,30 @@ describe('PublicService', () => {
       feedItem.content = { id: '1' };
       await feedItemRepository.save(feedItem);
 
-      const result = await service.listFeedItems(org.id, product.id, 1, 10);
+      const result = await service.listFeedItems(org.id, project.id, 1, 10);
       expect(result).toHaveLength(1);
     });
     it('should throw an error if the isFeedPagePublic is false', async () => {
       const newOrg = await orgsRepository.save(new Org());
-      const newProduct = new Product();
-      newProduct.name = 'Test Product';
-      newProduct.org = Promise.resolve(newOrg);
-      await productRepository.save(newProduct);
+      const newProject = new Project();
+      newProject.name = 'Test Project';
+      newProject.org = Promise.resolve(newOrg);
+      await projectRepository.save(newProject);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isFeedPagePublic = false;
       bipSettings.org = Promise.resolve(newOrg);
-      bipSettings.product = Promise.resolve(newProduct);
+      bipSettings.project = Promise.resolve(newProject);
       await bipRepository.save(bipSettings);
       await expect(
-        service.listFeedItems(newOrg.id, newProduct.id, 1, 10),
+        service.listFeedItems(newOrg.id, newProject.id, 1, 10),
       ).rejects.toThrow();
     });
     it('should filter out assignedTo from the feed items', async () => {
       const feedItem = new FeedItem();
       feedItem.org = Promise.resolve(org);
       feedItem.user = Promise.resolve(user);
-      feedItem.product = Promise.resolve(product);
+      feedItem.project = Promise.resolve(project);
       feedItem.title = 'Test Feed Item';
       feedItem.entity = 'workItem';
       feedItem.entityId = '1';
@@ -126,7 +126,7 @@ describe('PublicService', () => {
 
       await feedItemRepository.save(feedItem);
 
-      const result = await service.listFeedItems(org.id, product.id, 1, 10);
+      const result = await service.listFeedItems(org.id, project.id, 1, 10);
 
       expect(result).toHaveLength(1);
       expect(result[0].title).toEqual('Test Feed Item');

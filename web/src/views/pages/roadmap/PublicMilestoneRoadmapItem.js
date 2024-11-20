@@ -26,7 +26,7 @@ function PublicMilestoneRoadmapItem({ orgId, milestone }) {
           {!showFeatures && <i className="ni ni-bold-right" />}
           {showFeatures && <i className="ni ni-bold-down" />}
         </button>
-        <Link to={`/public/orgs/${orgId}/products/${productId}/milestones/detail/${milestone.id}`}>
+        <Link to={`/public/orgs/${orgId}/projects/${productId}/milestones/detail/${milestone.id}`}>
           <span className="text-gray">{milestone.dueDate}</span> | {milestone.title} <span
           className="text-muted text-sm"></span>
         </Link>

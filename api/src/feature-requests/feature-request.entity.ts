@@ -13,7 +13,7 @@ import { FeatureRequestStatus } from './feature-request-status.enum';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { FeatureRequestComment } from './feature-request-comment.entity';
 import { Feature } from '../roadmap/features/feature.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Entity()
 export class FeatureRequest {
@@ -71,8 +71,8 @@ export class FeatureRequest {
     onDelete: 'CASCADE',
   })
   features: Promise<Feature[]>;
-  @ManyToOne(() => Product, (product) => product.featureRequests, {
+  @ManyToOne(() => Project, (project) => project.featureRequests, {
     lazy: true,
   })
-  product: Promise<Product>;
+  project: Promise<Project>;
 }

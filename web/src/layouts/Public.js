@@ -53,8 +53,8 @@ function PublicLayout() {
     return replace;
   }
 
-  useNavigationHotKey("r", `/public/orgs/${orgId}/products/${productId}/feature-requests/new`, isNavigationReplace(), org?.paymentPlan === "premium");
-  useNavigationHotKey("f", `/public/orgs/${orgId}/products/${productId}/feature-requests`, false, org?.paymentPlan === "premium");
+  useNavigationHotKey("r", `/public/orgs/${orgId}/projects/${productId}/feature-requests/new`, isNavigationReplace(), org?.paymentPlan === "premium");
+  useNavigationHotKey("f", `/public/orgs/${orgId}/projects/${productId}/feature-requests`, false, org?.paymentPlan === "premium");
   useNavigationHotKey("left", -1);
   useNavigationHotKey("right", 1);
 

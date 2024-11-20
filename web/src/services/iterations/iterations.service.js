@@ -3,7 +3,7 @@ import axios from "axios";
 
 export async function getIteration(orgId, productId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/iterations/${id}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/iterations/${id}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -12,7 +12,7 @@ export async function getIteration(orgId, productId, id) {
 
 export async function getPublicIteration(orgId, productId, id) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/products/${productId}/iterations/${id}`);
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${productId}/iterations/${id}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -21,7 +21,7 @@ export async function getPublicIteration(orgId, productId, id) {
 
 export async function updateIteration(orgId, productId, id, iteration) {
   try {
-    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/iterations/${id}`, iteration);
+    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/iterations/${id}`, iteration);
   } catch (e) {
     throw new Error(e.message);
   }
@@ -29,7 +29,7 @@ export async function updateIteration(orgId, productId, id, iteration) {
 
 export async function addIteration(orgId, productId, iteration) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/iterations`, iteration);
+    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/iterations`, iteration);
   } catch (e) {
     throw new Error(e.message);
   }
@@ -37,7 +37,7 @@ export async function addIteration(orgId, productId, iteration) {
 
 export async function listIterations(orgId, productId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/iterations`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/iterations`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -46,7 +46,7 @@ export async function listIterations(orgId, productId) {
 
 export async function listIterationsWithWorkItemsForTimeline(orgId, productId, timeline) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/iterations/timeline/${timeline}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/iterations/timeline/${timeline}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -55,7 +55,7 @@ export async function listIterationsWithWorkItemsForTimeline(orgId, productId, t
 
 export async function listPublicIterationsWithWorkItemsForTimeline(orgId, productId, timeline) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/products/${productId}/iterations/timeline/${timeline}`);
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${productId}/iterations/timeline/${timeline}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -64,7 +64,7 @@ export async function listPublicIterationsWithWorkItemsForTimeline(orgId, produc
 
 export async function deleteIteration(orgId, productId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/iterations/${id}`);
+    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/iterations/${id}`);
   } catch (e) {
     throw new Error(e.message);
   }
@@ -72,7 +72,7 @@ export async function deleteIteration(orgId, productId, id) {
 
 export async function startIteration(orgId, productId, id) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/iterations/${id}/start`);
+    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/iterations/${id}/start`);
   } catch (e) {
     throw new Error(e.message);
   }
@@ -80,7 +80,7 @@ export async function startIteration(orgId, productId, id) {
 
 export async function completeIteration(orgId, productId, id) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/iterations/${id}/complete`);
+    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/iterations/${id}/complete`);
   } catch (e) {
     throw new Error(e.message);
   }
@@ -88,7 +88,7 @@ export async function completeIteration(orgId, productId, id) {
 
 export async function getActiveIteration(orgId, productId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/products/${productId}/iterations/active`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/iterations/active`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -97,7 +97,7 @@ export async function getActiveIteration(orgId, productId) {
 
 export async function getPublicActiveIteration(orgId, productId) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/products/${productId}/iterations/active`);
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${productId}/iterations/active`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);

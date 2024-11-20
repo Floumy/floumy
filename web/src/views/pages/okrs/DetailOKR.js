@@ -424,14 +424,14 @@ function DetailOKR() {
                           <tr key={keyResult.id}>
                             <td>
                               <Link
-                                to={`/admin/orgs/${orgId}/products/${productId}/okrs/${id}/kr/detail/${keyResult.id}`}
+                                to={`/admin/orgs/${orgId}/projects/${productId}/okrs/${id}/kr/detail/${keyResult.id}`}
                                 className={"okr-detail"}>
                                 {keyResult.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
                               <Link
-                                to={`/admin/orgs/${orgId}/products/${productId}/okrs/${id}/kr/detail/${keyResult.id}`}
+                                to={`/admin/orgs/${orgId}/projects/${productId}/okrs/${id}/kr/detail/${keyResult.id}`}
                                 className={"okr-detail"}>
                                 {keyResult.title}
                               </Link>

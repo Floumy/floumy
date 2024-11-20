@@ -159,13 +159,13 @@ function FeaturesList({
                 }}
                 className={selectedFeatures.includes(feature.id) ? "selected-row" : ""}>
               <td>
-                <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.reference}
                 </Link>
               </td>
               <td className="title-cell">
-                <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.title}
                 </Link>
