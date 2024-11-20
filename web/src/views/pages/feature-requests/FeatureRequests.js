@@ -107,10 +107,10 @@ export default function FeatureRequests({ isPublic = false }) {
 
   function getDetailPage(context, orgId, productId, featureRequestId) {
     if (context === "admin") {
-      return `/admin/orgs/${orgId}/products/${productId}/feature-requests/edit/${featureRequestId}/`;
+      return `/admin/orgs/${orgId}/projects/${productId}/feature-requests/edit/${featureRequestId}/`;
     }
 
-    return `/public/orgs/${orgId}/products/${productId}/feature-requests/${featureRequestId}/`;
+    return `/public/orgs/${orgId}/projects/${productId}/feature-requests/${featureRequestId}/`;
   }
 
   function upVote(featureRequest) {
@@ -159,7 +159,7 @@ export default function FeatureRequests({ isPublic = false }) {
             shortcut: "r",
             id: "new-feature-request",
             action: () => {
-              navigate(`/${context}/orgs/${orgId}/products/${productId}/feature-requests/new`);
+              navigate(`/${context}/orgs/${orgId}/projects/${productId}/feature-requests/new`);
             }
           }
         ]}

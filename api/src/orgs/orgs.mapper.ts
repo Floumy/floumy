@@ -1,7 +1,7 @@
 import { User } from '../users/user.entity';
-import { MemberDto, OrgDto, ProductDto } from './orgs.dtos';
+import { MemberDto, OrgDto, ProjectDto } from './orgs.dtos';
 import { Org } from './org.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 export class MembersMapper {
   static toMembers(members: User[]): MemberDto[] {
@@ -19,18 +19,18 @@ export class MembersMapper {
   }
 }
 
-export class ProductMapper {
-  static toProduct(product: Product): ProductDto {
+export class ProjectMapper {
+  static toProject(project: Project): ProjectDto {
     return {
-      id: product.id,
-      name: product.name,
+      id: project.id,
+      name: project.name,
     };
   }
 }
 
 export class OrgsMapper {
   static async toOrg(org: Org): Promise<OrgDto> {
-    const products = await org.products;
+    const projects = await org.projects;
     return {
       id: org.id,
       name: org.name,
@@ -40,7 +40,7 @@ export class OrgsMapper {
       nextPaymentDate: org.nextPaymentDate,
       createdAt: org.createdAt,
       updatedAt: org.updatedAt,
-      products: products.map(ProductMapper.toProduct),
+      projects: projects.map(ProjectMapper.toProject),
       members: MembersMapper.toMembers(await org.users),
     };
   }

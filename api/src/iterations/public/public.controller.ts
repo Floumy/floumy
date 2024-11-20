@@ -10,7 +10,7 @@ import { PublicService } from './public.service';
 import { Public } from '../../auth/public.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-@Controller('public/orgs/:orgId/products/:productId/iterations')
+@Controller('public/orgs/:orgId/projects/:projectId/iterations')
 @Public()
 @UseInterceptors(CacheInterceptor)
 export class PublicController {
@@ -19,13 +19,13 @@ export class PublicController {
   @Get('/timeline/:timeline')
   async listIterationsForTimeline(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('timeline') timeline: Timeline,
   ) {
     try {
       return await this.publicIterationsService.listIterationsForTimeline(
         orgId,
-        productId,
+        projectId,
         timeline,
       );
     } catch (e) {
@@ -36,12 +36,12 @@ export class PublicController {
   @Get('/active')
   async getActiveIteration(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
   ) {
     try {
       return await this.publicIterationsService.getActiveIteration(
         orgId,
-        productId,
+        projectId,
       );
     } catch (e) {
       throw new BadRequestException();
@@ -51,13 +51,13 @@ export class PublicController {
   @Get('/:iterationId')
   async getIterationById(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('iterationId') iterationId: string,
   ) {
     try {
       return await this.publicIterationsService.getIterationById(
         orgId,
-        productId,
+        projectId,
         iterationId,
       );
     } catch (e) {

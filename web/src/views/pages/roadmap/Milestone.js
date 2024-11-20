@@ -27,7 +27,7 @@ function Milestone({ milestone, onFeatureChangeMilestone }) {
           {!showFeatures && <i className="ni ni-bold-right" />}
           {showFeatures && <i className="ni ni-bold-down" />}
         </button>
-        <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/milestones/edit/${milestone.id}`}>
+        <Link to={`/admin/orgs/${orgId}/projects/${productId}/roadmap/milestones/edit/${milestone.id}`}>
           <span className="text-gray">{milestone.dueDate}</span> | {milestone.title} <span
           className="text-muted text-sm"></span>
         </Link>

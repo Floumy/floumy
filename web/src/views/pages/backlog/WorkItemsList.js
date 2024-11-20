@@ -167,19 +167,19 @@ function WorkItemsList({
         >
           <td>
             <Link className={"edit-work-item"} color={"muted"}
-                  to={`/admin/orgs/${orgId}/products/${productId}/work-item/edit/${workItem.id}`}>
+                  to={`/admin/orgs/${orgId}/projects/${productId}/work-item/edit/${workItem.id}`}>
               {workItem.reference}
             </Link>
           </td>
           <td className={"title-cell"}>{workItemTypeIcon(workItem.type)}
             <Link className={"edit-work-item"} color={"muted"}
-                  to={`/admin/orgs/${orgId}/products/${productId}/work-item/edit/${workItem.id}`}>
+                  to={`/admin/orgs/${orgId}/projects/${productId}/work-item/edit/${workItem.id}`}>
               {workItem.title}
             </Link>
           </td>
           {showFeature && <td className="title-cell">
             {workItem.feature && (
-              <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/features/detail/${workItem.feature.id}`}
+              <Link to={`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${workItem.feature.id}`}
                     className="text-gray">
                 {workItem.feature.title}
               </Link>)}

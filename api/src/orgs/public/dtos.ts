@@ -1,11 +1,11 @@
 import { PaymentPlan } from '../../auth/payment.plan';
-import { ProductDto } from '../orgs.dtos';
+import { ProjectDto } from '../orgs.dtos';
 
 export interface PublicOrgDto {
   id: string;
   name: string;
   paymentPlan: PaymentPlan;
-  products: ProductDto[];
+  projects: ProjectDto[];
   createdAt: Date;
   updatedAt: Date;
 }

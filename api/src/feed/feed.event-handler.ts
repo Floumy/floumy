@@ -8,7 +8,7 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { KeyResultDto, OKRDto } from '../okrs/dtos';
 import { FeatureDto } from '../roadmap/features/dtos';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Injectable()
 export class FeedEventHandler {
@@ -19,8 +19,8 @@ export class FeedEventHandler {
     private readonly orgRepository: Repository<Org>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Product)
-    private readonly productsRepository: Repository<Product>,
+    @InjectRepository(Project)
+    private readonly projectsRepository: Repository<Project>,
   ) {}
 
   @OnEvent('workItem.created')
@@ -30,13 +30,13 @@ export class FeedEventHandler {
     const user = await this.userRepository.findOneByOrFail({
       id: event.createdBy.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.project.id,
       org: { id: event.org.id },
     });
     feedItem.org = Promise.resolve(org);
     feedItem.user = Promise.resolve(user);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Work Item Created';
     feedItem.entity = 'workItem';
     feedItem.entityId = event.id;
@@ -52,13 +52,13 @@ export class FeedEventHandler {
     const user = await this.userRepository.findOneByOrFail({
       id: event.createdBy.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.project.id,
       org: { id: event.org.id },
     });
     feedItem.org = Promise.resolve(org);
     feedItem.user = Promise.resolve(user);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Work Item Deleted';
     feedItem.entity = 'workItem';
     feedItem.entityId = event.id;
@@ -79,13 +79,13 @@ export class FeedEventHandler {
     const user = await this.userRepository.findOneByOrFail({
       id: event.current.createdBy.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.current.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.current.project.id,
       org: { id: event.current.org.id },
     });
     feedItem.org = Promise.resolve(org);
     feedItem.user = Promise.resolve(user);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Work Item Updated';
     feedItem.entity = 'workItem';
     feedItem.entityId = event.current.id;
@@ -100,12 +100,12 @@ export class FeedEventHandler {
     const org = await this.orgRepository.findOneByOrFail({
       id: event.objective.org.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.objective.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.objective.project.id,
       org: { id: event.objective.org.id },
     });
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'OKR Created';
     feedItem.entity = 'okr';
     feedItem.entityId = event.objective.id;
@@ -120,12 +120,12 @@ export class FeedEventHandler {
     const org = await this.orgRepository.findOneByOrFail({
       id: event.objective.org.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.objective.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.objective.project.id,
       org: { id: event.objective.org.id },
     });
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'OKR Deleted';
     feedItem.entity = 'okr';
     feedItem.entityId = event.objective.id;
@@ -140,12 +140,12 @@ export class FeedEventHandler {
     const org = await this.orgRepository.findOneByOrFail({
       id: event.current.objective.org.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.current.objective.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.current.objective.project.id,
       org: { id: event.current.objective.org.id },
     });
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'OKR Updated';
     feedItem.entity = 'okr';
     feedItem.entityId = event.current.objective.id;
@@ -160,12 +160,12 @@ export class FeedEventHandler {
     const org = await this.orgRepository.findOneByOrFail({
       id: event.org.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.project.id,
       org: { id: event.org.id },
     });
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Key Result Created';
     feedItem.entity = 'keyResult';
     feedItem.entityId = event.id;
@@ -180,12 +180,12 @@ export class FeedEventHandler {
     const org = await this.orgRepository.findOneByOrFail({
       id: event.org.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.project.id,
       org: { id: event.org.id },
     });
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Key Result Deleted';
     feedItem.entity = 'keyResult';
     feedItem.entityId = event.id;
@@ -203,12 +203,12 @@ export class FeedEventHandler {
     const org = await this.orgRepository.findOneByOrFail({
       id: event.current.org.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.current.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.current.project.id,
       org: { id: event.current.org.id },
     });
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Key Result Updated';
     feedItem.entity = 'keyResult';
     feedItem.entityId = event.current.id;
@@ -223,12 +223,12 @@ export class FeedEventHandler {
     const org = await this.orgRepository.findOneByOrFail({
       id: event.org.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.project.id,
       org: { id: event.org.id },
     });
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Feature Created';
     feedItem.entity = 'feature';
     feedItem.entityId = event.id;
@@ -243,12 +243,12 @@ export class FeedEventHandler {
     const org = await this.orgRepository.findOneByOrFail({
       id: event.org.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.project.id,
       org: { id: event.org.id },
     });
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Feature Deleted';
     feedItem.entity = 'feature';
     feedItem.entityId = event.id;
@@ -266,12 +266,12 @@ export class FeedEventHandler {
     const org = await this.orgRepository.findOneByOrFail({
       id: event.current.org.id,
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: event.current.product.id,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: event.current.project.id,
       org: { id: event.current.org.id },
     });
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Feature Updated';
     feedItem.entity = 'feature';
     feedItem.entityId = event.current.id;

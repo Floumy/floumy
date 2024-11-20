@@ -10,7 +10,7 @@ import {
 import { Org } from '../orgs/org.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { IterationStatus } from './iteration-status.enum';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Entity()
 export class Iteration {
@@ -46,6 +46,6 @@ export class Iteration {
   org: Promise<Org>;
   @OneToMany(() => WorkItem, (workItem) => workItem.iteration, { lazy: false })
   workItems: Promise<WorkItem[]>;
-  @ManyToOne(() => Product, (product) => product.iterations, { lazy: false })
-  product: Promise<Product>;
+  @ManyToOne(() => Project, (project) => project.iterations, { lazy: false })
+  project: Promise<Project>;
 }

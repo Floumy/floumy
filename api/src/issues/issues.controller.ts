@@ -19,7 +19,7 @@ import { IssueDto, UpdateIssueDto } from './dtos';
 import { Public } from '../auth/public.guard';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 
-@Controller('/orgs/:orgId/products/:productId/issues')
+@Controller('/orgs/:orgId/projects/:projectId/issues')
 export class IssuesController {
   constructor(private issuesService: IssuesService) {}
 
@@ -29,14 +29,14 @@ export class IssuesController {
   async addIssue(
     @Request() request,
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Body() issueDto: IssueDto,
   ) {
     try {
       return await this.issuesService.addIssue(
         request.user.sub,
         orgId,
-        productId,
+        projectId,
         issueDto,
       );
     } catch (e) {
@@ -49,12 +49,12 @@ export class IssuesController {
   @Public()
   async listIssues(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
     try {
-      return await this.issuesService.listIssues(orgId, productId, page, limit);
+      return await this.issuesService.listIssues(orgId, projectId, page, limit);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -64,7 +64,7 @@ export class IssuesController {
   @HttpCode(HttpStatus.OK)
   async search(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Query('q') query: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
@@ -72,7 +72,7 @@ export class IssuesController {
     try {
       return await this.issuesService.searchIssues(
         orgId,
-        productId,
+        projectId,
         query,
         page,
         limit,
@@ -87,11 +87,11 @@ export class IssuesController {
   @Public()
   async getIssueById(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('issueId') issueId: string,
   ) {
     try {
-      return await this.issuesService.getIssueById(orgId, productId, issueId);
+      return await this.issuesService.getIssueById(orgId, projectId, issueId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -103,7 +103,7 @@ export class IssuesController {
   async updateIssue(
     @Request() request,
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('issueId') issueId: string,
     @Body() issueDto: UpdateIssueDto,
   ) {
@@ -111,7 +111,7 @@ export class IssuesController {
       return await this.issuesService.updateIssue(
         request.user.sub,
         orgId,
-        productId,
+        projectId,
         issueId,
         issueDto,
       );
@@ -126,14 +126,14 @@ export class IssuesController {
   async deleteIssue(
     @Request() request,
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('issueId') issueId: string,
   ) {
     try {
       return await this.issuesService.deleteIssue(
         request.user.sub,
         orgId,
-        productId,
+        projectId,
         issueId,
       );
     } catch (e) {

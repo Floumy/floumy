@@ -138,7 +138,7 @@ function InitiativesRoadmap() {
           shortcut: "m",
           id: "new-milestone",
           action: () => {
-            navigate(`/admin/orgs/${orgId}/products/${productId}/roadmap/milestones/new`);
+            navigate(`/admin/orgs/${orgId}/projects/${productId}/roadmap/milestones/new`);
           }
         },
         {
@@ -146,7 +146,7 @@ function InitiativesRoadmap() {
           shortcut: "i",
           id: "new-feature",
           action: () => {
-            navigate(`/admin/orgs/${orgId}/products/${productId}/roadmap/features/new`);
+            navigate(`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/new`);
           }
         }
       ]} />
@@ -195,7 +195,7 @@ function InitiativesRoadmap() {
                       track major progress and ensure you're meeting key deadlines. Set milestones to celebrate your
                       accomplishments and keep your project on schedule.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/milestones/new`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${productId}/roadmap/milestones/new`}
                             className="text-blue font-weight-bold">Set a
                         Milestone</Link>
                     </p>
@@ -205,7 +205,7 @@ function InitiativesRoadmap() {
                       towards a common objective. Define initiatives to prioritize efforts, allocate resources
                       effectively, and ensure your team is working towards the same strategic vision.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/features/new`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/new`}
                             className="text-blue font-weight-bold">Add an
                         Initiative</Link>
                     </p>

@@ -20,7 +20,7 @@ export class FeatureRequestVoteService {
   async upvoteFeatureRequest(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     featureRequestId: string,
   ) {
     await this.userRepository.findOneByOrFail({ id: userId });
@@ -28,7 +28,7 @@ export class FeatureRequestVoteService {
     const featureRequest = await this.featureRequestRepository.findOneByOrFail({
       id: featureRequestId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     const org = await featureRequest.org;
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {
@@ -64,13 +64,13 @@ export class FeatureRequestVoteService {
   async downvoteFeatureRequest(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     featureRequestId: string,
   ) {
     const featureRequest = await this.featureRequestRepository.findOneByOrFail({
       id: featureRequestId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
 
     const org = await featureRequest.org;
@@ -106,13 +106,13 @@ export class FeatureRequestVoteService {
     await this.featureRequestRepository.save(featureRequest);
   }
 
-  async getVotes(userId: string, orgId: string, productId: string) {
+  async getVotes(userId: string, orgId: string, projectId: string) {
     const votes = await this.featureRequestVoteRepository.find({
       where: {
         user: { id: userId },
         featureRequest: {
           org: { id: orgId },
-          product: { id: productId },
+          project: { id: projectId },
         },
       },
     });

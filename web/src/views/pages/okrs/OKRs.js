@@ -74,7 +74,7 @@ function OKRs() {
             id: "new-objective",
             shortcut: "o",
             action: () => {
-              navigate(`/admin/orgs/${orgId}/products/${productId}/okrs/new`);
+              navigate(`/admin/orgs/${orgId}/projects/${productId}/okrs/new`);
             }
           }
         ]}
@@ -127,7 +127,7 @@ function OKRs() {
                         They help you track your success and ensure you're on the right track. Think of them as
                         targets that show how close you are to achieving your goals. .
                         <br />
-                        <Link to={`/admin/orgs/${orgId}/products/${productId}/okrs/new`}
+                        <Link to={`/admin/orgs/${orgId}/projects/${productId}/okrs/new`}
                               className="text-blue font-weight-bold">Create an Objective with
                           Key Results</Link></p>
                     </div>
@@ -165,13 +165,13 @@ function OKRs() {
                         {okr.id !== 0 &&
                           <>
                             <td>
-                              <Link to={`/admin/orgs/${orgId}/products/${productId}/okrs/detail/${okr.id}`}
+                              <Link to={`/admin/orgs/${orgId}/projects/${productId}/okrs/detail/${okr.id}`}
                                     className={"okr-detail"}>
                                 {okr.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
-                              <Link to={`/admin/orgs/${orgId}/products/${productId}/okrs/detail/${okr.id}`}
+                              <Link to={`/admin/orgs/${orgId}/projects/${productId}/okrs/detail/${okr.id}`}
                                     className={"okr-detail"}>
                                 {okr.title}
                               </Link>

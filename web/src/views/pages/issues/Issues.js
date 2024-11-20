@@ -97,11 +97,11 @@ export default function Issues({ isPublic = false }) {
 
   function navigateToDetailPage(issue) {
     if (isPublic) {
-      navigate(`/${context}/orgs/${orgId}/products/${productId}/issues/${issue.id}`);
+      navigate(`/${context}/orgs/${orgId}/projects/${productId}/issues/${issue.id}`);
       return;
     }
 
-    navigate(`/${context}/orgs/${orgId}/products/${productId}/issues/edit/${issue.id}`);
+    navigate(`/${context}/orgs/${orgId}/projects/${productId}/issues/edit/${issue.id}`);
   }
 
   return (
@@ -114,7 +114,7 @@ export default function Issues({ isPublic = false }) {
             shortcut: "n",
             id: "new-issue",
             action: () => {
-              navigate(`/${context}/orgs/${orgId}/products/${productId}/issues/new`);
+              navigate(`/${context}/orgs/${orgId}/projects/${productId}/issues/new`);
             }
           }
         ]}

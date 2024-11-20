@@ -81,19 +81,19 @@ function BuildInPublic() {
     setIsBuildInPublicEnabled(isBuildInPublicEnabledBasedOnSettings(buildInPublicSettings));
 
     if (buildInPublicSettings.isFeedPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/feed`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/feed`));
     } else if (buildInPublicSettings.isObjectivesPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/okrs`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/okrs`));
     } else if (buildInPublicSettings.isRoadmapPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/roadmap`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/roadmap`));
     } else if (buildInPublicSettings.isIterationsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/iterations`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/iterations`));
     } else if (buildInPublicSettings.isActiveIterationsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/active-iteration`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/active-iteration`));
     } else if (buildInPublicSettings.isIssuesPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/issues`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/issues`));
     } else if (buildInPublicSettings.isFeatureRequestsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/products/${productId}/feature-requests`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/feature-requests`));
     }
   }, [buildInPublicSettings, orgId]);
 

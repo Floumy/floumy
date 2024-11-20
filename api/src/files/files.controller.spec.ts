@@ -16,13 +16,13 @@ import { WorkItemsService } from '../backlog/work-items/work-items.service';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Iteration } from '../iterations/Iteration.entity';
 import { Feature } from '../roadmap/features/feature.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 describe('FilesController', () => {
   let controller: FilesController;
   let cleanup: () => Promise<void>;
   let org: Org;
-  let product: Product;
+  let project: Project;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -53,7 +53,7 @@ describe('FilesController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
   });
 
   afterEach(async () => {
@@ -74,7 +74,7 @@ describe('FilesController', () => {
       };
       const result = await controller.uploadFile(
         org.id,
-        product.id,
+        project.id,
         file as any,
         {
           user: { org: org.id },
@@ -97,13 +97,13 @@ describe('FilesController', () => {
       };
       const result = await controller.uploadFile(
         org.id,
-        product.id,
+        project.id,
         file as any,
         {
           user: { org: org.id },
         },
       );
-      await controller.deleteFile(org.id, product.id, result.id, {
+      await controller.deleteFile(org.id, project.id, result.id, {
         user: { org: org.id },
       });
 
@@ -114,7 +114,7 @@ describe('FilesController', () => {
       const request = { user: { org: org.id } };
       await controller.getFile(
         org.id,
-        product.id,
+        project.id,
         result.id,
         request,
         response,

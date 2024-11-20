@@ -7,24 +7,24 @@ export default function PublicFeed() {
 
   function getLinkUrl(item) {
     if (item.entity === "okr") {
-      return `/public/orgs/${orgId}/products/${productId}/okrs/detail/${item.entityId}`;
+      return `/public/orgs/${orgId}/projects/${productId}/okrs/detail/${item.entityId}`;
     }
 
     if (item.entity === "workItem") {
-      return `/public/orgs/${orgId}/products/${productId}/work-item/detail/${item.entityId}`;
+      return `/public/orgs/${orgId}/projects/${productId}/work-item/detail/${item.entityId}`;
     }
 
     if (item.entity === "keyResult") {
 
       if (item.action === "updated") {
-        return `/public/orgs/${orgId}/products/${productId}/objectives/${item.content.current.objective.id}/kr/detail/${item.entityId}`;
+        return `/public/orgs/${orgId}/projects/${productId}/objectives/${item.content.current.objective.id}/kr/detail/${item.entityId}`;
       }
 
-      return `/public/orgs/${orgId}/products/${productId}/objectives/${item.content.objective.id}/kr/detail/${item.entityId}`;
+      return `/public/orgs/${orgId}/projects/${productId}/objectives/${item.content.objective.id}/kr/detail/${item.entityId}`;
     }
 
     if (item.entity === "feature") {
-      return `/public/orgs/${orgId}/products/${productId}/roadmap/features/detail/${item.entityId}`;
+      return `/public/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${item.entityId}`;
     }
   }
 

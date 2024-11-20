@@ -100,7 +100,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             <Nav navbar>
               {buildingInPublicSettings.isIssuesPagePublic && <NavItem className="d-none d-md-block">
                 <NavLink
-                  to={`/public/orgs/${org.id}/products/${productId}/issues`}
+                  to={`/public/orgs/${org.id}/projects/${productId}/issues`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >
@@ -112,7 +112,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
                 <Row style={{ maxWidth: "100%" }}>
                   <Col xs={7}>
                     <NavLink
-                      to={`/public/orgs/${org.id}/products/${productId}/feature-requests`}
+                      to={`/public/orgs/${org.id}/projects/${productId}/feature-requests`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -135,7 +135,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
           <Nav className="mb-md-3" navbar>
             {buildingInPublicSettings.isFeedPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/feed`}
+                to={`/public/orgs/${org.id}/projects/${productId}/feed`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -145,7 +145,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isObjectivesPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/objectives`}
+                to={`/public/orgs/${org.id}/projects/${productId}/objectives`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -155,7 +155,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isRoadmapPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/roadmap`}
+                to={`/public/orgs/${org.id}/projects/${productId}/roadmap`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -165,7 +165,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isIterationsPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/iterations`}
+                to={`/public/orgs/${org.id}/projects/${productId}/iterations`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -175,7 +175,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isActiveIterationsPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/active-iteration`}
+                to={`/public/orgs/${org.id}/projects/${productId}/active-iteration`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >

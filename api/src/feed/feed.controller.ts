@@ -15,7 +15,7 @@ import {
 import { FeedService } from './feed.service';
 import { AuthGuard } from '../auth/auth.guard';
 
-@Controller('/orgs/:orgId/products/:productId/feed')
+@Controller('/orgs/:orgId/projects/:projectId/feed')
 @UseGuards(AuthGuard)
 export class FeedController {
   constructor(private readonly feedService: FeedService) {}
@@ -24,7 +24,7 @@ export class FeedController {
   @HttpCode(HttpStatus.OK)
   async listFeedItems(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -36,7 +36,7 @@ export class FeedController {
     try {
       return await this.feedService.listFeedItems(
         orgId,
-        productId,
+        projectId,
         page,
         limit,
       );
@@ -49,7 +49,7 @@ export class FeedController {
   @HttpCode(HttpStatus.CREATED)
   async createFeedItem(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Body() textFeedItem: { text: string },
   ) {
@@ -61,7 +61,7 @@ export class FeedController {
       return await this.feedService.createTextFeedItem(
         request.user.sub,
         orgId,
-        productId,
+        projectId,
         textFeedItem,
       );
     } catch (e) {

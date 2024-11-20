@@ -264,7 +264,7 @@ function Iterations() {
             shortcut: "s",
             id: "new-iteration",
             action: () => {
-              navigate(`/admin/orgs/${orgId}/products/${productId}/iterations/new`);
+              navigate(`/admin/orgs/${orgId}/projects/${productId}/iterations/new`);
             }
           },
           {
@@ -272,7 +272,7 @@ function Iterations() {
             shortcut: "w",
             id: "new-work-item",
             action: () => {
-              navigate(`/admin/orgs/${orgId}/products/${productId}/work-item/new`);
+              navigate(`/admin/orgs/${orgId}/projects/${productId}/work-item/new`);
             }
           }
         ]
@@ -317,7 +317,7 @@ function Iterations() {
                       work items. They help you deliver incremental progress and adapt quickly to changes. Plan your
                       sprints to maintain a steady development pace and ensure continuous improvement.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/products/${productId}/iterations/new`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${productId}/iterations/new`}
                             className="text-blue font-weight-bold">Plan a Sprint</Link>
                     </p>
                     <h3>Work Items</h3>
@@ -325,7 +325,7 @@ function Iterations() {
                       They break down the work into manageable chunks, making it easier to track progress and stay
                       organized. Create work items to keep your team aligned and productive.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/products/${productId}/work-item/new`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${productId}/work-item/new`}
                             className="text-blue font-weight-bold">Create a Work
                         Item</Link>
                     </p>
@@ -345,7 +345,7 @@ function Iterations() {
                             {!showWorkItems[iteration.id] && <i className="ni ni-bold-right" />}
                             {showWorkItems[iteration.id] && <i className="ni ni-bold-down" />}
                           </button>
-                          <Link to={`/admin/orgs/${orgId}/products/${productId}/iterations/edit/${iteration.id}`}
+                          <Link to={`/admin/orgs/${orgId}/projects/${productId}/iterations/edit/${iteration.id}`}
                                 className="mr-2">
                             <span
                               className="text-muted">{formatDate(getIterationStartDate(iteration))} - {formatDate(getIterationEndDate(iteration))}</span> | {iteration.title}

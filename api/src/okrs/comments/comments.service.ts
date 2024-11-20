@@ -25,7 +25,7 @@ export class CommentsService {
 
   async addCommentToKeyResult(
     orgId: string,
-    productId: string,
+    projectId: string,
     keyResultId: string,
     userId: string,
     content: string,
@@ -33,7 +33,7 @@ export class CommentsService {
     const keyResult = await this.keyResultRepository.findOneByOrFail({
       id: keyResultId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
 
     const org = await keyResult.org;
@@ -57,7 +57,7 @@ export class CommentsService {
 
   async updateKeyResultComment(
     orgId: string,
-    productId: string,
+    projectId: string,
     userId: string,
     commentId: string,
     content: string,
@@ -67,7 +67,7 @@ export class CommentsService {
       createdBy: { id: userId },
       keyResult: {
         org: { id: orgId },
-        product: { id: productId },
+        project: { id: projectId },
       },
     });
 
@@ -84,7 +84,7 @@ export class CommentsService {
 
   async deleteKeyResultComment(
     orgId: string,
-    productId: string,
+    projectId: string,
     userId: string,
     commentInd: string,
   ) {
@@ -93,7 +93,7 @@ export class CommentsService {
       createdBy: { id: userId },
       keyResult: {
         org: { id: orgId },
-        product: { id: productId },
+        project: { id: projectId },
       },
     });
 
@@ -102,7 +102,7 @@ export class CommentsService {
 
   async addCommentToObjective(
     orgId: string,
-    productId: string,
+    projectId: string,
     objectiveId: string,
     userId: string,
     content: string,
@@ -110,7 +110,7 @@ export class CommentsService {
     const objective = await this.objectiveRepository.findOneByOrFail({
       id: objectiveId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
 
     const org = await objective.org;
@@ -134,7 +134,7 @@ export class CommentsService {
 
   async updateObjectiveComment(
     orgId: string,
-    productId: string,
+    projectId: string,
     userId: string,
     commentId: string,
     content: string,
@@ -144,7 +144,7 @@ export class CommentsService {
       createdBy: { id: userId },
       objective: {
         org: { id: orgId },
-        product: { id: productId },
+        project: { id: projectId },
       },
     });
 
@@ -161,7 +161,7 @@ export class CommentsService {
 
   async deleteObjectiveComment(
     orgId: string,
-    productId: string,
+    projectId: string,
     userId: string,
     commentId: string,
   ) {
@@ -170,7 +170,7 @@ export class CommentsService {
       createdBy: { id: userId },
       objective: {
         org: { id: orgId },
-        product: { id: productId },
+        project: { id: projectId },
       },
     });
 

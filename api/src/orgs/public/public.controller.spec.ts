@@ -26,13 +26,13 @@ import { UsersService } from '../../users/users.service';
 import { PublicService } from './public.service';
 import { BipSettings } from '../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
   let cleanup: () => Promise<void>;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let bipRepository: Repository<BipSettings>;
 
   beforeEach(async () => {
@@ -78,7 +78,7 @@ describe('PublicController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     bipRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
@@ -93,7 +93,7 @@ describe('PublicController', () => {
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.org = Promise.resolve(org);
-      bipSettings.product = Promise.resolve(product);
+      bipSettings.project = Promise.resolve(project);
       await bipRepository.save(bipSettings);
 
       const result = await controller.getOrg(org.id);

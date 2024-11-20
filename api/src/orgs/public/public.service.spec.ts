@@ -6,13 +6,13 @@ import { setupTestingModule } from '../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../../users/user.entity';
 import { BipSettings } from '../../bip/bip-settings.entity';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 describe('PublicService', () => {
   let service: PublicService;
   let orgsRepository: Repository<Org>;
   let bipRepository: Repository<BipSettings>;
-  let productRepository: Repository<Product>;
+  let projectRepository: Repository<Project>;
 
   let cleanup: () => Promise<void>;
 
@@ -26,8 +26,8 @@ describe('PublicService', () => {
     bipRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
-    productRepository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
+    projectRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
     );
     cleanup = dbCleanup;
   });
@@ -42,17 +42,17 @@ describe('PublicService', () => {
 
   describe('when getting the public org', () => {
     it('should return the public org', async () => {
-      const product = new Product();
-      product.name = 'Test Product';
-      await productRepository.save(product);
+      const project = new Project();
+      project.name = 'Test Project';
+      await projectRepository.save(project);
       const org = new Org();
       org.name = 'Test Org';
-      org.products = Promise.resolve([product]);
+      org.projects = Promise.resolve([project]);
       await orgsRepository.save(org);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.org = Promise.resolve(org);
-      bipSettings.product = Promise.resolve(product);
+      bipSettings.project = Promise.resolve(project);
       await bipRepository.save(bipSettings);
 
       const publicOrg = await service.getPublicOrg(org.id);
@@ -64,12 +64,12 @@ describe('PublicService', () => {
       await expect(service.getPublicOrg('invalid-id')).rejects.toThrow();
     });
     it('should throw an error if the org is not public', async () => {
-      const product = new Product();
-      product.name = 'Test Product';
-      await productRepository.save(product);
+      const project = new Project();
+      project.name = 'Test Project';
+      await projectRepository.save(project);
       const org = new Org();
       org.name = 'Test Org';
-      org.products = Promise.resolve([product]);
+      org.projects = Promise.resolve([project]);
       await orgsRepository.save(org);
 
       await expect(service.getPublicOrg(org.id)).rejects.toThrow();

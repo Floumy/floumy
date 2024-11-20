@@ -26,7 +26,7 @@ import { BipSettings } from '../../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { PublicService } from './public.service';
-import { Product } from '../../../products/product.entity';
+import { Project } from '../../../projects/project.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
@@ -34,7 +34,7 @@ describe('PublicController', () => {
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
-  let product: Product;
+  let project: Project;
   let orgsService: OrgsService;
   let usersService: UsersService;
 
@@ -86,11 +86,11 @@ describe('PublicController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     await bipRepository.save(bipSettings);
   });
 
@@ -103,11 +103,11 @@ describe('PublicController', () => {
       const feature = new Feature();
       feature.title = 'Test Feature';
       feature.org = Promise.resolve(org);
-      feature.product = Promise.resolve(product);
+      feature.project = Promise.resolve(project);
       await featuresRepository.save(feature);
       const result = await controller.getFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
       );
       expect(result).toBeDefined();
@@ -117,10 +117,10 @@ describe('PublicController', () => {
       const feature = new Feature();
       feature.title = 'Test Feature';
       feature.org = Promise.resolve(new Org());
-      feature.product = Promise.resolve(product);
+      feature.project = Promise.resolve(project);
       await featuresRepository.save(feature);
       await expect(
-        controller.getFeature(org.id, product.id, feature.id),
+        controller.getFeature(org.id, project.id, feature.id),
       ).rejects.toThrow(NotFoundException);
     });
   });

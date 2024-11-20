@@ -12,16 +12,16 @@ import { KeyResult } from '../key-result.entity';
 import { User } from '../../users/user.entity';
 import { BipSettings } from '../../bip/bip-settings.entity';
 import { Timeline } from '../../common/timeline.enum';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 describe('PublicService', () => {
   let service: PublicService;
   let okrsService: OkrsService;
   let orgsRepository: Repository<Org>;
   let bipSettingsRepository: Repository<BipSettings>;
-  let productsRepository: Repository<Product>;
+  let projectsRepository: Repository<Project>;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
@@ -45,20 +45,20 @@ describe('PublicService', () => {
     bipSettingsRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
-    productsRepository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
+    projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
     );
     org = new Org();
     org.name = 'Test Org';
     await orgsRepository.save(org);
-    product = new Product();
-    product.name = 'Test Product';
-    product.org = Promise.resolve(org);
-    await productsRepository.save(product);
+    project = new Project();
+    project.name = 'Test Project';
+    project.org = Promise.resolve(org);
+    await projectsRepository.save(project);
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     await bipSettingsRepository.save(bipSettings);
   });
 
@@ -74,20 +74,20 @@ describe('PublicService', () => {
     it('should return an empty list when no objectives exist', async () => {
       const result = await service.listObjectives(
         org.id,
-        product.id,
+        project.id,
         Timeline.THIS_QUARTER,
       );
       expect(result).toEqual([]);
     });
     it('should return the objectives', async () => {
-      await okrsService.create(org.id, product.id, {
+      await okrsService.create(org.id, project.id, {
         objective: {
           title: 'Objective 1',
           timeline: Timeline.THIS_QUARTER,
         },
         keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
       });
-      await okrsService.create(org.id, product.id, {
+      await okrsService.create(org.id, project.id, {
         objective: {
           title: 'Objective 2',
           timeline: Timeline.THIS_QUARTER,
@@ -96,7 +96,7 @@ describe('PublicService', () => {
       });
       const result = await service.listObjectives(
         org.id,
-        product.id,
+        project.id,
         Timeline.THIS_QUARTER,
       );
       expect(result.length).toEqual(2);
@@ -116,17 +116,17 @@ describe('PublicService', () => {
       const newOrgBipSettings = new BipSettings();
       newOrgBipSettings.isBuildInPublicEnabled = false;
       newOrgBipSettings.org = Promise.resolve(newOrg);
-      newOrgBipSettings.product = Promise.resolve(product);
+      newOrgBipSettings.project = Promise.resolve(project);
       await bipSettingsRepository.save(newOrgBipSettings);
       await expect(
-        service.listObjectives(newOrg.id, product.id, Timeline.THIS_QUARTER),
+        service.listObjectives(newOrg.id, project.id, Timeline.THIS_QUARTER),
       ).rejects.toThrow('Building in public is not enabled');
     });
   });
 
   describe('when getting an objective', () => {
     it('should return the okr', async () => {
-      const okr = await okrsService.create(org.id, product.id, {
+      const okr = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'Objective 1',
           timeline: Timeline.THIS_QUARTER,
@@ -135,7 +135,7 @@ describe('PublicService', () => {
       });
       const result = await service.getObjective(
         org.id,
-        product.id,
+        project.id,
         okr.objective.id,
       );
       expect(result).toBeDefined();
@@ -146,16 +146,16 @@ describe('PublicService', () => {
       const newOrg = new Org();
       newOrg.name = 'Test Org 2';
       await orgsRepository.save(newOrg);
-      const newOrgProduct = new Product();
-      newOrgProduct.name = 'Test Product';
-      newOrgProduct.org = Promise.resolve(newOrg);
-      await productsRepository.save(newOrgProduct);
+      const newOrgProject = new Project();
+      newOrgProject.name = 'Test Project';
+      newOrgProject.org = Promise.resolve(newOrg);
+      await projectsRepository.save(newOrgProject);
       const newOrgBipSettings = new BipSettings();
       newOrgBipSettings.isBuildInPublicEnabled = false;
       newOrgBipSettings.org = Promise.resolve(newOrg);
-      newOrgBipSettings.product = Promise.resolve(product);
+      newOrgBipSettings.project = Promise.resolve(project);
       await bipSettingsRepository.save(newOrgBipSettings);
-      const okr = await okrsService.create(newOrg.id, newOrgProduct.id, {
+      const okr = await okrsService.create(newOrg.id, newOrgProject.id, {
         objective: {
           title: 'Objective 1',
           timeline: Timeline.THIS_QUARTER,
@@ -163,19 +163,19 @@ describe('PublicService', () => {
         keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
       });
       await expect(
-        service.getObjective(newOrg.id, product.id, okr.objective.id),
+        service.getObjective(newOrg.id, project.id, okr.objective.id),
       ).rejects.toThrow('Building in public is not enabled');
     });
     it('should throw an error if the objective does not exist', async () => {
       const invalidUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getObjective(org.id, product.id, invalidUUID),
+        service.getObjective(org.id, project.id, invalidUUID),
       ).rejects.toThrow();
     });
   });
   describe('when getting a key result', () => {
     it('should return the key result', async () => {
-      const okr = await okrsService.create(org.id, product.id, {
+      const okr = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'Objective 1',
           timeline: Timeline.THIS_QUARTER,
@@ -185,7 +185,7 @@ describe('PublicService', () => {
       const keyResult = okr.keyResults[0];
       const result = await service.getKeyResult(
         org.id,
-        product.id,
+        project.id,
         okr.objective.id,
         keyResult.id,
       );
@@ -203,16 +203,16 @@ describe('PublicService', () => {
       const newOrg = new Org();
       newOrg.name = 'Test Org 2';
       await orgsRepository.save(newOrg);
-      const newOrgProduct = new Product();
-      newOrgProduct.name = 'Test Product';
-      newOrgProduct.org = Promise.resolve(newOrg);
-      await productsRepository.save(newOrgProduct);
+      const newOrgProject = new Project();
+      newOrgProject.name = 'Test Project';
+      newOrgProject.org = Promise.resolve(newOrg);
+      await projectsRepository.save(newOrgProject);
       const newOrgBipSettings = new BipSettings();
       newOrgBipSettings.isBuildInPublicEnabled = false;
       newOrgBipSettings.org = Promise.resolve(newOrg);
-      newOrgBipSettings.product = Promise.resolve(product);
+      newOrgBipSettings.project = Promise.resolve(project);
       await bipSettingsRepository.save(newOrgBipSettings);
-      const okr = await okrsService.create(newOrg.id, newOrgProduct.id, {
+      const okr = await okrsService.create(newOrg.id, newOrgProject.id, {
         objective: {
           title: 'Objective 1',
           timeline: Timeline.THIS_QUARTER,
@@ -223,14 +223,14 @@ describe('PublicService', () => {
       await expect(
         service.getKeyResult(
           newOrg.id,
-          product.id,
+          project.id,
           okr.objective.id,
           keyResult.id,
         ),
       ).rejects.toThrow('Building in public is not enabled');
     });
     it('should throw an error if the key result does not exist', async () => {
-      const okr = await okrsService.create(org.id, product.id, {
+      const okr = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'Objective 1',
           timeline: Timeline.THIS_QUARTER,
@@ -239,13 +239,13 @@ describe('PublicService', () => {
       });
       const invalidUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getKeyResult(org.id, product.id, okr.objective.id, invalidUUID),
+        service.getKeyResult(org.id, project.id, okr.objective.id, invalidUUID),
       ).rejects.toThrow();
     });
     it('should throw an error if the objective does not exist', async () => {
       const invalidUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getKeyResult(org.id, product.id, invalidUUID, invalidUUID),
+        service.getKeyResult(org.id, project.id, invalidUUID, invalidUUID),
       ).rejects.toThrow();
     });
     it('should throw an error if the org does not exist', async () => {

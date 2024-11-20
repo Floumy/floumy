@@ -19,7 +19,7 @@ import { CreateUpdateMilestoneDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
 import { Timeline } from '../../common/timeline.enum';
 
-@Controller('/orgs/:orgId/products/:productId/milestones')
+@Controller('/orgs/:orgId/projects/:projectId/milestones')
 @UseGuards(AuthGuard)
 export class MilestonesController {
   constructor(private milestonesService: MilestonesService) {}
@@ -28,7 +28,7 @@ export class MilestonesController {
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Body() createMilestoneDto: CreateUpdateMilestoneDto,
   ) {
@@ -39,7 +39,7 @@ export class MilestonesController {
     try {
       return await this.milestonesService.createMilestone(
         orgId,
-        productId,
+        projectId,
         createMilestoneDto,
       );
     } catch (e) {
@@ -51,7 +51,7 @@ export class MilestonesController {
   @HttpCode(HttpStatus.OK)
   async listMilestonesWithFeatures(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
   ) {
     if (orgId !== request.user.org) {
@@ -60,7 +60,7 @@ export class MilestonesController {
 
     return await this.milestonesService.listMilestonesWithFeatures(
       orgId,
-      productId,
+      projectId,
     );
   }
 
@@ -68,21 +68,21 @@ export class MilestonesController {
   @HttpCode(HttpStatus.OK)
   async list(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
-    return await this.milestonesService.listMilestones(orgId, productId);
+    return await this.milestonesService.listMilestones(orgId, projectId);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async get(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id,
   ) {
@@ -91,7 +91,7 @@ export class MilestonesController {
     }
 
     try {
-      return await this.milestonesService.get(orgId, productId, id);
+      return await this.milestonesService.get(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException();
     }
@@ -101,7 +101,7 @@ export class MilestonesController {
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() updateMilestoneDto: CreateUpdateMilestoneDto,
@@ -113,7 +113,7 @@ export class MilestonesController {
     try {
       return await this.milestonesService.update(
         orgId,
-        productId,
+        projectId,
         id,
         updateMilestoneDto,
       );
@@ -126,7 +126,7 @@ export class MilestonesController {
   @HttpCode(HttpStatus.OK)
   async delete(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
   ) {
@@ -135,7 +135,7 @@ export class MilestonesController {
     }
 
     try {
-      return await this.milestonesService.delete(orgId, productId, id);
+      return await this.milestonesService.delete(orgId, projectId, id);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -144,7 +144,7 @@ export class MilestonesController {
   @Get('timeline/:timeline')
   async listForTimeline(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('timeline') timeline: Timeline,
   ) {
@@ -154,7 +154,7 @@ export class MilestonesController {
 
     return await this.milestonesService.listForTimeline(
       orgId,
-      productId,
+      projectId,
       timeline,
     );
   }

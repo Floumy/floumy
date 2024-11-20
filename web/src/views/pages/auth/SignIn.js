@@ -72,7 +72,7 @@ function SignIn() {
       const currentOrgId = localStorage.getItem("currentUserOrgId");
       const currentProductId = localStorage.getItem("currentProductId");
       if (localStorage.getItem("currentUser") && currentOrgId && currentProductId) {
-        navigate(`/admin/orgs/${currentOrgId}/products/${currentProductId}/dashboard`);
+        navigate(`/admin/orgs/${currentOrgId}/projects/${currentProductId}/dashboard`);
       }
     };
 
@@ -99,7 +99,7 @@ function SignIn() {
           return;
         }
 
-        navigate(`/admin/orgs/${currentOrg.id}/products/${currentOrg.products[0].id}/dashboard`);
+        navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.products[0].id}/dashboard`);
         return;
       }
 
