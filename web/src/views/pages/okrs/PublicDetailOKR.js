@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React, { useEffect, useState } from "react";
 // javascript plugin that creates a sortable object from a dom object
 // reactstrap components
@@ -42,14 +27,14 @@ import PublicShareButtons from "../../../components/PublicShareButtons/PublicSha
 import Comments from "../../../components/Comments/Comments";
 
 function PublicDetailOKR() {
-  const { orgId, productId, okrId } = useParams();
+  const { orgId, projectId, okrId } = useParams();
   const [okr, setOKR] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function fetchAndSetOKR() {
       try {
-        const okr = await getPublicOKR(orgId, productId, okrId);
+        const okr = await getPublicOKR(orgId, projectId, okrId);
         setOKR(okr);
       } catch (e) {
         toast.error("The OKR could not be loaded");
@@ -67,7 +52,7 @@ function PublicDetailOKR() {
 
   const handleAddComment = async (content) => {
     try {
-      const addedComment = await addObjectiveComment(orgId, productId, okr.objective.id, content);
+      const addedComment = await addObjectiveComment(orgId, projectId, okr.objective.id, content);
       okr.objective.comments.push(addedComment);
       setOKR({ ...okr });
       toast.success("The comment has been added");
@@ -78,7 +63,7 @@ function PublicDetailOKR() {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await deleteObjectiveComment(orgId, productId, okr.objective.id, commentId);
+      await deleteObjectiveComment(orgId, projectId, okr.objective.id, commentId);
       okr.objective.comments = okr.objective.comments.filter(comment => comment.id !== commentId);
       setOKR({ ...okr });
       toast.success("The comment has been deleted");
@@ -89,7 +74,7 @@ function PublicDetailOKR() {
 
   const handleUpdateComment = async (commentId, content) => {
     try {
-      const updatedComment = await updateObjectiveComment(orgId, productId, okr.objective.id, commentId, content);
+      const updatedComment = await updateObjectiveComment(orgId, projectId, okr.objective.id, commentId, content);
       okr.objective.comments = okr.objective.comments.map(comment => {
         if (comment.id === commentId) {
           return updatedComment;
@@ -226,14 +211,14 @@ function PublicDetailOKR() {
                           <tr key={keyResult.id}>
                             <td>
                               <Link
-                                to={`/public/orgs/${orgId}/projects/${productId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
+                                to={`/public/orgs/${orgId}/projects/${projectId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
                                 className={"okr-detail"}>
                                 {keyResult.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
                               <Link
-                                to={`/public/orgs/${orgId}/projects/${productId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
+                                to={`/public/orgs/${orgId}/projects/${projectId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
                                 className={"okr-detail"}>
                                 {keyResult.title}
                               </Link>

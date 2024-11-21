@@ -9,7 +9,7 @@ import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import NotFoundCard from "../components/NotFoundCard";
 
 function EditFeature() {
-  const { orgId, productId, id } = useParams();
+  const { orgId, projectId, id } = useParams();
   const [feature, setFeature] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,7 @@ function EditFeature() {
     async function fetchData() {
       setLoading(true);
       try {
-        const feature = await getFeature(orgId, productId, id);
+        const feature = await getFeature(orgId, projectId, id);
         setFeature(feature);
         setLoading(false);
       } catch (error) {
@@ -29,7 +29,7 @@ function EditFeature() {
   }, [id]);
 
   const handleSubmit = async (feature) => {
-    await updateFeature(orgId, productId, id, feature);
+    await updateFeature(orgId, projectId, id, feature);
   };
 
   return (

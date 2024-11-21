@@ -8,7 +8,7 @@ import FeaturesListCard from "./FeaturesListCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 function Features() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [features, setFeatures] = useState([]);
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ function Features() {
   async function fetchData(page, features = []) {
     setIsLoading(true);
     try {
-      const featuresList = await listFeatures(orgId, productId, page);
+      const featuresList = await listFeatures(orgId, projectId, page);
       if (featuresList.length === 0) {
         setHasMoreFeatures(false);
       } else {
@@ -41,7 +41,7 @@ function Features() {
   async function searchFeaturesByText(searchText, page, features = []) {
     setIsLoading(true);
     try {
-      const response = await searchFeatures(orgId, productId, searchText, page);
+      const response = await searchFeatures(orgId, projectId, searchText, page);
       if (response.length === 0) {
         setHasMoreFeatures(false);
       } else {
@@ -83,7 +83,7 @@ function Features() {
           shortcut: "i",
           id: "new-feature",
           action: () => {
-            navigate(`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/new`);
+            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`);
           }
         }
       ]} />

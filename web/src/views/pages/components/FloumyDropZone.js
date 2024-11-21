@@ -9,7 +9,7 @@ import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 
 export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
 
   const [files, setFiles] = useState(initialFiles.map(file => ({
     name: file.name,
@@ -19,7 +19,7 @@ export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
 
   const uploadFileSafely = async (file) => {
     try {
-      const uploadedFile = await uploadFile(orgId, productId, file);
+      const uploadedFile = await uploadFile(orgId, projectId, file);
       setFiles(prevFiles => prevFiles.map(f => f.name === file.name ? { ...f, uploading: false, uploadedFile } : f));
     } catch (e) {
       toast.error("An error occurred while uploading the file");
@@ -62,7 +62,7 @@ export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
 
   const removeFile = async fileId => {
     try {
-      await deleteFile(orgId, productId, fileId);
+      await deleteFile(orgId, projectId, fileId);
       setFiles(prevFiles => prevFiles.filter(file => file.uploadedFile.id !== fileId));
     } catch (e) {
       toast.error("An error occurred while deleting the file");
@@ -88,7 +88,7 @@ export function FloumyDropZone({ onFilesChanged, initialFiles = [] }) {
   }
 
   async function downloadUploadedFile(file) {
-    if (file.uploadedFile) await downloadFile(orgId, productId, file.uploadedFile.id);
+    if (file.uploadedFile) await downloadFile(orgId, projectId, file.uploadedFile.id);
   }
 
   return (

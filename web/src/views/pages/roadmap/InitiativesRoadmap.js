@@ -17,7 +17,7 @@ import { sortByPriority } from "../../../services/utils/utils";
 import FeaturesListCard from "../features/FeaturesListCard";
 
 function InitiativesRoadmap() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get("timeline");
@@ -37,7 +37,7 @@ function InitiativesRoadmap() {
     async function fetchFeatures() {
       setIsLoadingFeatures(true);
       try {
-        const features = await listFeaturesWithoutMilestone(orgId, productId);
+        const features = await listFeaturesWithoutMilestone(orgId, projectId);
         const sortedFeatures = sortByPriority(features);
         setFeatures(sortedFeatures);
       } catch (e) {
@@ -49,13 +49,13 @@ function InitiativesRoadmap() {
     }
 
     fetchFeatures();
-  }, [orgId, productId]);
+  }, [orgId, projectId]);
 
   useEffect(() => {
     async function fetchMilestones() {
       setIsLoadingMilestones(true);
       try {
-        const milestones = await listMilestonesWithFeatures(orgId, productId, timelineFilterValue);
+        const milestones = await listMilestonesWithFeatures(orgId, projectId, timelineFilterValue);
         setMilestones(milestones);
       } catch (e) {
         console.error(e.message);
@@ -65,7 +65,7 @@ function InitiativesRoadmap() {
     }
 
     fetchMilestones();
-  }, [orgId, productId, timelineFilterValue]);
+  }, [orgId, projectId, timelineFilterValue]);
 
   function updateFeaturesMilestone(updatedFeatures, newMilestoneId) {
     const previousMilestone = milestones.find(milestone => milestone.features.find(feature => feature.id === updatedFeatures[0].id));
@@ -123,7 +123,7 @@ function InitiativesRoadmap() {
 
   function onAddFeature() {
     return async (feature) => {
-      const savedFeature = await addFeature(orgId, productId, feature);
+      const savedFeature = await addFeature(orgId, projectId, feature);
       features.push(savedFeature);
       setFeatures([...features]);
     };
@@ -138,7 +138,7 @@ function InitiativesRoadmap() {
           shortcut: "m",
           id: "new-milestone",
           action: () => {
-            navigate(`/admin/orgs/${orgId}/projects/${productId}/roadmap/milestones/new`);
+            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`);
           }
         },
         {
@@ -146,7 +146,7 @@ function InitiativesRoadmap() {
           shortcut: "i",
           id: "new-feature",
           action: () => {
-            navigate(`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/new`);
+            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`);
           }
         }
       ]} />
@@ -195,7 +195,7 @@ function InitiativesRoadmap() {
                       track major progress and ensure you're meeting key deadlines. Set milestones to celebrate your
                       accomplishments and keep your project on schedule.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/projects/${productId}/roadmap/milestones/new`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`}
                             className="text-blue font-weight-bold">Set a
                         Milestone</Link>
                     </p>
@@ -205,7 +205,7 @@ function InitiativesRoadmap() {
                       towards a common objective. Define initiatives to prioritize efforts, allocate resources
                       effectively, and ensure your team is working towards the same strategic vision.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/new`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`}
                             className="text-blue font-weight-bold">Add an
                         Initiative</Link>
                     </p>

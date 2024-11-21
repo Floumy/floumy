@@ -1,9 +1,9 @@
 import api from "../api/api.service";
 import axios from "axios";
 
-export async function addFeature(orgId, productId, feature) {
+export async function addFeature(orgId, projectId, feature) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features`, feature);
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features`, feature);
 
     return response.data;
   } catch (e) {
@@ -11,29 +11,29 @@ export async function addFeature(orgId, productId, feature) {
   }
 }
 
-export async function listFeatures(orgId, productId, page = 1, limit = 50) {
+export async function listFeatures(orgId, projectId, page = 1, limit = 50) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features?page=${page}&limit=${limit}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features?page=${page}&limit=${limit}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listAllFeatures(orgId, productId) {
+export async function listAllFeatures(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function searchFeatures(orgId, productId, searchText, page = 1, limit = 50) {
+export async function searchFeatures(orgId, projectId, searchText, page = 1, limit = 50) {
   try {
     // Url encode the search text
     searchText = encodeURIComponent(searchText);
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/search?q=${searchText}&page=${page}&limit=${limit}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/search?q=${searchText}&page=${page}&limit=${limit}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -41,153 +41,153 @@ export async function searchFeatures(orgId, productId, searchText, page = 1, lim
 
 }
 
-export async function getFeature(orgId, productId, id) {
+export async function getFeature(orgId, projectId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${id}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${id}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function getPublicFeature(orgId, productId, id) {
+export async function getPublicFeature(orgId, projectId, id) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${productId}/features/${id}`);
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/features/${id}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateFeature(orgId, productId, id, feature) {
+export async function updateFeature(orgId, projectId, id, feature) {
   try {
-    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${id}`, feature);
+    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${id}`, feature);
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function deleteFeature(orgId, productId, id) {
+export async function deleteFeature(orgId, projectId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${id}`);
+    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${id}`);
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function addMilestone(orgId, productId, milestone) {
+export async function addMilestone(orgId, projectId, milestone) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/milestones`, milestone);
+    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones`, milestone);
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listMilestones(orgId, productId) {
+export async function listMilestones(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/milestones/list`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/list`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listMilestonesWithFeatures(orgId, productId, timeline) {
+export async function listMilestonesWithFeatures(orgId, projectId, timeline) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/milestones/timeline/${timeline}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/timeline/${timeline}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listPublicMilestonesWithFeatures(orgId, productId, timeline) {
+export async function listPublicMilestonesWithFeatures(orgId, projectId, timeline) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${productId}/milestones/timeline/${timeline}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/milestones/timeline/${timeline}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listFeaturesWithoutMilestone(orgId, productId) {
+export async function listFeaturesWithoutMilestone(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/without-milestone`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/without-milestone`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function getMilestone(orgId, productId, id) {
+export async function getMilestone(orgId, projectId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/milestones/${id}`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function getPublicMilestone(orgId, productId, milestoneId) {
+export async function getPublicMilestone(orgId, projectId, milestoneId) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${productId}/milestones/${milestoneId}`);
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/milestones/${milestoneId}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateMilestone(orgId, productId, id, milestone) {
+export async function updateMilestone(orgId, projectId, id, milestone) {
   try {
-    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/milestones/${id}`, milestone);
+    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`, milestone);
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function deleteMilestone(orgId, productId, id) {
+export async function deleteMilestone(orgId, projectId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/milestones/${id}`);
+    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`);
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateFeatureMilestone(orgId, productId, featureId, milestoneId) {
+export async function updateFeatureMilestone(orgId, projectId, featureId, milestoneId) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${featureId}`, { milestone: milestoneId });
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}`, { milestone: milestoneId });
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateFeatureKeyResult(orgId, productId, featureId, keyResultId) {
+export async function updateFeatureKeyResult(orgId, projectId, featureId, keyResultId) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${featureId}`, { keyResult: keyResultId });
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}`, { keyResult: keyResultId });
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateFeatureStatus(orgId, productId, featureId, status) {
+export async function updateFeatureStatus(orgId, projectId, featureId, status) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${featureId}`, { status });
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}`, { status });
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateFeaturePriority(orgId, productId, featureId, priority) {
+export async function updateFeaturePriority(orgId, projectId, featureId, priority) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${featureId}`, { priority });
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}`, { priority });
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function addFeatureComment(orgId, productId, featureId, comment) {
+export async function addFeatureComment(orgId, projectId, featureId, comment) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${featureId}/comments`, {
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}/comments`, {
       content: comment
     });
     return response.data;
@@ -196,17 +196,17 @@ export async function addFeatureComment(orgId, productId, featureId, comment) {
   }
 }
 
-export async function deleteFeatureComment(orgId, productId, featureId, commentId) {
+export async function deleteFeatureComment(orgId, projectId, featureId, commentId) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${featureId}/comments/${commentId}`);
+    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}/comments/${commentId}`);
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateFeatureComment(orgId, productId, featureId, commentId, comment) {
+export async function updateFeatureComment(orgId, projectId, featureId, commentId, comment) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${productId}/features/${featureId}/comments/${commentId}`, { content: comment });
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}/comments/${commentId}`, { content: comment });
     return response.data;
   } catch (e) {
     throw new Error(e.message);

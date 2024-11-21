@@ -71,7 +71,7 @@ describe('OrgsService', () => {
       const org = new Org();
       org.name = 'Some org';
       await orgsRepository.save(org);
-      const actual = await service.getOrCreateOrg(org.invitationToken);
+      const actual = await service.getOrCreateOrg(null, org.invitationToken);
       expect(org.id).toEqual(actual.id);
       expect(actual.name).toEqual(org.name);
     });

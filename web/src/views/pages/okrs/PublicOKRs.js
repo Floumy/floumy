@@ -13,7 +13,7 @@ import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
 
 function PublicOKRs() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get("timeline") || "this-quarter";
@@ -35,7 +35,7 @@ function PublicOKRs() {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const okrs = await listPublicObjectives(orgId, productId, timelineQueryFilter);
+        const okrs = await listPublicObjectives(orgId, projectId, timelineQueryFilter);
         setOKRs(okrs
           .sort((a, b) => a.createdAt < b.createdAt ? 1 : -1));
       } catch (e) {
@@ -46,7 +46,7 @@ function PublicOKRs() {
     }
 
     fetchData();
-  }, [orgId, productId, timelineQueryFilter]);
+  }, [orgId, projectId, timelineQueryFilter]);
 
   return (
     <>
@@ -118,13 +118,13 @@ function PublicOKRs() {
                         {okr.id !== 0 &&
                           <>
                             <td>
-                              <Link to={`/public/orgs/${orgId}/projects/${productId}/okrs/detail/${okr.id}`}
+                              <Link to={`/public/orgs/${orgId}/projects/${projectId}/okrs/detail/${okr.id}`}
                                     className={"okr-detail"}>
                                 {okr.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
-                              <Link to={`/public/orgs/${orgId}/projects/${productId}/okrs/detail/${okr.id}`}
+                              <Link to={`/public/orgs/${orgId}/projects/${projectId}/okrs/detail/${okr.id}`}
                                     className={"okr-detail"}>
                                 {okr.title}
                               </Link>

@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
@@ -49,7 +34,7 @@ function OrgSignUp() {
   const [focusedName, setFocusedName] = React.useState(false);
   const [focusedEmail, setFocusedEmail] = React.useState(false);
   const [focusedPassword, setFocusedPassword] = React.useState(false);
-  const [focusedProductName, setFocusedProductName] = React.useState(false);
+  const [focusedProjectName, setFocusedProjectName] = React.useState(false);
   const [error, setError] = React.useState(null);
   const navigate = useNavigate();
 
@@ -71,14 +56,14 @@ function OrgSignUp() {
   };
 
   if (!invitationToken) {
-    validationSpec.productName = Yup.string()
-      .min(2, "The product name must be at least 2 characters long")
-      .required("The product name is required");
+    validationSpec.projectName = Yup.string()
+      .min(2, "The project name must be at least 2 characters long")
+      .required("The project name is required");
   }
 
   const validationSchema = Yup.object(validationSpec);
 
-  const initialValues = { name: "", email: "", password: "", acceptedTerms: false, productName: "" };
+  const initialValues = { name: "", email: "", password: "", acceptedTerms: false, projectName: "" };
   return (
     <>
       <AuthHeader title="Join Floumy!"
@@ -100,7 +85,7 @@ function OrgSignUp() {
                     try {
                       setError(null);
                       setSubmitting(true);
-                      await orgSignUp(values.name, values.email, values.password, values.productName, invitationToken);
+                      await orgSignUp(values.name, values.email, values.password, values.projectName, invitationToken);
                       setSubmitting(false);
                       navigate("/auth/activation-required");
                     } catch (e) {
@@ -113,10 +98,10 @@ function OrgSignUp() {
                       {error && <div className="text-center text-danger mb-3">{error}</div>}
                       {!invitationToken && <FormGroup
                         className={classnames({
-                          focused: focusedProductName
+                          focused: focusedProjectName
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.productName && touched.productName)}>
+                        <InputGroup className={getInputGroupErrorClass(errors.projectName && touched.projectName)}>
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-app" />
@@ -124,17 +109,17 @@ function OrgSignUp() {
                           </InputGroupAddon>
                           <Field
                             as={Input}
-                            name="productName"
-                            placeholder="The name of your product"
+                            name="projectName"
+                            placeholder="The name of your project"
                             type="text"
-                            onFocus={() => setFocusedProductName(true)}
-                            onBlur={() => setFocusedProductName(false)}
-                            invalid={!!(errors.productName && touched.productName)}
+                            onFocus={() => setFocusedProjectName(true)}
+                            onBlur={() => setFocusedProjectName(false)}
+                            invalid={!!(errors.projectName && touched.projectName)}
                             className="px-3"
                             autoComplete="off"
                           />
                         </InputGroup>
-                        <ErrorMessage name="productName" component={InputError} />
+                        <ErrorMessage name="projectName" component={InputError} />
                       </FormGroup>}
                       <FormGroup
                         className={classnames({

@@ -9,22 +9,22 @@ import { getOrg, patchCurrentOrg, setCurrentOrg } from "../../../services/org/or
 import { toast } from "react-toastify";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 
-function Product() {
-  const [productName, setProductName] = useState("");
+function Project() {
+  const [projectName, setProjectName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [focusedProductName, setFocusedProductName] = useState(false);
-  const [isLoadingProductName, setIsLoadingProductName] = useState(false);
+  const [focusedProjectName, setFocusedProjectName] = useState(false);
+  const [isLoadingProjectName, setIsLoadingProjectName] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
-      setIsLoadingProductName(true);
+      setIsLoadingProjectName(true);
       try {
         const org = await getOrg();
-        setProductName(org.name);
+        setProjectName(org.name);
       } catch (e) {
-        toast.error("Failed to fetch product name");
+        toast.error("Failed to fetch project name");
       } finally {
-        setIsLoadingProductName(false);
+        setIsLoadingProjectName(false);
       }
     }
 
@@ -32,16 +32,16 @@ function Product() {
   }, []);
 
   const validationSchema = Yup.object().shape({
-    productName: Yup.string().trim()
-      .required("Product name is required")
-      .min(2, "Product name must be at least 3 characters")
+    projectName: Yup.string().trim()
+      .required("Project name is required")
+      .min(2, "Project name must be at least 3 characters")
   });
 
   async function handleSubmit(values) {
-    setProductName(values.productName);
-    await patchCurrentOrg({ name: values.productName });
+    setProjectName(values.projectName);
+    await patchCurrentOrg({ name: values.projectName });
     await setCurrentOrg();
-    toast.success("Product name saved");
+    toast.success("Project name saved");
 
     // TODO: This is a hack to refresh the local storage data. We should find a better way to do this.
     setTimeout(() => {
@@ -55,20 +55,20 @@ function Product() {
       <Container className="mt--6 pb-4" fluid>
         <Card className="shadow">
           <CardHeader>
-            <h3 className="mb-0">Product</h3>
+            <h3 className="mb-0">Project</h3>
           </CardHeader>
-          {isLoadingProductName && <LoadingSpinnerBox />}
-          {!isLoadingProductName && <Row className="p-4">
+          {isLoadingProjectName && <LoadingSpinnerBox />}
+          {!isLoadingProjectName && <Row className="p-4">
             <Col>
               <Formik
-                initialValues={{ productName: productName }}
+                initialValues={{ projectName: projectName }}
                 validationSchema={validationSchema}
                 onSubmit={async (values, { setErrors }) => {
                   try {
                     setIsSubmitting(true);
                     await handleSubmit(values);
                   } catch (e) {
-                    setErrors({ productName: e.message });
+                    setErrors({ projectName: e.message });
                   } finally {
                     setIsSubmitting(false);
                   }
@@ -78,26 +78,26 @@ function Product() {
                   <Form
                     className="needs-validation"
                     noValidate>
-                    <h4>Product Name</h4>
+                    <h4>Project Name</h4>
                     <FormGroup
                       className={classnames({
-                        focused: focusedProductName
+                        focused: focusedProjectName
                       })}
                     >
                       <InputGroup className="input-group input-group-merge">
                         <Field
                           as={Input}
-                          name="productName"
-                          placeholder="The name of your product"
+                          name="projectName"
+                          placeholder="The name of your project"
                           type="text"
-                          onFocus={() => setFocusedProductName(true)}
-                          onBlur={() => setFocusedProductName(false)}
-                          value={values.productName}
-                          invalid={!!(errors.productName && touched.productName)}
+                          onFocus={() => setFocusedProjectName(true)}
+                          onBlur={() => setFocusedProjectName(false)}
+                          value={values.projectName}
+                          invalid={!!(errors.projectName && touched.projectName)}
                           className="px-3"
                           autoComplete="off"
                         />
-                        <ErrorMessage name="productName" component={InputError} />
+                        <ErrorMessage name="projectName" component={InputError} />
                       </InputGroup>
                     </FormGroup>
                     <div>
@@ -117,4 +117,4 @@ function Product() {
   );
 }
 
-export default Product;
+export default Project;

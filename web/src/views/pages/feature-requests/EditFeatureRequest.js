@@ -16,17 +16,17 @@ import { toast } from "react-toastify";
 import Comments from "../../../components/Comments/Comments";
 
 export default function EditFeatureRequest() {
-  const { orgId, productId, featureRequestId } = useParams();
+  const { orgId, projectId, featureRequestId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [featureRequest, setFeatureRequest] = useState(null);
 
   useEffect(() => {
     document.title = "Floumy | Edit Feature Request";
 
-    async function fetchFeatureRequest(orgId, productId, featureRequestId) {
+    async function fetchFeatureRequest(orgId, projectId, featureRequestId) {
       try {
         setIsLoading(true);
-        const featureRequest = await getFeatureRequest(orgId, productId, featureRequestId);
+        const featureRequest = await getFeatureRequest(orgId, projectId, featureRequestId);
         setFeatureRequest(featureRequest);
       } catch (e) {
         console.error(e);
@@ -35,12 +35,12 @@ export default function EditFeatureRequest() {
       }
     }
 
-    fetchFeatureRequest(orgId, productId, featureRequestId);
-  }, [orgId, productId, featureRequestId]);
+    fetchFeatureRequest(orgId, projectId, featureRequestId);
+  }, [orgId, projectId, featureRequestId]);
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addFeatureRequestComment(orgId, productId, featureRequest.id, comment);
+      const addedComment = await addFeatureRequestComment(orgId, projectId, featureRequest.id, comment);
       featureRequest.comments.push(addedComment);
       setFeatureRequest({ ...featureRequest });
       toast.success("Comment added successfully");
@@ -51,7 +51,7 @@ export default function EditFeatureRequest() {
 
   async function handleCommentUpdate(commentId, content) {
     try {
-      const updatedComment = await updateFeatureRequestComment(orgId, productId, featureRequest.id, commentId, content);
+      const updatedComment = await updateFeatureRequestComment(orgId, projectId, featureRequest.id, commentId, content);
       const index = featureRequest.comments.findIndex((c) => c.id === updatedComment.id);
       featureRequest.comments[index] = updatedComment;
       setFeatureRequest({ ...featureRequest });
@@ -63,7 +63,7 @@ export default function EditFeatureRequest() {
 
   async function handleCommentDelete(commentId) {
     try {
-      await deleteFeatureRequestComment(orgId, productId, featureRequest.id, commentId);
+      await deleteFeatureRequestComment(orgId, projectId, featureRequest.id, commentId);
       const index = featureRequest.comments.findIndex((c) => c.id === commentId);
       featureRequest.comments.splice(index, 1);
       setFeatureRequest({ ...featureRequest });
@@ -74,11 +74,11 @@ export default function EditFeatureRequest() {
   }
 
   const handleUpdate = async (updatedFeatureRequest) => {
-    await updateFeatureRequest(orgId, productId, featureRequestId, updatedFeatureRequest);
+    await updateFeatureRequest(orgId, projectId, featureRequestId, updatedFeatureRequest);
   };
 
   const handleDelete = async (featureRequestId) => {
-    await deleteFeatureRequest(orgId, productId, featureRequestId);
+    await deleteFeatureRequest(orgId, projectId, featureRequestId);
   };
 
   return (<>

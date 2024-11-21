@@ -46,6 +46,7 @@ describe('AuthController', () => {
   describe('when signing in with valid credentials', () => {
     it('should return an access token', async () => {
       await controller.orgSignUp({
+        projectName: 'Test project',
         name: 'John Doe',
         email: 'john@example.com',
         password: 'testtesttest',
@@ -75,6 +76,7 @@ describe('AuthController', () => {
   describe('when refreshing an access token', () => {
     it('should return a new access token and a new refresh token', async () => {
       await controller.orgSignUp({
+        projectName: 'Test project',
         name: 'Test User',
         email: 'test@example.com',
         password: 'testtesttest',

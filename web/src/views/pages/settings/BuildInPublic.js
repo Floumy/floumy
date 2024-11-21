@@ -10,7 +10,7 @@ import { clearCache } from "../../../services/cache/cache.service";
 import { useBuildInPublic } from "../../../contexts/BuidInPublicContext";
 
 function BuildInPublic() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [isLoadingBuildInPublicSettings, setIsLoadingBuildInPublicSettings] = useState(false);
   const [isBuildInPublicEnabled, setIsBuildInPublicEnabled] = useState(false);
 
@@ -29,7 +29,7 @@ function BuildInPublic() {
     async function fetchData() {
       setIsLoadingBuildInPublicSettings(true);
       try {
-        const buildInPublicSettings = await getBuildInPublicSettings(orgId, productId);
+        const buildInPublicSettings = await getBuildInPublicSettings(orgId, projectId);
         setBuildInPublicSettings({
           isObjectivesPagePublic: buildInPublicSettings.isObjectivesPagePublic,
           isRoadmapPagePublic: buildInPublicSettings.isRoadmapPagePublic,
@@ -66,7 +66,7 @@ function BuildInPublic() {
           ...newSettings,
           isBuildInPublicEnabled: isBuildInPublicEnabledBasedOnSettings(newSettings)
         });
-        await updateBuildInPublicSettings(orgId, productId, {
+        await updateBuildInPublicSettings(orgId, projectId, {
           ...newSettings,
           isBuildInPublicEnabled: isBuildInPublicEnabledBasedOnSettings(newSettings)
         });
@@ -81,19 +81,19 @@ function BuildInPublic() {
     setIsBuildInPublicEnabled(isBuildInPublicEnabledBasedOnSettings(buildInPublicSettings));
 
     if (buildInPublicSettings.isFeedPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/feed`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/feed`));
     } else if (buildInPublicSettings.isObjectivesPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/okrs`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/okrs`));
     } else if (buildInPublicSettings.isRoadmapPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/roadmap`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/roadmap`));
     } else if (buildInPublicSettings.isIterationsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/iterations`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/iterations`));
     } else if (buildInPublicSettings.isActiveIterationsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/active-iteration`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-iteration`));
     } else if (buildInPublicSettings.isIssuesPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/issues`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/issues`));
     } else if (buildInPublicSettings.isFeatureRequestsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${productId}/feature-requests`));
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/feature-requests`));
     }
   }, [buildInPublicSettings, orgId]);
 
@@ -108,7 +108,7 @@ function BuildInPublic() {
         isIssuesPagePublic: !isBuildInPublicEnabled,
         isFeatureRequestsPagePublic: !isBuildInPublicEnabled
       };
-      await updateBuildInPublicSettings(orgId, productId, {
+      await updateBuildInPublicSettings(orgId, projectId, {
         ...settings,
         isBuildInPublicEnabled: !isBuildInPublicEnabled
       });
@@ -142,7 +142,7 @@ function BuildInPublic() {
                       <div className="text-xs-left text-sm-right">
                         <Link className="btn btn-icon btn-primary" color="primary" id="tooltipCopyLink" type="button"
                               to={publicLink} target="_blank">
-                          Open the public product page <i className="fas fa-external-link ml-2" />
+                          Open the public project page <i className="fas fa-external-link ml-2" />
                         </Link>
 
                       </div>}
