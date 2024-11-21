@@ -42,7 +42,7 @@ function Milestone({ milestone, onFeatureChangeMilestone }) {
 
   async function handleAddFeatureWithMilestone(feature, milestoneId) {
     feature.milestone = milestoneId;
-    const savedFeature = await addFeature(feature);
+    const savedFeature = await addFeature(feature, orgId, projectId);
     features.push(savedFeature);
     setFeatures([...features]);
   }
