@@ -16,7 +16,7 @@ import { FeatureRequestVote } from './feature-request-vote.entity';
 import { CommentMapper } from '../comments/mappers';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 import { FeatureRequestComment } from './feature-request-comment.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 
 @Injectable()
@@ -32,8 +32,8 @@ export class FeatureRequestsService {
     private featureRequestVotesRepository: Repository<FeatureRequestVote>,
     @InjectRepository(FeatureRequestComment)
     private featureRequestCommentsRepository: Repository<FeatureRequestComment>,
-    @InjectRepository(Product)
-    private productsRepository: Repository<Product>,
+    @InjectRepository(Project)
+    private projectsRepository: Repository<Project>,
     @InjectRepository(Feature)
     private featuresRepository: Repository<Feature>,
   ) {}
@@ -41,7 +41,7 @@ export class FeatureRequestsService {
   async addFeatureRequest(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     createFeatureRequestDto: CreateFeatureRequestDto,
   ): Promise<FeatureRequestDto> {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
@@ -58,11 +58,11 @@ export class FeatureRequestsService {
     featureRequest.createdBy = Promise.resolve(user);
     featureRequest.org = Promise.resolve(org);
     featureRequest.votesCount = 1;
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
-    featureRequest.product = Promise.resolve(product);
+    featureRequest.project = Promise.resolve(project);
     const savedFeatureRequest =
       await this.featureRequestsRepository.save(featureRequest);
 
@@ -77,7 +77,7 @@ export class FeatureRequestsService {
 
   async listFeatureRequests(
     orgId: string,
-    productId: string,
+    projectId: string,
     page: number = 1,
     limit: number = 0,
   ) {
@@ -88,7 +88,7 @@ export class FeatureRequestsService {
     }
 
     const featureRequests = await this.featureRequestsRepository.find({
-      where: { org: { id: orgId }, product: { id: productId } },
+      where: { org: { id: orgId }, project: { id: projectId } },
       take: limit,
       skip: (page - 1) * limit,
       order: { votesCount: 'DESC', createdAt: 'DESC' },
@@ -99,7 +99,7 @@ export class FeatureRequestsService {
 
   async getFeatureRequestById(
     orgId: string,
-    productId: string,
+    projectId: string,
     featureRequestId: string,
   ): Promise<FeatureRequestDto> {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
@@ -112,7 +112,7 @@ export class FeatureRequestsService {
       where: {
         id: featureRequestId,
         org: { id: orgId },
-        product: { id: productId },
+        project: { id: projectId },
       },
     });
     return await FeatureRequestsMapper.toFeatureRequestDto(featureRequest);
@@ -121,7 +121,7 @@ export class FeatureRequestsService {
   async updateFeatureRequest(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     featureRequestId: string,
     updateFeatureRequestDto: UpdateFeatureRequestDto,
   ): Promise<FeatureRequestDto> {
@@ -136,7 +136,7 @@ export class FeatureRequestsService {
       where: {
         id: featureRequestId,
         org: { id: orgId },
-        product: { id: productId },
+        project: { id: projectId },
       },
     });
 
@@ -164,7 +164,7 @@ export class FeatureRequestsService {
   async deleteFeatureRequest(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     featureRequestId: string,
   ) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
@@ -178,7 +178,7 @@ export class FeatureRequestsService {
       where: {
         id: featureRequestId,
         org: { id: orgId },
-        product: { id: productId },
+        project: { id: projectId },
       },
     });
 
@@ -201,7 +201,7 @@ export class FeatureRequestsService {
 
   async createFeatureRequestComment(
     orgId: string,
-    productId: string,
+    projectId: string,
     userId: string,
     featureRequestId: string,
     createCommentDto: CreateUpdateCommentDto,
@@ -211,7 +211,7 @@ export class FeatureRequestsService {
       {
         id: featureRequestId,
         org: { id: orgId },
-        product: { id: productId },
+        project: { id: projectId },
       },
     );
     const org = await featureRequest.org;
@@ -250,7 +250,7 @@ export class FeatureRequestsService {
 
   async updateFeatureRequestComment(
     orgId: string,
-    productId: string,
+    projectId: string,
     userId: string,
     featureRequestId: string,
     commentId: string,
@@ -260,7 +260,7 @@ export class FeatureRequestsService {
       {
         id: featureRequestId,
         org: { id: orgId },
-        product: { id: productId },
+        project: { id: projectId },
       },
     );
     const org = await featureRequest.org;
@@ -285,7 +285,7 @@ export class FeatureRequestsService {
 
   async searchFeatureRequestsByTitleOrDescription(
     orgId: string,
-    productId: string,
+    projectId: string,
     search: string,
     page: number,
     limit: number,
@@ -294,17 +294,17 @@ export class FeatureRequestsService {
         SELECT *
         FROM feature_request
         WHERE feature_request."orgId" = $1
-          AND feature_request."productId" = $2
+          AND feature_request."projectId" = $2
           AND (feature_request.title ILIKE $3 OR feature_request.description ILIKE $3)
         ORDER BY feature_request."votesCount" DESC,
                  feature_request."createdAt" DESC
     `;
-    let params = [orgId, productId, `%${search}%`] as any[];
+    let params = [orgId, projectId, `%${search}%`] as any[];
 
     if (limit > 0) {
       query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, productId, `%${search}%`, offset, limit];
+      params = [orgId, projectId, `%${search}%`, offset, limit];
     }
 
     const workItems = await this.featureRequestsRepository.query(query, params);

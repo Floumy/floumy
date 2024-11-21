@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 /*eslint-disable*/
 import React from "react";
 // react library for routing
@@ -38,9 +23,9 @@ function Index() {
                   A complete React solution
                 </h2>
                 <p className="lead text-white">
-                  Argon is a completly new product built on our newest re-built
+                  Argon is a completly new project built on our newest re-built
                   from scratch framework structure that is meant to make our
-                  products more intuitive, more adaptive and, needless to say,
+                  projects more intuitive, more adaptive and, needless to say,
                   so much easier to customize. Let Argon amaze you with its cool
                   features and build tools and get your project to a whole new
                   level.
@@ -343,7 +328,7 @@ function Index() {
                   <Button
                     className="btn-neutral mb-3 mb-sm-0"
                     color="default"
-                    href="https://www.creative-tim.com/product/argon-dashboard-react?ref=adpr-index-page"
+                    href="https://www.creative-tim.com/project/argon-dashboard-react?ref=adpr-index-page"
                     target="_blank"
                   >
                     <span className="btn-inner--text">Get FREE version</span>
@@ -351,7 +336,7 @@ function Index() {
                   <Button
                     className="btn-icon mb-3 mb-sm-0"
                     color="info"
-                    href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adpr-index-page"
+                    href="https://www.creative-tim.com/project/argon-dashboard-pro-react?ref=adpr-index-page"
                     target="_blank"
                   >
                     <span className="btn-inner--icon">
@@ -374,7 +359,7 @@ function Index() {
                   <Row className="justify-content-center">
                     <Col className="my-2" md="2" xs="3">
                       <a
-                        href="https://www.creative-tim.com/product/argon-dashboard-pro?ref=adpr-index-page"
+                        href="https://www.creative-tim.com/project/argon-dashboard-pro?ref=adpr-index-page"
                         id="tooltip170669606"
                         target="_blank"
                       >
@@ -390,7 +375,7 @@ function Index() {
                     </Col>
                     <Col className="my-2" md="2" xs="3">
                       <a
-                        href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adpr-index-page"
+                        href="https://www.creative-tim.com/project/argon-dashboard-pro-react?ref=adpr-index-page"
                         id="tooltip374813715"
                         target="_blank"
                       >
@@ -407,7 +392,7 @@ function Index() {
                     </Col>
                     <Col className="my-2" md="2" xs="3">
                       <a
-                        href="https://www.creative-tim.com/product/argon-dashboard-pro-nodejs?ref=adpr-index-page"
+                        href="https://www.creative-tim.com/project/argon-dashboard-pro-nodejs?ref=adpr-index-page"
                         id="tooltip374813716"
                         target="_blank"
                       >
@@ -424,7 +409,7 @@ function Index() {
                     </Col>
                     <Col className="my-2" md="2" xs="3">
                       <a
-                        href="https://www.creative-tim.com/product/argon-dashboard-pro-laravel?ref=adpr-index-page"
+                        href="https://www.creative-tim.com/project/argon-dashboard-pro-laravel?ref=adpr-index-page"
                         id="tooltip374813717"
                         target="_blank"
                       >
@@ -441,7 +426,7 @@ function Index() {
                     </Col>
                     <Col className="my-2" md="2" xs="3">
                       <a
-                        href="https://www.creative-tim.com/product/vue-argon-dashboard-pro?ref=adpr-index-page"
+                        href="https://www.creative-tim.com/project/vue-argon-dashboard-pro?ref=adpr-index-page"
                         id="tooltip616015001"
                         target="_blank"
                       >
@@ -457,7 +442,7 @@ function Index() {
                     </Col>
                     <Col className="my-2" md="2" xs="3">
                       <a
-                        href="https://www.creative-tim.com/product/argon-dashboard-pro-angular?ref=adpr-index-page"
+                        href="https://www.creative-tim.com/project/argon-dashboard-pro-angular?ref=adpr-index-page"
                         id="tooltip211254026"
                         target="_blank"
                       >
@@ -473,7 +458,7 @@ function Index() {
                     </Col>
                     <Col className="my-2" md="2" xs="3">
                       <a
-                        href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adpr-index-page"
+                        href="https://www.creative-tim.com/project/argon-dashboard-pro-react?ref=adpr-index-page"
                         id="tooltip82987604"
                         target="_blank"
                       >
@@ -489,7 +474,7 @@ function Index() {
                     </Col>
                     <Col className="my-2" md="2" xs="3">
                       <a
-                        href="https://www.adobe.com/products/photoshop.html?ref=creative-tim"
+                        href="https://www.adobe.com/projects/photoshop.html?ref=creative-tim"
                         id="tooltip731835410"
                         target="_blank"
                       >

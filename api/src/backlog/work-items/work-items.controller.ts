@@ -22,7 +22,7 @@ import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from './dtos';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
 
-@Controller('/orgs/:orgId/products/:productId/work-items')
+@Controller('/orgs/:orgId/projects/:projectId/work-items')
 @UseGuards(AuthGuard)
 export class WorkItemsController {
   constructor(private workItemsService: WorkItemsService) {}
@@ -31,7 +31,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Body() workItemDto: CreateUpdateWorkItemDto,
   ): Promise<WorkItemDto> {
@@ -42,7 +42,7 @@ export class WorkItemsController {
     try {
       return await this.workItemsService.createWorkItem(
         orgId,
-        productId,
+        projectId,
         request.user.sub,
         workItemDto,
       );
@@ -55,7 +55,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async list(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
@@ -67,7 +67,7 @@ export class WorkItemsController {
     try {
       return await this.workItemsService.listWorkItems(
         orgId,
-        productId,
+        projectId,
         page,
         limit,
       );
@@ -80,7 +80,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async search(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Query('q') query: string,
     @Query('page') page: number = 1,
@@ -93,7 +93,7 @@ export class WorkItemsController {
     try {
       return await this.workItemsService.searchWorkItems(
         orgId,
-        productId,
+        projectId,
         query,
         page,
         limit,
@@ -107,7 +107,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async listOpenWithoutIterations(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
   ) {
     if (orgId !== request.user.org) {
@@ -116,7 +116,7 @@ export class WorkItemsController {
 
     return await this.workItemsService.listOpenWorkItemsWithoutIterations(
       orgId,
-      productId,
+      projectId,
     );
   }
 
@@ -124,7 +124,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async get(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
   ) {
@@ -133,7 +133,7 @@ export class WorkItemsController {
     }
 
     try {
-      return await this.workItemsService.getWorkItem(orgId, productId, id);
+      return await this.workItemsService.getWorkItem(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -143,7 +143,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() workItemDto: CreateUpdateWorkItemDto,
@@ -155,7 +155,7 @@ export class WorkItemsController {
     try {
       return await this.workItemsService.updateWorkItem(
         orgId,
-        productId,
+        projectId,
         id,
         workItemDto,
       );
@@ -168,7 +168,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async delete(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
   ) {
@@ -177,7 +177,7 @@ export class WorkItemsController {
     }
 
     try {
-      await this.workItemsService.deleteWorkItem(orgId, productId, id);
+      await this.workItemsService.deleteWorkItem(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -187,7 +187,7 @@ export class WorkItemsController {
   @HttpCode(HttpStatus.OK)
   async patch(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() workItemDto: WorkItemPatchDto,
@@ -199,7 +199,7 @@ export class WorkItemsController {
     try {
       return await this.workItemsService.patchWorkItem(
         orgId,
-        productId,
+        projectId,
         id,
         workItemDto,
       );
@@ -211,7 +211,7 @@ export class WorkItemsController {
   @Post(':id/comments')
   async createComment(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() createCommentDto: CreateUpdateCommentDto,
@@ -224,7 +224,7 @@ export class WorkItemsController {
       return await this.workItemsService.createWorkItemComment(
         request.user.sub,
         orgId,
-        productId,
+        projectId,
         id,
         createCommentDto,
       );
@@ -237,13 +237,13 @@ export class WorkItemsController {
   @Public()
   async listComments(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('id') id: string,
   ) {
     try {
       return await this.workItemsService.listWorkItemComments(
         orgId,
-        productId,
+        projectId,
         id,
       );
     } catch (e) {

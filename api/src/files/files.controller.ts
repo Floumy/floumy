@@ -21,7 +21,7 @@ import { FilesService } from './files.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Readable } from 'stream';
 
-@Controller('/orgs/:orgId/products/:productId/files')
+@Controller('/orgs/:orgId/projects/:projectId/files')
 @UseGuards(AuthGuard)
 export class FilesController {
   constructor(private filesService: FilesService) {}
@@ -30,7 +30,7 @@ export class FilesController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 })],
@@ -44,7 +44,7 @@ export class FilesController {
     }
 
     try {
-      return await this.filesService.uploadFile(orgId, productId, file);
+      return await this.filesService.uploadFile(orgId, projectId, file);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -54,7 +54,7 @@ export class FilesController {
   @Header('Access-Control-Expose-Headers', 'Content-Disposition')
   async getFile(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('id') fileId: string,
     @Request() request,
     @Response() response,
@@ -64,7 +64,7 @@ export class FilesController {
     }
 
     try {
-      const file = await this.filesService.getFile(orgId, productId, fileId);
+      const file = await this.filesService.getFile(orgId, projectId, fileId);
       response.setHeader('Content-Type', file.object.ContentType);
       response.setHeader(
         'Content-Disposition',
@@ -85,7 +85,7 @@ export class FilesController {
   @Delete('/:id')
   async deleteFile(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Param('id') fileId: string,
     @Request() request,
   ) {
@@ -93,6 +93,6 @@ export class FilesController {
       throw new UnauthorizedException();
     }
 
-    await this.filesService.deleteFile(orgId, productId, fileId);
+    await this.filesService.deleteFile(orgId, projectId, fileId);
   }
 }

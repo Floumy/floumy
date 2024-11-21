@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
 // react library for routing
 import { Link } from "react-router-dom";
@@ -53,7 +38,7 @@ function IndexHeader() {
                     <Button
                       className="my-2"
                       color="default"
-                      href="https://www.creative-tim.com/product/argon-dashboard-pro-react?ref=adpr-auth-navbar"
+                      href="https://www.creative-tim.com/project/argon-dashboard-pro-react?ref=adpr-auth-navbar"
                     >
                       Purchase now
                     </Button>

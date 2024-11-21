@@ -3,7 +3,7 @@ import { getBuildInPublicSettings } from "../services/bip/build-in-public.servic
 
 const BuildInPublicContext = createContext({});
 
-export const BuildInPublicProvider = ({ children, orgId, productId }) => {
+export const BuildInPublicProvider = ({ children, orgId, projectId }) => {
 
   const [settings, setSettings] = useState({
     isObjectivesPagePublic: false,
@@ -19,14 +19,14 @@ export const BuildInPublicProvider = ({ children, orgId, productId }) => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const fetchedSettings = await getBuildInPublicSettings(orgId, productId);
+        const fetchedSettings = await getBuildInPublicSettings(orgId, projectId);
         setSettings(fetchedSettings);
       } catch (error) {
         console.error("Failed to fetch build in public settings", error);
       }
     };
     fetchSettings();
-  }, [orgId, productId]);
+  }, [orgId, projectId]);
 
   const value = useMemo(() => ({ settings, setSettings }), [settings]);
 

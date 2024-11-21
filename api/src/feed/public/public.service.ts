@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FeedService } from '../feed.service';
 import { FeedItemDto } from '../dtos';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -9,22 +9,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class PublicService {
   constructor(
     private readonly feedService: FeedService,
-    @InjectRepository(Product)
-    private readonly productsRepository: Repository<Product>,
+    @InjectRepository(Project)
+    private readonly projectsRepository: Repository<Project>,
   ) {}
 
   async listFeedItems(
     orgId: string,
-    productId: string,
+    projectId: string,
     page: number,
     limit: number,
   ): Promise<FeedItemDto[]> {
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
 
-    const bipSettings = await product.bipSettings;
+    const bipSettings = await project.bipSettings;
 
     if (
       bipSettings?.isBuildInPublicEnabled !== true ||
@@ -35,7 +35,7 @@ export class PublicService {
 
     const feedItems = await this.feedService.listFeedItems(
       orgId,
-      productId,
+      projectId,
       page,
       limit,
     );

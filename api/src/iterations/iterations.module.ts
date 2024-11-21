@@ -11,13 +11,13 @@ import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PublicService } from './public/public.service';
 import { PublicController } from './public/public.controller';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Module({
   controllers: [IterationsController, PublicController],
   imports: [
     CacheModule.register(),
-    TypeOrmModule.forFeature([Org, WorkItem, Iteration, User, Product]),
+    TypeOrmModule.forFeature([Org, WorkItem, Iteration, User, Project]),
     OrgsModule,
     AuthModule,
   ],

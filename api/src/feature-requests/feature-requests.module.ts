@@ -10,7 +10,7 @@ import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestVoteService } from './feature-request-votes.service';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { FeatureRequestComment } from './feature-request-comment.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 
 @Module({
@@ -22,7 +22,7 @@ import { Feature } from '../roadmap/features/feature.entity';
       FeatureRequestVote,
       FeatureRequestComment,
       Feature,
-      Product,
+      Project,
     ]),
     OrgsModule,
     AuthModule,

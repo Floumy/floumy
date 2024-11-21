@@ -17,7 +17,7 @@ import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { PaymentPlan } from '../../auth/payment.plan';
 import { WorkItemComment } from './work-item-comment.entity';
 import { Issue } from '../../issues/issue.entity';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 @Injectable()
 export class WorkItemsService {
@@ -36,25 +36,25 @@ export class WorkItemsService {
     private filesService: FilesService,
     private eventEmitter: EventEmitter2,
     @InjectRepository(Issue) private issuesRepository: Repository<Issue>,
-    @InjectRepository(Product) private productsRepository: Repository<Product>,
+    @InjectRepository(Project) private projectsRepository: Repository<Project>,
   ) {}
 
   async createWorkItem(
     orgId: string,
-    productId: string,
+    projectId: string,
     userId: string,
     workItemDto: CreateUpdateWorkItemDto,
   ) {
     if (!userId) throw new Error('User id is required');
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
     const org = await user.org;
     const workItem = new WorkItem();
     workItem.createdBy = Promise.resolve(user);
-    workItem.product = Promise.resolve(product);
+    workItem.project = Promise.resolve(project);
     await this.setWorkItemData(workItem, workItemDto, org.id);
     workItem.org = Promise.resolve(org);
     await this.workItemsRepository.save(workItem);
@@ -73,7 +73,7 @@ export class WorkItemsService {
 
   async listWorkItems(
     orgId: string,
-    productId: string,
+    projectId: string,
     page: number = 1,
     limit: number = 0,
   ) {
@@ -81,7 +81,7 @@ export class WorkItemsService {
         SELECT *
         FROM work_item
         WHERE work_item."orgId" = $1
-          AND work_item."productId" = $2
+          AND work_item."projectId" = $2
         ORDER BY CASE
                      WHEN work_item."priority" = 'high' THEN 1
                      WHEN work_item."priority" = 'medium' THEN 2
@@ -90,36 +90,36 @@ export class WorkItemsService {
                      END,
                  work_item."createdAt" DESC
     `;
-    let params = [orgId, productId] as any[];
+    let params = [orgId, projectId] as any[];
     if (limit > 0) {
       query += ' OFFSET $3 LIMIT $4';
       const offset = (page - 1) * limit;
-      params = [orgId, productId, offset, limit];
+      params = [orgId, projectId, offset, limit];
     }
 
     const workItems = await this.workItemsRepository.query(query, params);
     return WorkItemMapper.toSimpleListDto(workItems);
   }
 
-  async getWorkItem(orgId: string, productId: string, id: string) {
+  async getWorkItem(orgId: string, projectId: string, id: string) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     return WorkItemMapper.toDto(workItem);
   }
 
   async updateWorkItem(
     orgId: string,
-    productId: string,
+    projectId: string,
     id: string,
     workItemDto: CreateUpdateWorkItemDto,
   ) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     const previous = await WorkItemMapper.toDto(workItem);
     const oldFeature = await workItem.feature;
@@ -139,14 +139,14 @@ export class WorkItemsService {
     return current;
   }
 
-  async deleteWorkItem(orgId: string, productId: string, id: string) {
+  async deleteWorkItem(orgId: string, projectId: string, id: string) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     const deletedWorkItem = await WorkItemMapper.toDto(workItem);
-    await this.deleteWorkItemFiles(orgId, productId, workItem.id);
+    await this.deleteWorkItemFiles(orgId, projectId, workItem.id);
 
     const feature = await workItem.feature;
 
@@ -158,20 +158,20 @@ export class WorkItemsService {
     this.eventEmitter.emit('workItem.deleted', deletedWorkItem);
   }
 
-  removeFeatureFromWorkItems(orgId: string, productId: string, id: string) {
+  removeFeatureFromWorkItems(orgId: string, projectId: string, id: string) {
     return this.workItemsRepository.update(
-      { org: { id: orgId }, feature: { id }, product: { id: productId } },
+      { org: { id: orgId }, feature: { id }, project: { id: projectId } },
       { feature: null },
     );
   }
 
-  async listOpenWorkItemsWithoutIterations(orgId: string, productId: string) {
+  async listOpenWorkItemsWithoutIterations(orgId: string, projectId: string) {
     const workItems = await this.workItemsRepository
       .createQueryBuilder('workItem')
       .leftJoinAndSelect('workItem.feature', 'feature')
       .leftJoinAndSelect('workItem.assignedTo', 'assignedTo')
       .where('workItem.orgId = :orgId', { orgId })
-      .andWhere('workItem.productId = :productId', { productId })
+      .andWhere('workItem.projectId = :projectId', { projectId })
       .andWhere('workItem.status NOT IN (:closedStatus, :doneStatus)', {
         closedStatus: WorkItemStatus.CLOSED,
         doneStatus: WorkItemStatus.DONE,
@@ -183,14 +183,14 @@ export class WorkItemsService {
 
   async patchWorkItem(
     orgId: string,
-    productId: string,
+    projectId: string,
     workItemId: string,
     workItemPatchDto: WorkItemPatchDto,
   ) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id: workItemId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     const previous = await WorkItemMapper.toDto(workItem);
     const currentIteration = await workItem.iteration;
@@ -216,7 +216,7 @@ export class WorkItemsService {
 
   async searchWorkItems(
     orgId: string,
-    productId: string,
+    projectId: string,
     search: string,
     page: number = 1,
     limit: number = 0,
@@ -226,7 +226,7 @@ export class WorkItemsService {
     if (this.isReference(search)) {
       return await this.searchWorkItemsByReference(
         orgId,
-        productId,
+        projectId,
         search,
         page,
         limit,
@@ -235,7 +235,7 @@ export class WorkItemsService {
 
     return await this.searchWorkItemsByTitleOrDescription(
       orgId,
-      productId,
+      projectId,
       search,
       page,
       limit,
@@ -244,13 +244,13 @@ export class WorkItemsService {
 
   async listWorkItemComments(
     orgId: string,
-    productId: string,
+    projectId: string,
     workItemId: string,
   ) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id: workItemId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     const comments = await workItem.comments;
     return await CommentMapper.toDtoList(comments);
@@ -259,7 +259,7 @@ export class WorkItemsService {
   async createWorkItemComment(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     workItemId: string,
     createCommentDto: CreateUpdateCommentDto,
   ) {
@@ -267,7 +267,7 @@ export class WorkItemsService {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       id: workItemId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     const org = await workItem.org;
     if (org.paymentPlan !== PaymentPlan.PREMIUM) {
@@ -465,7 +465,7 @@ export class WorkItemsService {
 
   private async deleteWorkItemFiles(
     orgId: string,
-    productId: string,
+    projectId: string,
     workItemId: string,
   ) {
     const workItemFiles = await this.workItemFilesRepository.find({
@@ -473,7 +473,7 @@ export class WorkItemsService {
     });
     for (const workItemFile of workItemFiles) {
       const file = await workItemFile.file;
-      await this.filesService.deleteFile(orgId, productId, file.id);
+      await this.filesService.deleteFile(orgId, projectId, file.id);
     }
   }
 
@@ -483,7 +483,7 @@ export class WorkItemsService {
 
   private async searchWorkItemsByTitleOrDescription(
     orgId: string,
-    productId: string,
+    projectId: string,
     search: string,
     page: number,
     limit: number,
@@ -492,7 +492,7 @@ export class WorkItemsService {
         SELECT *
         FROM work_item
         WHERE work_item."orgId" = $1
-          AND work_item."productId" = $2
+          AND work_item."projectId" = $2
           AND (work_item.title ILIKE $3 OR work_item.description ILIKE $3)
         ORDER BY CASE
                      WHEN work_item."priority" = 'high' THEN 1
@@ -502,12 +502,12 @@ export class WorkItemsService {
                      END,
                  work_item."createdAt" DESC
     `;
-    let params = [orgId, productId, `%${search}%`] as any[];
+    let params = [orgId, projectId, `%${search}%`] as any[];
 
     if (limit > 0) {
       query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, productId, `%${search}%`, offset, limit];
+      params = [orgId, projectId, `%${search}%`, offset, limit];
     }
 
     const workItems = await this.workItemsRepository.query(query, params);
@@ -517,7 +517,7 @@ export class WorkItemsService {
 
   private async searchWorkItemsByReference(
     orgId: string,
-    productId: string,
+    projectId: string,
     search: string,
     page: number,
     limit: number,
@@ -526,7 +526,7 @@ export class WorkItemsService {
         SELECT *
         FROM work_item
         WHERE work_item."orgId" = $1
-          AND work_item."productId" = $2
+          AND work_item."projectId" = $2
           AND CAST(work_item."sequenceNumber" AS TEXT) LIKE $3
         ORDER BY CASE
                      WHEN work_item."priority" = 'high' THEN 1
@@ -538,12 +538,12 @@ export class WorkItemsService {
     `;
 
     const referenceSequenceNumber = search.split('-')[1];
-    let params = [orgId, productId, `${referenceSequenceNumber}%`] as any[];
+    let params = [orgId, projectId, `${referenceSequenceNumber}%`] as any[];
 
     if (limit > 0) {
       query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, productId, `${referenceSequenceNumber}%`, offset, limit];
+      params = [orgId, projectId, `${referenceSequenceNumber}%`, offset, limit];
     }
 
     const workItems = await this.workItemsRepository.query(query, params);

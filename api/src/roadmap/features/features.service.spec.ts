@@ -30,7 +30,7 @@ import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { FeatureRequestsService } from '../../feature-requests/feature-requests.service';
 import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
 import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 describe('FeaturesService', () => {
   let usersService: UsersService;
@@ -44,7 +44,7 @@ describe('FeaturesService', () => {
   let orgsRepository: Repository<Org>;
   let user: User;
   let org: Org;
-  let product: Product;
+  let project: Project;
 
   let cleanup: () => Promise<void>;
 
@@ -96,7 +96,7 @@ describe('FeaturesService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     featureRequestsService = module.get<FeatureRequestsService>(
       FeatureRequestsService,
     );
@@ -112,7 +112,7 @@ describe('FeaturesService', () => {
 
   describe('when creating a feature', () => {
     it('should return a feature', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -125,7 +125,7 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the org does not exist', async () => {
       await expect(
-        service.createFeature('non-existent-org', product.id, user.id, {
+        service.createFeature('non-existent-org', project.id, user.id, {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
@@ -135,7 +135,7 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the title is not provided', async () => {
       await expect(
-        service.createFeature(org.id, product.id, user.id, {
+        service.createFeature(org.id, project.id, user.id, {
           title: '',
           description: 'my feature description',
           priority: Priority.HIGH,
@@ -145,7 +145,7 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the priority is not provided', async () => {
       await expect(
-        service.createFeature(org.id, product.id, user.id, {
+        service.createFeature(org.id, project.id, user.id, {
           title: 'my feature',
           description: 'my feature description',
           priority: null,
@@ -154,7 +154,7 @@ describe('FeaturesService', () => {
       ).rejects.toThrowError();
     });
     it('should create a feature with a key result', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -164,7 +164,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -177,7 +177,7 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the key result does not exist', async () => {
       await expect(
-        service.createFeature(org.id, product.id, user.id, {
+        service.createFeature(org.id, project.id, user.id, {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
@@ -187,7 +187,7 @@ describe('FeaturesService', () => {
       ).rejects.toThrowError();
     });
     it('should throw an error if the key result does not belong to the org', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -203,7 +203,7 @@ describe('FeaturesService', () => {
         'testtesttest',
       );
       await expect(
-        service.createFeature(org.id, product.id, otherUser.id, {
+        service.createFeature(org.id, project.id, otherUser.id, {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
@@ -215,14 +215,14 @@ describe('FeaturesService', () => {
     it('should create a feature with a milestone', async () => {
       const milestone = await milestonesService.createMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           title: 'my milestone',
           description: 'my milestone description',
           dueDate: '2020-01-01',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -234,14 +234,14 @@ describe('FeaturesService', () => {
       expect(feature.milestone.title).toEqual(milestone.title);
     });
     it('should create a feature with files', async () => {
-      const file = await filesService.uploadFile(org.id, product.id, {
+      const file = await filesService.uploadFile(org.id, project.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
         mimetype: 'text/plain',
       } as any);
 
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -261,7 +261,7 @@ describe('FeaturesService', () => {
         'testtesttest',
         org.invitationToken,
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -278,13 +278,13 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -298,7 +298,7 @@ describe('FeaturesService', () => {
   });
   describe('when listing features', () => {
     it('should return a list of features', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -308,14 +308,14 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      await service.createFeature(org.id, product.id, user.id, {
+      await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
         status: FeatureStatus.PLANNED,
       });
-      const features = await service.listFeatures(org.id, product.id);
+      const features = await service.listFeatures(org.id, project.id);
       expect(features.length).toEqual(1);
       expect(features[0].title).toEqual('my feature');
       expect(features[0].priority).toEqual(Priority.HIGH);
@@ -323,7 +323,7 @@ describe('FeaturesService', () => {
       expect(features[0].updatedAt).toBeDefined();
     });
     it('should return the features paginated', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -333,28 +333,28 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      await service.createFeature(org.id, product.id, user.id, {
+      await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature 1',
         description: 'my feature description',
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
         status: FeatureStatus.PLANNED,
       });
-      await service.createFeature(org.id, product.id, user.id, {
+      await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature 2',
         description: 'my feature description',
         priority: Priority.HIGH,
         keyResult: objective.keyResults[0].id,
         status: FeatureStatus.PLANNED,
       });
-      const features = await service.listFeatures(org.id, product.id, 1, 1);
+      const features = await service.listFeatures(org.id, project.id, 1, 1);
       expect(features.length).toEqual(1);
       expect(features[0].title).toEqual('my feature 2');
     });
   });
   describe('when listing features without milestone', () => {
     it('should return a list of features', async () => {
-      await service.createFeature(org.id, product.id, user.id, {
+      await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -362,7 +362,7 @@ describe('FeaturesService', () => {
       });
       const features = await service.listFeaturesWithoutMilestone(
         org.id,
-        product.id,
+        project.id,
       );
       expect(features.length).toEqual(1);
       expect(features[0].title).toEqual('my feature');
@@ -373,14 +373,14 @@ describe('FeaturesService', () => {
     it('should not return features with a milestone', async () => {
       const milestone = await milestonesService.createMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           title: 'my milestone',
           description: 'my milestone description',
           dueDate: '2020-01-01',
         },
       );
-      await service.createFeature(org.id, product.id, user.id, {
+      await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -389,18 +389,18 @@ describe('FeaturesService', () => {
       });
       const features = await service.listFeaturesWithoutMilestone(
         org.id,
-        product.id,
+        project.id,
       );
       expect(features.length).toEqual(0);
     });
     it('should not return features that are closed or completed', async () => {
-      await service.createFeature(org.id, product.id, user.id, {
+      await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
         status: FeatureStatus.CLOSED,
       });
-      await service.createFeature(org.id, product.id, user.id, {
+      await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -408,14 +408,14 @@ describe('FeaturesService', () => {
       });
       const features = await service.listFeaturesWithoutMilestone(
         org.id,
-        product.id,
+        project.id,
       );
       expect(features.length).toEqual(0);
     });
   });
   describe('when getting a feature', () => {
     it('should return a feature', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -423,7 +423,7 @@ describe('FeaturesService', () => {
       });
       const foundFeature = await service.getFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
       );
       expect(foundFeature.id).toEqual(feature.id);
@@ -434,11 +434,11 @@ describe('FeaturesService', () => {
     });
     it('should throw an error if the feature does not exist', async () => {
       await expect(
-        service.getFeature(org.id, product.id, 'non-existent-feature'),
+        service.getFeature(org.id, project.id, 'non-existent-feature'),
       ).rejects.toThrowError();
     });
     it('should return the feature with the key result', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -448,7 +448,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -457,7 +457,7 @@ describe('FeaturesService', () => {
       });
       const foundFeature = await service.getFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
       );
       expect(foundFeature.keyResult).toBeDefined();
@@ -469,14 +469,14 @@ describe('FeaturesService', () => {
     it('should return the feature with the milestone', async () => {
       const milestone = await milestonesService.createMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           title: 'my milestone',
           description: 'my milestone description',
           dueDate: '2020-01-01',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -485,7 +485,7 @@ describe('FeaturesService', () => {
       });
       const foundFeature = await service.getFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
       );
       expect(foundFeature.milestone).toBeDefined();
@@ -495,7 +495,7 @@ describe('FeaturesService', () => {
   });
   describe('when updating a feature', () => {
     it('should return a feature', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -503,7 +503,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my updated feature',
@@ -523,7 +523,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).not.toEqual(feature.updatedAt);
     });
     it('should update the feature with a key result', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -533,7 +533,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -541,7 +541,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my updated feature',
@@ -560,14 +560,14 @@ describe('FeaturesService', () => {
     it('should update the feature with a milestone', async () => {
       const milestone = await milestonesService.createMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           title: 'my milestone',
           description: 'my milestone description',
           dueDate: '2020-01-01',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -575,7 +575,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my updated feature',
@@ -590,13 +590,13 @@ describe('FeaturesService', () => {
       expect(updatedFeature.milestone.title).toEqual(milestone.title);
     });
     it('should update the feature with files', async () => {
-      const file = await filesService.uploadFile(org.id, product.id, {
+      const file = await filesService.uploadFile(org.id, project.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -604,7 +604,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my updated feature',
@@ -626,7 +626,7 @@ describe('FeaturesService', () => {
         'testtesttest',
         org.invitationToken,
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -634,7 +634,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my updated feature',
@@ -655,7 +655,7 @@ describe('FeaturesService', () => {
         'testtesttest',
         org.invitationToken,
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -664,7 +664,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my updated feature',
@@ -677,13 +677,13 @@ describe('FeaturesService', () => {
       expect(updatedFeature.assignedTo).toBeUndefined();
     });
     it("should update the files of the feature if the update doesn't include files", async () => {
-      const file = await filesService.uploadFile(org.id, product.id, {
+      const file = await filesService.uploadFile(org.id, project.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -692,7 +692,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my updated feature',
@@ -705,19 +705,19 @@ describe('FeaturesService', () => {
       expect(updatedFeature.files.length).toEqual(0);
     });
     it('should update the files of the feature if the update contains some files', async () => {
-      const file1 = await filesService.uploadFile(org.id, product.id, {
+      const file1 = await filesService.uploadFile(org.id, project.id, {
         originalname: 'my file 1',
         buffer: Buffer.from('file content'),
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const file2 = await filesService.uploadFile(org.id, product.id, {
+      const file2 = await filesService.uploadFile(org.id, project.id, {
         originalname: 'my file 2',
         buffer: Buffer.from('file content'),
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -726,7 +726,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my updated feature',
@@ -742,13 +742,13 @@ describe('FeaturesService', () => {
       expect(updatedFeature.files[0].name).toEqual(file2.name);
     });
     it('should update the files of the feature if the update contains the same files', async () => {
-      const file = await filesService.uploadFile(org.id, product.id, {
+      const file = await filesService.uploadFile(org.id, project.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -757,7 +757,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my updated feature',
@@ -778,13 +778,13 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -792,7 +792,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my feature',
@@ -818,13 +818,13 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -833,7 +833,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my feature',
@@ -857,13 +857,13 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -871,7 +871,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my feature',
@@ -894,19 +894,19 @@ describe('FeaturesService', () => {
   });
   describe('when deleting a feature', () => {
     it('should delete the feature', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
         status: FeatureStatus.PLANNED,
       });
-      await service.deleteFeature(org.id, product.id, feature.id);
+      await service.deleteFeature(org.id, project.id, feature.id);
       await expect(
-        service.getFeature(org.id, product.id, feature.id),
+        service.getFeature(org.id, project.id, feature.id),
       ).rejects.toThrowError();
     });
     it('should remove the association between features and work items', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -914,7 +914,7 @@ describe('FeaturesService', () => {
       });
       const workItem = await workItemsService.createWorkItem(
         org.id,
-        product.id,
+        project.id,
         user.id,
         {
           title: 'my work item',
@@ -925,37 +925,37 @@ describe('FeaturesService', () => {
           status: WorkItemStatus.PLANNED,
         },
       );
-      await service.deleteFeature(org.id, product.id, feature.id);
+      await service.deleteFeature(org.id, project.id, feature.id);
       const foundWorkItem = await workItemsService.getWorkItem(
         org.id,
-        product.id,
+        project.id,
         workItem.id,
       );
       expect(foundWorkItem.feature).toBeUndefined();
     });
     it("should remove the association between features and the feature's files", async () => {
-      const file = await filesService.uploadFile(org.id, product.id, {
+      const file = await filesService.uploadFile(org.id, project.id, {
         originalname: 'my file',
         buffer: Buffer.from('file content'),
         size: 100,
         mimetype: 'text/plain',
       } as any);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
         status: FeatureStatus.PLANNED,
         files: [file],
       });
-      await service.deleteFeature(org.id, product.id, feature.id);
+      await service.deleteFeature(org.id, project.id, feature.id);
       await expect(
-        filesService.getFile(org.id, product.id, file.id),
+        filesService.getFile(org.id, project.id, file.id),
       ).rejects.toThrowError();
     });
   });
   describe('when patching a feature', () => {
     it('should update the status', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.HIGH,
@@ -963,7 +963,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           status: FeatureStatus.CLOSED,
@@ -976,7 +976,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should update the priority', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -984,7 +984,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           priority: Priority.HIGH,
@@ -999,14 +999,14 @@ describe('FeaturesService', () => {
     it('should update the milestone', async () => {
       const milestone = await milestonesService.createMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           title: 'my milestone',
           description: 'my milestone description',
           dueDate: '2020-01-01',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1014,7 +1014,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           milestone: milestone.id,
@@ -1030,14 +1030,14 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should throw an error if the milestone does not exist', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
         status: FeatureStatus.PLANNED,
       });
       await expect(
-        service.patchFeature(org.id, product.id, feature.id, {
+        service.patchFeature(org.id, project.id, feature.id, {
           milestone: 'non-existent-milestone',
         }),
       ).rejects.toThrowError();
@@ -1050,24 +1050,24 @@ describe('FeaturesService', () => {
           'testtesttest',
         ),
       );
-      const otherOrgProduct = (await otherOrg.products)[0];
+      const otherOrgProject = (await otherOrg.projects)[0];
       const milestone = await milestonesService.createMilestone(
         otherOrg.id,
-        otherOrgProduct.id,
+        otherOrgProject.id,
         {
           title: 'my milestone',
           description: 'my milestone description',
           dueDate: '2020-01-01',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
         status: FeatureStatus.PLANNED,
       });
       await expect(
-        service.patchFeature(org.id, product.id, feature.id, {
+        service.patchFeature(org.id, project.id, feature.id, {
           milestone: milestone.id,
         }),
       ).rejects.toThrowError();
@@ -1075,14 +1075,14 @@ describe('FeaturesService', () => {
     it('should update milestones to null', async () => {
       const milestone = await milestonesService.createMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           title: 'my milestone',
           description: 'my milestone description',
           dueDate: '2020-01-01',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1091,7 +1091,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           milestone: null,
@@ -1107,14 +1107,14 @@ describe('FeaturesService', () => {
     it('should not update the milestone if the update is for another field', async () => {
       const milestone = await milestonesService.createMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           title: 'my milestone',
           description: 'my milestone description',
           dueDate: '2020-01-01',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         milestone: milestone.id,
@@ -1123,7 +1123,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           status: FeatureStatus.IN_PROGRESS,
@@ -1139,7 +1139,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should update the key result', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -1149,7 +1149,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1157,7 +1157,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           keyResult: objective.keyResults[0].id,
@@ -1175,20 +1175,20 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should throw an error if the key result does not exist', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
         status: FeatureStatus.PLANNED,
       });
       await expect(
-        service.patchFeature(org.id, product.id, feature.id, {
+        service.patchFeature(org.id, project.id, feature.id, {
           keyResult: 'non-existent-key-result',
         }),
       ).rejects.toThrowError();
     });
     it('should throw an error if the key result does not belong to the org', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -1205,21 +1205,21 @@ describe('FeaturesService', () => {
           'testtesttest',
         ),
       );
-      const otherOrgProduct = (await otherOrg.products)[0];
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const otherOrgProject = (await otherOrg.projects)[0];
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
         status: FeatureStatus.PLANNED,
       });
       await expect(
-        service.patchFeature(otherOrg.id, otherOrgProduct.id, feature.id, {
+        service.patchFeature(otherOrg.id, otherOrgProject.id, feature.id, {
           keyResult: objective.keyResults[0].id,
         }),
       ).rejects.toThrowError();
     });
     it('should update the key result to null', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -1229,7 +1229,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         keyResult: objective.keyResults[0].id,
@@ -1238,7 +1238,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           keyResult: null,
@@ -1252,7 +1252,7 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should not update the key result if the update is for another field', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -1262,7 +1262,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         keyResult: objective.keyResults[0].id,
@@ -1271,7 +1271,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           status: FeatureStatus.IN_PROGRESS,
@@ -1294,13 +1294,13 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1308,7 +1308,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           priority: Priority.LOW,
@@ -1332,13 +1332,13 @@ describe('FeaturesService', () => {
       await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1346,7 +1346,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.updateFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           title: 'my feature',
@@ -1370,13 +1370,13 @@ describe('FeaturesService', () => {
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'My Feature Request',
           description: 'My Feature Request Description',
         },
       );
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1384,7 +1384,7 @@ describe('FeaturesService', () => {
       });
       const updatedFeature = await service.patchFeature(
         org.id,
-        product.id,
+        project.id,
         feature.id,
         {
           priority: Priority.LOW,
@@ -1405,7 +1405,7 @@ describe('FeaturesService', () => {
   });
   describe('when searching features', () => {
     it('should return a list of features', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1413,7 +1413,7 @@ describe('FeaturesService', () => {
       });
       const features = await service.searchFeatures(
         org.id,
-        product.id,
+        project.id,
         'my feature',
       );
       expect(features.length).toEqual(1);
@@ -1424,13 +1424,13 @@ describe('FeaturesService', () => {
       expect(features[0].updatedAt).toBeDefined();
     });
     it('should return the features paginated', async () => {
-      await service.createFeature(org.id, product.id, user.id, {
+      await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature 1',
         description: 'my feature description',
         priority: Priority.LOW,
         status: FeatureStatus.PLANNED,
       });
-      await service.createFeature(org.id, product.id, user.id, {
+      await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature 2',
         description: 'my feature description',
         priority: Priority.LOW,
@@ -1438,7 +1438,7 @@ describe('FeaturesService', () => {
       });
       const features = await service.searchFeatures(
         org.id,
-        product.id,
+        project.id,
         'my feature',
         1,
         1,
@@ -1447,7 +1447,7 @@ describe('FeaturesService', () => {
       expect(features[0].title).toEqual('my feature 2');
     });
     it('should search features by reference', async () => {
-      const objective = await okrsService.create(org.id, product.id, {
+      const objective = await okrsService.create(org.id, project.id, {
         objective: {
           title: 'my objective',
         },
@@ -1457,7 +1457,7 @@ describe('FeaturesService', () => {
           },
         ],
       });
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'my feature',
         description: 'my feature description',
         keyResult: objective.keyResults[0].id,
@@ -1466,7 +1466,7 @@ describe('FeaturesService', () => {
       });
       const features = await service.searchFeatures(
         org.id,
-        product.id,
+        project.id,
         feature.reference,
       );
       expect(features.length).toEqual(1);
@@ -1482,7 +1482,7 @@ describe('FeaturesService', () => {
     it('should return a list of comments if the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1502,7 +1502,7 @@ describe('FeaturesService', () => {
     it('should create a comment if the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1520,7 +1520,7 @@ describe('FeaturesService', () => {
     it('should delete the comment if it exists', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1536,7 +1536,7 @@ describe('FeaturesService', () => {
     });
 
     it('should throw an error if the comment does not exist', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1556,7 +1556,7 @@ describe('FeaturesService', () => {
     it('should update the comment if it exists and the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1578,7 +1578,7 @@ describe('FeaturesService', () => {
     });
 
     it('should throw an error if the comment does not exist', async () => {
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,
@@ -1599,7 +1599,7 @@ describe('FeaturesService', () => {
     it('should throw an error if the comment content is empty', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const feature = await service.createFeature(org.id, product.id, user.id, {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
         title: 'Test title',
         description: 'A test description',
         priority: Priority.HIGH,

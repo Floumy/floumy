@@ -47,7 +47,7 @@ function Pricing() {
                 </div>
                 <div>
       <span className="pl-2 ">
-        Product Roadmaps
+        Project Roadmaps
       </span>
                 </div>
               </div>
@@ -178,7 +178,7 @@ function Pricing() {
                 </div>
                 <div>
       <span className="pl-2 text-white">
-        Public Product Roadmaps
+        Public Project Roadmaps
       </span>
                 </div>
               </div>

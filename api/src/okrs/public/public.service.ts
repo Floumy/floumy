@@ -14,30 +14,30 @@ export class PublicService {
     private okrsService: OkrsService,
   ) {}
 
-  async listObjectives(orgId: string, productId: string, timeline: Timeline) {
+  async listObjectives(orgId: string, projectId: string, timeline: Timeline) {
     await this.validateOrgHasBuildingInPublicEnabled(orgId);
 
     const objectives = await this.okrsService.listObjectivesForTimeline(
       orgId,
-      productId,
+      projectId,
       timeline,
     );
 
     return objectives.map(PublicOkrMapper.toDTO);
   }
 
-  async getObjective(orgId: string, productId: string, okrId: string) {
+  async getObjective(orgId: string, projectId: string, okrId: string) {
     await this.validateOrgHasBuildingInPublicEnabled(orgId);
 
     const { objective, keyResults } =
-      await this.okrsService.getObjectiveDetails(okrId, orgId, productId);
+      await this.okrsService.getObjectiveDetails(okrId, orgId, projectId);
 
     return await PublicOkrMapper.toDetailDto(objective, keyResults);
   }
 
   async getKeyResult(
     orgId: string,
-    productId: string,
+    projectId: string,
     objectiveId: string,
     keyResultId: string,
   ) {
@@ -45,7 +45,7 @@ export class PublicService {
 
     const keyResult = await this.okrsService.getKeyResult(
       orgId,
-      productId,
+      projectId,
       objectiveId,
       keyResultId,
     );

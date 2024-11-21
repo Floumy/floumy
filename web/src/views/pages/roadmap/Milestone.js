@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { addFeature } from "../../../services/roadmap/roadmap.service";
 
 function Milestone({ milestone, onFeatureChangeMilestone }) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [features, setFeatures] = useState([]);
   const [showFeatures, setShowFeatures] = useState(true);
   useEffect(() => {
@@ -27,7 +27,7 @@ function Milestone({ milestone, onFeatureChangeMilestone }) {
           {!showFeatures && <i className="ni ni-bold-right" />}
           {showFeatures && <i className="ni ni-bold-down" />}
         </button>
-        <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/milestones/edit/${milestone.id}`}>
+        <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/edit/${milestone.id}`}>
           <span className="text-gray">{milestone.dueDate}</span> | {milestone.title} <span
           className="text-muted text-sm"></span>
         </Link>
@@ -42,7 +42,7 @@ function Milestone({ milestone, onFeatureChangeMilestone }) {
 
   async function handleAddFeatureWithMilestone(feature, milestoneId) {
     feature.milestone = milestoneId;
-    const savedFeature = await addFeature(feature);
+    const savedFeature = await addFeature(feature, orgId, projectId);
     features.push(savedFeature);
     setFeatures([...features]);
   }

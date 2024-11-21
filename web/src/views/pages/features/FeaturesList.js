@@ -31,7 +31,7 @@ function FeaturesList({
                         showAssignedTo = false,
                         enableContextMenu = true
                       }) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [priority, setPriority] = useState("medium");
   const [sortedFeatures, setSortedFeatures] = useState([]);
@@ -159,13 +159,13 @@ function FeaturesList({
                 }}
                 className={selectedFeatures.includes(feature.id) ? "selected-row" : ""}>
               <td>
-                <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.reference}
                 </Link>
               </td>
               <td className="title-cell">
-                <Link to={`/admin/orgs/${orgId}/products/${productId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.title}
                 </Link>

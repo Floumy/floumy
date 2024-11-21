@@ -25,16 +25,16 @@ import { Issue } from '../issues/issue.entity';
 import { Org } from '../orgs/org.entity';
 
 @Entity()
-export class Product {
+export class Project {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column()
   name: string;
-  @ManyToMany(() => User, (user) => user.products, { lazy: true })
+  @ManyToMany(() => User, (user) => user.projects, { lazy: true })
   @JoinTable({
-    name: 'product_user',
+    name: 'project_user',
     joinColumn: {
-      name: 'productId',
+      name: 'projectId',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
@@ -47,32 +47,32 @@ export class Product {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @OneToMany(() => Objective, (objective) => objective.product, { lazy: true })
+  @OneToMany(() => Objective, (objective) => objective.project, { lazy: true })
   objectives: Promise<Objective[]>;
-  @OneToMany(() => KeyResult, (keyResult) => keyResult.product, { lazy: true })
+  @OneToMany(() => KeyResult, (keyResult) => keyResult.project, { lazy: true })
   keyResults: Promise<KeyResult[]>;
-  @OneToMany(() => Feature, (feature) => feature.product, { lazy: true })
+  @OneToMany(() => Feature, (feature) => feature.project, { lazy: true })
   features: Promise<Feature[]>;
-  @OneToMany(() => Milestone, (milestone) => milestone.product, { lazy: true })
+  @OneToMany(() => Milestone, (milestone) => milestone.project, { lazy: true })
   milestones: Promise<Milestone[]>;
-  @OneToMany(() => WorkItem, (workItem) => workItem.product, { lazy: true })
+  @OneToMany(() => WorkItem, (workItem) => workItem.project, { lazy: true })
   workItems: Promise<WorkItem[]>;
-  @OneToMany(() => FeatureRequest, (featureRequest) => featureRequest.product, {
+  @OneToMany(() => FeatureRequest, (featureRequest) => featureRequest.project, {
     lazy: true,
   })
   featureRequests: Promise<FeatureRequest[]>;
-  @OneToMany(() => Iteration, (iteration) => iteration.product, { lazy: true })
+  @OneToMany(() => Iteration, (iteration) => iteration.project, { lazy: true })
   iterations: Promise<Iteration[]>;
-  @OneToMany(() => File, (file) => file.product, { lazy: true })
+  @OneToMany(() => File, (file) => file.project, { lazy: true })
   files: Promise<File[]>;
-  @OneToMany(() => FeedItem, (feedItem) => feedItem.product, { lazy: true })
+  @OneToMany(() => FeedItem, (feedItem) => feedItem.project, { lazy: true })
   feedItems: Promise<FeedItem[]>;
-  @OneToOne(() => BipSettings, (bipSettings) => bipSettings.product, {
+  @OneToOne(() => BipSettings, (bipSettings) => bipSettings.project, {
     lazy: true,
   })
   bipSettings: Promise<BipSettings>;
-  @OneToMany(() => Issue, (issue) => issue.product, { lazy: true })
+  @OneToMany(() => Issue, (issue) => issue.project, { lazy: true })
   issues: Promise<Issue[]>;
-  @ManyToOne(() => Org, (org) => org.products, { lazy: true })
+  @ManyToOne(() => Org, (org) => org.projects, { lazy: true })
   org: Promise<Org>;
 }

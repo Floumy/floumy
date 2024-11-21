@@ -26,7 +26,7 @@ import Comments from "../../../components/Comments/Comments";
 import { listIssues } from "../../../services/issues/issues.service";
 
 function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [priority, setPriority] = useState(workItem.priority || "");
@@ -50,7 +50,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const [issue, setIssue] = useState(workItem.issue ? workItem.issue.id : "");
 
   const loadAndSetIssues = useCallback(async () => {
-    const fetchedIssues = await listIssues(orgId, productId, 1, 0);
+    const fetchedIssues = await listIssues(orgId, projectId, 1, 0);
     const mappedIssues = fetchedIssues.map(issue => {
       return { id: issue.id, text: `${issue.title}` };
     });
@@ -60,7 +60,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   }, [workItem.issue]);
 
   const loadAndSetFeatures = useCallback(async () => {
-    const features = await listAllFeatures(orgId, productId);
+    const features = await listAllFeatures(orgId, projectId);
     const mappedFeatures = features
       .map(feature => {
         return { id: feature.id, text: `${feature.reference}: ${feature.title}` };
@@ -71,7 +71,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   }, [workItem.feature]);
 
   const loadAndSetIterations = useCallback(async () => {
-    const iterations = await listIterations(orgId, productId);
+    const iterations = await listIterations(orgId, projectId);
     const mappedIterations = iterations
       .map(iteration => {
         return {
@@ -96,9 +96,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   }, [workItem.assignedTo]);
 
   const loadAndSetComments = useCallback(async () => {
-    const comments = await listComments(orgId, productId, workItem.id);
+    const comments = await listComments(orgId, projectId, workItem.id);
     setComments(comments);
-  }, [orgId, productId, workItem.id]);
+  }, [orgId, projectId, workItem.id]);
 
   useEffect(() => {
     document.title = "Floumy | Work Item";
@@ -142,7 +142,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   async function onDelete(id) {
     try {
       setIsSubmitting(true);
-      await deleteWorkItem(orgId, productId, id);
+      await deleteWorkItem(orgId, projectId, id);
       navigate(-1);
       setTimeout(() => toast.success("The work item has been deleted"), 1000);
     } catch (e) {
@@ -194,7 +194,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
 
   const handleCommentSubmit = async (comment) => {
     try {
-      const addedComment = await addComment(orgId, productId, workItem.id, comment);
+      const addedComment = await addComment(orgId, projectId, workItem.id, comment);
       setComments([...comments, addedComment]);
       toast.success("Comment added successfully");
     } catch (e) {
@@ -204,7 +204,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
 
   const handleCommentEditSubmit = async (commentId, comment) => {
     try {
-      const updatedComment = await updateComment(orgId, productId, workItem.id, commentId, comment);
+      const updatedComment = await updateComment(orgId, projectId, workItem.id, commentId, comment);
       setComments(comments.map(c => c.id === commentId ? updatedComment : c));
       toast.success("Comment updated successfully");
     } catch (e) {
@@ -214,7 +214,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
 
   const handleCommentDelete = async (commentId) => {
     try {
-      await deleteComment(orgId, productId, workItem.id, commentId);
+      await deleteComment(orgId, projectId, workItem.id, commentId);
       setComments(comments.filter(comment => comment.id !== commentId));
       toast.success("Comment deleted successfully");
     } catch (e) {

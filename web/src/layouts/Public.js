@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React, { useEffect } from "react";
 // react library for routing
 import { Navigate, Route, Routes } from "react-router-dom";
@@ -32,7 +17,7 @@ function PublicLayout() {
   const [sidenavOpen, setSidenavOpen] = React.useState(true);
   const urlSegments = window.location.pathname.split("/");
   const orgId = urlSegments[3];
-  const productId = urlSegments[5];
+  const projectId = urlSegments[5];
   const [org, setOrg] = React.useState();
 
   const [buildInPublicSettings, setBuildInPublicSettings] = React.useState({
@@ -53,8 +38,8 @@ function PublicLayout() {
     return replace;
   }
 
-  useNavigationHotKey("r", `/public/orgs/${orgId}/products/${productId}/feature-requests/new`, isNavigationReplace(), org?.paymentPlan === "premium");
-  useNavigationHotKey("f", `/public/orgs/${orgId}/products/${productId}/feature-requests`, false, org?.paymentPlan === "premium");
+  useNavigationHotKey("r", `/public/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace(), org?.paymentPlan === "premium");
+  useNavigationHotKey("f", `/public/orgs/${orgId}/projects/${projectId}/feature-requests`, false, org?.paymentPlan === "premium");
   useNavigationHotKey("left", -1);
   useNavigationHotKey("right", 1);
 
@@ -67,7 +52,7 @@ function PublicLayout() {
         console.error(e.message);
         window.location.href = "/auth/sign-in";
       });
-    getBuildInPublicSettings(orgId, productId)
+    getBuildInPublicSettings(orgId, projectId)
       .then((buildInPublicSettings) => {
         if (buildInPublicSettings.isBuildInPublicEnabled) {
           setBuildInPublicSettings(buildInPublicSettings);
@@ -79,7 +64,7 @@ function PublicLayout() {
         console.error(e.message);
         window.location.href = "/auth/sign-in";
       });
-  }, [orgId, productId]);
+  }, [orgId, projectId]);
 
   useEffect(() => {
     if (window.innerWidth < 1200) {

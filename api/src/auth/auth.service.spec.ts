@@ -54,7 +54,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'john@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
       await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('john@example.com');
@@ -72,7 +72,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'john@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
       await service.orgSignUp(signUpDto);
       await expect(
@@ -84,7 +84,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'john@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
       await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('john@example.com');
@@ -118,7 +118,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'test@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
       await service.orgSignUp(signUpDto);
       expect(emailServiceMock.sendEmail).toHaveBeenCalled();
@@ -128,7 +128,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'test@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
       await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('test@example.com');
@@ -136,6 +136,7 @@ describe('AuthService', () => {
     });
     it('should create the org', async () => {
       const signUpDto = {
+        projectName: 'Test project',
         name: 'John Doe',
         email: 'testing@example.com',
         password: 'testtesttest',
@@ -153,7 +154,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'test@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
 
       await service.orgSignUp(signUpDto);
@@ -176,7 +177,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'test@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
       await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('test@example.com');
@@ -212,7 +213,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'john@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
       await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail('john@example.com');
@@ -235,7 +236,7 @@ describe('AuthService', () => {
           name: 'John Doe',
           email: 'test@example.com',
           password: 'testtesttest',
-          productName: 'Test product',
+          projectName: 'Test project',
         };
         await service.orgSignUp(signUpDto);
         const user = await usersService.findOneByEmail(signUpDto.email);
@@ -257,7 +258,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'john.doe@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
       await service.orgSignUp(signUpDto);
       await service.requestPasswordReset(signUpDto.email);
@@ -271,7 +272,7 @@ describe('AuthService', () => {
         name: 'John Doe',
         email: 'john.doe@example.com',
         password: 'testtesttest',
-        productName: 'Test product',
+        projectName: 'Test project',
       };
       await service.orgSignUp(signUpDto);
       const user = await usersService.findOneByEmail(signUpDto.email);

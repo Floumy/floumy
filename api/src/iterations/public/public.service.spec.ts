@@ -27,7 +27,7 @@ import { Repository } from 'typeorm';
 import { CreateOrUpdateIterationDto } from '../dtos';
 import { Timeline } from '../../common/timeline.enum';
 import { OrgsModule } from '../../orgs/orgs.module';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 describe('PublicService', () => {
   let usersService: UsersService;
@@ -37,8 +37,8 @@ describe('PublicService', () => {
   let org: Org;
   let bipSettingsRepository: Repository<BipSettings>;
   let user: User;
-  let product: Product;
-  let productsRepository: Repository<Product>;
+  let project: Project;
+  let projectsRepository: Repository<Project>;
 
   let cleanup: () => Promise<void>;
 
@@ -58,7 +58,7 @@ describe('PublicService', () => {
           WorkItemFile,
           FeatureFile,
           BipSettings,
-          Product,
+          Project,
         ]),
         OrgsModule,
         BacklogModule,
@@ -83,8 +83,8 @@ describe('PublicService', () => {
     bipSettingsRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
-    productsRepository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
+    projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
     );
     user = await usersService.createUserWithOrg(
       'Test User',
@@ -92,11 +92,11 @@ describe('PublicService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     await bipSettingsRepository.save(bipSettings);
   });
 
@@ -112,7 +112,7 @@ describe('PublicService', () => {
     it('should return an empty array if there are no iterations', async () => {
       const result = await service.listIterationsForTimeline(
         org.id,
-        product.id,
+        project.id,
         Timeline.THIS_QUARTER,
       );
       expect(result).toEqual([]);
@@ -123,10 +123,10 @@ describe('PublicService', () => {
         startDate: new Date().toString(),
         duration: 2,
       } as CreateOrUpdateIterationDto;
-      await iterationsService.create(org.id, product.id, iteration);
+      await iterationsService.create(org.id, project.id, iteration);
       const result = await service.listIterationsForTimeline(
         org.id,
-        product.id,
+        project.id,
         Timeline.THIS_QUARTER,
       );
       expect(result.length).toEqual(1);
@@ -136,14 +136,14 @@ describe('PublicService', () => {
 
   describe('when getting an iteration by id', () => {
     it('should return an iteration', async () => {
-      const iteration = await iterationsService.create(org.id, product.id, {
+      const iteration = await iterationsService.create(org.id, project.id, {
         goal: 'Test Goal',
         startDate: new Date().toString(),
         duration: 1,
       });
       const result = await service.getIterationById(
         org.id,
-        product.id,
+        project.id,
         iteration.id,
       );
       expect(result).toBeDefined();
@@ -152,17 +152,17 @@ describe('PublicService', () => {
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = false;
       bipSettings.org = Promise.resolve(org);
-      bipSettings.product = Promise.resolve(product);
+      bipSettings.project = Promise.resolve(project);
       await bipSettingsRepository.save(bipSettings);
       const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getIterationById(org.id, product.id, nonExistentUUID),
+        service.getIterationById(org.id, project.id, nonExistentUUID),
       ).rejects.toThrow();
     });
     it('should throw an error if the iteration does not exist', async () => {
       const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getIterationById(org.id, product.id, nonExistentUUID),
+        service.getIterationById(org.id, project.id, nonExistentUUID),
       ).rejects.toThrow();
     });
     it('should throw an error if the org does not exist', async () => {
@@ -178,23 +178,23 @@ describe('PublicService', () => {
   });
   describe('when getting the active iteration', () => {
     it('should return the active iteration', async () => {
-      const orgWithActiveIterations = await orgsService.getOrCreateOrg(null);
-      const productWithActiveIterations = new Product();
-      productWithActiveIterations.name = 'Test Product';
-      productWithActiveIterations.org = Promise.resolve(
+      const orgWithActiveIterations = await orgsService.getOrCreateOrg('Test Project');
+      const projectWithActiveIterations = new Project();
+      projectWithActiveIterations.name = 'Test Project';
+      projectWithActiveIterations.org = Promise.resolve(
         orgWithActiveIterations,
       );
-      await productsRepository.save(productWithActiveIterations);
+      await projectsRepository.save(projectWithActiveIterations);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveIterationsPagePublic = true;
       bipSettings.org = Promise.resolve(orgWithActiveIterations);
-      bipSettings.product = Promise.resolve(productWithActiveIterations);
+      bipSettings.project = Promise.resolve(projectWithActiveIterations);
       await bipSettingsRepository.save(bipSettings);
 
       const iteration = await iterationsService.create(
         orgWithActiveIterations.id,
-        productWithActiveIterations.id,
+        projectWithActiveIterations.id,
         {
           goal: 'Test Goal',
           startDate: new Date().toString(),
@@ -203,34 +203,34 @@ describe('PublicService', () => {
       );
       await iterationsService.startIteration(
         orgWithActiveIterations.id,
-        productWithActiveIterations.id,
+        projectWithActiveIterations.id,
         iteration.id,
       );
       const result = await service.getActiveIteration(
         orgWithActiveIterations.id,
-        productWithActiveIterations.id,
+        projectWithActiveIterations.id,
       );
       expect(result).toBeDefined();
       expect(result.goal).toEqual('Test Goal');
     });
     it('should return null if there is no active iteration', async () => {
-      const orgWithActiveIterations = await orgsService.getOrCreateOrg(null);
-      const productWithActiveIterations = new Product();
-      productWithActiveIterations.name = 'Test Product';
-      productWithActiveIterations.org = Promise.resolve(
+      const orgWithActiveIterations = await orgsService.getOrCreateOrg('Test Project');
+      const projectWithActiveIterations = new Project();
+      projectWithActiveIterations.name = 'Test Project';
+      projectWithActiveIterations.org = Promise.resolve(
         orgWithActiveIterations,
       );
-      await productsRepository.save(productWithActiveIterations);
+      await projectsRepository.save(projectWithActiveIterations);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveIterationsPagePublic = true;
       bipSettings.org = Promise.resolve(orgWithActiveIterations);
-      bipSettings.product = Promise.resolve(productWithActiveIterations);
+      bipSettings.project = Promise.resolve(projectWithActiveIterations);
       await bipSettingsRepository.save(bipSettings);
 
       await iterationsService.create(
         orgWithActiveIterations.id,
-        productWithActiveIterations.id,
+        projectWithActiveIterations.id,
         {
           goal: 'Test Goal',
           startDate: new Date().toString(),
@@ -240,22 +240,22 @@ describe('PublicService', () => {
 
       const result = await service.getActiveIteration(
         orgWithActiveIterations.id,
-        productWithActiveIterations.id,
+        projectWithActiveIterations.id,
       );
 
       expect(result).toBeNull();
     });
     it('should throw an error if the org does not have build in public enabled', async () => {
       const newOrg = await orgsService.createForUser(user);
-      const newProduct = (await newOrg.products)[0];
+      const newProject = (await newOrg.projects)[0];
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = false;
       bipSettings.isIterationsPagePublic = true;
       bipSettings.org = Promise.resolve(newOrg);
-      bipSettings.product = Promise.resolve(newProduct);
+      bipSettings.project = Promise.resolve(newProject);
       await bipSettingsRepository.save(bipSettings);
       await expect(
-        service.getActiveIteration(newOrg.id, newProduct.id),
+        service.getActiveIteration(newOrg.id, newProject.id),
       ).rejects.toThrow();
     });
     it('should throw an error if the org does not exist', async () => {
@@ -266,15 +266,15 @@ describe('PublicService', () => {
     });
     it('should throw an error if the org does not have active iterations page public enabled', async () => {
       const newOrg = await orgsService.createForUser(user);
-      const newProduct = (await newOrg.products)[0];
+      const newProject = (await newOrg.projects)[0];
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveIterationsPagePublic = false;
       bipSettings.org = Promise.resolve(newOrg);
-      bipSettings.product = Promise.resolve(newProduct);
+      bipSettings.project = Promise.resolve(newProject);
       await bipSettingsRepository.save(bipSettings);
       await expect(
-        service.getActiveIteration(newOrg.id, newProduct.id),
+        service.getActiveIteration(newOrg.id, newProject.id),
       ).rejects.toThrow();
     });
   });

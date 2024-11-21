@@ -9,7 +9,7 @@ import { getIteration, updateIteration } from "../../../services/iterations/iter
 import NotFoundCard from "../components/NotFoundCard";
 
 function EditIteration() {
-  const { orgId, productId, id } = useParams();
+  const { orgId, projectId, id } = useParams();
   const [iteration, setIteration] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,7 +17,7 @@ function EditIteration() {
     async function fetchIteration() {
       setIsLoading(true);
       try {
-        const iteration = await getIteration(orgId, productId, id);
+        const iteration = await getIteration(orgId, projectId, id);
         setIteration(iteration);
       } catch (e) {
         console.error(e);
@@ -27,10 +27,10 @@ function EditIteration() {
     }
 
     fetchIteration();
-  }, [orgId, productId, id]);
+  }, [orgId, projectId, id]);
 
   const handleSubmit = async (iteration) => {
-    await updateIteration(orgId, productId, id, iteration);
+    await updateIteration(orgId, projectId, id, iteration);
   };
 
   return (

@@ -7,7 +7,7 @@ import { OrgsService } from '../../orgs/orgs.service';
 import { MilestoneMapper } from './milestone.mapper';
 import { Timeline } from '../../common/timeline.enum';
 import { TimelineService } from '../../common/timeline.service';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 @Injectable()
 export class MilestonesService {
@@ -15,18 +15,18 @@ export class MilestonesService {
     @InjectRepository(Milestone)
     private milestoneRepository: Repository<Milestone>,
     private orgsService: OrgsService,
-    @InjectRepository(Product) private productsRepository: Repository<Product>,
+    @InjectRepository(Project) private projectsRepository: Repository<Project>,
   ) {}
 
   async createMilestone(
     orgId: string,
-    productId: string,
+    projectId: string,
     createMilestoneDto: CreateUpdateMilestoneDto,
   ) {
     this.validateMilestone(createMilestoneDto);
     const org = await this.orgsService.findOneById(orgId);
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
     const milestone = new Milestone();
@@ -34,41 +34,41 @@ export class MilestonesService {
     milestone.description = createMilestoneDto.description;
     milestone.dueDate = new Date(createMilestoneDto.dueDate);
     milestone.org = Promise.resolve(org);
-    milestone.product = Promise.resolve(product);
+    milestone.project = Promise.resolve(project);
     const savedMilestone = await this.milestoneRepository.save(milestone);
     return await MilestoneMapper.toDto(savedMilestone);
   }
 
-  async findOneById(orgId: string, productId: string, id: string) {
+  async findOneById(orgId: string, projectId: string, id: string) {
     return await this.milestoneRepository.findOneByOrFail({
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
       id: id,
     });
   }
 
-  async listMilestones(orgId: string, productId: string) {
+  async listMilestones(orgId: string, projectId: string) {
     return MilestoneMapper.toListDto(
       await this.milestoneRepository.find({
-        where: { org: { id: orgId }, product: { id: productId } },
+        where: { org: { id: orgId }, project: { id: projectId } },
         order: { dueDate: 'DESC' },
       }),
     );
   }
 
-  async listMilestonesWithFeatures(orgId: string, productId: string) {
+  async listMilestonesWithFeatures(orgId: string, projectId: string) {
     const milestones = await this.milestoneRepository.find({
-      where: { org: { id: orgId }, product: { id: productId } },
+      where: { org: { id: orgId }, project: { id: projectId } },
       order: { dueDate: 'DESC' },
       relations: ['features'],
     });
     return await MilestoneMapper.toListWithFeaturesDto(milestones);
   }
 
-  async get(orgId: string, productId: string, id: string) {
+  async get(orgId: string, projectId: string, id: string) {
     const milestone = await this.milestoneRepository.findOneByOrFail({
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
       id: id,
     });
     return await MilestoneMapper.toDto(milestone);
@@ -76,14 +76,14 @@ export class MilestonesService {
 
   async update(
     orgId: string,
-    productId: string,
+    projectId: string,
     id: string,
     updateMilestoneDto: CreateUpdateMilestoneDto,
   ) {
     this.validateMilestone(updateMilestoneDto);
     const milestone = await this.milestoneRepository.findOneByOrFail({
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
       id: id,
     });
     milestone.title = updateMilestoneDto.title;
@@ -93,10 +93,10 @@ export class MilestonesService {
     return await MilestoneMapper.toDto(savedMilestone);
   }
 
-  async delete(orgId: string, productId: string, id: string) {
+  async delete(orgId: string, projectId: string, id: string) {
     const milestone = await this.milestoneRepository.findOneByOrFail({
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
       id: id,
     });
     const features = await milestone.features;
@@ -105,10 +105,10 @@ export class MilestonesService {
     await this.milestoneRepository.remove(milestone);
   }
 
-  async listForTimeline(orgId: string, productId: string, timeline: Timeline) {
+  async listForTimeline(orgId: string, projectId: string, timeline: Timeline) {
     let where = {
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     } as any;
 
     switch (timeline) {
@@ -131,7 +131,7 @@ export class MilestonesService {
         where = [
           {
             org: { id: orgId },
-            product: { id: productId },
+            project: { id: projectId },
             dueDate: MoreThan(nextQuarterEndDate),
           },
           { org: { id: orgId }, dueDate: IsNull() },

@@ -4,26 +4,26 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Timeline } from '../../../common/timeline.enum';
 import { MilestonesService } from '../milestones.service';
 import { PublicMilestoneMapper } from './public.mappers';
-import { Product } from '../../../products/product.entity';
+import { Project } from '../../../projects/project.entity';
 
 @Injectable()
 export class PublicService {
   constructor(
     private milestoneService: MilestonesService,
-    @InjectRepository(Product)
-    private productsRepository: Repository<Product>,
+    @InjectRepository(Project)
+    private projectsRepository: Repository<Project>,
   ) {}
 
-  async listMilestones(orgId: string, productId: string, timeline: Timeline) {
-    await this.validateBuildInPublicSettings(orgId, productId);
-    return this.milestoneService.listForTimeline(orgId, productId, timeline);
+  async listMilestones(orgId: string, projectId: string, timeline: Timeline) {
+    await this.validateBuildInPublicSettings(orgId, projectId);
+    return this.milestoneService.listForTimeline(orgId, projectId, timeline);
   }
 
-  async findMilestone(orgId: string, productId: string, milestoneId: string) {
-    await this.validateBuildInPublicSettings(orgId, productId);
+  async findMilestone(orgId: string, projectId: string, milestoneId: string) {
+    await this.validateBuildInPublicSettings(orgId, projectId);
     const milestone = await this.milestoneService.findOneById(
       orgId,
-      productId,
+      projectId,
       milestoneId,
     );
     return await PublicMilestoneMapper.toDto(milestone);
@@ -31,13 +31,13 @@ export class PublicService {
 
   private async validateBuildInPublicSettings(
     orgId: string,
-    productId: string,
+    projectId: string,
   ) {
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
-    const bipSettings = await product.bipSettings;
+    const bipSettings = await project.bipSettings;
     if (
       !bipSettings?.isRoadmapPagePublic ||
       !bipSettings?.isBuildInPublicEnabled

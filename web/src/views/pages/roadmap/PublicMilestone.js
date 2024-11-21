@@ -9,7 +9,7 @@ import NotFoundCard from "../components/NotFoundCard";
 import PublicMilestoneDetail from "./PublicMilestoneDetail.";
 
 function PublicMilestone() {
-  const { orgId, productId, milestoneId } = useParams();
+  const { orgId, projectId, milestoneId } = useParams();
   const [milestone, setMilestone] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,7 @@ function PublicMilestone() {
     async function fetchData() {
       setLoading(true);
       try {
-        const milestone = await getPublicMilestone(orgId, productId, milestoneId);
+        const milestone = await getPublicMilestone(orgId, projectId, milestoneId);
         setMilestone(milestone);
         setLoading(false);
       } catch (error) {

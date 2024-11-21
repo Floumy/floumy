@@ -9,12 +9,12 @@ import { UsersModule } from '../users/users.module';
 import { OrgsModule } from '../orgs/orgs.module';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Module({
   imports: [
     CacheModule.register(),
-    TypeOrmModule.forFeature([BipSettings, Org, User, Product]),
+    TypeOrmModule.forFeature([BipSettings, Org, User, Project]),
     AuthModule,
     UsersModule,
     OrgsModule,

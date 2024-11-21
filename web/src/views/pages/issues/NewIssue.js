@@ -6,10 +6,10 @@ import { addIssue } from "../../../services/issues/issues.service";
 import { useParams } from "react-router-dom";
 
 export default function NewIssue() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
 
   const handleSubmit = async (issue) => {
-    await addIssue(orgId, productId, issue);
+    await addIssue(orgId, projectId, issue);
   };
 
   return (

@@ -17,13 +17,13 @@ import { FeatureFile } from '../roadmap/features/feature-file.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 import { WorkItemsService } from '../backlog/work-items/work-items.service';
 import { Iteration } from '../iterations/Iteration.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 describe('FilesService', () => {
   let service: FilesService;
   let cleanup: () => Promise<void>;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let workItemFilesRepository: Repository<WorkItemFile>;
   let fileRepository: Repository<File>;
   let workItemRepository: Repository<WorkItem>;
@@ -64,7 +64,7 @@ describe('FilesService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
   });
 
   afterEach(async () => {
@@ -83,7 +83,7 @@ describe('FilesService', () => {
         size: 9,
         buffer: Buffer.from('Test file'),
       };
-      const result = await service.uploadFile(org.id, product.id, file as any);
+      const result = await service.uploadFile(org.id, project.id, file as any);
       expect(result).toEqual({
         id: expect.any(String),
         name: 'test.txt',
@@ -103,10 +103,10 @@ describe('FilesService', () => {
       };
       const uploadedFile = await service.uploadFile(
         org.id,
-        product.id,
+        project.id,
         file as any,
       );
-      const result = await service.getFile(org.id, product.id, uploadedFile.id);
+      const result = await service.getFile(org.id, project.id, uploadedFile.id);
       expect(result.id).toEqual(uploadedFile.id);
       expect(result.name).toEqual('test.txt');
       expect(result.size).toEqual(9);
@@ -125,18 +125,18 @@ describe('FilesService', () => {
       };
       const uploadedFile = await service.uploadFile(
         org.id,
-        product.id,
+        project.id,
         file as any,
       );
-      await service.deleteFile(org.id, product.id, uploadedFile.id);
+      await service.deleteFile(org.id, project.id, uploadedFile.id);
       await expect(
-        service.getFile(org.id, product.id, uploadedFile.id),
+        service.getFile(org.id, project.id, uploadedFile.id),
       ).rejects.toThrow();
     });
     it('should delete the associated work item file', async () => {
       const file = new File();
       file.org = Promise.resolve(org);
-      file.product = Promise.resolve(product);
+      file.project = Promise.resolve(project);
       file.name = 'test.txt';
       file.path = `test.txt`;
       file.size = 9;
@@ -147,13 +147,13 @@ describe('FilesService', () => {
       workItem.org = Promise.resolve(org);
       workItem.title = 'Test work item';
       workItem.description = 'Test work item description';
-      workItem.product = Promise.resolve(product);
+      workItem.project = Promise.resolve(project);
       const savedWorkItem = await workItemRepository.save(workItem);
       const workItemFile = new WorkItemFile();
       workItemFile.file = Promise.resolve(savedFile);
       workItemFile.workItem = Promise.resolve(savedWorkItem);
       await workItemFilesRepository.save(workItemFile);
-      await service.deleteFile(org.id, product.id, savedFile.id);
+      await service.deleteFile(org.id, project.id, savedFile.id);
       await expect(
         workItemFilesRepository.findOneBy({ file: { id: savedFile.id } }),
       ).resolves.toBeNull();

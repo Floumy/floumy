@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import FeaturesListCard from "../features/FeaturesListCard";
 
 function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: "", description: "", dueDate: "" } }) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dueDate, setDueDate] = useState(milestone?.dueDate);
   const [isDueDateInvalid, setIsDueDateInvalid] = useState(false);
@@ -65,7 +65,7 @@ function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: ""
 
   const onDelete = async (id) => {
     try {
-      await deleteMilestone(orgId, productId, id);
+      await deleteMilestone(orgId, projectId, id);
       navigate(-1);
       setTimeout(() => toast.success("The milestone has been deleted"), 100);
     } catch (e) {
@@ -96,7 +96,7 @@ function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: ""
   function onAddFeature() {
     return async (feature) => {
       feature.milestone = milestone.id;
-      const savedFeature = await addFeature(orgId, productId, feature);
+      const savedFeature = await addFeature(orgId, projectId, feature);
       features.push(savedFeature);
       setFeatures([...features]);
     };

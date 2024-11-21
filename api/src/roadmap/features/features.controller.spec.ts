@@ -30,7 +30,7 @@ import { PaymentPlan } from '../../auth/payment.plan';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
 import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 describe('FeaturesController', () => {
   let controller: FeaturesController;
@@ -39,7 +39,7 @@ describe('FeaturesController', () => {
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
-  let product: Product;
+  let project: Project;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -59,7 +59,7 @@ describe('FeaturesController', () => {
           FeatureRequest,
           FeatureRequestComment,
           FeatureRequestVote,
-          Product,
+          Project,
         ]),
         UsersModule,
         BacklogModule,
@@ -88,7 +88,7 @@ describe('FeaturesController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
   });
 
   afterEach(async () => {
@@ -103,7 +103,7 @@ describe('FeaturesController', () => {
     it('should return 201', async () => {
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -127,7 +127,7 @@ describe('FeaturesController', () => {
       try {
         await controller.create(
           org.id,
-          product.id,
+          project.id,
           {
             user: {
               sub: user.id,
@@ -150,7 +150,7 @@ describe('FeaturesController', () => {
     it('should return 200', async () => {
       await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -164,7 +164,7 @@ describe('FeaturesController', () => {
           status: FeatureStatus.PLANNED,
         },
       );
-      const features = await controller.list(org.id, product.id, {
+      const features = await controller.list(org.id, project.id, {
         user: {
           org: org.id,
         },
@@ -179,7 +179,7 @@ describe('FeaturesController', () => {
     it('should return features paginated', async () => {
       await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -195,7 +195,7 @@ describe('FeaturesController', () => {
       );
       await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -211,7 +211,7 @@ describe('FeaturesController', () => {
       );
       const features = await controller.list(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -227,7 +227,7 @@ describe('FeaturesController', () => {
     it('should return 200', async () => {
       await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -243,7 +243,7 @@ describe('FeaturesController', () => {
       );
       const features = await controller.listWithoutMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -260,7 +260,7 @@ describe('FeaturesController', () => {
     it('should return 200', async () => {
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -276,7 +276,7 @@ describe('FeaturesController', () => {
       );
       const feature = await controller.get(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -294,7 +294,7 @@ describe('FeaturesController', () => {
     it('should return 200', async () => {
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -310,7 +310,7 @@ describe('FeaturesController', () => {
       );
       const feature = await controller.update(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -335,7 +335,7 @@ describe('FeaturesController', () => {
     it('should return 200', async () => {
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -351,7 +351,7 @@ describe('FeaturesController', () => {
       );
       await controller.delete(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -365,7 +365,7 @@ describe('FeaturesController', () => {
     it('should update the status', async () => {
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -381,7 +381,7 @@ describe('FeaturesController', () => {
       );
       const feature = await controller.patch(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -401,7 +401,7 @@ describe('FeaturesController', () => {
     it('should update the priority', async () => {
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -417,7 +417,7 @@ describe('FeaturesController', () => {
       );
       const feature = await controller.patch(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -437,7 +437,7 @@ describe('FeaturesController', () => {
     it('should update the milestone', async () => {
       const milestone = await milestoneService.createMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           title: 'my milestone',
           description: 'my milestone description',
@@ -446,7 +446,7 @@ describe('FeaturesController', () => {
       );
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -462,7 +462,7 @@ describe('FeaturesController', () => {
       );
       const feature = await controller.patch(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -485,7 +485,7 @@ describe('FeaturesController', () => {
     it('should return 200', async () => {
       await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -501,7 +501,7 @@ describe('FeaturesController', () => {
       );
       const features = await controller.search(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -521,7 +521,7 @@ describe('FeaturesController', () => {
       await orgsRepository.save(org);
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -558,7 +558,7 @@ describe('FeaturesController', () => {
       await orgsRepository.save(org);
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -594,7 +594,7 @@ describe('FeaturesController', () => {
       await orgsRepository.save(org);
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,
@@ -638,7 +638,7 @@ describe('FeaturesController', () => {
       await orgsRepository.save(org);
       const featureResponse = await controller.create(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             sub: user.id,

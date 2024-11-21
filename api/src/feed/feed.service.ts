@@ -6,7 +6,7 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { FeedItemMapper } from './mappers';
 import { FeedItemDto } from './dtos';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Injectable()
 export class FeedService {
@@ -15,18 +15,18 @@ export class FeedService {
     private readonly feedItemRepository: Repository<FeedItem>,
     @InjectRepository(Org) private readonly orgsRepository: Repository<Org>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    @InjectRepository(Product)
-    private readonly productsRepository: Repository<Product>,
+    @InjectRepository(Project)
+    private readonly projectsRepository: Repository<Project>,
   ) {}
 
   async listFeedItems(
     orgId: string,
-    productId: string,
+    projectId: string,
     page: number,
     limit: number,
   ): Promise<FeedItemDto[]> {
     const feedItems = await this.feedItemRepository.find({
-      where: { org: { id: orgId }, product: { id: productId } },
+      where: { org: { id: orgId }, project: { id: projectId } },
       take: limit,
       skip: (page - 1) * limit,
       order: { createdAt: 'DESC' },
@@ -37,7 +37,7 @@ export class FeedService {
   async createTextFeedItem(
     userId: string,
     orgId: string,
-    productId: string,
+    projectId: string,
     textFeedItem: { text: string },
   ): Promise<FeedItemDto> {
     const user = await this.usersRepository.findOneByOrFail({
@@ -45,8 +45,8 @@ export class FeedService {
       org: { id: orgId },
     });
     const org = await user.org;
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
 
@@ -55,7 +55,7 @@ export class FeedService {
     }
     const feedItem = new FeedItem();
     feedItem.org = Promise.resolve(org);
-    feedItem.product = Promise.resolve(product);
+    feedItem.project = Promise.resolve(project);
     feedItem.title = 'Text Feed Item Created';
     feedItem.entity = 'text';
     feedItem.action = 'created';

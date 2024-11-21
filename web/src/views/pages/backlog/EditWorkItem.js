@@ -11,16 +11,16 @@ import NotFoundCard from "../components/NotFoundCard";
 function EditWorkItem() {
   const [loading, setLoading] = useState(true);
   const [workItem, setWorkItem] = useState(null);
-  const { orgId, productId, id } = useParams();
+  const { orgId, projectId, id } = useParams();
   const handleSubmit = async (workItem) => {
-    await updateWorkItem(orgId, productId, id, workItem);
+    await updateWorkItem(orgId, projectId, id, workItem);
   };
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        const workItem = await getWorkItem(orgId, productId, id);
+        const workItem = await getWorkItem(orgId, projectId, id);
         setWorkItem(workItem);
         setLoading(false);
       } catch (error) {

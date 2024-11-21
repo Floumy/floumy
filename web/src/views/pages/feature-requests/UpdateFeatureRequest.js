@@ -12,7 +12,7 @@ import FeaturesList from "../features/FeaturesList";
 import { addFeature } from "../../../services/roadmap/roadmap.service";
 
 export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelete }) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +71,7 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
 
   async function handleAddFeature(featureRequestId, feature) {
     feature.featureRequest = featureRequestId;
-    const savedFeature = await addFeature(orgId, productId, feature);
+    const savedFeature = await addFeature(orgId, projectId, feature);
     featureRequest.features.push(savedFeature);
     featureRequest.features.sort(sortFeatures);
   }

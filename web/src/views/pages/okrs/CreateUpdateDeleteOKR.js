@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import { getOrg } from "../../../services/org/orgs.service";
 
 function CreateUpdateDeleteOKR({ onSubmit, okr }) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [fields, setFields] = useState([{}]);
   const [timeline, setTimeline] = useState("this-quarter");
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
   const onDeleteOKR = async (id) => {
     setIsLoading(true);
     try {
-      await deleteOKR(orgId, productId, id);
+      await deleteOKR(orgId, projectId, id);
       navigate(-1);
       setTimeout(() => toast.success("The OKR has been deleted"), 100);
     } catch (e) {

@@ -18,13 +18,13 @@ import { Repository } from 'typeorm';
 import { PublicService } from './public.service';
 import { Timeline } from '../../../common/timeline.enum';
 import { MilestonesService } from '../milestones.service';
-import { Product } from '../../../products/product.entity';
+import { Project } from '../../../projects/project.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
   let cleanup: () => Promise<void>;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let bipRepository: Repository<BipSettings>;
   let milestonesService: MilestonesService;
 
@@ -38,7 +38,7 @@ describe('PublicController', () => {
           Milestone,
           Feature,
           BipSettings,
-          Product,
+          Project,
         ]),
         UsersModule,
         BacklogModule,
@@ -67,12 +67,12 @@ describe('PublicController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.isRoadmapPagePublic = true;
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     await bipRepository.save(bipSettings);
   });
 
@@ -84,7 +84,7 @@ describe('PublicController', () => {
     it('should return a list of milestones', async () => {
       const milestones = await controller.listMilestones(
         org.id,
-        product.id,
+        project.id,
         Timeline.THIS_QUARTER,
       );
       expect(milestones).toEqual([]);
@@ -95,7 +95,7 @@ describe('PublicController', () => {
     it('should return the milestone', async () => {
       const milestone = await milestonesService.createMilestone(
         org.id,
-        product.id,
+        project.id,
         {
           title: 'test',
           description: 'test description',
@@ -105,7 +105,7 @@ describe('PublicController', () => {
 
       const actual = await controller.findMilestone(
         org.id,
-        product.id,
+        project.id,
         milestone.id,
       );
 

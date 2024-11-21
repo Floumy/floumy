@@ -17,7 +17,7 @@ import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { FeatureRequestVote } from '../feature-requests/feature-request-vote.entity';
 import { Issue } from '../issues/issue.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Entity()
 export class User {
@@ -84,8 +84,8 @@ export class User {
   @ManyToOne(() => Org, (org) => org.users, { lazy: true, nullable: true })
   org: Promise<Org>;
 
-  @ManyToMany(() => Product, (product) => product.users, { lazy: true })
-  products: Promise<Product[]>;
+  @ManyToMany(() => Project, (project) => project.users, { lazy: true })
+  projects: Promise<Project[]>;
 
   constructor(name: string, email: string, password: string) {
     this.name = name;
