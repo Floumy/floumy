@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 /*eslint-disable*/
 import React from "react";
 // react library for routing
@@ -38,9 +23,9 @@ function Index() {
                   A complete React solution
                 </h2>
                 <p className="lead text-white">
-                  Argon is a completly new product built on our newest re-built
+                  Argon is a completly new project built on our newest re-built
                   from scratch framework structure that is meant to make our
-                  products more intuitive, more adaptive and, needless to say,
+                  projects more intuitive, more adaptive and, needless to say,
                   so much easier to customize. Let Argon amaze you with its cool
                   features and build tools and get your project to a whole new
                   level.

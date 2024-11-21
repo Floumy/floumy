@@ -18,7 +18,7 @@ import PublicShareButtons from "../../../components/PublicShareButtons/PublicSha
 import Comments from "../../../components/Comments/Comments";
 
 function PublicDetailKeyResult() {
-  const { orgId, productId, objectiveId, keyResultId } = useParams();
+  const { orgId, projectId, objectiveId, keyResultId } = useParams();
   const [keyResult, setKeyResult] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -28,7 +28,7 @@ function PublicDetailKeyResult() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const keyResult = await getPublicKeyResult(orgId, productId, objectiveId, keyResultId);
+        const keyResult = await getPublicKeyResult(orgId, projectId, objectiveId, keyResultId);
         setKeyResult(keyResult);
       } catch (e) {
         toast.error("The key result could not be loaded");
@@ -42,7 +42,7 @@ function PublicDetailKeyResult() {
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addKeyResultComment(orgId, productId, keyResultId, comment);
+      const addedComment = await addKeyResultComment(orgId, projectId, keyResultId, comment);
       keyResult.comments.push(addedComment);
       setKeyResult({ ...keyResult });
       toast.success("Comment added successfully");
@@ -53,7 +53,7 @@ function PublicDetailKeyResult() {
 
   async function handleCommentEditSubmit(commentId, content) {
     try {
-      await updateKeyResultComment(orgId, productId, keyResultId, commentId, content);
+      await updateKeyResultComment(orgId, projectId, keyResultId, commentId, content);
       const updatedComment = keyResult.comments.find(c => c.id === commentId);
       updatedComment.content = content;
       setKeyResult({ ...keyResult });
@@ -65,7 +65,7 @@ function PublicDetailKeyResult() {
 
   async function handCommentDelete(commentId) {
     try {
-      await deleteKeyResultComment(orgId, productId, keyResultId, commentId);
+      await deleteKeyResultComment(orgId, projectId, keyResultId, commentId);
       const index = keyResult.comments.findIndex(c => c.id === commentId);
       keyResult.comments.splice(index, 1);
       setKeyResult({ ...keyResult });
@@ -156,7 +156,7 @@ function PublicDetailKeyResult() {
                 </CardHeader>
                 <PublicFeaturesList
                   orgId={orgId}
-                  productId={productId}
+                  projectId={projectId}
                   features={keyResult.features}
                 />
               </Card>

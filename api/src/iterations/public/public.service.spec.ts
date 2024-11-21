@@ -178,7 +178,7 @@ describe('PublicService', () => {
   });
   describe('when getting the active iteration', () => {
     it('should return the active iteration', async () => {
-      const orgWithActiveIterations = await orgsService.getOrCreateOrg(null);
+      const orgWithActiveIterations = await orgsService.getOrCreateOrg('Test Project');
       const projectWithActiveIterations = new Project();
       projectWithActiveIterations.name = 'Test Project';
       projectWithActiveIterations.org = Promise.resolve(
@@ -214,7 +214,7 @@ describe('PublicService', () => {
       expect(result.goal).toEqual('Test Goal');
     });
     it('should return null if there is no active iteration', async () => {
-      const orgWithActiveIterations = await orgsService.getOrCreateOrg(null);
+      const orgWithActiveIterations = await orgsService.getOrCreateOrg('Test Project');
       const projectWithActiveIterations = new Project();
       projectWithActiveIterations.name = 'Test Project';
       projectWithActiveIterations.org = Promise.resolve(

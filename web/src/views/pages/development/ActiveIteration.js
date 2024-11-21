@@ -17,7 +17,7 @@ import WorkItemsList from "../backlog/WorkItemsList";
 import { getWorkItemsGroupedByStatus } from "../../../services/utils/workItemUtils";
 
 function ActiveIteration() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [activeIteration, setActiveIteration] = useState(null);
@@ -34,7 +34,7 @@ function ActiveIteration() {
     async function fetchData() {
       try {
         setIsLoading(true);
-        const activeIteration = await getActiveIteration(orgId, productId);
+        const activeIteration = await getActiveIteration(orgId, projectId);
         setActiveIteration(activeIteration);
         if (activeIteration && activeIteration.workItems.length > 0) {
           setWorkItemsGroupedByStatus(activeIteration.workItems);
@@ -48,7 +48,7 @@ function ActiveIteration() {
     }
 
     fetchData();
-  }, [orgId, productId, setWorkItemsGroupedByStatus]);
+  }, [orgId, projectId, setWorkItemsGroupedByStatus]);
 
   function removeWorkItemsFromActiveIteration(workItems) {
     const newWorkItems = [];
@@ -104,7 +104,7 @@ function ActiveIteration() {
           shortcut: "w",
           id: "new-work-item",
           action: () => {
-            navigate(`/admin/orgs/${orgId}/projects/${productId}/work-item/new`);
+            navigate(`/admin/orgs/${orgId}/projects/${projectId}/work-item/new`);
           }
         }
       ]} />
@@ -130,7 +130,7 @@ function ActiveIteration() {
                       you focused on immediate priorities and ensure steady progress. Review your active sprint
                       regularly to stay on track and adjust as needed for optimal performance.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/projects/${productId}/iterations`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/iterations`}
                             className="text-blue font-weight-bold">Manage the Active
                         Sprint</Link>
                     </p>
@@ -164,7 +164,7 @@ function ActiveIteration() {
                   {Object.keys(workItemsByStatus).length === 0 && !isLoading && (
                     <div className="text-center m-3">
                       <h3 className="">No work items found in this sprint. Add them <Link
-                        to={`/admin/orgs/${orgId}/projects/${productId}/iterations`}
+                        to={`/admin/orgs/${orgId}/projects/${projectId}/iterations`}
                         className="text-blue">here</Link>
                       </h3>
                     </div>

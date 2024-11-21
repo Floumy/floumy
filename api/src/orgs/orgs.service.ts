@@ -50,7 +50,10 @@ export class OrgsService {
     return await this.orgRepository.findOneBy({ invitationToken });
   }
 
-  async getOrCreateOrg(invitationToken?: string): Promise<Org> {
+  async getOrCreateOrg(
+    projectName?: string,
+    invitationToken?: string,
+  ): Promise<Org> {
     if (invitationToken && invitationToken.trim().length === 0) {
       throw new Error('Invalid invitation token');
     }
@@ -59,7 +62,7 @@ export class OrgsService {
       return await this.findOneByInvitationToken(invitationToken);
     }
 
-    return await this.createOrg();
+    return await this.createOrg(projectName);
   }
 
   async patchOrg(orgId: string, name: string) {
@@ -72,14 +75,15 @@ export class OrgsService {
     return org;
   }
 
-  private async createOrg() {
+  private async createOrg(projectName?: string) {
     const org = new Org();
-    org.paymentPlan = PaymentPlan.FREE;
+    org.name = projectName;
+    org.paymentPlan = PaymentPlan.PREMIUM;
     org.isSubscribed = false;
     org.nextPaymentDate = null;
     const savedOrg = await this.orgRepository.save(org);
     const project = new Project();
-    project.name = 'Default Project';
+    project.name = projectName;
     project.org = Promise.resolve(savedOrg);
     await this.projectRepository.save(project);
     this.eventEmitter.emit('org.created', savedOrg);

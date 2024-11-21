@@ -15,7 +15,7 @@ function PublicWorkItemsList({
                                showFeature = true,
                                headerClassName = "thead-light"
                              }) {
-  const { productId } = useParams();
+  const { projectId } = useParams();
   return (<>
     <div className="table-responsive">
       <Table className="align-items-center table-flush border-bottom no-select" style={{ minWidth: "700px" }}>
@@ -38,19 +38,19 @@ function PublicWorkItemsList({
         {workItems.map((workItem) => (<tr key={workItem.id}>
           <td>
             <Link className={"edit-work-item"} color={"muted"}
-                  to={`/public/orgs/${orgId}/projects/${productId}/work-item/detail/${workItem.id}`}>
+                  to={`/public/orgs/${orgId}/projects/${projectId}/work-item/detail/${workItem.id}`}>
               {workItem.reference}
             </Link>
           </td>
           <td className={"title-cell"}>{workItemTypeIcon(workItem.type)}
             <Link className={"edit-work-item"} color={"muted"}
-                  to={`/public/orgs/${orgId}/projects/${productId}/work-item/detail/${workItem.id}`}>
+                  to={`/public/orgs/${orgId}/projects/${projectId}/work-item/detail/${workItem.id}`}>
               {workItem.title}
             </Link>
           </td>
           {showFeature && <td className="title-cell">
             {workItem.feature && (
-              <Link to={`/public/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${workItem.feature.id}`}
+              <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${workItem.feature.id}`}
                     className="text-gray">
                 {workItem.feature.title}
               </Link>)}

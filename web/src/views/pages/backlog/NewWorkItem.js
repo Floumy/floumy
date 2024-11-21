@@ -6,9 +6,9 @@ import { addWorkItem } from "../../../services/backlog/backlog.service";
 import { useParams } from "react-router-dom";
 
 function NewWorkItem() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const handleSubmit = async (workItem) => {
-    await addWorkItem(orgId, productId, workItem);
+    await addWorkItem(orgId, projectId, workItem);
   };
 
   return (

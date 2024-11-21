@@ -17,17 +17,17 @@ import { formatHyphenatedString } from "../../../services/utils/utils";
 import WorkItemsList from "../backlog/WorkItemsList";
 
 export default function IssueDetails() {
-  const { orgId, productId, issueId } = useParams();
+  const { orgId, projectId, issueId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [issue, setIssue] = useState(null);
 
   useEffect(() => {
     document.title = "Floumy | Issue Details";
 
-    async function fetchIssue(orgId, productId, issueId) {
+    async function fetchIssue(orgId, projectId, issueId) {
       try {
         setIsLoading(true);
-        const issue = await getIssue(orgId, productId, issueId);
+        const issue = await getIssue(orgId, projectId, issueId);
         setIssue(issue);
       } catch (e) {
         console.error(e);
@@ -37,12 +37,12 @@ export default function IssueDetails() {
       }
     }
 
-    fetchIssue(orgId, productId, issueId);
-  }, [orgId, productId, issueId]);
+    fetchIssue(orgId, projectId, issueId);
+  }, [orgId, projectId, issueId]);
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addIssueComment(orgId, productId, issueId, comment);
+      const addedComment = await addIssueComment(orgId, projectId, issueId, comment);
       setIssue({ ...issue, comments: [...issue.comments, addedComment] });
       toast.success("Comment added successfully");
     } catch (e) {
@@ -52,7 +52,7 @@ export default function IssueDetails() {
 
   async function handleCommentUpdate(commentId, content) {
     try {
-      const updatedComment = await updateIssueComment(orgId, productId, issueId, commentId, content);
+      const updatedComment = await updateIssueComment(orgId, projectId, issueId, commentId, content);
       const updatedComments = issue.comments.map(c => c.id === updatedComment.id ? updatedComment : c);
       setIssue({ ...issue, comments: updatedComments });
       toast.success("Comment updated successfully");
@@ -63,7 +63,7 @@ export default function IssueDetails() {
 
   async function handleCommentDelete(commentId) {
     try {
-      await deleteIssueComment(orgId, productId, issueId, commentId);
+      await deleteIssueComment(orgId, projectId, issueId, commentId);
       const updatedComments = issue.comments.filter(c => c.id !== commentId);
       setIssue({ ...issue, comments: updatedComments });
       toast.success("Comment deleted successfully");

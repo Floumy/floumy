@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React, { useEffect, useLayoutEffect, useState } from "react";
 // react library for routing
 import { Navigate, Route, Routes } from "react-router-dom";
@@ -35,7 +20,7 @@ function Admin() {
   const [sidenavOpen, setSidenavOpen] = useState(true);
   const currentOrg = JSON.parse(localStorage.getItem("currentOrg"));
   const orgId = currentOrg ? currentOrg.id : "";
-  const productId = currentOrg ? currentOrg.products[0].id : "";
+  const projectId = currentOrg ? currentOrg.projects[0].id : "";
 
   function isNavigationReplace() {
     let replace = false;
@@ -45,20 +30,20 @@ function Admin() {
     return replace;
   }
 
-  useNavigationHotKey("1", `/admin/orgs/${orgId}/projects/${productId}/feed`);
-  useNavigationHotKey("2", `/admin/orgs/${orgId}/projects/${productId}/okrs`);
-  useNavigationHotKey("3", `/admin/orgs/${orgId}/projects/${productId}/roadmap`);
-  useNavigationHotKey("4", `/admin/orgs/${orgId}/projects/${productId}/iterations`);
-  useNavigationHotKey("5", `/admin/orgs/${orgId}/projects/${productId}/active-iteration`);
-  useNavigationHotKey("6", `/admin/orgs/${orgId}/projects/${productId}/work-items`);
-  useNavigationHotKey("7", `/admin/orgs/${orgId}/projects/${productId}/features`);
-  useNavigationHotKey("w", `/admin/orgs/${orgId}/projects/${productId}/work-item/new`, isNavigationReplace());
-  useNavigationHotKey("i", `/admin/orgs/${orgId}/projects/${productId}/roadmap/features/new`, isNavigationReplace());
-  useNavigationHotKey("m", `/admin/orgs/${orgId}/projects/${productId}/roadmap/milestones/new`, isNavigationReplace());
-  useNavigationHotKey("s", `/admin/orgs/${orgId}/projects/${productId}/iterations/new`, isNavigationReplace());
-  useNavigationHotKey("o", `/admin/orgs/${orgId}/projects/${productId}/okrs/new`, isNavigationReplace());
-  useNavigationHotKey("r", `/admin/orgs/${orgId}/projects/${productId}/feature-requests/new`, isNavigationReplace(), currentOrg?.paymentPlan === "premium");
-  useNavigationHotKey("n", `/admin/orgs/${orgId}/projects/${productId}/issues/new`, false, currentOrg?.paymentPlan === "premium");
+  useNavigationHotKey("1", `/admin/orgs/${orgId}/projects/${projectId}/feed`);
+  useNavigationHotKey("2", `/admin/orgs/${orgId}/projects/${projectId}/okrs`);
+  useNavigationHotKey("3", `/admin/orgs/${orgId}/projects/${projectId}/roadmap`);
+  useNavigationHotKey("4", `/admin/orgs/${orgId}/projects/${projectId}/iterations`);
+  useNavigationHotKey("5", `/admin/orgs/${orgId}/projects/${projectId}/active-iteration`);
+  useNavigationHotKey("6", `/admin/orgs/${orgId}/projects/${projectId}/work-items`);
+  useNavigationHotKey("7", `/admin/orgs/${orgId}/projects/${projectId}/features`);
+  useNavigationHotKey("w", `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`, isNavigationReplace());
+  useNavigationHotKey("i", `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`, isNavigationReplace());
+  useNavigationHotKey("m", `/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`, isNavigationReplace());
+  useNavigationHotKey("s", `/admin/orgs/${orgId}/projects/${projectId}/iterations/new`, isNavigationReplace());
+  useNavigationHotKey("o", `/admin/orgs/${orgId}/projects/${projectId}/okrs/new`, isNavigationReplace());
+  useNavigationHotKey("r", `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace(), currentOrg?.paymentPlan === "premium");
+  useNavigationHotKey("n", `/admin/orgs/${orgId}/projects/${projectId}/issues/new`, false, currentOrg?.paymentPlan === "premium");
 
   useNavigationHotKey("left", -1);
   useNavigationHotKey("right", 1);
@@ -144,7 +129,7 @@ function Admin() {
 
   return (
     <>
-      <BuildInPublicProvider orgId={orgId} productId={productId}>
+      <BuildInPublicProvider orgId={orgId} projectId={projectId}>
         <Sidebar
           routes={routes}
           toggleSidenav={toggleSidenav}

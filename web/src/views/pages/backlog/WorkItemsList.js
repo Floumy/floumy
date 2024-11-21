@@ -36,7 +36,7 @@ function WorkItemsList({
   const [selectedWorkItems, setSelectedWorkItems] = useState([]);
   const [lastSelectedWorkItem, setLastSelectedWorkItem] = useState(null);
   const { show } = useContextMenu({ id });
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
 
   function handleContextMenu(event, workItem) {
     if (!enableContextMenu) {
@@ -167,19 +167,19 @@ function WorkItemsList({
         >
           <td>
             <Link className={"edit-work-item"} color={"muted"}
-                  to={`/admin/orgs/${orgId}/projects/${productId}/work-item/edit/${workItem.id}`}>
+                  to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`}>
               {workItem.reference}
             </Link>
           </td>
           <td className={"title-cell"}>{workItemTypeIcon(workItem.type)}
             <Link className={"edit-work-item"} color={"muted"}
-                  to={`/admin/orgs/${orgId}/projects/${productId}/work-item/edit/${workItem.id}`}>
+                  to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`}>
               {workItem.title}
             </Link>
           </td>
           {showFeature && <td className="title-cell">
             {workItem.feature && (
-              <Link to={`/admin/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${workItem.feature.id}`}
+              <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${workItem.feature.id}`}
                     className="text-gray">
                 {workItem.feature.title}
               </Link>)}

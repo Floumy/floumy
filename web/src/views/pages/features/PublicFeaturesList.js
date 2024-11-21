@@ -13,7 +13,7 @@ import React, { useEffect, useState } from "react";
 
 function PublicFeaturesList({
                               orgId,
-                              productId,
+                              projectId,
                               features,
                               headerClassName = "thead-light",
                               showAssignedTo = false
@@ -52,13 +52,13 @@ function PublicFeaturesList({
           {sortedFeatures.map((feature) => (
             <tr key={feature.id}>
               <td>
-                <Link to={`/public/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.reference}
                 </Link>
               </td>
               <td className="title-cell">
-                <Link to={`/public/orgs/${orgId}/projects/${productId}/roadmap/features/detail/${feature.id}`}
+                <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
                       className={"feature-detail"}>
                   {feature.title}
                 </Link>

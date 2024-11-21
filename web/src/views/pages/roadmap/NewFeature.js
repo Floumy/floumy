@@ -6,9 +6,9 @@ import CreateUpdateDeleteFeature from "../features/CreateUpdateDeleteFeature";
 import { useParams } from "react-router-dom";
 
 function NewFeature() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const handleSubmit = async (feature) => {
-    await addFeature(orgId, productId, feature);
+    await addFeature(orgId, projectId, feature);
   };
 
   return (

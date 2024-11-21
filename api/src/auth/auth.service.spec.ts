@@ -136,6 +136,7 @@ describe('AuthService', () => {
     });
     it('should create the org', async () => {
       const signUpDto = {
+        projectName: 'Test project',
         name: 'John Doe',
         email: 'testing@example.com',
         password: 'testtesttest',

@@ -38,6 +38,8 @@ export class UsersService {
 
     if (org) {
       user.org = Promise.resolve(org);
+      const projects = await org.projects;
+      user.projects = Promise.resolve(projects);
     }
 
     return await this.usersRepository.save(user);

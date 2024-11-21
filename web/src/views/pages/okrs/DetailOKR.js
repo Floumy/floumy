@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React, { useEffect, useMemo, useState } from "react";
 // javascript plugin that creates a sortable object from a dom object
 // reactstrap components
@@ -50,7 +35,7 @@ import { getOrg } from "../../../services/org/orgs.service";
 import Comments from "../../../components/Comments/Comments";
 
 function DetailOKR() {
-  const { orgId, productId, id } = useParams();
+  const { orgId, projectId, id } = useParams();
   const [okr, setOKR] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [timeline, setTimeline] = useState("this-quarter");
@@ -79,7 +64,7 @@ function DetailOKR() {
 
     async function fetchAndSetOKR() {
       try {
-        const okr = await getOKR(orgId, productId, id);
+        const okr = await getOKR(orgId, projectId, id);
         setOKR(okr);
         setStatus(okr.objective.status);
         setTimeline(okr.objective.timeline);
@@ -135,7 +120,7 @@ function DetailOKR() {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      await updateObjective(orgId, productId, okr.objective.id, {
+      await updateObjective(orgId, projectId, okr.objective.id, {
         title: values.title,
         assignedTo,
         status,
@@ -153,7 +138,7 @@ function DetailOKR() {
   const handleDelete = async () => {
     try {
       setIsSubmitting(true);
-      await deleteOKR(orgId, productId, okr.objective.id);
+      await deleteOKR(orgId, projectId, okr.objective.id);
       navigate(-1);
       setTimeout(() => toast.success("The OKR has been deleted"), 100);
     } catch (e) {
@@ -173,7 +158,7 @@ function DetailOKR() {
         status: "on-track",
         progress: 0
       };
-      const savedKeyResult = await addKeyResult(orgId, productId, okr.objective.id, keyResult);
+      const savedKeyResult = await addKeyResult(orgId, projectId, okr.objective.id, keyResult);
       okr.keyResults.push(savedKeyResult);
       setOKR({ ...okr });
     } catch (e) {
@@ -194,7 +179,7 @@ function DetailOKR() {
 
   const handleAddComment = async (content) => {
     try {
-      const addedComment = await addObjectiveComment(orgId, productId, okr.objective.id, content);
+      const addedComment = await addObjectiveComment(orgId, projectId, okr.objective.id, content);
       okr.objective.comments.push(addedComment);
       setOKR({ ...okr });
       toast.success("The comment has been added");
@@ -205,7 +190,7 @@ function DetailOKR() {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await deleteObjectiveComment(orgId, productId, okr.objective.id, commentId);
+      await deleteObjectiveComment(orgId, projectId, okr.objective.id, commentId);
       okr.objective.comments = okr.objective.comments.filter(comment => comment.id !== commentId);
       setOKR({ ...okr });
       toast.success("The comment has been deleted");
@@ -216,7 +201,7 @@ function DetailOKR() {
 
   const handleUpdateComment = async (commentId, content) => {
     try {
-      const updatedComment = await updateObjectiveComment(orgId, productId, okr.objective.id, commentId, content);
+      const updatedComment = await updateObjectiveComment(orgId, projectId, okr.objective.id, commentId, content);
       okr.objective.comments = okr.objective.comments.map(comment => {
         if (comment.id === commentId) {
           return updatedComment;
@@ -424,14 +409,14 @@ function DetailOKR() {
                           <tr key={keyResult.id}>
                             <td>
                               <Link
-                                to={`/admin/orgs/${orgId}/projects/${productId}/okrs/${id}/kr/detail/${keyResult.id}`}
+                                to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/${id}/kr/detail/${keyResult.id}`}
                                 className={"okr-detail"}>
                                 {keyResult.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
                               <Link
-                                to={`/admin/orgs/${orgId}/projects/${productId}/okrs/${id}/kr/detail/${keyResult.id}`}
+                                to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/${id}/kr/detail/${keyResult.id}`}
                                 className={"okr-detail"}>
                                 {keyResult.title}
                               </Link>

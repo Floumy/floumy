@@ -30,7 +30,7 @@ function DetailKeyResult() {
   const [status, setStatus] = React.useState("");
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = React.useState(false);
   const [progress, setProgress] = React.useState("");
-  const { objectiveId, keyResultId, orgId, productId } = useParams();
+  const { objectiveId, keyResultId, orgId, projectId } = useParams();
   const [keyResult, setKeyResult] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ function DetailKeyResult() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const keyResult = await getKeyResult(orgId, productId, objectiveId, keyResultId);
+        const keyResult = await getKeyResult(orgId, projectId, objectiveId, keyResultId);
         setKeyResult(keyResult);
         setStatus(keyResult.status);
         setProgress(keyResult.progress);
@@ -66,14 +66,14 @@ function DetailKeyResult() {
     }
 
     loadData();
-  }, [orgId, productId, keyResultId, objectiveId]);
+  }, [orgId, projectId, keyResultId, objectiveId]);
 
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
       await updateKeyResult(
         orgId,
-        productId,
+        projectId,
         objectiveId,
         keyResultId,
         {
@@ -93,7 +93,7 @@ function DetailKeyResult() {
   const handleDelete = async () => {
     try {
       setIsSubmitting(true);
-      await deleteKeyResult(orgId, productId, objectiveId, keyResultId);
+      await deleteKeyResult(orgId, projectId, objectiveId, keyResultId);
       navigate(-1);
       setTimeout(() => toast.success("The key result has been deleted"), 100);
     } catch (e) {
@@ -106,7 +106,7 @@ function DetailKeyResult() {
 
   async function handleAddFeature(keyResultId, feature) {
     feature.keyResult = keyResultId;
-    const savedFeature = await addFeature(orgId, productId, feature);
+    const savedFeature = await addFeature(orgId, projectId, feature);
     keyResult.features.push(savedFeature);
     sortByPriority(keyResult.features);
     setKeyResult({ ...keyResult });
@@ -148,7 +148,7 @@ function DetailKeyResult() {
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addKeyResultComment(orgId, productId, objectiveId, keyResultId, comment);
+      const addedComment = await addKeyResultComment(orgId, projectId, objectiveId, keyResultId, comment);
       keyResult.comments.push(addedComment);
       setKeyResult({ ...keyResult });
       toast.success("Comment added successfully");
@@ -159,7 +159,7 @@ function DetailKeyResult() {
 
   async function handleCommentEditSubmit(commentId, content) {
     try {
-      await updateKeyResultComment(orgId, productId, objectiveId, keyResultId, commentId, content);
+      await updateKeyResultComment(orgId, projectId, objectiveId, keyResultId, commentId, content);
       const updatedComment = keyResult.comments.find(c => c.id === commentId);
       updatedComment.content = content;
       setKeyResult({ ...keyResult });
@@ -171,7 +171,7 @@ function DetailKeyResult() {
 
   async function handCommentDelete(commentId) {
     try {
-      await deleteKeyResultComment(orgId, productId, objectiveId, keyResultId, commentId);
+      await deleteKeyResultComment(orgId, projectId, objectiveId, keyResultId, commentId);
       const index = keyResult.comments.findIndex(c => c.id === commentId);
       keyResult.comments.splice(index, 1);
       setKeyResult({ ...keyResult });
