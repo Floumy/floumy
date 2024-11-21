@@ -11,14 +11,14 @@ import { OrgsModule } from '../orgs/orgs.module';
 import { PublicController } from './public/public.controller';
 import { PublicService } from './public/public.service';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Module({
   imports: [
     CacheModule.register(),
     AuthModule,
     OrgsModule,
-    TypeOrmModule.forFeature([User, Org, FeedItem, Product]),
+    TypeOrmModule.forFeature([User, Org, FeedItem, Project]),
   ],
   providers: [FeedService, FeedEventHandler, PublicService],
   controllers: [FeedController, PublicController],

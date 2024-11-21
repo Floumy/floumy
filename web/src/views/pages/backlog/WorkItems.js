@@ -14,12 +14,12 @@ function WorkItems() {
   const [page, setPage] = useState(1);
   const [hasMoreWorkItems, setHasMoreWorkItems] = useState(true);
   const [search, setSearch] = useState("");
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
 
   async function fetchData(page, workItems = []) {
     setIsLoading(true);
     try {
-      const workItemsList = await listWorkItems(orgId, productId, page, 50);
+      const workItemsList = await listWorkItems(orgId, projectId, page, 50);
       if (workItemsList.length === 0) {
         setHasMoreWorkItems(false);
       } else {
@@ -60,7 +60,7 @@ function WorkItems() {
   async function searchWorkItemsByText(searchText, page, workItems = []) {
     setIsLoading(true);
     try {
-      const response = await searchWorkItems(orgId, productId, searchText, page);
+      const response = await searchWorkItems(orgId, projectId, searchText, page);
       if (response.length === 0) {
         setHasMoreWorkItems(false);
       } else {

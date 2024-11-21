@@ -15,7 +15,7 @@ export async function setCurrentOrg() {
     const currentOrg = await getOrg();
     localStorage.setItem("currentOrg", JSON.stringify(currentOrg));
     localStorage.setItem("currentOrgId", currentOrg.id);
-    localStorage.setItem("currentProductId", currentOrg.products[0].id);
+    localStorage.setItem("currentProjectId", currentOrg.projects[0].id);
     localStorage.setItem("currentOrgName", currentOrg.name);
     localStorage.setItem("paymentPlan", currentOrg.paymentPlan);
     localStorage.setItem("isSubscribed", currentOrg.isSubscribed);

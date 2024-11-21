@@ -18,17 +18,17 @@ import { addWorkItem } from "../../../services/backlog/backlog.service";
 import WorkItemsList from "../backlog/WorkItemsList";
 
 export default function EditIssue() {
-  const { orgId, productId, issueId } = useParams();
+  const { orgId, projectId, issueId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [issue, setIssue] = useState(null);
 
   useEffect(() => {
     document.title = "Floumy | Edit Issue";
 
-    async function fetchIssue(orgId, productId, issueId) {
+    async function fetchIssue(orgId, projectId, issueId) {
       try {
         setIsLoading(true);
-        const issue = await getIssue(orgId, productId, issueId);
+        const issue = await getIssue(orgId, projectId, issueId);
         setIssue(issue);
       } catch (e) {
         console.error(e);
@@ -37,12 +37,12 @@ export default function EditIssue() {
       }
     }
 
-    fetchIssue(orgId, productId, issueId);
-  }, [orgId, productId, issueId]);
+    fetchIssue(orgId, projectId, issueId);
+  }, [orgId, projectId, issueId]);
 
   async function handleAddWorkItem(workItem) {
     workItem.issue = issue.id;
-    const savedWorkItem = await addWorkItem(orgId, productId, workItem);
+    const savedWorkItem = await addWorkItem(orgId, projectId, workItem);
     issue.workItems.push(savedWorkItem);
     issue.workItems.sort(sortWorkItems);
     setIssue({ ...issue });
@@ -89,7 +89,7 @@ export default function EditIssue() {
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addIssueComment(orgId, productId, issueId, comment);
+      const addedComment = await addIssueComment(orgId, projectId, issueId, comment);
       issue.comments.push(addedComment);
       setIssue({ ...issue });
       toast.success("Comment added successfully");
@@ -100,7 +100,7 @@ export default function EditIssue() {
 
   async function handleCommentUpdate(commentId, content) {
     try {
-      const updatedComment = await updateIssueComment(orgId, productId, issueId, commentId, content);
+      const updatedComment = await updateIssueComment(orgId, projectId, issueId, commentId, content);
       const index = issue.comments.findIndex((c) => c.id === updatedComment.id);
       issue.comments[index] = updatedComment;
       setIssue({ ...issue });
@@ -112,7 +112,7 @@ export default function EditIssue() {
 
   async function handleCommentDelete(commentId) {
     try {
-      await deleteIssueComment(orgId, productId, issueId, commentId);
+      await deleteIssueComment(orgId, projectId, issueId, commentId);
       const index = issue.comments.findIndex((c) => c.id === commentId);
       issue.comments.splice(index, 1);
       setIssue({ ...issue });
@@ -123,11 +123,11 @@ export default function EditIssue() {
   }
 
   const handleUpdate = async (updatedIssue) => {
-    await updateIssue(orgId, productId, issueId, updatedIssue);
+    await updateIssue(orgId, projectId, issueId, updatedIssue);
   };
 
   const handleDelete = async (issueId) => {
-    await deleteIssue(orgId, productId, issueId);
+    await deleteIssue(orgId, projectId, issueId);
   };
 
   return (

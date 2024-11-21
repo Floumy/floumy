@@ -13,7 +13,7 @@ import { useParams } from "react-router-dom";
 function PublicWorkItem({ workItem = defaultWorkItem }) {
   const [comments, setComments] = React.useState(workItem.comments || []);
   const [org, setOrg] = React.useState(null);
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
 
   useEffect(() => {
     document.title = "Floumy | Work Item";
@@ -29,7 +29,7 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
 
   const handleCommentSubmit = async (comment) => {
     try {
-      const addedComment = await addComment(orgId, productId, workItem.id, comment);
+      const addedComment = await addComment(orgId, projectId, workItem.id, comment);
       setComments([...comments, addedComment]);
       toast.success("The comment has been saved");
     } catch (e) {
@@ -39,7 +39,7 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
 
   const handleCommentEditSubmit = async (commentId, comment) => {
     try {
-      const updatedComment = await updateComment(orgId, productId, workItem.id, commentId, comment);
+      const updatedComment = await updateComment(orgId, projectId, workItem.id, commentId, comment);
       setComments(comments.map(c => c.id === commentId ? updatedComment : c));
       toast.success("The comment has been updated");
     } catch (e) {
@@ -49,7 +49,7 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
 
   const handleCommentDelete = async (commentId) => {
     try {
-      await deleteComment(orgId, productId, workItem.id, commentId);
+      await deleteComment(orgId, projectId, workItem.id, commentId);
       setComments(comments.filter(comment => comment.id !== commentId));
       toast.success("The comment has been deleted");
     } catch (e) {

@@ -17,7 +17,7 @@ import { getOrg } from "../../../services/org/orgs.service";
 import { listFeatureRequests } from "../../../services/feature-requests/feature-requests.service";
 
 function CreateUpdateDeleteFeature({ onSubmit, feature }) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [priority, setPriority] = useState("medium");
   const [descriptionText, setDescriptionText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,7 +40,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   const paymentPlan = localStorage.getItem("paymentPlan");
 
   const fetchAndSetKeyResults = useCallback(async () => {
-    const keyResults = await listKeyResults(orgId, productId);
+    const keyResults = await listKeyResults(orgId, projectId);
     keyResults.push({ id: "", title: "None" });
     setKeyResults(keyResults);
     if (feature?.keyResult?.id) {
@@ -51,7 +51,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   }, [feature?.keyResult?.id]);
 
   const fetchAndSetMilestones = useCallback(async () => {
-    const milestones = await listMilestones(orgId, productId);
+    const milestones = await listMilestones(orgId, projectId);
     milestones.push({ id: "", title: "None" });
     setMilestones(milestones);
     if (feature?.milestone?.id) {
@@ -73,7 +73,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   }, [feature?.assignedTo?.id]);
 
   const fetchAndSetFeatureRequests = useCallback(async () => {
-    const featureRequests = await listFeatureRequests(orgId, productId, 1, 0);
+    const featureRequests = await listFeatureRequests(orgId, projectId, 1, 0);
     featureRequests.push({ id: "", title: "None" });
     setFeatureRequests(featureRequests);
     if (feature?.featureRequest?.id) {
@@ -175,7 +175,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
 
   const onDelete = async (id) => {
     try {
-      await deleteFeature(orgId, productId, id);
+      await deleteFeature(orgId, projectId, id);
       navigate(-1);
       setTimeout(() => toast.success("The feature has been deleted"), 100);
     } catch (e) {

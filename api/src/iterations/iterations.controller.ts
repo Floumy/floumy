@@ -19,7 +19,7 @@ import { CreateOrUpdateIterationDto } from './dtos';
 import { IterationsService } from './iterations.service';
 import { Timeline } from '../common/timeline.enum';
 
-@Controller('/orgs/:orgId/products/:productId/iterations')
+@Controller('/orgs/:orgId/projects/:projectId/iterations')
 @UseGuards(AuthGuard)
 export class IterationsController {
   constructor(private iterationsService: IterationsService) {}
@@ -28,7 +28,7 @@ export class IterationsController {
   @HttpCode(201)
   async create(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Body() body: CreateOrUpdateIterationDto,
   ) {
@@ -37,7 +37,7 @@ export class IterationsController {
     }
 
     try {
-      return await this.iterationsService.create(orgId, productId, body);
+      return await this.iterationsService.create(orgId, projectId, body);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -47,35 +47,35 @@ export class IterationsController {
   @HttpCode(200)
   async listWithWorkItems(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
-    return await this.iterationsService.listWithWorkItems(orgId, productId);
+    return await this.iterationsService.listWithWorkItems(orgId, projectId);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   async list(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
-    return await this.iterationsService.list(orgId, productId);
+    return await this.iterationsService.list(orgId, projectId);
   }
 
   @Post(':id/start')
   @HttpCode(200)
   async startIteration(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
   ) {
@@ -84,7 +84,7 @@ export class IterationsController {
     }
 
     try {
-      return await this.iterationsService.startIteration(orgId, productId, id);
+      return await this.iterationsService.startIteration(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -94,21 +94,21 @@ export class IterationsController {
   @HttpCode(200)
   async getActiveIteration(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
-    return await this.iterationsService.getActiveIteration(orgId, productId);
+    return await this.iterationsService.getActiveIteration(orgId, projectId);
   }
 
   @Post(':id/complete')
   @HttpCode(200)
   async completeIteration(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
   ) {
@@ -119,7 +119,7 @@ export class IterationsController {
     try {
       return await this.iterationsService.completeIteration(
         orgId,
-        productId,
+        projectId,
         id,
       );
     } catch (e) {
@@ -131,7 +131,7 @@ export class IterationsController {
   @HttpCode(200)
   async get(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
   ) {
@@ -140,7 +140,7 @@ export class IterationsController {
     }
 
     try {
-      return await this.iterationsService.get(orgId, productId, id);
+      return await this.iterationsService.get(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -150,7 +150,7 @@ export class IterationsController {
   @HttpCode(200)
   async update(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() body: CreateOrUpdateIterationDto,
@@ -160,7 +160,7 @@ export class IterationsController {
     }
 
     try {
-      return await this.iterationsService.update(orgId, productId, id, body);
+      return await this.iterationsService.update(orgId, projectId, id, body);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -170,7 +170,7 @@ export class IterationsController {
   @HttpCode(200)
   async delete(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
   ) {
@@ -179,7 +179,7 @@ export class IterationsController {
     }
 
     try {
-      return await this.iterationsService.delete(orgId, productId, id);
+      return await this.iterationsService.delete(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -188,7 +188,7 @@ export class IterationsController {
   @Get('timeline/:timeline')
   async listForTimeline(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('timeline') timeline: Timeline,
   ) {
@@ -198,7 +198,7 @@ export class IterationsController {
 
     return await this.iterationsService.listForTimeline(
       orgId,
-      productId,
+      projectId,
       timeline,
     );
   }

@@ -12,7 +12,7 @@ import { BipSettings } from '../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
 import { Timeline } from '../../common/timeline.enum';
 import { PublicService } from './public.service';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
@@ -20,7 +20,7 @@ describe('PublicController', () => {
   let orgRepository: Repository<Org>;
   let okrsService: OkrsService;
   let org: Org;
-  let product: Product;
+  let project: Project;
 
   let cleanup: () => Promise<void>;
 
@@ -43,20 +43,20 @@ describe('PublicController', () => {
     orgRepository = module.get(getRepositoryToken(Org));
     bipSettingsRepository = module.get(getRepositoryToken(BipSettings));
     okrsService = module.get<OkrsService>(OkrsService);
-    const productsRepository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
+    const projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
     );
     org = new Org();
     org.name = 'Test Org';
     await orgRepository.save(org);
-    product = new Product();
-    product.name = 'Test Product';
-    product.org = Promise.resolve(org);
-    await productsRepository.save(product);
+    project = new Project();
+    project.name = 'Test Project';
+    project.org = Promise.resolve(org);
+    await projectsRepository.save(project);
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     await bipSettingsRepository.save(bipSettings);
   });
 
@@ -70,18 +70,18 @@ describe('PublicController', () => {
 
   describe('when listing the okrs', () => {
     it('should return the okrs', async () => {
-      await okrsService.create(org.id, product.id, {
+      await okrsService.create(org.id, project.id, {
         objective: { title: 'Objective 1', timeline: 'this-quarter' },
         keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
       });
-      await okrsService.create(org.id, product.id, {
+      await okrsService.create(org.id, project.id, {
         objective: { title: 'Objective 2', timeline: 'this-quarter' },
         keyResults: [{ title: 'KR 3' }, { title: 'KR 4' }],
       });
 
       const okrs = await controller.listObjectives(
         org.id,
-        product.id,
+        project.id,
         Timeline.THIS_QUARTER,
       );
 
@@ -92,14 +92,14 @@ describe('PublicController', () => {
 
   describe('when getting an objective', () => {
     it('should return the okr', async () => {
-      const okr = await okrsService.create(org.id, product.id, {
+      const okr = await okrsService.create(org.id, project.id, {
         objective: { title: 'Objective 1', timeline: 'this-quarter' },
         keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
       });
 
       const result = await controller.getObjective(
         org.id,
-        product.id,
+        project.id,
         okr.objective.id,
       );
 
@@ -111,14 +111,14 @@ describe('PublicController', () => {
 
   describe('when getting a key result', () => {
     it('should return the key result', async () => {
-      const okr = await okrsService.create(org.id, product.id, {
+      const okr = await okrsService.create(org.id, project.id, {
         objective: { title: 'Objective 1', timeline: 'this-quarter' },
         keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
       });
 
       const result = await controller.getKeyResult(
         org.id,
-        product.id,
+        project.id,
         okr.objective.id,
         okr.keyResults[0].id,
       );

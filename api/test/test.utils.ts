@@ -33,7 +33,7 @@ import { FeatureRequestVote } from '../src/feature-requests/feature-request-vote
 import { FeatureRequest } from '../src/feature-requests/feature-request.entity';
 import { Issue } from '../src/issues/issue.entity';
 import { IssueComment } from '../src/issues/issue-comment.entity';
-import { Product } from '../src/products/product.entity';
+import { Project } from '../src/projects/project.entity';
 import { Milestone } from '../src/roadmap/milestones/milestone.entity';
 import { WorkItem } from '../src/backlog/work-items/work-item.entity';
 import { Feature } from '../src/roadmap/features/feature.entity';
@@ -141,7 +141,7 @@ export async function setupTestingModule(
         Feature,
         Issue,
         Milestone,
-        Product,
+        Project,
       ]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],

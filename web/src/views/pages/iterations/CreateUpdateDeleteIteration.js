@@ -7,7 +7,7 @@ import ReactDatetime from "react-datetime";
 import Select2 from "react-select2-wrapper";
 import { deleteIteration, startIteration } from "../../../services/iterations/iterations.service";
 import DeleteWarning from "../components/DeleteWarning";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from "react-toastify";
 import WorkItemsListCard from "../backlog/WorkItemsListCard";
 import { addWorkItem } from "../../../services/backlog/backlog.service";
@@ -25,7 +25,7 @@ function CreateUpdateDeleteIteration(
     }
   }
 ) {
-
+  const { orgId, projectId } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startDate, setStartDate] = useState(iteration?.startDate);
   const [isStartDateTouched, setIsStartDateTouched] = useState(false);
@@ -177,7 +177,7 @@ function CreateUpdateDeleteIteration(
             {iterationStatus === "completed" && <span className="badge badge-success">Completed</span>}
             {iterationStatus === "planned" &&
               <button onClick={async () => {
-                await start(iteration.id);
+                await start(orgId, projectId, iteration.id);
               }} className="btn btn-sm btn-outline-primary mr-0">Start Sprint
               </button>}
           </h3>}

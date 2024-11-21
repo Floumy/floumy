@@ -12,7 +12,7 @@ import { FeatureRequestVoteService } from './feature-request-votes.service';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { uuid } from 'uuidv4';
 import { FeatureRequestComment } from './feature-request-comment.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 describe('FeatureRequestVotesService', () => {
   let usersService: UsersService;
@@ -21,9 +21,9 @@ describe('FeatureRequestVotesService', () => {
   let featureRequestService: FeatureRequestsService;
   let orgsRepository: Repository<Org>;
   let featureRequestVotesRepository: Repository<FeatureRequestVote>;
-  let productsRepository: Repository<Product>;
+  let projectsRepository: Repository<Project>;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let user: User;
 
   let cleanup: () => Promise<void>;
@@ -58,8 +58,8 @@ describe('FeatureRequestVotesService', () => {
     featureRequestVotesRepository = module.get<Repository<FeatureRequestVote>>(
       getRepositoryToken(FeatureRequestVote),
     );
-    productsRepository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
+    projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
     );
     user = await usersService.createUserWithOrg(
       'Test User',
@@ -69,10 +69,10 @@ describe('FeatureRequestVotesService', () => {
     org = await orgsService.createForUser(user);
     org.paymentPlan = PaymentPlan.PREMIUM;
     await orgsRepository.save(org);
-    product = new Product();
-    product.name = 'Test Product';
-    product.org = Promise.resolve(org);
-    await productsRepository.save(product);
+    project = new Project();
+    project.name = 'Test Project';
+    project.org = Promise.resolve(org);
+    await projectsRepository.save(project);
   });
 
   afterEach(async () => {
@@ -88,7 +88,7 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -97,7 +97,7 @@ describe('FeatureRequestVotesService', () => {
       await service.upvoteFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         featureRequest.id,
       );
       const featureRequestVote =
@@ -109,14 +109,14 @@ describe('FeatureRequestVotesService', () => {
     });
     it('should throw an error if the feature request does not exist', async () => {
       await expect(
-        service.upvoteFeatureRequest(user.id, org.id, product.id, uuid()),
+        service.upvoteFeatureRequest(user.id, org.id, project.id, uuid()),
       ).rejects.toThrow();
     });
     it('should throw an error if the feature request does not belong to the org', async () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -139,7 +139,7 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -151,7 +151,7 @@ describe('FeatureRequestVotesService', () => {
         service.upvoteFeatureRequest(
           user.id,
           org.id,
-          product.id,
+          project.id,
           featureRequest.id,
         ),
       ).rejects.toThrow(
@@ -162,7 +162,7 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -171,7 +171,7 @@ describe('FeatureRequestVotesService', () => {
       await service.upvoteFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         featureRequest.id,
       );
       const featureRequestVote =
@@ -188,7 +188,7 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -197,7 +197,7 @@ describe('FeatureRequestVotesService', () => {
       await service.downvoteFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         featureRequest.id,
       );
       const featureRequestVote =
@@ -210,7 +210,7 @@ describe('FeatureRequestVotesService', () => {
       const updatedFeatureRequest =
         await featureRequestService.getFeatureRequestById(
           org.id,
-          product.id,
+          project.id,
           featureRequest.id,
         );
       expect(updatedFeatureRequest.votesCount).toEqual(0);
@@ -224,7 +224,7 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -233,16 +233,16 @@ describe('FeatureRequestVotesService', () => {
 
       const otherOrg = await orgsService.createForUser(user);
       await orgsRepository.save(otherOrg);
-      const otherOrgProduct = new Product();
-      otherOrgProduct.name = 'Test Product';
-      otherOrgProduct.org = Promise.resolve(otherOrg);
-      await productsRepository.save(otherOrgProduct);
+      const otherOrgProject = new Project();
+      otherOrgProject.name = 'Test Project';
+      otherOrgProject.org = Promise.resolve(otherOrg);
+      await projectsRepository.save(otherOrgProject);
 
       await expect(
         service.downvoteFeatureRequest(
           user.id,
           otherOrg.id,
-          otherOrgProduct.id,
+          otherOrgProject.id,
           featureRequest.id,
         ),
       ).rejects.toThrow();
@@ -251,7 +251,7 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -263,7 +263,7 @@ describe('FeatureRequestVotesService', () => {
         service.downvoteFeatureRequest(
           user.id,
           org.id,
-          product.id,
+          project.id,
           featureRequest.id,
         ),
       ).rejects.toThrow(
@@ -276,7 +276,7 @@ describe('FeatureRequestVotesService', () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           title: 'Test Feature Request',
           description: 'Test Description',
@@ -286,23 +286,23 @@ describe('FeatureRequestVotesService', () => {
       await service.upvoteFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         featureRequest.id,
       );
       await service.downvoteFeatureRequest(
         user.id,
         org.id,
-        product.id,
+        project.id,
         featureRequest.id,
       );
 
-      const votes = await service.getVotes(user.id, org.id, product.id);
+      const votes = await service.getVotes(user.id, org.id, project.id);
 
       expect(votes.length).toEqual(1);
       expect(votes[0].vote).toEqual(-1);
     });
     it('should return an empty array if there are no votes', async () => {
-      const votes = await service.getVotes(user.id, org.id, product.id);
+      const votes = await service.getVotes(user.id, org.id, project.id);
 
       expect(votes.length).toEqual(0);
     });

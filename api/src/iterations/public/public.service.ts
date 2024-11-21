@@ -5,27 +5,27 @@ import { IterationMapper } from './public.mapper';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../../orgs/org.entity';
 import { Repository } from 'typeorm';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 @Injectable()
 export class PublicService {
   constructor(
     @InjectRepository(Org) private orgsRepository: Repository<Org>,
     private iterationsService: IterationsService,
-    @InjectRepository(Product)
-    private productsRepository: Repository<Product>,
+    @InjectRepository(Project)
+    private projectsRepository: Repository<Project>,
   ) {}
 
   async listIterationsForTimeline(
     orgId: string,
-    productId: string,
+    projectId: string,
     timeline: Timeline,
   ) {
     await this.validateOrgHasBuildInPublicEnabled(orgId);
 
     const iterations = await this.iterationsService.findIterationsForTimeline(
       orgId,
-      productId,
+      projectId,
       timeline,
     );
 
@@ -36,26 +36,26 @@ export class PublicService {
 
   async getIterationById(
     orgId: string,
-    productId: string,
+    projectId: string,
     iterationId: string,
   ) {
     await this.validateOrgHasBuildInPublicEnabled(orgId);
 
     const iteration = await this.iterationsService.findIteration(
       orgId,
-      productId,
+      projectId,
       iterationId,
     );
     return IterationMapper.toDto(iteration);
   }
 
-  async getActiveIteration(orgId: string, productId: string) {
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+  async getActiveIteration(orgId: string, projectId: string) {
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
 
-    const bipSettings = await product.bipSettings;
+    const bipSettings = await project.bipSettings;
     if (
       !bipSettings ||
       bipSettings.isBuildInPublicEnabled === false ||
@@ -66,7 +66,7 @@ export class PublicService {
 
     const iteration = await this.iterationsService.findActiveIteration(
       orgId,
-      productId,
+      projectId,
     );
     return iteration ? await IterationMapper.toDto(iteration) : null;
   }

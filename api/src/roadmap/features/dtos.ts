@@ -27,7 +27,7 @@ export interface FeatureDto {
     id: string;
     name: string;
   };
-  product: {
+  project: {
     id: string;
   };
   reference: string;

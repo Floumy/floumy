@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React, { useEffect, useState } from "react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
@@ -70,9 +55,9 @@ function SignIn() {
     const redirectIfLoggedIn = async () => {
       // If the user is already logged in, redirect to the dashboard
       const currentOrgId = localStorage.getItem("currentUserOrgId");
-      const currentProductId = localStorage.getItem("currentProductId");
-      if (localStorage.getItem("currentUser") && currentOrgId && currentProductId) {
-        navigate(`/admin/orgs/${currentOrgId}/products/${currentProductId}/dashboard`);
+      const currentProjectId = localStorage.getItem("currentProjectId");
+      if (localStorage.getItem("currentUser") && currentOrgId && currentProjectId) {
+        navigate(`/admin/orgs/${currentOrgId}/projects/${currentProjectId}/dashboard`);
       }
     };
 
@@ -99,7 +84,7 @@ function SignIn() {
           return;
         }
 
-        navigate(`/admin/orgs/${currentOrg.id}/products/${currentOrg.products[0].id}/dashboard`);
+        navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/dashboard`);
         return;
       }
 

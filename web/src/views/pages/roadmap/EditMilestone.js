@@ -9,7 +9,7 @@ import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import NotFoundCard from "../components/NotFoundCard";
 
 function EditMilestone() {
-  const { orgId, productId, id } = useParams();
+  const { orgId, projectId, id } = useParams();
   const [milestone, setMilestone] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,7 @@ function EditMilestone() {
     async function fetchData() {
       setLoading(true);
       try {
-        const milestone = await getMilestone(orgId, productId, id);
+        const milestone = await getMilestone(orgId, projectId, id);
         setMilestone(milestone);
         setLoading(false);
       } catch (error) {
@@ -29,7 +29,7 @@ function EditMilestone() {
   }, [id]);
 
   const handleSubmit = async (values) => {
-    await updateMilestone(orgId, productId, id, values);
+    await updateMilestone(orgId, projectId, id, values);
   };
 
   return (

@@ -30,7 +30,7 @@ import { toast } from "react-toastify";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 
 export default function FeatureRequests({ isPublic = false }) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [featureRequests, setFeatureRequests] = useState([]);
   const [hasMoreFeatureRequests, setHasMoreFeatureRequests] = useState(true);
@@ -59,9 +59,9 @@ export default function FeatureRequests({ isPublic = false }) {
     try {
       let featureRequestsData;
       if (searchTerm) {
-        featureRequestsData = await searchFeatureRequests(orgId, productId, searchTerm, page, 50);
+        featureRequestsData = await searchFeatureRequests(orgId, projectId, searchTerm, page, 50);
       } else {
-        featureRequestsData = await listFeatureRequests(orgId, productId, page, 50);
+        featureRequestsData = await listFeatureRequests(orgId, projectId, page, 50);
       }
       if (featureRequestsData.length === 0) {
         setHasMoreFeatureRequests(false);
@@ -85,7 +85,7 @@ export default function FeatureRequests({ isPublic = false }) {
 
   async function fetchCurrentUserFeatureRequestVotes() {
     if (await isAuthenticated()) {
-      const featureRequestVotes = await listCurrentUserFeatureRequestVotes(orgId, productId);
+      const featureRequestVotes = await listCurrentUserFeatureRequestVotes(orgId, projectId);
       let featureRequestVotesMap = {};
       featureRequestVotes.forEach(featureRequestVote => {
         featureRequestVotesMap[featureRequestVote.featureRequest.id] = featureRequestVote.vote;
@@ -105,12 +105,12 @@ export default function FeatureRequests({ isPublic = false }) {
     setPage(page + 1);
   }
 
-  function getDetailPage(context, orgId, productId, featureRequestId) {
+  function getDetailPage(context, orgId, projectId, featureRequestId) {
     if (context === "admin") {
-      return `/admin/orgs/${orgId}/products/${productId}/feature-requests/edit/${featureRequestId}/`;
+      return `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequestId}/`;
     }
 
-    return `/public/orgs/${orgId}/products/${productId}/feature-requests/${featureRequestId}/`;
+    return `/public/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/`;
   }
 
   function upVote(featureRequest) {
@@ -118,7 +118,7 @@ export default function FeatureRequests({ isPublic = false }) {
       if (featureRequestVotesMap[featureRequest.id] === 1) {
         return;
       }
-      await upvoteFeatureRequest(orgId, productId, featureRequest.id);
+      await upvoteFeatureRequest(orgId, projectId, featureRequest.id);
       featureRequestVotesMap[featureRequest.id] = 1;
       setFeatureRequestVotesMap({ ...featureRequestVotesMap });
       featureRequests.forEach(fr => {
@@ -136,7 +136,7 @@ export default function FeatureRequests({ isPublic = false }) {
       if (featureRequestVotesMap[featureRequest.id] === -1) {
         return;
       }
-      await downvoteFeatureRequest(orgId, productId, featureRequest.id);
+      await downvoteFeatureRequest(orgId, projectId, featureRequest.id);
       featureRequestVotesMap[featureRequest.id] = -1;
       setFeatureRequestVotesMap({ ...featureRequestVotesMap });
       featureRequests.forEach(fr => {
@@ -159,7 +159,7 @@ export default function FeatureRequests({ isPublic = false }) {
             shortcut: "r",
             id: "new-feature-request",
             action: () => {
-              navigate(`/${context}/orgs/${orgId}/products/${productId}/feature-requests/new`);
+              navigate(`/${context}/orgs/${orgId}/projects/${projectId}/feature-requests/new`);
             }
           }
         ]}
@@ -237,7 +237,7 @@ export default function FeatureRequests({ isPublic = false }) {
                           </div>
                         </td>
                         <td className="title-cell" style={{ maxWidth: "300px" }}>
-                          <Link to={getDetailPage(context, orgId, productId, featureRequest.id)}>
+                          <Link to={getDetailPage(context, orgId, projectId, featureRequest.id)}>
                             {featureRequest.title}
                           </Link>
                         </td>

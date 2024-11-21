@@ -1,24 +1,24 @@
 import { Org } from '../org.entity';
 import { PublicOrgDto } from './dtos';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
-class ProductMapper {
-  static toProduct(product: Product): { id: string; name: string } {
+class ProjectMapper {
+  static toProject(project: Project): { id: string; name: string } {
     return {
-      id: product.id,
-      name: product.name,
+      id: project.id,
+      name: project.name,
     };
   }
 }
 
 export class PublicMapper {
   public static async toPublicOrg(org: Org): Promise<PublicOrgDto> {
-    const products = await org.products;
+    const projects = await org.projects;
     return {
       id: org.id,
       name: org.name,
       paymentPlan: org.paymentPlan,
-      products: products.map(ProductMapper.toProduct),
+      projects: projects.map(ProjectMapper.toProject),
       createdAt: org.createdAt,
       updatedAt: org.updatedAt,
     };

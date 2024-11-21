@@ -5,13 +5,13 @@ import { UsersService } from '../users/users.service';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { setupTestingModule } from '../../test/test.utils';
 import { Repository } from 'typeorm';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 describe('OrgsService', () => {
   let service: OrgsService;
   let usersService: UsersService;
   let orgsRepository: Repository<Org>;
-  let productsRepository: Repository<Product>;
+  let projectsRepository: Repository<Project>;
 
   let cleanup: () => Promise<void>;
 
@@ -23,8 +23,8 @@ describe('OrgsService', () => {
     service = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
-    productsRepository = module.get<Repository<Product>>(
-      getRepositoryToken(Product),
+    projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
     );
     cleanup = dbCleanup;
   });
@@ -71,7 +71,7 @@ describe('OrgsService', () => {
       const org = new Org();
       org.name = 'Some org';
       await orgsRepository.save(org);
-      const actual = await service.getOrCreateOrg(org.invitationToken);
+      const actual = await service.getOrCreateOrg(null, org.invitationToken);
       expect(org.id).toEqual(actual.id);
       expect(actual.name).toEqual(org.name);
     });
@@ -87,9 +87,9 @@ describe('OrgsService', () => {
       const org = new Org();
       org.name = 'Old Name';
       await orgsRepository.save(org);
-      const product = new Product();
-      product.name = 'Old Name';
-      await productsRepository.save(product);
+      const project = new Project();
+      project.name = 'Old Name';
+      await projectsRepository.save(project);
       await service.patchOrg(org.id, 'New Name');
       const storedOrg = await service.findOneById(org.id);
       expect(storedOrg.name).toBe('New Name');

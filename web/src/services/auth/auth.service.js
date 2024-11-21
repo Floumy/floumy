@@ -19,8 +19,8 @@ function handleAuthentication(response) {
   return false;
 }
 
-export async function orgSignUp(name, email, password, productName, invitationToken) {
-  const requestData = { name, email, password, productName, invitationToken };
+export async function orgSignUp(name, email, password, projectName, invitationToken) {
+  const requestData = { name, email, password, projectName, invitationToken };
 
   try {
     await axios.post(`${process.env.REACT_APP_API_URL}/auth/org/sign-up`, requestData);

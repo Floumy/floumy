@@ -21,7 +21,7 @@ import { Invoice } from '../payments/invoice.entity';
 import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Entity()
 export class Org {
@@ -83,6 +83,6 @@ export class Org {
   @OneToMany(() => Issue, (issue) => issue.org, { lazy: true })
   issues: Promise<Issue[]>;
 
-  @OneToMany(() => Product, (product) => product.org, { lazy: true })
-  products: Promise<Product[]>;
+  @OneToMany(() => Project, (project) => project.org, { lazy: true })
+  projects: Promise<Project[]>;
 }

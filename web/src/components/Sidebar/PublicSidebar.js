@@ -1,19 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard PRO React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-pro-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
 // react library for routing
 import { Link, NavLink as NavLinkRRD } from "react-router-dom";
@@ -27,7 +12,7 @@ import { Col, Collapse, Nav, Navbar, NavbarBrand, NavItem, NavLink, Row } from "
 
 function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, buildingInPublicSettings }) {
   // makes the sidenav normal on hover (actually when mouse enters on it)
-  const productId = org ? org.products[0].id : "";
+  const projectId = org ? org.projects[0].id : "";
   const onMouseEnterSidenav = () => {
     if (!document.body.classList.contains("g-sidenav-pinned")) {
       document.body.classList.add("g-sidenav-show");
@@ -65,7 +50,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
     return buildingInPublicSettings.isIssuesPagePublic || buildingInPublicSettings.isFeatureRequestsPagePublic;
   }
 
-  function isProductEnabled() {
+  function isProjectEnabled() {
     return buildingInPublicSettings.isFeedPagePublic ||
       buildingInPublicSettings.isObjectivesPagePublic ||
       buildingInPublicSettings.isRoadmapPagePublic ||
@@ -90,7 +75,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
       </div>
       <div className="navbar-inner mb-2">
         <Collapse navbar isOpen={true}>
-          {org.name && <h5 className="navbar-product-name text-light text-xl pb-3 text-break">
+          {org.name && <h5 className="navbar-project-name text-light text-xl pb-3 text-break">
             {org.name}
           </h5>}
           {org.paymentPlan === "premium" && <div className="mb-3">
@@ -100,7 +85,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             <Nav navbar>
               {buildingInPublicSettings.isIssuesPagePublic && <NavItem className="d-none d-md-block">
                 <NavLink
-                  to={`/public/orgs/${org.id}/products/${productId}/issues`}
+                  to={`/public/orgs/${org.id}/projects/${projectId}/issues`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >
@@ -112,7 +97,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
                 <Row style={{ maxWidth: "100%" }}>
                   <Col xs={7}>
                     <NavLink
-                      to={`/public/orgs/${org.id}/products/${productId}/feature-requests`}
+                      to={`/public/orgs/${org.id}/projects/${projectId}/feature-requests`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -129,13 +114,13 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
               </NavItem>}
             </Nav>
           </div>}
-          {isProductEnabled() && <h6 className="navbar-heading p-0 text-muted">
-            <span className="docs-normal" style={{ whiteSpace: "nowrap" }}>Product</span>
+          {isProjectEnabled() && <h6 className="navbar-heading p-0 text-muted">
+            <span className="docs-normal" style={{ whiteSpace: "nowrap" }}>Project</span>
           </h6>}
           <Nav className="mb-md-3" navbar>
             {buildingInPublicSettings.isFeedPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/feed`}
+                to={`/public/orgs/${org.id}/projects/${projectId}/feed`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -145,7 +130,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isObjectivesPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/objectives`}
+                to={`/public/orgs/${org.id}/projects/${projectId}/objectives`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -155,7 +140,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isRoadmapPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/roadmap`}
+                to={`/public/orgs/${org.id}/projects/${projectId}/roadmap`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -165,7 +150,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isIterationsPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/iterations`}
+                to={`/public/orgs/${org.id}/projects/${projectId}/iterations`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -175,7 +160,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isActiveIterationsPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/products/${productId}/active-iteration`}
+                to={`/public/orgs/${org.id}/projects/${projectId}/active-iteration`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >

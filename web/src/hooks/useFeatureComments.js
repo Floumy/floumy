@@ -3,10 +3,10 @@ import { addFeatureComment, deleteFeatureComment, updateFeatureComment } from ".
 import { useParams } from "react-router-dom";
 
 function useFeatureComments(feature, setFeature, toast) {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const addComment = useCallback(async (comment) => {
     try {
-      const addedComment = await addFeatureComment(orgId, productId, feature.id, comment);
+      const addedComment = await addFeatureComment(orgId, projectId, feature.id, comment);
       setFeature((prevFeature) => ({
         ...prevFeature,
         comments: [...prevFeature.comments, addedComment]
@@ -15,11 +15,11 @@ function useFeatureComments(feature, setFeature, toast) {
     } catch (e) {
       toast.error("Failed to add comment");
     }
-  }, [orgId, productId, feature?.id, setFeature, toast]);
+  }, [orgId, projectId, feature?.id, setFeature, toast]);
 
   const updateComment = useCallback(async (commentId, content) => {
     try {
-      const updatedComment = await updateFeatureComment(orgId, productId, feature.id, commentId, content);
+      const updatedComment = await updateFeatureComment(orgId, projectId, feature.id, commentId, content);
       setFeature((prevFeature) => {
         const index = prevFeature.comments.findIndex((c) => c.id === updatedComment.id);
         const newComments = [...prevFeature.comments];
@@ -30,11 +30,11 @@ function useFeatureComments(feature, setFeature, toast) {
     } catch (e) {
       toast.error("Failed to update comment");
     }
-  }, [orgId, productId, feature?.id, setFeature, toast]);
+  }, [orgId, projectId, feature?.id, setFeature, toast]);
 
   const deleteComment = useCallback(async (commentId) => {
     try {
-      await deleteFeatureComment(orgId, productId, feature.id, commentId);
+      await deleteFeatureComment(orgId, projectId, feature.id, commentId);
       setFeature((prevFeature) => ({
         ...prevFeature,
         comments: prevFeature.comments.filter((c) => c.id !== commentId)
@@ -43,7 +43,7 @@ function useFeatureComments(feature, setFeature, toast) {
     } catch (e) {
       toast.error("Failed to delete comment");
     }
-  }, [orgId, productId, feature?.id, setFeature, toast]);
+  }, [orgId, projectId, feature?.id, setFeature, toast]);
 
   return { addComment, updateComment, deleteComment };
 }

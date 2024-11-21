@@ -6,10 +6,10 @@ import { addIteration } from "../../../services/iterations/iterations.service";
 import { useParams } from "react-router-dom";
 
 function NewIteration() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
 
   const handleSubmit = async (iteration) => {
-    await addIteration(orgId, productId, iteration);
+    await addIteration(orgId, projectId, iteration);
   };
 
   return (

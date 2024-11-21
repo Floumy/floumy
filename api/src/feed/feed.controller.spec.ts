@@ -9,14 +9,14 @@ import { UsersService } from '../users/users.service';
 import { FeedService } from './feed.service';
 import { FeedEventHandler } from './feed.event-handler';
 import { FeedItem } from './feed-item.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 describe('FeedController', () => {
   let controller: FeedController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
-  let product: Product;
+  let project: Project;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -34,7 +34,7 @@ describe('FeedController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
   });
 
   afterEach(async () => {
@@ -49,7 +49,7 @@ describe('FeedController', () => {
     it('should return the paginated list of feed items', async () => {
       const result = await controller.listFeedItems(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,
@@ -66,7 +66,7 @@ describe('FeedController', () => {
     it('should create a text feed item', async () => {
       const result = await controller.createFeedItem(
         org.id,
-        product.id,
+        project.id,
         {
           user: {
             org: org.id,

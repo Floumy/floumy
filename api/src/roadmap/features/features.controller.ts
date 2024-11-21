@@ -21,7 +21,7 @@ import { AuthGuard } from '../../auth/auth.guard';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
 
-@Controller('/orgs/:orgId/products/:productId/features')
+@Controller('/orgs/:orgId/projects/:projectId/features')
 @UseGuards(AuthGuard)
 export class FeaturesController {
   constructor(private featuresService: FeaturesService) {}
@@ -30,7 +30,7 @@ export class FeaturesController {
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Body() featureDto: CreateUpdateFeatureDto,
   ) {
@@ -41,7 +41,7 @@ export class FeaturesController {
     try {
       return await this.featuresService.createFeature(
         orgId,
-        productId,
+        projectId,
         request.user.sub,
         featureDto,
       );
@@ -54,7 +54,7 @@ export class FeaturesController {
   @HttpCode(HttpStatus.OK)
   async list(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
@@ -67,7 +67,7 @@ export class FeaturesController {
       const { org: orgId } = request.user;
       return await this.featuresService.listFeatures(
         orgId,
-        productId,
+        projectId,
         page,
         limit,
       );
@@ -80,7 +80,7 @@ export class FeaturesController {
   @HttpCode(HttpStatus.OK)
   async search(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request: any,
     @Query('q') query: string,
     @Query('page') page: number = 1,
@@ -94,7 +94,7 @@ export class FeaturesController {
       const { org: orgId } = request.user;
       return await this.featuresService.searchFeatures(
         orgId,
-        productId,
+        projectId,
         query,
         page,
         limit,
@@ -108,7 +108,7 @@ export class FeaturesController {
   @HttpCode(HttpStatus.OK)
   async listWithoutMilestone(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
   ) {
     if (orgId !== request.user.org) {
@@ -119,7 +119,7 @@ export class FeaturesController {
       const { org: orgId } = request.user;
       return await this.featuresService.listFeaturesWithoutMilestone(
         orgId,
-        productId,
+        projectId,
       );
     } catch (e) {
       throw new BadRequestException();
@@ -130,7 +130,7 @@ export class FeaturesController {
   @HttpCode(HttpStatus.OK)
   async get(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
   ) {
@@ -140,7 +140,7 @@ export class FeaturesController {
 
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.getFeature(orgId, productId, id);
+      return await this.featuresService.getFeature(orgId, projectId, id);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -150,7 +150,7 @@ export class FeaturesController {
   @HttpCode(HttpStatus.OK)
   async update(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() updateFeatureDto: CreateUpdateFeatureDto,
@@ -163,7 +163,7 @@ export class FeaturesController {
       const { org: orgId } = request.user;
       return await this.featuresService.updateFeature(
         orgId,
-        productId,
+        projectId,
         id,
         updateFeatureDto,
       );
@@ -176,7 +176,7 @@ export class FeaturesController {
   @HttpCode(HttpStatus.OK)
   async delete(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
   ) {
@@ -186,7 +186,7 @@ export class FeaturesController {
 
     try {
       const { org: orgId } = request.user;
-      await this.featuresService.deleteFeature(orgId, productId, id);
+      await this.featuresService.deleteFeature(orgId, projectId, id);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -196,7 +196,7 @@ export class FeaturesController {
   @HttpCode(HttpStatus.OK)
   async patch(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
     @Body() patchFeatureDto: PatchFeatureDto,
@@ -209,7 +209,7 @@ export class FeaturesController {
       const { org: orgId } = request.user;
       return await this.featuresService.patchFeature(
         orgId,
-        productId,
+        projectId,
         id,
         patchFeatureDto,
       );

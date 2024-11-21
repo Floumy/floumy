@@ -6,10 +6,10 @@ import { Col, Container, Row } from "reactstrap";
 import { useParams } from "react-router-dom";
 
 function NewMilestone() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
 
   const handleSubmit = async (milestone) => {
-    await addMilestone(orgId, productId, milestone);
+    await addMilestone(orgId, projectId, milestone);
   };
 
   return (

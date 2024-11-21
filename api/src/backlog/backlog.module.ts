@@ -24,7 +24,7 @@ import { PublicService } from './work-items/public/public.service';
 import { PublicController } from './work-items/public/public.controller';
 import { WorkItemComment } from './work-items/work-item-comment.entity';
 import { Issue } from '../issues/issue.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Module({
   controllers: [WorkItemsController, PublicController],
@@ -46,7 +46,7 @@ import { Product } from '../products/product.entity';
       WorkItemsStatusStats,
       WorkItemComment,
       Issue,
-      Product,
+      Project,
     ]),
     OrgsModule,
     OkrsModule,

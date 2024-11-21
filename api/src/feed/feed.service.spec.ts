@@ -8,14 +8,14 @@ import { FeedEventHandler } from './feed.event-handler';
 import { UsersService } from '../users/users.service';
 import { OrgsService } from '../orgs/orgs.service';
 import { Repository } from 'typeorm';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 describe('FeedService', () => {
   let service: FeedService;
   let feedItemRepository: Repository<FeedItem>;
   let user: User;
   let org: Org;
-  let product: Product;
+  let project: Project;
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
@@ -35,7 +35,7 @@ describe('FeedService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     cleanup = dbCleanup;
   });
 
@@ -52,7 +52,7 @@ describe('FeedService', () => {
       const feedItem = new FeedItem();
       feedItem.org = Promise.resolve(org);
       feedItem.user = Promise.resolve(user);
-      feedItem.product = Promise.resolve(product);
+      feedItem.project = Promise.resolve(project);
       feedItem.title = 'Test Feed Item';
       feedItem.entity = 'workItem';
       feedItem.entityId = '1';
@@ -60,7 +60,7 @@ describe('FeedService', () => {
       feedItem.content = { id: '1' };
       await feedItemRepository.save(feedItem);
 
-      const result = await service.listFeedItems(org.id, product.id, 1, 10);
+      const result = await service.listFeedItems(org.id, project.id, 1, 10);
 
       expect(result).toHaveLength(1);
       expect(result[0].title).toEqual('Test Feed Item');
@@ -76,7 +76,7 @@ describe('FeedService', () => {
       const result = await service.createTextFeedItem(
         user.id,
         org.id,
-        product.id,
+        project.id,
         {
           text: 'Test Text Feed Item',
         },
@@ -91,14 +91,14 @@ describe('FeedService', () => {
     });
     it('should throw an error if the user is not part of the org', async () => {
       await expect(
-        service.createTextFeedItem('invalid-id', org.id, product.id, {
+        service.createTextFeedItem('invalid-id', org.id, project.id, {
           text: 'Test Text Feed Item',
         }),
       ).rejects.toThrow();
     });
     it('should throw an error if the item does not have a text field', async () => {
       await expect(
-        service.createTextFeedItem(user.id, org.id, product.id, {
+        service.createTextFeedItem(user.id, org.id, project.id, {
           tex: 'Test Text Feed Item',
         } as any),
       ).rejects.toThrow();

@@ -38,6 +38,8 @@ export class UsersService {
 
     if (org) {
       user.org = Promise.resolve(org);
+      const projects = await org.projects;
+      user.projects = Promise.resolve(projects);
     }
 
     return await this.usersRepository.save(user);
@@ -45,7 +47,7 @@ export class UsersService {
 
   /**
    * This method is used only by tests and will be removed in the future
-   * @deprecated Use createUser instead for production code
+   * @deprecated Use createUser instead for projection code
    * @param name
    * @param email
    * @param password

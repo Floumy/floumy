@@ -15,7 +15,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { BipService } from './bip.service';
 import { Public } from '../auth/public.guard';
 
-@Controller('/orgs/:orgId/products/:productId/build-in-public')
+@Controller('/orgs/:orgId/projects/:projectId/build-in-public')
 export class BipController {
   constructor(private bipService: BipService) {}
 
@@ -24,7 +24,7 @@ export class BipController {
   @UseGuards(AuthGuard)
   async createOrUpdateSettings(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
     @Request() request,
     @Body() settings: BipSettingsDto,
   ) {
@@ -35,7 +35,7 @@ export class BipController {
     try {
       return await this.bipService.createOrUpdateSettings(
         orgId,
-        productId,
+        projectId,
         settings,
       );
     } catch (e) {
@@ -48,10 +48,10 @@ export class BipController {
   @Public()
   async getSettings(
     @Param('orgId') orgId: string,
-    @Param('productId') productId: string,
+    @Param('projectId') projectId: string,
   ) {
     try {
-      return await this.bipService.getSettings(orgId, productId);
+      return await this.bipService.getSettings(orgId, projectId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

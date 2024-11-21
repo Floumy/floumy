@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import useFeatureComments from "../../../hooks/useFeatureComments";
 
 export function DetailFeature() {
-  const { orgId, productId } = useParams();
+  const { orgId, projectId } = useParams();
   const [feature, setFeature] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
@@ -30,7 +30,7 @@ export function DetailFeature() {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const feature = await getFeature(orgId, productId, id);
+        const feature = await getFeature(orgId, projectId, id);
         setFeature(feature);
       } catch (e) {
         toast.error("Failed to fetch initiative");
@@ -44,14 +44,14 @@ export function DetailFeature() {
 
   async function handleAddWorkItem(workItem) {
     workItem.feature = feature.id;
-    const savedWorkItem = await addWorkItem(orgId, productId, workItem);
+    const savedWorkItem = await addWorkItem(orgId, projectId, workItem);
     feature.workItems.push(savedWorkItem);
     sortByPriority(feature.workItems);
     setFeature({ ...feature });
   }
 
   const handleSubmit = async (feature) => {
-    await updateFeature(orgId, productId, id, feature);
+    await updateFeature(orgId, projectId, id, feature);
   };
 
   function updateWorkItemsChangeStatus(workItems, status) {

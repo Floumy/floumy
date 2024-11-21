@@ -11,13 +11,13 @@ import PublicWorkItem from "./PublicWorkItem";
 function PublicDetailWorkItem() {
   const [loading, setLoading] = useState(true);
   const [workItem, setWorkItem] = useState(null);
-  const { orgId, productId, workItemId } = useParams();
+  const { orgId, projectId, workItemId } = useParams();
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        const workItem = await getPublicWorkItem(orgId, productId, workItemId);
+        const workItem = await getPublicWorkItem(orgId, projectId, workItemId);
         setWorkItem(workItem);
         setLoading(false);
       } catch (error) {
@@ -26,7 +26,7 @@ function PublicDetailWorkItem() {
     }
 
     fetchData();
-  }, [orgId, productId, workItemId]);
+  }, [orgId, projectId, workItemId]);
 
   return (
     <>

@@ -12,14 +12,14 @@ import { UsersService } from '../../users/users.service';
 import { PublicService } from './public.service';
 import { Repository } from 'typeorm';
 import { BipSettings } from '../../bip/bip-settings.entity';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
-  let product: Product;
+  let project: Project;
   let feedItemRepository: Repository<FeedItem>;
   let bipRepository: Repository<BipSettings>;
 
@@ -45,12 +45,12 @@ describe('PublicController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    product = (await org.products)[0];
+    project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.isFeedPagePublic = true;
     bipSettings.org = Promise.resolve(org);
-    bipSettings.product = Promise.resolve(product);
+    bipSettings.project = Promise.resolve(project);
     await bipRepository.save(bipSettings);
   });
 
@@ -67,7 +67,7 @@ describe('PublicController', () => {
       const feedItem = new FeedItem();
       feedItem.org = Promise.resolve(org);
       feedItem.user = Promise.resolve(user);
-      feedItem.product = Promise.resolve(product);
+      feedItem.project = Promise.resolve(project);
       feedItem.title = 'Test Feed Item';
       feedItem.entity = 'workItem';
       feedItem.entityId = '1';
@@ -75,7 +75,7 @@ describe('PublicController', () => {
       feedItem.content = { id: '1' };
       await feedItemRepository.save(feedItem);
 
-      const result = await controller.listFeedItems(org.id, product.id, 1, 10);
+      const result = await controller.listFeedItems(org.id, project.id, 1, 10);
       expect(result).toHaveLength(1);
     });
   });

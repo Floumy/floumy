@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { File } from './file.entity';
 import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { FeatureFile } from '../roadmap/features/feature-file.entity';
-import { Product } from '../products/product.entity';
+import { Project } from '../projects/project.entity';
 
 @Injectable()
 export class FilesService {
@@ -21,24 +21,24 @@ export class FilesService {
     @InjectRepository(FeatureFile)
     private featureFilesRepository: Repository<FeatureFile>,
     private filesStorageRepository: FilesStorageRepository,
-    @InjectRepository(Product) private productsRepository: Repository<Product>,
+    @InjectRepository(Project) private projectsRepository: Repository<Project>,
   ) {}
 
   async uploadFile(
     orgId: string,
-    productId: string,
+    projectId: string,
     file: Express.Multer.File,
   ) {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
     const filePath = `${orgId}/${uuidV4()}-${file.originalname}`;
     await this.filesStorageRepository.storeObject(filePath, file.buffer);
     const fileEntity = new File();
     fileEntity.org = Promise.resolve(org);
-    fileEntity.product = Promise.resolve(product);
+    fileEntity.project = Promise.resolve(project);
     fileEntity.name = file.originalname;
     fileEntity.path = filePath;
     fileEntity.size = file.size;
@@ -55,11 +55,11 @@ export class FilesService {
     };
   }
 
-  async getFile(orgId: string, productId: string, fileId: string) {
+  async getFile(orgId: string, projectId: string, fileId: string) {
     const file = await this.filesRepository.findOneByOrFail({
       id: fileId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     return {
       ...file,
@@ -67,11 +67,11 @@ export class FilesService {
     };
   }
 
-  async deleteFile(orgId: string, productId: string, fileId: string) {
+  async deleteFile(orgId: string, projectId: string, fileId: string) {
     const file = await this.filesRepository.findOneByOrFail({
       id: fileId,
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
     });
     await this.filesStorageRepository.deleteObject(file.path);
     await this.workItemFilesRepository.delete({ file: { id: file.id } });

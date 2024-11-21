@@ -18,7 +18,7 @@ import { CommentMapper } from '../../comments/mappers';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { FeatureComment } from './feature-comment.entity';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
-import { Product } from '../../products/product.entity';
+import { Project } from '../../projects/project.entity';
 
 @Injectable()
 export class FeaturesService {
@@ -38,12 +38,12 @@ export class FeaturesService {
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(FeatureRequest)
     private featureRequestsRepository: Repository<FeatureRequest>,
-    @InjectRepository(Product) private productsRepository: Repository<Product>,
+    @InjectRepository(Project) private projectsRepository: Repository<Project>,
   ) {}
 
   async createFeature(
     orgId: string,
-    productId: string,
+    projectId: string,
     userId: string,
     featureDto: CreateUpdateFeatureDto,
   ) {
@@ -53,8 +53,8 @@ export class FeaturesService {
       id: userId,
       org: { id: orgId },
     });
-    const product = await this.productsRepository.findOneByOrFail({
-      id: productId,
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
       org: { id: orgId },
     });
     const org = await user.org;
@@ -65,14 +65,14 @@ export class FeaturesService {
     feature.status = featureDto.status;
     feature.org = Promise.resolve(org);
     feature.createdBy = Promise.resolve(user);
-    feature.product = Promise.resolve(product);
-    await this.setFeatureAssignedTo(featureDto, org, productId, feature);
-    await this.setFeatureKeyResult(featureDto, org, productId, feature);
+    feature.project = Promise.resolve(project);
+    await this.setFeatureAssignedTo(featureDto, org, projectId, feature);
+    await this.setFeatureKeyResult(featureDto, org, projectId, feature);
 
     if (featureDto.milestone) {
       const milestone = await this.milestonesService.findOneById(
         org.id,
-        productId,
+        projectId,
         featureDto.milestone,
       );
       feature.milestone = Promise.resolve(milestone);
@@ -82,7 +82,7 @@ export class FeaturesService {
       const featureRequest =
         await this.featureRequestsRepository.findOneByOrFail({
           org: { id: org.id },
-          product: { id: productId },
+          project: { id: projectId },
           id: featureDto.featureRequest,
         });
       feature.featureRequest = Promise.resolve(featureRequest);
@@ -104,7 +104,7 @@ export class FeaturesService {
 
   async listFeatures(
     orgId: string,
-    productId: string,
+    projectId: string,
     page: number = 1,
     limit: number = 0,
   ) {
@@ -112,7 +112,7 @@ export class FeaturesService {
         SELECT *
         FROM feature
         WHERE feature."orgId" = $1
-          AND feature."productId" = $2
+          AND feature."projectId" = $2
         ORDER BY CASE
                      WHEN feature."priority" = 'high' THEN 1
                      WHEN feature."priority" = 'medium' THEN 2
@@ -121,25 +121,25 @@ export class FeaturesService {
                      END,
                  feature."createdAt" DESC
     `;
-    let params = [orgId, productId] as any[];
+    let params = [orgId, projectId] as any[];
     if (limit > 0) {
       query += ' OFFSET $3 LIMIT $4';
       const offset = (page - 1) * limit;
-      params = [orgId, productId, offset, limit];
+      params = [orgId, projectId, offset, limit];
     }
 
     const features = await this.featuresRepository.query(query, params);
     return await FeatureMapper.toListDtoWithoutAssignees(features);
   }
 
-  async listFeaturesWithoutMilestone(orgId: string, productId: string) {
+  async listFeaturesWithoutMilestone(orgId: string, projectId: string) {
     const features = await this.featuresRepository
       .createQueryBuilder('feature')
       .leftJoinAndSelect('feature.org', 'org')
       .leftJoinAndSelect('feature.milestone', 'milestone')
       .leftJoinAndSelect('feature.assignedTo', 'assignedTo')
       .where('org.id = :orgId', { orgId })
-      .andWhere('feature.productId = :productId', { productId })
+      .andWhere('feature.projectId = :projectId', { projectId })
       .andWhere('milestone.id IS NULL')
       .andWhere('feature.status not in (:...status)', {
         status: ['closed', 'completed'],
@@ -149,10 +149,10 @@ export class FeaturesService {
     return await FeatureMapper.toListDto(features);
   }
 
-  async getFeature(orgId: string, productId: string, id: string) {
+  async getFeature(orgId: string, projectId: string, id: string) {
     const feature = await this.featuresRepository.findOneByOrFail({
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
       id: id,
     });
     return await FeatureMapper.toDto(feature);
@@ -160,14 +160,14 @@ export class FeaturesService {
 
   async updateFeature(
     orgId: string,
-    productId: string,
+    projectId: string,
     id: string,
     updateFeatureDto: CreateUpdateFeatureDto,
   ) {
     this.validateFeature(updateFeatureDto);
     const feature = await this.featuresRepository.findOneByOrFail({
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
       id: id,
     });
     const originalFeature = await FeatureMapper.toDto(feature);
@@ -180,21 +180,21 @@ export class FeaturesService {
     await this.updateFeatureKeyResult(
       updateFeatureDto,
       orgId,
-      productId,
+      projectId,
       feature,
     );
 
     await this.updateFeatureFeatureRequest(
       updateFeatureDto,
       orgId,
-      productId,
+      projectId,
       feature,
     );
 
     await this.updateFeatureMilestone(
       updateFeatureDto,
       orgId,
-      productId,
+      projectId,
       feature,
     );
 
@@ -203,7 +203,7 @@ export class FeaturesService {
     await this.updateFeatureAssignedTo(
       updateFeatureDto,
       orgId,
-      productId,
+      projectId,
       feature,
     );
 
@@ -216,17 +216,17 @@ export class FeaturesService {
     return updatedFeature;
   }
 
-  async deleteFeature(orgId: string, productId: string, id: string) {
+  async deleteFeature(orgId: string, projectId: string, id: string) {
     const feature = await this.featuresRepository.findOneByOrFail({
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
       id: id,
     });
     const deletedFeature = await FeatureMapper.toDto(feature);
-    await this.deleteFeatureFiles(orgId, productId, feature.id);
+    await this.deleteFeatureFiles(orgId, projectId, feature.id);
     await this.workItemsService.removeFeatureFromWorkItems(
       orgId,
-      productId,
+      projectId,
       id,
     );
     await this.featuresRepository.remove(feature);
@@ -235,13 +235,13 @@ export class FeaturesService {
 
   async patchFeature(
     orgId: string,
-    productId: string,
+    projectId: string,
     featureId: string,
     patchFeatureDto: PatchFeatureDto,
   ) {
     const feature = await this.featuresRepository.findOneByOrFail({
       org: { id: orgId },
-      product: { id: productId },
+      project: { id: projectId },
       id: featureId,
     });
     const originalFeature = await FeatureMapper.toDto(feature);
@@ -250,19 +250,19 @@ export class FeaturesService {
     await this.patchFeatureMilestone(
       patchFeatureDto,
       orgId,
-      productId,
+      projectId,
       feature,
     );
     await this.patchFeatureKeyResult(
       patchFeatureDto,
       orgId,
-      productId,
+      projectId,
       feature,
     );
     await this.patchFeatureFeatureRequest(
       patchFeatureDto,
       orgId,
-      productId,
+      projectId,
       feature,
     );
     const savedFeature = await this.featuresRepository.save(feature);
@@ -276,7 +276,7 @@ export class FeaturesService {
 
   async searchFeatures(
     orgId: string,
-    productId: string,
+    projectId: string,
     search: string,
     page: number = 1,
     limit: number = 0,
@@ -286,7 +286,7 @@ export class FeaturesService {
     if (this.isReference(search)) {
       return await this.searchFeaturesByReference(
         orgId,
-        productId,
+        projectId,
         search,
         page,
         limit,
@@ -295,7 +295,7 @@ export class FeaturesService {
 
     return await this.searchFeaturesByTitleOrDescription(
       orgId,
-      productId,
+      projectId,
       search,
       page,
       limit,
@@ -370,13 +370,13 @@ export class FeaturesService {
   private async setFeatureKeyResult(
     featureDto: CreateUpdateFeatureDto,
     org: Org,
-    productId: string,
+    projectId: string,
     feature: Feature,
   ) {
     if (featureDto.keyResult) {
-      const keyResult = await this.okrsService.getKeyResultByOrgAndProduct(
+      const keyResult = await this.okrsService.getKeyResultByOrgAndProject(
         org.id,
-        productId,
+        projectId,
         featureDto.keyResult,
       );
       feature.keyResult = Promise.resolve(keyResult);
@@ -386,7 +386,7 @@ export class FeaturesService {
   private async setFeatureAssignedTo(
     featureDto: CreateUpdateFeatureDto,
     org: Org,
-    productId: string,
+    projectId: string,
     feature: Feature,
   ) {
     if (featureDto.assignedTo) {
@@ -429,7 +429,7 @@ export class FeaturesService {
   private async updateFeatureAssignedTo(
     updateFeatureDto: CreateUpdateFeatureDto,
     orgId: string,
-    productId: string,
+    projectId: string,
     feature: Feature,
   ) {
     if (updateFeatureDto.assignedTo) {
@@ -457,13 +457,13 @@ export class FeaturesService {
   private async updateFeatureMilestone(
     updateFeatureDto: CreateUpdateFeatureDto,
     orgId: string,
-    productId: string,
+    projectId: string,
     feature: Feature,
   ) {
     if (updateFeatureDto.milestone) {
       const milestone = await this.milestonesService.findOneById(
         orgId,
-        productId,
+        projectId,
         updateFeatureDto.milestone,
       );
       feature.milestone = Promise.resolve(milestone);
@@ -475,13 +475,13 @@ export class FeaturesService {
   private async updateFeatureKeyResult(
     updateFeatureDto: CreateUpdateFeatureDto,
     orgId: string,
-    productId: string,
+    projectId: string,
     feature: Feature,
   ) {
     if (updateFeatureDto.keyResult) {
-      const keyResult = await this.okrsService.getKeyResultByOrgAndProduct(
+      const keyResult = await this.okrsService.getKeyResultByOrgAndProject(
         orgId,
-        productId,
+        projectId,
         updateFeatureDto.keyResult,
       );
       feature.keyResult = Promise.resolve(keyResult);
@@ -493,13 +493,13 @@ export class FeaturesService {
   private async patchFeatureKeyResult(
     patchFeatureDto: PatchFeatureDto,
     orgId: string,
-    productId: string,
+    projectId: string,
     feature: Feature,
   ) {
     if (patchFeatureDto.keyResult) {
-      const keyResult = await this.okrsService.getKeyResultByOrgAndProduct(
+      const keyResult = await this.okrsService.getKeyResultByOrgAndProject(
         orgId,
-        productId,
+        projectId,
         patchFeatureDto.keyResult,
       );
       feature.keyResult = Promise.resolve(keyResult);
@@ -514,13 +514,13 @@ export class FeaturesService {
   private async patchFeatureMilestone(
     patchFeatureDto: PatchFeatureDto,
     orgId: string,
-    productId: string,
+    projectId: string,
     feature: Feature,
   ) {
     if (patchFeatureDto.milestone) {
       const milestone = await this.milestonesService.findOneById(
         orgId,
-        productId,
+        projectId,
         patchFeatureDto.milestone,
       );
       feature.milestone = Promise.resolve(milestone);
@@ -552,7 +552,7 @@ export class FeaturesService {
 
   private async deleteFeatureFiles(
     orgId: string,
-    productId: string,
+    projectId: string,
     id: string,
   ) {
     const featureFiles = await this.featureFilesRepository.findBy({
@@ -561,7 +561,7 @@ export class FeaturesService {
 
     for (const featureFile of featureFiles) {
       const file = await featureFile.file;
-      await this.filesService.deleteFile(orgId, productId, file.id);
+      await this.filesService.deleteFile(orgId, projectId, file.id);
     }
   }
 
@@ -571,7 +571,7 @@ export class FeaturesService {
 
   private async searchFeaturesByTitleOrDescription(
     orgId: string,
-    productId: string,
+    projectId: string,
     search: string,
     page: number,
     limit: number,
@@ -580,7 +580,7 @@ export class FeaturesService {
         SELECT *
         FROM feature
         WHERE feature."orgId" = $1
-          AND feature."productId" = $2
+          AND feature."projectId" = $2
           AND (feature.title ILIKE $3 OR feature.description ILIKE $3)
         ORDER BY CASE
                      WHEN feature."priority" = 'high' THEN 1
@@ -590,12 +590,12 @@ export class FeaturesService {
                      END,
                  feature."createdAt" DESC
     `;
-    let params = [orgId, productId, `%${search}%`] as any[];
+    let params = [orgId, projectId, `%${search}%`] as any[];
 
     if (limit > 0) {
       query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, productId, `%${search}%`, offset, limit];
+      params = [orgId, projectId, `%${search}%`, offset, limit];
     }
 
     const features = await this.featuresRepository.query(query, params);
@@ -605,7 +605,7 @@ export class FeaturesService {
 
   private async searchFeaturesByReference(
     orgId: string,
-    productId: string,
+    projectId: string,
     search: string,
     page: number,
     limit: number,
@@ -614,7 +614,7 @@ export class FeaturesService {
         SELECT *
         FROM feature
         WHERE feature."orgId" = $1
-          AND feature."productId" = $2
+          AND feature."projectId" = $2
           AND CAST(feature."sequenceNumber" AS TEXT) LIKE $3
         ORDER BY CASE
                      WHEN feature."priority" = 'high' THEN 1
@@ -626,12 +626,12 @@ export class FeaturesService {
     `;
 
     const referenceSequenceNumber = search.split('-')[1];
-    let params = [orgId, productId, `${referenceSequenceNumber}%`] as any[];
+    let params = [orgId, projectId, `${referenceSequenceNumber}%`] as any[];
 
     if (limit > 0) {
       query += ' OFFSET $3 LIMIT $4';
       const offset = (page - 1) * limit;
-      params = [orgId, productId, `${referenceSequenceNumber}%`, offset, limit];
+      params = [orgId, projectId, `${referenceSequenceNumber}%`, offset, limit];
     }
 
     const features = await this.featuresRepository.query(query, params);
@@ -642,14 +642,14 @@ export class FeaturesService {
   private async updateFeatureFeatureRequest(
     updateFeatureDto: CreateUpdateFeatureDto,
     orgId: string,
-    productId: string,
+    projectId: string,
     feature: Feature,
   ) {
     if (updateFeatureDto.featureRequest) {
       const featureRequest =
         await this.featureRequestsRepository.findOneByOrFail({
           org: { id: orgId },
-          product: { id: productId },
+          project: { id: projectId },
           id: updateFeatureDto.featureRequest,
         });
       feature.featureRequest = Promise.resolve(featureRequest);
@@ -661,7 +661,7 @@ export class FeaturesService {
   private async patchFeatureFeatureRequest(
     patchFeatureDto: PatchFeatureDto,
     orgId: string,
-    productId: string,
+    projectId: string,
     feature: Feature,
   ) {
     if (patchFeatureDto.featureRequest === null) {
@@ -670,7 +670,7 @@ export class FeaturesService {
       const featureRequest =
         await this.featureRequestsRepository.findOneByOrFail({
           org: { id: orgId },
-          product: { id: productId },
+          project: { id: projectId },
           id: patchFeatureDto.featureRequest,
         });
       feature.featureRequest = Promise.resolve(featureRequest);
