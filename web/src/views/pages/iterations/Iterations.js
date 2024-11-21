@@ -74,10 +74,10 @@ function Iterations() {
     fetchBacklogWorkItems();
   }, []);
 
-  async function start(iterationId) {
+  async function start(orgId, projectId, iterationId) {
     try {
       await startIteration(orgId, projectId, iterationId);
-      navigate("/admin/active-iteration");
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/active-iteration`);
     } catch (e) {
       console.error(e);
     }
@@ -355,7 +355,7 @@ function Iterations() {
                             <span className="badge badge-success">Completed</span>}
                           {iteration.status === "planned" &&
                             <button onClick={async () => {
-                              await start(iteration.id);
+                              await start(orgId, projectId, iteration.id);
                             }} className="btn btn-sm btn-outline-primary mr-0">Start Sprint
                             </button>}
                         </h3>
