@@ -16,7 +16,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { sortByPriority } from "../../../services/utils/utils";
 import FeaturesListCard from "../features/FeaturesListCard";
 
-function Roadmap() {
+function InitiativesRoadmap() {
   const { orgId, productId } = useParams();
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -49,7 +49,7 @@ function Roadmap() {
     }
 
     fetchFeatures();
-  }, []);
+  }, [orgId, productId]);
 
   useEffect(() => {
     async function fetchMilestones() {
@@ -230,4 +230,4 @@ function Roadmap() {
   );
 }
 
-export default Roadmap;
+export default InitiativesRoadmap;
