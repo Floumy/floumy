@@ -160,7 +160,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
                 tag={NavLinkRRD}
               >
                 <i className="fa fa-road" />
-                <span className="nav-link-text">Roadmap</span>
+                <span className="nav-link-text">Initiatives Roadmap</span>
               </NavLink>
             </NavItem>}
             {buildingInPublicSettings.isIterationsPagePublic && <NavItem>
