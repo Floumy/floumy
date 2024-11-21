@@ -19,7 +19,7 @@ import NewOKR from "./views/pages/okrs/NewOKR";
 import DetailOKR from "./views/pages/okrs/DetailOKR";
 import SignIn from "./views/pages/auth/SignIn";
 import OrgSignUp from "./views/pages/auth/OrgSignUp";
-import Roadmap from "./views/pages/roadmap/Roadmap";
+import InitiativesRoadmap from "./views/pages/roadmap/InitiativesRoadmap";
 import ActiveIteration from "./views/pages/development/ActiveIteration";
 import NewFeature from "./views/pages/roadmap/NewFeature";
 import NewMilestone from "./views/pages/roadmap/NewMilestone";
@@ -124,11 +124,9 @@ const routes = [
     shortcut: "2"
   },
   {
-    collapse: false,
-    name: "Roadmap",
-    icon: "fa fa-road",
+    redirect: true,
     path: "/orgs/:orgId/products/:productId/roadmap",
-    component: <Roadmap />,
+    component: <InitiativesRoadmap />,
     layout: "/admin",
     shortcut: "3"
   },
