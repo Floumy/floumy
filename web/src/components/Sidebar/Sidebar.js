@@ -16,7 +16,7 @@
 */
 import React from "react";
 // react library for routing
-import { Link, NavLink as NavLinkRRD, useLocation } from "react-router-dom";
+import { Link, NavLink as NavLinkRRD } from "react-router-dom";
 // nodejs library that concatenates classes
 // nodejs library to set properties for components
 // react library that creates nice scrollbar on windows devices
@@ -26,10 +26,9 @@ import { Badge, Col, Collapse, Nav, Navbar, NavbarBrand, NavItem, NavLink, Row, 
 import ShortcutIcon from "../Shortcuts/ShortcutIcon";
 import { useBuildInPublic } from "../../contexts/BuidInPublicContext";
 
-function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
+function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
   const { settings: buildInPublicSettings } = useBuildInPublic();
   const isBuildInPublicEnabled = buildInPublicSettings.isBuildInPublicEnabled;
-  const location = useLocation();
   const currentOrg = JSON.parse(localStorage.getItem("currentOrg"));
   const orgName = currentOrg ? currentOrg.name : "";
   const productId = currentOrg ? currentOrg.products[0].id : "";
@@ -49,33 +48,8 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
       document.body.classList.remove("g-sidenav-show");
     }
   };
-  // this creates the intial state of this component based on the collapse routes
-  // that it gets through routes
-  const getCollapseStates = (routes) => {
-    let initialState = {};
-    routes.map((prop) => {
-      if (prop.collapse) {
-        initialState = {
-          [prop.state]: getCollapseInitialState(prop.views),
-          ...getCollapseStates(prop.views),
-          ...initialState
-        };
-      }
-      return null;
-    });
-    return initialState;
-  };
-  // this verifies if any of the collapses should be default opened on a rerender of this component
-  // for example, on the refresh of the page,
-  // while on the src/views/forms/RegularForms.js - route /admin/regular-forms
-  const getCollapseInitialState = (routes) => {
-    for (let route of routes) {
-      if ((route.collapse && getCollapseInitialState(route.views)) || location.pathname.indexOf(route.path) !== -1) {
-        return true;
-      }
-    }
-    return false;
-  };
+
+
   // this is used on mobile devices, when a user navigates
   // the sidebar will autoclose
   const closeSidenav = () => {
@@ -265,7 +239,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, routes, logo, rtlActive }) {
                     >
 
                       <i className="fa fa-road" />
-                      <span className="nav-link-text">Roadmap</span>
+                      <span className="nav-link-text">Initiatives Roadmap</span>
                     </NavLink>
                   </Col>
                   {sidenavOpen &&
