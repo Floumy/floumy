@@ -152,8 +152,8 @@ function ActiveIteration() {
                     <Col xs={12} sm={2} className="text-left text-lg-right pt-3 pb-3">
                       <Button color="primary" size="sm" type="button"
                               onClick={async () => {
-                                await completeIteration(activeIteration.id);
-                                navigate("/admin/iterations");
+                                await completeIteration(orgId, projectId, activeIteration.id);
+                                navigate(`/admin/orgs/${orgId}/projects/${projectId}/iterations`);
                               }}>
                         Complete Sprint
                       </Button>
