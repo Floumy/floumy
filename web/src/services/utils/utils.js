@@ -1,5 +1,6 @@
 import React from "react";
 import { colors } from "../../variables/charts";
+import moment from 'moment';
 
 export function formatHyphenatedString(str) {
   if (!str) return "";
@@ -26,16 +27,11 @@ function padNumber(number) {
 }
 
 export function formatDate(date) {
-  // Add leading zero to single digit numbers
-  const dateObj = new Date(date);
-  return dateObj.getFullYear() + "-" + padNumber(dateObj.getMonth() + 1) + "-" + padNumber(dateObj.getDate());
+  return moment(date).format('D MMM YYYY')
 }
 
 export function formatDateWithTime(date) {
-  // Add leading zero to single digit numbers
-
-  const dateObj = new Date(date);
-  return dateObj.getFullYear() + "-" + padNumber(dateObj.getMonth() + 1) + "-" + padNumber(dateObj.getDate()) + " " + padNumber(dateObj.getHours()) + ":" + padNumber(dateObj.getMinutes());
+  return moment(date).format('D MMM YYYY, h:mm a')
 }
 
 export function workItemTypeIcon(type) {
