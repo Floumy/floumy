@@ -133,7 +133,7 @@ function OKRs() {
                     </div>
                   </div>
                 </div>}
-              {!isLoading && okrs.length > 0 &&
+              {!isLoading &&
                 <div className="table-responsive">
                   <Table className="align-items-center table-flush no-select" onContextMenu={(e) => e.preventDefault()}>
                     <thead className="thead-light">
@@ -154,7 +154,7 @@ function OKRs() {
                     </tr>
                     </thead>
                     <tbody className="list">
-                    {okrs.map((okr) => (
+                    {okrs.length > 0 ? okrs.map((okr) => (
                       <tr key={okr.id}>
                         {/*Display empty row with message if is template*/}
                         {okr.id === 0 &&
@@ -206,7 +206,12 @@ function OKRs() {
                           </>
                         }
                       </tr>
-                    ))}
+                    )) :
+                      <tr>
+                        <td colSpan={5} className={"text-center"}>
+                          No objectives found.
+                        </td>
+                      </tr>}
                     </tbody>
                   </Table>
                 </div>}
