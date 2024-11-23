@@ -43,22 +43,27 @@ const dataSource = new DataSource(testDbOptions);
 export async function clearDatabase(dataSource: DataSource) {
   const queryRunner = dataSource.createQueryRunner();
   await queryRunner.connect();
-  await queryRunner.startTransaction();
 
-  await dataSource.transaction(async () => {
-    try {
-      for (const entity of dataSource.entityMetadatas) {
-        const repository = queryRunner.manager.getRepository(entity.name);
-        await repository.query(`TRUNCATE TABLE "${entity.tableName}" CASCADE;`);
-      }
-      await queryRunner.commitTransaction();
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
-      await queryRunner.release();
+  try {
+    // Get all table names except migrations and typeorm metadata
+    const tables = await queryRunner.query(`
+      SELECT string_agg('"' || tablename || '"', ', ') 
+      FROM pg_tables 
+      WHERE schemaname = 'public' 
+      AND tablename NOT IN ('migrations', 'typeorm_metadata');
+    `);
+
+    if (tables[0].string_agg) {
+      // Disable triggers and truncate all tables in a single query
+      await queryRunner.query('SET session_replication_role = replica;');
+      await queryRunner.query(
+        `TRUNCATE TABLE ${tables[0].string_agg} CASCADE;`,
+      );
+      await queryRunner.query('SET session_replication_role = DEFAULT;');
     }
-  });
+  } finally {
+    await queryRunner.release();
+  }
 }
 
 export async function setupTestingModule(
