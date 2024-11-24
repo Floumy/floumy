@@ -24,6 +24,7 @@ export class OrgsService {
    */
   async createForUser(user: User) {
     const org = new Org();
+    org.paymentPlan = PaymentPlan.FREE;
     org.users = Promise.resolve([user]);
     const savedOrg = await this.orgRepository.save(org);
 
