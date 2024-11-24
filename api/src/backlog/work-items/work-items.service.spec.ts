@@ -758,7 +758,7 @@ describe('WorkItemsService', () => {
         },
       );
       await service.deleteWorkItem(org.id, project.id, workItem.id);
-      expect(
+      await expect(
         service.getWorkItem(org.id, project.id, workItem.id),
       ).rejects.toThrow(EntityNotFoundError);
     });
@@ -803,10 +803,10 @@ describe('WorkItemsService', () => {
         },
       );
       await service.deleteWorkItem(org.id, project.id, workItem.id);
-      expect(
+      await expect(
         filesRepository.findOneByOrFail({ id: savedFile1.id }),
       ).rejects.toThrow(EntityNotFoundError);
-      expect(
+      await expect(
         filesRepository.findOneByOrFail({ id: savedFile2.id }),
       ).rejects.toThrow(EntityNotFoundError);
     });
