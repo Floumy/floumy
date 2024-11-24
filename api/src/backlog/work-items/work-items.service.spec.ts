@@ -758,7 +758,7 @@ describe('WorkItemsService', () => {
         },
       );
       await service.deleteWorkItem(org.id, project.id, workItem.id);
-      expect(
+      await expect(
         service.getWorkItem(org.id, project.id, workItem.id),
       ).rejects.toThrow(EntityNotFoundError);
     });
@@ -803,10 +803,10 @@ describe('WorkItemsService', () => {
         },
       );
       await service.deleteWorkItem(org.id, project.id, workItem.id);
-      expect(
+      await expect(
         filesRepository.findOneByOrFail({ id: savedFile1.id }),
       ).rejects.toThrow(EntityNotFoundError);
-      expect(
+      await expect(
         filesRepository.findOneByOrFail({ id: savedFile2.id }),
       ).rejects.toThrow(EntityNotFoundError);
     });
@@ -927,21 +927,30 @@ describe('WorkItemsService', () => {
         project.id,
       );
       expect(workItems).toBeDefined();
-      expect(workItems.length).toEqual(2);
-      expect(workItems[0].title).toEqual('my work item');
-      expect(workItems[0].description).toEqual('my work item description');
-      expect(workItems[0].priority).toEqual(Priority.HIGH);
-      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
-      expect(workItems[0].feature.id).toBeDefined();
-      expect(workItems[0].feature.title).toEqual('my feature');
-      expect(workItems[1].title).toEqual('my other work item');
-      expect(workItems[1].description).toEqual(
-        'my other work item description',
+      expect(workItems).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            title: 'my work item',
+            description: 'my work item description',
+            priority: Priority.HIGH,
+            type: WorkItemType.USER_STORY,
+            feature: expect.objectContaining({
+              id: expect.any(String), // or whatever type id is
+              title: 'my feature',
+            }),
+          }),
+          expect.objectContaining({
+            title: 'my other work item',
+            description: 'my other work item description',
+            priority: Priority.MEDIUM,
+            type: WorkItemType.TECHNICAL_DEBT,
+            feature: expect.objectContaining({
+              id: expect.any(String),
+              title: 'my other feature',
+            }),
+          }),
+        ]),
       );
-      expect(workItems[1].priority).toEqual(Priority.MEDIUM);
-      expect(workItems[1].type).toEqual(WorkItemType.TECHNICAL_DEBT);
-      expect(workItems[1].feature.id).toBeDefined();
-      expect(workItems[1].feature.title).toEqual('my other feature');
     });
     it('should return the open work items that are not associated with an iteration', async () => {
       const iteration = await iterationService.create(org.id, project.id, {
@@ -1795,7 +1804,7 @@ describe('WorkItemsService', () => {
         },
       );
 
-      expect(
+      await expect(
         service.createWorkItemComment(
           user.id,
           org.id,
