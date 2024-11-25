@@ -7,7 +7,19 @@ import { Link, NavLink as NavLinkRRD } from "react-router-dom";
 // react library that creates nice scrollbar on windows devices
 import PerfectScrollbar from "react-perfect-scrollbar";
 // reactstrap components
-import { Badge, Col, Collapse, Nav, Navbar, NavbarBrand, NavItem, NavLink, Row, UncontrolledTooltip } from "reactstrap";
+import {
+  Badge,
+  Col,
+  Collapse, DropdownItem, DropdownMenu, DropdownToggle,
+  Nav,
+  Navbar,
+  NavbarBrand,
+  NavItem,
+  NavLink,
+  Row,
+  UncontrolledDropdown,
+  UncontrolledTooltip,
+} from 'reactstrap';
 import ShortcutIcon from "../Shortcuts/ShortcutIcon";
 import { useBuildInPublic } from "../../contexts/BuidInPublicContext";
 
@@ -73,9 +85,29 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
         </div>
         <div className="navbar-inner mb-2">
           <Collapse navbar isOpen={true}>
-            {orgName && <h5 className="navbar-project-name text-light text-xl pb-3 text-break">
-              {orgName}
-            </h5>}
+            <UncontrolledDropdown group className="mb-4 text-left">
+              <DropdownToggle caret className="text-left overflow-hidden transparent background-none d-flex justify-content-between align-items-center text-white" style={{borderColor: "#686868", backgroundColor: "#32303f"}}>
+                <span className="text-truncate" style={{ flexGrow: 1, marginRight: '8px' }}>
+                  {orgName}
+                </span>
+              </DropdownToggle>
+              <DropdownMenu className="w-100">
+                <DropdownItem href="#pablo" onClick={e => e.preventDefault()} className="d-flex align-items-center">
+                <span className="text-truncate" style={{ flexGrow: 1 }}>
+                  My first project My first project My first project My first project My first project My first project
+                </span>
+                </DropdownItem>
+                <DropdownItem href="#pablo" onClick={e => e.preventDefault()} className="d-flex align-items-center">
+                <span className="text-truncate" style={{ flexGrow: 1 }}>
+                  My second project
+                </span>
+                </DropdownItem>
+                <DropdownItem divider />
+                <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
+                  <i className="fas fa-plus"/> New Project
+                </DropdownItem>
+              </DropdownMenu>
+            </UncontrolledDropdown>
             {isBuildInPublicEnabled &&
               <a href={`/public/orgs/${orgId}/projects/${projectId}/feed`} target="_blank"
                  className="nav-link text-green text-lg p-0 pb-4 no-visited no-active" rel="noreferrer">
