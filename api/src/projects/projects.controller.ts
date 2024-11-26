@@ -1,11 +1,18 @@
-import { BadRequestException, Controller, Get, Param, Request, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  Request,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { AuthGuard } from '../auth/auth.guard';
 
-@Controller('orgs/:orgId/projects')
+@Controller('orgs/:orgId/my-projects')
 export class ProjectsController {
-  constructor(private projectsService: ProjectsService) {
-  }
+  constructor(private projectsService: ProjectsService) {}
 
   @UseGuards(AuthGuard)
   @Get()
