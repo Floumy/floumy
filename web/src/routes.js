@@ -37,7 +37,6 @@ import PublicIterations from "./views/pages/iterations/PublicIterations";
 import PublicIteration from "./views/pages/iterations/PublicIteration";
 import PublicMilestone from "./views/pages/roadmap/PublicMilestone";
 import PublicActiveIteration from "./views/pages/development/PublicActiveIteration";
-import Billing from "./views/pages/settings/Billing";
 import Project from "./views/pages/settings/Project";
 import MyProfile from "./views/pages/users/MyProfile";
 import PrivateFeed from "./views/pages/feed/PrivateFeed";
@@ -55,38 +54,38 @@ import IssueDetails from "./views/pages/issues/IssueDetails";
 const routes = [
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/dashboard",
+    path: "/dashboard",
     component: <OKRs />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/feature-requests",
+    path: "/feature-requests",
     component: <FeatureRequests />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/feature-requests/new",
+    path: "/feature-requests/new",
     component: <NewFeatureRequest />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/feature-requests/edit/:featureRequestId",
+    path: "/feature-requests/edit/:featureRequestId",
     component: <EditFeatureRequest />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/issues",
+    path: "/issues",
     component: <Issues />,
     layout: "/admin"
   },
-  { redirect: true, path: "/orgs/:orgId/projects/:projectId/issues/new", component: <NewIssue />, layout: "/admin" },
+  { redirect: true, path: "/issues/new", component: <NewIssue />, layout: "/admin" },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/issues/edit/:issueId",
+    path: "/issues/edit/:issueId",
     component: <EditIssue />,
     layout: "/admin"
   },
@@ -94,7 +93,7 @@ const routes = [
     collapse: false,
     name: "Feed",
     icon: "fa fa-newspaper",
-    path: "/orgs/:orgId/projects/:projectId/feed",
+    path: "/feed",
     component: <PrivateFeed />,
     layout: "/admin",
     shortcut: "1"
@@ -103,59 +102,59 @@ const routes = [
     collapse: false,
     name: "Objectives",
     icon: "fa fa-bullseye",
-    path: "/orgs/:orgId/projects/:projectId/okrs",
+    path: "/okrs",
     component: <OKRs />,
     layout: "/admin",
     shortcut: "2"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap",
+    path: "/roadmap",
     component: <InitiativesRoadmap />,
     layout: "/admin",
     shortcut: "3"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap/features/new",
+    path: "/roadmap/features/new",
     component: <NewFeature />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap/features/edit/:id",
+    path: "/roadmap/features/edit/:id",
     component: <EditFeature />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap/features/detail/:id",
+    path: "/roadmap/features/detail/:id",
     component: <DetailFeature />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap/milestones/new",
+    path: "/roadmap/milestones/new",
     component: <NewMilestone />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap/milestones/edit/:id",
+    path: "/roadmap/milestones/edit/:id",
     component: <EditMilestone />,
     layout: "/admin"
   },
   {
     redirect: true,
     name: "New Work Item",
-    path: "/orgs/:orgId/projects/:projectId/work-item/new",
+    path: "/work-item/new",
     component: <NewWorkItem />,
     layout: "/admin"
   },
   {
     redirect: true,
     name: "Edit Work Item",
-    path: "/orgs/:orgId/projects/:projectId/work-item/edit/:id",
+    path: "/work-item/edit/:id",
     component: <EditWorkItem />,
     layout: "/admin"
   },
@@ -163,20 +162,20 @@ const routes = [
     collapse: false,
     name: "Sprints",
     icon: "fa fa-refresh",
-    path: "/orgs/:orgId/projects/:projectId/iterations",
+    path: "/iterations",
     component: <Iterations />,
     layout: "/admin",
     shortcut: "4"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/iterations/new",
+    path: "/iterations/new",
     component: <NewIteration />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/iterations/edit/:id",
+    path: "/iterations/edit/:id",
     component: <EditIteration />,
     layout: "/admin"
   },
@@ -184,7 +183,7 @@ const routes = [
     collapse: false,
     name: "Active Sprint",
     icon: "fa fa-rocket",
-    path: "/orgs/:orgId/projects/:projectId/active-iteration",
+    path: "/active-iteration",
     component: <ActiveIteration />,
     layout: "/admin",
     shortcut: "5"
@@ -193,7 +192,7 @@ const routes = [
     collapse: false,
     name: "All Work Items",
     icon: "fa fa-tasks",
-    path: "/orgs/:orgId/projects/:projectId/work-items",
+    path: "/work-items",
     component: <WorkItems />,
     layout: "/admin",
     shortcut: "6"
@@ -202,50 +201,44 @@ const routes = [
     collapse: false,
     name: "All Initiatives",
     icon: "fa fa-list-alt",
-    path: "/orgs/:orgId/projects/:projectId/features",
+    path: "/features",
     component: <Features />,
     layout: "/admin",
     shortcut: "7"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/okrs/new",
+    path: "/okrs/new",
     component: <NewOKR />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/okrs/detail/:id",
+    path: "/okrs/detail/:id",
     component: <DetailOKR />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/okrs/:objectiveId/kr/detail/:keyResultId",
+    path: "/okrs/:objectiveId/kr/detail/:keyResultId",
     component: <DetailKeyResult />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/build-in-public",
+    path: "/build-in-public",
     component: <BuildInPublic />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/members",
+    path: "/members",
     component: <Members />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/billing",
-    component: <Billing />,
-    layout: "/admin"
-  },
-  {
-    redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/project",
+    path: "/project",
     component: <Project />,
     layout: "/admin"
   },

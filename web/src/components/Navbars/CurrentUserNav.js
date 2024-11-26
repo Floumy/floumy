@@ -2,8 +2,10 @@ import { DropdownItem, DropdownMenu, DropdownToggle, Media, Nav, NavItem, Uncont
 import { memberNameInitials, textToColor } from "../../services/utils/utils";
 import { logoutUser } from "../../services/api/api.service";
 import React from "react";
+import { useParams } from 'react-router-dom';
 
 export default function CurrentUserNav() {
+  const {orgId, projectId} = useParams();
   const currentUserName = localStorage.getItem("currentUserName");
 
   if (!currentUserName) {
@@ -42,7 +44,7 @@ export default function CurrentUserNav() {
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem
-            href="/admin/my-profile"
+            href={`/admin/orgs/${orgId}/projects/${projectId}/my-profile`}
           >
             <i className="ni ni-single-02" />
             <span>My profile</span>

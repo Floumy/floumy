@@ -1,7 +1,7 @@
 
 import React from "react";
 // react library for routing
-import { Link, NavLink as NavLinkRRD } from "react-router-dom";
+import { Link, NavLink as NavLinkRRD, useParams } from 'react-router-dom';
 // nodejs library that concatenates classes
 // nodejs library to set properties for components
 // react library that creates nice scrollbar on windows devices
@@ -22,14 +22,13 @@ import {
 } from 'reactstrap';
 import ShortcutIcon from "../Shortcuts/ShortcutIcon";
 import { useBuildInPublic } from "../../contexts/BuidInPublicContext";
+import { useProjects } from '../../contexts/ProjectsContext';
 
 function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
   const { settings: buildInPublicSettings } = useBuildInPublic();
   const isBuildInPublicEnabled = buildInPublicSettings.isBuildInPublicEnabled;
-  const currentOrg = JSON.parse(localStorage.getItem("currentOrg"));
-  const orgName = currentOrg ? currentOrg.name : "";
-  const projectId = currentOrg ? currentOrg.projects[0].id : "";
-  const orgId = currentOrg ? currentOrg.id : "";
+  const { orgId, projectId } = useParams();
+  const { currentProject, projects, loading: loadingProjects, setCurrentProject } = useProjects();
   const paymentPlan = localStorage.getItem("paymentPlan");
   const { settings: bipSettings } = useBuildInPublic();
 
@@ -88,23 +87,20 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
             <UncontrolledDropdown group className="mb-4 text-left">
               <DropdownToggle caret className="text-left overflow-hidden transparent background-none d-flex justify-content-between align-items-center text-white" style={{borderColor: "#686868", backgroundColor: "#32303f"}}>
                 <span className="text-truncate" style={{ flexGrow: 1, marginRight: '8px' }}>
-                  {orgName}
+                  {currentProject?.name}
                 </span>
               </DropdownToggle>
-              <DropdownMenu className="w-100">
-                <DropdownItem href="#pablo" onClick={e => e.preventDefault()} className="d-flex align-items-center">
-                <span className="text-truncate" style={{ flexGrow: 1 }}>
-                  My first project My first project My first project My first project My first project My first project
-                </span>
-                </DropdownItem>
-                <DropdownItem href="#pablo" onClick={e => e.preventDefault()} className="d-flex align-items-center">
-                <span className="text-truncate" style={{ flexGrow: 1 }}>
-                  My second project
-                </span>
-                </DropdownItem>
+              <DropdownMenu className="w-100" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+                {projects.map(project => (
+                  <DropdownItem key={project.id} href={`/admin/orgs/${orgId}/projects/${project.id}`} onClick={e => e.preventDefault()} className="d-flex align-items-center">
+                    <span className="text-truncate" style={{ flexGrow: 1 }}>
+                      {project.name}
+                    </span>
+                  </DropdownItem>
+                ))}
                 <DropdownItem divider />
-                <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
-                  <i className="fas fa-plus"/> New Project
+                <DropdownItem className="text-xs" href="#pablo" onClick={e => e.preventDefault()}>
+                  <i className="fas fa-plus text-xs"/> New Project
                 </DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
@@ -395,7 +391,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
               </NavItem>
               <NavItem>
                 <NavLink
-                  to={`/admin/orgs/${orgId}/members`}
+                  to={`/admin/orgs/${orgId}/projects/${projectId}/members`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >

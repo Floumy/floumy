@@ -1,7 +1,7 @@
 
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 // react library for routing
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 // core components
 import Sidebar from "components/Sidebar/Sidebar.js";
 
@@ -12,15 +12,13 @@ import useNavigationHotKey from "./useNavigationHotKey";
 import { Offline, Online } from "react-detect-offline";
 import { Button, Modal, ModalBody, ModalHeader } from "reactstrap";
 import Footer from "../components/Footers/Footer";
-import { setCurrentOrg } from "../services/org/orgs.service";
 import { BuildInPublicProvider } from "../contexts/BuidInPublicContext";
+import { ProjectsProvider } from '../contexts/ProjectsContext';
 
 function Admin() {
   const { location, mainContentRef, getRoutes } = useLayoutHandler("admin");
   const [sidenavOpen, setSidenavOpen] = useState(true);
-  const currentOrg = JSON.parse(localStorage.getItem("currentOrg"));
-  const orgId = currentOrg ? currentOrg.id : "";
-  const projectId = currentOrg ? currentOrg.projects[0].id : "";
+  const { orgId, projectId } = useParams();
 
   function isNavigationReplace() {
     let replace = false;
@@ -42,28 +40,11 @@ function Admin() {
   useNavigationHotKey("m", `/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`, isNavigationReplace());
   useNavigationHotKey("s", `/admin/orgs/${orgId}/projects/${projectId}/iterations/new`, isNavigationReplace());
   useNavigationHotKey("o", `/admin/orgs/${orgId}/projects/${projectId}/okrs/new`, isNavigationReplace());
-  useNavigationHotKey("r", `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace(), currentOrg?.paymentPlan === "premium");
-  useNavigationHotKey("n", `/admin/orgs/${orgId}/projects/${projectId}/issues/new`, false, currentOrg?.paymentPlan === "premium");
+  useNavigationHotKey("r", `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace());
+  useNavigationHotKey("n", `/admin/orgs/${orgId}/projects/${projectId}/issues/new`, false);
 
   useNavigationHotKey("left", -1);
   useNavigationHotKey("right", 1);
-
-  // toggles collapse between mini sidenav and normal
-  const toggleSidenav = () => {
-    if (document.body.classList.contains("g-sidenav-pinned")) {
-      document.body.classList.remove("g-sidenav-pinned");
-      document.body.classList.add("g-sidenav-hidden");
-    } else {
-      document.body.classList.add("g-sidenav-pinned");
-      document.body.classList.remove("g-sidenav-hidden");
-    }
-    setSidenavOpen(!sidenavOpen);
-  };
-  const getNavbarTheme = () => {
-    return location.pathname.indexOf("admin/alternative-dashboard") === -1
-      ? "dark"
-      : "light";
-  };
 
   useEffect(() => {
     if (window.innerWidth < 1200) {
@@ -71,51 +52,6 @@ function Admin() {
       document.body.classList.remove("g-sidenav-pinned");
       setSidenavOpen(false);
     }
-  }, []);
-
-  useEffect(() => {
-    // Calculate the interval time in milliseconds (6 hours = 6 * 60 * 60 * 1000 ms)
-    const intervalTime = 6 * 60 * 60 * 1000;
-
-    // Set up the interval
-    const intervalId = setInterval(setCurrentOrg, intervalTime);
-
-    // Run the function immediately on mount
-    setCurrentOrg();
-
-    // Clear the interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
-
-  function getCurrentUser() {
-    const currentUser = localStorage.getItem("currentUser");
-
-    let currentUserData = {};
-
-    try {
-      currentUserData = JSON.parse(currentUser);
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
-
-    return currentUserData;
-  }
-
-  useLayoutEffect(() => {
-    const timer = setTimeout(() => {
-      if (window.isUserHelpReady === true &&
-        window.UserHelpSetName !== undefined &&
-        window.UserHelpSetEmail !== undefined) {
-        const currentUserData = getCurrentUser();
-        if (currentUserData !== null) {
-          window.UserHelpSetName(currentUserData.name);
-          window.UserHelpSetEmail(currentUserData.email);
-        }
-      }
-    }, 3000);
-
-    return () => clearTimeout(timer);
   }, []);
 
   const helpButtonStyle = {
@@ -130,67 +66,64 @@ function Admin() {
   return (
     <>
       <BuildInPublicProvider orgId={orgId} projectId={projectId}>
-        <Sidebar
-          routes={routes}
-          toggleSidenav={toggleSidenav}
-          sidenavOpen={sidenavOpen}
-          logo={{
-            outterLink: "https://floumy.com",
-            // innerLink: "/admin/okrs",
-            imgSrc: require("assets/img/brand/logo.png"),
-            imgAlt: "Floumy Logo"
-          }}
-        />
-        <div className="main-content" ref={mainContentRef}>
-          <AdminNavbar
-            theme={getNavbarTheme()}
-            toggleSidenav={toggleSidenav}
+        <ProjectsProvider orgId={orgId} projectId={projectId}>
+          <Sidebar
+            routes={routes}
             sidenavOpen={sidenavOpen}
+            logo={{
+              outterLink: "https://floumy.com",
+              // innerLink: "/admin/okrs",
+              imgSrc: require("assets/img/brand/logo.png"),
+              imgAlt: "Floumy Logo"
+            }}
           />
-          <Online>
-            <Routes>
-              {getRoutes(routes)}
-              <Route
-                path="*"
-                element={<Navigate to="/admin/dashboard" replace />}
-              />
-            </Routes>
-          </Online>
-          <Offline>
-            <div className="offline">
-              <div className="container">
-                <Modal
-                  className="modal-dialog-centered"
-                  contentClassName="bg-white border-0 rounded"
-                  isOpen={true}
-                  centered={true}
-                  fade={false}
-                >
-                  <ModalHeader className="bg-warning text-white border-0 d-flex justify-content-center">
-                    <h2 className="font-weight-bold text-white">You are offline</h2>
-                  </ModalHeader>
-                  <ModalBody className="p-4 text-center bg-warning">
-                    <p className="mb-4 text-white">
-                      You are currently offline. Please check your internet connection and try again.
-                    </p>
-                    <Button color="white" onClick={() => window.location.reload()}>
-                      Retry
-                    </Button>
-                  </ModalBody>
-                </Modal>
+          <div className="main-content" ref={mainContentRef}>
+            <AdminNavbar
+              theme={"dark"}
+              sidenavOpen={true}
+            />
+            <Online>
+              <Routes>
+                {getRoutes(routes)}
+                <Route
+                  path="*"
+                  element={<Navigate to="/admin/dashboard" replace />}
+                />
+              </Routes>
+            </Online>
+            <Offline>
+              <div className="offline">
+                <div className="container">
+                  <Modal
+                    className="modal-dialog-centered"
+                    contentClassName="bg-white border-0 rounded"
+                    isOpen={true}
+                    centered={true}
+                    fade={false}
+                  >
+                    <ModalHeader className="bg-warning text-white border-0 d-flex justify-content-center">
+                      <h2 className="font-weight-bold text-white">You are offline</h2>
+                    </ModalHeader>
+                    <ModalBody className="p-4 text-center bg-warning">
+                      <p className="mb-4 text-white">
+                        You are currently offline. Please check your internet connection and try again.
+                      </p>
+                      <Button color="white" onClick={() => window.location.reload()}>
+                        Retry
+                      </Button>
+                    </ModalBody>
+                  </Modal>
+                </div>
               </div>
-            </div>
-          </Offline>
-          <Footer />
-        </div>
-        {sidenavOpen ? (
-          <div className="backdrop d-xl-none" onClick={toggleSidenav} onKeyDown={toggleSidenav} role="button" />
-        ) : null}
-        <button id="userHelpButton" className="userHelpButtonMiddleRight" data-drawer-trigger="true"
-                aria-controls="drawer-name" aria-expanded="false"
-                style={helpButtonStyle}>Report
-          a problem
-        </button>
+            </Offline>
+            <Footer />
+          </div>
+          <button id="userHelpButton" className="userHelpButtonMiddleRight" data-drawer-trigger="true"
+                  aria-controls="drawer-name" aria-expanded="false"
+                  style={helpButtonStyle}>Report
+            a problem
+          </button>
+        </ProjectsProvider>
       </BuildInPublicProvider>
     </>
   );
