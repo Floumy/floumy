@@ -30,6 +30,8 @@ export function ProjectsProvider({ children, orgId, projectId }) {
   }, [orgId, projectId]);
 
   const value = {
+    orgId,
+    currentProjectId: projectId,
     currentProject,
     projects,
     loading,
@@ -50,18 +52,4 @@ export function useProjects() {
     throw new Error('useProjects must be used within a ProjectsProvider');
   }
   return context;
-}
-
-export function useCurrentProject() {
-  const context = useContext(ProjectsContext);
-  if (context === undefined) {
-    throw new Error('useCurrentProject must be used within a ProjectsProvider');
-  }
-
-  const { currentProject, loading } = context;
-
-  return {
-    project: currentProject,
-    loading,
-  };
 }

@@ -67,4 +67,33 @@ describe('ProjectsController', () => {
       expect(projects[1].name).toEqual(project.name);
     });
   });
+
+  describe('when creating a project', () => {
+    it('should create a project', async () => {
+      const createProjectDto = {
+        name: 'Test Project',
+      };
+      await controller.createProject(
+        {
+          user: { org: org.id },
+        },
+        createProjectDto,
+        org.id,
+      );
+
+      const projects = await controller.listProjects(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+      );
+
+      expect(projects).toBeDefined();
+      expect(projects.length).toEqual(3);
+      expect(projects[0].id).toBeDefined();
+      expect(projects[0].name).toEqual(project.name);
+      expect(projects[1].id).toBeDefined();
+      expect(projects[1].name).toEqual(createProjectDto.name);
+    });
+  });
 });
