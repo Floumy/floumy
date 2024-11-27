@@ -8,3 +8,12 @@ export async function listProjects(orgId) {
     throw new Error(e.message);
   }
 }
+
+export async function createProject(orgId, projectName) {
+  try {
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/my-projects`, { name: projectName });
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
