@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ProjectMapper } from './mappers';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ProjectsService {
@@ -13,6 +14,7 @@ export class ProjectsService {
     private readonly projectsRepository: Repository<Project>,
     @InjectRepository(Org) private readonly orgsRepository: Repository<Org>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async listProjects(orgId: string) {
@@ -49,6 +51,7 @@ export class ProjectsService {
     userProjects.push(project);
     user.projects = Promise.resolve(userProjects);
     await this.usersRepository.save(user);
+    this.eventEmitter.emit('project.created', project);
     return await ProjectMapper.toDto(project);
   }
 }

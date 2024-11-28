@@ -5,11 +5,11 @@ import { createProject } from '../../services/projects/projects.service';
 import { useNavigate } from 'react-router-dom';
 
 export default function NewProjectModal({ newProjectModal, toggleNewProjectModal }) {
-  const [projectName, setProjectName] = React.useState("");
+  const [projectName, setProjectName] = React.useState('');
   const { orgId, setCurrentProject } = useProjects();
   const navigate = useNavigate();
 
-  const handleCreateProject = async (projectName) => {
+  const handleCreateProject = async () => {
     try {
       const project = await createProject(orgId, projectName);
       setCurrentProject(project);
@@ -38,8 +38,8 @@ export default function NewProjectModal({ newProjectModal, toggleNewProjectModal
           <span aria-hidden={true}>×</span>
         </button>
       </div>
-      <div className="modal-body">
-        <form>
+      <form onSubmit={handleCreateProject}>
+        <div className="modal-body">
           <div className="form-group">
             <label>Project Name</label>
             <input
@@ -49,20 +49,20 @@ export default function NewProjectModal({ newProjectModal, toggleNewProjectModal
               onChange={(e) => setProjectName(e.target.value)}
             />
           </div>
-        </form>
-      </div>
-      <div className="modal-footer">
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={toggleNewProjectModal}
-        >
-          Close
-        </button>
-        <button type="button" className="btn btn-primary" onClick={() => handleCreateProject(projectName)}>
-          Create Project
-        </button>
-      </div>
+        </div>
+        <div className="modal-footer">
+          <button type="submit" className="btn btn-primary">
+            Create Project
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={toggleNewProjectModal}
+          >
+            Close
+          </button>
+        </div>
+      </form>
     </Modal>
   );
 }
