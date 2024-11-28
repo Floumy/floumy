@@ -31,14 +31,14 @@ function ProjectSelector({
           {currentProject?.name}
         </span>
       </DropdownToggle>
-      <DropdownMenu className="w-100 text-white mt-1 rounded-sm" style={{ backgroundColor: '#b3b0c6' }}>
+      <DropdownMenu className="w-100 text-white mt-1 py-0 rounded-sm" style={{ backgroundColor: '#b3b0c6', maxHeight: '300px', overflowY: 'auto' }}>
         {projects
           .filter(project => project.id !== currentProject?.id)
           .map(project => (
             <DropdownItem
               key={project.id}
               onClick={() => handleProjectClick(project)}
-              className="d-flex align-items-center"
+              className="d-flex align-items-center border-bottom py-2"
               style={{
                 backgroundColor: '#b3b0c6',
                 '&:hover': {
@@ -51,10 +51,9 @@ function ProjectSelector({
               </span>
             </DropdownItem>
           ))}
-        {showNewProject && projects.length > 1 && <DropdownItem divider className="" />}
         {showNewProject && (
           <DropdownItem
-            className="text-xs"
+            className="text-xs py-3 font-italic text-white"
             onClick={onNewProject}
             style={{
               backgroundColor: '#b3b0c6',

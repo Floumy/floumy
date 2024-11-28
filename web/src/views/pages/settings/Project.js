@@ -49,6 +49,10 @@ function Project() {
     }, 2000);
   }
 
+  function deleteProject() {
+
+  }
+
   return (
     <>
       <SimpleHeader />
@@ -74,7 +78,7 @@ function Project() {
                   }
                 }}
               >
-                {({ values, handleChange, errors, touched }) => (
+                {({ values, errors, touched }) => (
                   <Form
                     className="needs-validation"
                     noValidate>
@@ -103,7 +107,11 @@ function Project() {
                     <div>
                       <Button color="primary" type="submit"
                               disabled={isSubmitting}>
-                        Save Settings
+                        Save
+                      </Button>
+                      <Button color="danger" type="button"
+                              onClick={() => deleteProject()}>
+                        Delete Project
                       </Button>
                     </div>
                   </Form>
