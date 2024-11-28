@@ -38,7 +38,7 @@ function ProjectSelector({
             <DropdownItem
               key={project.id}
               onClick={() => handleProjectClick(project)}
-              className="d-flex align-items-center border-bottom py-2"
+              className="d-flex align-items-center py-2"
               style={{
                 backgroundColor: '#b3b0c6',
                 '&:hover': {
