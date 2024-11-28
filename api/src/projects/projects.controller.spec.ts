@@ -75,7 +75,7 @@ describe('ProjectsController', () => {
       };
       await controller.createProject(
         {
-          user: { org: org.id },
+          user: { sub: user.id, org: org.id },
         },
         createProjectDto,
         org.id,
@@ -89,11 +89,11 @@ describe('ProjectsController', () => {
       );
 
       expect(projects).toBeDefined();
-      expect(projects.length).toEqual(3);
+      expect(projects.length).toEqual(2);
       expect(projects[0].id).toBeDefined();
-      expect(projects[0].name).toEqual(project.name);
+      expect(projects[0].name).toEqual(createProjectDto.name);
       expect(projects[1].id).toBeDefined();
-      expect(projects[1].name).toEqual(createProjectDto.name);
+      expect(projects[1].name).toEqual(project.name);
     });
   });
 });
