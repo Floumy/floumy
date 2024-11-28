@@ -9,19 +9,19 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
   Badge,
   Col,
-  Collapse, DropdownItem, DropdownMenu, DropdownToggle, Nav,
+  Collapse, Nav,
   Navbar,
   NavbarBrand,
   NavItem,
   NavLink,
   Row,
-  UncontrolledDropdown,
   UncontrolledTooltip,
 } from 'reactstrap';
 import ShortcutIcon from '../Shortcuts/ShortcutIcon';
 import { useBuildInPublic } from '../../contexts/BuidInPublicContext';
 import { useProjects } from '../../contexts/ProjectsContext';
 import NewProjectModal from './NewProjectModal';
+import ProjectSelector from './ProjectSelector';
 
 function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
@@ -89,44 +89,13 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
           <>
             <div className="navbar-inner mb-2">
               <Collapse navbar isOpen={true}>
-                <UncontrolledDropdown group className="mb-4 text-left">
-                  <DropdownToggle caret
-                                  className="text-left overflow-hidden transparent background-none d-flex justify-content-between align-items-center"
-                                  style={{ borderColor: '#686868', backgroundColor: '#b3b0c6' }}>
-                <span className="text-truncate" style={{ flexGrow: 1, marginRight: '8px' }}>
-                  {currentProject?.name}
-                </span>
-                  </DropdownToggle>
-                  <DropdownMenu className="w-100 text-white mt-1 rounded-sm" style={{ backgroundColor: '#b3b0c6' }}>
-                    {projects
-                      .filter(project => project.id !== currentProject.id)
-                      .map(project => (
-                        <DropdownItem key={project.id} href={`/admin/orgs/${orgId}/projects/${project.id}`}
-                                      onClick={e => e.preventDefault()} className="d-flex align-items-center"
-                                      style={{
-                                        backgroundColor: '#b3b0c6',
-                                        '&:hover': {
-                                          backgroundColor: '#b3b0c6',
-                                        },
-                                      }}>
-                    <span className="text-truncate" style={{ flexGrow: 1 }}>
-                      {project.name}
-                    </span>
-                        </DropdownItem>
-                      ))}
-                    {projects.length > 1 && <DropdownItem divider className="" />}
-                    <DropdownItem className="text-xs" onClick={toggleNewProjectModal} style={{
-                      backgroundColor: '#b3b0c6',
-                      '&:hover': {
-                        backgroundColor: '#b3b0c6',
-                      },
-                    }}>
-                  <span className="d-none d-md-inline">
-                    <i className="fas fa-plus text-xs mr-2" /> New Project
-                  </span>
-                    </DropdownItem>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
+                <ProjectSelector
+                  currentProject={currentProject}
+                  projects={projects}
+                  orgId={orgId}
+                  onNewProject={toggleNewProjectModal}
+                  showNewProject={true}
+                />
                 {isBuildInPublicEnabled &&
                   <a href={`/public/orgs/${orgId}/projects/${currentProject.id}/feed`} target="_blank"
                      className="nav-link text-green text-lg p-0 pb-4 no-visited no-active" rel="noreferrer">

@@ -19,7 +19,6 @@ function ProjectSelector({
   const navigate = useNavigate();
 
   function handleProjectClick(project) {
-    console.log(project);
     setCurrentProject(project);
     navigate(`/admin/orgs/${orgId}/projects/${project.id}/dashboard`);
   }
