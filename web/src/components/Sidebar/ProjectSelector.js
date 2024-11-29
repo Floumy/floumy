@@ -3,7 +3,7 @@ import {
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
 } from 'reactstrap';
 import { useProjects } from '../../contexts/ProjectsContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +13,7 @@ function ProjectSelector({
                            projects,
                            orgId,
                            onNewProject,
-                           showNewProject = true // Optional prop to hide "New Project" button in public view
+                           showNewProject = true, // Optional prop to hide "New Project" button in public view
                          }) {
   const { setCurrentProject } = useProjects();
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ function ProjectSelector({
     setCurrentProject(project);
     navigate(`/admin/orgs/${orgId}/projects/${project.id}/dashboard`);
   }
+
   return (
     <UncontrolledDropdown group className="mb-4 text-left">
       <DropdownToggle caret
@@ -31,9 +32,9 @@ function ProjectSelector({
           {currentProject?.name}
         </span>
       </DropdownToggle>
-      <DropdownMenu className="w-100 text-white mt-1 py-0 rounded-sm" style={{ backgroundColor: '#b3b0c6', maxHeight: '300px', overflowY: 'auto' }}>
+      <DropdownMenu className="w-100 text-white mt-1 py-0 rounded-sm"
+                    style={{ backgroundColor: '#b3b0c6', maxHeight: '300px', overflowY: 'auto' }}>
         {projects
-          .filter(project => project.id !== currentProject?.id)
           .map(project => (
             <DropdownItem
               key={project.id}
@@ -44,6 +45,7 @@ function ProjectSelector({
                 '&:hover': {
                   backgroundColor: '#b3b0c6',
                 },
+                borderBottom: '1px solid #939393',
               }}
               tag="button">
               <span className="text-truncate" style={{ flexGrow: 1 }}>
@@ -56,13 +58,14 @@ function ProjectSelector({
             className="text-xs py-3 font-italic text-white"
             onClick={onNewProject}
             style={{
+              color: '#f4f4f4',
               backgroundColor: '#b3b0c6',
               '&:hover': {
                 backgroundColor: '#b3b0c6',
               },
             }}>
             <span className="d-none d-md-inline">
-              <i className="fas fa-plus text-xs mr-2" /> New Project
+              <i className="fas fa-plus text-xs mr-2" style={{ color: '#f4f4f4' }} /> New Project
             </span>
           </DropdownItem>
         )}

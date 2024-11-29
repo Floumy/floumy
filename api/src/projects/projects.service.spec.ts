@@ -250,10 +250,15 @@ describe('ProjectsService', () => {
   });
   describe('when deleting a project', () => {
     it('should delete the project', async () => {
+      await service.createProject(user.id, org.id, {
+        name: 'Test Project',
+      });
       await service.deleteProject(org.id, project.id);
       const projects = await service.listProjects(org.id);
       expect(projects).toBeDefined();
-      expect(projects.length).toEqual(0);
+      expect(projects.length).toEqual(1);
+      expect(projects[0].id).toBeDefined();
+      expect(projects[0].name).toEqual('Test Project');
     });
     it('should throw an error if the project does not exist', async () => {
       await expect(
@@ -271,6 +276,9 @@ describe('ProjectsService', () => {
       await expect(
         service.deleteProject('non-existent-org', project.id),
       ).rejects.toThrow();
+    });
+    it('should throw an error if the project is the only one', async () => {
+      await expect(service.deleteProject(org.id, project.id)).rejects.toThrow();
     });
   });
 });
