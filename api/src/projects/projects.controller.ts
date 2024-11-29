@@ -2,10 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
   Post,
+  Put,
   Request,
   UnauthorizedException,
   UseGuards,
@@ -48,6 +50,65 @@ export class ProjectsController {
         orgId,
         createProjectDto,
       );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Put(':id')
+  @HttpCode(200)
+  async updateProject(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('id') id: string,
+    @Body() updateProjectDto: { name: string },
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.projectsService.updateProject(
+        orgId,
+        id,
+        updateProjectDto.name,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get(':id')
+  @HttpCode(200)
+  async getProject(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.projectsService.findOneById(orgId, id);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete(':id')
+  @HttpCode(200)
+  async deleteProject(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.projectsService.deleteProject(orgId, id);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

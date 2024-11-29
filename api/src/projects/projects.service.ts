@@ -30,9 +30,7 @@ export class ProjectsService {
     orgId: string,
     createProjectDto: { name: string },
   ) {
-    if (!userId) throw new Error('User id is required');
-    if (!orgId) throw new Error('Org id is required');
-    if (!createProjectDto.name) throw new Error('Project name is required');
+    this.validateProjectName(createProjectDto.name);
 
     const org = await this.orgsRepository.findOneByOrFail({
       id: orgId,
@@ -53,5 +51,47 @@ export class ProjectsService {
     await this.usersRepository.save(user);
     this.eventEmitter.emit('project.created', project);
     return await ProjectMapper.toDto(project);
+  }
+
+  async findOneById(orgId: string, projectId: string) {
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+    return await ProjectMapper.toDto(project);
+  }
+
+  async updateProject(orgId: string, projectId: string, projectName: string) {
+    this.validateProjectName(projectName);
+
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+    project.name = projectName;
+    await this.projectsRepository.save(project);
+    return await ProjectMapper.toDto(project);
+  }
+
+  async deleteProject(orgId: string, projectId: string) {
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+    await this.projectsRepository.remove(project);
+  }
+
+  private validateProjectName(name: string) {
+    if (!name) throw new Error('Project name is required');
+    if (name.trim().length === 0)
+      throw new Error('Project name cannot be empty');
+    if (name.length > 50)
+      throw new Error('Project name cannot be longer than 50 characters');
+    if (name.length < 3)
+      throw new Error('Project name must be at least 3 characters');
+    if (!/^[a-zA-Z0-9_\- ]+$/.test(name))
+      throw new Error(
+        'Project name can only contain letters, numbers, underscores, hyphens and spaces',
+      );
   }
 }
