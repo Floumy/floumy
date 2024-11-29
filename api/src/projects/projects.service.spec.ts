@@ -123,9 +123,98 @@ describe('ProjectsService', () => {
         'testtesttest',
       );
       await expect(
-        service.createProject(otherUser.id, null, {
+        service.createProject(otherUser.id, '', {
           name: 'Test Project',
         }),
+      ).rejects.toThrow();
+    });
+  });
+  describe('when updating a project', () => {
+    it('should update the project', async () => {
+      const updateProjectDto = {
+        name: 'Updated Project',
+      };
+      await service.updateProject(org.id, project.id, updateProjectDto.name);
+      const updatedProject = await service.findOneById(org.id, project.id);
+      expect(updatedProject).toBeDefined();
+      expect(updatedProject.id).toEqual(project.id);
+      expect(updatedProject.name).toEqual(updateProjectDto.name);
+    });
+    it('should throw an error if the project does not exist', async () => {
+      await expect(
+        service.updateProject(
+          org.id,
+          'non-existent-project',
+          'Updated Project',
+        ),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project does not belong to the org', async () => {
+      const project = new Project();
+      project.name = 'Test Project';
+      project.org = Promise.resolve(new Org());
+      await projectsRepository.save(project);
+      await expect(
+        service.updateProject(org.id, project.id, 'Updated Project'),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the org does not exist', async () => {
+      await expect(
+        service.updateProject(
+          'non-existent-org',
+          project.id,
+          'Updated Project',
+        ),
+      ).rejects.toThrow();
+    });
+  });
+  describe('when getting a project', () => {
+    it('should get the project', async () => {
+      const currentProject = await service.findOneById(org.id, project.id);
+      expect(currentProject).toBeDefined();
+      expect(currentProject.id).toEqual(currentProject.id);
+      expect(currentProject.name).toEqual(currentProject.name);
+    });
+    it('should throw an error if the project does not exist', async () => {
+      await expect(
+        service.findOneById(org.id, 'non-existent-project'),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project does not belong to the org', async () => {
+      const project = new Project();
+      project.name = 'Test Project';
+      project.org = Promise.resolve(new Org());
+      await projectsRepository.save(project);
+      await expect(service.findOneById(org.id, project.id)).rejects.toThrow();
+    });
+    it('should throw an error if the org does not exist', async () => {
+      await expect(
+        service.findOneById('non-existent-org', project.id),
+      ).rejects.toThrow();
+    });
+  });
+  describe('when deleting a project', () => {
+    it('should delete the project', async () => {
+      await service.deleteProject(org.id, project.id);
+      const projects = await service.listProjects(org.id);
+      expect(projects).toBeDefined();
+      expect(projects.length).toEqual(0);
+    });
+    it('should throw an error if the project does not exist', async () => {
+      await expect(
+        service.deleteProject(org.id, 'non-existent-project'),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project does not belong to the org', async () => {
+      const project = new Project();
+      project.name = 'Test Project';
+      project.org = Promise.resolve(new Org());
+      await projectsRepository.save(project);
+      await expect(service.deleteProject(org.id, project.id)).rejects.toThrow();
+    });
+    it('should throw an error if the org does not exist', async () => {
+      await expect(
+        service.deleteProject('non-existent-org', project.id),
       ).rejects.toThrow();
     });
   });
