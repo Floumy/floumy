@@ -30,7 +30,7 @@ export class ProjectsService {
     orgId: string,
     createProjectDto: { name: string },
   ) {
-    this.validateProjectName(createProjectDto.name);
+    await this.validateProjectName(orgId, createProjectDto.name);
 
     const org = await this.orgsRepository.findOneByOrFail({
       id: orgId,
@@ -62,7 +62,7 @@ export class ProjectsService {
   }
 
   async updateProject(orgId: string, projectId: string, projectName: string) {
-    this.validateProjectName(projectName);
+    await this.validateProjectName(orgId, projectName);
 
     const project = await this.projectsRepository.findOneByOrFail({
       id: projectId,
@@ -81,7 +81,7 @@ export class ProjectsService {
     await this.projectsRepository.remove(project);
   }
 
-  private validateProjectName(name: string) {
+  private async validateProjectName(orgId: string, name: string) {
     if (!name) throw new Error('Project name is required');
     if (name.trim().length === 0)
       throw new Error('Project name cannot be empty');
@@ -93,5 +93,13 @@ export class ProjectsService {
       throw new Error(
         'Project name can only contain letters, numbers, underscores, hyphens and spaces',
       );
+
+    // Check if the project name already exists
+    const projects = await this.projectsRepository.find({
+      where: { org: { id: orgId }, name: name },
+      relations: ['users'],
+    });
+
+    if (projects.length > 0) throw new Error('Project name already exists');
   }
 }

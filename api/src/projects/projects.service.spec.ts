@@ -128,7 +128,39 @@ describe('ProjectsService', () => {
         }),
       ).rejects.toThrow();
     });
+    it('should throw an error if the project name is already taken', async () => {
+      await service.createProject(user.id, org.id, {
+        name: 'Test Project',
+      });
+      await expect(
+        service.createProject(user.id, org.id, {
+          name: 'Test Project',
+        }),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project name is empty', async () => {
+      await expect(
+        service.createProject(user.id, org.id, {
+          name: '',
+        }),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project name is too long', async () => {
+      await expect(
+        service.createProject(user.id, org.id, {
+          name: 'a'.repeat(51),
+        }),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project name contains invalid characters', async () => {
+      await expect(
+        service.createProject(user.id, org.id, {
+          name: 'a~b',
+        }),
+      ).rejects.toThrow();
+    });
   });
+
   describe('when updating a project', () => {
     it('should update the project', async () => {
       const updateProjectDto = {
@@ -165,6 +197,29 @@ describe('ProjectsService', () => {
           project.id,
           'Updated Project',
         ),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project name is empty', async () => {
+      await expect(
+        service.updateProject(org.id, project.id, ''),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project name is too long', async () => {
+      await expect(
+        service.updateProject(org.id, project.id, 'a'.repeat(51)),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project name contains invalid characters', async () => {
+      await expect(
+        service.updateProject(org.id, project.id, 'a~b'),
+      ).rejects.toThrow();
+    });
+    it('should throw an error if the project name is already taken', async () => {
+      await service.createProject(user.id, org.id, {
+        name: 'Test Project',
+      });
+      await expect(
+        service.updateProject(org.id, project.id, 'Test Project'),
       ).rejects.toThrow();
     });
   });
