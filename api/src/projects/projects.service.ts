@@ -74,6 +74,7 @@ export class ProjectsService {
   }
 
   async deleteProject(orgId: string, projectId: string) {
+    await this.validateMoreThanOneProject(orgId);
     const project = await this.projectsRepository.findOneByOrFail({
       id: projectId,
       org: { id: orgId },
@@ -101,5 +102,15 @@ export class ProjectsService {
     });
 
     if (projects.length > 0) throw new Error('Project name already exists');
+  }
+
+  private async validateMoreThanOneProject(orgId: string) {
+    const projects = await this.projectsRepository.find({
+      where: { org: { id: orgId } },
+    });
+
+    if (projects.length > 1) return;
+
+    throw new Error('You cannot delete the last project');
   }
 }

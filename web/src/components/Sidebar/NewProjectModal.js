@@ -9,7 +9,8 @@ export default function NewProjectModal({ newProjectModal, toggleNewProjectModal
   const { orgId, setCurrentProject } = useProjects();
   const navigate = useNavigate();
 
-  const handleCreateProject = async () => {
+  const handleCreateProject = async (e) => {
+    e.preventDefault();
     try {
       const project = await createProject(orgId, projectName);
       setCurrentProject(project);
