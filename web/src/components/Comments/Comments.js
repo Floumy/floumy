@@ -153,6 +153,7 @@ export default function Comments({
                setIsEditing(false);
                setEditingCommentId(null);
                setEditingCommentContent("");
+               setEditingCommentMentions([]);
              }}
              role="button"
              tabIndex="0"
