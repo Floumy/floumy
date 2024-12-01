@@ -89,4 +89,13 @@ export class OrgsService {
     this.eventEmitter.emit('org.created', savedOrg);
     return savedOrg;
   }
+
+  async getUsers(orgId: string) {
+    const org = await this.findOneById(orgId);
+    const users = await org.users;
+    return users.map((user) => ({
+      id: user.id,
+      name: user.name,
+    }));
+  }
 }

@@ -11,4 +11,5 @@ export interface CommentDto {
 
 export interface CreateUpdateCommentDto {
   content: string;
+  mentions: string[];
 }

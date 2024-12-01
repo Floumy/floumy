@@ -45,3 +45,12 @@ export async function deactivateUser(userId) {
     throw new Error(e.response.data.message);
   }
 }
+
+export async function getUsersByOrgId(orgId) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/users`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.response.data.message);
+  }
+}
