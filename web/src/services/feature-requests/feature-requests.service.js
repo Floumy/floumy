@@ -87,7 +87,8 @@ export async function addFeatureRequestComment(orgId, projectId, featureRequestI
 
   try {
     const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments`, {
-      content: comment
+      content: comment.content,
+      mentions: comment.mentions
     });
     return response.data;
   } catch (e) {
@@ -102,7 +103,8 @@ export async function updateFeatureRequestComment(orgId, projectId, featureReque
 
   try {
     const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments/${commentId}`, {
-      content: comment
+      content: comment.content,
+      mentions: comment.mentions
     });
     return response.data;
   } catch (e) {
