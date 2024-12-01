@@ -364,6 +364,7 @@ export class OkrsController {
         objectiveId,
         resquest.user.sub,
         commentDto.content,
+        commentDto.mentions,
       );
     } catch (e) {
       throw new BadRequestException();
@@ -386,6 +387,7 @@ export class OkrsController {
         request.user.sub,
         commentId,
         commentDto.content,
+        commentDto.mentions,
       );
     } catch (e) {
       throw new BadRequestException();
