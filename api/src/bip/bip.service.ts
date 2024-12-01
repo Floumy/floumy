@@ -47,20 +47,23 @@ export class BipService {
   }
 
   // TODO: Extract this in an event handler class
-  @OnEvent('org.created')
-  async createSettings(eventOrg: Org) {
-    const org = await this.orgRepository.findOneBy({ id: eventOrg.id });
-    if (!org) {
+  @OnEvent('project.created')
+  async createSettings(projectEvent: Project) {
+    const project = await this.projectsRepository.findOneBy({
+      id: projectEvent.id,
+    });
+
+    if (!project) {
       return;
     }
-    if (await org.bipSettings) {
+
+    if (await project.bipSettings) {
       return;
     }
 
     const bipSettings = new BipSettings();
+    const org = await project.org;
     bipSettings.org = Promise.resolve(org);
-    const project = (await org.projects)[0];
-    // TODO: This is a temporary solution to set the project
     bipSettings.project = Promise.resolve(project);
     await this.bipSettingsRepository.save(bipSettings);
   }

@@ -29,10 +29,10 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <>
-    <ToastContainer theme={"dark"} hideProgressBar={true} />
+    <ToastContainer theme="dark" hideProgressBar={true} />
     <BrowserRouter>
       <Routes>
-        <Route path="/admin/*" element={
+        <Route path="/admin/orgs/:orgId/projects/:projectId/*" element={
           <AuthGuard>
             <AdminLayout />
           </AuthGuard>

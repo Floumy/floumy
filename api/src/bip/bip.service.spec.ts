@@ -25,7 +25,7 @@ describe('BipService', () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [TypeOrmModule.forFeature([Org, BipSettings])],
-      [BipService, OrgsService, TokensService, UsersService],
+      [BipService, OrgsService, TokensService, UsersService, Project],
     );
     cleanup = dbCleanup;
     service = module.get<BipService>(BipService);
@@ -82,7 +82,7 @@ describe('BipService', () => {
 
   describe('createSettings', () => {
     it('should create the default building in public settings on org created event', async () => {
-      await service.createSettings(org);
+      await service.createSettings(project);
       const settings = await service.getSettings(org.id, project.id);
       expect(settings).toEqual({
         isBuildInPublicEnabled: false,
@@ -98,7 +98,7 @@ describe('BipService', () => {
     it('should create the default building in public settings on org created event when the org is premium', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      await service.createSettings(org);
+      await service.createSettings(project);
       const settings = await service.getSettings(org.id, project.id);
       expect(settings).toEqual({
         isBuildInPublicEnabled: false,
@@ -123,7 +123,7 @@ describe('BipService', () => {
         isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
-      await service.createSettings(org);
+      await service.createSettings(project);
       const updatedSettings = await service.getSettings(org.id, project.id);
       expect(updatedSettings).toEqual(settings);
     });
@@ -139,10 +139,12 @@ describe('BipService', () => {
         isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
-      await expect(service.createSettings(org)).resolves.not.toThrow();
+      await expect(service.createSettings(project)).resolves.not.toThrow();
     });
     it('should not throw an error if org does not exist', async () => {
-      await expect(service.createSettings(new Org())).resolves.not.toThrow();
+      await expect(
+        service.createSettings(new Project()),
+      ).resolves.not.toThrow();
     });
   });
 });
