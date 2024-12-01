@@ -29,4 +29,12 @@ export class OrgsController {
     const org = request.user.org;
     return await this.orgsService.patchOrg(org, requestBody.name);
   }
+
+  @Get(':id/users')
+  @HttpCode(200)
+  @UseGuards(BasicAuthGuard)
+  async getUsers(@Request() request) {
+    const org = request.user.org;
+    return await this.orgsService.getUsers(org);
+  }
 }
