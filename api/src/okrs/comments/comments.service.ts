@@ -29,6 +29,7 @@ export class CommentsService {
     keyResultId: string,
     userId: string,
     content: string,
+    mentions: string[],
   ) {
     const keyResult = await this.keyResultRepository.findOneByOrFail({
       id: keyResultId,
@@ -51,6 +52,9 @@ export class CommentsService {
     comment.keyResult = Promise.resolve(keyResult);
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
+    comment.mentions = await this.usersRepository.findBy({
+      id: In(mentions),
+    });
     await this.keyResultCommentRepository.save(comment);
     return CommentMapper.toDto(comment);
   }
@@ -61,6 +65,7 @@ export class CommentsService {
     userId: string,
     commentId: string,
     content: string,
+    mentions: string[],
   ) {
     const comment = await this.keyResultCommentRepository.findOneByOrFail({
       id: commentId,
@@ -76,7 +81,9 @@ export class CommentsService {
     }
 
     comment.content = content;
-
+    comment.mentions = await this.usersRepository.findBy({
+      id: In(mentions),
+    });
     await this.keyResultCommentRepository.save(comment);
 
     return CommentMapper.toDto(comment);

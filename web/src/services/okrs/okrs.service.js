@@ -114,18 +114,24 @@ export async function getPublicKeyResult(orgId, projectId, objectiveId, keyResul
   }
 }
 
-export async function addKeyResultComment(orgId, projectId, objectiveId, keyResultId, content) {
+export async function addKeyResultComment(orgId, projectId, objectiveId, keyResultId, comment) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/key-results/${keyResultId}/comments`, { content });
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/key-results/${keyResultId}/comments`, {
+      content: comment.content,
+      mentions: comment.mentions,
+    });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateKeyResultComment(orgId, projectId, objectiveId, keyResultId, commentId, content) {
+export async function updateKeyResultComment(orgId, projectId, objectiveId, keyResultId, commentId, comment) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/key-results/${keyResultId}/comments/${commentId}`, { content });
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/key-results/${keyResultId}/comments/${commentId}`, {
+      content: comment.content,
+      mentions: comment.mentions,
+    });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
