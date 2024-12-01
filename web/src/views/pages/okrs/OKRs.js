@@ -62,7 +62,7 @@ function OKRs() {
     }
 
     fetchData();
-  }, [timelineQueryFilter]);
+  }, [orgId, projectId, timelineQueryFilter]);
 
   return (
     <>
