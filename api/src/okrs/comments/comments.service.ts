@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { KeyResult } from '../key-result.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {In, Repository} from 'typeorm';
 import { KeyResultComment } from '../key-result-comment.entity';
 import { User } from '../../users/user.entity';
 import { CommentMapper } from '../../comments/mappers';
@@ -106,6 +106,7 @@ export class CommentsService {
     objectiveId: string,
     userId: string,
     content: string,
+    mentions: string[],
   ) {
     const objective = await this.objectiveRepository.findOneByOrFail({
       id: objectiveId,
@@ -128,6 +129,9 @@ export class CommentsService {
     comment.objective = Promise.resolve(objective);
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
+    comment.mentions = await this.usersRepository.findBy({
+      id: In(mentions),
+    });
     await this.objectiveCommentRepository.save(comment);
     return CommentMapper.toDto(comment);
   }
@@ -138,6 +142,7 @@ export class CommentsService {
     userId: string,
     commentId: string,
     content: string,
+    mentions: string[],
   ) {
     const comment = await this.objectiveCommentRepository.findOneByOrFail({
       id: commentId,
@@ -153,7 +158,9 @@ export class CommentsService {
     }
 
     comment.content = content;
-
+    comment.mentions = await this.usersRepository.findBy({
+      id: In(mentions),
+    });
     await this.objectiveCommentRepository.save(comment);
 
     return CommentMapper.toDto(comment);

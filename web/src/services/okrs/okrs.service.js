@@ -140,18 +140,18 @@ export async function deleteKeyResultComment(orgId, projectId, objectiveId, keyR
   }
 }
 
-export async function addObjectiveComment(orgId, projectId, objectiveId, content) {
+export async function addObjectiveComment(orgId, projectId, objectiveId, comment) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments`, { content });
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments`, {content: comment.content, mentions: comment.mentions});
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateObjectiveComment(orgId, projectId, objectiveId, commentId, content) {
+export async function updateObjectiveComment(orgId, projectId, objectiveId, commentId, comment) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments/${commentId}`, { content });
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments/${commentId}`, { content: comment.content, mentions: comment.mentions });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
