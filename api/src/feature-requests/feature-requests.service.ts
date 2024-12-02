@@ -6,7 +6,7 @@ import {
 } from './dtos';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FeatureRequest } from './feature-request.entity';
-import {In, Repository} from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
 import { PaymentPlan } from '../auth/payment.plan';
@@ -226,9 +226,11 @@ export class FeatureRequestsService {
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
     comment.featureRequest = Promise.resolve(featureRequest);
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(createCommentDto.mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(createCommentDto.mentions),
+      }),
+    );
     const savedComment =
       await this.featureRequestCommentsRepository.save(comment);
     return CommentMapper.toDto(savedComment);
@@ -281,9 +283,11 @@ export class FeatureRequestsService {
       },
     );
     comment.content = createCommentDto.content;
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(createCommentDto.mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(createCommentDto.mentions),
+      }),
+    );
     const savedComment =
       await this.featureRequestCommentsRepository.save(comment);
     return await CommentMapper.toDto(savedComment);

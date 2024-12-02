@@ -22,5 +22,5 @@ export class KeyResultComment extends Comment {
       referencedColumnName: 'id',
     },
   })
-  mentions: User[];
+  mentions: Promise<User[]>;
 }

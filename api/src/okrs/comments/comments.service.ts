@@ -52,9 +52,11 @@ export class CommentsService {
     comment.keyResult = Promise.resolve(keyResult);
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(mentions),
-    });
+    comment.mentions = Promise.resolve(
+      this.usersRepository.findBy({
+        id: In(mentions),
+      }),
+    );
     await this.keyResultCommentRepository.save(comment);
     return CommentMapper.toDto(comment);
   }
@@ -81,9 +83,11 @@ export class CommentsService {
     }
 
     comment.content = content;
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(mentions),
+      }),
+    );
     await this.keyResultCommentRepository.save(comment);
 
     return CommentMapper.toDto(comment);
@@ -136,9 +140,11 @@ export class CommentsService {
     comment.objective = Promise.resolve(objective);
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(mentions),
+      }),
+    );
     await this.objectiveCommentRepository.save(comment);
     return CommentMapper.toDto(comment);
   }
@@ -165,9 +171,11 @@ export class CommentsService {
     }
 
     comment.content = content;
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(mentions),
+      }),
+    );
     await this.objectiveCommentRepository.save(comment);
 
     return CommentMapper.toDto(comment);
