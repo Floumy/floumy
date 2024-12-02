@@ -281,7 +281,11 @@ export class WorkItemsService {
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
     comment.workItem = Promise.resolve(workItem);
-    comment.mentions = await this.usersRepository.findBy({id: In(createCommentDto.mentions)});
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(createCommentDto.mentions),
+      }),
+    );
     const savedComment = await this.workItemCommentsRepository.save(comment);
     return CommentMapper.toDto(savedComment);
   }
@@ -320,9 +324,11 @@ export class WorkItemsService {
       workItem: { id: workItemId },
       createdBy: { id: userId },
     });
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(createCommentDto.mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(createCommentDto.mentions),
+      }),
+    );
     comment.content = createCommentDto.content;
     const savedComment = await this.workItemCommentsRepository.save(comment);
     return await CommentMapper.toDto(savedComment);

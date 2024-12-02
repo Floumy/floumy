@@ -22,5 +22,5 @@ export class ObjectiveComment extends Comment {
       referencedColumnName: 'id',
     },
   })
-  mentions: User[];
+  mentions: Promise<User[]>;
 }

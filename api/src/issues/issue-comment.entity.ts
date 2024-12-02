@@ -22,5 +22,5 @@ export class IssueComment extends Comment {
       referencedColumnName: 'id',
     },
   })
-  mentions: User[];
+  mentions: Promise<User[]>;
 }

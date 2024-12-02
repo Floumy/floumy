@@ -26,5 +26,5 @@ export class FeatureRequestComment extends Comment {
       referencedColumnName: 'id',
     },
   })
-  mentions: User[];
+  mentions: Promise<User[]>;
 }

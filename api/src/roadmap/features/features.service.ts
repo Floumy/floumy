@@ -331,9 +331,11 @@ export class FeaturesService {
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
     comment.feature = Promise.resolve(feature);
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(createCommentDto.mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(createCommentDto.mentions),
+      }),
+    );
     const savedComment = await this.featureCommentsRepository.save(comment);
     return CommentMapper.toDto(savedComment);
   }
@@ -366,9 +368,11 @@ export class FeaturesService {
       createdBy: { id: userId },
     });
     comment.content = createCommentDto.content;
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(createCommentDto.mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(createCommentDto.mentions),
+      }),
+    );
     const savedComment = await this.featureCommentsRepository.save(comment);
     return await CommentMapper.toDto(savedComment);
   }

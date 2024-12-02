@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { IssueDto, UpdateIssueDto } from './dtos';
-import {In, Repository} from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { Issue } from './issue.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -187,9 +187,11 @@ export class IssuesService {
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
     comment.issue = Promise.resolve(issue);
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(createCommentDto.mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(createCommentDto.mentions),
+      }),
+    );
     const savedComment = await this.issueCommentsRepository.save(comment);
     return CommentMapper.toDto(savedComment);
   }
@@ -225,9 +227,11 @@ export class IssuesService {
       createdBy: { id: userId },
     });
     comment.content = updateCommentDto.content;
-    comment.mentions = await this.usersRepository.findBy({
-      id: In(updateCommentDto.mentions),
-    });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(updateCommentDto.mentions),
+      }),
+    );
     const savedComment = await this.issueCommentsRepository.save(comment);
     return await CommentMapper.toDto(savedComment);
   }
