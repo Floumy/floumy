@@ -1511,7 +1511,7 @@ describe('FeaturesService', () => {
       });
       const comment = await service.createFeatureComment(user.id, feature.id, {
         content: 'Test comment',
-        mentions: [],
+        mentions: [user.id],
       });
       expect(comment).toBeDefined();
       expect(comment.content).toEqual('Test comment');
@@ -1575,7 +1575,7 @@ describe('FeaturesService', () => {
         comment.id,
         {
           content: 'Updated comment',
-          mentions: [],
+          mentions: [user.id],
         },
       );
       expect(updatedComment).toBeDefined();

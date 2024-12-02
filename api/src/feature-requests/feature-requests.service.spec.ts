@@ -514,6 +514,32 @@ describe('FeatureRequestsService', () => {
       expect(comment.content).toEqual('Test Comment');
     });
   });
+  describe('when adding a comment with mention to a feature request', () => {
+    it('should add a comment to the feature request', async () => {
+      const featureRequest = await service.addFeatureRequest(
+        user.id,
+        org.id,
+        project.id,
+        {
+          title: 'Test Feature Request',
+          description: 'Test Description',
+        },
+      );
+      const comment = await service.createFeatureRequestComment(
+        org.id,
+        project.id,
+        user.id,
+        featureRequest.id,
+        {
+          content: 'Test Comment',
+          mentions: [user.id],
+        },
+      );
+      expect(comment).toBeDefined();
+      expect((await comment.createdBy).id).toEqual(user.id);
+      expect(comment.content).toEqual('Test Comment');
+    });
+  });
   describe('when updating a comment for a feature request', () => {
     it('should update the comment', async () => {
       const featureRequest = await service.addFeatureRequest(
@@ -544,6 +570,43 @@ describe('FeatureRequestsService', () => {
         {
           content: 'Updated Comment',
           mentions: [],
+        },
+      );
+      expect(updatedComment).toBeDefined();
+      expect(updatedComment.id).toEqual(comment.id);
+      expect(updatedComment.content).toEqual('Updated Comment');
+    });
+  });
+  describe('when updating a comment with mention for a feature request', () => {
+    it('should update the comment', async () => {
+      const featureRequest = await service.addFeatureRequest(
+        user.id,
+        org.id,
+        project.id,
+        {
+          title: 'Test Feature Request',
+          description: 'Test Description',
+        },
+      );
+      const comment = await service.createFeatureRequestComment(
+        org.id,
+        project.id,
+        user.id,
+        featureRequest.id,
+        {
+          content: 'Test Comment',
+          mentions: [],
+        },
+      );
+      const updatedComment = await service.updateFeatureRequestComment(
+        org.id,
+        project.id,
+        user.id,
+        featureRequest.id,
+        comment.id,
+        {
+          content: 'Updated Comment',
+          mentions: [user.id],
         },
       );
       expect(updatedComment).toBeDefined();

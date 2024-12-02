@@ -294,6 +294,41 @@ describe('FeatureRequestsController', () => {
       expect(comment.content).toEqual('Test Comment');
     });
   });
+  describe('when adding a comment with mentions', () => {
+    it('should add a comment', async () => {
+      const createFeatureRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      const { id } = await controller.addFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        project.id,
+        createFeatureRequestDto,
+      );
+      const comment = await controller.addFeatureRequestComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        project.id,
+        id,
+        {
+          content: 'Test Comment',
+          mentions: [user.id],
+        },
+      );
+      expect(comment).toBeDefined();
+      expect(comment.createdBy.id).toEqual(user.id);
+      expect(comment.content).toEqual('Test Comment');
+    });
+  });
   describe('when deleting a comment', () => {
     it('should delete the comment', async () => {
       const createFeatureRequestDto = {
@@ -376,6 +411,56 @@ describe('FeatureRequestsController', () => {
       const updateCommentDto = {
         content: 'Updated Comment',
         mentions: [],
+      };
+      const updatedComment = await controller.updateFeatureRequestComment(
+        org.id,
+        project.id,
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        id,
+        comment.id,
+        updateCommentDto,
+      );
+      expect(updatedComment).toBeDefined();
+      expect(updatedComment.content).toEqual('Updated Comment');
+    });
+  });
+  describe('when updating a comment with mention', () => {
+    it('should update the comment', async () => {
+      const createFeatureRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      const { id } = await controller.addFeatureRequest(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        project.id,
+        createFeatureRequestDto,
+      );
+      const comment = await controller.addFeatureRequestComment(
+        {
+          user: {
+            sub: user.id,
+          },
+        },
+        org.id,
+        project.id,
+        id,
+        {
+          content: 'Test Comment',
+          mentions: [],
+        },
+      );
+      const updateCommentDto = {
+        content: 'Updated Comment',
+        mentions: [user.id],
       };
       const updatedComment = await controller.updateFeatureRequestComment(
         org.id,

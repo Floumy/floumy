@@ -86,7 +86,7 @@ describe('CommentsService', () => {
         keyResult.id,
         user.id,
         'Test Comment',
-        [],
+        [user.id],
       );
       expect(comment).toBeDefined();
       expect((await comment.createdBy).id).toEqual(user.id);
@@ -148,7 +148,7 @@ describe('CommentsService', () => {
         user.id,
         comment.id,
         'Updated Comment',
-        [],
+        [user.id],
       );
       expect(updatedComment).toBeDefined();
       expect(updatedComment.id).toEqual(comment.id);

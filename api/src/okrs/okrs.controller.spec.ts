@@ -700,7 +700,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Test Comment',
-          mentions: [],
+          mentions: [user.id],
         },
       );
       expect(comment).toBeDefined();
@@ -758,7 +758,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Updated Comment',
-          mentions: [],
+          mentions: [user.id],
         },
       );
       expect(updatedComment.content).toEqual('Updated Comment');

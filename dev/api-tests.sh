@@ -9,4 +9,4 @@ else
 fi
 
 # Enter as current user
-docker compose exec -u "$USER_ID" api npm run test
+docker compose exec -u "$USER_ID" api npm run test "$@"
