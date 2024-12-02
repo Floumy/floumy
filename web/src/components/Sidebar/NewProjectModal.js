@@ -21,9 +21,9 @@ export default function NewProjectModal({ newProjectModal, toggleNewProjectModal
       setIsSubmitting(true);
       const createdProject = await createProject(orgId, projectName);
       setCurrentProject(createdProject);
-      navigate(`/admin/orgs/${orgId}/projects/${createdProject.id}/dashboard`);
-      toggleNewProjectModal();
       toast.success('Project created');
+      toggleNewProjectModal();
+      navigate(`/admin/orgs/${orgId}/projects/${createdProject.id}/dashboard`);
     } catch (e) {
       toast.error('Failed to create project');
     }
