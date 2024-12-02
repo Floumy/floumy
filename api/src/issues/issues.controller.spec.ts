@@ -211,7 +211,7 @@ describe('IssuesController', () => {
         id,
         {
           content: 'Test Comment',
-          mentions: [],
+          mentions: [user.id],
         },
       );
       expect(comment).toBeDefined();
@@ -252,7 +252,7 @@ describe('IssuesController', () => {
         comment.id,
         {
           content: 'Updated Comment',
-          mentions: [],
+          mentions: [user.id],
         },
       );
       expect(updatedComment).toBeDefined();

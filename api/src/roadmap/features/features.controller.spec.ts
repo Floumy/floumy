@@ -583,7 +583,7 @@ describe('FeaturesController', () => {
         featureResponse.id,
         {
           content: 'my comment',
-          mentions: [],
+          mentions: [user.id],
         },
       );
       expect(comment.content).toEqual('my comment');
@@ -679,7 +679,7 @@ describe('FeaturesController', () => {
         comment.id,
         {
           content: 'my updated comment',
-          mentions: [],
+          mentions: [user.id],
         },
       );
       expect(updatedComment.content).toEqual('my updated comment');
