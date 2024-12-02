@@ -744,6 +744,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
 
@@ -791,6 +792,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       const comments = await controller.listComments(
@@ -844,6 +846,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       await controller.deleteComment(
@@ -898,6 +901,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
 
@@ -951,6 +955,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       const updatedComment = await controller.updateComment(
@@ -963,6 +968,7 @@ describe('WorkItemsController', () => {
         comment.id,
         {
           content: 'my updated comment',
+          mentions: [],
         },
       );
 
