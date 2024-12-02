@@ -286,6 +286,7 @@ describe('FeatureRequestsController', () => {
         id,
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       expect(comment).toBeDefined();
@@ -320,6 +321,7 @@ describe('FeatureRequestsController', () => {
         id,
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       await controller.deleteFeatureRequestComment(
@@ -368,10 +370,12 @@ describe('FeatureRequestsController', () => {
         id,
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       const updateCommentDto = {
         content: 'Updated Comment',
+        mentions: [],
       };
       const updatedComment = await controller.updateFeatureRequestComment(
         org.id,

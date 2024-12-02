@@ -506,6 +506,7 @@ describe('FeatureRequestsService', () => {
         featureRequest.id,
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       expect(comment).toBeDefined();
@@ -531,6 +532,7 @@ describe('FeatureRequestsService', () => {
         featureRequest.id,
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       const updatedComment = await service.updateFeatureRequestComment(
@@ -541,6 +543,7 @@ describe('FeatureRequestsService', () => {
         comment.id,
         {
           content: 'Updated Comment',
+          mentions: [],
         },
       );
       expect(updatedComment).toBeDefined();
@@ -566,6 +569,7 @@ describe('FeatureRequestsService', () => {
         featureRequest.id,
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       await service.deleteFeatureRequestComment(

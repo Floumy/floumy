@@ -1774,6 +1774,7 @@ describe('WorkItemsService', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       expect(comment).toBeDefined();
@@ -1803,6 +1804,7 @@ describe('WorkItemsService', () => {
           workItem.id,
           {
             content: 'my comment',
+            mentions: [],
           },
         ),
       ).rejects.toThrowError('You need to upgrade to premium to add comments');
@@ -1831,6 +1833,7 @@ describe('WorkItemsService', () => {
           workItem.id,
           {
             content: '',
+            mentions: [],
           },
         ),
       ).rejects.toThrowError('Comment content is required');
@@ -1938,6 +1941,7 @@ describe('WorkItemsService', () => {
         savedComment.id,
         {
           content: 'my updated comment',
+          mentions: [],
         },
       );
       expect(updatedComment).toBeDefined();
@@ -1967,6 +1971,7 @@ describe('WorkItemsService', () => {
       await expect(
         service.updateWorkItemComment(user.id, workItem.id, savedComment.id, {
           content: '',
+          mentions: [],
         }),
       ).rejects.toThrowError('Comment content is required');
     });

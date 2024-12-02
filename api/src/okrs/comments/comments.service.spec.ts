@@ -86,6 +86,7 @@ describe('CommentsService', () => {
         keyResult.id,
         user.id,
         'Test Comment',
+        [],
       );
       expect(comment).toBeDefined();
       expect((await comment.createdBy).id).toEqual(user.id);
@@ -111,6 +112,7 @@ describe('CommentsService', () => {
           keyResult.id,
           user.id,
           '',
+          [],
         ),
       ).rejects.toThrowError('Comment content is required');
     });
@@ -138,6 +140,7 @@ describe('CommentsService', () => {
         keyResult.id,
         user.id,
         'Test Comment',
+        [],
       );
       const updatedComment = await service.updateKeyResultComment(
         org.id,
@@ -145,6 +148,7 @@ describe('CommentsService', () => {
         user.id,
         comment.id,
         'Updated Comment',
+        [],
       );
       expect(updatedComment).toBeDefined();
       expect(updatedComment.id).toEqual(comment.id);
@@ -170,6 +174,7 @@ describe('CommentsService', () => {
         keyResult.id,
         user.id,
         'Test Comment',
+        [],
       );
 
       const otherUser = await usersService.createUserWithOrg(
@@ -185,6 +190,7 @@ describe('CommentsService', () => {
           otherUser.id,
           comment.id,
           'Updated Comment',
+          [],
         ),
       ).rejects.toThrow();
     });
@@ -207,6 +213,7 @@ describe('CommentsService', () => {
         keyResult.id,
         user.id,
         'Test Comment',
+        [],
       );
 
       await expect(
@@ -216,6 +223,7 @@ describe('CommentsService', () => {
           user.id,
           comment.id,
           '',
+          [],
         ),
       ).rejects.toThrowError('Comment content is required');
     });
@@ -243,6 +251,7 @@ describe('CommentsService', () => {
         keyResult.id,
         user.id,
         'Test Comment',
+        [],
       );
       await service.deleteKeyResultComment(
         org.id,
@@ -257,6 +266,7 @@ describe('CommentsService', () => {
           user.id,
           comment.id,
           'update',
+          [],
         ),
       ).rejects.toThrow();
     });
@@ -279,6 +289,7 @@ describe('CommentsService', () => {
         keyResult.id,
         user.id,
         'Test Comment',
+        [],
       );
 
       const otherUser = await usersService.createUserWithOrg(
@@ -308,6 +319,7 @@ describe('CommentsService', () => {
         objective.id,
         user.id,
         'Test Comment',
+        [],
       );
       expect(comment).toBeDefined();
       expect(comment.createdBy.id).toEqual(user.id);
@@ -328,6 +340,7 @@ describe('CommentsService', () => {
         objective.id,
         user.id,
         'Test Comment',
+        [],
       );
       const updatedComment = await service.updateObjectiveComment(
         org.id,
@@ -335,6 +348,7 @@ describe('CommentsService', () => {
         user.id,
         comment.id,
         'Updated Comment',
+        [],
       );
       expect(updatedComment).toBeDefined();
       expect(updatedComment.id).toEqual(comment.id);
@@ -351,6 +365,7 @@ describe('CommentsService', () => {
         objective.id,
         user.id,
         'Test Comment',
+        [],
       );
       await expect(
         service.updateObjectiveComment(
@@ -359,6 +374,7 @@ describe('CommentsService', () => {
           user.id,
           comment.id,
           '',
+          [],
         ),
       ).rejects.toThrowError('Comment content is required');
     });
@@ -377,6 +393,7 @@ describe('CommentsService', () => {
         objective.id,
         user.id,
         'Test Comment',
+        [],
       );
       await service.deleteObjectiveComment(
         org.id,
@@ -391,6 +408,7 @@ describe('CommentsService', () => {
           user.id,
           comment.id,
           'update',
+          [],
         ),
       ).rejects.toThrow();
     });
