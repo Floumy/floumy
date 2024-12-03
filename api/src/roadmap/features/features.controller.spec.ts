@@ -545,6 +545,7 @@ describe('FeaturesController', () => {
         featureResponse.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       const comments = await controller.listComments(featureResponse.id);
@@ -582,6 +583,7 @@ describe('FeaturesController', () => {
         featureResponse.id,
         {
           content: 'my comment',
+          mentions: [user.id],
         },
       );
       expect(comment.content).toEqual('my comment');
@@ -618,6 +620,7 @@ describe('FeaturesController', () => {
         featureResponse.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       await controller.deleteComment(
@@ -662,6 +665,7 @@ describe('FeaturesController', () => {
         featureResponse.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       const updatedComment = await controller.updateComment(
@@ -675,6 +679,7 @@ describe('FeaturesController', () => {
         comment.id,
         {
           content: 'my updated comment',
+          mentions: [user.id],
         },
       );
       expect(updatedComment.content).toEqual('my updated comment');

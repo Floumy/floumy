@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUpdateWorkItemDto, WorkItemPatchDto } from './dtos';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Feature } from '../../roadmap/features/feature.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { WorkItem } from './work-item.entity';
 import WorkItemMapper from './work-item.mapper';
 import { WorkItemStatus } from './work-item-status.enum';
@@ -281,6 +281,11 @@ export class WorkItemsService {
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
     comment.workItem = Promise.resolve(workItem);
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(createCommentDto.mentions),
+      }),
+    );
     const savedComment = await this.workItemCommentsRepository.save(comment);
     return CommentMapper.toDto(savedComment);
   }
@@ -319,6 +324,11 @@ export class WorkItemsService {
       workItem: { id: workItemId },
       createdBy: { id: userId },
     });
+    comment.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(createCommentDto.mentions),
+      }),
+    );
     comment.content = createCommentDto.content;
     const savedComment = await this.workItemCommentsRepository.save(comment);
     return await CommentMapper.toDto(savedComment);

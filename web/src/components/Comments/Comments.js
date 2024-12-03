@@ -1,7 +1,9 @@
-import { Card, CardBody, CardHeader, FormText, Input, ListGroup, ListGroupItem, UncontrolledTooltip } from "reactstrap";
-import { formatDateWithTime, memberNameInitials, textToColor } from "../../services/utils/utils";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {Card, CardBody, CardHeader, FormText, ListGroup, ListGroupItem, UncontrolledTooltip} from "reactstrap";
+import {formatDateWithTime, memberNameInitials, textToColor} from "../../services/utils/utils";
+import React, {useState} from "react";
+import {useNavigate} from "react-router-dom";
+import CommentArea from './CommentArea';
+import DOMPurify from 'dompurify';
 
 export default function Comments({
                                    comments = [],
@@ -12,10 +14,12 @@ export default function Comments({
   const currentUserId = localStorage.getItem("currentUserId");
   const currentUserName = localStorage.getItem("currentUserName");
   const [comment, setComment] = useState("");
+  const [mentions, setMentions] = useState([]);
   const [isHovered, setIsHovered] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingCommentContent, setEditingCommentContent] = useState("");
+  const [editingCommentMentions, setEditingCommentMentions] = useState([]);
   const navigate = useNavigate();
 
   const handleMouseEnter = (commentId) => {
@@ -39,8 +43,9 @@ export default function Comments({
         return;
       }
 
-      await onCommentAdd(comment);
+      await onCommentAdd({ content: comment, mentions: mentions.map(mention => mention.id) });
       setComment("");
+      setMentions([]);
     } catch (e) {
       console.error(e);
     }
@@ -58,7 +63,8 @@ export default function Comments({
     try {
       setIsEditing(true);
       setEditingCommentId(commentId);
-      setEditingCommentContent(comments.find((comment) => comment.id === commentId)?.content);
+      const comment = comments.find((comment) => comment.id === commentId);
+      setEditingCommentContent(comment.content);
     } catch (e) {
       console.error(e);
     }
@@ -103,9 +109,7 @@ export default function Comments({
           </div>) :
           (<small>{formatDateWithTime(comment.createdAt)}</small>)}
       </div>
-      <p className="text-sm mb-0">
-        {comment.content}
-      </p>
+      <div dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(comment.content)}}/>
     </ListGroupItem>;
   }
 
@@ -133,10 +137,11 @@ export default function Comments({
           <i className="fa fa-check text-gray mr-2" style={{ cursor: "pointer" }}
              onClick={async () => {
                if (!editingCommentContent?.trim()?.length) return;
-               await onCommentEdit(editingCommentId, editingCommentContent);
+               await onCommentEdit(editingCommentId, { content: editingCommentContent, mentions: editingCommentMentions.map((m) => m.id) });
                setIsEditing(false);
                setEditingCommentId(null);
                setEditingCommentContent("");
+               setEditingCommentMentions([]);
              }}
              role="button"
              tabIndex="0"
@@ -148,6 +153,7 @@ export default function Comments({
                setIsEditing(false);
                setEditingCommentId(null);
                setEditingCommentContent("");
+               setEditingCommentMentions([]);
              }}
              role="button"
              tabIndex="0"
@@ -157,13 +163,10 @@ export default function Comments({
         </div>
       </div>
       <FormText className="text-sm mb-0">
-        <Input
-          placeholder="Write a comment..."
-          value={editingCommentContent}
-          onChange={(e) => setEditingCommentContent(e.target.value)}
-          type="textarea"
-          rows={3}
-        />
+        <CommentArea value={editingCommentContent} onChange={(text, mentions) => {
+          setEditingCommentContent(text)
+          setEditingCommentMentions(mentions)
+        }}/>
       </FormText>
     </ListGroupItem>;
   }
@@ -196,20 +199,10 @@ export default function Comments({
               {!currentUserName && <UncontrolledTooltip delay={0} target="add-comment">
                 Sign in to comment
               </UncontrolledTooltip>}
-              <Input
-                id={"add-comment"}
-                placeholder="Write a comment..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                type="textarea"
-                rows={3}
-                disabled={isEditing}
-                onClick={() => {
-                  if (!currentUserName) {
-                    navigate(`/auth/sign-in?redirectTo=${encodeURI(window.location.pathname)}`);
-                  }
-                }}
-              />
+              <CommentArea value={comment} onChange={(text, mentions) => {
+                setComment(text)
+                setMentions(mentions)
+              }}/>
             </FormText>
             <button
               className="btn btn-sm btn-primary mt-2"

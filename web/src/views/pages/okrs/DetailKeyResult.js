@@ -157,11 +157,12 @@ function DetailKeyResult() {
     }
   }
 
-  async function handleCommentEditSubmit(commentId, content) {
+  async function handleCommentEditSubmit(commentId, comment) {
     try {
-      await updateKeyResultComment(orgId, projectId, objectiveId, keyResultId, commentId, content);
+      await updateKeyResultComment(orgId, projectId, objectiveId, keyResultId, commentId, comment);
       const updatedComment = keyResult.comments.find(c => c.id === commentId);
-      updatedComment.content = content;
+      updatedComment.content = comment.content;
+      updatedComment.mentions = comment.mentions;
       setKeyResult({ ...keyResult });
       toast.success("Comment updated successfully");
     } catch (e) {

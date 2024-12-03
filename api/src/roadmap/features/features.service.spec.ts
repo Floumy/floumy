@@ -1490,6 +1490,7 @@ describe('FeaturesService', () => {
       });
       await service.createFeatureComment(user.id, feature.id, {
         content: 'Test comment',
+        mentions: [],
       });
       const comments = await service.listFeatureComments(feature.id);
       expect(comments).toBeDefined();
@@ -1510,6 +1511,7 @@ describe('FeaturesService', () => {
       });
       const comment = await service.createFeatureComment(user.id, feature.id, {
         content: 'Test comment',
+        mentions: [user.id],
       });
       expect(comment).toBeDefined();
       expect(comment.content).toEqual('Test comment');
@@ -1528,6 +1530,7 @@ describe('FeaturesService', () => {
       });
       const comment = await service.createFeatureComment(user.id, feature.id, {
         content: 'Test comment',
+        mentions: [],
       });
       await service.deleteFeatureComment(user.id, feature.id, comment.id);
       await expect(service.listFeatureComments(feature.id)).resolves.toEqual(
@@ -1564,6 +1567,7 @@ describe('FeaturesService', () => {
       });
       const comment = await service.createFeatureComment(user.id, feature.id, {
         content: 'Test comment',
+        mentions: [],
       });
       const updatedComment = await service.updateFeatureComment(
         user.id,
@@ -1571,6 +1575,7 @@ describe('FeaturesService', () => {
         comment.id,
         {
           content: 'Updated comment',
+          mentions: [user.id],
         },
       );
       expect(updatedComment).toBeDefined();
@@ -1591,6 +1596,7 @@ describe('FeaturesService', () => {
           'non-existent-comment-id',
           {
             content: 'Updated comment',
+            mentions: [],
           },
         ),
       ).rejects.toThrowError();
@@ -1607,10 +1613,12 @@ describe('FeaturesService', () => {
       });
       const comment = await service.createFeatureComment(user.id, feature.id, {
         content: 'Test comment',
+        mentions: [],
       });
       await expect(
         service.updateFeatureComment(user.id, feature.id, comment.id, {
           content: '',
+          mentions: [],
         }),
       ).rejects.toThrowError('Comment content is required');
     });
