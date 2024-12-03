@@ -7,6 +7,9 @@ on:
       - completed
     branches:
       - main
+  push:
+    tags:
+      - '*'
 
 jobs:
   build-and-deploy-api:
