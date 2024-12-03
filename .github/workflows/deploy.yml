@@ -5,16 +5,15 @@ on:
     workflows: [ "CI" ]
     types:
       - completed
-    branches:
-      - main
-  push:
+    branches-ignore:
+      - '**'
     tags:
       - '*'
 
 jobs:
   build-and-deploy-api:
     # Only run this job if the "CI" workflow is successful and a new tag was pushed
-    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'refs/tags/') }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
 
     steps:
@@ -55,7 +54,7 @@ jobs:
 
   build-and-deploy-web:
     # Only run this job if the "CI" workflow is successful and a new tag was pushed
-    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'refs/tags/') }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && contains(github.event.workflow_run.head_commit.ref, 'refs/tags/') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
