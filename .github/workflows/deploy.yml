@@ -6,19 +6,7 @@ on:
       - '*'
 
 jobs:
-  debug:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug
-        run: |
-          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
-          echo "Head ref: ${{ github.event.workflow_run.head_ref }}"
-          echo "Head branch: ${{ github.event.workflow_run.head_branch }}"
-          echo "Event: ${{ github.event_name }}"
   build-and-deploy-api:
-    # Only run this job if the "CI" workflow is successful and a new tag was pushed
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -58,8 +46,6 @@ jobs:
             docker image prune -f
 
   build-and-deploy-web:
-    # Only run this job if the "CI" workflow is successful and a new tag was pushed
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
