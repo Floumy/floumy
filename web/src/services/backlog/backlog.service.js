@@ -96,7 +96,7 @@ export async function updateWorkItemPriority(orgId, projectId, id, priority) {
 
 export async function addComment(orgId, projectId, workItemId, comment) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`, { content: comment });
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`, { content: comment.content, mentions: comment.mentions });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -105,7 +105,7 @@ export async function addComment(orgId, projectId, workItemId, comment) {
 
 export async function updateComment(orgId, projectId, workItemId, commentId, comment) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`, { content: comment });
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`, { content: comment.content, mentions: comment.mentions });
     return response.data;
   } catch (e) {
     throw new Error(e.message);

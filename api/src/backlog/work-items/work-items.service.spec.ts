@@ -1783,12 +1783,52 @@ describe('WorkItemsService', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       expect(comment).toBeDefined();
       expect(comment.content).toEqual('my comment');
       expect(comment.createdBy.id).toEqual(user.id);
       expect(comment.createdBy.name).toEqual(user.name);
+    });
+    describe('when creating a work item comment with mentions', () => {
+      it('should create the work item comment', async () => {
+        const { org, user, project } = await getTestPremiumOrgAndUser();
+        const secondUser = await usersService.createUser(
+          'second user',
+          'second@example.com',
+          'password',
+          org,
+        );
+
+        const workItem = await service.createWorkItem(
+          org.id,
+          project.id,
+          user.id,
+          {
+            title: 'Test title',
+            description: 'A test description',
+            priority: Priority.HIGH,
+            type: WorkItemType.BUG,
+            status: WorkItemStatus.PLANNED,
+          },
+        );
+
+        const comment = await service.createWorkItemComment(
+          user.id,
+          org.id,
+          project.id,
+          workItem.id,
+          {
+            content: 'my comment',
+            mentions: [secondUser.id],
+          },
+        );
+        expect(comment).toBeDefined();
+        expect(comment.content).toEqual('my comment');
+        expect(comment.createdBy.id).toEqual(user.id);
+        expect(comment.createdBy.name).toEqual(user.name);
+      });
     });
     it('should throw an error if the org is not premium', async () => {
       const workItem = await service.createWorkItem(
@@ -1812,6 +1852,7 @@ describe('WorkItemsService', () => {
           workItem.id,
           {
             content: 'my comment',
+            mentions: [],
           },
         ),
       ).rejects.toThrowError('You need to upgrade to premium to add comments');
@@ -1840,6 +1881,7 @@ describe('WorkItemsService', () => {
           workItem.id,
           {
             content: '',
+            mentions: [],
           },
         ),
       ).rejects.toThrowError('Comment content is required');
@@ -1947,6 +1989,7 @@ describe('WorkItemsService', () => {
         savedComment.id,
         {
           content: 'my updated comment',
+          mentions: [],
         },
       );
       expect(updatedComment).toBeDefined();
@@ -1976,8 +2019,49 @@ describe('WorkItemsService', () => {
       await expect(
         service.updateWorkItemComment(user.id, workItem.id, savedComment.id, {
           content: '',
+          mentions: [],
         }),
       ).rejects.toThrowError('Comment content is required');
+    });
+  });
+  describe('when updating a work item comment with mentions', () => {
+    it('should update the work item comment', async () => {
+      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const secondUser = await usersService.createUser(
+        'second user',
+        'second@example.com',
+        'password',
+        org,
+      );
+      const workItem = new WorkItem();
+      workItem.title = 'my work item';
+      workItem.description = 'my work item description';
+      workItem.priority = Priority.HIGH;
+      workItem.type = WorkItemType.USER_STORY;
+      workItem.status = WorkItemStatus.PLANNED;
+      workItem.org = Promise.resolve(org);
+      workItem.createdBy = Promise.resolve(user);
+      workItem.project = Promise.resolve(project);
+      const savedWorkItem = await workItemsRepository.save(workItem);
+
+      const comment = new WorkItemComment();
+      comment.content = 'my comment';
+      comment.createdBy = Promise.resolve(user);
+      comment.workItem = Promise.resolve(savedWorkItem);
+      comment.org = Promise.resolve(org);
+      const savedComment = await workItemCommentsRepository.save(comment);
+
+      const updatedComment = await service.updateWorkItemComment(
+        user.id,
+        workItem.id,
+        savedComment.id,
+        {
+          content: 'my updated comment',
+          mentions: [secondUser.id],
+        },
+      );
+      expect(updatedComment).toBeDefined();
+      expect(updatedComment.content).toEqual('my updated comment');
     });
   });
 });

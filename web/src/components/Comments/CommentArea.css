@@ -1,0 +1,8 @@
+.mention {
+  background-color: rgb(239, 239, 239);
+}
+
+.ql-mention-list-container-bottom,
+.ql-mention-list-container-top {
+  color: rgb(82, 95, 127);
+}

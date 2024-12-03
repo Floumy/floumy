@@ -211,6 +211,7 @@ describe('IssuesController', () => {
         id,
         {
           content: 'Test Comment',
+          mentions: [user.id],
         },
       );
       expect(comment).toBeDefined();
@@ -240,6 +241,7 @@ describe('IssuesController', () => {
         id,
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       const updatedComment = await controller.updateIssueComment(
@@ -250,6 +252,7 @@ describe('IssuesController', () => {
         comment.id,
         {
           content: 'Updated Comment',
+          mentions: [user.id],
         },
       );
       expect(updatedComment).toBeDefined();
@@ -278,6 +281,7 @@ describe('IssuesController', () => {
         id,
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       await controller.deleteIssueComment(

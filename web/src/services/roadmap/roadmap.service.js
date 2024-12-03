@@ -188,7 +188,8 @@ export async function updateFeaturePriority(orgId, projectId, featureId, priorit
 export async function addFeatureComment(orgId, projectId, featureId, comment) {
   try {
     const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}/comments`, {
-      content: comment
+      content: comment.content,
+      mentions: comment.mentions
     });
     return response.data;
   } catch (e) {
@@ -206,7 +207,10 @@ export async function deleteFeatureComment(orgId, projectId, featureId, commentI
 
 export async function updateFeatureComment(orgId, projectId, featureId, commentId, comment) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}/comments/${commentId}`, { content: comment });
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}/comments/${commentId}`, {
+      content: comment.content,
+      mentions: comment.mentions
+    });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
