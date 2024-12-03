@@ -744,6 +744,63 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
+        },
+      );
+
+      expect(comment.id).toBeDefined();
+      expect(comment.content).toEqual('my comment');
+      expect(comment.createdBy.id).toEqual(premiumOrgUser.id);
+      expect(comment.createdBy.name).toEqual(premiumOrgUser.name);
+      expect(comment.createdAt).toBeDefined();
+      expect(comment.updatedAt).toBeDefined();
+    });
+  });
+
+  describe('when adding a comment with a mention to a work item', () => {
+    it('should return the comment', async () => {
+      const {
+        org: premiumOrg,
+        user: premiumOrgUser,
+        project,
+      } = await getTestPremiumOrgAndUser();
+      const secondUser = await usersRepository.save({
+        name: 'Second User',
+        email: 'second@example.com',
+        password: 'testtesttest',
+        org: Promise.resolve(premiumOrg),
+      });
+
+      const workItem = await controller.create(
+        premiumOrg.id,
+        project.id,
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        {
+          title: 'my work item',
+          description: 'my work item description',
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      const comment = await controller.createComment(
+        premiumOrg.id,
+        project.id,
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+        {
+          content: 'my comment',
+          mentions: [secondUser.id, premiumOrgUser.id],
         },
       );
 
@@ -791,6 +848,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       const comments = await controller.listComments(
@@ -844,6 +902,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       await controller.deleteComment(
@@ -898,6 +957,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
 
@@ -951,6 +1011,7 @@ describe('WorkItemsController', () => {
         workItem.id,
         {
           content: 'my comment',
+          mentions: [],
         },
       );
       const updatedComment = await controller.updateComment(
@@ -963,6 +1024,74 @@ describe('WorkItemsController', () => {
         comment.id,
         {
           content: 'my updated comment',
+          mentions: [],
+        },
+      );
+
+      expect(updatedComment.id).toEqual(comment.id);
+      expect(updatedComment.content).toEqual('my updated comment');
+      expect(updatedComment.createdBy.id).toEqual(premiumOrgUser.id);
+      expect(updatedComment.createdBy.name).toEqual(premiumOrgUser.name);
+      expect(updatedComment.createdAt).toBeDefined();
+      expect(updatedComment.updatedAt).toBeDefined();
+    });
+  });
+  describe('when updating a work item comment with mentions', () => {
+    it('should update the comment', async () => {
+      const {
+        org: premiumOrg,
+        user: premiumOrgUser,
+        project,
+      } = await getTestPremiumOrgAndUser();
+      const secondUser = await usersRepository.save({
+        name: 'Second User',
+        email: 'second@example.com',
+        password: 'testtesttest',
+        org: Promise.resolve(premiumOrg),
+      });
+      const workItem = await controller.create(
+        premiumOrg.id,
+        project.id,
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        {
+          title: 'my work item',
+          description: 'my work item description',
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      const comment = await controller.createComment(
+        premiumOrg.id,
+        project.id,
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+        {
+          content: 'my comment',
+          mentions: [secondUser.id, premiumOrgUser.id],
+        },
+      );
+      const updatedComment = await controller.updateComment(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+          },
+        },
+        workItem.id,
+        comment.id,
+        {
+          content: 'my updated comment',
+          mentions: [secondUser.id],
         },
       );
 
