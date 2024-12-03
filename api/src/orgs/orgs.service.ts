@@ -87,7 +87,7 @@ export class OrgsService {
     project.name = projectName;
     project.org = Promise.resolve(savedOrg);
     await this.projectRepository.save(project);
-    this.eventEmitter.emit('org.created', savedOrg);
+    this.eventEmitter.emit('project.created', project);
     return savedOrg;
   }
 }
