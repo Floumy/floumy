@@ -700,6 +700,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Test Comment',
+          mentions: [user.id],
         },
       );
       expect(comment).toBeDefined();
@@ -742,6 +743,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       const updatedComment = await controller.updateKeyResultComment(
@@ -756,6 +758,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Updated Comment',
+          mentions: [user.id],
         },
       );
       expect(updatedComment.content).toEqual('Updated Comment');
@@ -796,6 +799,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       await expect(
@@ -843,6 +847,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       expect(comment).toBeDefined();
@@ -885,6 +890,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       const updatedComment = await controller.updateObjectiveComment(
@@ -899,6 +905,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Updated Comment',
+          mentions: [],
         },
       );
       expect(updatedComment.content).toEqual('Updated Comment');
@@ -939,6 +946,7 @@ describe('OkrsController', () => {
         },
         {
           content: 'Test Comment',
+          mentions: [],
         },
       );
       await expect(

@@ -42,10 +42,11 @@ export async function deleteIssue(orgId, projectId, issueId) {
   }
 }
 
-export async function addIssueComment(orgId, projectId, issueId, content) {
+export async function addIssueComment(orgId, projectId, issueId, comment) {
   try {
     const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/issues/${issueId}/comments`, {
-      content
+      content: comment.content,
+      mentions: comment.mentions
     });
     return response.data;
   } catch (e) {
@@ -53,10 +54,11 @@ export async function addIssueComment(orgId, projectId, issueId, content) {
   }
 }
 
-export async function updateIssueComment(orgId, projectId, issueId, commentId, content) {
+export async function updateIssueComment(orgId, projectId, issueId, commentId, comment) {
   try {
     const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/issues/${issueId}/comments/${commentId}`, {
-      content
+      content: comment.content,
+      mentions: comment.mentions
     });
     return response.data;
   } catch (e) {

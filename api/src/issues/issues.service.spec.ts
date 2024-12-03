@@ -372,6 +372,7 @@ describe('IssuesService', () => {
       });
       const comment = await service.createIssueComment(user.id, issue.id, {
         content: 'Test Comment',
+        mentions: [user.id],
       });
       expect(comment).toBeDefined();
       expect((await comment.createdBy).id).toEqual(user.id);
@@ -387,6 +388,7 @@ describe('IssuesService', () => {
       });
       const comment = await service.createIssueComment(user.id, issue.id, {
         content: 'Test Comment',
+        mentions: [],
       });
       const updatedComment = await service.updateIssueComment(
         user.id,
@@ -394,6 +396,7 @@ describe('IssuesService', () => {
         comment.id,
         {
           content: 'Updated Comment',
+          mentions: [user.id],
         },
       );
       expect(updatedComment).toBeDefined();
@@ -410,11 +413,13 @@ describe('IssuesService', () => {
       });
       const comment = await service.createIssueComment(user.id, issue.id, {
         content: 'Test Comment',
+        mentions: [],
       });
       await service.deleteIssueComment(user.id, issue.id, comment.id);
       await expect(
         service.updateIssueComment(user.id, issue.id, comment.id, {
           content: 'Updated Comment',
+          mentions: [],
         }),
       ).rejects.toThrow();
     });
