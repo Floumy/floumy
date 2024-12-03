@@ -53,7 +53,7 @@ export class CommentsService {
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
     comment.mentions = Promise.resolve(
-      this.usersRepository.findBy({
+      await this.usersRepository.findBy({
         id: In(mentions),
       }),
     );
