@@ -10,9 +10,8 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 // reactstrap components
 import { Col, Collapse, Nav, Navbar, NavbarBrand, NavItem, NavLink, Row } from "reactstrap";
 
-function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, buildingInPublicSettings }) {
+function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, orgId, project, buildingInPublicSettings }) {
   // makes the sidenav normal on hover (actually when mouse enters on it)
-  const projectId = org ? org.projects[0].id : "";
   const onMouseEnterSidenav = () => {
     if (!document.body.classList.contains("g-sidenav-pinned")) {
       document.body.classList.add("g-sidenav-show");
@@ -75,17 +74,17 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
       </div>
       <div className="navbar-inner mb-2">
         <Collapse navbar isOpen={true}>
-          {org.name && <h5 className="navbar-project-name text-light text-xl pb-3 text-break">
-            {org.name}
+          {project.name && <h5 className="navbar-project-name text-light text-xl pb-3 text-break">
+            {project.name}
           </h5>}
-          {org.paymentPlan === "premium" && <div className="mb-3">
+          <div className="mb-3">
             {isFeedbackEnabled() && <h6 className="navbar-heading p-0 text-muted">
               <span className="docs-normal" style={{ whiteSpace: "nowrap" }}>Feedback</span>
             </h6>}
             <Nav navbar>
               {buildingInPublicSettings.isIssuesPagePublic && <NavItem className="d-none d-md-block">
                 <NavLink
-                  to={`/public/orgs/${org.id}/projects/${projectId}/issues`}
+                  to={`/public/orgs/${orgId}/projects/${project.id}/issues`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >
@@ -97,7 +96,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
                 <Row style={{ maxWidth: "100%" }}>
                   <Col xs={7}>
                     <NavLink
-                      to={`/public/orgs/${org.id}/projects/${projectId}/feature-requests`}
+                      to={`/public/orgs/${orgId}/projects/${project.id}/feature-requests`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
                     >
@@ -113,14 +112,14 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
                 </Row>
               </NavItem>}
             </Nav>
-          </div>}
+          </div>
           {isProjectEnabled() && <h6 className="navbar-heading p-0 text-muted">
             <span className="docs-normal" style={{ whiteSpace: "nowrap" }}>Project</span>
           </h6>}
           <Nav className="mb-md-3" navbar>
             {buildingInPublicSettings.isFeedPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/projects/${projectId}/feed`}
+                to={`/public/orgs/${orgId}/projects/${project.id}/feed`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -130,7 +129,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isObjectivesPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/projects/${projectId}/objectives`}
+                to={`/public/orgs/${orgId}/projects/${project.id}/objectives`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -140,7 +139,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isRoadmapPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/projects/${projectId}/roadmap`}
+                to={`/public/orgs/${orgId}/projects/${project.id}/roadmap`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -150,7 +149,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isIterationsPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/projects/${projectId}/iterations`}
+                to={`/public/orgs/${orgId}/projects/${project.id}/iterations`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -160,7 +159,7 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, org, build
             </NavItem>}
             {buildingInPublicSettings.isActiveIterationsPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${org.id}/projects/${projectId}/active-iteration`}
+                to={`/public/orgs/${orgId}/projects/${project.id}/active-iteration`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >

@@ -66,7 +66,6 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
 
   const toggleNewProjectModal = () => {
     setNewProjectModal(!newProjectModal);
-    toggleSidenav();
   };
 
   const scrollBarInner = (

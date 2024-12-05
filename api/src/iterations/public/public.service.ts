@@ -21,7 +21,7 @@ export class PublicService {
     projectId: string,
     timeline: Timeline,
   ) {
-    await this.validateOrgHasBuildInPublicEnabled(orgId);
+    await this.validateProjectHasBuildInPublicEnabled(orgId, projectId);
 
     const iterations = await this.iterationsService.findIterationsForTimeline(
       orgId,
@@ -39,7 +39,7 @@ export class PublicService {
     projectId: string,
     iterationId: string,
   ) {
-    await this.validateOrgHasBuildInPublicEnabled(orgId);
+    await this.validateProjectHasBuildInPublicEnabled(orgId, projectId);
 
     const iteration = await this.iterationsService.findIteration(
       orgId,
@@ -71,9 +71,16 @@ export class PublicService {
     return iteration ? await IterationMapper.toDto(iteration) : null;
   }
 
-  private async validateOrgHasBuildInPublicEnabled(orgId: string) {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    const bipSettings = await org.bipSettings;
+  private async validateProjectHasBuildInPublicEnabled(
+    orgId: string,
+    projectId: string,
+  ) {
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+
+    const bipSettings = await project.bipSettings;
 
     if (!bipSettings || bipSettings.isBuildInPublicEnabled === false) {
       throw new Error('Building in public is not enabled');

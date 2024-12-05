@@ -16,8 +16,13 @@ export class PublicService {
   ) {}
 
   async getFeature(orgId: string, projectId: string, featureId: string) {
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
-    const bipSettings = await org.bipSettings;
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+
+    const bipSettings = await project.bipSettings;
+
     if (!bipSettings?.isBuildInPublicEnabled) {
       throw new Error('Roadmap page is not public');
     }
