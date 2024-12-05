@@ -55,17 +55,16 @@ function ProjectSelector({
           ))}
         {showNewProject && (
           <DropdownItem
-            className="text-xs py-3 font-italic text-white"
+            className="text-xs py-3 font-italic"
             onClick={onNewProject}
             style={{
-              color: '#f4f4f4',
               backgroundColor: '#b3b0c6',
               '&:hover': {
                 backgroundColor: '#b3b0c6',
               },
             }}>
-            <span className="d-none d-md-inline">
-              <i className="fas fa-plus text-xs mr-2" style={{ color: '#f4f4f4' }} /> New Project
+            <span className="d-md-inline">
+              <i className="fas fa-plus text-xs mr-2" /> New Project
             </span>
           </DropdownItem>
         )}

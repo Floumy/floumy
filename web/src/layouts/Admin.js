@@ -25,7 +25,16 @@ function Admin() {
     return replace;
   }
 
-  const toggleSidenav = () => setSidenavOpen(!sidenavOpen);
+  const toggleSidenav = () => {
+    if (document.body.classList.contains("g-sidenav-pinned")) {
+      document.body.classList.remove("g-sidenav-pinned");
+      document.body.classList.add("g-sidenav-hidden");
+    } else {
+      document.body.classList.add("g-sidenav-pinned");
+      document.body.classList.remove("g-sidenav-hidden");
+    }
+    setSidenavOpen(!sidenavOpen);
+  };
 
   useNavigationHotKey('1', `/admin/orgs/${orgId}/projects/${projectId}/feed`);
   useNavigationHotKey('2', `/admin/orgs/${orgId}/projects/${projectId}/okrs`);
@@ -67,8 +76,6 @@ function Admin() {
       <BuildInPublicProvider orgId={orgId} projectId={projectId}>
         <ProjectsProvider orgId={orgId} projectId={projectId}>
           <Sidebar
-            routes={routes}
-            sidenavOpen={sidenavOpen}
             toggleSidenav={toggleSidenav}
             logo={{
               outterLink: 'https://floumy.com',
@@ -92,6 +99,9 @@ function Admin() {
             </Routes>
             <Footer />
           </div>
+          {sidenavOpen ? (
+            <div className="backdrop d-xl-none" onClick={toggleSidenav} onKeyDown={toggleSidenav} role="button" />
+          ) : null}
           <button id="userHelpButton" className="userHelpButtonMiddleRight" data-drawer-trigger="true"
                   aria-controls="drawer-name" aria-expanded="false"
                   style={helpButtonStyle}>Report

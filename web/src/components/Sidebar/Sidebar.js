@@ -23,7 +23,7 @@ import { useProjects } from '../../contexts/ProjectsContext';
 import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
 
-function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
+function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
   const { settings: buildInPublicSettings } = useBuildInPublic();
   const isBuildInPublicEnabled = buildInPublicSettings.isBuildInPublicEnabled;
@@ -66,6 +66,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
 
   const toggleNewProjectModal = () => {
     setNewProjectModal(!newProjectModal);
+    toggleSidenav();
   };
 
   const scrollBarInner = (
@@ -400,13 +401,9 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
     )
   ;
 
-  if(!sidenavOpen) {
-    return null;
-  }
-
   return (
     <>
-      <NewProjectModal newProjectModal={newProjectModal} toggleNewProjectModal={toggleNewProjectModal} />
+      <NewProjectModal isOpen={newProjectModal} toggleModal={toggleNewProjectModal} />
       <Navbar
         className={
           'sidenav navbar-vertical navbar-expand-xs navbar-dark bg-dark ' +
