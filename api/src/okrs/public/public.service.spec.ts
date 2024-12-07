@@ -113,13 +113,18 @@ describe('PublicService', () => {
       const newOrg = new Org();
       newOrg.name = 'Test Org 2';
       await orgsRepository.save(newOrg);
+      const newProject = new Project();
+      newProject.name = 'Test Project 2';
+      newProject.org = Promise.resolve(newOrg);
+      await projectsRepository.save(newProject);
+      await orgsRepository.save(newOrg);
       const newOrgBipSettings = new BipSettings();
       newOrgBipSettings.isBuildInPublicEnabled = false;
       newOrgBipSettings.org = Promise.resolve(newOrg);
-      newOrgBipSettings.project = Promise.resolve(project);
+      newOrgBipSettings.project = Promise.resolve(newProject);
       await bipSettingsRepository.save(newOrgBipSettings);
       await expect(
-        service.listObjectives(newOrg.id, project.id, Timeline.THIS_QUARTER),
+        service.listObjectives(newOrg.id, newProject.id, Timeline.THIS_QUARTER),
       ).rejects.toThrow('Building in public is not enabled');
     });
   });
@@ -153,7 +158,7 @@ describe('PublicService', () => {
       const newOrgBipSettings = new BipSettings();
       newOrgBipSettings.isBuildInPublicEnabled = false;
       newOrgBipSettings.org = Promise.resolve(newOrg);
-      newOrgBipSettings.project = Promise.resolve(project);
+      newOrgBipSettings.project = Promise.resolve(newOrgProject);
       await bipSettingsRepository.save(newOrgBipSettings);
       const okr = await okrsService.create(newOrg.id, newOrgProject.id, {
         objective: {
@@ -163,7 +168,7 @@ describe('PublicService', () => {
         keyResults: [{ title: 'KR 1' }, { title: 'KR 2' }],
       });
       await expect(
-        service.getObjective(newOrg.id, project.id, okr.objective.id),
+        service.getObjective(newOrg.id, newOrgProject.id, okr.objective.id),
       ).rejects.toThrow('Building in public is not enabled');
     });
     it('should throw an error if the objective does not exist', async () => {
@@ -210,7 +215,7 @@ describe('PublicService', () => {
       const newOrgBipSettings = new BipSettings();
       newOrgBipSettings.isBuildInPublicEnabled = false;
       newOrgBipSettings.org = Promise.resolve(newOrg);
-      newOrgBipSettings.project = Promise.resolve(project);
+      newOrgBipSettings.project = Promise.resolve(newOrgProject);
       await bipSettingsRepository.save(newOrgBipSettings);
       const okr = await okrsService.create(newOrg.id, newOrgProject.id, {
         objective: {
@@ -223,7 +228,7 @@ describe('PublicService', () => {
       await expect(
         service.getKeyResult(
           newOrg.id,
-          project.id,
+          newOrgProject.id,
           okr.objective.id,
           keyResult.id,
         ),

@@ -7,24 +7,14 @@ import PublicShareButtons from "../../../components/PublicShareButtons/PublicSha
 import { addComment, deleteComment, updateComment } from "../../../services/backlog/backlog.service";
 import { toast } from "react-toastify";
 import Comments from "../../../components/Comments/Comments";
-import { getPublicOrg } from "../../../services/org/orgs.service";
 import { useParams } from "react-router-dom";
 
 function PublicWorkItem({ workItem = defaultWorkItem }) {
   const [comments, setComments] = React.useState(workItem.comments || []);
-  const [org, setOrg] = React.useState(null);
   const { orgId, projectId } = useParams();
 
   useEffect(() => {
     document.title = "Floumy | Work Item";
-    getPublicOrg(orgId)
-      .then((org) => {
-        setOrg(org);
-      })
-      .catch((e) => {
-        console.error(e.message);
-        window.location.href = "/auth/sign-in";
-      });
   });
 
   const handleCommentSubmit = async (comment) => {
@@ -177,7 +167,7 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                       placeholder="Select a sprint" />
                   </Col>
                 </Row>
-                {org?.paymentPlan === "premium" && <Row className="mb-3">
+                <Row className="mb-3">
                   <Col>
                     <label
                       className="form-control-label"
@@ -191,7 +181,7 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                       className="bg-white"
                       defaultValue={workItem.issue?.title || "None"} />
                   </Col>
-                </Row>}
+                </Row>
                 <Row className="mb-3">
                   <Col>
                     <label

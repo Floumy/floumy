@@ -23,7 +23,7 @@ import { useProjects } from '../../contexts/ProjectsContext';
 import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
 
-function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
+function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
   const { settings: buildInPublicSettings } = useBuildInPublic();
   const isBuildInPublicEnabled = buildInPublicSettings.isBuildInPublicEnabled;
@@ -42,7 +42,6 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
       document.body.classList.remove('g-sidenav-show');
     }
   };
-
 
   // this is used on mobile devices, when a user navigates
   // the sidebar will autoclose
@@ -68,7 +67,6 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
   const toggleNewProjectModal = () => {
     setNewProjectModal(!newProjectModal);
   };
-
 
   const scrollBarInner = (
       <div className="scrollbar-inner">
@@ -119,21 +117,20 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                             <span className="nav-link-text">Issues</span>
                           </NavLink>
                         </Col>
-                        {sidenavOpen &&
-                          <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
-                            <div className={bipSettings.isIssuesPagePublic ? '' : 'd-none'}>
-                              <UncontrolledTooltip target="feed-nav-item" placement="top">
-                                This page is public and can be accessed by anyone.
-                              </UncontrolledTooltip>
-                              <Badge id="feed-nav-item"
-                                     color="success" pill={true}
-                                     style={{ cursor: 'default' }}>
-                                PUBLIC
-                              </Badge>
-                            </div>
-                          </Col>}
-                        {sidenavOpen && <Col xs={2} className="text-right pr-2 pt-2">
-                        </Col>}
+                        <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
+                          <div className={bipSettings.isIssuesPagePublic ? '' : 'd-none'}>
+                            <UncontrolledTooltip target="feed-nav-item" placement="top">
+                              This page is public and can be accessed by anyone.
+                            </UncontrolledTooltip>
+                            <Badge id="feed-nav-item"
+                                   color="success" pill={true}
+                                   style={{ cursor: 'default' }}>
+                              PUBLIC
+                            </Badge>
+                          </div>
+                        </Col>
+                        <Col xs={2} className="text-right pr-2 pt-2">
+                        </Col>
                       </Row>
                     </NavItem>
                     <NavItem>
@@ -149,7 +146,6 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                             <span className="nav-link-text">Feature Requests</span>
                           </NavLink>
                         </Col>
-                        {sidenavOpen &&
                           <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                             <div className={bipSettings.isFeatureRequestsPagePublic ? '' : 'd-none'}>
                               <UncontrolledTooltip target="feed-nav-item" placement="top">
@@ -161,9 +157,8 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                                 PUBLIC
                               </Badge>
                             </div>
-                          </Col>}
-                        {sidenavOpen && <Col xs={2} className="text-right pr-2 pt-2">
-                        </Col>}
+                          </Col><Col xs={2} className="text-right pr-2 pt-2">
+                        </Col>
                       </Row>
                     </NavItem>
                   </Nav>
@@ -185,8 +180,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                           <span className="nav-link-text">Feed</span>
                         </NavLink>
                       </Col>
-                      {sidenavOpen &&
-                        <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
+                      <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                           <div className={bipSettings.isFeedPagePublic ? '' : 'd-none'}>
                             <UncontrolledTooltip target="feed-nav-item" placement="top">
                               This page is public and can be accessed by anyone.
@@ -197,10 +191,10 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                               PUBLIC
                             </Badge>
                           </div>
-                        </Col>}
-                      {sidenavOpen && <Col xs={2} className="text-right pr-2 pt-2">
+                        </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={1} />
-                      </Col>}
+                      </Col>
                     </Row>
                   </NavItem>
                   <NavItem>
@@ -216,8 +210,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                           <span className="nav-link-text">Objectives</span>
                         </NavLink>
                       </Col>
-                      {sidenavOpen &&
-                        <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
+                      <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                           <div className={bipSettings.isObjectivesPagePublic ? '' : 'd-none'}>
                             <UncontrolledTooltip target="objectives-nav-item" placement="top">
                               This page is public and can be accessed by anyone.
@@ -228,10 +221,10 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                               PUBLIC
                             </Badge>
                           </div>
-                        </Col>}
-                      {sidenavOpen && <Col xs={2} className="text-right pr-2 pt-2">
+                        </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={2} />
-                      </Col>}
+                      </Col>
                     </Row>
                   </NavItem>
                   <NavItem>
@@ -247,8 +240,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                           <span className="nav-link-text">Initiatives Roadmap</span>
                         </NavLink>
                       </Col>
-                      {sidenavOpen &&
-                        <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
+                      <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                           <div className={bipSettings.isRoadmapPagePublic ? '' : 'd-none'}>
                             <UncontrolledTooltip target="roadmap-nav-item" placement="top">
                               This page is public and can be accessed by anyone.
@@ -259,10 +251,10 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                               PUBLIC
                             </Badge>
                           </div>
-                        </Col>}
-                      {sidenavOpen && <Col xs={2} className="text-right pr-2 pt-2">
+                        </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={3} />
-                      </Col>}
+                      </Col>
                     </Row>
                   </NavItem>
                   <NavItem>
@@ -278,8 +270,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                           <span className="nav-link-text">Sprints</span>
                         </NavLink>
                       </Col>
-                      {sidenavOpen &&
-                        <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
+                      <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                           <div className={bipSettings.isIterationsPagePublic ? '' : 'd-none'}>
                             <UncontrolledTooltip target="sprints-nav-item" placement="top">
                               This page is public and can be accessed by anyone.
@@ -290,10 +281,10 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                               PUBLIC
                             </Badge>
                           </div>
-                        </Col>}
-                      {sidenavOpen && <Col xs={2} className="text-right pr-2 pt-2">
+                        </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={4} />
-                      </Col>}
+                      </Col>
                     </Row>
                   </NavItem>
                   <NavItem>
@@ -309,8 +300,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                           <span className="nav-link-text">Active Sprint</span>
                         </NavLink>
                       </Col>
-                      {sidenavOpen &&
-                        <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
+                      <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                           <div className={bipSettings.isActiveIterationsPagePublic ? '' : 'd-none'}>
                             <UncontrolledTooltip target="sprints-nav-item" placement="top" popperClassName="p-2">
                               This page is public and can be accessed by anyone.
@@ -321,10 +311,10 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                               PUBLIC
                             </Badge>
                           </div>
-                        </Col>}
-                      {sidenavOpen && <Col xs={2} className="text-right pr-2 pt-2">
+                        </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={5} />
-                      </Col>}
+                      </Col>
                     </Row>
                   </NavItem>
                   <NavItem>
@@ -340,9 +330,9 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                           <span className="nav-link-text">All Work Items</span>
                         </NavLink>
                       </Col>
-                      {sidenavOpen && <Col xs={2} className="text-right pr-2 pt-2">
+                      <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={6} />
-                      </Col>}
+                      </Col>
                     </Row>
                   </NavItem>
                   <NavItem>
@@ -357,9 +347,9 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
                           <span className="nav-link-text">All Initiatives</span>
                         </NavLink>
                       </Col>
-                      {sidenavOpen && <Col xs={2} className="text-right pr-2 pt-2">
+                      <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={7} />
-                      </Col>}
+                      </Col>
                     </Row>
                   </NavItem>
                 </Nav>
@@ -412,7 +402,7 @@ function Sidebar({ toggleSidenav, sidenavOpen, logo, rtlActive }) {
 
   return (
     <>
-      <NewProjectModal newProjectModal={newProjectModal} toggleNewProjectModal={toggleNewProjectModal} />
+      <NewProjectModal isOpen={newProjectModal} toggleModal={toggleNewProjectModal} />
       <Navbar
         className={
           'sidenav navbar-vertical navbar-expand-xs navbar-dark bg-dark ' +

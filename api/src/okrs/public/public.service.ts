@@ -5,17 +5,18 @@ import { Org } from '../../orgs/org.entity';
 import { Repository } from 'typeorm';
 import { OkrsService } from '../okrs.service';
 import { PublicOkrMapper } from './public.mappers';
+import { Project } from '../../projects/project.entity';
 
 @Injectable()
 export class PublicService {
   constructor(
-    @InjectRepository(Org)
-    private orgRepository: Repository<Org>,
+    @InjectRepository(Project)
+    private projectsRepository: Repository<Project>,
     private okrsService: OkrsService,
   ) {}
 
   async listObjectives(orgId: string, projectId: string, timeline: Timeline) {
-    await this.validateOrgHasBuildingInPublicEnabled(orgId);
+    await this.validateProjectHasBuildingInPublicEnabled(orgId, projectId);
 
     const objectives = await this.okrsService.listObjectivesForTimeline(
       orgId,
@@ -27,7 +28,7 @@ export class PublicService {
   }
 
   async getObjective(orgId: string, projectId: string, okrId: string) {
-    await this.validateOrgHasBuildingInPublicEnabled(orgId);
+    await this.validateProjectHasBuildingInPublicEnabled(orgId, projectId);
 
     const { objective, keyResults } =
       await this.okrsService.getObjectiveDetails(okrId, orgId, projectId);
@@ -41,7 +42,7 @@ export class PublicService {
     objectiveId: string,
     keyResultId: string,
   ) {
-    await this.validateOrgHasBuildingInPublicEnabled(orgId);
+    await this.validateProjectHasBuildingInPublicEnabled(orgId, projectId);
 
     const keyResult = await this.okrsService.getKeyResult(
       orgId,
@@ -53,13 +54,16 @@ export class PublicService {
     return PublicOkrMapper.toKeyResultDto(keyResult);
   }
 
-  private async validateOrgHasBuildingInPublicEnabled(orgId: string) {
-    const org = await this.orgRepository.findOneBy({ id: orgId });
-    if (!org) {
-      throw new Error('Org not found');
-    }
+  private async validateProjectHasBuildingInPublicEnabled(
+    orgId: string,
+    projectId: string,
+  ) {
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
 
-    const bipSettings = await org.bipSettings;
+    const bipSettings = await project.bipSettings;
     if (!bipSettings?.isBuildInPublicEnabled) {
       throw new Error('Building in public is not enabled');
     }
