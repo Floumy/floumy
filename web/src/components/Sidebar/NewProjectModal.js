@@ -9,7 +9,7 @@ import InputError from '../Errors/InputError';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 
-export default function NewProjectModal({ newProjectModal, toggleNewProjectModal }) {
+export default function NewProjectModal({ isOpen, toggleModal }) {
   const { orgId, currenProject, setCurrentProject, projects } = useProjects();
   const navigate = useNavigate();
   const [focusedProjectName, setFocusedProjectName] = useState(false);
@@ -22,7 +22,7 @@ export default function NewProjectModal({ newProjectModal, toggleNewProjectModal
       const createdProject = await createProject(orgId, projectName);
       setCurrentProject(createdProject);
       toast.success('Project created');
-      toggleNewProjectModal();
+      toggleModal();
       navigate(`/admin/orgs/${orgId}/projects/${createdProject.id}/dashboard`);
     } catch (e) {
       toast.error('Failed to create project');
@@ -49,8 +49,8 @@ export default function NewProjectModal({ newProjectModal, toggleNewProjectModal
 
   return (
     <Modal
-      isOpen={newProjectModal}
-      toggle={toggleNewProjectModal}
+      isOpen={isOpen}
+      toggle={toggleModal}
       className="modal-dialog-centered"
       fade={false}
     >
@@ -59,7 +59,7 @@ export default function NewProjectModal({ newProjectModal, toggleNewProjectModal
         <button
           aria-label="Close"
           className="close"
-          onClick={toggleNewProjectModal}
+          onClick={toggleModal}
           type="button"
         >
           <span aria-hidden={true}>×</span>
@@ -112,7 +112,7 @@ export default function NewProjectModal({ newProjectModal, toggleNewProjectModal
                   Create Project
                 </Button>
                 <Button color="secondary" type="button"
-                        onClick={toggleNewProjectModal}>
+                        onClick={toggleModal}>
                   Close
                 </Button>
               </div>

@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Configuration
-DB_NAME=floumy
+DB_NAME=test
 DB_USER=floumy
 DB_PASSWORD=floumy
-DB_CONTAINER_NAME=floumy-db
-DB_PORT=5432
+DB_CONTAINER_NAME=floumy-local-dev-test-db
+DB_PORT=5455
 
 # Pull the PostgreSQL image
 echo "Pulling the PostgreSQL image..."
