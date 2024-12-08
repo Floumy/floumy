@@ -8,9 +8,9 @@ import useLayoutHandler from "./useLayoutHandler";
 import useNavigationHotKey from "./useNavigationHotKey";
 import PublicSidebar from "../components/Sidebar/PublicSidebar";
 import { getBuildInPublicSettings } from "../services/bip/build-in-public.service";
-import { getPublicOrg } from "../services/org/orgs.service";
 import PublicNavbar from "../components/Navbars/PublicNavbar";
 import Footer from "../components/Footers/Footer";
+import { getPublicProject } from '../services/projects/projects.service';
 
 function PublicLayout() {
   const { mainContentRef, location, getRoutes } = useLayoutHandler("public");
@@ -18,7 +18,7 @@ function PublicLayout() {
   const urlSegments = window.location.pathname.split("/");
   const orgId = urlSegments[3];
   const projectId = urlSegments[5];
-  const [org, setOrg] = React.useState();
+  const [project, setProject] = React.useState();
 
   const [buildInPublicSettings, setBuildInPublicSettings] = React.useState({
     isObjectivesPagePublic: false,
@@ -38,15 +38,15 @@ function PublicLayout() {
     return replace;
   }
 
-  useNavigationHotKey("r", `/public/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace(), org?.paymentPlan === "premium");
-  useNavigationHotKey("f", `/public/orgs/${orgId}/projects/${projectId}/feature-requests`, false, org?.paymentPlan === "premium");
+  useNavigationHotKey("r", `/public/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace());
+  useNavigationHotKey("f", `/public/orgs/${orgId}/projects/${projectId}/feature-requests`, false);
   useNavigationHotKey("left", -1);
   useNavigationHotKey("right", 1);
 
   useEffect(() => {
-    getPublicOrg(orgId)
-      .then((org) => {
-        setOrg(org);
+    getPublicProject(orgId, projectId)
+      .then((project) => {
+        setProject(project);
       })
       .catch((e) => {
         console.error(e.message);
@@ -86,7 +86,7 @@ function PublicLayout() {
     setSidenavOpen(!sidenavOpen);
   };
 
-  if (!org) {
+  if (!project) {
     return <div className="main-content" ref={mainContentRef}></div>;
   }
 
@@ -98,7 +98,8 @@ function PublicLayout() {
         sidenavOpen={sidenavOpen}
       />
       <PublicSidebar
-        org={org}
+        orgId={orgId}
+        project={project}
         toggleSidenav={toggleSidenav}
         sidenavOpen={sidenavOpen}
         buildingInPublicSettings={buildInPublicSettings}
