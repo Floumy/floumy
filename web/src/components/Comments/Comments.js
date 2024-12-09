@@ -199,7 +199,7 @@ export default function Comments({
               {!currentUserName && <UncontrolledTooltip delay={0} target="add-comment">
                 Sign in to comment
               </UncontrolledTooltip>}
-              <CommentArea value={comment} onChange={(text, mentions) => {
+              <CommentArea id="add-comment" value={comment} onChange={(text, mentions) => {
                 setComment(text)
                 setMentions(mentions)
               }}/>
