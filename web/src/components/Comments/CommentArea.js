@@ -11,7 +11,7 @@ const { Quill } = ReactQuill;
 Quill.register('blots/mention', MentionBlot);
 Quill.register('modules/mention', Mention);
 
-const CommentArea = ({ onChange, value }) => {
+const CommentArea = ({ onChange, value , ...props}) => {
   const { orgId } = useParams();
 
   const modules = useMemo(() => ({
@@ -65,6 +65,7 @@ const CommentArea = ({ onChange, value }) => {
           onChange(content, getMentions(editor));
         }}
         modules={modules}
+        {...props}
       />
     </div>
   );
