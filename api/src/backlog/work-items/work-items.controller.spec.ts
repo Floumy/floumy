@@ -370,6 +370,7 @@ describe('WorkItemsController', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.LOW,
           type: WorkItemType.BUG,
           feature: feature.id,
@@ -451,6 +452,7 @@ describe('WorkItemsController', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.LOW,
           type: WorkItemType.BUG,
           status: WorkItemStatus.PLANNED,

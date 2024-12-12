@@ -445,6 +445,7 @@ describe('WorkItemsService', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           feature: feature2.id,
@@ -493,6 +494,7 @@ describe('WorkItemsService', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           status: WorkItemStatus.PLANNED,
@@ -527,6 +529,7 @@ describe('WorkItemsService', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           status: WorkItemStatus.DONE,
@@ -561,6 +564,7 @@ describe('WorkItemsService', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           status: WorkItemStatus.CLOSED,
@@ -622,6 +626,7 @@ describe('WorkItemsService', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           estimation: 13,
@@ -672,6 +677,7 @@ describe('WorkItemsService', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           status: WorkItemStatus.PLANNED,
@@ -716,6 +722,7 @@ describe('WorkItemsService', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           status: WorkItemStatus.PLANNED,
@@ -837,6 +844,7 @@ describe('WorkItemsService', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.LOW,
           type: WorkItemType.BUG,
           issue: issue.id,
@@ -873,6 +881,7 @@ describe('WorkItemsService', () => {
         {
           title: 'my work item updated',
           description: 'my work item description updated',
+          mentions: [user.id],
           priority: Priority.LOW,
           type: WorkItemType.BUG,
           issue: null,
