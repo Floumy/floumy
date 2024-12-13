@@ -1,7 +1,7 @@
 import {
   Column,
   CreateDateColumn,
-  Entity,
+  Entity, JoinTable, ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -81,4 +81,20 @@ export class Feature {
     },
   )
   featureRequest: Promise<FeatureRequest>;
+
+  @ManyToMany(() => User, {
+    lazy: true,
+  })
+  @JoinTable({
+    name: 'feature_description_mentions',
+    joinColumn: {
+      name: 'featureId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
+  mentions: Promise<User[]>;
 }

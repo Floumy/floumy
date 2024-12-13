@@ -24,6 +24,7 @@ import CardHeaderDetails from "../components/CardHeaderDetails";
 import { getOrg } from "../../../services/org/orgs.service";
 import Comments from "../../../components/Comments/Comments";
 import { listIssues } from "../../../services/issues/issues.service";
+import RichTextEditor from "../../../components/RichTextEditor/RichTextEditor";
 
 function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const { orgId, projectId } = useParams();
@@ -31,6 +32,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const [isUpdate, setIsUpdate] = useState(false);
   const [priority, setPriority] = useState(workItem.priority || "");
   const [descriptionText, setDescriptionText] = useState(workItem.description);
+  const [mentions, setMentions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [type, setType] = useState(workItem.type || "");
   const [status, setStatus] = useState(workItem.status || "");
@@ -159,6 +161,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       const workItem = {
         title: values.title,
         description: descriptionText,
+        mentions: mentions.map(mention => mention.id),
         priority: priority,
         type: type,
         feature: feature,
@@ -416,26 +419,21 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         >
                           Description
                         </label>
-                        <ReactQuill
-                          value={descriptionText}
-                          onChange={(value) => setDescriptionText(value)}
-                          theme="snow"
-                          placeholder="Describe this work item..."
-                          modules={{
-                            toolbar: [
-                              ["bold", "italic"],
-                              ["link", "blockquote", "code", "image", "video"],
-                              [
-                                {
-                                  list: "ordered"
-                                },
-                                {
-                                  list: "bullet"
-                                }
-                              ]
-                            ]
-                          }}
-                        />
+                        <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
+                          setDescriptionText(text);
+                          setMentions(mentions);
+                        }} toolbar={[
+                          ["bold", "italic"],
+                          ["link", "blockquote", "code", "image", "video"],
+                          [
+                            {
+                              list: "ordered"
+                            },
+                            {
+                              list: "bullet"
+                            }
+                          ]
+                        ]} placeholder="Describe this work item..." />
                       </Col>
                     </Row>
                     <Row className="mb-0">

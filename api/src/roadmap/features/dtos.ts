@@ -7,6 +7,7 @@ export interface CreateUpdateFeatureDto {
   priority: Priority;
   status: FeatureStatus;
   description?: string;
+  mentions?: string[];
   milestone?: string;
   keyResult?: string;
   files?: { id: string }[];

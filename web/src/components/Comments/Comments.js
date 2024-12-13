@@ -2,7 +2,7 @@ import {Card, CardBody, CardHeader, FormText, ListGroup, ListGroupItem, Uncontro
 import {formatDateWithTime, memberNameInitials, textToColor} from "../../services/utils/utils";
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import CommentArea from './CommentArea';
+import RichTextEditor from '../RichTextEditor/RichTextEditor';
 import DOMPurify from 'dompurify';
 
 export default function Comments({
@@ -163,7 +163,7 @@ export default function Comments({
         </div>
       </div>
       <FormText className="text-sm mb-0">
-        <CommentArea value={editingCommentContent} onChange={(text, mentions) => {
+        <RichTextEditor value={editingCommentContent} onChange={(text, mentions) => {
           setEditingCommentContent(text)
           setEditingCommentMentions(mentions)
         }}/>
@@ -199,10 +199,10 @@ export default function Comments({
               {!currentUserName && <UncontrolledTooltip delay={0} target="add-comment">
                 Sign in to comment
               </UncontrolledTooltip>}
-              <CommentArea id="add-comment" value={comment} onChange={(text, mentions) => {
+              <RichTextEditor id="add-comment" value={comment} onChange={(text, mentions) => {
                 setComment(text)
                 setMentions(mentions)
-              }}/>
+              }} placeholder="Write a comment..."/>
             </FormText>
             <button
               className="btn btn-sm btn-primary mt-2"

@@ -363,6 +363,13 @@ export class WorkItemsService {
   ) {
     workItem.title = workItemDto.title;
     workItem.description = workItemDto.description;
+    workItem.mentions = Promise.resolve(
+      workItemDto.mentions
+        ? await this.usersRepository.findBy({
+            id: In(workItemDto.mentions),
+          })
+        : undefined,
+    );
     workItem.priority = workItemDto.priority;
     workItem.type = workItemDto.type;
     workItem.status = workItemDto.status;

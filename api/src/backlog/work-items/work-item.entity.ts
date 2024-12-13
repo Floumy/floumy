@@ -2,7 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
+  JoinColumn, JoinTable, ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -97,4 +97,20 @@ export class WorkItem {
   issue: Promise<Issue>;
   @ManyToOne(() => Project, (project) => project.workItems, { lazy: true })
   project: Promise<Project>;
+
+  @ManyToMany(() => User, {
+    lazy: true,
+  })
+  @JoinTable({
+    name: 'work_item_description_mentions',
+    joinColumn: {
+      name: 'workItemId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'userId',
+      referencedColumnName: 'id',
+    },
+  })
+  mentions: Promise<User[]>;
 }

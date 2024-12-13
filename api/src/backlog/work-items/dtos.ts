@@ -5,6 +5,7 @@ import { WorkItemStatus } from './work-item-status.enum';
 export interface CreateUpdateWorkItemDto {
   title: string;
   description: string;
+  mentions?: string[];
   priority: Priority;
   type: WorkItemType;
   status: WorkItemStatus;
