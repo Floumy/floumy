@@ -508,6 +508,7 @@ describe('FeaturesService', () => {
         {
           title: 'my updated feature',
           description: 'my updated feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.CLOSED,
         },
@@ -546,6 +547,7 @@ describe('FeaturesService', () => {
         {
           title: 'my updated feature',
           description: 'my updated feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           keyResult: objective.keyResults[0].id,
           status: FeatureStatus.PLANNED,
@@ -580,6 +582,7 @@ describe('FeaturesService', () => {
         {
           title: 'my updated feature',
           description: 'my updated feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           milestone: milestone.id,
           status: FeatureStatus.PLANNED,
@@ -609,6 +612,7 @@ describe('FeaturesService', () => {
         {
           title: 'my updated feature',
           description: 'my updated feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
           files: [file],
@@ -639,6 +643,7 @@ describe('FeaturesService', () => {
         {
           title: 'my updated feature',
           description: 'my updated feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
           assignedTo: otherUser.id,
@@ -669,6 +674,7 @@ describe('FeaturesService', () => {
         {
           title: 'my updated feature',
           description: 'my updated feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
           assignedTo: null,
@@ -697,6 +703,7 @@ describe('FeaturesService', () => {
         {
           title: 'my updated feature',
           description: 'my updated feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
         },
@@ -731,6 +738,7 @@ describe('FeaturesService', () => {
         {
           title: 'my updated feature',
           description: 'my updated feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
           files: [file2],
@@ -762,6 +770,7 @@ describe('FeaturesService', () => {
         {
           title: 'my updated feature',
           description: 'my updated feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
           files: [file],
@@ -797,6 +806,7 @@ describe('FeaturesService', () => {
         {
           title: 'my feature',
           description: 'my feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
           featureRequest: featureRequest.id,
@@ -838,6 +848,7 @@ describe('FeaturesService', () => {
         {
           title: 'my feature',
           description: 'my feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
           featureRequest: null,
@@ -876,6 +887,7 @@ describe('FeaturesService', () => {
         {
           title: 'my feature',
           description: 'my feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
           featureRequest: featureRequest.id,
@@ -1351,6 +1363,7 @@ describe('FeaturesService', () => {
         {
           title: 'my feature',
           description: 'my feature description',
+          mentions: [user.id],
           priority: Priority.LOW,
           status: FeatureStatus.PLANNED,
           featureRequest: null,

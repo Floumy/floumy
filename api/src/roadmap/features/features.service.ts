@@ -66,6 +66,13 @@ export class FeaturesService {
     feature.org = Promise.resolve(org);
     feature.createdBy = Promise.resolve(user);
     feature.project = Promise.resolve(project);
+    feature.mentions = Promise.resolve(
+      featureDto.mentions
+        ? await this.usersRepository.findBy({
+            id: In(featureDto.mentions),
+          })
+        : undefined,
+    );
     await this.setFeatureAssignedTo(featureDto, org, projectId, feature);
     await this.setFeatureKeyResult(featureDto, org, projectId, feature);
 
@@ -176,6 +183,11 @@ export class FeaturesService {
     feature.description = updateFeatureDto.description;
     feature.priority = updateFeatureDto.priority;
     feature.status = updateFeatureDto.status;
+    feature.mentions = Promise.resolve(
+      await this.usersRepository.findBy({
+        id: In(updateFeatureDto.mentions),
+      }),
+    );
 
     await this.updateFeatureKeyResult(
       updateFeatureDto,

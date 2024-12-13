@@ -320,6 +320,7 @@ describe('FeaturesController', () => {
         {
           title: 'my feature',
           description: 'my feature description',
+          mentions: [user.id],
           priority: Priority.HIGH,
           status: FeatureStatus.CLOSED,
         },

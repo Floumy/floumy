@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useRef } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'quill-mention';
 import 'quill-mention/dist/quill.mention.css';
-import './CommentArea.css';
+import './RichTextEditor.css';
 import { Mention, MentionBlot } from 'quill-mention';
 import { useParams } from 'react-router-dom';
 import { getUsersByOrgId } from '../../services/users/users.service';
@@ -11,11 +11,11 @@ const { Quill } = ReactQuill;
 Quill.register('blots/mention', MentionBlot);
 Quill.register('modules/mention', Mention);
 
-const CommentArea = ({ onChange, value , ...props}) => {
+const RichTextEditor = ({ onChange, value , toolbar = false, ...props}) => {
   const { orgId } = useParams();
 
   const modules = useMemo(() => ({
-    toolbar: false,
+    toolbar: toolbar,
     mention: {
       allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
       mentionDenotationChars: ['@'],
@@ -60,7 +60,6 @@ const CommentArea = ({ onChange, value , ...props}) => {
       <ReactQuill
         value={value}
         theme="snow"
-        placeholder="Write a comment..."
         onChange={(content, delta, source, editor) => {
           onChange(content, getMentions(editor));
         }}
@@ -71,4 +70,4 @@ const CommentArea = ({ onChange, value , ...props}) => {
   );
 };
 
-export default CommentArea;
+export default RichTextEditor;

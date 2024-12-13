@@ -1,25 +1,26 @@
-import { Button, Card, CardBody, CardHeader, Col, Input, Row } from "reactstrap";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import {Button, Card, CardBody, CardHeader, Col, Input, Row} from "reactstrap";
+import {ErrorMessage, Field, Form, Formik} from "formik";
 import InputError from "../../../components/Errors/InputError";
 import Select2 from "react-select2-wrapper";
-import ReactQuill from "react-quill";
-import React, { useCallback, useEffect, useState } from "react";
-import { deleteFeature, listMilestones } from "../../../services/roadmap/roadmap.service";
-import { listKeyResults } from "../../../services/okrs/okrs.service";
+import React, {useCallback, useEffect, useState} from "react";
+import {deleteFeature, listMilestones} from "../../../services/roadmap/roadmap.service";
+import {listKeyResults} from "../../../services/okrs/okrs.service";
 import * as Yup from "yup";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import DeleteWarning from "../components/DeleteWarning";
 import FloumyDropZone from "../components/FloumyDropZone";
-import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
+import {toast} from "react-toastify";
+import {useNavigate, useParams} from "react-router-dom";
 import CardHeaderDetails from "../components/CardHeaderDetails";
-import { getOrg } from "../../../services/org/orgs.service";
-import { listFeatureRequests } from "../../../services/feature-requests/feature-requests.service";
+import {getOrg} from "../../../services/org/orgs.service";
+import {listFeatureRequests} from "../../../services/feature-requests/feature-requests.service";
+import RichTextEditor from "../../../components/RichTextEditor/RichTextEditor";
 
 function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   const { orgId, projectId } = useParams();
   const [priority, setPriority] = useState("medium");
   const [descriptionText, setDescriptionText] = useState("");
+  const [mentions, setMentions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [keyResults, setKeyResults] = useState([{}]);
   const [keyResult, setKeyResult] = useState("");
@@ -152,6 +153,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
       const feature = {
         title: values.title,
         description: descriptionText,
+        mentions: mentions.map(mention => mention.id),
         priority: priority,
         status: status,
         files: files,
@@ -346,26 +348,21 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                     >
                       Description
                     </label>
-                    <ReactQuill
-                      value={descriptionText}
-                      onChange={(value) => setDescriptionText(value)}
-                      theme="snow"
-                      placeholder="Describe your initiative and its impact ..."
-                      modules={{
-                        toolbar: [
-                          ["bold", "italic"],
-                          ["link", "blockquote", "code", "image", "video"],
-                          [
-                            {
-                              list: "ordered"
-                            },
-                            {
-                              list: "bullet"
-                            }
-                          ]
-                        ]
-                      }}
-                    />
+                    <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
+                        setDescriptionText(text);
+                        setMentions(mentions);
+                    }} toolbar={[
+                      ["bold", "italic"],
+                      ["link", "blockquote", "code", "image", "video"],
+                      [
+                        {
+                          list: "ordered"
+                        },
+                        {
+                          list: "bullet"
+                        }
+                      ]
+                    ]} placeholder="Describe your initiative and its impact ..." />
                   </Col>
                 </Row>
                 <Row>
