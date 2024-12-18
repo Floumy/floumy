@@ -64,8 +64,6 @@ export class WorkItem {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  // TODO: Remove this after changing the mappers
-  sequenceNumber: number;
   @Column({
     nullable: false,
   })

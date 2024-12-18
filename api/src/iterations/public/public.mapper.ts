@@ -35,7 +35,7 @@ class WorkItemMapper {
     const iteration = await workItem.iteration;
     return {
       id: workItem.id,
-      reference: `WI-${workItem.sequenceNumber}`,
+      reference: workItem.reference,
       title: workItem.title,
       description: workItem.description,
       priority: workItem.priority,

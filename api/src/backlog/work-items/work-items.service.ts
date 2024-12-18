@@ -544,7 +544,7 @@ export class WorkItemsService {
         FROM work_item
         WHERE work_item."orgId" = $1
           AND work_item."projectId" = $2
-          AND CAST(work_item."sequenceNumber" AS TEXT) LIKE $3
+          AND LOWER(work_item."reference") = LOWER($3)
         ORDER BY CASE
                      WHEN work_item."priority" = 'high' THEN 1
                      WHEN work_item."priority" = 'medium' THEN 2
@@ -554,13 +554,12 @@ export class WorkItemsService {
                  work_item."createdAt" DESC
     `;
 
-    const referenceSequenceNumber = search.split('-')[1];
-    let params = [orgId, projectId, `${referenceSequenceNumber}%`] as any[];
+    let params = [orgId, projectId, search] as any[];
 
     if (limit > 0) {
       query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, projectId, `${referenceSequenceNumber}%`, offset, limit];
+      params = [orgId, projectId, search, offset, limit];
     }
 
     const workItems = await this.workItemsRepository.query(query, params);

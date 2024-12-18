@@ -44,7 +44,7 @@ export class FeatureMapper {
   static mapWorkItemToWorkItemDto(workItem: WorkItem) {
     return {
       id: workItem.id,
-      reference: `WI-${workItem.sequenceNumber}`,
+      reference: workItem.reference,
       title: workItem.title,
       description: workItem.description,
       priority: workItem.priority,
