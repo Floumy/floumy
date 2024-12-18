@@ -399,7 +399,7 @@ function DetailOKR() {
                         <tbody className="list">
                         {okr && okr.keyResults && okr.keyResults.length === 0 &&
                           <tr>
-                            <td colSpan={4}>
+                            <td colSpan={5}>
                               <div className="text-center text-muted">
                                 No key results have been added yet
                               </div>
