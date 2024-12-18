@@ -91,7 +91,7 @@ class FeatureMapper {
   static async toDTO(feature: Feature): Promise<FeatureDto> {
     return {
       id: feature.id,
-      reference: `F-${feature.sequenceNumber}`,
+      reference: feature.reference,
       title: feature.title,
       priority: feature.priority,
       status: feature.status,

@@ -70,7 +70,7 @@ export class PublicOkrMapper {
     const workItems = (await feature.workItems) || [];
     return {
       id: feature.id,
-      reference: `F-${feature.sequenceNumber}`,
+      reference: feature.reference,
       title: feature.title,
       status: feature.status,
       priority: feature.priority,

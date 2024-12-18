@@ -13,7 +13,7 @@ export class FeatureMapper {
     const featureRequest = await feature.featureRequest;
     const mappedFeature = {
       id: feature.id,
-      reference: `F-${feature.sequenceNumber}`,
+      reference: feature.reference,
       title: feature.title,
       description: feature.description,
       priority: feature.priority,
