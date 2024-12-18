@@ -20,7 +20,7 @@ export class IssueMapper {
           );
         })
         .map((workItem) => ({
-          reference: `WI-${workItem.sequenceNumber}`,
+          reference: workItem.reference,
           id: workItem.id,
           title: workItem.title,
           description: workItem.description,

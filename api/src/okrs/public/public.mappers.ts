@@ -84,7 +84,7 @@ export class PublicOkrMapper {
   static toWorkItemDto(workItem: WorkItem) {
     return {
       id: workItem.id,
-      reference: `WI-${workItem.sequenceNumber}`,
+      reference: workItem.reference,
       title: workItem.title,
       status: workItem.status,
       type: workItem.type,
