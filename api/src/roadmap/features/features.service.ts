@@ -73,7 +73,7 @@ export class FeaturesService {
           })
         : undefined,
     );
-    await this.setFeatureAssignedTo(featureDto, org, projectId, feature);
+    await this.setFeatureAssignedTo(featureDto, org, feature);
     await this.setFeatureKeyResult(featureDto, org, projectId, feature);
 
     if (featureDto.milestone) {
@@ -212,12 +212,7 @@ export class FeaturesService {
 
     await this.updateFeatureFiles(updateFeatureDto, feature);
 
-    await this.updateFeatureAssignedTo(
-      updateFeatureDto,
-      orgId,
-      projectId,
-      feature,
-    );
+    await this.updateFeatureAssignedTo(updateFeatureDto, orgId, feature);
 
     const savedFeature = await this.featuresRepository.save(feature);
     const updatedFeature = await FeatureMapper.toDto(savedFeature);
@@ -408,14 +403,12 @@ export class FeaturesService {
   private async setFeatureAssignedTo(
     featureDto: CreateUpdateFeatureDto,
     org: Org,
-    projectId: string,
     feature: Feature,
   ) {
     if (featureDto.assignedTo) {
       const assignedTo = await this.userRepository.findOneByOrFail({
         id: featureDto.assignedTo,
         org: { id: org.id },
-        projects: { id: projectId },
       });
       if (assignedTo) {
         feature.assignedTo = Promise.resolve(assignedTo);
@@ -452,14 +445,12 @@ export class FeaturesService {
   private async updateFeatureAssignedTo(
     updateFeatureDto: CreateUpdateFeatureDto,
     orgId: string,
-    projectId: string,
     feature: Feature,
   ) {
     if (updateFeatureDto.assignedTo) {
       const assignedTo = await this.userRepository.findOneByOrFail({
         id: updateFeatureDto.assignedTo,
         org: { id: orgId },
-        projects: { id: projectId },
       });
       feature.assignedTo = Promise.resolve(assignedTo);
     } else if (await feature.assignedTo) {
