@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Objective } from './objective.entity';
@@ -15,6 +16,7 @@ import { KeyResultComment } from './key-result-comment.entity';
 import { Project } from '../projects/project.entity';
 
 @Entity()
+@Unique(['reference', 'org'])
 export class KeyResult {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -33,11 +35,9 @@ export class KeyResult {
   @UpdateDateColumn()
   updatedAt: Date;
   @Column({
-    type: 'int',
     nullable: false,
-    unique: true,
   })
-  sequenceNumber: number;
+  reference: string;
   @ManyToOne(() => Org, (org) => org.keyResults, { lazy: true })
   org: Promise<Org>;
   @ManyToOne(() => Objective, (objective) => objective.keyResults, {
