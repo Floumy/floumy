@@ -23,7 +23,7 @@ export class OKRMapper {
         project: {
           id: project.id,
         },
-        reference: `O-${objective.sequenceNumber}`,
+        reference: objective.reference,
         title: objective.title,
         progress: parseFloat(objective.progress?.toFixed(2)),
         createdAt: objective.createdAt,
@@ -67,7 +67,7 @@ export class OKRMapper {
     const assignedTo = await objective.assignedTo;
     return {
       id: objective.id,
-      reference: `O-${objective.sequenceNumber}`,
+      reference: objective.reference,
       title: objective.title,
       status: objective.status,
       timeline: TimelineService.startAndEndDatesToTimeline(
@@ -130,11 +130,11 @@ export class KeyResultMapper {
 
     return {
       id: keyResult.id,
-      reference: `KR-${keyResult.sequenceNumber}`,
+      reference: keyResult.reference,
       title: keyResult.title,
       objective: {
         id: objective.id,
-        reference: `O-${objective.sequenceNumber}`,
+        reference: objective.reference,
         title: objective.title,
       },
       org: {

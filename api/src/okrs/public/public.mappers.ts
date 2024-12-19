@@ -10,7 +10,7 @@ export class PublicOkrMapper {
   static toDTO(objective: Objective): ObjectiveDto {
     return {
       id: objective.id,
-      reference: `O-${objective.sequenceNumber}`,
+      reference: objective.reference,
       title: objective.title,
       timeline: TimelineService.startAndEndDatesToTimeline(
         objective.startDate,
@@ -29,7 +29,7 @@ export class PublicOkrMapper {
     return {
       objective: {
         id: objective.id,
-        reference: `O-${objective.sequenceNumber}`,
+        reference: objective.reference,
         title: objective.title,
         timeline: TimelineService.startAndEndDatesToTimeline(
           objective.startDate,
@@ -55,7 +55,7 @@ export class PublicOkrMapper {
 
     return {
       id: keyResult.id,
-      reference: `KR-${keyResult.sequenceNumber}`,
+      reference: keyResult.reference,
       title: keyResult.title,
       progress: parseFloat(keyResult.progress.toFixed(2)),
       status: keyResult.status,
