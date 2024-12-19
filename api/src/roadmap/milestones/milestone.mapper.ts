@@ -67,7 +67,7 @@ class FeatureMapper {
     const assignedTo = await feature.assignedTo;
     return {
       id: feature.id,
-      reference: `F-${feature.sequenceNumber}`,
+      reference: feature.reference,
       title: feature.title,
       priority: feature.priority.valueOf(),
       status: feature.status.valueOf(),

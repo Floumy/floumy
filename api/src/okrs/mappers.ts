@@ -23,7 +23,7 @@ export class OKRMapper {
         project: {
           id: project.id,
         },
-        reference: `O-${objective.sequenceNumber}`,
+        reference: objective.reference,
         title: objective.title,
         progress: parseFloat(objective.progress?.toFixed(2)),
         createdAt: objective.createdAt,
@@ -67,7 +67,7 @@ export class OKRMapper {
     const assignedTo = await objective.assignedTo;
     return {
       id: objective.id,
-      reference: `O-${objective.sequenceNumber}`,
+      reference: objective.reference,
       title: objective.title,
       status: objective.status,
       timeline: TimelineService.startAndEndDatesToTimeline(
@@ -91,7 +91,7 @@ class FeatureMapper {
   static async toDTO(feature: Feature): Promise<FeatureDto> {
     return {
       id: feature.id,
-      reference: `F-${feature.sequenceNumber}`,
+      reference: feature.reference,
       title: feature.title,
       priority: feature.priority,
       status: feature.status,
@@ -130,11 +130,11 @@ export class KeyResultMapper {
 
     return {
       id: keyResult.id,
-      reference: `KR-${keyResult.sequenceNumber}`,
+      reference: keyResult.reference,
       title: keyResult.title,
       objective: {
         id: objective.id,
-        reference: `O-${objective.sequenceNumber}`,
+        reference: objective.reference,
         title: objective.title,
       },
       org: {

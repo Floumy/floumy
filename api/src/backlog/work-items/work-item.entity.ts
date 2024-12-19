@@ -2,11 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn, JoinTable, ManyToMany,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Priority } from '../../common/priority.enum';
@@ -23,6 +26,7 @@ import { Issue } from '../../issues/issue.entity';
 import { Project } from '../../projects/project.entity';
 
 @Entity()
+@Unique(['reference', 'org'])
 export class WorkItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -61,11 +65,9 @@ export class WorkItem {
   @UpdateDateColumn()
   updatedAt: Date;
   @Column({
-    type: 'int',
     nullable: false,
-    unique: true,
   })
-  sequenceNumber: number;
+  reference: string;
   @ManyToOne(() => User, (user) => user.createdWorkItems, { lazy: false })
   createdBy: Promise<User>;
   @ManyToOne(() => User, (user) => user.assignedWorkItems, { lazy: false })

@@ -138,9 +138,15 @@ describe('PublicService', () => {
       ).rejects.toThrow('Roadmap page is not public');
     });
     it('should throw an error if the feature does not belong to the org', async () => {
+      const newUser = await usersService.createUserWithOrg(
+        'Test User',
+        'new-user@example.com',
+        'testtesttest',
+      );
+      const newOrg = await orgsService.createForUser(newUser);
       const feature = new Feature();
       feature.title = 'Test Feature';
-      feature.org = Promise.resolve(new Org());
+      feature.org = Promise.resolve(newOrg);
       feature.project = Promise.resolve(project);
       await featuresRepository.save(feature);
       await expect(

@@ -73,7 +73,7 @@ export class FeaturesService {
           })
         : undefined,
     );
-    await this.setFeatureAssignedTo(featureDto, org, projectId, feature);
+    await this.setFeatureAssignedTo(featureDto, org, feature);
     await this.setFeatureKeyResult(featureDto, org, projectId, feature);
 
     if (featureDto.milestone) {
@@ -212,12 +212,7 @@ export class FeaturesService {
 
     await this.updateFeatureFiles(updateFeatureDto, feature);
 
-    await this.updateFeatureAssignedTo(
-      updateFeatureDto,
-      orgId,
-      projectId,
-      feature,
-    );
+    await this.updateFeatureAssignedTo(updateFeatureDto, orgId, feature);
 
     const savedFeature = await this.featuresRepository.save(feature);
     const updatedFeature = await FeatureMapper.toDto(savedFeature);
@@ -408,7 +403,6 @@ export class FeaturesService {
   private async setFeatureAssignedTo(
     featureDto: CreateUpdateFeatureDto,
     org: Org,
-    projectId: string,
     feature: Feature,
   ) {
     if (featureDto.assignedTo) {
@@ -451,7 +445,6 @@ export class FeaturesService {
   private async updateFeatureAssignedTo(
     updateFeatureDto: CreateUpdateFeatureDto,
     orgId: string,
-    projectId: string,
     feature: Feature,
   ) {
     if (updateFeatureDto.assignedTo) {
@@ -588,7 +581,7 @@ export class FeaturesService {
   }
 
   private isReference(search: string) {
-    return /^[fF]-\d+$/.test(search);
+    return /^[iI]-\d+$/.test(search);
   }
 
   private async searchFeaturesByTitleOrDescription(
@@ -637,7 +630,7 @@ export class FeaturesService {
         FROM feature
         WHERE feature."orgId" = $1
           AND feature."projectId" = $2
-          AND CAST(feature."sequenceNumber" AS TEXT) LIKE $3
+          AND LOWER(feature.reference) LIKE LOWER($3)
         ORDER BY CASE
                      WHEN feature."priority" = 'high' THEN 1
                      WHEN feature."priority" = 'medium' THEN 2
@@ -647,13 +640,12 @@ export class FeaturesService {
                  feature."createdAt" DESC
     `;
 
-    const referenceSequenceNumber = search.split('-')[1];
-    let params = [orgId, projectId, `${referenceSequenceNumber}%`] as any[];
+    let params = [orgId, projectId, search] as any[];
 
     if (limit > 0) {
-      query += ' OFFSET $3 LIMIT $4';
+      query += ' OFFSET $4 LIMIT $5';
       const offset = (page - 1) * limit;
-      params = [orgId, projectId, `${referenceSequenceNumber}%`, offset, limit];
+      params = [orgId, projectId, search, offset, limit];
     }
 
     const features = await this.featuresRepository.query(query, params);
