@@ -38,8 +38,6 @@ export class Objective {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  // TODO: Remove this when we have a proper way to handle it
-  sequenceNumber: number;
   @Column({
     nullable: false,
   })
