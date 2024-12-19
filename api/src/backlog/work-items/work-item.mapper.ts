@@ -44,7 +44,7 @@ export default class WorkItemMapper {
       id: workItem.id,
       org: org ? { id: org.id } : undefined,
       project: { id: project.id },
-      reference: `WI-${workItem.sequenceNumber}`,
+      reference: workItem.reference,
       title: workItem.title,
       description: workItem.description,
       priority: workItem.priority,
@@ -83,7 +83,7 @@ export default class WorkItemMapper {
     const assignedTo = await workItem.assignedTo;
     return {
       id: workItem.id,
-      reference: `WI-${workItem.sequenceNumber}`,
+      reference: workItem.reference,
       title: workItem.title,
       description: workItem.description,
       priority: workItem.priority,
@@ -109,7 +109,7 @@ export default class WorkItemMapper {
   static toSimpleListItemDto(workItem: WorkItem) {
     return {
       id: workItem.id,
-      reference: `WI-${workItem.sequenceNumber}`,
+      reference: workItem.reference,
       title: workItem.title,
       description: workItem.description,
       priority: workItem.priority,

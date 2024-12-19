@@ -1,10 +1,13 @@
 import {
   Column,
   CreateDateColumn,
-  Entity, JoinTable, ManyToMany,
+  Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Org } from '../../orgs/org.entity';
@@ -20,6 +23,7 @@ import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { Project } from '../../projects/project.entity';
 
 @Entity()
+@Unique(['reference', 'org'])
 export class Feature {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -48,11 +52,9 @@ export class Feature {
   @UpdateDateColumn()
   updatedAt: Date;
   @Column({
-    type: 'int',
     nullable: false,
-    unique: true,
   })
-  sequenceNumber: number;
+  reference: string;
   @ManyToOne(() => Org, (org) => org.features, { lazy: true })
   org: Promise<Org>;
   @ManyToOne(() => Project, (project) => project.features, { lazy: true })
