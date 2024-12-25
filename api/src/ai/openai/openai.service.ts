@@ -18,7 +18,7 @@ export class OpenaiService {
 
   constructor(private configService: ConfigService) {
     this.openai = new OpenAI({
-      apiKey: this.configService.get<string>('OPENAI_API_KEY'),
+      apiKey: this.configService.get('ai.apiKey'),
     });
   }
 
@@ -31,7 +31,7 @@ export class OpenaiService {
   ): Promise<AIResponse<T>> {
     const completion = await this.openai.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
-      model: options.model || 'gpt-4-turbo-preview',
+      model: options.model || 'gpt-4o-mini',
       response_format: { type: 'json_object' },
       temperature: options.temperature || 0.7,
     });

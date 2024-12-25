@@ -16,6 +16,7 @@ import jwtConfig from './config/jwt.config';
 import fileStorageConfig from './config/file-storage.config';
 import emailConfig from './config/mail.config';
 import appConfig from './config/app.config';
+import aiConfig from './config/ai.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -44,6 +45,7 @@ import { AiModule } from './ai/ai.module';
         emailConfig,
         appConfig,
         stripeConfig,
+        aiConfig,
       ],
     }),
     TypeOrmModule.forRootAsync({

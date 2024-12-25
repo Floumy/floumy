@@ -10,6 +10,7 @@ import DeleteWarning from "../components/DeleteWarning";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getOrg } from "../../../services/org/orgs.service";
+import { generateKeyResults } from '../../../services/ai/ai.service';
 
 function CreateUpdateDeleteOKR({ onSubmit, okr }) {
   const { orgId, projectId } = useParams();
@@ -20,6 +21,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
   const navigate = useNavigate();
   const [members, setMembers] = useState([{ id: "", text: "None" }]);
   const [assignedTo, setAssignedTo] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
   const onDeleteOKR = async (id) => {
     setIsLoading(true);
@@ -135,6 +137,19 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
     fetchData();
   }, []);
 
+  async function fillKeyResultsWithAi(objective) {
+    try {
+      setIsAiLoading(true);
+      const keyResults = (await generateKeyResults(objective))
+        .map((kr) => ({ id: kr, title: kr }));
+      setFields([...keyResults, ...fields]);
+    } catch (e) {
+      toast.error("The key results could not be filled with AI");
+    } finally {
+      setIsAiLoading(false);
+    }
+  }
+
   return (
     <>
       <DeleteWarning
@@ -221,6 +236,21 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                       htmlFor="validationCustom01"
                     >
                       Key Results
+                      <Button
+                        color="link"
+                        size="sm"
+                        className="ml-2 p-0 shadow-none"
+                        style={{ color: '#9b59b6' }}
+                        disabled={values.objective.length === 0}
+                        onClick={() => {
+                          fillKeyResultsWithAi(values.objective);
+                        }}
+                      >
+                        {isAiLoading ? <i className="fas fa-spinner fa-spin fa-1x"></i> : <>
+                          <i className="fas fa-wand-magic-sparkles"></i> Fill with AI
+                        </>}
+
+                      </Button>
                     </label>
                     <FieldArray name="keyResults">
                       <div>
