@@ -1,14 +1,14 @@
-export interface KeyResult {
+export interface KeyResultType {
   title: string;
 }
 
-export interface Initiative {
+export interface InitiativeType {
   title: string;
   description: string;
   priority: string;
 }
 
-export interface WorkItem {
+export interface WorkItemType {
   title: string;
   description: string;
   priority: string;

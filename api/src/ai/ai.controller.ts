@@ -1,4 +1,6 @@
 import {
+  Request,
+  Body,
   Controller,
   Get,
   Post,
@@ -11,7 +13,7 @@ import { AiService } from './ai.service';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { AuthGuard } from '../auth/auth.guard';
 
-@Controller('/orgs/{orgId}/projects/{projectId}/ai')
+@Controller('/ai')
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard)
 export class AiController {
@@ -39,11 +41,12 @@ export class AiController {
   }
 
   @Post('initiatives')
-  async generateInitiatives(
-    @Query('objective') objective: string,
-    @Query('keyResults') keyResults: string[],
+  async addInitiatives(
+    @Request() request,
+    @Body('keyResult') keyResult: string,
   ) {
-    return await this.aiService.generateInitiatives(objective, keyResults);
+    const user = request.user.sub;
+    return await this.aiService.addInitiativesForKeyResult(user, keyResult);
   }
 
   @Post('work-items')
