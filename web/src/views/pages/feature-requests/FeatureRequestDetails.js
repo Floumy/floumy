@@ -101,6 +101,7 @@ export default function FeatureRequestDetails() {
             </CardHeader>
             <PublicFeaturesList
               orgId={orgId}
+              projectId={projectId}
               features={featureRequest?.features}
               headerClassName={"thead"}
             />
