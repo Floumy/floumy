@@ -1,28 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Row } from "reactstrap";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Row } from 'reactstrap';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import {
   addIssueComment,
   deleteIssueComment,
   getIssue,
-  updateIssueComment
-} from "../../../services/issues/issues.service";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import Comments from "../../../components/Comments/Comments";
-import { toast } from "react-toastify";
-import CardHeaderDetails from "../components/CardHeaderDetails";
-import { formatHyphenatedString } from "../../../services/utils/utils";
-import WorkItemsList from "../backlog/WorkItemsList";
+  updateIssueComment,
+} from '../../../services/issues/issues.service';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import Comments from '../../../components/Comments/Comments';
+import { toast } from 'react-toastify';
+import CardHeaderDetails from '../components/CardHeaderDetails';
+import { formatHyphenatedString } from '../../../services/utils/utils';
+import WorkItemsList from '../backlog/WorkItemsList';
+import PublicWorkItemsList from '../backlog/PublicWorkItemsList';
 
 export default function IssueDetails() {
   const { orgId, projectId, issueId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [issue, setIssue] = useState(null);
-
+  const isPublicPage = window.location.pathname.startsWith('/public');
   useEffect(() => {
-    document.title = "Floumy | Issue Details";
+    document.title = 'Floumy | Issue Details';
 
     async function fetchIssue(orgId, projectId, issueId) {
       try {
@@ -31,7 +32,7 @@ export default function IssueDetails() {
         setIssue(issue);
       } catch (e) {
         console.error(e);
-        toast.error("Failed to load issue details");
+        toast.error('Failed to load issue details');
       } finally {
         setIsLoading(false);
       }
@@ -44,9 +45,9 @@ export default function IssueDetails() {
     try {
       const addedComment = await addIssueComment(orgId, projectId, issueId, comment);
       setIssue({ ...issue, comments: [...issue.comments, addedComment] });
-      toast.success("Comment added successfully");
+      toast.success('Comment added successfully');
     } catch (e) {
-      toast.error("Failed to add comment");
+      toast.error('Failed to add comment');
     }
   }
 
@@ -55,9 +56,9 @@ export default function IssueDetails() {
       const updatedComment = await updateIssueComment(orgId, projectId, issueId, commentId, content);
       const updatedComments = issue.comments.map(c => c.id === updatedComment.id ? updatedComment : c);
       setIssue({ ...issue, comments: updatedComments });
-      toast.success("Comment updated successfully");
+      toast.success('Comment updated successfully');
     } catch (e) {
-      toast.error("Failed to update comment");
+      toast.error('Failed to update comment');
     }
   }
 
@@ -66,9 +67,9 @@ export default function IssueDetails() {
       await deleteIssueComment(orgId, projectId, issueId, commentId);
       const updatedComments = issue.comments.filter(c => c.id !== commentId);
       setIssue({ ...issue, comments: updatedComments });
-      toast.success("Comment deleted successfully");
+      toast.success('Comment deleted successfully');
     } catch (e) {
-      toast.error("Failed to delete comment");
+      toast.error('Failed to delete comment');
     }
   }
 
@@ -78,10 +79,10 @@ export default function IssueDetails() {
       <SimpleHeader
         headerButtons={[
           {
-            name: "Back",
-            shortcut: "←",
-            action: () => window.history.back()
-          }
+            name: 'Back',
+            shortcut: '←',
+            action: () => window.history.back(),
+          },
         ]}
       />
       <Container className="mt--6" fluid>
@@ -171,9 +172,14 @@ export default function IssueDetails() {
               <CardHeader>
                 <h3 className="mb-0">Related Work Items</h3>
               </CardHeader>
-              <WorkItemsList
-                workItems={issue?.workItems}
-              />
+              {isPublicPage ? <PublicWorkItemsList
+                  orgId={orgId}
+                  workItems={issue?.workItems}
+                  headerClassName={'thead'}
+                /> :
+                <WorkItemsList
+                  workItems={issue?.workItems}
+                />}
             </Card>
           </Col>
         </Row>}
