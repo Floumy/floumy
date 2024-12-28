@@ -104,7 +104,7 @@ export class AiService {
     
     Format the description as an HTML string.
     
-    Format the response as a JSON object with an "initiatives" array of with the structure:
+    Format the response as a JSON object with an "initiatives" array with the structure:
     {
       title: string;
       description: string;
