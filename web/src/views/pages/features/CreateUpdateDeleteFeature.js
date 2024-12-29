@@ -49,7 +49,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
     } else {
       setKeyResult("");
     }
-  }, [feature?.keyResult?.id]);
+  }, [feature?.keyResult?.id, orgId, projectId]);
 
   const fetchAndSetMilestones = useCallback(async () => {
     const milestones = await listMilestones(orgId, projectId);
@@ -60,7 +60,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
     } else {
       setMilestone("");
     }
-  }, [feature?.milestone?.id]);
+  }, [feature?.milestone?.id, orgId, projectId]);
 
   const fetchAndSetMembers = useCallback(async () => {
     const org = await getOrg();
@@ -80,7 +80,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
     if (feature?.featureRequest?.id) {
       setFeatureRequest(feature.featureRequest.id);
     }
-  }, [feature?.featureRequest?.id]);
+  }, [feature?.featureRequest?.id, orgId, projectId]);
 
   useEffect(() => {
     document.title = "Floumy | Initiative";
@@ -102,7 +102,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
     }
 
     fetchData();
-  }, [fetchAndSetKeyResults, fetchAndSetMilestones, fetchAndSetMembers]);
+  }, [fetchAndSetKeyResults, fetchAndSetMilestones, fetchAndSetMembers, fetchAndSetFeatureRequests]);
 
   useEffect(() => {
     if (feature?.id) {
@@ -157,7 +157,8 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
         priority: priority,
         status: status,
         files: files,
-        assignedTo: assignedTo
+        assignedTo: assignedTo,
+        featureRequest: featureRequest
       };
       if (keyResult !== "") {
         feature.keyResult = keyResult;
