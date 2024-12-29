@@ -67,7 +67,7 @@ export default function Issues({ isPublic = false }) {
         setIsLoadingMore(false);
       }
     }
-  }, [orgId]);
+  }, [orgId, projectId]);
 
   function doSearch(event) {
     const searchText = event.target.value;
