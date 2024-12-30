@@ -144,7 +144,7 @@ export class IterationsService {
     return `Sprint ${this.getIterationCalendarWeekNumbersForTitle(
       iteration.startDate,
       iteration.endDate,
-    )} ${iteration.startDate.getFullYear()}`;
+    )} ${iteration.endDate.getFullYear()}`;
   }
 
   getIterationEndDate(iteration: Iteration) {
