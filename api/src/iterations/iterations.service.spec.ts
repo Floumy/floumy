@@ -115,6 +115,12 @@ describe('IterationsService', () => {
         duration: 1,
       });
       expect(iteration.title).toEqual('Sprint CW51-CW52 2023');
+      const iteration2 = await service.create(org.id, project.id, {
+        goal: 'Test Iteration',
+        startDate: '2024-12-15',
+        duration: 3,
+      });
+      expect(iteration2.title).toEqual('Sprint CW50-CW1 2025');
     });
     it('should set the status to planned', async () => {
       const iteration = await service.create(org.id, project.id, {
