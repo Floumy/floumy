@@ -74,6 +74,10 @@ export default function Comments({
     return isHovered[comment.id] && comment.createdBy.id === currentUserId;
   }
 
+  function formatCommentWithClickableLinks(comment) {
+    return comment.content.replace(/(https?:\/\/[^\s<>]+)/g, '<a href="$1" style="color: #06c;" target="_blank">$1</a>');
+  }
+
   function getListGroupItem(comment) {
     return <ListGroupItem key={comment.id}
                           className="flex-column align-items-start py-4 px-4"
@@ -109,7 +113,7 @@ export default function Comments({
           </div>) :
           (<small>{formatDateWithTime(comment.createdAt)}</small>)}
       </div>
-      <div dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(comment.content)}}/>
+      <div dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(formatCommentWithClickableLinks(comment))}}/>
     </ListGroupItem>;
   }
 
