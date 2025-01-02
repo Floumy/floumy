@@ -509,6 +509,7 @@ describe('FeaturesController', () => {
           },
         },
         'my feature',
+        {},
       );
       expect(features[0].title).toEqual('my feature');
       expect(features[0].priority).toEqual(Priority.HIGH);

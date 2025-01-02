@@ -19,6 +19,7 @@ import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { FeatureComment } from './feature-comment.entity';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { Project } from '../../projects/project.entity';
+import { FeatureQueryBuilder, FilterOptions } from './feature.query-builder';
 
 @Injectable()
 export class FeaturesService {
@@ -285,28 +286,30 @@ export class FeaturesService {
     orgId: string,
     projectId: string,
     search: string,
+    filters: FilterOptions,
     page: number = 1,
     limit: number = 0,
   ) {
     if (!search) return [];
 
     if (this.isReference(search)) {
-      return await this.searchFeaturesByReference(
+      const queryBuilder = new FeatureQueryBuilder(
         orgId,
         projectId,
-        search,
-        page,
-        limit,
+        { reference: search },
+        this.featuresRepository,
       );
+      return queryBuilder.execute(page, limit);
     }
 
-    return await this.searchFeaturesByTitleOrDescription(
+    const queryBuilder = new FeatureQueryBuilder(
       orgId,
       projectId,
-      search,
-      page,
-      limit,
+      { term: search },
+      this.featuresRepository,
     );
+
+    return queryBuilder.execute(page, limit);
   }
 
   async listFeatureComments(featureId: string) {
@@ -582,75 +585,6 @@ export class FeaturesService {
 
   private isReference(search: string) {
     return /^[iI]-\d+$/.test(search);
-  }
-
-  private async searchFeaturesByTitleOrDescription(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-        SELECT *
-        FROM feature
-        WHERE feature."orgId" = $1
-          AND feature."projectId" = $2
-          AND (feature.title ILIKE $3 OR feature.description ILIKE $3)
-        ORDER BY CASE
-                     WHEN feature."priority" = 'high' THEN 1
-                     WHEN feature."priority" = 'medium' THEN 2
-                     WHEN feature."priority" = 'low' THEN 3
-                     ELSE 4
-                     END,
-                 feature."createdAt" DESC
-    `;
-    let params = [orgId, projectId, `%${search}%`] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, `%${search}%`, offset, limit];
-    }
-
-    const features = await this.featuresRepository.query(query, params);
-
-    return await FeatureMapper.toListDtoWithoutAssignees(features);
-  }
-
-  private async searchFeaturesByReference(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-        SELECT *
-        FROM feature
-        WHERE feature."orgId" = $1
-          AND feature."projectId" = $2
-          AND LOWER(feature.reference) LIKE LOWER($3)
-        ORDER BY CASE
-                     WHEN feature."priority" = 'high' THEN 1
-                     WHEN feature."priority" = 'medium' THEN 2
-                     WHEN feature."priority" = 'low' THEN 3
-                     ELSE 4
-                     END,
-                 feature."createdAt" DESC
-    `;
-
-    let params = [orgId, projectId, search] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, search, offset, limit];
-    }
-
-    const features = await this.featuresRepository.query(query, params);
-
-    return await FeatureMapper.toListDtoWithoutAssignees(features);
   }
 
   private async updateFeatureFeatureRequest(
