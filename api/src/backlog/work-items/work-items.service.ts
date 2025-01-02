@@ -19,6 +19,12 @@ import { WorkItemComment } from './work-item-comment.entity';
 import { Issue } from '../../issues/issue.entity';
 import { Project } from '../../projects/project.entity';
 import { FilterOptions, WorkItemQueryBuilder } from './work-item.query-builder';
+import { CreateNotificationDto } from '../../notifications/dtos';
+import {
+  ActionType,
+  EntityType,
+  StatusType,
+} from '../../notifications/notification.entity';
 
 @Injectable()
 export class WorkItemsService {
@@ -62,6 +68,20 @@ export class WorkItemsService {
     const savedWorkItem = await this.workItemsRepository.findOneByOrFail({
       id: workItem.id,
     });
+    const savedMentions = await savedWorkItem.mentions;
+    if (savedMentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions: savedMentions,
+        createdBy: user,
+        org: org,
+        project: project,
+        action: ActionType.CREATE,
+        entity: EntityType.WORK_ITEM_DESCRIPTION,
+        status: StatusType.UNREAD,
+        entityId: savedWorkItem.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     const feature = await savedWorkItem.feature;
     await this.updateFeatureProgress(feature);
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
@@ -79,18 +99,18 @@ export class WorkItemsService {
     limit: number = 0,
   ) {
     let query = `
-        SELECT *
-        FROM work_item
-        WHERE work_item."orgId" = $1
-          AND work_item."projectId" = $2
-        ORDER BY CASE
-                     WHEN work_item."priority" = 'high' THEN 1
-                     WHEN work_item."priority" = 'medium' THEN 2
-                     WHEN work_item."priority" = 'low' THEN 3
-                     ELSE 4
-                     END,
-                 work_item."createdAt" DESC
-    `;
+            SELECT *
+            FROM work_item
+            WHERE work_item."orgId" = $1
+              AND work_item."projectId" = $2
+            ORDER BY CASE
+                         WHEN work_item."priority" = 'high' THEN 1
+                         WHEN work_item."priority" = 'medium' THEN 2
+                         WHEN work_item."priority" = 'low' THEN 3
+                         ELSE 4
+                         END,
+                     work_item."createdAt" DESC
+        `;
     let params = [orgId, projectId] as any[];
     if (limit > 0) {
       query += ' OFFSET $3 LIMIT $4';
@@ -112,6 +132,7 @@ export class WorkItemsService {
   }
 
   async updateWorkItem(
+    userId: string,
     orgId: string,
     projectId: string,
     id: string,
@@ -126,6 +147,20 @@ export class WorkItemsService {
     const oldFeature = await workItem.feature;
     await this.setWorkItemData(workItem, workItemDto, orgId);
     const savedWorkItem = await this.workItemsRepository.save(workItem);
+    const savedMentions = await savedWorkItem.mentions;
+    if (savedMentions && savedMentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions: savedMentions,
+        createdBy: await this.usersRepository.findOneByOrFail({ id: userId }),
+        org: await workItem.org,
+        project: await workItem.project,
+        action: ActionType.UPDATE,
+        entity: EntityType.WORK_ITEM_DESCRIPTION,
+        status: StatusType.UNREAD,
+        entityId: savedWorkItem.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     const newFeature = await savedWorkItem.feature;
     await this.updateFeatureProgress(oldFeature);
     if (newFeature && (!oldFeature || oldFeature.id !== newFeature.id)) {
@@ -290,6 +325,20 @@ export class WorkItemsService {
       }),
     );
     const savedComment = await this.workItemCommentsRepository.save(comment);
+    const savedMentions = await savedComment.mentions;
+    if (savedMentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions: savedMentions,
+        createdBy: user,
+        org: org,
+        project: await workItem.project,
+        action: ActionType.CREATE,
+        entity: EntityType.WORK_ITEM_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return CommentMapper.toDto(savedComment);
   }
 
@@ -334,6 +383,20 @@ export class WorkItemsService {
     );
     comment.content = createCommentDto.content;
     const savedComment = await this.workItemCommentsRepository.save(comment);
+    const savedMentions = await savedComment.mentions;
+    if (savedMentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions: savedMentions,
+        createdBy: await comment.createdBy,
+        org: org,
+        project: await workItem.project,
+        action: ActionType.UPDATE,
+        entity: EntityType.WORK_ITEM_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return await CommentMapper.toDto(savedComment);
   }
 
@@ -499,5 +562,74 @@ export class WorkItemsService {
 
   private isReference(search: string) {
     return /^[Ww][Ii]-\d+$/.test(search);
+  }
+
+  private async searchWorkItemsByTitleOrDescription(
+    orgId: string,
+    projectId: string,
+    search: string,
+    page: number,
+    limit: number,
+  ) {
+    let query = `
+            SELECT *
+            FROM work_item
+            WHERE work_item."orgId" = $1
+              AND work_item."projectId" = $2
+              AND (work_item.title ILIKE $3 OR work_item.description ILIKE $3)
+            ORDER BY CASE
+                         WHEN work_item."priority" = 'high' THEN 1
+                         WHEN work_item."priority" = 'medium' THEN 2
+                         WHEN work_item."priority" = 'low' THEN 3
+                         ELSE 4
+                         END,
+                     work_item."createdAt" DESC
+        `;
+    let params = [orgId, projectId, `%${search}%`] as any[];
+
+    if (limit > 0) {
+      query += ' OFFSET $4 LIMIT $5';
+      const offset = (page - 1) * limit;
+      params = [orgId, projectId, `%${search}%`, offset, limit];
+    }
+
+    const workItems = await this.workItemsRepository.query(query, params);
+
+    return WorkItemMapper.toSimpleListDto(workItems);
+  }
+
+  private async searchWorkItemsByReference(
+    orgId: string,
+    projectId: string,
+    search: string,
+    page: number,
+    limit: number,
+  ) {
+    let query = `
+            SELECT *
+            FROM work_item
+            WHERE work_item."orgId" = $1
+              AND work_item."projectId" = $2
+              AND LOWER(work_item."reference") = LOWER($3)
+            ORDER BY CASE
+                         WHEN work_item."priority" = 'high' THEN 1
+                         WHEN work_item."priority" = 'medium' THEN 2
+                         WHEN work_item."priority" = 'low' THEN 3
+                         ELSE 4
+                         END,
+                     work_item."createdAt" DESC
+        `;
+
+    let params = [orgId, projectId, search] as any[];
+
+    if (limit > 0) {
+      query += ' OFFSET $4 LIMIT $5';
+      const offset = (page - 1) * limit;
+      params = [orgId, projectId, search, offset, limit];
+    }
+
+    const workItems = await this.workItemsRepository.query(query, params);
+
+    return WorkItemMapper.toSimpleListDto(workItems);
   }
 }

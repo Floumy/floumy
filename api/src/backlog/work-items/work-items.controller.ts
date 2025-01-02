@@ -156,6 +156,7 @@ export class WorkItemsController {
 
     try {
       return await this.workItemsService.updateWorkItem(
+        request.user.sub,
         orgId,
         projectId,
         id,
