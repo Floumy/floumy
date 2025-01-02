@@ -21,6 +21,12 @@ import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { Project } from '../../projects/project.entity';
 import { FeatureQueryBuilder, FilterOptions } from './feature.query-builder';
 import { FeatureStatus } from './featurestatus.enum';
+import {
+  ActionType,
+  EntityType,
+  StatusType,
+} from '../../notifications/notification.entity';
+import { CreateNotificationDto } from '../../notifications/dtos';
 
 @Injectable()
 export class FeaturesService {
@@ -113,6 +119,20 @@ export class FeaturesService {
 
     const createdFeature = await FeatureMapper.toDto(savedFeature);
     this.eventEmitter.emit('feature.created', createdFeature);
+    const mentions = await savedFeature.mentions;
+    if (mentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions,
+        org,
+        project,
+        createdBy: user,
+        action: ActionType.CREATE,
+        entity: EntityType.INITIATIVE_DESCRIPTION,
+        status: StatusType.UNREAD,
+        entityId: savedFeature.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return createdFeature;
   }
 
@@ -123,18 +143,18 @@ export class FeaturesService {
     limit: number = 0,
   ) {
     let query = `
-        SELECT *
-        FROM feature
-        WHERE feature."orgId" = $1
-          AND feature."projectId" = $2
-        ORDER BY CASE
-                     WHEN feature."priority" = 'high' THEN 1
-                     WHEN feature."priority" = 'medium' THEN 2
-                     WHEN feature."priority" = 'low' THEN 3
-                     ELSE 4
-                     END,
-                 feature."createdAt" DESC
-    `;
+            SELECT *
+            FROM feature
+            WHERE feature."orgId" = $1
+              AND feature."projectId" = $2
+            ORDER BY CASE
+                         WHEN feature."priority" = 'high' THEN 1
+                         WHEN feature."priority" = 'medium' THEN 2
+                         WHEN feature."priority" = 'low' THEN 3
+                         ELSE 4
+                         END,
+                     feature."createdAt" DESC
+        `;
     let params = [orgId, projectId] as any[];
     if (limit > 0) {
       query += ' OFFSET $3 LIMIT $4';
@@ -173,6 +193,7 @@ export class FeaturesService {
   }
 
   async updateFeature(
+    userId: string,
     orgId: string,
     projectId: string,
     id: string,
@@ -231,6 +252,20 @@ export class FeaturesService {
       previous: originalFeature,
       current: updatedFeature,
     });
+    const mentions = await savedFeature.mentions;
+    if (mentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions,
+        createdBy: await this.userRepository.findOneByOrFail({ id: userId }),
+        org: await savedFeature.org,
+        project: await savedFeature.project,
+        action: ActionType.UPDATE,
+        entity: EntityType.INITIATIVE_DESCRIPTION,
+        status: StatusType.UNREAD,
+        entityId: savedFeature.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return updatedFeature;
   }
 
@@ -357,6 +392,20 @@ export class FeaturesService {
       }),
     );
     const savedComment = await this.featureCommentsRepository.save(comment);
+    const mentions = await savedComment.mentions;
+    if (mentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions,
+        createdBy: await this.userRepository.findOneByOrFail({ id: userId }),
+        org: org,
+        project: await feature.project,
+        action: ActionType.CREATE,
+        entity: EntityType.INITIATIVE_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return CommentMapper.toDto(savedComment);
   }
 
@@ -394,6 +443,20 @@ export class FeaturesService {
       }),
     );
     const savedComment = await this.featureCommentsRepository.save(comment);
+    const mentions = await savedComment.mentions;
+    if (mentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions,
+        createdBy: await this.userRepository.findOneByOrFail({ id: userId }),
+        org: await savedComment.org,
+        project: await (await savedComment.feature).project,
+        action: ActionType.UPDATE,
+        entity: EntityType.INITIATIVE_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return await CommentMapper.toDto(savedComment);
   }
 
@@ -595,6 +658,75 @@ export class FeaturesService {
 
   private isReference(search: string) {
     return /^[iI]-\d+$/.test(search);
+  }
+
+  private async searchFeaturesByTitleOrDescription(
+    orgId: string,
+    projectId: string,
+    search: string,
+    page: number,
+    limit: number,
+  ) {
+    let query = `
+            SELECT *
+            FROM feature
+            WHERE feature."orgId" = $1
+              AND feature."projectId" = $2
+              AND (feature.title ILIKE $3 OR feature.description ILIKE $3)
+            ORDER BY CASE
+                         WHEN feature."priority" = 'high' THEN 1
+                         WHEN feature."priority" = 'medium' THEN 2
+                         WHEN feature."priority" = 'low' THEN 3
+                         ELSE 4
+                         END,
+                     feature."createdAt" DESC
+        `;
+    let params = [orgId, projectId, `%${search}%`] as any[];
+
+    if (limit > 0) {
+      query += ' OFFSET $4 LIMIT $5';
+      const offset = (page - 1) * limit;
+      params = [orgId, projectId, `%${search}%`, offset, limit];
+    }
+
+    const features = await this.featuresRepository.query(query, params);
+
+    return await FeatureMapper.toListDtoWithoutAssignees(features);
+  }
+
+  private async searchFeaturesByReference(
+    orgId: string,
+    projectId: string,
+    search: string,
+    page: number,
+    limit: number,
+  ) {
+    let query = `
+            SELECT *
+            FROM feature
+            WHERE feature."orgId" = $1
+              AND feature."projectId" = $2
+              AND LOWER(feature.reference) LIKE LOWER($3)
+            ORDER BY CASE
+                         WHEN feature."priority" = 'high' THEN 1
+                         WHEN feature."priority" = 'medium' THEN 2
+                         WHEN feature."priority" = 'low' THEN 3
+                         ELSE 4
+                         END,
+                     feature."createdAt" DESC
+        `;
+
+    let params = [orgId, projectId, search] as any[];
+
+    if (limit > 0) {
+      query += ' OFFSET $4 LIMIT $5';
+      const offset = (page - 1) * limit;
+      params = [orgId, projectId, search, offset, limit];
+    }
+
+    const features = await this.featuresRepository.query(query, params);
+
+    return await FeatureMapper.toListDtoWithoutAssignees(features);
   }
 
   private async updateFeatureFeatureRequest(
