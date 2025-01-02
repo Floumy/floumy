@@ -144,8 +144,9 @@ function ActiveIteration() {
                   <Row>
                     <Col xs={12} sm={10}>
                       <h3>
-                          <span
-                            className="text-muted">{formatDate(getIterationStartDate(activeIteration))} - {formatDate(getIterationEndDate(activeIteration))}</span> | {activeIteration.title}
+                          <a href={`/admin/orgs/${orgId}/projects/${projectId}/iterations/edit/${activeIteration.id}`}
+                             >
+                            <span className="text-muted">{formatDate(getIterationStartDate(activeIteration))} - {formatDate(getIterationEndDate(activeIteration))}</span> | {activeIteration.title}</a>
                       </h3>
                       <p className="text-muted mb-0">{activeIteration.goal}</p>
                     </Col>
