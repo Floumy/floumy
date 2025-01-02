@@ -2,7 +2,7 @@ import { In, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityType, Notification, StatusType } from './notification.entity';
-import { ViewNotificationDto } from './dtos';
+import { CreateNotificationDto, ViewNotificationDto } from './dtos';
 import { Feature } from '../roadmap/features/feature.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { FeatureComment } from '../roadmap/features/feature-comment.entity';
@@ -204,5 +204,34 @@ export class NotificationService {
       org: { id: orgId },
       project: { id: projectId },
     });
+  }
+
+  async createNotification(payload: CreateNotificationDto) {
+    const notifications: Notification[] = [];
+    for (const mention of payload.mentions) {
+      if (mention.id === payload.createdBy.id) {
+        continue;
+      }
+      const alreadyExists = await this.notificationsRepository.count({
+        where: {
+          entityId: payload.entityId,
+          user: { id: mention.id },
+        },
+      });
+      if (!alreadyExists) {
+        const notification = new Notification();
+        notification.entity = payload.entity;
+        notification.createdBy = Promise.resolve(payload.createdBy);
+        notification.action = payload.action;
+        notification.status = payload.status;
+        notification.entityId = payload.entityId;
+        notification.user = Promise.resolve(mention);
+        notification.project = Promise.resolve(payload.project);
+        notification.org = Promise.resolve(payload.org);
+        notifications.push(notification);
+      }
+    }
+
+    return await this.notificationsRepository.save(notifications);
   }
 }
