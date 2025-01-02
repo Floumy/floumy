@@ -9,7 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshToken } from './refresh-token.entity';
 import { ConfigService } from '@nestjs/config';
 import { TokensService } from './tokens.service';
-import { NotificationsModule } from '../notifications/notifications.module';
+import { MailNotificationsModule } from '../mail-notifications/mail-notifications.module';
 import { User } from '../users/user.entity';
 import { RefreshTokensCleanerService } from './referesh-tokens-cleaner.service';
 import { OrgsModule } from '../orgs/orgs.module';
@@ -27,7 +27,7 @@ import { BasicAuthGuard } from './basic-auth.guard';
   ],
   imports: [
     UsersModule,
-    NotificationsModule,
+    MailNotificationsModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,

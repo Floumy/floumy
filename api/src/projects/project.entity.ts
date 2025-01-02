@@ -23,6 +23,7 @@ import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
 import { Org } from '../orgs/org.entity';
+import { Notification } from '../notifications/notification.entity';
 
 @Entity()
 export class Project {
@@ -75,4 +76,8 @@ export class Project {
   issues: Promise<Issue[]>;
   @ManyToOne(() => Org, (org) => org.projects, { lazy: true })
   org: Promise<Org>;
+  @OneToMany(() => Notification, (notification) => notification.project, {
+    lazy: true,
+  })
+  notifications: Promise<Notification[]>;
 }

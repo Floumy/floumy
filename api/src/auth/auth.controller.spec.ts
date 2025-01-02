@@ -6,7 +6,7 @@ import { setupTestingModule } from '../../test/test.utils';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshToken } from './refresh-token.entity';
 import { TokensService } from './tokens.service';
-import { NotificationsService } from '../notifications/notifications.service';
+import { MailNotificationsService } from '../mail-notifications/mail-notifications.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { OrgsService } from '../orgs/orgs.service';
@@ -23,7 +23,7 @@ describe('AuthController', () => {
       [
         AuthService,
         TokensService,
-        NotificationsService,
+        MailNotificationsService,
         UsersService,
         OrgsService,
       ],

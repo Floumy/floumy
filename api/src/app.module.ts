@@ -9,7 +9,7 @@ import { RoadmapModule } from './roadmap/roadmap.module';
 import { BacklogModule } from './backlog/backlog.module';
 import { IterationsModule } from './iterations/iterations.module';
 import { FilesModule } from './files/files.module';
-import { NotificationsModule } from './notifications/notifications.module';
+import { MailNotificationsModule } from './mail-notifications/mail-notifications.module';
 import databaseConfig from './config/database.config';
 import encryptionConfig from './config/encryption.config';
 import jwtConfig from './config/jwt.config';
@@ -31,6 +31,7 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { ProjectsModule } from './projects/projects.module';
 import { AiModule } from './ai/ai.module';
+import { NotificationModule } from './notifications/notification.module';
 
 @Module({
   imports: [
@@ -90,7 +91,7 @@ import { AiModule } from './ai/ai.module';
     BacklogModule,
     IterationsModule,
     FilesModule,
-    NotificationsModule,
+    MailNotificationsModule,
     BipModule,
     PaymentsModule,
     FeedModule,
@@ -98,6 +99,7 @@ import { AiModule } from './ai/ai.module';
     IssuesModule,
     ProjectsModule,
     AiModule,
+    NotificationModule,
   ],
   providers: [
     {

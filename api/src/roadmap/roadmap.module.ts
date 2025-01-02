@@ -27,6 +27,8 @@ import { StripeModule } from '../stripe/stripe.module';
 import { FeatureComment } from './features/feature-comment.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Project } from '../projects/project.entity';
+import { NotificationListener } from '../notifications/notification.listener';
+import { Notification } from '../notifications/notification.entity';
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { Project } from '../projects/project.entity';
       FeatureComment,
       FeatureRequest,
       Project,
+      Notification,
     ]),
     OrgsModule,
     OkrsModule,
@@ -65,6 +68,7 @@ import { Project } from '../projects/project.entity';
     MilestonesService,
     FeaturesPublicService,
     MilestonesPublicService,
+    NotificationListener,
   ],
   exports: [FeaturesService],
 })
