@@ -20,6 +20,7 @@ import { CreateUpdateFeatureDto, PatchFeatureDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
+import { FilterOptions } from './feature.query-builder';
 
 @Controller('/orgs/:orgId/projects/:projectId/features')
 @UseGuards(AuthGuard)
@@ -83,6 +84,7 @@ export class FeaturesController {
     @Param('projectId') projectId: string,
     @Request() request: any,
     @Query('q') query: string,
+    @Query('f') filters: FilterOptions,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
@@ -96,6 +98,7 @@ export class FeaturesController {
         orgId,
         projectId,
         query,
+        filters,
         page,
         limit,
       );
