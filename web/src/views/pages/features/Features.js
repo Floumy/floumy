@@ -1,11 +1,11 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { Col, Container, Row } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import { listFeatures, searchFeatures } from "../../../services/roadmap/roadmap.service";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import FeaturesListCard from "./FeaturesListCard";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { useNavigate, useParams } from 'react-router-dom';
+import { Col, Container, Row } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { listFeatures, searchFeatures } from '../../../services/roadmap/roadmap.service';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import SearchFeaturesListCard from './SearchFeaturesListCard';
 
 function Features() {
   const { orgId, projectId } = useParams();
@@ -14,7 +14,10 @@ function Features() {
   const navigate = useNavigate();
   const [hasMoreFeatures, setHasMoreFeatures] = useState(true);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
+
+  const [filterByPriority, setFilterByPriority] = useState('all');
+  const [filterByStatus, setFilterByStatus] = useState('all');
 
   async function fetchData(page, features = []) {
     setIsLoading(true);
@@ -34,7 +37,7 @@ function Features() {
   }
 
   useEffect(() => {
-    document.title = "Floumy | Initiatives";
+    document.title = 'Floumy | Initiatives';
     fetchData(1);
   }, []);
 
@@ -56,7 +59,7 @@ function Features() {
   }
 
   async function loadNextPage() {
-    if (search !== "") {
+    if (search !== '') {
       await searchFeaturesByText(search, page, features);
     } else {
       await fetchData(page, features);
@@ -67,7 +70,7 @@ function Features() {
     setSearch(searchText);
     setFeatures([]);
     setPage(1);
-    if (searchText === "") {
+    if (searchText === '') {
       await fetchData(1);
     } else {
       await searchFeaturesByText(searchText, 1);
@@ -79,13 +82,13 @@ function Features() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader headerButtons={[
         {
-          name: "New Initiative",
-          shortcut: "i",
-          id: "new-feature",
+          name: 'New Initiative',
+          shortcut: 'i',
+          id: 'new-feature',
           action: () => {
             navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`);
-          }
-        }
+          },
+        },
       ]} />
       <Container className="mt--6" fluid>
         <Row>
@@ -94,14 +97,15 @@ function Features() {
                             hasMore={hasMoreFeatures}
                             loader={<></>}
                             dataLength={features.length}>
-              <FeaturesListCard title="All Initiatives"
-                                features={features}
-                                isLoading={isLoading}
-                                showFilters={false}
-                                enableContextMenu={false}
-                                showAssignedTo={false}
-                                onSearch={handleSearch}
-                                searchPlaceholder={"Search by title, description, or reference"}
+              <SearchFeaturesListCard title="All Initiatives"
+                                      features={features}
+                                      isLoading={isLoading}
+                                      onSearch={handleSearch}
+                                      searchPlaceholder={'Search by title, description, or reference'}
+                                      filterByPriority={filterByPriority}
+                                      setFilterByPriority={setFilterByPriority}
+                                      filterByStatus={filterByStatus}
+                                      setFilterByStatus={setFilterByStatus}
               />
             </InfiniteScroll>
           </Col>
