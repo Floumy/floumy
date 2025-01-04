@@ -20,18 +20,20 @@ export interface SearchOptions {
 
 export class FeatureQueryBuilder {
   private baseQuery = `
-      SELECT f2.* FROM (
-                           SELECT DISTINCT f.*,
-                                           CASE
-                                               WHEN f."priority" = 'high' THEN 1
-                                               WHEN f."priority" = 'medium' THEN 2
-                                               WHEN f."priority" = 'low' THEN 3
-                                               ELSE 4
-                                               END as priority_order
-                           FROM feature f
-                        LEFT JOIN "user" u ON u.id = f."assignedToId"
-                           WHERE f."orgId" = $1
-                             AND f."projectId" = $2
+      SELECT f2.*
+      FROM (SELECT DISTINCT f.*,
+                            CASE
+                                WHEN f."priority" = 'high' THEN 1
+                                WHEN f."priority" = 'medium' THEN 2
+                                WHEN f."priority" = 'low' THEN 3
+                                ELSE 4
+                                END as priority_order,
+                            u.id    as "assignedToId",
+                            u.name  as "assignedToName"
+            FROM feature f
+                     LEFT JOIN "user" u ON u.id = f."assignedToId"
+            WHERE f."orgId" = $1
+              AND f."projectId" = $2
   `;
 
   private paramCounter = 2; // Start after orgId and projectId
@@ -93,7 +95,7 @@ export class FeatureQueryBuilder {
     // Assignees filter
     if (assigneeIds?.length) {
       const paramNum = this.getNextParamNumber();
-      this.addFilter(`fa."assigneeId" = ANY($${paramNum})`, assigneeIds);
+      this.addFilter(`f."assignedToId" = ANY($${paramNum})`, assigneeIds);
     }
 
     // Priority filter
@@ -102,7 +104,7 @@ export class FeatureQueryBuilder {
       this.addFilter(`f.priority = ANY($${paramNum})`, priority);
     }
 
-    // Due date range filter
+    // Completed at range filter
     if (completedAt?.start) {
       const paramNum = this.getNextParamNumber();
       this.addFilter(`f."completedAt" >= $${paramNum}`, completedAt.start);
@@ -157,7 +159,7 @@ export class FeatureQueryBuilder {
   async execute(page = 1, limit = 0): Promise<FeaturesListDto[]> {
     const { query, params } = this.buildQuery(true, page, limit);
     const features = await this.featuresRepository.query(query, params);
-    return FeatureMapper.toListDtoWithoutAssignees(features);
+    return FeatureMapper.toSearchListDto(features);
   }
 
   async count(): Promise<number> {

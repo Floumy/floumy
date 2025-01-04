@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'reactstrap';
 import React, { useEffect, useState } from 'react';
-import { listFeatures, searchFeatures } from '../../../services/roadmap/roadmap.service';
+import { listFeatures, searchFeaturesWithOptions } from '../../../services/roadmap/roadmap.service';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -14,7 +14,7 @@ function Features() {
   const navigate = useNavigate();
   const [hasMoreFeatures, setHasMoreFeatures] = useState(true);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState({ text: '' });
 
   const [filterByPriority, setFilterByPriority] = useState('all');
   const [filterByStatus, setFilterByStatus] = useState('all');
@@ -41,10 +41,10 @@ function Features() {
     fetchData(1);
   }, []);
 
-  async function searchFeaturesByText(searchText, page, features = []) {
+  async function searchFeatures(searchOptions, page, features = []) {
     setIsLoading(true);
     try {
-      const response = await searchFeatures(orgId, projectId, searchText, page);
+      const response = await searchFeaturesWithOptions(orgId, projectId, searchOptions, page);
       if (response.length === 0) {
         setHasMoreFeatures(false);
       } else {
@@ -59,22 +59,14 @@ function Features() {
   }
 
   async function loadNextPage() {
-    if (search !== '') {
-      await searchFeaturesByText(search, page, features);
-    } else {
-      await fetchData(page, features);
-    }
+    await searchFeatures(search, page, features);
   }
 
-  async function handleSearch(searchText) {
-    setSearch(searchText);
+  async function handleSearch(searchOptions) {
+    setSearch(searchOptions);
     setFeatures([]);
     setPage(1);
-    if (searchText === '') {
-      await fetchData(1);
-    } else {
-      await searchFeaturesByText(searchText, 1);
-    }
+    await searchFeatures(searchOptions, 1);
   }
 
   return (
