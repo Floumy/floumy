@@ -7,7 +7,7 @@ export interface FilterOptions {
   status?: string[];
   assigneeIds?: string[];
   priority?: ('high' | 'medium' | 'low')[];
-  dueDate?: {
+  completedAt?: {
     start?: Date;
     end?: Date;
   };
@@ -82,7 +82,7 @@ export class FeatureQueryBuilder {
   private buildFilters(): void {
     if (!this.filters) return;
 
-    const { status, assigneeIds, priority, dueDate } = this.filters;
+    const { status, assigneeIds, priority, completedAt } = this.filters;
 
     // Status filter
     if (status?.length) {
@@ -103,13 +103,13 @@ export class FeatureQueryBuilder {
     }
 
     // Due date range filter
-    if (dueDate?.start) {
+    if (completedAt?.start) {
       const paramNum = this.getNextParamNumber();
-      this.addFilter(`f."dueDate" >= $${paramNum}`, dueDate.start);
+      this.addFilter(`f."completedAt" >= $${paramNum}`, completedAt.start);
     }
-    if (dueDate?.end) {
+    if (completedAt?.end) {
       const paramNum = this.getNextParamNumber();
-      this.addFilter(`f."dueDate" <= $${paramNum}`, dueDate.end);
+      this.addFilter(`f."completedAt" <= $${paramNum}`, completedAt.end);
     }
   }
 

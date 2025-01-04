@@ -20,6 +20,7 @@ import { FeatureComment } from './feature-comment.entity';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { Project } from '../../projects/project.entity';
 import { FeatureQueryBuilder, FilterOptions } from './feature.query-builder';
+import { FeatureStatus } from './featurestatus.enum';
 
 @Injectable()
 export class FeaturesService {
@@ -74,6 +75,11 @@ export class FeaturesService {
           })
         : undefined,
     );
+
+    if (featureDto.status === FeatureStatus.COMPLETED) {
+      feature.completedAt = new Date();
+    }
+
     await this.setFeatureAssignedTo(featureDto, org, feature);
     await this.setFeatureKeyResult(featureDto, org, projectId, feature);
 
@@ -189,6 +195,10 @@ export class FeaturesService {
         id: In(updateFeatureDto.mentions),
       }),
     );
+
+    if (updateFeatureDto.status === FeatureStatus.COMPLETED) {
+      feature.completedAt = new Date();
+    }
 
     await this.updateFeatureKeyResult(
       updateFeatureDto,

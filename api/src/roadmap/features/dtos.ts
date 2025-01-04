@@ -66,6 +66,7 @@ export interface FeatureDto {
   };
   createdAt: Date;
   updatedAt: Date;
+  completedAt?: Date;
 }
 
 export interface FeaturesListDto {

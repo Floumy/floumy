@@ -295,6 +295,15 @@ describe('FeaturesService', () => {
       expect(feature.featureRequest).toBeDefined();
       expect(feature.featureRequest.id).toEqual(featureRequest.id);
     });
+    it('should set the completedAt field if the status is completed', async () => {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.COMPLETED,
+      });
+      expect(feature.completedAt).not.toBeNull();
+    });
   });
   describe('when listing features', () => {
     it('should return a list of features', async () => {
@@ -902,6 +911,27 @@ describe('FeaturesService', () => {
       expect(updatedFeature.featureRequest.title).toEqual(featureRequest.title);
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
+    });
+    it('should set the completedAt field if the status is completed', async () => {
+      const feature = await service.createFeature(org.id, project.id, user.id, {
+        title: 'my feature',
+        description: 'my feature description',
+        priority: Priority.HIGH,
+        status: FeatureStatus.COMPLETED,
+      });
+      const updatedFeature = await service.updateFeature(
+        org.id,
+        project.id,
+        feature.id,
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          mentions: [user.id],
+          priority: Priority.LOW,
+          status: FeatureStatus.COMPLETED,
+        },
+      );
+      expect(updatedFeature.completedAt).not.toBeNull();
     });
   });
   describe('when deleting a feature', () => {

@@ -60,6 +60,7 @@ export class FeatureMapper {
         : undefined,
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt,
+      completedAt: feature.completedAt,
     };
     const featureKeyResult = await feature.keyResult;
     if (featureKeyResult) {
