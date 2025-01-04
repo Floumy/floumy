@@ -286,9 +286,9 @@ export class FeaturesService {
     orgId: string,
     projectId: string,
     search: string,
-    filters: FilterOptions,
     page: number = 1,
     limit: number = 0,
+    filters?: FilterOptions,
   ) {
     if (!search) return [];
 
@@ -298,6 +298,7 @@ export class FeaturesService {
         projectId,
         { reference: search },
         this.featuresRepository,
+        filters,
       );
       return queryBuilder.execute(page, limit);
     }
@@ -307,6 +308,7 @@ export class FeaturesService {
       projectId,
       { term: search },
       this.featuresRepository,
+      filters,
     );
 
     return queryBuilder.execute(page, limit);
