@@ -88,7 +88,8 @@ function Features() {
             <InfiniteScroll next={loadNextPage}
                             hasMore={hasMoreFeatures}
                             loader={<></>}
-                            dataLength={features.length}>
+                            dataLength={features.length}
+                            style={{ overflow: 'visible' }}>
               <SearchFeaturesListCard title="All Initiatives"
                                       features={features}
                                       isLoading={isLoading}
