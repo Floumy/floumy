@@ -84,9 +84,9 @@ export class FeaturesController {
     @Param('projectId') projectId: string,
     @Request() request: any,
     @Query('q') query: string,
-    @Query('f') filters: FilterOptions,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
+    @Query('f') filters?: FilterOptions,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
@@ -98,9 +98,9 @@ export class FeaturesController {
         orgId,
         projectId,
         query,
-        filters,
         page,
         limit,
+        filters,
       );
     } catch (e) {
       throw new BadRequestException();
