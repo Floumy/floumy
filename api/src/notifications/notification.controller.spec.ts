@@ -23,8 +23,8 @@ import { AuthModule } from '../auth/auth.module';
 import { NotificationService } from './notification.service';
 import { OrgsService } from '../orgs/orgs.service';
 import { TestingModule } from '@nestjs/testing';
-import { uuid } from 'uuidv4';
 import { Repository } from 'typeorm';
+import { NotificationListener } from './notification.listener';
 
 describe('NotificationController', () => {
   let controller: NotificationController;
@@ -52,7 +52,7 @@ describe('NotificationController', () => {
         ]),
         AuthModule,
       ],
-      [NotificationService],
+      [NotificationService, NotificationListener],
       [NotificationController],
     );
     cleanup = dbCleanup;
@@ -98,8 +98,8 @@ describe('NotificationController', () => {
   describe('when listing notifications when there are some', () => {
     let notifications: Notification[];
     beforeEach(async () => {
-      const notificationService =
-        testingModule.get<NotificationService>(NotificationService);
+      const notificationListener =
+        testingModule.get<NotificationListener>(NotificationListener);
       const workItemRepository = testingModule.get<Repository<WorkItem>>(
         getRepositoryToken(WorkItem),
       );
@@ -110,7 +110,7 @@ describe('NotificationController', () => {
       workItem.title = 'Test Work Item';
       workItem.description = 'Test Description';
       await workItemRepository.save(workItem);
-      notifications = await notificationService.createNotification({
+      notifications = await notificationListener.handleCreateNotification({
         org,
         project,
         entity: EntityType.WORK_ITEM_DESCRIPTION,
