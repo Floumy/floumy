@@ -18,20 +18,72 @@ import {
   priorityColor,
   textToColor,
 } from '../../../services/utils/utils';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Select2 from 'react-select2-wrapper';
 import useDebounceSearch from '../../../hooks/useDebounceSearch';
+import ReactDatetime from 'react-datetime';
+import { getOrg } from '../../../services/org/orgs.service';
 
-function SearchFeaturesListCard({ features,
+function SearchFeaturesListCard({
+                                  features,
                                   title,
                                   onSearch,
                                   searchPlaceholder = 'Search by title',
-                                  filterByPriority,
-                                  setFilterByPriority,
-                                  filterByStatus,
-                                  setFilterByStatus }) {
+                                }) {
+
   const { orgId, projectId } = useParams();
-  const [searchText, handleSearch] = useDebounceSearch(onSearch);
+  const [searchText, handleSearch] = useDebounceSearch((text) => {
+    onSearch({
+      text,
+      assignee: filterByAssignee,
+      priority: filterByPriority,
+      status: filterByStatus,
+      completedAt: {
+        start: startDate,
+        end: endDate,
+      },
+    });
+  });
+  const [filterByAssignee, setFilterByAssignee] = useState('all');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [filterByPriority, setFilterByPriority] = useState('all');
+  const [filterByStatus, setFilterByStatus] = useState('all');
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const handleFilterChange = () => {
+      onSearch({
+        text: searchText,
+        assignee: filterByAssignee,
+        priority: filterByPriority,
+        status: filterByStatus,
+        completedAt: {
+          start: startDate,
+          end: endDate,
+        },
+      });
+    };
+
+    handleFilterChange();
+  }, [filterByAssignee, filterByPriority, filterByStatus, startDate, endDate]);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const org = await getOrg();
+        const usersOptions = [
+          { id: 'all', text: 'All Assignees' },
+          ...org.members.map(user => ({ id: user.id, text: user.name })),
+        ];
+        setUsers(usersOptions);
+      } catch (e) {
+        console.error(e.message);
+      }
+    }
+
+    fetchUsers();
+  }, [orgId, projectId]);
 
   return (
     <Card>
@@ -40,25 +92,61 @@ function SearchFeaturesListCard({ features,
           <Col className="pb-2">
             <CardTitle tag="h2">{title}</CardTitle>
           </Col>
-          <Col xs={12} sm={3} className="pb-2">
-            <Select2
-              className="form-control"
-              defaultValue={filterByPriority}
-              data={[
-                { id: 'all', text: 'All Priorities' },
-                { id: 'high', text: 'High' },
-                { id: 'medium', text: 'Medium' },
-                { id: 'low', text: 'Low' },
-              ]}
-              options={{
-                placeholder: 'Filter by priority',
+        </Row>
+        <Row className="pb-2">
+          <Col xs={12} sm={2} className="pb-2">
+            <ReactDatetime
+              inputProps={{
+                placeholder: 'Completed from',
+                className: 'form-control mr-2',
               }}
-              onSelect={(e) => {
-                setFilterByPriority(e.target.value);
+              closeOnSelect={true}
+              timeFormat={false}
+              dateFormat={'YYYY-MM-DD'}
+              value={startDate}
+              onChange={(value) => {
+                if (value._isAMomentObject) {
+                  setStartDate(value.format('YYYY-MM-DD'));
+                } else {
+                  setStartDate(null);
+                }
               }}
             />
           </Col>
-          <Col xs={12} sm={3} className="pb-2">
+          <Col xs={12} sm={2} className="pb-2">
+            <ReactDatetime
+              inputProps={{
+                placeholder: 'Completed to',
+                className: 'form-control',
+              }}
+              className="datetime-left"
+              closeOnSelect={true}
+              timeFormat={false}
+              dateFormat={'YYYY-MM-DD'}
+              value={endDate}
+              onChange={(value) => {
+                if (value._isAMomentObject) {
+                  setEndDate(value.format('YYYY-MM-DD'));
+                } else {
+                  setEndDate(null);
+                }
+              }}
+            />
+          </Col>
+          <Col xs={12} sm={4} className="pb-2">
+            <Select2
+              className="form-control"
+              defaultValue={filterByAssignee}
+              data={users}
+              options={{
+                placeholder: 'Filter by assignee',
+              }}
+              onSelect={(e) => {
+                setFilterByAssignee(e.target.value);
+              }}
+            />
+          </Col>
+          <Col xs={12} sm={2} className="pb-2">
             <Select2
               className="form-control"
               defaultValue={filterByStatus}
@@ -75,6 +163,24 @@ function SearchFeaturesListCard({ features,
               }}
               onSelect={(e) => {
                 setFilterByStatus(e.target.value);
+              }}
+            />
+          </Col>
+          <Col xs={12} sm={2} className="pb-2">
+            <Select2
+              className="form-control"
+              defaultValue={filterByPriority}
+              data={[
+                { id: 'all', text: 'All Priorities' },
+                { id: 'high', text: 'High' },
+                { id: 'medium', text: 'Medium' },
+                { id: 'low', text: 'Low' },
+              ]}
+              options={{
+                placeholder: 'Filter by priority',
+              }}
+              onSelect={(e) => {
+                setFilterByPriority(e.target.value);
               }}
             />
           </Col>

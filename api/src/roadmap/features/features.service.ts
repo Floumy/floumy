@@ -300,8 +300,6 @@ export class FeaturesService {
     limit: number = 0,
     filters?: FilterOptions,
   ) {
-    if (!search) return [];
-
     if (this.isReference(search)) {
       const queryBuilder = new FeatureQueryBuilder(
         orgId,
