@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'reactstrap';
 import React, { useEffect, useState } from 'react';
-import { listFeatures, searchFeaturesWithOptions } from '../../../services/roadmap/roadmap.service';
+import { searchFeaturesWithOptions } from '../../../services/roadmap/roadmap.service';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -19,26 +19,8 @@ function Features() {
   const [filterByPriority, setFilterByPriority] = useState('all');
   const [filterByStatus, setFilterByStatus] = useState('all');
 
-  async function fetchData(page, features = []) {
-    setIsLoading(true);
-    try {
-      const featuresList = await listFeatures(orgId, projectId, page);
-      if (featuresList.length === 0) {
-        setHasMoreFeatures(false);
-      } else {
-        setFeatures([...features, ...featuresList]);
-        setPage(page + 1);
-      }
-    } catch (e) {
-      console.error(e.message);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
   useEffect(() => {
     document.title = 'Floumy | Initiatives';
-    fetchData(1);
   }, []);
 
   async function searchFeatures(searchOptions, page, features = []) {
