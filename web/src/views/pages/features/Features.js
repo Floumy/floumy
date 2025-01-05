@@ -71,7 +71,7 @@ function Features() {
                             hasMore={hasMoreFeatures}
                             loader={<></>}
                             dataLength={features.length}
-                            style={{ overflow: 'visible' }}>
+                            style={{ minHeight: '500px', overflow: 'visible' }}>
               <SearchFeaturesListCard title="All Initiatives"
                                       features={features}
                                       isLoading={isLoading}
