@@ -85,6 +85,7 @@ export class WorkItemsController {
     @Query('q') query: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
+    @Query('f') filters?: string,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
@@ -97,6 +98,7 @@ export class WorkItemsController {
         query,
         page,
         limit,
+        filters ? JSON.parse(filters) : undefined,
       );
     } catch (e) {
       throw new BadRequestException();
