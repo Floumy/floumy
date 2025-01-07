@@ -240,9 +240,8 @@ function SearchWorkItemsListCard({
           <tr>
             <th scope="col" width="5%">Reference</th>
             <th scope="col" width="40%">Title</th>
-            <th scope="col" width="15%">Feature</th>
-            <th scope="col" width="10%">Status</th>
             <th scope="col" width="10%">Assigned To</th>
+            <th scope="col" width="10%">Status</th>
             <th scope="col" width="10%">Priority</th>
           </tr>
           </thead>
@@ -269,19 +268,6 @@ function SearchWorkItemsListCard({
                 </Link>
               </td>
               <td>
-                {workItem.feature ? (
-                  <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${workItem.feature.id}`}>
-                    {workItem.feature.reference}
-                  </Link>
-                ) : '-'}
-              </td>
-              <td>
-                <Badge color="" className="badge-dot mr-4">
-                  <i className={workItemStatusColorClassName(workItem.status)} />
-                  <span className="status">{formatHyphenatedString(workItem.status)}</span>
-                </Badge>
-              </td>
-              <td>
                 {workItem.assignedTo && workItem.assignedTo.name &&
                   <>
                     <UncontrolledTooltip target={'assigned-to-' + workItem.id} placement="top">
@@ -294,6 +280,12 @@ function SearchWorkItemsListCard({
                     </span>
                   </>}
                 {!workItem.assignedTo && '-'}
+              </td>
+              <td>
+                <Badge color="" className="badge-dot mr-4">
+                  <i className={workItemStatusColorClassName(workItem.status)} />
+                  <span className="status">{formatHyphenatedString(workItem.status)}</span>
+                </Badge>
               </td>
               <td>
                 <Badge color={priorityColor(workItem.priority)} pill={true}>
