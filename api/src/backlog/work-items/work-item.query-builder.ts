@@ -154,7 +154,7 @@ export class WorkItemQueryBuilder {
   async execute(page = 1, limit = 0) {
     const { query, params } = this.buildQuery(true, page, limit);
     const workItems = await this.workItemsRepository.query(query, params);
-    return WorkItemMapper.toSimpleListDto(workItems);
+    return WorkItemMapper.toSearchListDto(workItems);
   }
 
   async count(): Promise<number> {

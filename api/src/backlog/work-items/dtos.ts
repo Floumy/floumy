@@ -67,3 +67,37 @@ export interface UserDto {
   id: string;
   name: string;
 }
+
+export interface SearchWorkItem {
+  id: string;
+  reference: string;
+  title: string;
+  description: string;
+  priority: Priority;
+  type: WorkItemType;
+  status: WorkItemStatus;
+  assignedToId: string;
+  assignedToName: string;
+  estimation: number;
+  completedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SearchWorkItemDto {
+  id: string;
+  reference: string;
+  title: string;
+  description: string;
+  priority: Priority;
+  type: WorkItemType;
+  status: WorkItemStatus;
+  estimation: number;
+  completedAt: Date;
+  assignedTo: {
+    id: string;
+    name: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
