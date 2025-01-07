@@ -18,9 +18,42 @@ export async function listWorkItems(orgId, projectId, page = 1, limit = 50) {
   }
 }
 
-export async function searchWorkItems(orgId, projectId, searchText, page = 1, limit = 50) {
+export async function searchWorkItemsWithOptions(orgId, projectId, searchOptions, page = 1, limit = 50) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/search?q=${searchText}&page=${page}&limit=${limit}`);
+    const params = new URLSearchParams();
+
+    // Add basic search params
+    if (searchOptions.text) {
+      params.append('q', searchOptions.text);
+    }
+
+    // Add pagination
+    if (page) {
+      params.append('page', page.toString());
+    }
+    if (limit) {
+      params.append('limit', limit.toString());
+    }
+
+    // Build filters object
+    const filters = {
+      status: searchOptions.status !== 'all' ? [searchOptions.status] : undefined,
+      assigneeIds: searchOptions.assignee !== 'all' ? [searchOptions.assignee] : undefined,
+      priority: searchOptions.priority !== 'all' ? [searchOptions.priority] : undefined,
+      completedAt: (searchOptions.completedAt?.start || searchOptions.completedAt?.end) ? {
+        start: searchOptions.completedAt.start || undefined,
+        end: searchOptions.completedAt.end || undefined
+      } : undefined
+    };
+
+    // Only add filters if there are any active ones
+    if (Object.values(filters).some(v => v !== undefined)) {
+      params.append('f', JSON.stringify(filters));
+    }
+
+    const url = `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/search?${params.toString()}`;
+
+    const response = await api.get(url);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
