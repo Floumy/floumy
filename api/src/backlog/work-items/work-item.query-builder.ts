@@ -6,6 +6,7 @@ export interface FilterOptions {
   status?: string[];
   assigneeIds?: string[];
   priority?: ('high' | 'medium' | 'low')[];
+  type?: ('user-story' | 'task' | 'bug' | 'spike' | 'technical-debt')[];
   completedAt?: {
     start?: Date;
     end?: Date;
@@ -82,7 +83,7 @@ export class WorkItemQueryBuilder {
   private buildFilters(): void {
     if (!this.filters) return;
 
-    const { status, assigneeIds, priority, completedAt } = this.filters;
+    const { status, assigneeIds, priority, completedAt, type } = this.filters;
 
     if (status?.length) {
       const paramNum = this.getNextParamNumber();
@@ -97,6 +98,11 @@ export class WorkItemQueryBuilder {
     if (priority?.length) {
       const paramNum = this.getNextParamNumber();
       this.addFilter(`wi.priority = ANY($${paramNum})`, priority);
+    }
+
+    if (type?.length) {
+      const paramNum = this.getNextParamNumber();
+      this.addFilter(`wi.type = ANY($${paramNum})`, type);
     }
 
     if (completedAt?.start) {

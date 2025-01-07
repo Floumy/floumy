@@ -16,9 +16,6 @@ function WorkItems() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState({ text: '' });
 
-  const [filterByPriority, setFilterByPriority] = useState('all');
-  const [filterByStatus, setFilterByStatus] = useState('all');
-
   useEffect(() => {
     document.title = 'Floumy | Work Items';
   }, []);
@@ -86,13 +83,8 @@ function WorkItems() {
               <SearchWorkItemsListCard
                 title="All Work Items"
                 workItems={workItems}
-                isLoading={isLoading}
                 onSearch={handleSearch}
                 searchPlaceholder={'Search by title, description, or reference'}
-                filterByPriority={filterByPriority}
-                setFilterByPriority={setFilterByPriority}
-                filterByStatus={filterByStatus}
-                setFilterByStatus={setFilterByStatus}
               />
             </InfiniteScroll>
           </Col>

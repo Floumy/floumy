@@ -40,6 +40,7 @@ export async function searchWorkItemsWithOptions(orgId, projectId, searchOptions
       status: searchOptions.status !== 'all' ? [searchOptions.status] : undefined,
       assigneeIds: searchOptions.assignee !== 'all' ? [searchOptions.assignee] : undefined,
       priority: searchOptions.priority !== 'all' ? [searchOptions.priority] : undefined,
+      type: searchOptions.type !== 'all' ? [searchOptions.type] : undefined,
       completedAt: (searchOptions.completedAt?.start || searchOptions.completedAt?.end) ? {
         start: searchOptions.completedAt.start || undefined,
         end: searchOptions.completedAt.end || undefined

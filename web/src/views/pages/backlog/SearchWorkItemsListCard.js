@@ -18,7 +18,7 @@ import {
   memberNameInitials,
   priorityColor,
   textToColor,
-  workItemStatusColorClassName,
+  workItemStatusColorClassName, workItemTypeIcon,
 } from '../../../services/utils/utils';
 import React, { useEffect, useState } from 'react';
 import Select2 from 'react-select2-wrapper';
@@ -39,6 +39,7 @@ function SearchWorkItemsListCard({
       assignee: filterByAssignee,
       priority: filterByPriority,
       status: filterByStatus,
+      type: filterByType,
       completedAt: {
         start: startDate,
         end: endDate,
@@ -52,6 +53,7 @@ function SearchWorkItemsListCard({
   const [filterByPriority, setFilterByPriority] = useState('all');
   const [filterByStatus, setFilterByStatus] = useState('all');
   const [users, setUsers] = useState([]);
+  const [filterByType, setFilterByType] = useState('all');
 
   useEffect(() => {
     const handleFilterChange = () => {
@@ -60,6 +62,7 @@ function SearchWorkItemsListCard({
         assignee: filterByAssignee,
         priority: filterByPriority,
         status: filterByStatus,
+        type: filterByType,
         completedAt: {
           start: startDate,
           end: endDate,
@@ -68,7 +71,7 @@ function SearchWorkItemsListCard({
     };
 
     handleFilterChange();
-  }, [filterByAssignee, filterByPriority, filterByStatus, startDate, endDate]);
+  }, [filterByAssignee, filterByPriority, filterByStatus, startDate, endDate, filterByType]);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -135,7 +138,27 @@ function SearchWorkItemsListCard({
               }}
             />
           </Col>
-          <Col xs={12} sm={4} className="pb-2">
+          <Col xs={12} sm={2} className="pb-2">
+            <Select2
+              className="form-control"
+              defaultValue={filterByType}
+              data={[
+                { id: 'all', text: 'All Types' },
+                { id: 'user-story', text: 'User Story' },
+                { id: 'task', text: 'Task' },
+                { id: 'bug', text: 'Bug' },
+                { id: 'spike', text: 'Spike' },
+                { id: 'technical-debt', text: 'Technical Debt' },
+              ]}
+              options={{
+                placeholder: 'Filter by type',
+              }}
+              onSelect={(e) => {
+                setFilterByType(e.target.value);
+              }}
+            />
+          </Col>
+          <Col xs={12} sm={2} className="pb-2">
             <Select2
               className="form-control"
               defaultValue={filterByAssignee}
@@ -154,8 +177,15 @@ function SearchWorkItemsListCard({
               defaultValue={filterByStatus}
               data={[
                 { id: 'all', text: 'All Statuses' },
-                { id: 'todo', text: 'To Do' },
+                { id: 'planned', text: 'Planned' },
+                { id: 'ready-to-start', text: 'Ready to Start' },
                 { id: 'in-progress', text: 'In Progress' },
+                { id: 'blocked', text: 'Blocked' },
+                { id: 'code-review', text: 'Code Review' },
+                { id: 'testing', text: 'Testing' },
+                { id: 'revisions', text: 'Revisions' },
+                { id: 'ready-for-deployment', text: 'Ready for Deployment' },
+                { id: 'deployed', text: 'Deployed' },
                 { id: 'done', text: 'Done' },
                 { id: 'closed', text: 'Closed' },
               ]}
@@ -214,7 +244,6 @@ function SearchWorkItemsListCard({
             <th scope="col" width="10%">Status</th>
             <th scope="col" width="10%">Assigned To</th>
             <th scope="col" width="10%">Priority</th>
-            <th scope="col" width="10%">Type</th>
           </tr>
           </thead>
           <tbody className="list">
@@ -233,7 +262,9 @@ function SearchWorkItemsListCard({
                 </Link>
               </td>
               <td className="title-cell">
-                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/backlog/work-items/detail/${workItem.id}`}>
+                {workItemTypeIcon(workItem.type)}
+                <Link className={"edit-work-item"} color={"muted"}
+                      to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`}>
                   {workItem.title}
                 </Link>
               </td>
@@ -267,11 +298,6 @@ function SearchWorkItemsListCard({
               <td>
                 <Badge color={priorityColor(workItem.priority)} pill={true}>
                   {workItem.priority}
-                </Badge>
-              </td>
-              <td>
-                <Badge color="primary" className="text-uppercase">
-                  {workItem.type}
                 </Badge>
               </td>
             </tr>
