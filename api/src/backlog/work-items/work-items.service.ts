@@ -18,6 +18,7 @@ import { PaymentPlan } from '../../auth/payment.plan';
 import { WorkItemComment } from './work-item-comment.entity';
 import { Issue } from '../../issues/issue.entity';
 import { Project } from '../../projects/project.entity';
+import { FilterOptions, WorkItemQueryBuilder } from './work-item.query-builder';
 
 @Injectable()
 export class WorkItemsService {
@@ -220,26 +221,28 @@ export class WorkItemsService {
     search: string,
     page: number = 1,
     limit: number = 0,
+    filters?: FilterOptions,
   ) {
-    if (!search) return [];
-
     if (this.isReference(search)) {
-      return await this.searchWorkItemsByReference(
+      const queryBuilder = new WorkItemQueryBuilder(
         orgId,
         projectId,
-        search,
-        page,
-        limit,
+        { reference: search },
+        this.workItemsRepository,
+        filters,
       );
+      return queryBuilder.execute(page, limit);
     }
 
-    return await this.searchWorkItemsByTitleOrDescription(
+    const queryBuilder = new WorkItemQueryBuilder(
       orgId,
       projectId,
-      search,
-      page,
-      limit,
+      { term: search },
+      this.workItemsRepository,
+      filters,
     );
+
+    return queryBuilder.execute(page, limit);
   }
 
   async listWorkItemComments(
@@ -496,74 +499,5 @@ export class WorkItemsService {
 
   private isReference(search: string) {
     return /^[Ww][Ii]-\d+$/.test(search);
-  }
-
-  private async searchWorkItemsByTitleOrDescription(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-        SELECT *
-        FROM work_item
-        WHERE work_item."orgId" = $1
-          AND work_item."projectId" = $2
-          AND (work_item.title ILIKE $3 OR work_item.description ILIKE $3)
-        ORDER BY CASE
-                     WHEN work_item."priority" = 'high' THEN 1
-                     WHEN work_item."priority" = 'medium' THEN 2
-                     WHEN work_item."priority" = 'low' THEN 3
-                     ELSE 4
-                     END,
-                 work_item."createdAt" DESC
-    `;
-    let params = [orgId, projectId, `%${search}%`] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, `%${search}%`, offset, limit];
-    }
-
-    const workItems = await this.workItemsRepository.query(query, params);
-
-    return WorkItemMapper.toSimpleListDto(workItems);
-  }
-
-  private async searchWorkItemsByReference(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-        SELECT *
-        FROM work_item
-        WHERE work_item."orgId" = $1
-          AND work_item."projectId" = $2
-          AND LOWER(work_item."reference") = LOWER($3)
-        ORDER BY CASE
-                     WHEN work_item."priority" = 'high' THEN 1
-                     WHEN work_item."priority" = 'medium' THEN 2
-                     WHEN work_item."priority" = 'low' THEN 3
-                     ELSE 4
-                     END,
-                 work_item."createdAt" DESC
-    `;
-
-    let params = [orgId, projectId, search] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, search, offset, limit];
-    }
-
-    const workItems = await this.workItemsRepository.query(query, params);
-
-    return WorkItemMapper.toSimpleListDto(workItems);
   }
 }
