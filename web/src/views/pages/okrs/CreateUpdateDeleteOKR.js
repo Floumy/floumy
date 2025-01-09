@@ -109,18 +109,18 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
     }
   };
 
-  async function fetchAndSetMembers() {
-    const org = await getOrg();
-    const mappedUsers = org.members
-      .filter(user => user.isActive || user.id === okr?.objective?.assignedTo)
-      .map(user => {
-        return { id: user.id, text: user.name };
-      });
-    mappedUsers.push({ id: '', text: 'None' });
-    setMembers(mappedUsers);
-  }
-
   useEffect(() => {
+    async function fetchAndSetMembers() {
+      const org = await getOrg();
+      const mappedUsers = org.members
+        .filter(user => user.isActive || user.id === okr?.objective?.assignedTo)
+        .map(user => {
+          return { id: user.id, text: user.name };
+        });
+      mappedUsers.push({ id: '', text: 'None' });
+      setMembers(mappedUsers);
+    }
+
     async function fetchData() {
       setIsLoading(true);
       try {
@@ -135,12 +135,12 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
     }
 
     fetchData();
-  }, []);
+  }, [okr?.objective?.assignedTo]);
 
   async function fillKeyResultsWithAi(objective) {
     try {
       const keyResults = (await generateKeyResults(objective))
-        .map((kr) => ({ id: kr, title: kr }));
+        .map((kr) => ({ id: kr.title, title: kr.title }));
       setFields([...keyResults, ...fields]);
     } catch (e) {
       toast.error('The key results could not be filled with AI');

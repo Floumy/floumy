@@ -24,8 +24,6 @@ import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import NotFoundCard from '../components/NotFoundCard';
 import { toast } from 'react-toastify';
 import Comments from '../../../components/Comments/Comments';
-import AIButton from '../../../components/AI/AIButton';
-import { addInitiativesWithAi } from '../../../services/ai/ai.service';
 
 function DetailKeyResult() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -309,14 +307,7 @@ function DetailKeyResult() {
                 <CardHeader className="border-1">
                   <div className="row">
                     <div className="col-12">
-                      <h3 className="mb-0">Related Initiatives <AIButton
-                        text="Add with AI"
-                        disabled={keyResult.objective.id === null}
-                        onClick={async () => {
-                          const initiatives = await addInitiativesWithAi(keyResult.id);
-                          setKeyResult({ ...keyResult, features: initiatives });
-                        }}
-                      /></h3>
+                      <h3 className="mb-0">Related Initiatives</h3>
                     </div>
                   </div>
                 </CardHeader>

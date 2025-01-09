@@ -1,11 +1,8 @@
 import {
-  Request,
-  Body,
+  BadRequestException,
   Controller,
   Get,
-  Post,
   Query,
-  UnauthorizedException,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,38 +16,12 @@ import { AuthGuard } from '../auth/auth.guard';
 export class AiController {
   constructor(private aiService: AiService) {}
 
-  @Get('description-for-initiative')
-  async generateDescriptionForInitiative(
-    @Query('initiative') initiative: string,
-  ) {
-    try {
-      return await this.aiService.generateDescriptionForInitiative(initiative);
-    } catch (e) {
-      throw new UnauthorizedException();
-    }
-  }
-
-  @Get('description-for-work-item')
-  async generateDescriptionForWorkItem(@Query('workItem') workItem: string) {
-    return await this.aiService.generateDescriptionForWorkItem(workItem);
-  }
-
   @Get('key-results')
   async generateKeyResults(@Query('objective') objective: string) {
-    return await this.aiService.generateKeyResults(objective);
-  }
-
-  @Post('initiatives')
-  async addInitiatives(
-    @Request() request,
-    @Body('keyResult') keyResult: string,
-  ) {
-    const user = request.user.sub;
-    return await this.aiService.addInitiativesForKeyResult(user, keyResult);
-  }
-
-  @Post('work-items')
-  async generateWorkItems(@Query('initiative') initiative: string) {
-    return await this.aiService.generateWorkItems(initiative);
+    try {
+      return await this.aiService.generateKeyResults(objective);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }
