@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
+import floumySystemPrompt from './prompts';
 
 export interface AIResponse<T> {
   data: T;
@@ -24,16 +25,26 @@ export class OpenaiService {
 
   async generateCompletion<T>(
     prompt: string,
+    jsonSchema: any,
     options: {
       temperature?: number;
       model?: string;
     } = {},
   ): Promise<AIResponse<T>> {
     const completion = await this.openai.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
+      messages: [
+        {
+          role: 'system',
+          content: floumySystemPrompt,
+        },
+        { role: 'user', content: prompt },
+      ],
       model: options.model || 'gpt-4o-mini',
-      response_format: { type: 'json_object' },
-      temperature: options.temperature || 0.7,
+      temperature: options.temperature || 0.1,
+      response_format: {
+        type: 'json_schema',
+        json_schema: jsonSchema,
+      },
     });
 
     const response = JSON.parse(completion.choices[0].message.content);
