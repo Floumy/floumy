@@ -51,6 +51,8 @@ export class Feature {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @Column({ nullable: true })
+  completedAt: Date;
   @Column({
     nullable: false,
   })
