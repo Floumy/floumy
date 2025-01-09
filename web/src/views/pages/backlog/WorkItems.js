@@ -1,66 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { listWorkItems, searchWorkItems } from "../../../services/backlog/backlog.service";
-import { useNavigate, useParams } from "react-router-dom";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Container, Row } from "reactstrap";
-import WorkItemsListCard from "./WorkItemsListCard";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { useNavigate, useParams } from 'react-router-dom';
+import { Col, Container, Row } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import SearchWorkItemsListCard from './SearchWorkItemsListCard';
+import { searchWorkItemsWithOptions } from '../../../services/backlog/backlog.service';
 
 function WorkItems() {
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const [workItems, setWorkItems] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasMoreWorkItems, setHasMoreWorkItems] = useState(true);
-  const [search, setSearch] = useState("");
   const { orgId, projectId } = useParams();
-
-  async function fetchData(page, workItems = []) {
-    setIsLoading(true);
-    try {
-      const workItemsList = await listWorkItems(orgId, projectId, page, 50);
-      if (workItemsList.length === 0) {
-        setHasMoreWorkItems(false);
-      } else {
-        setWorkItems([...workItems, ...workItemsList]);
-        setPage(page + 1);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const [isLoading, setIsLoading] = useState(true);
+  const [workItems, setWorkItems] = useState([]);
+  const navigate = useNavigate();
+  const [hasMoreWorkItems, setHasMoreWorkItems] = useState(true);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState({ text: '' });
 
   useEffect(() => {
-    document.title = "Floumy | Work Items";
-    fetchData(1);
+    document.title = 'Floumy | Work Items';
   }, []);
 
-  async function loadNextPage() {
-    if (search !== "") {
-      await searchWorkItemsByText(search, page, workItems);
-    } else {
-      await fetchData(page, workItems);
-    }
-  }
-
-  async function handleSearch(searchText) {
-    setSearch(searchText);
-    setWorkItems([]);
-    setPage(1);
-    if (searchText === "") {
-      await fetchData(1);
-    } else {
-      await searchWorkItemsByText(searchText, 1);
-    }
-  }
-
-  async function searchWorkItemsByText(searchText, page, workItems = []) {
+  async function searchWorkItems(searchOptions, page, workItems = []) {
     setIsLoading(true);
     try {
-      const response = await searchWorkItems(orgId, projectId, searchText, page);
+      const response = await searchWorkItemsWithOptions(
+        orgId,
+        projectId,
+        searchOptions,
+        page,
+      );
+
       if (response.length === 0) {
         setHasMoreWorkItems(false);
       } else {
@@ -74,40 +43,51 @@ function WorkItems() {
     }
   }
 
+  async function loadNextPage() {
+    await searchWorkItems(search, page, workItems);
+  }
+
+  async function handleSearch(searchOptions) {
+    setSearch(searchOptions);
+    setWorkItems([]);
+    setPage(1);
+    setHasMoreWorkItems(true);
+    await searchWorkItems(searchOptions, 1);
+  }
+
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader
         headerButtons={[
           {
-            name: "New Work Item",
-            shortcut: "w",
-            id: "new-work-item",
+            name: 'New Work Item',
+            shortcut: 'w',
+            id: 'new-work-item',
             action: () => {
               navigate(`/admin/orgs/${orgId}/projects/${projectId}/work-item/new`);
-            }
-          }
+            },
+          },
         ]}
       />
-      <Container className="mt--6" fluid id="OKRs">
+      <Container className="mt--6" fluid>
         <Row>
-          <div className="col">
-            <InfiniteScroll next={loadNextPage}
-                            hasMore={hasMoreWorkItems}
-                            loader={<></>}
-                            dataLength={workItems.length}>
-              <WorkItemsListCard workItems={workItems}
-                                 title={"All Work Items"}
-                                 isLoading={isLoading}
-                                 enableContextMenu={false}
-                                 showAssignedTo={false}
-                                 showFeature={false}
-                                 showFilters={false}
-                                 onSearch={handleSearch}
-                                 searchPlaceholder={"Search by title, description, or reference"}
+          <Col>
+            <InfiniteScroll
+              next={loadNextPage}
+              hasMore={hasMoreWorkItems}
+              loader={<></>}
+              dataLength={workItems.length}
+              style={{ minHeight: '500px', overflow: 'visible' }}
+            >
+              <SearchWorkItemsListCard
+                title="All Work Items"
+                workItems={workItems}
+                onSearch={handleSearch}
+                searchPlaceholder={'Search by title, description, or reference'}
               />
             </InfiniteScroll>
-          </div>
+          </Col>
         </Row>
       </Container>
     </>

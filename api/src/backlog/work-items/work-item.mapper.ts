@@ -1,5 +1,5 @@
 import { WorkItem } from './work-item.entity';
-import { WorkItemDto } from './dtos';
+import { SearchWorkItem, SearchWorkItemDto, WorkItemDto } from './dtos';
 import { Feature } from '../../roadmap/features/feature.entity';
 import { Iteration } from '../../iterations/Iteration.entity';
 import { User } from '../../users/user.entity';
@@ -115,6 +115,29 @@ export default class WorkItemMapper {
       priority: workItem.priority,
       type: workItem.type,
       status: workItem.status,
+      estimation: workItem.estimation,
+      completedAt: workItem.completedAt,
+      createdAt: workItem.createdAt,
+      updatedAt: workItem.updatedAt,
+    };
+  }
+
+  static toSearchListDto(workItems: SearchWorkItem[]): SearchWorkItemDto[] {
+    return workItems.map(WorkItemMapper.toSearchListItemDto);
+  }
+  static toSearchListItemDto(workItem: SearchWorkItem): SearchWorkItemDto {
+    return {
+      id: workItem.id,
+      reference: workItem.reference,
+      title: workItem.title,
+      description: workItem.description,
+      priority: workItem.priority,
+      type: workItem.type,
+      status: workItem.status,
+      assignedTo: {
+        id: workItem.assignedToId,
+        name: workItem.assignedToName,
+      },
       estimation: workItem.estimation,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
