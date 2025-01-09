@@ -1,5 +1,5 @@
 import { Feature } from './feature.entity';
-import { FeatureDto, FeaturesListDto } from './dtos';
+import { FeatureDto, FeaturesListDto, SearchFeature } from './dtos';
 import { CommentMapper } from '../../comments/mappers';
 
 export class FeatureMapper {
@@ -60,6 +60,7 @@ export class FeatureMapper {
         : undefined,
       createdAt: feature.createdAt,
       updatedAt: feature.updatedAt,
+      completedAt: feature.completedAt,
     };
     const featureKeyResult = await feature.keyResult;
     if (featureKeyResult) {
@@ -85,6 +86,34 @@ export class FeatureMapper {
     return await Promise.all(
       features.map(FeatureMapper.toListItemDtoWithoutAssignees),
     );
+  }
+
+  static async toSearchListDto(
+    features: SearchFeature[],
+  ): Promise<FeaturesListDto[]> {
+    return await Promise.all(features.map(FeatureMapper.toSearchListItemDto));
+  }
+
+  static async toSearchListItemDto(
+    feature: SearchFeature,
+  ): Promise<FeaturesListDto> {
+    return {
+      id: feature.id,
+      reference: feature.reference,
+      title: feature.title,
+      priority: feature.priority,
+      status: feature.status,
+      progress: feature.progress,
+      workItemsCount: feature.workItemsCount,
+      assignedTo: feature.assignedToId
+        ? {
+            id: feature.assignedToId,
+            name: feature.assignedToName,
+          }
+        : null,
+      createdAt: feature.createdAt,
+      updatedAt: feature.updatedAt,
+    };
   }
 
   static async toListDto(features: Feature[]): Promise<FeaturesListDto[]> {

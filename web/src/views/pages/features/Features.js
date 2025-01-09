@@ -1,11 +1,11 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { Col, Container, Row } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import { listFeatures, searchFeatures } from "../../../services/roadmap/roadmap.service";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import FeaturesListCard from "./FeaturesListCard";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { useNavigate, useParams } from 'react-router-dom';
+import { Col, Container, Row } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { searchFeaturesWithOptions } from '../../../services/roadmap/roadmap.service';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import SearchFeaturesListCard from './SearchFeaturesListCard';
 
 function Features() {
   const { orgId, projectId } = useParams();
@@ -14,34 +14,19 @@ function Features() {
   const navigate = useNavigate();
   const [hasMoreFeatures, setHasMoreFeatures] = useState(true);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState({ text: '' });
 
-  async function fetchData(page, features = []) {
-    setIsLoading(true);
-    try {
-      const featuresList = await listFeatures(orgId, projectId, page);
-      if (featuresList.length === 0) {
-        setHasMoreFeatures(false);
-      } else {
-        setFeatures([...features, ...featuresList]);
-        setPage(page + 1);
-      }
-    } catch (e) {
-      console.error(e.message);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const [filterByPriority, setFilterByPriority] = useState('all');
+  const [filterByStatus, setFilterByStatus] = useState('all');
 
   useEffect(() => {
-    document.title = "Floumy | Initiatives";
-    fetchData(1);
+    document.title = 'Floumy | Initiatives';
   }, []);
 
-  async function searchFeaturesByText(searchText, page, features = []) {
+  async function searchFeatures(searchOptions, page, features = []) {
     setIsLoading(true);
     try {
-      const response = await searchFeatures(orgId, projectId, searchText, page);
+      const response = await searchFeaturesWithOptions(orgId, projectId, searchOptions, page);
       if (response.length === 0) {
         setHasMoreFeatures(false);
       } else {
@@ -56,22 +41,14 @@ function Features() {
   }
 
   async function loadNextPage() {
-    if (search !== "") {
-      await searchFeaturesByText(search, page, features);
-    } else {
-      await fetchData(page, features);
-    }
+    await searchFeatures(search, page, features);
   }
 
-  async function handleSearch(searchText) {
-    setSearch(searchText);
+  async function handleSearch(searchOptions) {
+    setSearch(searchOptions);
     setFeatures([]);
     setPage(1);
-    if (searchText === "") {
-      await fetchData(1);
-    } else {
-      await searchFeaturesByText(searchText, 1);
-    }
+    await searchFeatures(searchOptions, 1);
   }
 
   return (
@@ -79,13 +56,13 @@ function Features() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader headerButtons={[
         {
-          name: "New Initiative",
-          shortcut: "i",
-          id: "new-feature",
+          name: 'New Initiative',
+          shortcut: 'i',
+          id: 'new-feature',
           action: () => {
             navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`);
-          }
-        }
+          },
+        },
       ]} />
       <Container className="mt--6" fluid>
         <Row>
@@ -93,15 +70,17 @@ function Features() {
             <InfiniteScroll next={loadNextPage}
                             hasMore={hasMoreFeatures}
                             loader={<></>}
-                            dataLength={features.length}>
-              <FeaturesListCard title="All Initiatives"
-                                features={features}
-                                isLoading={isLoading}
-                                showFilters={false}
-                                enableContextMenu={false}
-                                showAssignedTo={false}
-                                onSearch={handleSearch}
-                                searchPlaceholder={"Search by title, description, or reference"}
+                            dataLength={features.length}
+                            style={{ minHeight: '500px', overflow: 'visible' }}>
+              <SearchFeaturesListCard title="All Initiatives"
+                                      features={features}
+                                      isLoading={isLoading}
+                                      onSearch={handleSearch}
+                                      searchPlaceholder={'Search by title, description, or reference'}
+                                      filterByPriority={filterByPriority}
+                                      setFilterByPriority={setFilterByPriority}
+                                      filterByStatus={filterByStatus}
+                                      setFilterByStatus={setFilterByStatus}
               />
             </InfiniteScroll>
           </Col>

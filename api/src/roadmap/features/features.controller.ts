@@ -20,6 +20,7 @@ import { CreateUpdateFeatureDto, PatchFeatureDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
+import { FilterOptions } from './feature.query-builder';
 
 @Controller('/orgs/:orgId/projects/:projectId/features')
 @UseGuards(AuthGuard)
@@ -85,6 +86,7 @@ export class FeaturesController {
     @Query('q') query: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
+    @Query('f') filters?: string,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
@@ -98,6 +100,7 @@ export class FeaturesController {
         query,
         page,
         limit,
+        filters ? JSON.parse(filters) : undefined,
       );
     } catch (e) {
       throw new BadRequestException();

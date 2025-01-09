@@ -66,6 +66,7 @@ export interface FeatureDto {
   };
   createdAt: Date;
   updatedAt: Date;
+  completedAt?: Date;
 }
 
 export interface FeaturesListDto {
@@ -81,5 +82,20 @@ export interface FeaturesListDto {
     name: string;
   };
   createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SearchFeature {
+  id: string;
+  reference: string;
+  title: string;
+  priority: Priority;
+  status: string;
+  progress: number;
+  workItemsCount: number;
+  assignedToId?: string;
+  assignedToName?: string;
+  createdAt: Date;
+  completedAt?: Date;
   updatedAt: Date;
 }
