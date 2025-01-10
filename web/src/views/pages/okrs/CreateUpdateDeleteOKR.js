@@ -147,6 +147,10 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
     }
   }
 
+  function isPlaceholderKeyResultOnly() {
+    return fields && fields.length === 1 && !fields[0].title;
+  }
+
   return (
     <>
       <DeleteWarning
@@ -233,10 +237,10 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                       htmlFor="validationCustom01"
                     >
                       Key Results
-                      <AIButton
+                      {isPlaceholderKeyResultOnly() && <AIButton
                         disabled={values.objective.length === 0}
                         onClick={async () => await fillKeyResultsWithAi(values.objective)}
-                      />
+                      />}
                     </label>
                     <FieldArray name="keyResults">
                       <div>
