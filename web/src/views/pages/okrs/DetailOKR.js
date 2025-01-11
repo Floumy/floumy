@@ -174,12 +174,13 @@ function DetailOKR() {
       const keyResultsToAdd = keyResults.map(keyResult => {
         return { title: keyResult.title, status: 'on-track', progress: 0 };
       });
-      okr.keyResults = await Promise.all(
-        keyResultsToAdd.map(
-          async (keyResult) =>
-            await addKeyResult(orgId, projectId, okr.objective.id, keyResult),
-        ),
-      );
+      const savedKeyResults = [];
+      for (const keyResult of keyResultsToAdd) {
+        savedKeyResults.push(
+          await addKeyResult(orgId, projectId, okr.objective.id, keyResult),
+        );
+      }
+      okr.keyResults = savedKeyResults;
       setOKR({ ...okr });
     } catch (e) {
       toast.error('The key results could not be saved');
