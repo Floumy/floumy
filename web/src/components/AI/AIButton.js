@@ -1,7 +1,7 @@
 import { Button } from 'reactstrap';
 import { useState } from 'react';
 
-const AIButton = ({ onClick, text = 'Fill with AI', disabled = false }) => {
+const AIButton = ({ onClick, text = 'Add with AI', disabled = false }) => {
   const [isLoading, setIsLoading] = useState(false);
   return (
     <Button
