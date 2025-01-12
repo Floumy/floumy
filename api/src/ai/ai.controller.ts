@@ -24,4 +24,34 @@ export class AiController {
       throw new BadRequestException(e.message);
     }
   }
+
+  @Get('okrs-initiatives')
+  async generateInitiativesForOKR(
+    @Query('objective') objective: string,
+    @Query('keyResult') keyResult: string,
+  ) {
+    try {
+      return await this.aiService.generateInitiativesForOKR(
+        objective,
+        keyResult,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get('feature-requests-initiatives')
+  async generateInitiativesForFeatureRequest(
+    @Query('featureRequest') featureRequest: string,
+    @Query('description') featureRequestDescription: string,
+  ) {
+    try {
+      return await this.aiService.generateInitiativesForFeatureRequest(
+        featureRequest,
+        featureRequestDescription,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }

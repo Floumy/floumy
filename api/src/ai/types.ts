@@ -7,10 +7,3 @@ export interface InitiativeType {
   description: string;
   priority: string;
 }
-
-export interface WorkItemType {
-  title: string;
-  description: string;
-  priority: string;
-  storyPoints: number;
-}
