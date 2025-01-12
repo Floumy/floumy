@@ -7,3 +7,10 @@ export interface InitiativeType {
   description: string;
   priority: string;
 }
+
+export interface WorkItemType {
+  title: string;
+  type: string;
+  priority: string;
+  description: string;
+}

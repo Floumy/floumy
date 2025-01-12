@@ -16,6 +16,8 @@ import Comments from "../../../components/Comments/Comments";
 import { toast } from "react-toastify";
 import { addWorkItem } from "../../../services/backlog/backlog.service";
 import WorkItemsList from "../backlog/WorkItemsList";
+import { generateWorkItemsForIssue } from '../../../services/ai/ai.service';
+import AIButton from '../../../components/AI/AIButton';
 
 export default function EditIssue() {
   const { orgId, projectId, issueId } = useParams();
@@ -130,6 +132,29 @@ export default function EditIssue() {
     await deleteIssue(orgId, projectId, issueId);
   };
 
+  function isPlaceholderWorkItemOnly() {
+    return issue && (!issue.workItems || issue.workItems.length === 1 || !issue.workItems[0]?.title);
+  }
+
+  const addWorkItemsWithAi = async () => {
+    try {
+      const workItemsToAdd = (await generateWorkItemsForIssue(issue.title, issue.description))
+        .map(workItem => {
+          return { title: workItem.title, type: workItem.type, priority: workItem.priority, description: workItem.description };
+        });
+      const savedWorkItems = [];
+      for (const workItem of workItemsToAdd) {
+        workItem.issue = issue.id;
+        savedWorkItems.push(await addWorkItem(orgId, projectId, workItem));
+      }
+      setIssue({ ...issue, workItems: savedWorkItems });
+      toast.success('The work items have been added');
+    } catch (e) {
+      toast.error('The work items could not be saved');
+      console.error(e);
+    }
+  }
+
   return (
     <>
       <SimpleHeader
@@ -169,7 +194,11 @@ export default function EditIssue() {
           <Col>
             <Card>
               <CardHeader>
-                <h3 className="mb-0">Related Work Items</h3>
+                <h3 className="mb-0">Related Work Items {isPlaceholderWorkItemOnly() && <AIButton
+                  disabled={issue.title.length === 0 || issue.description.length === 0}
+                  onClick={addWorkItemsWithAi}
+                />}
+                </h3>
               </CardHeader>
               <WorkItemsList
                 workItems={issue?.workItems}
