@@ -24,6 +24,8 @@ import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import NotFoundCard from '../components/NotFoundCard';
 import { toast } from 'react-toastify';
 import Comments from '../../../components/Comments/Comments';
+import AIButton from '../../../components/AI/AIButton';
+import { generateInitiativesForOKR } from '../../../services/ai/ai.service';
 
 function DetailKeyResult() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -182,6 +184,28 @@ function DetailKeyResult() {
     }
   }
 
+  function isPlaceholderInitiativeOnly() {
+    return keyResult && (!keyResult.features || keyResult.features.length === 1 || !keyResult.features[0]?.title);
+  }
+
+  const addInitiativesWithAi = async () => {
+    try {
+      const initiativesToAdd = (await generateInitiativesForOKR(keyResult.title, keyResult.title))
+        .map(initiative => {
+          return { title: initiative.title, description: initiative.description, priority: initiative.priority, status: 'planned' };
+        });
+      const savedInitiatives = [];
+      for (const initiative of initiativesToAdd) {
+        savedInitiatives.push(await addFeature(orgId, projectId, initiative));
+      }
+      setKeyResult({ ...keyResult, features: savedInitiatives });
+      toast.success('The initiatives have been added');
+    } catch (e) {
+      toast.error('The initiatives could not be saved');
+      console.error(e);
+    }
+  }
+
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
@@ -307,7 +331,13 @@ function DetailKeyResult() {
                 <CardHeader className="border-1">
                   <div className="row">
                     <div className="col-12">
-                      <h3 className="mb-0">Related Initiatives</h3>
+                      <h3 className="mb-0">Related Initiatives
+                        {isPlaceholderInitiativeOnly() && <AIButton
+                          disabled={keyResult.title.length === 0}
+                          onClick={addInitiativesWithAi}
+                        />}
+                      </h3>
+
                     </div>
                   </div>
                 </CardHeader>
