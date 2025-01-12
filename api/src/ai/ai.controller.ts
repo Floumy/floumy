@@ -54,4 +54,31 @@ export class AiController {
       throw new BadRequestException(e.message);
     }
   }
+
+  @Get('initiatives-work-items')
+  async generateWorkItemsForInitiative(
+    @Query('initiative') initiative: string,
+    @Query('description') description: string,
+  ) {
+    try {
+      return await this.aiService.generateWorkItemsForInitiative(
+        initiative,
+        description,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get('issues-work-items')
+  async generateWorkItemsForIssue(
+    @Query('issue') issue: string,
+    @Query('description') description: string,
+  ) {
+    try {
+      return await this.aiService.generateWorkItemsForIssue(issue, description);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }

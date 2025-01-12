@@ -26,3 +26,21 @@ export async function generateInitiativesForFeatureRequest(featureRequest, featu
     throw new Error(e.message);
   }
 }
+
+export async function generateWorkItemsForInitiative(initiative, description) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/ai/initiatives-work-items?initiative=${initiative}&description=${description}`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
+export async function generateWorkItemsForIssue(issue, description) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/ai/issues-work-items?issue=${issue}&description=${description}`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
