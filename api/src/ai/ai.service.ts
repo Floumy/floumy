@@ -14,6 +14,8 @@ export class AiService {
     For each key result, include only:
     - Title
     
+    Have a preference for a lower number of key results.
+    
     Do not include any timelines or deadlines or money amounts.
     Make the key results specific and measurable.
     Make sure the key results are clear and concise.
@@ -65,8 +67,10 @@ export class AiService {
     - What is the goal of the initiative?
     - Why is it important?
     - What is the expected outcome of the initiative?
-    
+   
     Separate the description into sections, each with a heading.
+    
+    Have a preference for a lower number of key results.
     
     Format the description as an HTML string.`;
 
@@ -126,6 +130,8 @@ export class AiService {
     - What is the expected outcome of the initiative?
     
     Separate the description into sections, each with a heading.
+    
+    Have a preference for a lower number of key results.
     
     Format the description as an HTML string.`;
 
@@ -189,9 +195,6 @@ export class AiService {
     The bug type should be used for work items that are about a something that is broken.
     The spike type should be used for work items that are about investigating an idea or a concept.
     
-    The user story should have in its description the following with the headings in bold and the sections in italic:
-    As a [role], I want to [goal] so that [benefit].
-    
     In the description, include:
     - What is the goal of the work item?
     - Why is it important?
@@ -199,6 +202,8 @@ export class AiService {
     - Acceptance criteria
     
     Separate the description into sections, each with a heading.
+    
+    Have a preference for a lower number of key results.
     
     Format the description as an HTML string.
     `;
@@ -263,9 +268,6 @@ export class AiService {
     The bug type should be used for work items that are about a something that is broken.
     The spike type should be used for work items that are about investigating an idea or a concept.
     
-    The user story should have in its description the following with the headings in bold and the sections in italic:
-    As a [role], I want to [goal] so that [benefit].
-    
     In the description, include:
     - What is the goal of the work item?
     - Why is it important?
@@ -273,6 +275,8 @@ export class AiService {
     - Acceptance criteria
     
     Separate the description into sections, each with a heading.
+    
+    Have a preference for a lower number of key results.
     
     Format the description as an HTML string.
     `;

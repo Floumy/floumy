@@ -192,7 +192,7 @@ function DetailKeyResult() {
     try {
       const initiativesToAdd = (await generateInitiativesForOKR(keyResult.title, keyResult.title))
         .map(initiative => {
-          return { title: initiative.title, description: initiative.description, priority: initiative.priority, status: 'planned' };
+          return { title: initiative.title, description: initiative.description, priority: initiative.priority, status: 'planned', keyResult: keyResult.id };
         });
       const savedInitiatives = [];
       for (const initiative of initiativesToAdd) {
