@@ -355,7 +355,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                   </NavItem>
                   <NavItem>
                     <Row style={{ maxWidth: '100%', height: '47px' }}>
-                      <Col xs={12}>
+                      <Col xs={10}>
                         <NavLink
                           to={`/admin/orgs/${orgId}/projects/${currentProject.id}/code`}
                           onClick={closeSidenav}
@@ -365,6 +365,9 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           <i className="fa fa-code-pull-request" />
                           <span className="nav-link-text">Code</span>
                         </NavLink>
+                      </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <ShortcutIcon shortcutKey={8} />
                       </Col>
                     </Row>
                   </NavItem>
