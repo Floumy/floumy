@@ -1,29 +1,28 @@
-
-import React from "react";
-import ReactDOM from "react-dom/client";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 // react library for routing
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 // plugins styles from node_modules
-import "react-notification-alert/dist/animate.css";
-import "react-perfect-scrollbar/dist/css/styles.css";
-import "sweetalert2/dist/sweetalert2.min.css";
-import "select2/dist/css/select2.min.css";
-import "react-quill/dist/quill.core.css";
-import "react-quill/dist/quill.snow.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+import 'react-notification-alert/dist/animate.css';
+import 'react-perfect-scrollbar/dist/css/styles.css';
+import 'sweetalert2/dist/sweetalert2.min.css';
+import 'select2/dist/css/select2.min.css';
+import 'react-quill/dist/quill.core.css';
+import 'react-quill/dist/quill.snow.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 // plugins styles downloaded
-import "assets/vendor/nucleo/css/nucleo.css";
-import "react-toastify/dist/ReactToastify.css";
+import 'assets/vendor/nucleo/css/nucleo.css';
+import 'react-toastify/dist/ReactToastify.css';
 // core styles
-import "assets/scss/argon-dashboard-pro-react.scss?v1.2.1";
-import "@mdxeditor/editor/style.css";
+import 'assets/scss/argon-dashboard-pro-react.scss?v1.2.1';
+import '@mdxeditor/editor/style.css';
 
-import AdminLayout from "layouts/Admin.js";
-import AuthLayout from "layouts/Auth.js";
-import AuthGuard from "./guards/AuthGuard";
-import { ToastContainer } from "react-toastify";
-import PublicLayout from "./layouts/Public";
+import AdminLayout from 'layouts/Admin.js';
+import AuthLayout from 'layouts/Auth.js';
+import AuthGuard from './guards/AuthGuard';
+import { ToastContainer } from 'react-toastify';
+import PublicLayout from './layouts/Public';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

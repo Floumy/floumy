@@ -1,55 +1,55 @@
-
-import OKRs from "./views/pages/okrs/OKRs";
-import NewOKR from "./views/pages/okrs/NewOKR";
-import DetailOKR from "./views/pages/okrs/DetailOKR";
-import SignIn from "./views/pages/auth/SignIn";
-import OrgSignUp from "./views/pages/auth/OrgSignUp";
-import InitiativesRoadmap from "./views/pages/roadmap/InitiativesRoadmap";
-import ActiveIteration from "./views/pages/development/ActiveIteration";
-import NewFeature from "./views/pages/roadmap/NewFeature";
-import NewMilestone from "./views/pages/roadmap/NewMilestone";
-import EditMilestone from "./views/pages/roadmap/EditMilestone";
-import EditFeature from "./views/pages/features/EditFeature";
-import NewWorkItem from "./views/pages/backlog/NewWorkItem";
-import EditWorkItem from "./views/pages/backlog/EditWorkItem";
-import { DetailFeature } from "./views/pages/features/DetailFeature";
-import Iterations from "./views/pages/iterations/Iterations";
-import WorkItems from "./views/pages/backlog/WorkItems";
-import NewIteration from "./views/pages/iterations/NewIteration";
-import EditIteration from "./views/pages/iterations/EditIteration";
-import Features from "./views/pages/features/Features";
-import DetailKeyResult from "./views/pages/okrs/DetailKeyResult";
-import Members from "./views/pages/settings/Members";
-import ActivationRequired from "./views/pages/auth/ActivationRequired";
-import Activation from "./views/pages/auth/Activation";
-import ForgotPassword from "./views/pages/auth/ForgotPassword";
-import ResetPassword from "./views/pages/auth/ResetPassword";
-import ResetEmailSent from "./views/pages/auth/ResetEmailSent";
-import PasswordReset from "./views/pages/auth/PasswordReset";
-import BuildInPublic from "./views/pages/settings/BuildInPublic";
-import PublicRoadmap from "./views/pages/roadmap/PublicRoadmap";
-import { PublicDetailFeature } from "./views/pages/features/PublicDetailFeature";
-import PublicDetailWorkItem from "./views/pages/backlog/PublicDetailWorkItem";
-import PublicOKRs from "./views/pages/okrs/PublicOKRs";
-import PublicDetailOKR from "./views/pages/okrs/PublicDetailOKR";
-import PublicDetailKeyResult from "./views/pages/okrs/PublicDetailKeyResult";
-import PublicIterations from "./views/pages/iterations/PublicIterations";
-import PublicIteration from "./views/pages/iterations/PublicIteration";
-import PublicMilestone from "./views/pages/roadmap/PublicMilestone";
-import PublicActiveIteration from "./views/pages/development/PublicActiveIteration";
-import Project from "./views/pages/settings/Project";
-import MyProfile from "./views/pages/users/MyProfile";
-import PrivateFeed from "./views/pages/feed/PrivateFeed";
-import PublicFeed from "./views/pages/feed/PublicFeed";
-import SignUp from "./views/pages/auth/SignUp";
-import FeatureRequests from "./views/pages/feature-requests/FeatureRequests";
-import NewFeatureRequest from "./views/pages/feature-requests/NewFeatureRequest";
-import EditFeatureRequest from "./views/pages/feature-requests/EditFeatureRequest";
-import FeatureRequestDetails from "./views/pages/feature-requests/FeatureRequestDetails";
-import Issues from "./views/pages/issues/Issues";
-import NewIssue from "./views/pages/issues/NewIssue";
-import EditIssue from "./views/pages/issues/EditIssue";
-import IssueDetails from "./views/pages/issues/IssueDetails";
+import OKRs from './views/pages/okrs/OKRs';
+import NewOKR from './views/pages/okrs/NewOKR';
+import DetailOKR from './views/pages/okrs/DetailOKR';
+import SignIn from './views/pages/auth/SignIn';
+import OrgSignUp from './views/pages/auth/OrgSignUp';
+import InitiativesRoadmap from './views/pages/roadmap/InitiativesRoadmap';
+import ActiveIteration from './views/pages/development/ActiveIteration';
+import NewFeature from './views/pages/roadmap/NewFeature';
+import NewMilestone from './views/pages/roadmap/NewMilestone';
+import EditMilestone from './views/pages/roadmap/EditMilestone';
+import EditFeature from './views/pages/features/EditFeature';
+import NewWorkItem from './views/pages/backlog/NewWorkItem';
+import EditWorkItem from './views/pages/backlog/EditWorkItem';
+import { DetailFeature } from './views/pages/features/DetailFeature';
+import Iterations from './views/pages/iterations/Iterations';
+import WorkItems from './views/pages/backlog/WorkItems';
+import NewIteration from './views/pages/iterations/NewIteration';
+import EditIteration from './views/pages/iterations/EditIteration';
+import Features from './views/pages/features/Features';
+import DetailKeyResult from './views/pages/okrs/DetailKeyResult';
+import Members from './views/pages/settings/Members';
+import ActivationRequired from './views/pages/auth/ActivationRequired';
+import Activation from './views/pages/auth/Activation';
+import ForgotPassword from './views/pages/auth/ForgotPassword';
+import ResetPassword from './views/pages/auth/ResetPassword';
+import ResetEmailSent from './views/pages/auth/ResetEmailSent';
+import PasswordReset from './views/pages/auth/PasswordReset';
+import BuildInPublic from './views/pages/settings/BuildInPublic';
+import PublicRoadmap from './views/pages/roadmap/PublicRoadmap';
+import { PublicDetailFeature } from './views/pages/features/PublicDetailFeature';
+import PublicDetailWorkItem from './views/pages/backlog/PublicDetailWorkItem';
+import PublicOKRs from './views/pages/okrs/PublicOKRs';
+import PublicDetailOKR from './views/pages/okrs/PublicDetailOKR';
+import PublicDetailKeyResult from './views/pages/okrs/PublicDetailKeyResult';
+import PublicIterations from './views/pages/iterations/PublicIterations';
+import PublicIteration from './views/pages/iterations/PublicIteration';
+import PublicMilestone from './views/pages/roadmap/PublicMilestone';
+import PublicActiveIteration from './views/pages/development/PublicActiveIteration';
+import Project from './views/pages/settings/Project';
+import MyProfile from './views/pages/users/MyProfile';
+import PrivateFeed from './views/pages/feed/PrivateFeed';
+import PublicFeed from './views/pages/feed/PublicFeed';
+import SignUp from './views/pages/auth/SignUp';
+import FeatureRequests from './views/pages/feature-requests/FeatureRequests';
+import NewFeatureRequest from './views/pages/feature-requests/NewFeatureRequest';
+import EditFeatureRequest from './views/pages/feature-requests/EditFeatureRequest';
+import FeatureRequestDetails from './views/pages/feature-requests/FeatureRequestDetails';
+import Issues from './views/pages/issues/Issues';
+import NewIssue from './views/pages/issues/NewIssue';
+import EditIssue from './views/pages/issues/EditIssue';
+import IssueDetails from './views/pages/issues/IssueDetails';
+import Code from './views/pages/code/Code';
 
 const routes = [
   {
@@ -232,12 +232,6 @@ const routes = [
   },
   {
     redirect: true,
-    path: "/members",
-    component: <Members />,
-    layout: "/admin"
-  },
-  {
-    redirect: true,
     path: "/project",
     component: <Project />,
     layout: "/admin"
@@ -301,7 +295,19 @@ const routes = [
     path: "/activation-required",
     component: <ActivationRequired />,
     layout: "/auth"
-  }
+  },
+  {
+    redirect: true,
+    path: "/members",
+    component: <Members />,
+    layout: "/admin"
+  },
+  {
+    redirect: true,
+    path: "/code",
+    component: <Code />,
+    layout: "/admin"
+  },
 ];
 
 export const publicRoutes = [
