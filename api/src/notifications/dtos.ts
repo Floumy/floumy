@@ -21,6 +21,7 @@ export interface ViewNotificationDto {
   status: StatusType;
   entityId: string;
   entityName: string;
+  entityUrl: string;
   createdAt: Date;
   createdBy: User;
 }
