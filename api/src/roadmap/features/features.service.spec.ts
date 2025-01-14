@@ -932,6 +932,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.COMPLETED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
