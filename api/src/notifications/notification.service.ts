@@ -184,6 +184,7 @@ export class NotificationService {
         project: {
           id: projectId,
         },
+        status: StatusType.UNREAD,
       },
     });
   }
