@@ -130,7 +130,7 @@ export default function Notifications() {
                 </h6>
             </div>
 
-            <ListGroup flush>
+            <ListGroup flush style={{maxHeight: "500px", overflowY: "scroll"}}>
                 {notifications.map(notification => (
                     <ListGroupItem
                         className="list-group-item-action"
@@ -151,10 +151,10 @@ export default function Notifications() {
                                             {notification.status === 'unread' ? <h4 className="mb-0 text-sm">{notificationTextAction(notification)}</h4> :
                                                 <span className="text-sm">{notificationTextAction(notification)}</span>}
                                         </div>
-                                        <div className="text-right text-muted">
+                                        <div className="text-left text-muted">
                                             <small>{moment(notification.createdAt).fromNow()}</small>
                                         </div>
-                                        <div style={{width: '100px'}}>
+                                        <div style={{width: '100px'}} className="text-right">
                                             <Button outline color="primary"
                                                     id={`mark-as-read-${notification.id}`}
                                                     onClick={async (event) => {
