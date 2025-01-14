@@ -1,35 +1,37 @@
-import { Button, Card, CardBody, CardHeader, Col, Input, Row } from "reactstrap";
-import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
-import InputError from "../../../components/Errors/InputError";
-import React, { useEffect, useState } from "react";
-import * as Yup from "yup";
-import { deleteOKR } from "../../../services/okrs/okrs.service";
-import Select2 from "react-select2-wrapper";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import DeleteWarning from "../components/DeleteWarning";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import { getOrg } from "../../../services/org/orgs.service";
+import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import { ErrorMessage, Field, FieldArray, Form, Formik } from 'formik';
+import InputError from '../../../components/Errors/InputError';
+import React, { useEffect, useState } from 'react';
+import * as Yup from 'yup';
+import { deleteOKR } from '../../../services/okrs/okrs.service';
+import Select2 from 'react-select2-wrapper';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import DeleteWarning from '../components/DeleteWarning';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { getOrg } from '../../../services/org/orgs.service';
+import { generateKeyResults } from '../../../services/ai/ai.service';
+import AIButton from '../../../components/AI/AIButton';
 
 function CreateUpdateDeleteOKR({ onSubmit, okr }) {
   const { orgId, projectId } = useParams();
   const [fields, setFields] = useState([{}]);
-  const [timeline, setTimeline] = useState("this-quarter");
+  const [timeline, setTimeline] = useState('this-quarter');
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
   const navigate = useNavigate();
-  const [members, setMembers] = useState([{ id: "", text: "None" }]);
-  const [assignedTo, setAssignedTo] = useState("");
+  const [members, setMembers] = useState([{ id: '', text: 'None' }]);
+  const [assignedTo, setAssignedTo] = useState('');
 
   const onDeleteOKR = async (id) => {
     setIsLoading(true);
     try {
       await deleteOKR(orgId, projectId, id);
       navigate(-1);
-      setTimeout(() => toast.success("The OKR has been deleted"), 100);
+      setTimeout(() => toast.success('The OKR has been deleted'), 100);
     } catch (e) {
       setIsDeleteWarningOpen(false);
-      toast.error("The OKR could not be deleted");
+      toast.error('The OKR could not be deleted');
     } finally {
       setIsLoading(false);
     }
@@ -44,9 +46,9 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
         .filter((field) => field.title);
       await onSubmit({ ...values, timeline, assignedTo, keyResults: keyResults });
       navigate(-1);
-      setTimeout(() => toast.success("The OKR has been saved"), 100);
+      setTimeout(() => toast.success('The OKR has been saved'), 100);
     } catch (e) {
-      toast.error("The OKR could not be saved");
+      toast.error('The OKR could not be saved');
     } finally {
       setSubmitting(false);
       setIsLoading(false);
@@ -56,7 +58,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
   useEffect(() => {
     if (!okr) return;
 
-    document.title = "Floumy | OKR";
+    document.title = 'Floumy | OKR';
 
     if (okr.objective.timeline) {
       setTimeline(okr.objective.timeline);
@@ -68,7 +70,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
         .map((keyResult) => {
           return {
             id: keyResult.id,
-            title: keyResult.title
+            title: keyResult.title,
           };
         });
       setFields([...keyResults, {}]);
@@ -77,18 +79,18 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
 
   const validationSchema = Yup.object({
     objective: Yup.string()
-      .required("The objective is required")
+      .required('The objective is required'),
   });
 
   const handleFieldChange = (e, keyResultId, index) => {
     const newFields = [...fields];
     newFields[index] = {
       id: keyResultId,
-      title: e.target.value
+      title: e.target.value,
     };
 
     // Add a new field if typing in the last field
-    if (e.target.value !== "" && index === fields.length - 1) {
+    if (e.target.value !== '' && index === fields.length - 1) {
       newFields.push({});
     }
 
@@ -100,57 +102,71 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
   };
 
   const handleFieldKeyDown = (e, index) => {
-    if (e.key === "Backspace" && fields[index].title === "" && fields.length > 1) {
+    if (e.key === 'Backspace' && fields[index].title === '' && fields.length > 1) {
       // This is important to prevent React to propagate the event further and call handleFieldChange
       e.preventDefault();
       setFields(fields.filter((_, idx) => idx !== index));
     }
   };
 
-  async function fetchAndSetMembers() {
-    const org = await getOrg();
-    const mappedUsers = org.members
-      .filter(user => user.isActive || user.id === okr?.objective?.assignedTo)
-      .map(user => {
-        return { id: user.id, text: user.name };
-      });
-    mappedUsers.push({ id: "", text: "None" });
-    setMembers(mappedUsers);
-  }
-
   useEffect(() => {
+    async function fetchAndSetMembers() {
+      const org = await getOrg();
+      const mappedUsers = org.members
+        .filter(user => user.isActive || user.id === okr?.objective?.assignedTo)
+        .map(user => {
+          return { id: user.id, text: user.name };
+        });
+      mappedUsers.push({ id: '', text: 'None' });
+      setMembers(mappedUsers);
+    }
+
     async function fetchData() {
       setIsLoading(true);
       try {
         await Promise.all([
-          fetchAndSetMembers()
+          fetchAndSetMembers(),
         ]);
       } catch (e) {
-        toast.error("The members could not be loaded.");
+        toast.error('The members could not be loaded.');
       } finally {
         setIsLoading(false);
       }
     }
 
     fetchData();
-  }, []);
+  }, [okr?.objective?.assignedTo]);
+
+  async function fillKeyResultsWithAi(objective) {
+    try {
+      const keyResults = (await generateKeyResults(objective))
+        .map((kr) => ({ id: kr.title, title: kr.title }));
+      setFields([...keyResults, ...fields]);
+    } catch (e) {
+      toast.error('The key results could not be filled with AI');
+    }
+  }
+
+  function isPlaceholderKeyResultOnly() {
+    return fields && fields.length === 1 && !fields[0].title;
+  }
 
   return (
     <>
       <DeleteWarning
         isOpen={isDeleteWarningOpen}
-        entity={"objective"}
+        entity={'objective'}
         toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
         onDelete={() => onDeleteOKR(okr.objective.id)}
       />
       {isLoading && <InfiniteLoadingBar />}
       <Card>
         <CardHeader>
-          <h3 className="mb-0">{okr ? "Edit Objective" : "New Objective"}</h3>
+          <h3 className="mb-0">{okr ? 'Edit Objective' : 'New Objective'}</h3>
         </CardHeader>
         <CardBody>
           <Formik
-            initialValues={{ objective: okr?.objective.title || "", keyResults: fields }}
+            initialValues={{ objective: okr?.objective.title || '', keyResults: fields }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -177,7 +193,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                       invalid={!!(errors.objective && touched.objective)}
                       autoComplete="off"
                     />
-                    <ErrorMessage name={"objective"} component={InputError} />
+                    <ErrorMessage name={'objective'} component={InputError} />
                   </Col>
                   <Col className="mb-3">
                     <label
@@ -191,9 +207,9 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                       defaultValue={timeline}
                       name="timeline"
                       data={[
-                        { id: "this-quarter", text: "This Quarter" },
-                        { id: "next-quarter", text: "Next Quarter" },
-                        { id: "later", text: "Later" }
+                        { id: 'this-quarter', text: 'This Quarter' },
+                        { id: 'next-quarter', text: 'Next Quarter' },
+                        { id: 'later', text: 'Later' },
                       ]}
                       onChange={handleTimelineChange}></Select2>
                   </Col>
@@ -221,6 +237,10 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                       htmlFor="validationCustom01"
                     >
                       Key Results
+                      {isPlaceholderKeyResultOnly() && <AIButton
+                        disabled={values.objective.length === 0}
+                        onClick={async () => await fillKeyResultsWithAi(values.objective)}
+                      />}
                     </label>
                     <FieldArray name="keyResults">
                       <div>
@@ -234,13 +254,13 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                               name={`keyResults.${index}`}
                               placeholder="How will you measure your progress?"
                               type="text"
-                              value={field.title || ""}
+                              value={field.title || ''}
                               onChange={(e) => {
                                 handleChange(e);
                                 handleFieldChange(e, field.id, index);
                               }}
                               onKeyDown={(e) => handleFieldKeyDown(e, index)}
-                              autoComplete={"off"}
+                              autoComplete={'off'}
                               invalid={!!(errors.keyResults && touched.keyResults)}
                             />
                           ))}
@@ -250,7 +270,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                 </div>
                 <div>
                   <Button
-                    id={"save-objective"}
+                    id={'save-objective'}
                     color="primary"
                     type="submit"
                     className="mr-3 mb-3"
@@ -259,7 +279,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                     Save Objective
                   </Button>
                   {okr && <Button
-                    id={"delete-objective"}
+                    id={'delete-objective'}
                     color="secondary"
                     type="button"
                     className="ml-0 mb-3"

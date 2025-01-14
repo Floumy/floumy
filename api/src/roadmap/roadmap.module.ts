@@ -66,5 +66,6 @@ import { Project } from '../projects/project.entity';
     FeaturesPublicService,
     MilestonesPublicService,
   ],
+  exports: [FeaturesService],
 })
 export class RoadmapModule {}

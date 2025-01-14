@@ -10,6 +10,8 @@ import InputError from "../../../components/Errors/InputError";
 import Select2 from "react-select2-wrapper";
 import FeaturesList from "../features/FeaturesList";
 import { addFeature } from "../../../services/roadmap/roadmap.service";
+import AIButton from '../../../components/AI/AIButton';
+import { generateInitiativesForFeatureRequest } from '../../../services/ai/ai.service';
 
 export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelete }) {
   const { orgId, projectId } = useParams();
@@ -18,6 +20,7 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
   const [status, setStatus] = useState(featureRequest.status);
+  const [features, setFeatures] = useState(featureRequest.features);
 
   const navigate = useNavigate();
 
@@ -72,18 +75,20 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
   async function handleAddFeature(featureRequestId, feature) {
     feature.featureRequest = featureRequestId;
     const savedFeature = await addFeature(orgId, projectId, feature);
-    featureRequest.features.push(savedFeature);
-    featureRequest.features.sort(sortFeatures);
+    features.push(savedFeature);
+    features.sort(sortFeatures);
+    setFeatures([...features]);
   }
 
   function updateFeaturesStatus(updatedFeatures, status) {
     const updatedFeaturesIds = updatedFeatures.map(feature => feature.id);
-    featureRequest.features.map(feature => {
+    const featureRequestFeatures = features.map(feature => {
       if (updatedFeaturesIds.includes(feature.id)) {
         feature.status = status;
       }
       return feature;
     });
+    setFeatures([...featureRequestFeatures]);
   }
 
   function sortFeatures(a, b) {
@@ -93,14 +98,37 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
 
   function updateFeaturesPriority(updatedFeatures, priority) {
     const updatedFeaturesIds = updatedFeatures.map(feature => feature.id);
-    featureRequest.features = featureRequest.features.map(feature => {
+    const featureRequestFeatures = features.map(feature => {
       if (updatedFeaturesIds.includes(feature.id)) {
         feature.priority = priority;
       }
       return feature;
     }).sort(sortFeatures);
+    setFeatures([...featureRequestFeatures]);
   }
 
+  function isPlaceholderInitiativeOnly() {
+    return featureRequest && (!features || features.length === 1 || !features[0]?.title);
+  }
+
+  const addInitiativesWithAi = async () => {
+    try {
+      const initiativesToAdd = (await generateInitiativesForFeatureRequest(featureRequest.title, featureRequest.description))
+        .map(initiative => {
+          return { title: initiative.title, description: initiative.description, priority: initiative.priority, status: 'planned' };
+        });
+      const savedInitiatives = [];
+      for (const initiative of initiativesToAdd) {
+        initiative.featureRequest = featureRequest.id;
+        savedInitiatives.push(await addFeature(orgId, projectId, initiative));
+      }
+      setFeatures([...savedInitiatives]);
+      toast.success('The initiatives have been added');
+    } catch (e) {
+      toast.error('The initiatives could not be saved');
+      console.error(e);
+    }
+  }
   return (
     <>
       <DeleteWarning
@@ -247,17 +275,21 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
           </Formik>
         </CardBody>
       </Card>
-      {!isLoading && featureRequest && featureRequest.features && <>
+      {!isLoading && featureRequest && features && <>
         <Card>
           <CardHeader className="border-1">
             <div className="row">
               <div className="col-12">
-                <h3 className="mb-0">Related Initiatives</h3>
+                <h3 className="mb-0">Related Initiatives {isPlaceholderInitiativeOnly() && <AIButton
+                  disabled={featureRequest.title.length === 0 || featureRequest.description.length === 0}
+                  onClick={addInitiativesWithAi}
+                />}
+                </h3>
               </div>
             </div>
           </CardHeader>
           <FeaturesList
-            features={featureRequest.features}
+            features={features}
             onAddFeature={async (feature) => {
               await handleAddFeature(featureRequest.id, feature);
             }}

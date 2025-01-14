@@ -1,55 +1,57 @@
-import { Button, Card, CardBody, CardHeader, Col, Container, Input, Row } from "reactstrap";
-import FloumySlider from "../../../components/Sliders/FloumySlider";
-import Select2 from "react-select2-wrapper";
-import FeaturesList from "../features/FeaturesList";
-import React, { useEffect } from "react";
-import DeleteWarning from "../components/DeleteWarning";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import InputError from "../../../components/Errors/InputError";
-import { addFeature } from "../../../services/roadmap/roadmap.service";
-import { sortByPriority } from "../../../services/utils/utils";
+import { Button, Card, CardBody, CardHeader, Col, Container, Input, Row } from 'reactstrap';
+import FloumySlider from '../../../components/Sliders/FloumySlider';
+import Select2 from 'react-select2-wrapper';
+import FeaturesList from '../features/FeaturesList';
+import React, { useEffect } from 'react';
+import DeleteWarning from '../components/DeleteWarning';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import InputError from '../../../components/Errors/InputError';
+import { addFeature } from '../../../services/roadmap/roadmap.service';
+import { sortByPriority } from '../../../services/utils/utils';
 import {
   addKeyResultComment,
   deleteKeyResult,
   deleteKeyResultComment,
   getKeyResult,
   updateKeyResult,
-  updateKeyResultComment
-} from "../../../services/okrs/okrs.service";
-import { useNavigate, useParams } from "react-router-dom";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import NotFoundCard from "../components/NotFoundCard";
-import { toast } from "react-toastify";
-import Comments from "../../../components/Comments/Comments";
+  updateKeyResultComment,
+} from '../../../services/okrs/okrs.service';
+import { useNavigate, useParams } from 'react-router-dom';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import NotFoundCard from '../components/NotFoundCard';
+import { toast } from 'react-toastify';
+import Comments from '../../../components/Comments/Comments';
+import AIButton from '../../../components/AI/AIButton';
+import { generateInitiativesForOKR } from '../../../services/ai/ai.service';
 
 function DetailKeyResult() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [status, setStatus] = React.useState("");
+  const [status, setStatus] = React.useState('');
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = React.useState(false);
-  const [progress, setProgress] = React.useState("");
+  const [progress, setProgress] = React.useState('');
   const { objectiveId, keyResultId, orgId, projectId } = useParams();
   const [keyResult, setKeyResult] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
 
   const statuses = [
-    { id: "on-track", text: "On-Track" },
-    { id: "off-track", text: "Off-Track" },
-    { id: "at-risk", text: "At Risk" },
-    { id: "ahead-of-schedule", text: "Ahead of Schedule" },
-    { id: "completed", text: "Completed" },
-    { id: "stalled", text: "Stalled" },
-    { id: "deferred", text: "Deferred" },
-    { id: "cancelled", text: "Cancelled" },
-    { id: "under-review", text: "Under Review" },
-    { id: "needs-attention", text: "Needs Attention" }
+    { id: 'on-track', text: 'On-Track' },
+    { id: 'off-track', text: 'Off-Track' },
+    { id: 'at-risk', text: 'At Risk' },
+    { id: 'ahead-of-schedule', text: 'Ahead of Schedule' },
+    { id: 'completed', text: 'Completed' },
+    { id: 'stalled', text: 'Stalled' },
+    { id: 'deferred', text: 'Deferred' },
+    { id: 'cancelled', text: 'Cancelled' },
+    { id: 'under-review', text: 'Under Review' },
+    { id: 'needs-attention', text: 'Needs Attention' },
   ];
 
   useEffect(() => {
-    document.title = "Floumy | Key Result";
+    document.title = 'Floumy | Key Result';
 
     async function loadData() {
       try {
@@ -59,7 +61,7 @@ function DetailKeyResult() {
         setStatus(keyResult.status);
         setProgress(keyResult.progress);
       } catch (e) {
-        toast.error("The key result could not be loaded");
+        toast.error('The key result could not be loaded');
       } finally {
         setIsLoading(false);
       }
@@ -79,12 +81,12 @@ function DetailKeyResult() {
         {
           title: values.title,
           status,
-          progress
+          progress,
         });
       navigate(-1);
-      setTimeout(() => toast.success("The key result has been saved"), 100);
+      setTimeout(() => toast.success('The key result has been saved'), 100);
     } catch (e) {
-      toast.error("The key result could not be saved");
+      toast.error('The key result could not be saved');
     } finally {
       setIsSubmitting(false);
     }
@@ -95,9 +97,9 @@ function DetailKeyResult() {
       setIsSubmitting(true);
       await deleteKeyResult(orgId, projectId, objectiveId, keyResultId);
       navigate(-1);
-      setTimeout(() => toast.success("The key result has been deleted"), 100);
+      setTimeout(() => toast.success('The key result has been deleted'), 100);
     } catch (e) {
-      toast.error("The key result could not be deleted");
+      toast.error('The key result could not be deleted');
     } finally {
       setIsSubmitting(false);
       setIsDeleteWarningOpen(false);
@@ -114,7 +116,7 @@ function DetailKeyResult() {
 
   const validationSchema = Yup.object({
     title: Yup.string()
-      .required("The key result title is required")
+      .required('The key result title is required'),
   });
 
   function updateFeaturesKeyResult(updatedFeatures, keyResultId) {
@@ -151,9 +153,9 @@ function DetailKeyResult() {
       const addedComment = await addKeyResultComment(orgId, projectId, objectiveId, keyResultId, comment);
       keyResult.comments.push(addedComment);
       setKeyResult({ ...keyResult });
-      toast.success("Comment added successfully");
+      toast.success('Comment added successfully');
     } catch (e) {
-      toast.error("Failed to add comment");
+      toast.error('Failed to add comment');
     }
   }
 
@@ -164,9 +166,9 @@ function DetailKeyResult() {
       updatedComment.content = comment.content;
       updatedComment.mentions = comment.mentions;
       setKeyResult({ ...keyResult });
-      toast.success("Comment updated successfully");
+      toast.success('Comment updated successfully');
     } catch (e) {
-      toast.error("Failed to update comment");
+      toast.error('Failed to update comment');
     }
   }
 
@@ -176,9 +178,31 @@ function DetailKeyResult() {
       const index = keyResult.comments.findIndex(c => c.id === commentId);
       keyResult.comments.splice(index, 1);
       setKeyResult({ ...keyResult });
-      toast.success("Comment deleted successfully");
+      toast.success('Comment deleted successfully');
     } catch (e) {
-      toast.error("Failed to delete comment");
+      toast.error('Failed to delete comment');
+    }
+  }
+
+  function isPlaceholderInitiativeOnly() {
+    return keyResult && (!keyResult.features || keyResult.features.length === 1 || !keyResult.features[0]?.title);
+  }
+
+  const addInitiativesWithAi = async () => {
+    try {
+      const initiativesToAdd = (await generateInitiativesForOKR(keyResult.title, keyResult.title))
+        .map(initiative => {
+          return { title: initiative.title, description: initiative.description, priority: initiative.priority, status: 'planned', keyResult: keyResult.id };
+        });
+      const savedInitiatives = [];
+      for (const initiative of initiativesToAdd) {
+        savedInitiatives.push(await addFeature(orgId, projectId, initiative));
+      }
+      setKeyResult({ ...keyResult, features: savedInitiatives });
+      toast.success('The initiatives have been added');
+    } catch (e) {
+      toast.error('The initiatives could not be saved');
+      console.error(e);
     }
   }
 
@@ -188,12 +212,12 @@ function DetailKeyResult() {
       <SimpleHeader
         headerButtons={[
           {
-            name: "Back",
-            shortcut: "←",
+            name: 'Back',
+            shortcut: '←',
             action: () => {
               window.history.back();
-            }
-          }
+            },
+          },
         ]}
       />
       <Container className="mt--6" fluid id="OKRs">
@@ -202,7 +226,7 @@ function DetailKeyResult() {
             {!isLoading && !keyResult && <NotFoundCard message="Key result not be found" />}
             <DeleteWarning
               isOpen={isDeleteWarningOpen}
-              entity={"Key Result"}
+              entity={'Key Result'}
               toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
               onDelete={handleDelete}
             />
@@ -218,7 +242,7 @@ function DetailKeyResult() {
                 {isLoading && <LoadingSpinnerBox />}
                 {!isLoading && keyResult &&
                   <Formik
-                    initialValues={{ title: keyResult.title || "" }}
+                    initialValues={{ title: keyResult.title || '' }}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                   >
@@ -242,7 +266,7 @@ function DetailKeyResult() {
                               invalid={!!(errors.title && touched.title)}
                               autoComplete="off"
                             />
-                            <ErrorMessage name={"objective"} component={InputError} />
+                            <ErrorMessage name={'objective'} component={InputError} />
                           </Col>
                         </Row>
                         <Row className="mb-3">
@@ -251,11 +275,11 @@ function DetailKeyResult() {
                               Status
                             </label>
                             <Select2
-                              id={"status-kr"}
+                              id={'status-kr'}
                               className="form-control"
                               defaultValue={status}
                               options={{
-                                placeholder: "Status"
+                                placeholder: 'Status',
                               }}
                               data={statuses}
                               onChange={async (e) => {
@@ -276,7 +300,7 @@ function DetailKeyResult() {
                         <Row>
                           <Col>
                             <Button
-                              id={"save-objective"}
+                              id={'save-objective'}
                               color="primary"
                               type="submit"
                               className="mr-3 mb-3"
@@ -285,7 +309,7 @@ function DetailKeyResult() {
                               Save Key Result
                             </Button>
                             <Button
-                              id={"delete-objective"}
+                              id={'delete-objective'}
                               color="secondary"
                               type="button"
                               className="ml-0 mb-3"
@@ -307,7 +331,13 @@ function DetailKeyResult() {
                 <CardHeader className="border-1">
                   <div className="row">
                     <div className="col-12">
-                      <h3 className="mb-0">Related Initiatives</h3>
+                      <h3 className="mb-0">Related Initiatives
+                        {isPlaceholderInitiativeOnly() && <AIButton
+                          disabled={keyResult.title.length === 0}
+                          onClick={addInitiativesWithAi}
+                        />}
+                      </h3>
+
                     </div>
                   </div>
                 </CardHeader>
