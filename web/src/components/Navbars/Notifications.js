@@ -41,8 +41,8 @@ const notificationTextActions = {
         update: (notification) => `${notification.createdBy.name} updated a comment on a key result`
     },
     objective_comment: {
-        create: (notification) => `${notification.createdBy.name} commented on an OKR`,
-        update: (notification) => `${notification.createdBy.name} updated a comment on an OKR`
+        create: (notification) => `${notification.createdBy.name} commented on an objective`,
+        update: (notification) => `${notification.createdBy.name} updated a comment on an objective`
     },
     work_item_comment: {
         create: (notification) => `${notification.createdBy.name} commented on a work item`,
@@ -92,43 +92,20 @@ export default function Notifications() {
                 return notificationTextActions.initiative_comment[notification.action](notification);
             case "initiative_description":
                 return notificationTextActions.initiative_description[notification.action](notification);
-            case "feature_request":
+            case "feature_request_comment":
                 return notificationTextActions.feature_request_comment[notification.action](notification);
-            case "issue":
+            case "issue_comment":
                 return notificationTextActions.issue_comment[notification.action](notification);
-            case "key_result":
+            case "key_result_comment":
                 return notificationTextActions.key_result_comment[notification.action](notification);
-            case "objective":
+            case "objective_comment":
                 return notificationTextActions.objective_comment[notification.action](notification);
-            case "work_item":
+            case "work_item_comment":
                 return notificationTextActions.work_item_comment[notification.action](notification);
             case "work_item_description":
                 return notificationTextActions.work_item_description[notification.action](notification);
             default:
                 return "Unknown notification";
-        }
-    }
-
-    function entityUrl(notification) {
-        switch (notification.entity) {
-            case "initiative_comment":
-                return `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${notification.entityId}`;
-            case "initiative_description":
-                return `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${notification.entityId}`;
-            case "feature_request":
-                return `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/${notification.entityId}`;
-            case "issue":
-                return `/admin/orgs/${orgId}/projects/${projectId}/issues/${notification.entityId}`;
-            case "key_result":
-                return `/admin/orgs/${orgId}/projects/${projectId}/key-results/${notification.entityId}`;
-            case "objective":
-                return `/admin/orgs/${orgId}/projects/${projectId}/objectives/${notification.entityId}`;
-            case "work_item":
-                return `/admin/orgs/${orgId}/projects/${projectId}/work-items/${notification.entityId}`;
-            case "work_item_description":
-                return `/admin/orgs/${orgId}/projects/${projectId}/work-items/${notification.entityId}`;
-            default:
-                return "#";
         }
     }
 
@@ -158,7 +135,7 @@ export default function Notifications() {
                     <ListGroupItem
                         className="list-group-item-action"
                     >
-                        <Link to={entityUrl(notification)} tag={Link}>
+                        <Link to={notification.entityUrl} tag={Link}>
 
                             <Row className="align-items-center">
                                 <Col className="col-auto">

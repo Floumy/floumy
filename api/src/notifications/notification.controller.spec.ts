@@ -139,6 +139,7 @@ describe('NotificationController', () => {
           status: StatusType.UNREAD,
           entityId: notifications[0].entityId,
           entityName: 'WI-1: Test Work Item',
+          entityUrl: `/admin/orgs/${org.id}/projects/${project.id}/work-item/edit/${notifications[0].entityId}`,
           createdAt: notifications[0].createdAt,
           createdBy: {
             id: user.id,
@@ -164,6 +165,7 @@ describe('NotificationController', () => {
           status: StatusType.UNREAD,
           entityId: notifications[0].entityId,
           entityName: 'WI-1: Test Work Item',
+          entityUrl: `/admin/orgs/${org.id}/projects/${project.id}/work-item/edit/${notifications[0].entityId}`,
           createdAt: notifications[0].createdAt,
           createdBy: {
             id: user.id,
@@ -200,6 +202,7 @@ describe('NotificationController', () => {
             status: StatusType.READ,
             entityId: notifications[0].entityId,
             entityName: 'WI-1: Test Work Item',
+            entityUrl: `/admin/orgs/${org.id}/projects/${project.id}/work-item/edit/${notifications[0].entityId}`,
             createdAt: notifications[0].createdAt,
             createdBy: {
               id: user.id,

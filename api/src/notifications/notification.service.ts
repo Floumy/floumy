@@ -73,6 +73,7 @@ export class NotificationService {
     return await Promise.all(
       notifications.map(async (notification) => {
         let entityName: string;
+        let entityUrl: string;
         switch (notification.entity) {
           case EntityType.INITIATIVE_COMMENT:
             const featureComment =
@@ -82,12 +83,14 @@ export class NotificationService {
               });
             const feature = await featureComment.feature;
             entityName = feature.reference + ': ' + feature.title;
+            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`;
             break;
           case EntityType.INITIATIVE_DESCRIPTION:
             const f = await this.featuresRepository.findOneOrFail({
               where: { id: notification.entityId },
             });
             entityName = f.reference + ': ' + f.title;
+            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${f.id}`;
             break;
           case EntityType.WORK_ITEM_COMMENT:
             const workItemComment =
@@ -97,20 +100,24 @@ export class NotificationService {
               });
             const workItem = await workItemComment.workItem;
             entityName = workItem.reference + ': ' + workItem.title;
+            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`;
             break;
           case EntityType.WORK_ITEM_DESCRIPTION:
             const wi = await this.workItemsRepository.findOneOrFail({
               where: { id: notification.entityId },
             });
             entityName = wi.reference + ': ' + wi.title;
+            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${wi.id}`;
             break;
           case EntityType.FEATURE_REQUEST_COMMENT:
-            const featureRequest =
+            const featureRequestComment =
               await this.featureRequestCommentsRepository.findOneOrFail({
                 where: { id: notification.entityId },
                 relations: ['featureRequest'],
               });
-            entityName = (await featureRequest.featureRequest).title;
+            const featureRequest = await featureRequestComment.featureRequest;
+            entityName = featureRequest.title;
+            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequest.id}`;
             break;
           case EntityType.ISSUE_COMMENT:
             const issueComment =
@@ -118,7 +125,9 @@ export class NotificationService {
                 where: { id: notification.entityId },
                 relations: ['issue'],
               });
-            entityName = (await issueComment.issue).title;
+            const issue = await issueComment.issue;
+            entityName = issue.title;
+            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/issues/edit/${issue.id}`;
             break;
           case EntityType.KEY_RESULT_COMMENT:
             const keyResultComment =
@@ -128,6 +137,8 @@ export class NotificationService {
               });
             const keyResult = await keyResultComment.keyResult;
             entityName = keyResult.reference + ': ' + keyResult.title;
+            const o = await keyResult.objective;
+            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/okrs/${o.id}/kr/detail/${keyResult.id}`;
             break;
           case EntityType.OBJECTIVE_COMMENT:
             const objectiveComment =
@@ -137,6 +148,7 @@ export class NotificationService {
               });
             const objective = await objectiveComment.objective;
             entityName = objective.reference + ': ' + objective.title;
+            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${objective.id}`;
             break;
           default:
             entityName = 'Unknown';
@@ -147,6 +159,7 @@ export class NotificationService {
           action: notification.action,
           status: notification.status,
           entityName: entityName,
+          entityUrl: entityUrl,
           entityId: notification.entityId,
           createdAt: notification.createdAt,
           createdBy: await notification.createdBy,
