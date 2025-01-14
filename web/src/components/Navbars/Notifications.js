@@ -111,6 +111,9 @@ export default function Notifications() {
 
     useEffect(() => {
         fetchData();
+        const interval = setInterval(fetchData, 60000); // Fetch data every 60 seconds
+
+        return () => clearInterval(interval);
     }, []);
     return (<Dropdown isOpen={dropdownOpen} toggle={toggleDropdown} nav style={{cursor: "pointer"}}>
         <DropdownToggle className="nav-link" color="" tag="a">
