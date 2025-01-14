@@ -14,6 +14,8 @@ import ExecutionStats from "../components/stats/ExecutionStats";
 import Comments from "../../../components/Comments/Comments";
 import { toast } from "react-toastify";
 import useFeatureComments from "../../../hooks/useFeatureComments";
+import AIButton from '../../../components/AI/AIButton';
+import { generateWorkItemsForInitiative } from '../../../services/ai/ai.service';
 
 export function DetailFeature() {
   const { orgId, projectId } = useParams();
@@ -78,6 +80,28 @@ export function DetailFeature() {
     setFeature({ ...feature });
   }
 
+  function isPlaceholderWorkItemOnly() {
+    return feature && (!feature.workItems || feature.workItems.length === 1 || !feature.workItems[0]?.title);
+  }
+
+  const addWorkItemsWithAi = async () => {
+    try {
+      const workItemsToAdd = (await generateWorkItemsForInitiative(feature.title, feature.description))
+        .map(workItem => {
+          return { title: workItem.title, type: workItem.type, priority: workItem.priority, description: workItem.description };
+        });
+      const savedWorkItems = [];
+      for (const workItem of workItemsToAdd) {
+        workItem.feature = feature.id;
+        savedWorkItems.push(await addWorkItem(orgId, projectId, workItem));
+      }
+      setFeature({ ...feature, workItems: savedWorkItems });
+      toast.success('The work items have been added');
+    } catch (e) {
+      toast.error('The work items could not be saved');
+      console.error(e);
+    }
+  }
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
@@ -106,7 +130,11 @@ export function DetailFeature() {
                   <CardHeader className="border-1">
                     <div className="row">
                       <div className="col-12">
-                        <h3 className="mb-0">Related Work Items</h3>
+                        <h3 className="mb-0">Related Work Items {isPlaceholderWorkItemOnly() && <AIButton
+                          disabled={feature.title.length === 0 || feature.description.length === 0}
+                          onClick={addWorkItemsWithAi}
+                        />}
+                        </h3>
                       </div>
                     </div>
                   </CardHeader>
