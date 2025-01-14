@@ -29,6 +29,8 @@ import stripeConfig from './config/stripe.config';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { ProjectsModule } from './projects/projects.module';
+import { GithubModule } from './github/github.module';
+import githubConfig from './config/github.config';
 
 @Module({
   imports: [
@@ -43,6 +45,7 @@ import { ProjectsModule } from './projects/projects.module';
         emailConfig,
         appConfig,
         stripeConfig,
+        githubConfig,
       ],
     }),
     TypeOrmModule.forRootAsync({
@@ -94,6 +97,7 @@ import { ProjectsModule } from './projects/projects.module';
     FeatureRequestsModule,
     IssuesModule,
     ProjectsModule,
+    GithubModule,
   ],
   providers: [
     {
