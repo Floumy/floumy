@@ -390,7 +390,7 @@ function DetailOKR() {
               <Card>
                 <CardHeader>
                   <h3 className="mb-0">
-                    Related Key Results {okr?.keyResults.length === 0 && <AIButton
+                    Related Key Results {okr?.keyResults?.length === 0 && <AIButton
                     text="Add with AI"
                     disabled={!okr.objective.id}
                     onClick={async () => {
