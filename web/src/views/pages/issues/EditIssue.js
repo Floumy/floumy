@@ -195,7 +195,7 @@ export default function EditIssue() {
             <Card>
               <CardHeader>
                 <h3 className="mb-0">Related Work Items {isPlaceholderWorkItemOnly() && <AIButton
-                  disabled={issue.title.length === 0 || issue.description.length === 0}
+                  disabled={issue?.title?.length === 0 || issue?.description?.length === 0}
                   onClick={addWorkItemsWithAi}
                 />}
                 </h3>

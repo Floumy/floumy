@@ -131,7 +131,7 @@ export function DetailFeature() {
                     <div className="row">
                       <div className="col-12">
                         <h3 className="mb-0">Related Work Items {isPlaceholderWorkItemOnly() && <AIButton
-                          disabled={feature.title.length === 0 || feature.description.length === 0}
+                          disabled={feature?.title?.length === 0 || feature?.description?.length === 0}
                           onClick={addWorkItemsWithAi}
                         />}
                         </h3>
