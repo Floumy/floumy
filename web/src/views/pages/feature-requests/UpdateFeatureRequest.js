@@ -281,7 +281,7 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
             <div className="row">
               <div className="col-12">
                 <h3 className="mb-0">Related Initiatives {isPlaceholderInitiativeOnly() && <AIButton
-                  disabled={featureRequest.title.length === 0 || featureRequest.description.length === 0}
+                  disabled={featureRequest?.title?.length === 0 || featureRequest?.description?.length === 0}
                   onClick={addInitiativesWithAi}
                 />}
                 </h3>

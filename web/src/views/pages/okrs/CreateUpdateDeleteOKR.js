@@ -148,7 +148,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
   }
 
   function isPlaceholderKeyResultOnly() {
-    return fields && fields.length === 1 && !fields[0].title;
+    return fields && fields?.length === 1 && !fields[0]?.title;
   }
 
   return (
