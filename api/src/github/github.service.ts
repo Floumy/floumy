@@ -1,11 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Octokit } from 'octokit';
 
 @Injectable()
 export class GithubService {
   constructor(
-    @Inject('GITHUB_CLIENT') private readonly octokit: Octokit,
+    @Inject('GITHUB_CLIENT') private readonly octokit: any,
     private readonly configService: ConfigService,
   ) {}
 
@@ -16,6 +15,8 @@ export class GithubService {
   }
 
   async handleOAuthCallback(code: string) {
+    const Octokit = (await import('octokit')).Octokit as any;
+
     try {
       const { token } = (await this.octokit.auth({
         type: 'oauth-user',
