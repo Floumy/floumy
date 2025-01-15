@@ -6,7 +6,7 @@ import { RefreshToken } from './refresh-token.entity';
 import { Repository } from 'typeorm';
 import { setupTestingModule } from '../../test/test.utils';
 import { TokensService } from './tokens.service';
-import { NotificationsService } from '../notifications/notifications.service';
+import { MailNotificationsService } from '../mail-notifications/mail-notifications.service';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
@@ -25,7 +25,7 @@ describe('AuthService', () => {
       [
         AuthService,
         TokensService,
-        NotificationsService,
+        MailNotificationsService,
         UsersService,
         OrgsService,
       ],

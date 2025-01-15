@@ -1,8 +1,19 @@
-import { DropdownItem, DropdownMenu, DropdownToggle, Media, Nav, NavItem, UncontrolledDropdown } from "reactstrap";
+import {
+    Col,
+    DropdownItem,
+    DropdownMenu,
+    DropdownToggle,
+    ListGroup, ListGroupItem,
+    Media,
+    Nav,
+    NavItem, Row,
+    UncontrolledDropdown
+} from "reactstrap";
 import { memberNameInitials, textToColor } from "../../services/utils/utils";
 import { logoutUser } from "../../services/api/api.service";
 import React from "react";
 import { useParams } from 'react-router-dom';
+import Notifications from "./Notifications";
 
 export default function CurrentUserNav() {
   const {orgId, projectId} = useParams();
@@ -22,6 +33,7 @@ export default function CurrentUserNav() {
 
   return (
     <Nav className="align-items-center ml-auto ml-md-0" navbar>
+      <Notifications />
       <UncontrolledDropdown nav>
         <DropdownToggle className="nav-link pr-0" color="" tag="a">
           <Media className="align-items-center" style={{ cursor: "pointer" }}>

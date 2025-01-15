@@ -1,12 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { KeyResult } from '../key-result.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import {In, Repository} from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { KeyResultComment } from '../key-result-comment.entity';
 import { User } from '../../users/user.entity';
 import { CommentMapper } from '../../comments/mappers';
 import { ObjectiveComment } from '../objective-comment.entity';
 import { Objective } from '../objective.entity';
+import { CreateNotificationDto } from '../../notifications/dtos';
+import {
+  ActionType,
+  EntityType,
+  StatusType,
+} from '../../notifications/notification.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CommentsService {
@@ -21,6 +28,7 @@ export class CommentsService {
     private objectiveCommentRepository: Repository<ObjectiveComment>,
     @InjectRepository(Objective)
     private objectiveRepository: Repository<Objective>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async addCommentToKeyResult(
@@ -57,7 +65,21 @@ export class CommentsService {
         id: In(mentions),
       }),
     );
-    await this.keyResultCommentRepository.save(comment);
+    const savedComment = await this.keyResultCommentRepository.save(comment);
+    const savedMentions = await savedComment.mentions;
+    if (savedMentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions: savedMentions,
+        createdBy: await this.usersRepository.findOneByOrFail({ id: userId }),
+        org: org,
+        project: await keyResult.project,
+        action: ActionType.CREATE,
+        entity: EntityType.KEY_RESULT_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return CommentMapper.toDto(comment);
   }
 
@@ -88,7 +110,21 @@ export class CommentsService {
         id: In(mentions),
       }),
     );
-    await this.keyResultCommentRepository.save(comment);
+    const savedComment = await this.keyResultCommentRepository.save(comment);
+    const savedMentions = await savedComment.mentions;
+    if (savedMentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions: savedMentions,
+        createdBy: await this.usersRepository.findOneByOrFail({ id: userId }),
+        org: await savedComment.org,
+        project: await (await savedComment.keyResult).project,
+        action: ActionType.UPDATE,
+        entity: EntityType.KEY_RESULT_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
 
     return CommentMapper.toDto(comment);
   }
@@ -145,7 +181,21 @@ export class CommentsService {
         id: In(mentions),
       }),
     );
-    await this.objectiveCommentRepository.save(comment);
+    const savedComment = await this.objectiveCommentRepository.save(comment);
+    const savedMentions = await savedComment.mentions;
+    if (savedMentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions: savedMentions,
+        createdBy: await this.usersRepository.findOneByOrFail({ id: userId }),
+        org: org,
+        project: await objective.project,
+        action: ActionType.CREATE,
+        entity: EntityType.OBJECTIVE_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return CommentMapper.toDto(comment);
   }
 
@@ -176,8 +226,21 @@ export class CommentsService {
         id: In(mentions),
       }),
     );
-    await this.objectiveCommentRepository.save(comment);
-
+    const savedComment = await this.objectiveCommentRepository.save(comment);
+    const savedMentions = await savedComment.mentions;
+    if (savedMentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions: savedMentions,
+        createdBy: await this.usersRepository.findOneByOrFail({ id: userId }),
+        org: await savedComment.org,
+        project: await (await savedComment.objective).project,
+        action: ActionType.UPDATE,
+        entity: EntityType.OBJECTIVE_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return CommentMapper.toDto(comment);
   }
 

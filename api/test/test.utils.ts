@@ -7,7 +7,7 @@ import databaseConfig from '../src/config/database.config';
 import encryptionConfig from '../src/config/encryption.config';
 import jwtConfig from '../src/config/jwt.config';
 import { testDbOptions } from './test-db.options';
-import { NotificationsService } from '../src/notifications/notifications.service';
+import { MailNotificationsService } from '../src/mail-notifications/mail-notifications.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../src/users/user.entity';
 import { RefreshToken } from '../src/auth/refresh-token.entity';
@@ -47,11 +47,11 @@ export async function clearDatabase(dataSource: DataSource) {
   try {
     // Get all table names except migrations and typeorm metadata
     const tables = await queryRunner.query(`
-      SELECT string_agg('"' || tablename || '"', ', ') 
-      FROM pg_tables 
-      WHERE schemaname = 'public' 
-      AND tablename NOT IN ('migrations', 'typeorm_metadata');
-    `);
+            SELECT string_agg('"' || tablename || '"', ', ')
+            FROM pg_tables
+            WHERE schemaname = 'public'
+              AND tablename NOT IN ('migrations', 'typeorm_metadata');
+        `);
 
     if (tables[0].string_agg) {
       // Disable triggers and truncate all tables in a single query
@@ -169,7 +169,7 @@ export async function setupTestingModule(
         provide: 'STRIPE_CLIENT',
         useValue: stripeClientMock,
       },
-      NotificationsService,
+      MailNotificationsService,
       StripeService,
       OrgsService,
       BipService,

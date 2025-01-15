@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ServerClient } from 'postmark';
 
 @Injectable()
-export class NotificationsService {
+export class MailNotificationsService {
   constructor(
     @Inject('POSTMARK_CLIENT') private postmarkClient: ServerClient,
     private configService: ConfigService,

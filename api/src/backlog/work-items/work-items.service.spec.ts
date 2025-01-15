@@ -439,6 +439,7 @@ describe('WorkItemsService', () => {
         },
       );
       const foundWorkItem = await service.updateWorkItem(
+        user.id,
         org.id,
         project.id,
         workItem.id,
@@ -488,6 +489,7 @@ describe('WorkItemsService', () => {
         },
       );
       const foundWorkItem = await service.updateWorkItem(
+        user.id,
         org.id,
         project.id,
         workItem.id,
@@ -523,6 +525,7 @@ describe('WorkItemsService', () => {
         },
       );
       const foundWorkItem = await service.updateWorkItem(
+        user.id,
         org.id,
         project.id,
         workItem.id,
@@ -558,6 +561,7 @@ describe('WorkItemsService', () => {
         },
       );
       const foundWorkItem = await service.updateWorkItem(
+        user.id,
         org.id,
         project.id,
         workItem.id,
@@ -620,6 +624,7 @@ describe('WorkItemsService', () => {
         },
       );
       const foundWorkItem = await service.updateWorkItem(
+        user.id,
         org.id,
         project.id,
         workItem.id,
@@ -671,6 +676,7 @@ describe('WorkItemsService', () => {
         },
       );
       const foundWorkItem = await service.updateWorkItem(
+        user.id,
         org.id,
         project.id,
         workItem.id,
@@ -716,6 +722,7 @@ describe('WorkItemsService', () => {
         },
       );
       const foundWorkItem = await service.updateWorkItem(
+        user.id,
         org.id,
         project.id,
         workItem.id,
@@ -838,6 +845,7 @@ describe('WorkItemsService', () => {
         },
       );
       const updatedWorkItem = await service.updateWorkItem(
+        user.id,
         org.id,
         project.id,
         workItem.id,
@@ -875,6 +883,7 @@ describe('WorkItemsService', () => {
         },
       );
       const updatedWorkItem = await service.updateWorkItem(
+        user.id,
         org.id,
         project.id,
         workItem.id,
@@ -1138,7 +1147,7 @@ describe('WorkItemsService', () => {
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
-      await service.updateWorkItem(org.id, project.id, workItem1.id, {
+      await service.updateWorkItem(user.id, org.id, project.id, workItem1.id, {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
@@ -1147,7 +1156,7 @@ describe('WorkItemsService', () => {
         status: WorkItemStatus.DONE,
         feature: feature.id,
       });
-      await service.updateWorkItem(org.id, project.id, workItem2.id, {
+      await service.updateWorkItem(user.id, org.id, project.id, workItem2.id, {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
@@ -1203,7 +1212,7 @@ describe('WorkItemsService', () => {
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
-      await service.updateWorkItem(org.id, project.id, workItem1.id, {
+      await service.updateWorkItem(user.id, org.id, project.id, workItem1.id, {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
@@ -1212,7 +1221,7 @@ describe('WorkItemsService', () => {
         status: WorkItemStatus.DONE,
         feature: feature.id,
       });
-      await service.updateWorkItem(org.id, project.id, workItem2.id, {
+      await service.updateWorkItem(user.id, org.id, project.id, workItem2.id, {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
@@ -1279,7 +1288,7 @@ describe('WorkItemsService', () => {
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
-      await service.updateWorkItem(org.id, project.id, workItem1.id, {
+      await service.updateWorkItem(user.id, org.id, project.id, workItem1.id, {
         title: 'my work item 1',
         description: 'my work item description 1',
         priority: Priority.HIGH,
@@ -1288,7 +1297,7 @@ describe('WorkItemsService', () => {
         status: WorkItemStatus.DONE,
         feature: feature2.id,
       });
-      await service.updateWorkItem(org.id, project.id, workItem2.id, {
+      await service.updateWorkItem(user.id, org.id, project.id, workItem2.id, {
         title: 'my work item 2',
         description: 'my work item description 2',
         priority: Priority.MEDIUM,
@@ -1449,7 +1458,7 @@ describe('WorkItemsService', () => {
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
-      await service.updateWorkItem(org.id, project.id, workItem2.id, {
+      await service.updateWorkItem(user.id, org.id, project.id, workItem2.id, {
         title: 'my work item 2',
         description: 'my work item description 2',
         priority: Priority.MEDIUM,

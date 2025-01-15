@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { NotificationsService } from './notifications.service';
+import { MailNotificationsService } from './mail-notifications.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServerClient } from 'postmark';
 
@@ -21,8 +21,8 @@ const postmarkClientProvider = {
 };
 
 @Module({
-  providers: [NotificationsService, postmarkClientProvider],
-  exports: [NotificationsService],
+  providers: [MailNotificationsService, postmarkClientProvider],
+  exports: [MailNotificationsService],
   imports: [ConfigModule],
 })
-export class NotificationsModule {}
+export class MailNotificationsModule {}

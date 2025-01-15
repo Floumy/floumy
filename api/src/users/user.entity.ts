@@ -18,6 +18,7 @@ import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { FeatureRequestVote } from '../feature-requests/feature-request-vote.entity';
 import { Issue } from '../issues/issue.entity';
 import { Project } from '../projects/project.entity';
+import { Notification } from '../notifications/notification.entity';
 
 @Entity()
 export class User {
@@ -86,6 +87,16 @@ export class User {
 
   @ManyToMany(() => Project, (project) => project.users, { lazy: true })
   projects: Promise<Project[]>;
+
+  @OneToMany(() => Notification, (notification) => notification.user, {
+    lazy: true,
+  })
+  createdNotifications: Promise<Notification[]>;
+
+  @OneToMany(() => Notification, (notification) => notification.user, {
+    lazy: true,
+  })
+  notifications: Promise<Notification[]>;
 
   constructor(name: string, email: string, password: string) {
     this.name = name;
