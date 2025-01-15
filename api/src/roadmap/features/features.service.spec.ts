@@ -511,6 +511,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -550,6 +551,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -585,6 +587,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -615,6 +618,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -646,6 +650,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -677,6 +682,7 @@ describe('FeaturesService', () => {
         assignedTo: otherUser.id,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -706,6 +712,7 @@ describe('FeaturesService', () => {
         files: [file],
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -741,6 +748,7 @@ describe('FeaturesService', () => {
         files: [file1],
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -773,6 +781,7 @@ describe('FeaturesService', () => {
         files: [file],
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -809,6 +818,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -851,6 +861,7 @@ describe('FeaturesService', () => {
         featureRequest: featureRequest.id,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -890,6 +901,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -920,6 +932,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.COMPLETED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
@@ -1387,6 +1400,7 @@ describe('FeaturesService', () => {
         status: FeatureStatus.PLANNED,
       });
       const updatedFeature = await service.updateFeature(
+        user.id,
         org.id,
         project.id,
         feature.id,
