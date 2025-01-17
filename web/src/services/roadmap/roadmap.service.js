@@ -246,3 +246,11 @@ export async function updateFeatureComment(orgId, projectId, featureId, commentI
     throw new Error(e.message);
   }
 }
+
+export async function changeAssignee(orgId, projectId, featureId, assigneeId) {
+  try {
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/features/${featureId}/assignee`, { assignee: assigneeId });
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
