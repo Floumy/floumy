@@ -1105,4 +1105,86 @@ describe('WorkItemsController', () => {
       expect(updatedComment.updatedAt).toBeDefined();
     });
   });
+  describe('when updating a work item assignee', () => {
+    it('should update the assignee', async () => {
+      const {
+        org: premiumOrg,
+        user: premiumOrgUser,
+        project,
+      } = await getTestPremiumOrgAndUser();
+      const secondUser = await usersRepository.save({
+        name: 'Second User',
+        email: 'second@example.com',
+        password: 'testtesttest',
+        org: Promise.resolve(premiumOrg),
+      });
+      const workItem = await controller.create(
+        premiumOrg.id,
+        project.id,
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        {
+          title: 'my work item',
+          description: 'my work item description',
+          priority: Priority.HIGH,
+          type: WorkItemType.TECHNICAL_DEBT,
+          status: WorkItemStatus.PLANNED,
+        },
+      );
+      await controller.changeAssignee(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        premiumOrg.id,
+        project.id,
+        workItem.id,
+        {
+          assignee: secondUser.id,
+        },
+      );
+      const updatedWorkItem = await controller.get(
+        premiumOrg.id,
+        project.id,
+        {
+          user: {
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+      );
+      expect(updatedWorkItem.assignedTo.id).toEqual(secondUser.id);
+      await controller.changeAssignee(
+        {
+          user: {
+            sub: premiumOrgUser.id,
+            org: premiumOrg.id,
+          },
+        },
+        premiumOrg.id,
+        project.id,
+        workItem.id,
+        {
+          assignee: '',
+        },
+      );
+      const secondUpdatedWorkItem = await controller.get(
+        premiumOrg.id,
+        project.id,
+        {
+          user: {
+            org: premiumOrg.id,
+          },
+        },
+        workItem.id,
+      );
+      expect(secondUpdatedWorkItem.assignedTo).toBeUndefined();
+    });
+  });
 });
