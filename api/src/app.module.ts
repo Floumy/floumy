@@ -30,6 +30,7 @@ import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { ProjectsModule } from './projects/projects.module';
 import { GithubModule } from './github/github.module';
+import { EncryptionModule } from './encryption/encryption.module';
 import githubConfig from './config/github.config';
 
 @Module({
@@ -98,6 +99,7 @@ import githubConfig from './config/github.config';
     IssuesModule,
     ProjectsModule,
     GithubModule,
+    EncryptionModule,
   ],
   providers: [
     {
