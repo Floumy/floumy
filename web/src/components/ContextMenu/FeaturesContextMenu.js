@@ -9,6 +9,7 @@ import {
   priorityColor
 } from "../../services/utils/utils";
 import {
+  changeAssignee,
   listMilestones,
   updateFeatureKeyResult,
   updateFeatureMilestone,
@@ -19,6 +20,7 @@ import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 import { listKeyResults } from "../../services/okrs/okrs.service";
 import { useParams } from "react-router-dom";
+import {getOrg} from "../../services/org/orgs.service";
 
 function FeaturesContextMenu({
                                menuId,
@@ -30,6 +32,8 @@ function FeaturesContextMenu({
                              }) {
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
   const [isLoadingKeyResults, setIsLoadingKeyResults] = useState(false);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [users, setUsers] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [keyResults, setKeyResults] = useState([]);
   const { projectId, orgId } = useParams();
@@ -59,8 +63,26 @@ function FeaturesContextMenu({
       }
     }
 
+    async function fetchUsers() {
+        try {
+            setIsLoadingUsers(true);
+            const org = await getOrg();
+            const users = org.members.filter(user => user.isActive).map(user => ({
+                id: user.id,
+                name: user.name,
+            }));
+            users.push({ id: null, name: "None" });
+            setUsers(users);
+        } catch (e) {
+            console.error("The users could not be loaded");
+        } finally {
+            setIsLoadingUsers(false);
+        }
+    }
+
     fetchMilestones();
     fetchKeyResults();
+    fetchUsers();
   }, []);
 
   function callChangeMilestoneCallbacks(milestoneId, features) {
@@ -114,6 +136,18 @@ function FeaturesContextMenu({
       toast.error("The features could not be moved to the key result");
     }
   };
+
+  const handleAssignTo = async ({ id: userId, event, props }) => {
+    try {
+      event.preventDefault();
+      for (const feature of props.features) {
+        await changeAssignee(orgId, projectId, feature.id, userId);
+      }
+      toast.success("The features have been assigned to the user");
+    } catch (e) {
+      toast.error("The features could not be assigned to the user");
+    }
+  }
 
   function callChangeStatusCallbacks(status, features) {
     try {
@@ -193,6 +227,19 @@ function FeaturesContextMenu({
           </Item>
         ))}
       </Submenu>
+        {isLoadingUsers && <Item disabled className="text-center"><Spinner className="m-auto" color="primary"/></Item>}
+        {!isLoadingUsers && users.length === 0 && <Item disabled>Assign to</Item>}
+        {!isLoadingUsers && users.length > 0 &&
+            <Submenu label={"Assign to"} style={{maxHeight: "200px", overflowY: "scroll"}}>
+                {users.map(user => (
+                    <Item key={user.id} id={user.id}
+                          onClick={handleAssignTo}
+                          style={{maxWidth: "300px", overflowX: "hidden", whiteSpace: "nowrap"}}>
+                        {user.name}
+                    </Item>
+                ))}
+            </Submenu>
+        }
       <Submenu label={"Change priority"} style={{ maxHeight: "200px", overflowY: "scroll" }}>
         {priorities.map(priority => (
           <Item key={priority} id={priority} onClick={handleChangePriority}>
