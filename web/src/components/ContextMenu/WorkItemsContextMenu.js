@@ -1,20 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { Item, Menu, Submenu } from "react-contexify";
+import React, {useEffect, useState} from "react";
+import {Item, Menu, Submenu} from "react-contexify";
 import "react-contexify/dist/ReactContexify.css";
-import { listIterations } from "../../services/iterations/iterations.service";
-import { Badge, Spinner } from "reactstrap";
+import {listIterations} from "../../services/iterations/iterations.service";
+import {Badge, Spinner} from "reactstrap";
 import {
+  changeWorkItemAssignee,
   updateWorkItemIteration,
   updateWorkItemPriority,
   updateWorkItemStatus
 } from "../../services/backlog/backlog.service";
-import { formatHyphenatedString, priorityColor, workItemStatusColorClassName } from "../../services/utils/utils";
-import { toast } from "react-toastify";
+import {formatHyphenatedString, priorityColor, workItemStatusColorClassName} from "../../services/utils/utils";
+import {toast} from "react-toastify";
 import PropTypes from "prop-types";
-import { useParams } from "react-router-dom";
+import {useParams} from "react-router-dom";
+import {getOrg} from "../../services/org/orgs.service";
 
 function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onChangePriority, onChange }) {
   const [isLoadingIterations, setIsLoadingIterations] = useState(false);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [users, setUsers] = useState([]);
   const [iterations, setIterations] = useState([]);
   const { orgId, projectId } = useParams();
 
@@ -30,7 +34,24 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
         setIsLoadingIterations(false);
       }
     }
+    async function fetchUsers() {
+      try {
+        setIsLoadingUsers(true);
+        const org = await getOrg();
+        const users = org.members.filter(user => user.isActive).map(user => ({
+          id: user.id,
+          name: user.name,
+        }));
+        users.push({ id: null, name: "None" });
+        setUsers(users);
+      } catch (e) {
+        console.error("The users could not be loaded");
+      } finally {
+        setIsLoadingUsers(false);
+      }
+    }
 
+    fetchUsers();
     fetchIterations();
   }, []);
 
@@ -99,6 +120,18 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
     }
   };
 
+  const handleAssignTo = async ({ id: userId, event, props }) => {
+    try {
+      event.preventDefault();
+      for (const workItem of props.workItems) {
+        await changeWorkItemAssignee(orgId, projectId, workItem.id, userId);
+      }
+      toast.success("The work items have been assigned to the user");
+    } catch (e) {
+      toast.error("The work items could not be assigned to the user");
+    }
+  }
+
   const callChangePriorityCallbacks = (priority, workItems) => {
     try {
       if (onChangePriority) {
@@ -144,6 +177,19 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
           </Item>
         ))}
       </Submenu>
+      {isLoadingUsers && <Item disabled className="text-center"><Spinner className="m-auto" color="primary"/></Item>}
+      {!isLoadingUsers && users.length === 0 && <Item disabled>Assign to</Item>}
+      {!isLoadingUsers && users.length > 0 &&
+          <Submenu label={"Assign to"} style={{maxHeight: "200px", overflowY: "scroll"}}>
+            {users.map(user => (
+                <Item key={user.id} id={user.id}
+                      onClick={handleAssignTo}
+                      style={{maxWidth: "300px", overflowX: "hidden", whiteSpace: "nowrap"}}>
+                  {user.name}
+                </Item>
+            ))}
+          </Submenu>
+      }
       <Submenu label={"Change priority"} style={{ maxHeight: "200px", overflowY: "scroll" }}>
         {priorities.map(priority => (
           <Item key={priority} id={priority} onClick={handleChangePriority}>
