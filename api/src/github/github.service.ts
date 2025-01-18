@@ -14,19 +14,25 @@ export class GithubService {
     private readonly encryptionService: EncryptionService,
   ) {}
 
-  async isAuthenticated(orgId: string) {
+  async isConnected(orgId: string) {
     const token = await this.getToken(orgId);
 
     if (!token) {
-      return false;
+      return {
+        connected: false,
+      };
     }
 
     const octokit = await this.getAuthenticatedOctokit(token);
     try {
       await octokit.rest.users.getAuthenticated();
-      return true;
+      return {
+        connected: true,
+      };
     } catch (error) {
-      return false;
+      return {
+        connected: false,
+      };
     }
   }
 
@@ -81,7 +87,7 @@ export class GithubService {
     }
   }
 
-  private async getAuthenticatedOctokit(token: string) {
+  async getAuthenticatedOctokit(token: string) {
     const Octokit = (await import('octokit')).Octokit as any;
 
     return new Octokit({
@@ -106,6 +112,11 @@ export class GithubService {
   private async getToken(orgId: string) {
     const token = (await this.orgRepository.findOneByOrFail({ id: orgId }))
       .githubAccessToken;
+
+    if (!token) {
+      return null;
+    }
+
     return this.encryptionService.decrypt(token);
   }
 }

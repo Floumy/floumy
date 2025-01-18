@@ -4,7 +4,8 @@ import {
   Get,
   Param,
   Query,
-  Request, Res,
+  Request,
+  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -19,8 +20,7 @@ export class GithubController {
   constructor(
     private readonly githubService: GithubService,
     private readonly configService: ConfigService,
-  ) {
-  }
+  ) {}
 
   @Get('auth/orgs/:orgId/projects/:projectId')
   async getAuthUrl(
@@ -73,17 +73,14 @@ export class GithubController {
     }
   }
 
-  @Get('auth/orgs/:orgId/is-authenticated')
-  async isAuthenticated(
-    @Request() request: any,
-    @Param('orgId') orgId: string,
-  ) {
+  @Get('auth/orgs/:orgId/is-connected')
+  async isConnected(@Request() request: any, @Param('orgId') orgId: string) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.githubService.isAuthenticated(orgId);
+      return await this.githubService.isConnected(orgId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
