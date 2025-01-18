@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
+import { EncryptionModule } from '../encryption/encryption.module';
 
 const octokitClientProvider = {
   provide: 'GITHUB_CLIENT',
@@ -33,6 +34,7 @@ const octokitClientProvider = {
     ConfigModule,
     AuthModule,
     UsersModule,
+    EncryptionModule,
     TypeOrmModule.forFeature([User, User, Org]),
   ],
 })
