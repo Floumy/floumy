@@ -20,7 +20,6 @@ import { CreateUpdateFeatureDto, PatchFeatureDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
-import { FilterOptions } from './feature.query-builder';
 
 @Controller('/orgs/:orgId/projects/:projectId/features')
 @UseGuards(AuthGuard)

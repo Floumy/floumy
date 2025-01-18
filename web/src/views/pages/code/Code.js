@@ -3,22 +3,45 @@ import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
-import { getGithubUrl } from '../../../services/github/github';
+import { getGithubUrl, getIsGithubConnected } from '../../../services/github/github';
 import { useProjects } from '../../../contexts/ProjectsContext';
 
 function Code() {
   const { orgId, currentProject } = useProjects();
-  const [isLoadingIntegration, setIsLoadingIntegration] = useState(false);
 
-  const [callbackUrl, setCallbackUrl] = useState("");
+  const [isLoadingIntegration, setIsLoadingIntegration] = useState(false);
+  const [isGithubConnected, setIsGithubConnected] = useState(true);
+
+  const [callbackUrl, setCallbackUrl] = useState('');
 
   useEffect(() => {
     if (!currentProject?.id || !orgId) return;
 
-    document.title = "Floumy | Code";
-    getGithubUrl(orgId, currentProject.id).then(response => {
-      setCallbackUrl(response);
-    });
+    setIsLoadingIntegration(true);
+
+    getIsGithubConnected(orgId, currentProject.id)
+      .then(response => {
+        setIsGithubConnected(response.connected);
+        
+        if (!response.connected) {
+          getGithubUrl(orgId, currentProject.id)
+            .then(response => {
+              setCallbackUrl(response);
+            })
+            .catch(() => {
+              setCallbackUrl('');
+            });
+        }
+
+      })
+      .catch(() => {
+        setIsGithubConnected(false);
+      })
+      .finally(() => {
+        setIsLoadingIntegration(false);
+      });
+
+    document.title = 'Floumy | Code';
   }, [currentProject?.id, orgId]);
 
   return (
@@ -43,11 +66,11 @@ function Code() {
                       <LoadingSpinnerBox />
                     </Col>
                   </Row>}
-                {!isLoadingIntegration &&
+                {!isLoadingIntegration && !isGithubConnected &&
                   <Row>
                     <Col>
                       <div>
-                        <button className="btn btn-success" type="button" onClick={() => {
+                        <button className="btn btn-primary" type="button" onClick={() => {
                           window.location.href = callbackUrl;
                         }}>
                           Connect GitHub

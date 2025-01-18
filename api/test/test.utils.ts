@@ -119,6 +119,85 @@ export async function setupTestingModule(
     },
   };
 
+  const githubClientMock = {
+    rest: {
+      users: {
+        getAuthenticated: jest.fn().mockImplementation(() => {
+          return {
+            data: {
+              login: 'thelexned',
+              id: 66918833,
+              node_id: 'MDQ6VXNlcjY2OTE4ODMz',
+              avatar_url:
+                'https://avatars.githubusercontent.com/u/66918833?v=4',
+              gravatar_id: '',
+              url: 'https://api.github.com/users/thelexned',
+              html_url: 'https://github.com/thelexned',
+              followers_url: 'https://api.github.com/users/thelexned/followers',
+              following_url:
+                'https://api.github.com/users/thelexned/following{/other_user}',
+              gists_url:
+                'https://api.github.com/users/thelexned/gists{/gist_id}',
+              starred_url:
+                'https://api.github.com/users/thelexned/starred{/owner}{/repo}',
+              subscriptions_url:
+                'https://api.github.com/users/thelexned/subscriptions',
+              organizations_url: 'https://api.github.com/users/thelexned/orgs',
+              repos_url: 'https://api.github.com/users/thelexned/repos',
+              events_url:
+                'https://api.github.com/users/thelexned/events{/privacy}',
+              received_events_url:
+                'https://api.github.com/users/thelexned/received_events',
+              type: 'User',
+              site_admin: false,
+              name: 'Alexandru Nedelcu',
+              company: 'x',
+              blog: '',
+              location: null,
+              email: null,
+              hireable: null,
+              bio: null,
+              twitter_username: null,
+              public_repos: 13,
+              public_gists: 1,
+              followers: 1,
+              following: 1,
+              created_at: '2020-06-14T18:11:50Z',
+              updated_at: '2025-01-10T20:27:41Z',
+            },
+          };
+        }),
+      },
+      repos: {
+        listForAuthenticatedUser: jest.fn().mockImplementation(() => {
+          return {
+            data: [
+              {
+                id: 1,
+                node_id: 'MDEwOlJlcG9zaXRvcnkx',
+                name: 'test',
+                full_name: 'test',
+                private: true,
+                owner: {
+                  login: 'thelexned',
+                  id: 66918833,
+                  node_id: 'MDQ6VXNlcjY2OTE4ODMz',
+                  avatar_url:
+                    'https://avatars.githubusercontent.com/u/66918833?v=4',
+                  gravatar_id: '',
+                  url: 'https://api.github.com/users/thelexned',
+                  html_url: 'https://github.com/thelexned',
+                  followers_url:
+                    'https://api.github.com/users/thelexned/followers',
+                },
+              },
+            ],
+          };
+        }),
+      },
+    },
+  };
+
   const module: TestingModule = await Test.createTestingModule({
     controllers,
     imports: [
@@ -168,6 +247,10 @@ export async function setupTestingModule(
       {
         provide: 'STRIPE_CLIENT',
         useValue: stripeClientMock,
+      },
+      {
+        provide: 'GITHUB_CLIENT',
+        useValue: githubClientMock,
       },
       NotificationsService,
       StripeService,
