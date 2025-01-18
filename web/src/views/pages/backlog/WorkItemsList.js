@@ -26,6 +26,7 @@ function WorkItemsList({
                          onChangeIteration,
                          onChangeStatus,
                          onChangePriority,
+                         onChangeAssignee,
                          onChange,
                          enableContextMenu = true,
                          id = "work-items-context-menu"
@@ -138,6 +139,7 @@ function WorkItemsList({
       onChangeIteration={onChangeIteration}
       onChangeStatus={onChangeStatus}
       onChangePriority={onChangePriority}
+      onChangeAssignee={onChangeAssignee}
       onChange={handleChange} />}
     <div className="table-responsive">
       <Table className="align-items-center table-flush border-bottom no-select" style={{ minWidth: "700px" }}>
