@@ -250,6 +250,27 @@ export class WorkItemsService {
     return current;
   }
 
+  async changeAssignee(
+    orgId: string,
+    projectId: string,
+    workItemId: string,
+    userId?: string,
+  ) {
+    const workItem = await this.workItemsRepository.findOneByOrFail({
+      id: workItemId,
+      org: { id: orgId },
+      project: { id: projectId },
+    });
+    if (!userId) {
+      workItem.assignedTo = Promise.resolve(null);
+      await this.workItemsRepository.save(workItem);
+    } else {
+      const user = await this.usersRepository.findOneByOrFail({ id: userId });
+      workItem.assignedTo = Promise.resolve(user);
+      await this.workItemsRepository.save(workItem);
+    }
+  }
+
   async searchWorkItems(
     orgId: string,
     projectId: string,

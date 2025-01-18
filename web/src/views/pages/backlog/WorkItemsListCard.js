@@ -15,6 +15,7 @@ function WorkItemsListCard({
                              onChangeIteration,
                              onChangeStatus,
                              onChangePriority,
+                             onChangeAssignee,
                              onSearch,
                              enableContextMenu = true,
                              showFilters = true,
@@ -85,6 +86,7 @@ function WorkItemsListCard({
             onChangeIteration={onChangeIteration}
             onChangeStatus={onChangeStatus}
             onChangePriority={onChangePriority}
+            onChangeAssignee={onChangeAssignee}
           />}
         {isLoading && <LoadingSpinnerBox />}
       </Card>

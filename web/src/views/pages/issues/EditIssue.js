@@ -89,6 +89,17 @@ export default function EditIssue() {
     setIssue({ ...issue, workItems: updatedWorkItems });
   }
 
+    function updateWorkItemsAssignee(workItems, assignee) {
+      const updatedWorkItems = [];
+      for (const workItem of issue.workItems) {
+        if (workItems.some((wi) => (wi.id === workItem.id))) {
+          workItem.assignedTo = assignee.id === null ? undefined : assignee;
+        }
+        updatedWorkItems.push(workItem);
+      }
+      setIssue({ ...issue, workItems: updatedWorkItems });
+    }
+
   async function handleCommentAdd(comment) {
     try {
       const addedComment = await addIssueComment(orgId, projectId, issueId, comment);
@@ -207,6 +218,7 @@ export default function EditIssue() {
                 onChangeStatus={updateWorkItemsStatus}
                 onChangePriority={updateWorkItemsPriority}
                 onChangeIteration={updateWorkItemsIteration}
+                onChangeAssignee={updateWorkItemsAssignee}
               />
             </Card>
           </Col>

@@ -39,6 +39,7 @@ describe('FeaturesController', () => {
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
+  let secondUser: User;
   let project: Project;
 
   beforeEach(async () => {
@@ -87,7 +88,14 @@ describe('FeaturesController', () => {
       'test@example.com',
       'testtesttest',
     );
+    secondUser = await usersService.createUserWithOrg(
+      'Second User',
+      'test2@example.com',
+      'testtesttest',
+    );
     org = await orgsService.createForUser(user);
+    org.users = Promise.resolve([user, secondUser]);
+    await orgsRepository.save(org);
     project = (await org.projects)[0];
   });
 
@@ -685,6 +693,78 @@ describe('FeaturesController', () => {
       );
       expect(updatedComment.content).toEqual('my updated comment');
       expect(updatedComment.createdAt).toBeDefined();
+    });
+  });
+  describe('when changing the assigned user of a feature', () => {
+    it('should update the assigned user', async () => {
+      org.paymentPlan = PaymentPlan.PREMIUM;
+      await orgsRepository.save(org);
+      const featureResponse = await controller.create(
+        org.id,
+        project.id,
+        {
+          user: {
+            sub: user.id,
+            org: org.id,
+          },
+        },
+        {
+          title: 'my feature',
+          description: 'my feature description',
+          priority: Priority.HIGH,
+          status: FeatureStatus.PLANNED,
+        },
+      );
+      await controller.changeAssignee(
+        {
+          user: {
+            sub: user.id,
+            org: org.id,
+          },
+        },
+        org.id,
+        project.id,
+        featureResponse.id,
+        {
+          assignee: secondUser.id,
+        },
+      );
+      const updatedFeature = await controller.get(
+        org.id,
+        project.id,
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        featureResponse.id,
+      );
+      expect(updatedFeature.assignedTo.id).toEqual(secondUser.id);
+      await controller.changeAssignee(
+        {
+          user: {
+            sub: user.id,
+            org: org.id,
+          },
+        },
+        org.id,
+        project.id,
+        featureResponse.id,
+        {
+          assignee: '',
+        },
+      );
+      const updatedFeatureWithNoAssignee = await controller.get(
+        org.id,
+        project.id,
+        {
+          user: {
+            org: org.id,
+          },
+        },
+        featureResponse.id,
+      );
+      expect(updatedFeatureWithNoAssignee.assignedTo).toBeUndefined();
     });
   });
 });

@@ -162,3 +162,11 @@ export async function listComments(orgId, projectId, workItemId) {
     throw new Error(e.message);
   }
 }
+
+export async function changeWorkItemAssignee(orgId, projectId, workItemId, userId) {
+  try {
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/assignee`, { assignee: userId });
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}

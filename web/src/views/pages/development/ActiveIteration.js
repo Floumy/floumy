@@ -95,6 +95,17 @@ function ActiveIteration() {
     setActiveIteration({ ...activeIteration, workItems: updatedWorkItems });
   }
 
+  function updateWorkItemAssignee(workItems, assignee) {
+    const updatedWorkItems = [];
+    for (const workItem of activeIteration.workItems) {
+      if (workItems.some((wi) => (wi.id === workItem.id))) {
+        workItem.assignedTo = assignee.id === null ? undefined : assignee;
+      }
+      updatedWorkItems.push(workItem);
+    }
+    setActiveIteration({ ...activeIteration, workItems: updatedWorkItems });
+  }
+
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
@@ -187,6 +198,7 @@ function ActiveIteration() {
                                      onChangeIteration={handleChangeIteration}
                                      onChangeStatus={updateWorkItemsStatus}
                                      onChangePriority={updateWorkItemsPriority}
+                                     onChangeAssignee={updateWorkItemAssignee}
                                      headerClassName={"thead"} />
                     </div>
                   ))}

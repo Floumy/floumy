@@ -242,6 +242,19 @@ function Iterations() {
     setIterations([...iterations]);
   }
 
+  function updateWorkItemAssigneeInIteration(workItems, assignee, iterationId) {
+    const iteration = iterations.find(iteration => iteration.id === iterationId);
+    const updatedWorkItems = [];
+    for (const workItem of iteration.workItems) {
+      if (workItems.some((wi) => (wi.id === workItem.id))) {
+        workItem.assignedTo = assignee.id === null ? undefined : assignee;
+      }
+      updatedWorkItems.push(workItem);
+    }
+    iteration.workItems = updatedWorkItems;
+    setIterations([...iterations]);
+  }
+
   function updateWorkItemsPriorityInBacklog(workItems, priority) {
     const updatedWorkItems = [];
     for (const workItem of backlogWorkItems) {
@@ -251,6 +264,17 @@ function Iterations() {
       updatedWorkItems.push(workItem);
     }
     sortByPriority(updatedWorkItems);
+    setBacklogWorkItems([...updatedWorkItems]);
+  }
+
+  function updateWorkItemAssigneeInBacklog(workItems, assignee) {
+    const updatedWorkItems = [];
+    for (const workItem of backlogWorkItems) {
+      if (workItems.some((wi) => (wi.id === workItem.id))) {
+        workItem.assignedTo = assignee.id === null ? undefined : assignee;
+      }
+      updatedWorkItems.push(workItem);
+    }
     setBacklogWorkItems([...updatedWorkItems]);
   }
 
@@ -387,6 +411,9 @@ function Iterations() {
                           onChangePriority={(workItems, priority) => {
                             updateWorkItemsPriorityInIteration(workItems, priority, iteration.id);
                           }}
+                          onChangeAssignee={(workItems, assignee) => {
+                            updateWorkItemAssigneeInIteration(workItems, assignee, iteration.id);
+                          }}
                         />
                         <CardBody className="pt-2 pb-2 font-italic"><Row><Col className="text-sm">Unfinished Work
                           Items</Col></Row></CardBody>
@@ -401,6 +428,9 @@ function Iterations() {
                           }}
                           onChangePriority={(workItems, priority) => {
                             updateWorkItemsPriorityInIteration(workItems, priority, iteration.id);
+                          }}
+                          onChangeAssignee={(workItems, assignee) => {
+                            updateWorkItemAssigneeInIteration(workItems, assignee, iteration.id);
                           }}
                         />
                       </div>
@@ -422,6 +452,10 @@ function Iterations() {
                           onChangePriority={(workItems, priority) => {
                             updateWorkItemsPriorityInIteration(workItems, priority, iteration.id);
                           }}
+                          onChangeAssignee={(workItems, assignee) => {
+                            updateWorkItemAssigneeInIteration(workItems, assignee, iteration.id);
+                          }}
+
                         />
                       </div>
                     }
@@ -444,6 +478,7 @@ function Iterations() {
               onChangePriority={(workItems, priority) => {
                 updateWorkItemsPriorityInBacklog(workItems, priority);
               }}
+              onChangeAssignee={(workItems, assignee) => {updateWorkItemAssigneeInBacklog(workItems, assignee);}}
             />
           </Col>
         </Row>

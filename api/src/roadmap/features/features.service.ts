@@ -244,7 +244,11 @@ export class FeaturesService {
 
     await this.updateFeatureFiles(updateFeatureDto, feature);
 
-    await this.updateFeatureAssignedTo(updateFeatureDto, orgId, feature);
+    await this.updateFeatureAssignedTo(
+      updateFeatureDto.assignedTo,
+      orgId,
+      feature,
+    );
 
     const savedFeature = await this.featuresRepository.save(feature);
     const updatedFeature = await FeatureMapper.toDto(savedFeature);
@@ -267,6 +271,21 @@ export class FeaturesService {
       this.eventEmitter.emit('mention.created', notification);
     }
     return updatedFeature;
+  }
+
+  async changeAssignee(
+    orgId: string,
+    projectId: string,
+    featureId: string,
+    assigneeId?: string,
+  ) {
+    const feature = await this.featuresRepository.findOneByOrFail({
+      org: { id: orgId },
+      project: { id: projectId },
+      id: featureId,
+    });
+    await this.updateFeatureAssignedTo(assigneeId, orgId, feature);
+    await this.featuresRepository.save(feature);
   }
 
   async deleteFeature(orgId: string, projectId: string, id: string) {
@@ -519,13 +538,13 @@ export class FeaturesService {
   }
 
   private async updateFeatureAssignedTo(
-    updateFeatureDto: CreateUpdateFeatureDto,
+    assignedToId: string | undefined,
     orgId: string,
     feature: Feature,
   ) {
-    if (updateFeatureDto.assignedTo) {
+    if (assignedToId) {
       const assignedTo = await this.userRepository.findOneByOrFail({
-        id: updateFeatureDto.assignedTo,
+        id: assignedToId,
         org: { id: orgId },
       });
       feature.assignedTo = Promise.resolve(assignedTo);

@@ -284,4 +284,28 @@ export class FeaturesController {
       throw new BadRequestException(e.message);
     }
   }
+
+  @Patch(':id/assignee')
+  async changeAssignee(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Param('id') id: string,
+    @Body() assignee: { assignee: string },
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      await this.featuresService.changeAssignee(
+        orgId,
+        projectId,
+        id,
+        assignee.assignee,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }
