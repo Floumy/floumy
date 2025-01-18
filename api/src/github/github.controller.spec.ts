@@ -86,9 +86,12 @@ describe('GithubController', () => {
 
   describe('when handling the OAuth callback', () => {
     it('should return the redirect url', async () => {
+      const base64State = Buffer.from(
+        JSON.stringify({ state: 'test' }),
+      ).toString('base64');
       const redirectUrl = await controller.handleOAuthCallback(
         'code',
-        'state',
+        base64State,
         {
           redirect: jest.fn().mockReturnValue({
             redirect: jest.fn().mockReturnValue({}),
