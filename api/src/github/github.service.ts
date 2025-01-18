@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
 import { Repository } from 'typeorm';
+import { EncryptionService } from '../encryption/encryption.service';
 
 @Injectable()
 export class GithubService {
@@ -10,11 +11,12 @@ export class GithubService {
     @Inject('GITHUB_CLIENT') private readonly octokit: any,
     private readonly configService: ConfigService,
     @InjectRepository(Org) private readonly orgRepository: Repository<Org>,
+    private readonly encryptionService: EncryptionService,
   ) {}
 
   async isAuthenticated(orgId: string) {
-    const token = (await this.orgRepository.findOneByOrFail({ id: orgId }))
-      .githubAccessToken;
+    const token = await this.getToken(orgId);
+
     if (!token) {
       return false;
     }
@@ -29,8 +31,7 @@ export class GithubService {
   }
 
   async getRepos(orgId: string) {
-    const token = (await this.orgRepository.findOneByOrFail({ id: orgId }))
-      .githubAccessToken;
+    const token = await this.getToken(orgId);
 
     if (!token) {
       throw new Error('No token found');
@@ -66,7 +67,7 @@ export class GithubService {
       const user = await this.getUser(token);
 
       await this.orgRepository.update(orgId, {
-        githubAccessToken: token,
+        githubAccessToken: this.encryptionService.encrypt(token),
         githubUsername: user.login,
       });
 
@@ -100,5 +101,11 @@ export class GithubService {
 
   private async decodeState(state: string) {
     return JSON.parse(Buffer.from(state, 'base64').toString());
+  }
+
+  private async getToken(orgId: string) {
+    const token = (await this.orgRepository.findOneByOrFail({ id: orgId }))
+      .githubAccessToken;
+    return this.encryptionService.decrypt(token);
   }
 }
