@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 
 @Global()
 @Module({
+  providers: [EncryptionService],
   imports: [ConfigModule],
   exports: [EncryptionService],
 })

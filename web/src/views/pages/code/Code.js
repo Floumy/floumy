@@ -13,11 +13,13 @@ function Code() {
   const [callbackUrl, setCallbackUrl] = useState("");
 
   useEffect(() => {
+    if (!currentProject?.id || !orgId) return;
+
     document.title = "Floumy | Code";
     getGithubUrl(orgId, currentProject.id).then(response => {
       setCallbackUrl(response);
     });
-  }, [currentProject.id, orgId]);
+  }, [currentProject?.id, orgId]);
 
   return (
     <>
