@@ -52,11 +52,11 @@ export class GithubController {
         state,
       );
       const url = `${this.configService.get(
-        'app.appUrl',
+        'app.url',
       )}/admin/orgs/${orgId}/projects/${projectId}/code`;
       return response.redirect(url);
     } catch (e) {
-      return response.redirect(this.configService.get('app.appUrl'));
+      return response.redirect(this.configService.get('app.url'));
     }
   }
 
