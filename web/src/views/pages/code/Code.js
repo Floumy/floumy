@@ -4,18 +4,20 @@ import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { getGithubUrl } from '../../../services/github/github';
+import { useProjects } from '../../../contexts/ProjectsContext';
 
 function Code() {
+  const { orgId, currentProject } = useProjects();
   const [isLoadingIntegration, setIsLoadingIntegration] = useState(false);
 
   const [callbackUrl, setCallbackUrl] = useState("");
 
   useEffect(() => {
     document.title = "Floumy | Code";
-    getGithubUrl().then(response => {
+    getGithubUrl(orgId, currentProject.id).then(response => {
       setCallbackUrl(response);
     });
-  }, []);
+  }, [currentProject.id, orgId]);
 
   return (
     <>

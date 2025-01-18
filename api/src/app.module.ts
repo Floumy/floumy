@@ -82,6 +82,7 @@ import githubConfig from './config/github.config';
     }),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
+    EncryptionModule,
     AuthModule,
     UsersModule,
     OkrsModule,
@@ -99,7 +100,6 @@ import githubConfig from './config/github.config';
     IssuesModule,
     ProjectsModule,
     GithubModule,
-    EncryptionModule,
   ],
   providers: [
     {

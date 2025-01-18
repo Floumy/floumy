@@ -22,7 +22,6 @@ import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
 import { Project } from '../projects/project.entity';
-import { EncryptedColumnTransformer } from '../encryption/encrypted-column.transformer';
 
 @Entity()
 export class Org {
@@ -56,7 +55,6 @@ export class Org {
   @Column({
     type: 'text',
     nullable: true,
-    transformer: new EncryptedColumnTransformer(global.encryptionService),
   })
   githubAccessToken: string;
   @Column({ nullable: true })
