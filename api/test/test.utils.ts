@@ -37,6 +37,7 @@ import { Project } from '../src/projects/project.entity';
 import { Milestone } from '../src/roadmap/milestones/milestone.entity';
 import { WorkItem } from '../src/backlog/work-items/work-item.entity';
 import { Feature } from '../src/roadmap/features/feature.entity';
+import { NotificationService } from '../src/notifications/notification.service';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -253,7 +254,6 @@ export async function setupTestingModule(
         provide: 'GITHUB_CLIENT',
         useValue: githubClientMock,
       },
-      NotificationsService,
       StripeService,
       OrgsService,
       BipService,
