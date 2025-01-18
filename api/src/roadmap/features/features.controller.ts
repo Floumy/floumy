@@ -164,6 +164,7 @@ export class FeaturesController {
     try {
       const { org: orgId } = request.user;
       return await this.featuresService.updateFeature(
+        request.user.sub,
         orgId,
         projectId,
         id,

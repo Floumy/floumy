@@ -9,13 +9,14 @@ import { RoadmapModule } from './roadmap/roadmap.module';
 import { BacklogModule } from './backlog/backlog.module';
 import { IterationsModule } from './iterations/iterations.module';
 import { FilesModule } from './files/files.module';
-import { NotificationsModule } from './notifications/notifications.module';
+import { MailNotificationsModule } from './mail-notifications/mail-notifications.module';
 import databaseConfig from './config/database.config';
 import encryptionConfig from './config/encryption.config';
 import jwtConfig from './config/jwt.config';
 import fileStorageConfig from './config/file-storage.config';
 import emailConfig from './config/mail.config';
 import appConfig from './config/app.config';
+import aiConfig from './config/ai.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -29,6 +30,8 @@ import stripeConfig from './config/stripe.config';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { ProjectsModule } from './projects/projects.module';
+import { AiModule } from './ai/ai.module';
+import { NotificationModule } from './notifications/notification.module';
 import { GithubModule } from './github/github.module';
 import { EncryptionModule } from './encryption/encryption.module';
 import githubConfig from './config/github.config';
@@ -46,6 +49,7 @@ import githubConfig from './config/github.config';
         emailConfig,
         appConfig,
         stripeConfig,
+        aiConfig,
         githubConfig,
       ],
     }),
@@ -92,13 +96,15 @@ import githubConfig from './config/github.config';
     BacklogModule,
     IterationsModule,
     FilesModule,
-    NotificationsModule,
+    MailNotificationsModule,
     BipModule,
     PaymentsModule,
     FeedModule,
     FeatureRequestsModule,
     IssuesModule,
     ProjectsModule,
+    AiModule,
+    NotificationModule,
     GithubModule,
   ],
   providers: [

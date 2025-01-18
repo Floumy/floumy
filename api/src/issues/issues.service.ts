@@ -12,6 +12,9 @@ import { IssueComment } from './issue-comment.entity';
 import { CommentMapper } from '../comments/mappers';
 import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
+import {CreateNotificationDto} from "../notifications/dtos";
+import {ActionType, EntityType, StatusType} from "../notifications/notification.entity";
+import {EventEmitter2} from "@nestjs/event-emitter";
 
 @Injectable()
 export class IssuesService {
@@ -28,6 +31,7 @@ export class IssuesService {
     private projectsRepository: Repository<Project>,
     @InjectRepository(WorkItem)
     private workItemsRepository: Repository<WorkItem>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async addIssue(
@@ -193,6 +197,20 @@ export class IssuesService {
       }),
     );
     const savedComment = await this.issueCommentsRepository.save(comment);
+    const mentions = await savedComment.mentions;
+    if (mentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions,
+        createdBy: user,
+        org: org,
+        project: await issue.project,
+        action: ActionType.CREATE,
+        entity: EntityType.ISSUE_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return CommentMapper.toDto(savedComment);
   }
 
@@ -233,6 +251,20 @@ export class IssuesService {
       }),
     );
     const savedComment = await this.issueCommentsRepository.save(comment);
+    const mentions = await savedComment.mentions;
+    if (mentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions,
+        createdBy: await this.usersRepository.findOneByOrFail({ id: userId }),
+        org: org,
+        project: await issue.project,
+        action: ActionType.UPDATE,
+        entity: EntityType.ISSUE_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return await CommentMapper.toDto(savedComment);
   }
 

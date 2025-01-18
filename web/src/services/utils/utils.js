@@ -294,3 +294,7 @@ export function dateToQuarterAndYear(date) {
   const quarter = Math.floor((date.getMonth() + 3) / 3);
   return "Q" + quarter + " " + date.getFullYear();
 }
+
+export function humanReadableRelativeDate(date) {
+  const momentDate = moment(date);
+}

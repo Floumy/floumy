@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { TokensService } from './tokens.service';
 import { OrgSignUpDto } from './auth.dtos';
 import { v4 as uuid } from 'uuid';
-import { NotificationsService } from '../notifications/notifications.service';
+import { MailNotificationsService } from '../mail-notifications/mail-notifications.service';
 import { OrgsService } from '../orgs/orgs.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Org } from '../orgs/org.entity';
@@ -27,7 +27,7 @@ export class AuthService {
     @InjectRepository(RefreshToken)
     private refreshTokenRepository: Repository<RefreshToken>,
     private tokensService: TokensService,
-    private notificationsService: NotificationsService,
+    private notificationsService: MailNotificationsService,
     private orgsService: OrgsService,
     private eventEmitter: EventEmitter2,
   ) {}

@@ -18,6 +18,13 @@ import { CreateUpdateCommentDto } from '../comments/dtos';
 import { FeatureRequestComment } from './feature-request-comment.entity';
 import { Project } from '../projects/project.entity';
 import { Feature } from '../roadmap/features/feature.entity';
+import { CreateNotificationDto } from '../notifications/dtos';
+import {
+  ActionType,
+  EntityType,
+  StatusType,
+} from '../notifications/notification.entity';
+import {EventEmitter2} from "@nestjs/event-emitter";
 
 @Injectable()
 export class FeatureRequestsService {
@@ -36,6 +43,7 @@ export class FeatureRequestsService {
     private projectsRepository: Repository<Project>,
     @InjectRepository(Feature)
     private featuresRepository: Repository<Feature>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async addFeatureRequest(
@@ -233,6 +241,22 @@ export class FeatureRequestsService {
     );
     const savedComment =
       await this.featureRequestCommentsRepository.save(comment);
+    const mentions = await savedComment.mentions;
+    if (mentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions,
+        createdBy: user,
+        org: await savedComment.org,
+        project: await this.projectsRepository.findOneByOrFail({
+          id: projectId,
+        }),
+        action: ActionType.CREATE,
+        entity: EntityType.FEATURE_REQUEST_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return CommentMapper.toDto(savedComment);
   }
 
@@ -290,6 +314,22 @@ export class FeatureRequestsService {
     );
     const savedComment =
       await this.featureRequestCommentsRepository.save(comment);
+    const mentions = await savedComment.mentions;
+    if (mentions.length > 0) {
+      const notification: CreateNotificationDto = {
+        mentions,
+        createdBy: await this.usersRepository.findOneByOrFail({ id: userId }),
+        org: org,
+        project: await this.projectsRepository.findOneByOrFail({
+          id: projectId,
+        }),
+        action: ActionType.UPDATE,
+        entity: EntityType.FEATURE_REQUEST_COMMENT,
+        status: StatusType.UNREAD,
+        entityId: savedComment.id,
+      };
+      this.eventEmitter.emit('mention.created', notification);
+    }
     return await CommentMapper.toDto(savedComment);
   }
 
@@ -301,14 +341,14 @@ export class FeatureRequestsService {
     limit: number,
   ) {
     let query = `
-        SELECT *
-        FROM feature_request
-        WHERE feature_request."orgId" = $1
-          AND feature_request."projectId" = $2
-          AND (feature_request.title ILIKE $3 OR feature_request.description ILIKE $3)
-        ORDER BY feature_request."votesCount" DESC,
-                 feature_request."createdAt" DESC
-    `;
+            SELECT *
+            FROM feature_request
+            WHERE feature_request."orgId" = $1
+              AND feature_request."projectId" = $2
+              AND (feature_request.title ILIKE $3 OR feature_request.description ILIKE $3)
+            ORDER BY feature_request."votesCount" DESC,
+                     feature_request."createdAt" DESC
+        `;
     let params = [orgId, projectId, `%${search}%`] as any[];
 
     if (limit > 0) {
