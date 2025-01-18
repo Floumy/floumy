@@ -15,7 +15,7 @@ import PropTypes from "prop-types";
 import {useParams} from "react-router-dom";
 import {getOrg} from "../../services/org/orgs.service";
 
-function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onChangePriority, onChange }) {
+function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onChangePriority, onChange, onChangeAssignee }) {
   const [isLoadingIterations, setIsLoadingIterations] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [users, setUsers] = useState([]);
@@ -120,18 +120,6 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
     }
   };
 
-  const handleAssignTo = async ({ id: userId, event, props }) => {
-    try {
-      event.preventDefault();
-      for (const workItem of props.workItems) {
-        await changeWorkItemAssignee(orgId, projectId, workItem.id, userId);
-      }
-      toast.success("The work items have been assigned to the user");
-    } catch (e) {
-      toast.error("The work items could not be assigned to the user");
-    }
-  }
-
   const callChangePriorityCallbacks = (priority, workItems) => {
     try {
       if (onChangePriority) {
@@ -141,6 +129,34 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
         onChange(workItems.map(workItem => workItem.id), { priority });
       }
     } catch (e) {
+      console.error("The callbacks could not be called");
+    }
+  };
+
+  const handleAssignTo = async ({ id: userId, event, props }) => {
+    try {
+      event.preventDefault();
+      for (const workItem of props.workItems) {
+        await changeWorkItemAssignee(orgId, projectId, workItem.id, userId);
+      }
+      callChangeAssigneeCallbacks(userId, props.workItems);
+      toast.success("The work items have been assigned to the user");
+    } catch (e) {
+      toast.error("The work items could not be assigned to the user");
+    }
+  }
+
+  const callChangeAssigneeCallbacks = (assigneeId, workItems) => {
+    try {
+      const assignee = users.find(user => user.id === assigneeId);
+      if (onChangeAssignee) {
+        onChangeAssignee(workItems, assignee);
+      }
+      if (onChange) {
+        onChange(workItems.map(workItem => workItem.id), { assignee });
+      }
+    } catch (e) {
+      console.log(e);
       console.error("The callbacks could not be called");
     }
   };
