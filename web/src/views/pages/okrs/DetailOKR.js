@@ -1,11 +1,10 @@
-
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 // javascript plugin that creates a sortable object from a dom object
 // reactstrap components
-import { Badge, Button, Card, CardBody, CardHeader, Col, Container, Input, Progress, Row, Table } from "reactstrap";
+import { Badge, Button, Card, CardBody, CardHeader, Col, Container, Input, Progress, Row, Table } from 'reactstrap';
 // core components
-import SimpleHeader from "components/Headers/SimpleHeader.js";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import SimpleHeader from 'components/Headers/SimpleHeader.js';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   addKeyResult,
   addObjectiveComment,
@@ -13,43 +12,45 @@ import {
   deleteOKR,
   getOKR,
   updateObjective,
-  updateObjectiveComment
-} from "../../../services/okrs/okrs.service";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import NotFoundCard from "../components/NotFoundCard";
-import DetailOKRStats from "./DetailOKRStats";
+  updateObjectiveComment,
+} from '../../../services/okrs/okrs.service';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import NotFoundCard from '../components/NotFoundCard';
+import DetailOKRStats from './DetailOKRStats';
 import {
   dateToQuarterAndYear,
   formatHyphenatedString,
   formatOKRsProgress,
-  okrStatusColorClassName
-} from "../../../services/utils/utils";
-import DeleteWarning from "../components/DeleteWarning";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import InputError from "../../../components/Errors/InputError";
-import Select2 from "react-select2-wrapper";
-import * as Yup from "yup";
-import { toast } from "react-toastify";
-import { getOrg } from "../../../services/org/orgs.service";
-import Comments from "../../../components/Comments/Comments";
+  okrStatusColorClassName,
+} from '../../../services/utils/utils';
+import DeleteWarning from '../components/DeleteWarning';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import InputError from '../../../components/Errors/InputError';
+import Select2 from 'react-select2-wrapper';
+import * as Yup from 'yup';
+import { toast } from 'react-toastify';
+import { getOrg } from '../../../services/org/orgs.service';
+import Comments from '../../../components/Comments/Comments';
+import { generateKeyResults } from '../../../services/ai/ai.service';
+import AIButton from '../../../components/AI/AIButton';
 
 function DetailOKR() {
   const { orgId, projectId, id } = useParams();
   const [okr, setOKR] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [timeline, setTimeline] = useState("this-quarter");
-  const [status, setStatus] = useState("on-track");
+  const [timeline, setTimeline] = useState('this-quarter');
+  const [status, setStatus] = useState('on-track');
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const [members, setMembers] = useState([{ id: "", text: "None" }]);
+  const [members, setMembers] = useState([{ id: '', text: 'None' }]);
   const [filteredMembers, setFilteredMembers] = useState([]);
-  const [assignedTo, setAssignedTo] = useState("");
+  const [assignedTo, setAssignedTo] = useState('');
   const [timelineOptions, setTimelineOptions] = useState([
-    { id: "this-quarter", text: "This Quarter" },
-    { id: "next-quarter", text: "Next Quarter" },
-    { id: "later", text: "Later" }
+    { id: 'this-quarter', text: 'This Quarter' },
+    { id: 'next-quarter', text: 'Next Quarter' },
+    { id: 'later', text: 'Later' },
   ]);
 
   useEffect(() => {
@@ -58,7 +59,7 @@ function DetailOKR() {
         const org = await getOrg();
         setMembers(org.members);
       } catch (e) {
-        toast.error("The members could not be loaded");
+        toast.error('The members could not be loaded');
       }
     }
 
@@ -68,16 +69,16 @@ function DetailOKR() {
         setOKR(okr);
         setStatus(okr.objective.status);
         setTimeline(okr.objective.timeline);
-        setAssignedTo(okr.objective?.assignedTo?.id || "");
+        setAssignedTo(okr.objective?.assignedTo?.id || '');
         // We need this to show the past quarter in the timeline options
-        if (okr.objective.timeline === "past") {
+        if (okr.objective.timeline === 'past') {
           setTimelineOptions([...timelineOptions, {
             id: okr.objective.timeline,
-            text: dateToQuarterAndYear(new Date(okr.objective.startDate))
+            text: dateToQuarterAndYear(new Date(okr.objective.startDate)),
           }]);
         }
       } catch (e) {
-        toast.error("The OKR could not be loaded");
+        toast.error('The OKR could not be loaded');
       }
     }
 
@@ -88,7 +89,7 @@ function DetailOKR() {
     }
 
     fetchData();
-  }, [id]);
+  }, [id, orgId, projectId, timelineOptions]);
 
   useMemo(() => {
     const filteredOrgMembers =
@@ -96,25 +97,25 @@ function DetailOKR() {
         .filter(member =>
           member.isActive ||
           member.id === assignedTo ||
-          member.id === "")
+          member.id === '')
         .map(user => {
           return { id: user.id, text: user.name };
         });
-    filteredOrgMembers.push({ id: "", text: "None" });
+    filteredOrgMembers.push({ id: '', text: 'None' });
     setFilteredMembers(filteredOrgMembers);
   }, [members, assignedTo]);
 
   const statuses = [
-    { id: "on-track", text: "On-Track" },
-    { id: "off-track", text: "Off-Track" },
-    { id: "at-risk", text: "At Risk" },
-    { id: "ahead-of-schedule", text: "Ahead of Schedule" },
-    { id: "completed", text: "Completed" },
-    { id: "stalled", text: "Stalled" },
-    { id: "deferred", text: "Deferred" },
-    { id: "cancelled", text: "Cancelled" },
-    { id: "under-review", text: "Under Review" },
-    { id: "needs-attention", text: "Needs Attention" }
+    { id: 'on-track', text: 'On-Track' },
+    { id: 'off-track', text: 'Off-Track' },
+    { id: 'at-risk', text: 'At Risk' },
+    { id: 'ahead-of-schedule', text: 'Ahead of Schedule' },
+    { id: 'completed', text: 'Completed' },
+    { id: 'stalled', text: 'Stalled' },
+    { id: 'deferred', text: 'Deferred' },
+    { id: 'cancelled', text: 'Cancelled' },
+    { id: 'under-review', text: 'Under Review' },
+    { id: 'needs-attention', text: 'Needs Attention' },
   ];
 
   const handleSubmit = async (values) => {
@@ -124,12 +125,12 @@ function DetailOKR() {
         title: values.title,
         assignedTo,
         status,
-        timeline
+        timeline,
       });
       navigate(-1);
-      setTimeout(() => toast.success("The OKR has been saved"), 100);
+      setTimeout(() => toast.success('The OKR has been saved'), 100);
     } catch (e) {
-      toast.error("The OKR could not be saved");
+      toast.error('The OKR could not be saved');
     } finally {
       setIsSubmitting(false);
     }
@@ -140,10 +141,10 @@ function DetailOKR() {
       setIsSubmitting(true);
       await deleteOKR(orgId, projectId, okr.objective.id);
       navigate(-1);
-      setTimeout(() => toast.success("The OKR has been deleted"), 100);
+      setTimeout(() => toast.success('The OKR has been deleted'), 100);
     } catch (e) {
       setIsDeleteWarningOpen(false);
-      toast.error("The OKR could not be deleted");
+      toast.error('The OKR could not be deleted');
     } finally {
       setIsSubmitting(false);
       setIsDeleteWarningOpen(false);
@@ -152,29 +153,49 @@ function DetailOKR() {
 
   async function handleAddKeyResult(values) {
     try {
-      toast.success("The key result has been added");
+      toast.success('The key result has been added');
       const keyResult = {
         title: values.title,
-        status: "on-track",
-        progress: 0
+        status: 'on-track',
+        progress: 0,
       };
       const savedKeyResult = await addKeyResult(orgId, projectId, okr.objective.id, keyResult);
       okr.keyResults.push(savedKeyResult);
       setOKR({ ...okr });
     } catch (e) {
-      toast.error("The key result could not be saved");
+      toast.error('The key result could not be saved');
       console.error(e);
     }
   }
 
+  const handleAddKeyResultsWithAi = async (keyResults) => {
+    try {
+      toast.success('The key results have been added');
+      const keyResultsToAdd = keyResults.map(keyResult => {
+        return { title: keyResult.title, status: 'on-track', progress: 0 };
+      });
+      const savedKeyResults = [];
+      for (const keyResult of keyResultsToAdd) {
+        savedKeyResults.push(
+          await addKeyResult(orgId, projectId, okr.objective.id, keyResult),
+        );
+      }
+      okr.keyResults = savedKeyResults;
+      setOKR({ ...okr });
+    } catch (e) {
+      toast.error('The key results could not be saved');
+      console.error(e);
+    }
+  };
+
   const validationSchema = Yup.object({
     title: Yup.string()
-      .required("The objective title is required")
+      .required('The objective title is required'),
   });
 
   const krValidationSchema = Yup.object({
     title: Yup.string()
-      .required("The key result title is required")
+      .required('The key result title is required'),
   });
 
   const handleAddComment = async (content) => {
@@ -182,9 +203,9 @@ function DetailOKR() {
       const addedComment = await addObjectiveComment(orgId, projectId, okr.objective.id, content);
       okr.objective.comments.push(addedComment);
       setOKR({ ...okr });
-      toast.success("The comment has been added");
+      toast.success('The comment has been added');
     } catch (e) {
-      toast.error("The comment could not be added");
+      toast.error('The comment could not be added');
     }
   };
 
@@ -193,9 +214,9 @@ function DetailOKR() {
       await deleteObjectiveComment(orgId, projectId, okr.objective.id, commentId);
       okr.objective.comments = okr.objective.comments.filter(comment => comment.id !== commentId);
       setOKR({ ...okr });
-      toast.success("The comment has been deleted");
+      toast.success('The comment has been deleted');
     } catch (e) {
-      toast.error("The comment could not be deleted");
+      toast.error('The comment could not be deleted');
     }
   };
 
@@ -209,9 +230,9 @@ function DetailOKR() {
         return comment;
       });
       setOKR({ ...okr });
-      toast.success("The comment has been updated");
+      toast.success('The comment has been updated');
     } catch (e) {
-      toast.error("The comment could not be updated");
+      toast.error('The comment could not be updated');
     }
   };
 
@@ -221,12 +242,12 @@ function DetailOKR() {
       <SimpleHeader
         headerButtons={[
           {
-            name: "Back",
-            shortcut: "←",
+            name: 'Back',
+            shortcut: '←',
             action: () => {
               window.history.back();
-            }
-          }
+            },
+          },
         ]}
       />
       <Container className="mt--6" fluid id="OKRs">
@@ -237,7 +258,7 @@ function DetailOKR() {
 
             <DeleteWarning
               isOpen={isDeleteWarningOpen}
-              entity={"objective"}
+              entity={'objective'}
               toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
               onDelete={() => handleDelete()}
             />
@@ -252,7 +273,7 @@ function DetailOKR() {
                 {!isLoading && !isSubmitting && okr &&
                   <>
                     <Formik
-                      initialValues={{ title: okr.objective.title || "" }}
+                      initialValues={{ title: okr.objective.title || '' }}
                       validationSchema={validationSchema}
                       onSubmit={handleSubmit}
                     >
@@ -278,7 +299,7 @@ function DetailOKR() {
                                   invalid={!!(errors.title && touched.title)}
                                   autoComplete="off"
                                 />
-                                <ErrorMessage name={"objective"} component={InputError} />
+                                <ErrorMessage name={'objective'} component={InputError} />
                               </div>
                             </Col>
                             <Col s={12} md={6}>
@@ -291,7 +312,7 @@ function DetailOKR() {
                                   className="form-control"
                                   defaultValue={status}
                                   options={{
-                                    placeholder: "Status"
+                                    placeholder: 'Status',
                                   }}
                                   data={statuses}
                                   onChange={(e) => {
@@ -338,7 +359,7 @@ function DetailOKR() {
                           <Row>
                             <Col>
                               <Button
-                                id={"save-objective"}
+                                id={'save-objective'}
                                 color="primary"
                                 type="submit"
                                 className="mr-3 mb-3"
@@ -347,7 +368,7 @@ function DetailOKR() {
                                 Save Objective
                               </Button>
                               <Button
-                                id={"delete-objective"}
+                                id={'delete-objective'}
                                 color="secondary"
                                 type="button"
                                 className="ml-0 mb-3"
@@ -369,13 +390,20 @@ function DetailOKR() {
               <Card>
                 <CardHeader>
                   <h3 className="mb-0">
-                    Related Key Results
+                    Related Key Results {okr?.keyResults?.length === 0 && <AIButton
+                    text="Add with AI"
+                    disabled={!okr.objective.id}
+                    onClick={async () => {
+                      const keyResults = await generateKeyResults(okr.objective.title);
+                      await handleAddKeyResultsWithAi(keyResults);
+                    }}
+                  />}
                   </h3>
                 </CardHeader>
                 <Row>
                   <Col>
                     <div className="table-responsive">
-                      <Table className="table align-items-center no-select" style={{ minWidth: "700px" }}
+                      <Table className="table align-items-center no-select" style={{ minWidth: '700px' }}
                              onContextMenu={(e) => e.preventDefault()}>
                         <thead className="thead-light">
                         <tr>
@@ -410,14 +438,14 @@ function DetailOKR() {
                             <td>
                               <Link
                                 to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/${id}/kr/detail/${keyResult.id}`}
-                                className={"okr-detail"}>
+                                className={'okr-detail'}>
                                 {keyResult.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
                               <Link
                                 to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/${id}/kr/detail/${keyResult.id}`}
-                                className={"okr-detail"}>
+                                className={'okr-detail'}>
                                 {keyResult.title}
                               </Link>
                             </td>
@@ -425,7 +453,8 @@ function DetailOKR() {
                               <div className="d-flex align-items-center">
                                 <span className="mr-2">{formatOKRsProgress(keyResult.progress)}%</span>
                                 <div>
-                                  <Progress max="100" value={formatOKRsProgress(keyResult.progress)} color="primary" />
+                                  <Progress max="100" value={formatOKRsProgress(keyResult.progress)}
+                                            color="primary" />
                                 </div>
                               </div>
                             </td>
@@ -442,7 +471,7 @@ function DetailOKR() {
                         <tr>
                           <td colSpan={5}>
                             {<Formik
-                              initialValues={{ title: "" }}
+                              initialValues={{ title: '' }}
                               validationSchema={krValidationSchema}
                               onSubmit={async (values, { resetForm }) => {
                                 await handleAddKeyResult(values);
@@ -469,7 +498,7 @@ function DetailOKR() {
                                     </Col>
                                     <Col xs={2} className="text-right">
                                       <Button
-                                        id={"save-key-result"}
+                                        id={'save-key-result'}
                                         color="primary"
                                         type="submit"
                                         disabled={isSubmitting}
