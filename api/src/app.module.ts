@@ -32,6 +32,9 @@ import { APP_FILTER } from '@nestjs/core';
 import { ProjectsModule } from './projects/projects.module';
 import { AiModule } from './ai/ai.module';
 import { NotificationModule } from './notifications/notification.module';
+import { GithubModule } from './github/github.module';
+import { EncryptionModule } from './encryption/encryption.module';
+import githubConfig from './config/github.config';
 
 @Module({
   imports: [
@@ -47,6 +50,7 @@ import { NotificationModule } from './notifications/notification.module';
         appConfig,
         stripeConfig,
         aiConfig,
+        githubConfig,
       ],
     }),
     TypeOrmModule.forRootAsync({
@@ -82,6 +86,7 @@ import { NotificationModule } from './notifications/notification.module';
     }),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
+    EncryptionModule,
     AuthModule,
     UsersModule,
     OkrsModule,
@@ -100,6 +105,7 @@ import { NotificationModule } from './notifications/notification.module';
     ProjectsModule,
     AiModule,
     NotificationModule,
+    GithubModule,
   ],
   providers: [
     {

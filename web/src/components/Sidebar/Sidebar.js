@@ -9,7 +9,8 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
   Badge,
   Col,
-  Collapse, Nav,
+  Collapse,
+  Nav,
   Navbar,
   NavbarBrand,
   NavItem,
@@ -146,19 +147,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                             <span className="nav-link-text">Feature Requests</span>
                           </NavLink>
                         </Col>
-                          <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
-                            <div className={bipSettings.isFeatureRequestsPagePublic ? '' : 'd-none'}>
-                              <UncontrolledTooltip target="feed-nav-item" placement="top">
-                                This page is public and can be accessed by anyone.
-                              </UncontrolledTooltip>
-                              <Badge id="feed-nav-item"
-                                     color="success" pill={true}
-                                     style={{ cursor: 'default' }}>
-                                PUBLIC
-                              </Badge>
-                            </div>
-                          </Col><Col xs={2} className="text-right pr-2 pt-2">
-                        </Col>
+                        <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
+                          <div className={bipSettings.isFeatureRequestsPagePublic ? '' : 'd-none'}>
+                            <UncontrolledTooltip target="feed-nav-item" placement="top">
+                              This page is public and can be accessed by anyone.
+                            </UncontrolledTooltip>
+                            <Badge id="feed-nav-item"
+                                   color="success" pill={true}
+                                   style={{ cursor: 'default' }}>
+                              PUBLIC
+                            </Badge>
+                          </div>
+                        </Col><Col xs={2} className="text-right pr-2 pt-2">
+                      </Col>
                       </Row>
                     </NavItem>
                   </Nav>
@@ -181,17 +182,17 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         </NavLink>
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
-                          <div className={bipSettings.isFeedPagePublic ? '' : 'd-none'}>
-                            <UncontrolledTooltip target="feed-nav-item" placement="top">
-                              This page is public and can be accessed by anyone.
-                            </UncontrolledTooltip>
-                            <Badge id="feed-nav-item"
-                                   color="success" pill={true}
-                                   style={{ cursor: 'default' }}>
-                              PUBLIC
-                            </Badge>
-                          </div>
-                        </Col>
+                        <div className={bipSettings.isFeedPagePublic ? '' : 'd-none'}>
+                          <UncontrolledTooltip target="feed-nav-item" placement="top">
+                            This page is public and can be accessed by anyone.
+                          </UncontrolledTooltip>
+                          <Badge id="feed-nav-item"
+                                 color="success" pill={true}
+                                 style={{ cursor: 'default' }}>
+                            PUBLIC
+                          </Badge>
+                        </div>
+                      </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={1} />
                       </Col>
@@ -211,17 +212,17 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         </NavLink>
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
-                          <div className={bipSettings.isObjectivesPagePublic ? '' : 'd-none'}>
-                            <UncontrolledTooltip target="objectives-nav-item" placement="top">
-                              This page is public and can be accessed by anyone.
-                            </UncontrolledTooltip>
-                            <Badge id="objectives-nav-item"
-                                   color="success" pill={true}
-                                   style={{ cursor: 'default' }}>
-                              PUBLIC
-                            </Badge>
-                          </div>
-                        </Col>
+                        <div className={bipSettings.isObjectivesPagePublic ? '' : 'd-none'}>
+                          <UncontrolledTooltip target="objectives-nav-item" placement="top">
+                            This page is public and can be accessed by anyone.
+                          </UncontrolledTooltip>
+                          <Badge id="objectives-nav-item"
+                                 color="success" pill={true}
+                                 style={{ cursor: 'default' }}>
+                            PUBLIC
+                          </Badge>
+                        </div>
+                      </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={2} />
                       </Col>
@@ -241,17 +242,17 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         </NavLink>
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
-                          <div className={bipSettings.isRoadmapPagePublic ? '' : 'd-none'}>
-                            <UncontrolledTooltip target="roadmap-nav-item" placement="top">
-                              This page is public and can be accessed by anyone.
-                            </UncontrolledTooltip>
-                            <Badge id="roadmap-nav-item"
-                                   color="success" pill={true}
-                                   style={{ cursor: 'default' }}>
-                              PUBLIC
-                            </Badge>
-                          </div>
-                        </Col>
+                        <div className={bipSettings.isRoadmapPagePublic ? '' : 'd-none'}>
+                          <UncontrolledTooltip target="roadmap-nav-item" placement="top">
+                            This page is public and can be accessed by anyone.
+                          </UncontrolledTooltip>
+                          <Badge id="roadmap-nav-item"
+                                 color="success" pill={true}
+                                 style={{ cursor: 'default' }}>
+                            PUBLIC
+                          </Badge>
+                        </div>
+                      </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={3} />
                       </Col>
@@ -271,17 +272,17 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         </NavLink>
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
-                          <div className={bipSettings.isIterationsPagePublic ? '' : 'd-none'}>
-                            <UncontrolledTooltip target="sprints-nav-item" placement="top">
-                              This page is public and can be accessed by anyone.
-                            </UncontrolledTooltip>
-                            <Badge id="sprints-nav-item"
-                                   color="success" pill={true}
-                                   style={{ cursor: 'default' }}>
-                              PUBLIC
-                            </Badge>
-                          </div>
-                        </Col>
+                        <div className={bipSettings.isIterationsPagePublic ? '' : 'd-none'}>
+                          <UncontrolledTooltip target="sprints-nav-item" placement="top">
+                            This page is public and can be accessed by anyone.
+                          </UncontrolledTooltip>
+                          <Badge id="sprints-nav-item"
+                                 color="success" pill={true}
+                                 style={{ cursor: 'default' }}>
+                            PUBLIC
+                          </Badge>
+                        </div>
+                      </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={4} />
                       </Col>
@@ -301,17 +302,17 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         </NavLink>
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
-                          <div className={bipSettings.isActiveIterationsPagePublic ? '' : 'd-none'}>
-                            <UncontrolledTooltip target="sprints-nav-item" placement="top" popperClassName="p-2">
-                              This page is public and can be accessed by anyone.
-                            </UncontrolledTooltip>
-                            <Badge id="sprints-nav-item"
-                                   color="success" pill={true}
-                                   style={{ cursor: 'default' }}>
-                              PUBLIC
-                            </Badge>
-                          </div>
-                        </Col>
+                        <div className={bipSettings.isActiveIterationsPagePublic ? '' : 'd-none'}>
+                          <UncontrolledTooltip target="sprints-nav-item" placement="top" popperClassName="p-2">
+                            This page is public and can be accessed by anyone.
+                          </UncontrolledTooltip>
+                          <Badge id="sprints-nav-item"
+                                 color="success" pill={true}
+                                 style={{ cursor: 'default' }}>
+                            PUBLIC
+                          </Badge>
+                        </div>
+                      </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">
                         <ShortcutIcon shortcutKey={5} />
                       </Col>
@@ -352,6 +353,24 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </Col>
                     </Row>
                   </NavItem>
+                  {false && <NavItem>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={10}>
+                        <NavLink
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/code`}
+                          onClick={closeSidenav}
+                          tag={NavLinkRRD}
+                        >
+
+                          <i className="fa fa-code-pull-request" />
+                          <span className="nav-link-text">Code</span>
+                        </NavLink>
+                      </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <ShortcutIcon shortcutKey={8} />
+                      </Col>
+                    </Row>
+                  </NavItem>}
                 </Nav>
               </Collapse>
             </div>
@@ -361,6 +380,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                   <span className="docs-normal" style={{ whiteSpace: 'nowrap' }}>Settings</span>
                 </h6>
                 <Nav className="mb-md-3" navbar>
+                  <NavItem>
+                    <NavLink
+                      to={`/admin/orgs/${orgId}/projects/${currentProject.id}/project`}
+                      onClick={closeSidenav}
+                      tag={NavLinkRRD}
+                    >
+                      <i className="fa fa-atom" />
+                      <span className="nav-link-text">Project</span>
+                    </NavLink>
+                  </NavItem>
                   <NavItem>
                     <NavLink
                       to={`/admin/orgs/${orgId}/projects/${currentProject.id}/build-in-public`}
@@ -379,16 +408,6 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     >
                       <i className="fa fa-users" />
                       <span className="nav-link-text">Members</span>
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      to={`/admin/orgs/${orgId}/projects/${currentProject.id}/project`}
-                      onClick={closeSidenav}
-                      tag={NavLinkRRD}
-                    >
-                      <i className="fa fa-atom" />
-                      <span className="nav-link-text">Project</span>
                     </NavLink>
                   </NavItem>
                 </Nav>
