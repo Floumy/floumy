@@ -25,12 +25,15 @@ import { getOrg } from "../../../services/org/orgs.service";
 import Comments from "../../../components/Comments/Comments";
 import { listIssues } from "../../../services/issues/issues.service";
 import RichTextEditor from "../../../components/RichTextEditor/RichTextEditor";
+import {generateKeyResults, getWorkItemDescription} from "../../../services/ai/ai.service";
+import AIButton from "../../../components/AI/AIButton";
 
 function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [priority, setPriority] = useState(workItem.priority || "");
+  const [title, setTitle] = useState(workItem.title);
   const [descriptionText, setDescriptionText] = useState(workItem.description);
   const [mentions, setMentions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -269,7 +272,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           placeholder="What is this work item about?"
                           type="text"
                           value={values.title}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            setTitle(e.target.value);
+                            handleChange(e);
+                          }}
                           invalid={!!(errors.title && touched.title)}
                           autoComplete="off"
                         />
@@ -419,6 +425,13 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         >
                           Description
                         </label>
+                        <AIButton
+                            text="Fill with AI"
+                            disabled={title.length === 0}
+                            onClick={async () => {
+                              setDescriptionText(await getWorkItemDescription(title, type, feature, issue));
+                            }}
+                        />
                         <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
                           setDescriptionText(text);
                           setMentions(mentions);
