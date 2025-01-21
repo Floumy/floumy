@@ -17,3 +17,12 @@ export async function getGithubUrl(orgId, projectId) {
     throw new Error(e.message);
   }
 }
+
+export async function getRepos(orgId) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/repos`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}

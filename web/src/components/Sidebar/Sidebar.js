@@ -353,7 +353,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </Col>
                     </Row>
                   </NavItem>
-                  {false && <NavItem>
+                  <NavItem>
                     <Row style={{ maxWidth: '100%', height: '47px' }}>
                       <Col xs={10}>
                         <NavLink
@@ -370,7 +370,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         <ShortcutIcon shortcutKey={8} />
                       </Col>
                     </Row>
-                  </NavItem>}
+                  </NavItem>
                 </Nav>
               </Collapse>
             </div>

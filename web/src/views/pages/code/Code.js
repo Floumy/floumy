@@ -3,8 +3,9 @@ import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
-import { getGithubUrl, getIsGithubConnected } from '../../../services/github/github';
+import { getGithubUrl, getIsGithubConnected, getRepos } from '../../../services/github/github';
 import { useProjects } from '../../../contexts/ProjectsContext';
+import Select2 from 'react-select2-wrapper';
 
 function Code() {
   const { orgId, currentProject } = useProjects();
@@ -13,6 +14,8 @@ function Code() {
   const [isGithubConnected, setIsGithubConnected] = useState(true);
 
   const [callbackUrl, setCallbackUrl] = useState('');
+  const [repos, setRepos] = useState([]);
+  const [selectedRepo, setSelectedRepo] = useState('');
 
   useEffect(() => {
     if (!currentProject?.id || !orgId) return;
@@ -30,6 +33,15 @@ function Code() {
             })
             .catch(() => {
               setCallbackUrl('');
+            });
+        }
+        else {
+          getRepos(orgId)
+            .then(response => {
+              setRepos(response);
+            })
+            .catch(() => {
+              setRepos([]);
             });
         }
 
@@ -76,6 +88,25 @@ function Code() {
                           Connect GitHub
                         </button>
                       </div>
+                    </Col>
+                  </Row>}
+                {!isLoadingIntegration && repos.length > 0 &&
+                  <Row>
+                    <Col xl={4}>
+                      <h4>Select a repository</h4>
+                      <Select2
+                        className="form-control"
+                        value={selectedRepo}
+                        defaultValue={repos.map(repo => repo.url)}
+                        data={repos.map(repo => ({ id: repo.url, text: repo.full_name }))}
+                        options={{
+                          placeholder: 'Select a repository'
+                        }}
+                        onSelect={(e) => {
+                          setSelectedRepo(e.target.value);
+                        }}
+                      ></Select2>
+                      <button className="btn btn-primary my-3" type="button" onClick={() => {}}>Save</button>
                     </Col>
                   </Row>}
               </CardBody>
