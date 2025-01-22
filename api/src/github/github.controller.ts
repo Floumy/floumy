@@ -1,8 +1,8 @@
 import {
-  BadRequestException,
+  BadRequestException, Body,
   Controller,
   Get,
-  Param,
+  Param, Put,
   Query,
   Request,
   Res,
@@ -73,14 +73,40 @@ export class GithubController {
     }
   }
 
-  @Get('auth/orgs/:orgId/is-connected')
-  async isConnected(@Request() request: any, @Param('orgId') orgId: string) {
+  @Get('auth/orgs/:orgId/projects/:projectId/is-connected')
+  async isConnected(
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.githubService.isConnected(orgId);
+      return await this.githubService.isConnected(orgId, projectId);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Put('auth/orgs/:orgId/projects/:projectId/github/repo')
+  async updateProjectRepo(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Body() updateProjectRepoDto: { id: number },
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.githubService.updateProjectRepo(
+        projectId,
+        orgId,
+        updateProjectRepoDto.id,
+      );
     } catch (e) {
       throw new BadRequestException(e.message);
     }
