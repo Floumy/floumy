@@ -4,17 +4,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
 import { Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
+import { Project } from '../projects/project.entity';
 
 @Injectable()
 export class GithubService {
   constructor(
     @Inject('GITHUB_CLIENT') private readonly octokit: any,
     private readonly configService: ConfigService,
-    @InjectRepository(Org) private readonly orgRepository: Repository<Org>,
+    @InjectRepository(Org)
+    private readonly orgRepository: Repository<Org>,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
     private readonly encryptionService: EncryptionService,
   ) {}
 
-  async isConnected(orgId: string) {
+  async isConnected(orgId: string, projectId: string) {
     const token = await this.getToken(orgId);
 
     if (!token) {
@@ -28,12 +32,78 @@ export class GithubService {
       await octokit.rest.users.getAuthenticated();
       return {
         connected: true,
+        repo: await this.getProjectRepo(projectId, orgId),
       };
     } catch (error) {
       return {
         connected: false,
       };
     }
+  }
+
+  async updateProjectRepo(projectId: string, orgId: string, repoId: number) {
+    const token = await this.getToken(orgId);
+
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const octokit = await this.getAuthenticatedOctokit(token);
+    const { data: repo } = await octokit.request('GET /repositories/:id', {
+      id: repoId,
+    });
+
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+
+    project.githubRepositoryId = repo.id;
+    project.githubRepositoryFullName = repo.full_name;
+    project.githubRepositoryUrl = repo.html_url;
+
+    await this.projectRepository.save(project);
+    return {
+      id: repo.id,
+      name: repo.full_name,
+      url: repo.html_url,
+    };
+  }
+
+  async getProjectRepo(projectId: string, orgId: string) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+
+    if (project.githubRepositoryUrl) {
+      return {
+        id: project.githubRepositoryId,
+        name: project.githubRepositoryFullName,
+        url: project.githubRepositoryUrl,
+      };
+    }
+
+    return null;
+  }
+
+  async getProjectPullRequests(projectId: string, orgId: string) {
+    const token = await this.getToken(orgId);
+
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const octokit = await this.getAuthenticatedOctokit(token);
+    const { data: pullRequests } = await octokit.request(
+      'GET /repos/:owner/:repo/pulls',
+      {
+        owner: orgId,
+        repo: projectId,
+      },
+    );
+
+    return pullRequests;
   }
 
   async getRepos(orgId: string) {

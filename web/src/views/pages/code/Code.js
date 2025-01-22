@@ -1,64 +1,81 @@
 import React, { useEffect, useState } from 'react';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
+import { Badge, Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
-import { getGithubUrl, getIsGithubConnected, getRepos } from '../../../services/github/github';
+import {
+  getGithubUrl,
+  getIsGithubConnected,
+  getGithubRepos,
+  updateProjectGithubRepo,
+} from '../../../services/github/github.service';
 import { useProjects } from '../../../contexts/ProjectsContext';
 import Select2 from 'react-select2-wrapper';
+import { toast } from 'react-toastify';
 
 function Code() {
   const { orgId, currentProject } = useProjects();
 
-  const [isLoadingIntegration, setIsLoadingIntegration] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isGithubConnected, setIsGithubConnected] = useState(true);
 
   const [callbackUrl, setCallbackUrl] = useState('');
   const [repos, setRepos] = useState([]);
   const [selectedRepo, setSelectedRepo] = useState('');
+  const [repo, setRepo] = useState(null);
 
   useEffect(() => {
     if (!currentProject?.id || !orgId) return;
 
-    setIsLoadingIntegration(true);
+    const fetchGithubData = async () => {
+      setIsLoading(true);
+      try {
+        const { connected, repo } = await getIsGithubConnected(orgId, currentProject.id);
+        setIsGithubConnected(connected);
 
-    getIsGithubConnected(orgId, currentProject.id)
-      .then(response => {
-        setIsGithubConnected(response.connected);
-        
-        if (!response.connected) {
-          getGithubUrl(orgId, currentProject.id)
-            .then(response => {
-              setCallbackUrl(response);
-            })
-            .catch(() => {
-              setCallbackUrl('');
-            });
+        if (!connected) {
+          try {
+            const url = await getGithubUrl(orgId, currentProject.id);
+            setCallbackUrl(url);
+          } catch (error) {
+            console.error('Failed to get Github URL:', error);
+            setCallbackUrl('');
+          }
+        } else if (!repo.id) {
+          try {
+            const repositories = await getGithubRepos(orgId);
+            setRepos(repositories);
+          } catch (error) {
+            console.error('Failed to fetch repositories:', error);
+            setRepos([]);
+          }
+        } else {
+          setRepo(repo);
         }
-        else {
-          getRepos(orgId)
-            .then(response => {
-              setRepos(response);
-            })
-            .catch(() => {
-              setRepos([]);
-            });
-        }
-
-      })
-      .catch(() => {
+      } catch (error) {
+        console.error('Failed to check Github connection:', error);
         setIsGithubConnected(false);
-      })
-      .finally(() => {
-        setIsLoadingIntegration(false);
-      });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    document.title = 'Floumy | Code';
+    fetchGithubData();
   }, [currentProject?.id, orgId]);
+
+  const handleRepoUpdate = async () => {
+    try {
+      const projectRepo = await updateProjectGithubRepo(orgId, currentProject.id, selectedRepo);
+      setRepo(projectRepo);
+      toast.success('Project repo updated');
+    } catch (e) {
+      toast.error(e.message);
+    }
+  };
 
   return (
     <>
-      {isLoadingIntegration && <InfiniteLoadingBar />}
+      {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
         <Row>
@@ -67,18 +84,22 @@ function Code() {
               <CardHeader>
                 <Row>
                   <Col md={12}>
-                    <CardTitle tag="h2" className="mb-3">Code</CardTitle>
+                    <CardTitle tag="h2" className="mb-3">Code  {repo &&
+                       <a className="btn-link text-blue" href={repo.url} target="_blank" rel="noreferrer">
+                          | {repo.name}
+                      </a>}
+                    </CardTitle>
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
-                {isLoadingIntegration &&
+                {isLoading &&
                   <Row>
                     <Col className="text-center">
                       <LoadingSpinnerBox />
                     </Col>
                   </Row>}
-                {!isLoadingIntegration && !isGithubConnected &&
+                {!isLoading && !isGithubConnected &&
                   <Row>
                     <Col>
                       <div>
@@ -90,23 +111,22 @@ function Code() {
                       </div>
                     </Col>
                   </Row>}
-                {!isLoadingIntegration && repos.length > 0 &&
+                {!isLoading && !repo && repos.length > 0 &&
                   <Row>
                     <Col xl={4}>
                       <h4>Select a repository</h4>
                       <Select2
                         className="form-control"
                         value={selectedRepo}
-                        defaultValue={repos.map(repo => repo.url)}
-                        data={repos.map(repo => ({ id: repo.url, text: repo.full_name }))}
+                        data={repos.map(repo => ({ id: repo.id, text: repo.full_name }))}
                         options={{
-                          placeholder: 'Select a repository'
+                          placeholder: 'Select a repository',
                         }}
                         onSelect={(e) => {
                           setSelectedRepo(e.target.value);
                         }}
                       ></Select2>
-                      <button className="btn btn-primary my-3" type="button" onClick={() => {}}>Save</button>
+                      <button className="btn btn-primary my-3" type="button" onClick={handleRepoUpdate}>Save</button>
                     </Col>
                   </Row>}
               </CardBody>

@@ -31,6 +31,12 @@ export class Project {
   id: string;
   @Column()
   name: string;
+  @Column({ nullable: true })
+  githubRepositoryId: string;
+  @Column({ nullable: true })
+  githubRepositoryFullName: string;
+  @Column({ nullable: true })
+  githubRepositoryUrl: string;
   @ManyToMany(() => User, (user) => user.projects, { lazy: true })
   @JoinTable({
     name: 'project_user',
