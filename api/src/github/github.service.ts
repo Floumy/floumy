@@ -5,6 +5,7 @@ import { Org } from '../orgs/org.entity';
 import { Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Project } from '../projects/project.entity';
+import crypto from 'crypto';
 
 @Injectable()
 export class GithubService {
@@ -188,5 +189,214 @@ export class GithubService {
     }
 
     return this.encryptionService.decrypt(token);
+  }
+
+  async handleWebhook(
+    orgId: string,
+    projectId: string,
+    headers: any,
+    payload: any,
+  ) {
+    // Verify webhook signature
+    const signature = headers['x-hub-signature-256'];
+    const webhookSecret = this.configService.get('github.webhookSecret');
+
+    if (!this.verifyWebhookSignature(payload, signature, webhookSecret)) {
+      throw new Error('Invalid webhook signature');
+    }
+
+    const event = headers['x-github-event'];
+
+    switch (event) {
+      case 'pull_request':
+        await this.handlePullRequestEvent(orgId, projectId, payload);
+        break;
+      case 'push': // Push events include branch creations/deletions
+        await this.handlePushEvent(orgId, projectId, payload);
+        break;
+      case 'create': // Branch or tag creation
+        if (payload.ref_type === 'branch') {
+          await this.handleBranchCreateEvent(orgId, projectId, payload);
+        }
+        break;
+      case 'delete': // Branch or tag deletion
+        if (payload.ref_type === 'branch') {
+          await this.handleBranchDeleteEvent(orgId, projectId, payload);
+        }
+        break;
+    }
+  }
+
+  private verifyWebhookSignature(
+    payload: any,
+    signature: string,
+    secret: string,
+  ): boolean {
+    const hmac = crypto.createHmac('sha256', secret);
+    const digest =
+      'sha256=' + hmac.update(JSON.stringify(payload)).digest('hex');
+    return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
+  }
+
+  private async handlePullRequestEvent(
+    orgId: string,
+    projectId: string,
+    payload: any,
+  ) {
+    const action = payload.action; // opened, closed, reopened, etc.
+    const repo = payload.repository;
+    const pr = payload.pull_request;
+
+    // Find the corresponding project
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      githubRepositoryId: repo.id,
+      org: { id: orgId },
+    });
+
+    if (!project) {
+      return;
+    }
+
+    // Handle the PR event (you'll need to create these methods based on your needs)
+    switch (action) {
+      case 'opened':
+        await this.onPullRequestOpened(project, pr);
+        break;
+      case 'closed':
+        await this.onPullRequestClosed(project, pr);
+        break;
+      // Add other cases as needed
+    }
+  }
+
+  private async handlePushEvent(
+    orgId: string,
+    projectId: string,
+    payload: any,
+  ) {
+    const repo = payload.repository;
+    const ref = payload.ref; // refs/heads/branch-name
+
+    // Find the corresponding project
+    const project = await this.projectRepository.findOneBy({
+      id: projectId,
+      githubRepositoryId: repo.id,
+      org: { id: orgId },
+    });
+
+    if (!project) {
+      return;
+    }
+
+    // Handle branch updates
+    await this.onBranchUpdated(project, ref);
+  }
+
+  private async handleBranchCreateEvent(
+    orgId: string,
+    projectId: string,
+    payload: any,
+  ) {
+    const repo = payload.repository;
+    const ref = payload.ref; // refs/heads/branch-name
+
+    // Find the corresponding project
+    const project = await this.projectRepository.findOneBy({
+      id: projectId,
+      githubRepositoryId: repo.id,
+      org: { id: orgId },
+    });
+
+    if (!project) {
+      return;
+    }
+
+    // Handle branch creation
+    await this.onBranchCreated(project, ref);
+  }
+
+  async setupWebhook(orgId: string, projectId: string) {
+    const token = await this.getToken(orgId);
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+
+    if (!project.githubRepositoryFullName) {
+      throw new Error('No GitHub repository connected');
+    }
+
+    const [owner, repo] = project.githubRepositoryFullName.split('/');
+
+    const octokit = await this.getAuthenticatedOctokit(token);
+
+    // Create webhook
+    const webhookUrlBase = this.configService.get('github.webhookUrlBase');
+    const webhookUrl = `${webhookUrlBase}/github/orgs/${orgId}/projects/${projectId}/webhooks`;
+    const webhookSecret = this.configService.get('github.webhookSecret');
+
+    await octokit.rest.repos.createWebhook({
+      owner,
+      repo,
+      config: {
+        url: webhookUrl,
+        content_type: 'json',
+        secret: webhookSecret,
+      },
+      events: ['pull_request', 'push', 'create', 'delete'],
+    });
+  }
+
+  private async onBranchCreated(project: Project, ref: any) {
+    // Handle branch creation
+    console.log(`Branch ${ref} created`);
+  }
+
+  private async onBranchUpdated(project: Project, ref: any) {
+    // Handle branch updates
+    console.log(`Branch ${ref} updated`);
+  }
+
+  private async onPullRequestOpened(project: Project, pr: any) {
+    // Handle pull request opened
+    console.log(`Pull request ${pr.number} opened`);
+  }
+
+  private async onPullRequestClosed(project: Project, pr: any) {
+    // Handle pull request closed
+    console.log(`Pull request ${pr.number} closed`);
+  }
+
+  private async handleBranchDeleteEvent(
+    orgId: string,
+    projectId: string,
+    payload: any,
+  ) {
+    const repo = payload.repository;
+    const ref = payload.ref; // refs/heads/branch-name
+
+    // Find the corresponding project
+    const project = await this.projectRepository.findOneBy({
+      id: projectId,
+      githubRepositoryId: repo.id,
+      org: { id: orgId },
+    });
+
+    if (!project) {
+      return;
+    }
+
+    // Handle branch deletion
+    await this.onBranchDeleted(project, ref);
+  }
+
+  private async onBranchDeleted(project: Project, ref: any) {
+    // Handle branch deletion
+    console.log(`Branch ${ref} deleted`);
   }
 }

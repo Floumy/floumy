@@ -1,13 +1,17 @@
 import {
-  BadRequestException, Body,
+  BadRequestException,
+  Body,
   Controller,
   Get,
-  Param, Put,
+  Param,
+  Post,
+  Put,
   Query,
   Request,
   Res,
   UnauthorizedException,
   UseGuards,
+  Headers,
 } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { AuthGuard } from '../auth/auth.guard';
@@ -110,5 +114,39 @@ export class GithubController {
     } catch (e) {
       throw new BadRequestException(e.message);
     }
+  }
+
+  @Post('/orgs/:orgId/projects/:projectId/webhooks/setup')
+  @Public()
+  async setupWebhook(
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.githubService.setupWebhook(orgId, projectId);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Post('/orgs/:orgId/projects/:projectId/webhooks')
+  @Public()
+  async handleWebhook(
+    @Headers() headers: any,
+    @Body() payload: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    return await this.githubService.handleWebhook(
+      orgId,
+      projectId,
+      headers,
+      payload,
+    );
   }
 }
