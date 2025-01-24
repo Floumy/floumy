@@ -116,24 +116,6 @@ export class GithubController {
     }
   }
 
-  @Post('/orgs/:orgId/projects/:projectId/webhooks/setup')
-  @Public()
-  async setupWebhook(
-    @Request() request: any,
-    @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
-  ) {
-    if (orgId !== request.user.org) {
-      throw new UnauthorizedException();
-    }
-
-    try {
-      return await this.githubService.setupWebhook(orgId, projectId);
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
-  }
-
   @Post('/orgs/:orgId/projects/:projectId/webhooks')
   @Public()
   async handleWebhook(
