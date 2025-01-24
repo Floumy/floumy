@@ -17,7 +17,7 @@ function Code() {
   const { orgId, currentProject } = useProjects();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isGithubConnected, setIsGithubConnected] = useState(true);
+  const [isGithubConnected, setIsGithubConnected] = useState(false);
 
   const [callbackUrl, setCallbackUrl] = useState('');
   const [repos, setRepos] = useState([]);
@@ -41,7 +41,7 @@ function Code() {
             console.error('Failed to get Github URL:', error);
             setCallbackUrl('');
           }
-        } else if (!repo.id) {
+        } else if (!repo?.id) {
           try {
             const repositories = await getGithubRepos(orgId);
             setRepos(repositories);

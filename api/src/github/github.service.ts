@@ -148,6 +148,8 @@ export class GithubService {
         githubUsername: user.login,
       });
 
+      await this.setupWebhook(orgId, projectId);
+
       return {
         orgId,
         projectId,
@@ -246,6 +248,7 @@ export class GithubService {
     const action = payload.action; // opened, closed, reopened, etc.
     const repo = payload.repository;
     const pr = payload.pull_request;
+    console.log(pr);
 
     // Find the corresponding project
     const project = await this.projectRepository.findOneByOrFail({
@@ -258,7 +261,6 @@ export class GithubService {
       return;
     }
 
-    // Handle the PR event (you'll need to create these methods based on your needs)
     switch (action) {
       case 'opened':
         await this.onPullRequestOpened(project, pr);
@@ -266,7 +268,12 @@ export class GithubService {
       case 'closed':
         await this.onPullRequestClosed(project, pr);
         break;
-      // Add other cases as needed
+      case 'reopened':
+        await this.onPullRequestOpened(project, pr);
+        break;
+      case 'merged':
+        await this.onPullRequestMerged(project, pr);
+        break;
     }
   }
 
@@ -398,5 +405,10 @@ export class GithubService {
   private async onBranchDeleted(project: Project, ref: any) {
     // Handle branch deletion
     console.log(`Branch ${ref} deleted`);
+  }
+
+  private async onPullRequestMerged(project: Project, pr: any) {
+    // Handle pull request merged
+    console.log(`Pull request ${pr.number} merged`);
   }
 }
