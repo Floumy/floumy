@@ -64,6 +64,9 @@ export class GithubService {
     project.githubRepositoryUrl = repo.html_url;
 
     await this.projectRepository.save(project);
+
+    await this.setupWebhook(orgId, projectId);
+
     return {
       id: repo.id,
       name: repo.full_name,
@@ -147,8 +150,6 @@ export class GithubService {
         githubAccessToken: this.encryptionService.encrypt(token),
         githubUsername: user.login,
       });
-
-      await this.setupWebhook(orgId, projectId);
 
       return {
         orgId,
@@ -323,7 +324,7 @@ export class GithubService {
     await this.onBranchCreated(project, ref);
   }
 
-  async setupWebhook(orgId: string, projectId: string) {
+  private async setupWebhook(orgId: string, projectId: string) {
     const token = await this.getToken(orgId);
     if (!token) {
       throw new Error('No token found');
