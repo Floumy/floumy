@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { OpenaiService } from './openai/openai.service';
 import { InitiativeType, KeyResultType, WorkItemType } from './types';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Repository } from 'typeorm';
 import { Feature } from '../roadmap/features/feature.entity';
 import { Issue } from '../issues/issue.entity';
+import { KeyResult } from '../okrs/key-result.entity';
+import { Milestone } from '../roadmap/milestones/milestone.entity';
+import { FeatureRequest } from '../feature-requests/feature-request.entity';
 
 @Injectable()
 export class AiService {
@@ -15,6 +17,12 @@ export class AiService {
     private featureRepository: Repository<Feature>,
     @InjectRepository(Issue)
     private issueRepository: Repository<Issue>,
+    @InjectRepository(KeyResult)
+    private keyResultRepository: Repository<KeyResult>,
+    @InjectRepository(Milestone)
+    private milestoneRepository: Repository<Milestone>,
+    @InjectRepository(FeatureRequest)
+    private featureRequestRepository: Repository<FeatureRequest>,
   ) {}
 
   async generateKeyResults(objective: string): Promise<KeyResultType[]> {
@@ -379,6 +387,67 @@ export class AiService {
       description: string;
     }>(prompt, {
       name: 'workItemDescription',
+      schema: {
+        type: 'object',
+        properties: {
+          description: {
+            type: 'string',
+          },
+        },
+        required: ['description'],
+        additionalProperties: false,
+      },
+    });
+    return response.data.description;
+  }
+
+  async generateInitiativeDescription(
+    initiative: string,
+    keyResultId: string,
+    milestoneId: string,
+    featureRequestId: string,
+  ) {
+    let prompt = `Generate a description for the following initiative:
+    
+    Initiative Title: ${initiative}
+    `;
+    if (keyResultId) {
+      const keyResult = await this.keyResultRepository.findOneOrFail({
+        where: { id: keyResultId },
+      });
+      prompt += `Linked Key Result title: ${keyResult.title}
+      `;
+    }
+    if (milestoneId) {
+      const milestone = await this.milestoneRepository.findOneOrFail({
+        where: { id: milestoneId },
+      });
+      prompt += `Linked Milestone title: ${milestone.title}
+      `;
+    }
+    if (featureRequestId) {
+      const featureRequest = await this.featureRequestRepository.findOneOrFail({
+        where: { id: featureRequestId },
+      });
+      prompt += `Linked Feature Request title: ${featureRequest.title}
+      Linked Feature Request description: ${featureRequest.description}
+      `;
+    }
+    prompt += `
+    In the description, include:
+    - What is the goal of the initiative?
+    - Why is it important?
+    - What is the expected outcome of the initiative?
+   
+    Separate the description into sections, each with a heading.
+    
+    Format the description as an HTML string.
+    `;
+
+    const response = await this.openaiService.generateCompletion<{
+      description: string;
+    }>(prompt, {
+      name: 'initiativeDescription',
       schema: {
         type: 'object',
         properties: {
