@@ -7,7 +7,7 @@ import {
   getGithubUrl,
   getIsGithubConnected,
   getGithubRepos,
-  updateProjectGithubRepo,
+  updateProjectGithubRepo, getOpenPullRequests,
 } from '../../../services/github/github.service';
 import { useProjects } from '../../../contexts/ProjectsContext';
 import Select2 from 'react-select2-wrapper';
@@ -23,6 +23,7 @@ function Code() {
   const [repos, setRepos] = useState([]);
   const [selectedRepo, setSelectedRepo] = useState('');
   const [repo, setRepo] = useState(null);
+  const [prs, setPrs] = useState(null);
 
   useEffect(() => {
     if (!currentProject?.id || !orgId) return;
@@ -51,6 +52,13 @@ function Code() {
           }
         } else {
           setRepo(repo);
+          try {
+            const prs = await getOpenPullRequests(orgId, currentProject.id);
+            setPrs(prs);
+          } catch (error) {
+            toast.error('Failed to fetch pull requests');
+            setPrs(null);
+          }
         }
       } catch (error) {
         console.error('Failed to check Github connection:', error);
