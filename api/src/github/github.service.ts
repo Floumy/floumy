@@ -6,6 +6,9 @@ import { Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Project } from '../projects/project.entity';
 import crypto from 'crypto';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { GithubBranch } from './github-branch.entity';
+import { GithubPullRequest } from './github-pull-request.entity';
 
 @Injectable()
 export class GithubService {
@@ -17,6 +20,12 @@ export class GithubService {
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
     private readonly encryptionService: EncryptionService,
+    @InjectRepository(WorkItem)
+    private readonly workItemRepository: Repository<WorkItem>,
+    @InjectRepository(GithubBranch)
+    private readonly githubBranchRepository: Repository<GithubBranch>,
+    @InjectRepository(GithubPullRequest)
+    private readonly githubPullRequestRepository: Repository<GithubPullRequest>,
   ) {}
 
   async isConnected(orgId: string, projectId: string) {
@@ -89,25 +98,6 @@ export class GithubService {
     }
 
     return null;
-  }
-
-  async getProjectPullRequests(projectId: string, orgId: string) {
-    const token = await this.getToken(orgId);
-
-    if (!token) {
-      throw new Error('No token found');
-    }
-
-    const octokit = await this.getAuthenticatedOctokit(token);
-    const { data: pullRequests } = await octokit.request(
-      'GET /repos/:owner/:repo/pulls',
-      {
-        owner: orgId,
-        repo: projectId,
-      },
-    );
-
-    return pullRequests;
   }
 
   async getRepos(orgId: string) {
@@ -214,9 +204,6 @@ export class GithubService {
       case 'pull_request':
         await this.handlePullRequestEvent(orgId, projectId, payload);
         break;
-      case 'push': // Push events include branch creations/deletions
-        await this.handlePushEvent(orgId, projectId, payload);
-        break;
       case 'create': // Branch or tag creation
         if (payload.ref_type === 'branch') {
           await this.handleBranchCreateEvent(orgId, projectId, payload);
@@ -249,7 +236,6 @@ export class GithubService {
     const action = payload.action; // opened, closed, reopened, etc.
     const repo = payload.repository;
     const pr = payload.pull_request;
-    console.log(pr);
 
     // Find the corresponding project
     const project = await this.projectRepository.findOneByOrFail({
@@ -267,38 +253,11 @@ export class GithubService {
         await this.onPullRequestOpened(project, pr);
         break;
       case 'closed':
-        await this.onPullRequestClosed(project, pr);
-        break;
       case 'reopened':
-        await this.onPullRequestOpened(project, pr);
-        break;
       case 'merged':
-        await this.onPullRequestMerged(project, pr);
+        await this.onPullRequestChangeState(project, pr);
         break;
     }
-  }
-
-  private async handlePushEvent(
-    orgId: string,
-    projectId: string,
-    payload: any,
-  ) {
-    const repo = payload.repository;
-    const ref = payload.ref; // refs/heads/branch-name
-
-    // Find the corresponding project
-    const project = await this.projectRepository.findOneBy({
-      id: projectId,
-      githubRepositoryId: repo.id,
-      org: { id: orgId },
-    });
-
-    if (!project) {
-      return;
-    }
-
-    // Handle branch updates
-    await this.onBranchUpdated(project, ref);
   }
 
   private async handleBranchCreateEvent(
@@ -361,23 +320,122 @@ export class GithubService {
   }
 
   private async onBranchCreated(project: Project, ref: any) {
-    // Handle branch creation
-    console.log(`Branch ${ref} created`);
+    const workItemReference = await this.getWorkItemReference(ref);
+
+    if (!workItemReference) {
+      return;
+    }
+
+    const org = await project.org;
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+
+    if (!workItem) {
+      return;
+    }
+
+    const githubBranch = new GithubBranch();
+    githubBranch.name = ref;
+    githubBranch.url = this.getBranchUrl(project.githubRepositoryFullName, ref);
+    githubBranch.state = 'open';
+    githubBranch.createdAt = new Date();
+    githubBranch.updatedAt = new Date();
+    githubBranch.org = Promise.resolve(org);
+    githubBranch.project = Promise.resolve(project);
+    githubBranch.workItem = Promise.resolve(workItem);
+    await this.githubBranchRepository.save(githubBranch);
   }
 
-  private async onBranchUpdated(project: Project, ref: any) {
-    // Handle branch updates
-    console.log(`Branch ${ref} updated`);
+  private async getPullRequestWorkItemReference(pr: any) {
+    const prWorkItemReference = await this.getWorkItemReference(pr.title);
+    if (prWorkItemReference) {
+      return prWorkItemReference;
+    }
+
+    const branchWorkItemReference = await this.getWorkItemReference(
+      pr.head.ref,
+    );
+    if (branchWorkItemReference) {
+      return branchWorkItemReference;
+    }
+
+    return null;
   }
 
   private async onPullRequestOpened(project: Project, pr: any) {
-    // Handle pull request opened
-    console.log(`Pull request ${pr.number} opened`);
+    const workItemReference = await this.getPullRequestWorkItemReference(pr);
+
+    if (!workItemReference) {
+      return;
+    }
+
+    const org = await project.org;
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+
+    if (!workItem) {
+      return;
+    }
+
+    const githubPullRequest = new GithubPullRequest();
+    githubPullRequest.githubId = pr.id;
+    githubPullRequest.title = pr.title;
+    githubPullRequest.url = pr.html_url;
+    githubPullRequest.state = pr.state;
+    githubPullRequest.createdAt = pr.created_at;
+    githubPullRequest.updatedAt = pr.updated_at;
+    githubPullRequest.org = Promise.resolve(org);
+    githubPullRequest.project = Promise.resolve(project);
+    githubPullRequest.workItem = Promise.resolve(workItem);
+    await this.githubPullRequestRepository.save(githubPullRequest);
   }
 
-  private async onPullRequestClosed(project: Project, pr: any) {
-    // Handle pull request closed
-    console.log(`Pull request ${pr.number} closed`);
+  private async onPullRequestChangeState(project: Project, pr: any) {
+    const workItemReference = await this.getPullRequestWorkItemReference(pr);
+
+    if (!workItemReference) {
+      return;
+    }
+
+    const org = await project.org;
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+
+    if (!workItem) {
+      return;
+    }
+
+    const githubPullRequest = await this.githubPullRequestRepository.findOne({
+      where: {
+        githubId: pr.id,
+        org: { id: org.id },
+        project: { id: project.id },
+        workItem: { id: workItem.id },
+      },
+    });
+
+    if (!githubPullRequest) {
+      return;
+    }
+
+    githubPullRequest.state = pr.state;
+    githubPullRequest.updatedAt = pr.updated_at;
+    await this.githubPullRequestRepository.save(githubPullRequest);
   }
 
   private async handleBranchDeleteEvent(
@@ -404,12 +462,53 @@ export class GithubService {
   }
 
   private async onBranchDeleted(project: Project, ref: any) {
-    // Handle branch deletion
-    console.log(`Branch ${ref} deleted`);
+    const workItemReference = await this.getWorkItemReference(ref);
+
+    if (!workItemReference) {
+      return;
+    }
+
+    const org = await project.org;
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+
+    if (!workItem) {
+      return;
+    }
+
+    const githubBranch = await this.githubBranchRepository.findOne({
+      where: {
+        name: ref,
+        org: { id: org.id },
+        project: { id: project.id },
+        workItem: { id: workItem.id },
+      },
+    });
+
+    if (!githubBranch) {
+      return;
+    }
+
+    githubBranch.state = 'closed';
+    githubBranch.updatedAt = new Date();
+    await this.githubBranchRepository.save(githubBranch);
   }
 
-  private async onPullRequestMerged(project: Project, pr: any) {
-    // Handle pull request merged
-    console.log(`Pull request ${pr.number} merged`);
+  private getBranchUrl(repositoryFullName: string, ref: string) {
+    return `https://github.com/${repositoryFullName}/tree/${ref}`;
+  }
+
+  private async getWorkItemReference(text: string) {
+    const workItemReference = text.toLowerCase().match(/wi-\d+/);
+    if (!workItemReference || workItemReference.length === 0) {
+      return null;
+    }
+
+    return workItemReference[0];
   }
 }

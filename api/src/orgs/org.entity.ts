@@ -23,6 +23,8 @@ import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
 import { Project } from '../projects/project.entity';
 import { Notification } from '../notifications/notification.entity';
+import { GithubBranch } from '../github/github-branch.entity';
+import { GithubPullRequest } from '../github/github-pull-request.entity';
 
 @Entity()
 export class Org {
@@ -99,4 +101,14 @@ export class Org {
     lazy: true,
   })
   notifications: Promise<Notification[]>;
+  @OneToMany(() => GithubBranch, (githubBranch) => githubBranch.org, {
+    lazy: true,
+  })
+  githubBranches: Promise<GithubBranch[]>;
+  @OneToMany(
+    () => GithubPullRequest,
+    (githubPullRequest) => githubPullRequest.org,
+    { lazy: true },
+  )
+  githubPullRequests: Promise<GithubPullRequest[]>;
 }
