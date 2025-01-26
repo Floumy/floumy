@@ -9,6 +9,9 @@ import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
 import { EncryptionModule } from '../encryption/encryption.module';
 import { Project } from '../projects/project.entity';
+import { GithubBranch } from './github-branch.entity';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { GithubPullRequest } from './github-pull-request.entity';
 
 const octokitClientProvider = {
   provide: 'GITHUB_CLIENT',
@@ -36,7 +39,15 @@ const octokitClientProvider = {
     AuthModule,
     UsersModule,
     EncryptionModule,
-    TypeOrmModule.forFeature([User, User, Org, Project]),
+    TypeOrmModule.forFeature([
+      User,
+      User,
+      Org,
+      Project,
+      GithubBranch,
+      GithubPullRequest,
+      WorkItem,
+    ]),
   ],
 })
 export class GithubModule {}

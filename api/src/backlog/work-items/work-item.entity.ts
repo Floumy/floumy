@@ -24,6 +24,8 @@ import { WorkItemsStatusStats } from './work-items-status-stats.entity';
 import { WorkItemComment } from './work-item-comment.entity';
 import { Issue } from '../../issues/issue.entity';
 import { Project } from '../../projects/project.entity';
+import { GithubBranch } from '../../github/github-branch.entity';
+import { GithubPullRequest } from '../../github/github-pull-request.entity';
 
 @Entity()
 @Unique(['reference', 'org'])
@@ -99,10 +101,22 @@ export class WorkItem {
   issue: Promise<Issue>;
   @ManyToOne(() => Project, (project) => project.workItems, { lazy: true })
   project: Promise<Project>;
-
+  @OneToMany(() => GithubBranch, (githubBranch) => githubBranch.workItem, {
+    lazy: true,
+  })
+  githubBranches: Promise<GithubBranch[]>;
   @ManyToMany(() => User, {
     lazy: true,
   })
+  @OneToMany(
+    () => GithubPullRequest,
+    (githubPullRequest) => githubPullRequest.workItem,
+    {
+      lazy: true,
+    },
+  )
+  githubPullRequests: Promise<GithubPullRequest[]>;
+
   @JoinTable({
     name: 'work_item_description_mentions',
     joinColumn: {
