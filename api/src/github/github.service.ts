@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
-import { Repository } from 'typeorm';
+import { And, LessThan, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Project } from '../projects/project.entity';
 import crypto from 'crypto';
@@ -149,6 +149,56 @@ export class GithubService {
       console.error('Authentication error:', error);
       throw new Error('Authentication error');
     }
+  }
+
+  async getPullRequests(orgId: string, projectId: string) {
+    const prsCreatedSinceYesterday =
+      await this.githubPullRequestRepository.find({
+        where: {
+          org: { id: orgId },
+          project: { id: projectId },
+          createdAt: MoreThan(
+            new Date(new Date().setDate(new Date().getDate() - 1)),
+          ),
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+    const prsCreatedSinceThreeDaysAgo =
+      await this.githubPullRequestRepository.find({
+        where: {
+          org: { id: orgId },
+          project: { id: projectId },
+          createdAt: And(
+            LessThanOrEqual(
+              new Date(new Date().setDate(new Date().getDate() - 1)),
+            ),
+            MoreThan(new Date(new Date().setDate(new Date().getDate() - 3))),
+          ),
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+    const stalePrs = await this.githubPullRequestRepository.find({
+      where: {
+        org: { id: orgId },
+        project: { id: projectId },
+        state: 'open',
+        createdAt: LessThanOrEqual(
+          new Date(new Date().setMonth(new Date().getMonth() - 1)),
+        ),
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    return {
+      prsOpenSinceYesterday: prsCreatedSinceYesterday,
+      prsOpenSinceThreeDaysAgo: prsCreatedSinceThreeDaysAgo,
+      stalePrs: stalePrs,
+    };
   }
 
   async getAuthenticatedOctokit(token: string) {

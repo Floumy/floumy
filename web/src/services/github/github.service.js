@@ -35,3 +35,12 @@ export async function updateProjectGithubRepo(orgId, projectId, repoId) {
     throw new Error(e.message);
   }
 }
+
+export async function getOpenPullRequests(orgId, projectId) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}

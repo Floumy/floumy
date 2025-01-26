@@ -131,4 +131,21 @@ export class GithubController {
       payload,
     );
   }
+
+  @Get('auth/orgs/:orgId/projects/:projectId/github/prs')
+  async getOpenPullRequests(
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.githubService.getPullRequests(orgId, projectId);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }
