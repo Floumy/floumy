@@ -53,3 +53,12 @@ export async function getWorkItemDescription(workItem, workItemType, initiativeI
         throw new Error(e.message);
     }
 }
+
+export async function getInitiativeDescription(initiative, keyResultId, milestoneId, featureRequestId) {
+    try {
+        const response = await api.get(`${process.env.REACT_APP_API_URL}/ai/initiative-description?initiative=${initiative}&keyResultId=${keyResultId}&milestoneId=${milestoneId}&featureRequestId=${featureRequestId}`);
+        return response.data;
+    } catch (e) {
+        throw new Error(e.message);
+    }
+}
