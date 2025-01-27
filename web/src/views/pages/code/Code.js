@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Badge, Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
+import { Badge, Card, CardBody, CardHeader, CardTitle, Col, Container, Row, Table } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import {
+  getGithubRepos,
   getGithubUrl,
   getIsGithubConnected,
-  getGithubRepos,
-  updateProjectGithubRepo, getOpenPullRequests,
+  getOpenPullRequests,
+  updateProjectGithubRepo,
 } from '../../../services/github/github.service';
 import { useProjects } from '../../../contexts/ProjectsContext';
 import Select2 from 'react-select2-wrapper';
@@ -92,9 +93,9 @@ function Code() {
               <CardHeader>
                 <Row>
                   <Col md={12}>
-                    <CardTitle tag="h2" className="mb-3">Code  {repo &&
-                       <a className="btn-link text-blue" href={repo.url} target="_blank" rel="noreferrer">
-                          | {repo.name}
+                    <CardTitle tag="h2" className="mb-3">Code {repo &&
+                      <a className="btn-link text-blue" href={repo.url} target="_blank" rel="noreferrer">
+                        | {repo.name}
                       </a>}
                     </CardTitle>
                   </Col>
@@ -137,6 +138,83 @@ function Code() {
                       <button className="btn btn-primary my-3" type="button" onClick={handleRepoUpdate}>Save</button>
                     </Col>
                   </Row>}
+                <Row className="mb-5">
+                  <Col>
+                    <h3>
+                        <i className="fa fa-code-pull-request mr-2 text-success" />
+                        Pull Requests Open For 1 Day
+                    </h3>
+                    <div className="table-responsive">
+                      <Table className="align-items-center table-flush border-bottom no-select"
+                             style={{ minWidth: '700px' }}>
+                        <thead className="thead">
+                        <tr>
+                          <th scope="col" width={'40%'}>Title</th>
+                          <th scope="col" width={'5%'}>Created at</th>
+                        </tr>
+                        </thead>
+                        <tbody className="list">
+                        <tr>
+                          <td>Pull Request Title</td>
+                          <td>2025-01-10</td>
+                        </tr>
+                        </tbody>
+                      </Table>
+                    </div>
+                  </Col>
+                </Row>
+                <Row className="mb-5">
+                  <Col>
+                    <h3>
+                      <i className="fa fa-code-pull-request mr-2 text-warning" />
+                      Pull Requests Open for 3 Days
+                    </h3>
+                    <div className="table-responsive">
+                      <Table className="align-items-center table-flush border-bottom no-select"
+                             style={{ minWidth: '700px' }}>
+                        <thead className="thead">
+                        <tr>
+                          <th scope="col" width={'40%'}>Title</th>
+                          <th scope="col" width={'5%'}>Created at</th>
+                        </tr>
+                        </thead>
+                        <tbody className="list">
+                        <tr>
+                          <td>Pull Request Title</td>
+                          <td>2025-01-10</td>
+                        </tr>
+                        </tbody>
+                      </Table>
+                    </div>
+                  </Col>
+                </Row>
+                <Row className="mb-5">
+                  <Col>
+                    <h3 className>
+                      <i className="fa fa-code-pull-request mr-2 text-danger" />
+                      Stale Pull Requests (More than 3 Days)
+                    </h3>
+                    <div className="table-responsive">
+                      <Table className="align-items-center table-flush border-bottom no-select"
+                             style={{ minWidth: '700px' }}>
+                        <thead className="thead">
+                        <tr>
+                          <th scope="col" width={'40%'}>Title</th>
+                          <th scope="col" width={'40%'}>Work Item</th>
+                          <th scope="col" width={'5%'}>Created at</th>
+                        </tr>
+                        </thead>
+                        <tbody className="list">
+                        <tr>
+                          <td>Pull Request Title</td>
+                          <td>Work Item Title</td>
+                          <td>2025-01-10</td>
+                        </tr>
+                        </tbody>
+                      </Table>
+                    </div>
+                  </Col>
+                </Row>
               </CardBody>
             </Card>
           </Col>
