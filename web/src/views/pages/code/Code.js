@@ -13,6 +13,7 @@ import {
 import { useProjects } from '../../../contexts/ProjectsContext';
 import Select2 from 'react-select2-wrapper';
 import { toast } from 'react-toastify';
+import { formatDate } from '../../../services/utils/utils';
 
 function Code() {
   const { orgId, currentProject } = useProjects();
@@ -138,83 +139,104 @@ function Code() {
                       <button className="btn btn-primary my-3" type="button" onClick={handleRepoUpdate}>Save</button>
                     </Col>
                   </Row>}
-                <Row className="mb-5">
-                  <Col>
-                    <h3>
-                        <i className="fa fa-code-pull-request mr-2 text-success" />
-                        Pull Requests Open For 1 Day
-                    </h3>
-                    <div className="table-responsive">
-                      <Table className="align-items-center table-flush border-bottom no-select"
-                             style={{ minWidth: '700px' }}>
-                        <thead className="thead">
-                        <tr>
-                          <th scope="col" width={'40%'}>Title</th>
-                          <th scope="col" width={'5%'}>Created at</th>
-                        </tr>
-                        </thead>
-                        <tbody className="list">
-                        <tr>
-                          <td>Pull Request Title</td>
-                          <td>2025-01-10</td>
-                        </tr>
-                        </tbody>
-                      </Table>
-                    </div>
-                  </Col>
-                </Row>
-                <Row className="mb-5">
-                  <Col>
-                    <h3>
-                      <i className="fa fa-code-pull-request mr-2 text-warning" />
-                      Pull Requests Open for 3 Days
-                    </h3>
-                    <div className="table-responsive">
-                      <Table className="align-items-center table-flush border-bottom no-select"
-                             style={{ minWidth: '700px' }}>
-                        <thead className="thead">
-                        <tr>
-                          <th scope="col" width={'40%'}>Title</th>
-                          <th scope="col" width={'5%'}>Created at</th>
-                        </tr>
-                        </thead>
-                        <tbody className="list">
-                        <tr>
-                          <td>Pull Request Title</td>
-                          <td>2025-01-10</td>
-                        </tr>
-                        </tbody>
-                      </Table>
-                    </div>
-                  </Col>
-                </Row>
-                <Row className="mb-5">
-                  <Col>
-                    <h3 className>
-                      <i className="fa fa-code-pull-request mr-2 text-danger" />
-                      Stale Pull Requests (More than 3 Days)
-                    </h3>
-                    <div className="table-responsive">
-                      <Table className="align-items-center table-flush border-bottom no-select"
-                             style={{ minWidth: '700px' }}>
-                        <thead className="thead">
-                        <tr>
-                          <th scope="col" width={'40%'}>Title</th>
-                          <th scope="col" width={'40%'}>Work Item</th>
-                          <th scope="col" width={'5%'}>Created at</th>
-                        </tr>
-                        </thead>
-                        <tbody className="list">
-                        <tr>
-                          <td>Pull Request Title</td>
-                          <td>Work Item Title</td>
-                          <td>2025-01-10</td>
-                        </tr>
-                        </tbody>
-                      </Table>
-                    </div>
-                  </Col>
-                </Row>
+                {!isLoading && prs && (
+                  <>
+                    <Row className="mb-5">
+                      <Col>
+                        <h3>
+                          <i className="fa fa-code-pull-request mr-2 text-success" />
+                          Pull Requests Open For 1 Day
+                        </h3>
+                        <div className="table-responsive">
+                          <Table className="align-items-center table-flush border-bottom no-select"
+                                 style={{ minWidth: '700px' }}>
+                            <thead className="thead">
+                            <tr>
+                              <th scope="col" width={'40%'}>Title</th>
+                              <th scope="col" width={'5%'}>Created at</th>
+                            </tr>
+                            </thead>
+                            <tbody className="list">
+                            {prs.prsOpenSinceYesterday.length === 0 && <tr>
+                              <td colSpan={2} className="text-center">No Pull Requests Open for 1 Day</td>
+                            </tr>}
+                            {prs.prsOpenSinceYesterday.map((pr, index) => (
+                              <tr key={index}>
+                                <td>{pr.title}</td>
+                                <td>{pr.createdAt}</td>
+                              </tr>
+                            ))}
+                            </tbody>
+                          </Table>
+                        </div>
+                      </Col>
+                    </Row>
+                    <Row className="mb-5">
+                      <Col>
+                        <h3>
+                          <i className="fa fa-code-pull-request mr-2 text-warning" />
+                          Pull Requests Open for 3 Days
+                        </h3>
+                        <div className="table-responsive">
+                          <Table className="align-items-center table-flush border-bottom no-select"
+                                 style={{ minWidth: '700px' }}>
+                            <thead className="thead">
+                            <tr>
+                              <th scope="col" width={'40%'}>Title</th>
+                              <th scope="col" width={'5%'}>Created at</th>
+                            </tr>
+                            </thead>
+                            <tbody className="list">
+                            {prs.prsOpenSinceThreeDaysAgo.length === 0 && <tr>
+                              <td colSpan={2} className="text-center">No Pull Requests Open for 3 Days</td>
+                            </tr>}
+                            {prs.prsOpenSinceThreeDaysAgo.map((pr, index) => (
+                              <tr key={index}>
+                                <td>
+                                  <a href={pr.url} target="_blank" rel="noreferrer">
+                                    {pr.title}
+                                  </a>
+                                </td>
+                                <td>{formatDate(pr.createdAt)}</td>
+                              </tr>
+                            ))}
+                            </tbody>
+                          </Table>
+                        </div>
+                      </Col>
+                    </Row>
+                    <Row className="mb-5">
+                      <Col>
+                        <h3 className>
+                          <i className="fa fa-code-pull-request mr-2 text-danger" />
+                          Stale Pull Requests (More than 3 Days)
+                        </h3>
+                        <div className="table-responsive">
+                          <Table className="align-items-center table-flush border-bottom no-select"
+                                 style={{ minWidth: '700px' }}>
+                            <thead className="thead">
+                            <tr>
+                              <th scope="col" width={'40%'}>Title</th>
+                              <th scope="col" width={'5%'}>Created at</th>
+                            </tr>
+                            </thead>
+                            <tbody className="list">
+                            {prs.stalePrs.length === 0 && <tr>
+                              <td colSpan={2} className="text-center">No Stale Pull Requests</td>
+                            </tr>}
+                            {prs.stalePrs.map((pr, index) => (
+                              <tr key={index}>
+                                <td>{pr.title}</td>
+                                <td>{formatDate(pr.createdAt)}</td>
+                              </tr>
+                            ))}
+                            </tbody>
+                          </Table>
+                        </div>
+                      </Col>
+                    </Row>
+                  </>
+                )}
               </CardBody>
             </Card>
           </Col>
