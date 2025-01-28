@@ -9,6 +9,7 @@ import crypto from 'crypto';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { GithubBranch } from './github-branch.entity';
 import { GithubPullRequest } from './github-pull-request.entity';
+import { GithubPullRequestMapper } from './mappers';
 
 @Injectable()
 export class GithubService {
@@ -26,7 +27,8 @@ export class GithubService {
     private readonly githubBranchRepository: Repository<GithubBranch>,
     @InjectRepository(GithubPullRequest)
     private readonly githubPullRequestRepository: Repository<GithubPullRequest>,
-  ) {}
+  ) {
+  }
 
   async isConnected(orgId: string, projectId: string) {
     const token = await this.getToken(orgId);
@@ -152,36 +154,36 @@ export class GithubService {
   }
 
   async getPullRequests(orgId: string, projectId: string) {
-    const prsCreatedSinceYesterday =
-      await this.githubPullRequestRepository.find({
-        where: {
-          org: { id: orgId },
-          project: { id: projectId },
-          createdAt: MoreThan(
+    const openForOneDay = await this.githubPullRequestRepository.find({
+      where: {
+        org: { id: orgId },
+        project: { id: projectId },
+        createdAt: MoreThan(
+          new Date(new Date().setDate(new Date().getDate() - 1)),
+        ),
+        state: 'open',
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    const openForThreeDays = await this.githubPullRequestRepository.find({
+      where: {
+        org: { id: orgId },
+        project: { id: projectId },
+        createdAt: And(
+          LessThanOrEqual(
             new Date(new Date().setDate(new Date().getDate() - 1)),
           ),
-        },
-        order: {
-          createdAt: 'DESC',
-        },
-      });
-    const prsCreatedSinceThreeDaysAgo =
-      await this.githubPullRequestRepository.find({
-        where: {
-          org: { id: orgId },
-          project: { id: projectId },
-          createdAt: And(
-            LessThanOrEqual(
-              new Date(new Date().setDate(new Date().getDate() - 1)),
-            ),
-            MoreThan(new Date(new Date().setDate(new Date().getDate() - 3))),
-          ),
-        },
-        order: {
-          createdAt: 'DESC',
-        },
-      });
-    const stalePrs = await this.githubPullRequestRepository.find({
+          MoreThan(new Date(new Date().setDate(new Date().getDate() - 3))),
+        ),
+        state: 'open',
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    const stale = await this.githubPullRequestRepository.find({
       where: {
         org: { id: orgId },
         project: { id: projectId },
@@ -194,10 +196,31 @@ export class GithubService {
         createdAt: 'DESC',
       },
     });
+    const closedInThePastSevenDays =
+      await this.githubPullRequestRepository.find({
+        where: {
+          org: { id: orgId },
+          project: { id: projectId },
+          state: 'closed',
+          createdAt: MoreThan(
+            new Date(new Date().setDate(new Date().getDate() - 7)),
+          ),
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
     return {
-      prsOpenSinceYesterday: prsCreatedSinceYesterday,
-      prsOpenSinceThreeDaysAgo: prsCreatedSinceThreeDaysAgo,
-      stalePrs: stalePrs,
+      openForOneDay: await Promise.all(
+        openForOneDay.map(GithubPullRequestMapper.toDto),
+      ),
+      openForThreeDays: await Promise.all(
+        openForThreeDays.map(GithubPullRequestMapper.toDto),
+      ),
+      stale: await Promise.all(stale.map(GithubPullRequestMapper.toDto)),
+      closedInThePastSevenDays: await Promise.all(
+        closedInThePastSevenDays.map(GithubPullRequestMapper.toDto),
+      ),
     };
   }
 
