@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Badge, Card, CardBody, CardHeader, CardTitle, Col, Container, Row, Table } from 'reactstrap';
+import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row, Table } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import {
   getGithubRepos,
@@ -13,7 +13,8 @@ import {
 import { useProjects } from '../../../contexts/ProjectsContext';
 import Select2 from 'react-select2-wrapper';
 import { toast } from 'react-toastify';
-import { formatDate } from '../../../services/utils/utils';
+import { formatDate, workItemTypeIcon } from '../../../services/utils/utils';
+import { Link } from 'react-router-dom';
 
 function Code() {
   const { orgId, currentProject } = useProjects();
@@ -152,17 +153,24 @@ function Code() {
                                  style={{ minWidth: '700px' }}>
                             <thead className="thead">
                             <tr>
-                              <th scope="col" width={'40%'}>Title</th>
-                              <th scope="col" width={'5%'}>Created at</th>
+                              <th scope="col" width={'45%'}>Title</th>
+                              <th scope="col" width={'45%'}>Work Item</th>
+                              <th scope="col" width={'10%'}>Created at</th>
                             </tr>
                             </thead>
                             <tbody className="list">
-                            {prs.prsOpenSinceYesterday.length === 0 && <tr>
-                              <td colSpan={2} className="text-center">No Pull Requests Open for 1 Day</td>
+                            {prs.openForOneDay.length === 0 && <tr>
+                              <td colSpan={3} className="text-center">No Pull Requests Open for 1 Day</td>
                             </tr>}
-                            {prs.prsOpenSinceYesterday.map((pr, index) => (
+                            {prs.openForOneDay.map((pr, index) => (
                               <tr key={index}>
                                 <td>{pr.title}</td>
+                                <td>
+                                  <Link to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
+                                        className="text-gray">
+                                    {workItemTypeIcon(pr.workItem.type)}{pr.workItem.title}
+                                  </Link>
+                                </td>
                                 <td>{pr.createdAt}</td>
                               </tr>
                             ))}
@@ -182,20 +190,27 @@ function Code() {
                                  style={{ minWidth: '700px' }}>
                             <thead className="thead">
                             <tr>
-                              <th scope="col" width={'40%'}>Title</th>
-                              <th scope="col" width={'5%'}>Created at</th>
+                              <th scope="col" width={'45%'}>Title</th>
+                              <th scope="col" width={'45%'}>Work Item</th>
+                              <th scope="col" width={'10%'}>Created at</th>
                             </tr>
                             </thead>
                             <tbody className="list">
-                            {prs.prsOpenSinceThreeDaysAgo.length === 0 && <tr>
-                              <td colSpan={2} className="text-center">No Pull Requests Open for 3 Days</td>
+                            {prs.openForThreeDays.length === 0 && <tr>
+                              <td colSpan={3} className="text-center">No Pull Requests Open for 3 Days</td>
                             </tr>}
-                            {prs.prsOpenSinceThreeDaysAgo.map((pr, index) => (
+                            {prs.openForThreeDays.map((pr, index) => (
                               <tr key={index}>
                                 <td>
                                   <a href={pr.url} target="_blank" rel="noreferrer">
                                     {pr.title}
                                   </a>
+                                </td>
+                                <td>
+                                  <Link to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
+                                        className="text-gray">
+                                    {workItemTypeIcon(pr.workItem.type)}{pr.workItem.title}
+                                  </Link>
                                 </td>
                                 <td>{formatDate(pr.createdAt)}</td>
                               </tr>
@@ -216,17 +231,61 @@ function Code() {
                                  style={{ minWidth: '700px' }}>
                             <thead className="thead">
                             <tr>
-                              <th scope="col" width={'40%'}>Title</th>
-                              <th scope="col" width={'5%'}>Created at</th>
+                              <th scope="col" width={'45%'}>Title</th>
+                              <th scope="col" width={'45%'}>Work Item</th>
+                              <th scope="col" width={'10%'}>Created at</th>
                             </tr>
                             </thead>
                             <tbody className="list">
-                            {prs.stalePrs.length === 0 && <tr>
-                              <td colSpan={2} className="text-center">No Stale Pull Requests</td>
+                            {prs.stale.length === 0 && <tr>
+                              <td colSpan={3} className="text-center">No Stale Pull Requests</td>
                             </tr>}
-                            {prs.stalePrs.map((pr, index) => (
+                            {prs.stale.map((pr, index) => (
                               <tr key={index}>
                                 <td>{pr.title}</td>
+                                <td>
+                                  <Link to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
+                                        className="text-gray">
+                                    {workItemTypeIcon(pr.workItem.type)}{pr.workItem.title}
+                                  </Link>
+                                </td>
+                                <td>{formatDate(pr.createdAt)}</td>
+                              </tr>
+                            ))}
+                            </tbody>
+                          </Table>
+                        </div>
+                      </Col>
+                    </Row>
+                    <Row className="mb-5">
+                      <Col>
+                        <h3 className="">
+                          <i className="fa fa-code-pull-request mr-2 text-primary" />
+                          Closed in the past 7 days
+                        </h3>
+                        <div className="table-responsive">
+                          <Table className="align-items-center table-flush border-bottom no-select"
+                                 style={{ minWidth: '700px' }}>
+                            <thead className="thead">
+                            <tr>
+                              <th scope="col" width={'45%'}>Title</th>
+                              <th scope="col" width={'45%'}>Work Item</th>
+                              <th scope="col" width={'10%'}>Created at</th>
+                            </tr>
+                            </thead>
+                            <tbody className="list">
+                            {prs.closedInThePastSevenDays.length === 0 && <tr>
+                              <td colSpan={2} className="text-center">No Pull Requests Closed in the past 7 days</td>
+                            </tr>}
+                            {prs.closedInThePastSevenDays.map((pr, index) => (
+                              <tr key={index}>
+                                <td>{pr.title}</td>
+                                <td>
+                                  <Link to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
+                                        className="text-gray">
+                                    {workItemTypeIcon(pr.workItem.type)}{pr.workItem.title}
+                                  </Link>
+                                </td>
                                 <td>{formatDate(pr.createdAt)}</td>
                               </tr>
                             ))}
