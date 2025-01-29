@@ -7,7 +7,7 @@ import {
   getGithubRepos,
   getGithubUrl,
   getIsGithubConnected,
-  getOpenPullRequests,
+  getPullRequests,
   updateProjectGithubRepo,
 } from '../../../services/github/github.service';
 import { useProjects } from '../../../contexts/ProjectsContext';
@@ -15,6 +15,7 @@ import Select2 from 'react-select2-wrapper';
 import { toast } from 'react-toastify';
 import { formatDate, workItemTypeIcon } from '../../../services/utils/utils';
 import { Link } from 'react-router-dom';
+import UpdateWarning from '../components/UpdateWarning';
 
 function Code() {
   const { orgId, currentProject } = useProjects();
@@ -28,6 +29,7 @@ function Code() {
   const [repo, setRepo] = useState(null);
   const [prs, setPrs] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [updateWarning, setUpdateWarning] = useState(false);
 
   useEffect(() => {
     if (!currentProject?.id || !orgId) return;
@@ -43,7 +45,7 @@ function Code() {
             const url = await getGithubUrl(orgId, currentProject.id);
             setCallbackUrl(url);
           } catch (error) {
-            console.error('Failed to get Github URL:', error);
+            toast.error('Failed to connect to Github');
             setCallbackUrl('');
           }
         } else if (!repo?.id) {
@@ -51,13 +53,13 @@ function Code() {
             const repositories = await getGithubRepos(orgId);
             setRepos(repositories);
           } catch (error) {
-            console.error('Failed to fetch repositories:', error);
+            toast.error('Failed to fetch repositories');
             setRepos([]);
           }
         } else {
           setRepo(repo);
           try {
-            const prs = await getOpenPullRequests(orgId, currentProject.id);
+            const prs = await getPullRequests(orgId, currentProject.id);
             setPrs(prs);
           } catch (error) {
             toast.error('Failed to fetch pull requests');
@@ -65,8 +67,8 @@ function Code() {
           }
         }
       } catch (error) {
-        console.error('Failed to check Github connection:', error);
         setIsGithubConnected(false);
+        toast.error('Failed to check Github connection');
       } finally {
         setIsLoading(false);
       }
@@ -79,7 +81,37 @@ function Code() {
     try {
       const projectRepo = await updateProjectGithubRepo(orgId, currentProject.id, selectedRepo);
       setRepo(projectRepo);
-      toast.success('Project repo updated');
+      setUpdateWarning(false);
+      const prs = await getPullRequests(orgId, currentProject.id);
+      setPrs(prs);
+      setIsEditing(false);
+      toast.success('Project repository updated');
+    } catch (e) {
+      toast.error(e.message);
+    }
+  };
+
+  const editRepo = async () => {
+    setIsEditing(!isEditing);
+    try {
+      const repositories = await getGithubRepos(orgId);
+      setRepos(repositories);
+    } catch (error) {
+      toast.error('Failed to fetch repositories');
+      setRepos([]);
+    }
+  };
+
+  const onRepoUpdateSave = async () => {
+    try {
+      if (isEditing) {
+        setUpdateWarning(true);
+        return;
+      }
+
+      const projectRepo = await updateProjectGithubRepo(orgId, currentProject.id, selectedRepo);
+      setRepo(projectRepo);
+      toast.success('Project repository updated');
     } catch (e) {
       toast.error(e.message);
     }
@@ -90,6 +122,12 @@ function Code() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
+        <UpdateWarning
+          isOpen={updateWarning}
+          toggle={() => setUpdateWarning(!updateWarning)}
+          warningMessage={"It will take a few minutes for the pull requests on your repository to be processed."}
+          entity={"project's repository"}
+          onUpdate={async () => await handleRepoUpdate()} />
         <Row>
           <Col>
             <Card className="mb-5">
@@ -100,16 +138,16 @@ function Code() {
                       <a className="btn-link text-blue mr-2" href={repo.url} target="_blank" rel="noreferrer">
                         | {repo.name}
                       </a>
-                      <i className="fa fa-edit mr-2" onClick={() => setIsEditing(!isEditing)} />
+                      <i className="fa fa-edit mr-2" onClick={editRepo} />
                     </>}
                     </CardTitle>
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
-                {!isLoading && isGithubConnected && !isEditing && <Row>
+                {!isLoading && prs && !isEditing && <Row>
                   <Col>
-                    <Alert color="info" className="mb-4">
+                    <Alert className="mb-4 bg-lighter text-gray-dark border-0">
                       <i className="fa fa-info-circle mr-2" />
                       <span>Your pull requests get processed when the work item reference is in the title or branch name.</span>
                     </Alert>
@@ -148,7 +186,7 @@ function Code() {
                           setSelectedRepo(e.target.value);
                         }}
                       ></Select2>
-                      <button className="btn btn-primary my-3" type="button" onClick={handleRepoUpdate}>Save</button>
+                      <button className="btn btn-primary my-3" type="button" onClick={onRepoUpdateSave} disabled={!selectedRepo}>Save</button>
                       {isEditing && <button className="btn btn-white my-3" type="button" onClick={() => setIsEditing(false)}>Cancel</button>}
                     </Col>
                   </Row>}
@@ -294,7 +332,12 @@ function Code() {
                             </tr>}
                             {prs.closedInThePastSevenDays.map((pr, index) => (
                               <tr key={index}>
-                                <td>{pr.title}</td>
+                                <td>
+                                  <a href={pr.url} target="_blank" rel="noreferrer">
+                                    <span className="mr-2">{pr.title}</span>
+                                    <i className="fa fa-external-link-alt mr-1" />
+                                  </a>
+                                </td>
                                 <td>
                                   <Link
                                     to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}

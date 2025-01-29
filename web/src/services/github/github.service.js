@@ -36,7 +36,7 @@ export async function updateProjectGithubRepo(orgId, projectId, repoId) {
   }
 }
 
-export async function getOpenPullRequests(orgId, projectId) {
+export async function getPullRequests(orgId, projectId) {
   try {
     const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs`);
     return response.data;

@@ -12,6 +12,7 @@ import { Project } from '../projects/project.entity';
 import { GithubBranch } from './github-branch.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { GithubPullRequest } from './github-pull-request.entity';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 const octokitClientProvider = {
   provide: 'GITHUB_CLIENT',
@@ -39,6 +40,7 @@ const octokitClientProvider = {
     AuthModule,
     UsersModule,
     EncryptionModule,
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forFeature([
       User,
       User,

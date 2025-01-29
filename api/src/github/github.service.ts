@@ -10,6 +10,8 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { GithubBranch } from './github-branch.entity';
 import { GithubPullRequest } from './github-pull-request.entity';
 import { GithubPullRequestMapper } from './mappers';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { GithubEvents } from './events';
 
 @Injectable()
 export class GithubService {
@@ -27,6 +29,7 @@ export class GithubService {
     private readonly githubBranchRepository: Repository<GithubBranch>,
     @InjectRepository(GithubPullRequest)
     private readonly githubPullRequestRepository: Repository<GithubPullRequest>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async isConnected(orgId: string, projectId: string) {
@@ -69,13 +72,25 @@ export class GithubService {
       org: { id: orgId },
     });
 
+    if (!project) {
+      throw new Error('Project not found');
+    }
+
+    if (project.githubRepositoryId) {
+      await this.cleanupGithubRepoAssociation(orgId, project);
+    }
+
     project.githubRepositoryId = repo.id;
     project.githubRepositoryFullName = repo.full_name;
     project.githubRepositoryUrl = repo.html_url;
 
     await this.projectRepository.save(project);
-
     await this.setupWebhook(orgId, projectId);
+
+    this.eventEmitter.emit(GithubEvents.ProcessPullRequests, {
+      orgId,
+      project,
+    });
 
     return {
       id: repo.id,
@@ -322,7 +337,7 @@ export class GithubService {
 
     switch (action) {
       case 'opened':
-        await this.onPullRequestOpened(project, pr);
+        await this.onNewPullRequest(project, pr);
         break;
       case 'edited':
         await this.onPullRequestUpdated(project, pr);
@@ -382,7 +397,7 @@ export class GithubService {
     const webhookUrl = `${webhookUrlBase}/github/orgs/${orgId}/projects/${projectId}/webhooks`;
     const webhookSecret = this.configService.get('github.webhookSecret');
 
-    await octokit.rest.repos.createWebhook({
+    const { data: webhook } = await octokit.rest.repos.createWebhook({
       owner,
       repo,
       config: {
@@ -392,6 +407,8 @@ export class GithubService {
       },
       events: ['pull_request', 'push', 'create', 'delete'],
     });
+    project.githubRepositoryWebhookId = webhook.id;
+    await this.projectRepository.save(project);
   }
 
   private async onBranchCreated(project: Project, ref: any) {
@@ -442,7 +459,7 @@ export class GithubService {
     return null;
   }
 
-  private async onPullRequestOpened(project: Project, pr: any) {
+  private async onNewPullRequest(project: Project, pr: any) {
     const workItemReference = await this.getPullRequestWorkItemReference(pr);
 
     if (!workItemReference) {
@@ -617,7 +634,7 @@ export class GithubService {
     });
 
     if (!githubPullRequest) {
-      return await this.onPullRequestOpened(project, pr);
+      return await this.onNewPullRequest(project, pr);
     }
 
     githubPullRequest.title = pr.title;
@@ -626,5 +643,83 @@ export class GithubService {
     githubPullRequest.updatedAt = pr.updated_at;
 
     await this.githubPullRequestRepository.save(githubPullRequest);
+  }
+
+  private async deleteWebhook(orgId: string, project: Project) {
+    const token = await this.getToken(orgId);
+
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const octokit = await this.getAuthenticatedOctokit(token);
+    const { data: repo } = await octokit.request('GET /repositories/:id', {
+      id: project.githubRepositoryId,
+    });
+
+    await octokit.request('DELETE /repos/:owner/:repo/hooks/:hook_id', {
+      owner: repo.owner.login,
+      repo: repo.name,
+      hook_id: project.githubRepositoryWebhookId,
+    });
+  }
+
+  private async cleanupGithubRepoAssociation(orgId: string, project: Project) {
+    const token = await this.getToken(orgId);
+
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    // Delete webhook
+    await this.deleteWebhook(orgId, project);
+
+    // Delete project pull requests
+    await this.githubPullRequestRepository.delete({
+      project: { id: project.id },
+    });
+
+    // Delete project branches
+    await this.githubBranchRepository.delete({
+      project: { id: project.id },
+    });
+  }
+
+  @OnEvent(GithubEvents.ProcessPullRequests)
+  async handleProcessPullRequests(payload: {
+    orgId: string;
+    project: Project;
+  }) {
+    try {
+      await this.processGithubPullRequests(payload.orgId, payload.project);
+    } catch (error) {
+      console.error('Error processing pull requests:', error);
+    }
+  }
+
+  private async processGithubPullRequests(orgId: string, project: Project) {
+    const token = await this.getToken(orgId);
+
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const octokit = await this.getAuthenticatedOctokit(token);
+    const { data: repo } = await octokit.request('GET /repositories/:id', {
+      id: project.githubRepositoryId,
+    });
+
+    const { data: pullRequests } = await octokit.request(
+      'GET /repos/:owner/:repo/pulls',
+      {
+        owner: repo.owner.login,
+        repo: repo.name,
+        state: 'all',
+      },
+    );
+
+    for (const pullRequest of pullRequests) {
+      await this.onNewPullRequest(project, pullRequest);
+    }
   }
 }
