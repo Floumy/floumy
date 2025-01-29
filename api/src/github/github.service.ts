@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
-import { And, LessThan, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
+import { And, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Project } from '../projects/project.entity';
 import crypto from 'crypto';
@@ -27,8 +27,7 @@ export class GithubService {
     private readonly githubBranchRepository: Repository<GithubBranch>,
     @InjectRepository(GithubPullRequest)
     private readonly githubPullRequestRepository: Repository<GithubPullRequest>,
-  ) {
-  }
+  ) {}
 
   async isConnected(orgId: string, projectId: string) {
     const token = await this.getToken(orgId);
@@ -325,6 +324,9 @@ export class GithubService {
       case 'opened':
         await this.onPullRequestOpened(project, pr);
         break;
+      case 'edited':
+        await this.onPullRequestUpdated(project, pr);
+        break;
       case 'closed':
       case 'reopened':
       case 'merged':
@@ -583,5 +585,46 @@ export class GithubService {
     }
 
     return workItemReference[0];
+  }
+
+  private async onPullRequestUpdated(project: Project, pr: any) {
+    const workItemReference = await this.getPullRequestWorkItemReference(pr);
+
+    if (!workItemReference) {
+      return;
+    }
+
+    const org = await project.org;
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+
+    if (!workItem) {
+      return;
+    }
+
+    const githubPullRequest = await this.githubPullRequestRepository.findOne({
+      where: {
+        githubId: pr.id,
+        org: { id: org.id },
+        project: { id: project.id },
+        workItem: { id: workItem.id },
+      },
+    });
+
+    if (!githubPullRequest) {
+      return await this.onPullRequestOpened(project, pr);
+    }
+
+    githubPullRequest.title = pr.title;
+    githubPullRequest.url = pr.html_url;
+    githubPullRequest.state = pr.state;
+    githubPullRequest.updatedAt = pr.updated_at;
+
+    await this.githubPullRequestRepository.save(githubPullRequest);
   }
 }

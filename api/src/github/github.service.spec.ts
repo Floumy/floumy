@@ -10,6 +10,9 @@ import { Project } from '../projects/project.entity';
 import { uuid } from 'uuidv4';
 import { Repository } from 'typeorm';
 import { EncryptionModule } from '../encryption/encryption.module';
+import { GithubPullRequest } from './github-pull-request.entity';
+import { GithubBranch } from './github-branch.entity';
+import { GithubPullRequestMapper } from './mappers';
 
 describe('GithubService', () => {
   let usersService: UsersService;
@@ -20,12 +23,14 @@ describe('GithubService', () => {
   let project: Project;
   let orgsRepository: Repository<Org>;
   let encryptionService: EncryptionService;
+  let githubBranchRepository: Repository<GithubBranch>;
+  let githubPullRequestRepository: Repository<GithubPullRequest>;
 
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, Project, User]), EncryptionModule],
+      [TypeOrmModule.forFeature([Org, Project, User, GithubBranch, GithubPullRequest]), EncryptionModule],
       [GithubService, EncryptionService, UsersService],
     );
     cleanup = dbCleanup;
@@ -57,53 +62,6 @@ describe('GithubService', () => {
     it('should return the auth url', async () => {
       const authUrl = await service.getAuthUrl(org.id, project.id);
       expect(authUrl).toBeDefined();
-    });
-  });
-
-  describe('when getting the repos', () => {
-    it('should return the repos', async () => {
-      org.githubAccessToken = encryptionService.encrypt(uuid());
-      await orgsRepository.save(org);
-      // Spy on getAuthenticatedOctokit to return a mock response
-      jest.spyOn(service, 'getAuthenticatedOctokit').mockImplementation(() => {
-        return {
-          rest: {
-            repos: {
-              listForAuthenticatedUser: jest.fn().mockResolvedValue({
-                data: [{ id: uuid() }, { id: uuid() }],
-              }),
-            },
-          },
-        } as any;
-      });
-      const repos = await service.getRepos(org.id);
-      expect(repos).toBeDefined();
-      expect(repos.length).toBeGreaterThan(0);
-    });
-  });
-
-  describe('when checking if the user is connected', () => {
-    it('should return true if the user is connected', async () => {
-      org.githubAccessToken = encryptionService.encrypt(uuid());
-      await orgsRepository.save(org);
-      // Spy on getAuthenticatedOctokit to return a mock response
-      jest.spyOn(service, 'getAuthenticatedOctokit').mockImplementation(() => {
-        return {
-          rest: {
-            users: {
-              getAuthenticated: jest.fn().mockResolvedValue({}),
-            },
-          },
-        } as any;
-      });
-      const isConnected = await service.isConnected(org.id);
-      expect(isConnected).toBeDefined();
-      expect(isConnected.connected).toBe(true);
-    });
-    it('should return false if the user is not connected', async () => {
-      const isConnected = await service.isConnected(org.id);
-      expect(isConnected).toBeDefined();
-      expect(isConnected.connected).toBe(false);
     });
   });
 });

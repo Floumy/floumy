@@ -11,6 +11,8 @@ import { GithubService } from './github.service';
 import { EncryptionService } from '../encryption/encryption.service';
 import { uuid } from 'uuidv4';
 import { Repository } from 'typeorm';
+import { GithubBranch } from './github-branch.entity';
+import { GithubPullRequest } from './github-pull-request.entity';
 
 describe('GithubController', () => {
   let controller: GithubController;
@@ -21,7 +23,16 @@ describe('GithubController', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User, Project]), UsersModule],
+      [
+        TypeOrmModule.forFeature([
+          Org,
+          User,
+          Project,
+          GithubBranch,
+          GithubPullRequest,
+        ]),
+        UsersModule,
+      ],
       [GithubService, EncryptionService],
       [GithubController],
     );
@@ -126,6 +137,7 @@ describe('GithubController', () => {
           },
         },
         org.id,
+        project.id,
       );
       expect(isConnected).toBeDefined();
       expect(isConnected.connected).toBe(true);
