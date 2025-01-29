@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row, Table } from 'reactstrap';
+import { Alert, Card, CardBody, CardHeader, CardTitle, Col, Container, Row, Table } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import {
   getGithubRepos,
@@ -20,7 +20,7 @@ function Code() {
   const { orgId, currentProject } = useProjects();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isGithubConnected, setIsGithubConnected] = useState(false);
+  const [isGithubConnected, setIsGithubConnected] = useState(true);
 
   const [callbackUrl, setCallbackUrl] = useState('');
   const [repos, setRepos] = useState([]);
@@ -104,6 +104,14 @@ function Code() {
                 </Row>
               </CardHeader>
               <CardBody>
+                {!isLoading && isGithubConnected && <Row>
+                  <Col>
+                  <Alert color="info" className="mb-4">
+                    <i className="fa fa-info-circle mr-2" />
+                    <span>Your pull requests get processed when the work item reference is in the title or branch name.</span>
+                  </Alert>
+                  </Col>
+                </Row>}
                 {isLoading &&
                   <Row>
                     <Col className="text-center">
