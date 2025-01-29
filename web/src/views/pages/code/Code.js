@@ -27,6 +27,7 @@ function Code() {
   const [selectedRepo, setSelectedRepo] = useState('');
   const [repo, setRepo] = useState(null);
   const [prs, setPrs] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (!currentProject?.id || !orgId) return;
@@ -95,21 +96,23 @@ function Code() {
               <CardHeader>
                 <Row>
                   <Col md={12}>
-                    <CardTitle tag="h2" className="mb-3">Code {repo &&
-                      <a className="btn-link text-blue" href={repo.url} target="_blank" rel="noreferrer">
+                    <CardTitle tag="h2" className="mb-3">Code {repo && <>
+                      <a className="btn-link text-blue mr-2" href={repo.url} target="_blank" rel="noreferrer">
                         | {repo.name}
-                      </a>}
+                      </a>
+                      <i className="fa fa-edit mr-2" onClick={() => setIsEditing(!isEditing)} />
+                    </>}
                     </CardTitle>
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
-                {!isLoading && isGithubConnected && <Row>
+                {!isLoading && isGithubConnected && !isEditing && <Row>
                   <Col>
-                  <Alert color="info" className="mb-4">
-                    <i className="fa fa-info-circle mr-2" />
-                    <span>Your pull requests get processed when the work item reference is in the title or branch name.</span>
-                  </Alert>
+                    <Alert color="info" className="mb-4">
+                      <i className="fa fa-info-circle mr-2" />
+                      <span>Your pull requests get processed when the work item reference is in the title or branch name.</span>
+                    </Alert>
                   </Col>
                 </Row>}
                 {isLoading &&
@@ -130,7 +133,7 @@ function Code() {
                       </div>
                     </Col>
                   </Row>}
-                {!isLoading && !repo && repos.length > 0 &&
+                {!isLoading && ((!repo && repos.length > 0) || isEditing) &&
                   <Row>
                     <Col xl={4}>
                       <h4>Select a repository</h4>
@@ -146,9 +149,10 @@ function Code() {
                         }}
                       ></Select2>
                       <button className="btn btn-primary my-3" type="button" onClick={handleRepoUpdate}>Save</button>
+                      {isEditing && <button className="btn btn-white my-3" type="button" onClick={() => setIsEditing(false)}>Cancel</button>}
                     </Col>
                   </Row>}
-                {!isLoading && prs && (
+                {!isLoading && prs && !isEditing && (
                   <>
                     <Row className="mb-5">
                       <Col>
@@ -174,8 +178,9 @@ function Code() {
                               <tr key={index}>
                                 <td>{pr.title}</td>
                                 <td>
-                                  <Link to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
-                                        className="text-gray">
+                                  <Link
+                                    to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
+                                    className="text-gray">
                                     {workItemTypeIcon(pr.workItem.type)}{pr.workItem.title}
                                   </Link>
                                 </td>
@@ -215,8 +220,9 @@ function Code() {
                                   </a>
                                 </td>
                                 <td>
-                                  <Link to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
-                                        className="text-gray">
+                                  <Link
+                                    to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
+                                    className="text-gray">
                                     {workItemTypeIcon(pr.workItem.type)}{pr.workItem.title}
                                   </Link>
                                 </td>
@@ -252,8 +258,9 @@ function Code() {
                               <tr key={index}>
                                 <td>{pr.title}</td>
                                 <td>
-                                  <Link to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
-                                        className="text-gray">
+                                  <Link
+                                    to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
+                                    className="text-gray">
                                     {workItemTypeIcon(pr.workItem.type)}{pr.workItem.title}
                                   </Link>
                                 </td>
@@ -289,8 +296,9 @@ function Code() {
                               <tr key={index}>
                                 <td>{pr.title}</td>
                                 <td>
-                                  <Link to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
-                                        className="text-gray">
+                                  <Link
+                                    to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
+                                    className="text-gray">
                                     {workItemTypeIcon(pr.workItem.type)}{pr.workItem.title}
                                   </Link>
                                 </td>
