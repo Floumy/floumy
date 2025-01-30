@@ -1,10 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { OpenaiService } from './openai/openai.service';
 import { InitiativeType, KeyResultType, WorkItemType } from './types';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Feature } from '../roadmap/features/feature.entity';
+import { Issue } from '../issues/issue.entity';
+import { KeyResult } from '../okrs/key-result.entity';
+import { Milestone } from '../roadmap/milestones/milestone.entity';
+import { FeatureRequest } from '../feature-requests/feature-request.entity';
 
 @Injectable()
 export class AiService {
-  constructor(private openaiService: OpenaiService) {}
+  constructor(
+    private openaiService: OpenaiService,
+    @InjectRepository(Feature)
+    private featureRepository: Repository<Feature>,
+    @InjectRepository(Issue)
+    private issueRepository: Repository<Issue>,
+    @InjectRepository(KeyResult)
+    private keyResultRepository: Repository<KeyResult>,
+    @InjectRepository(Milestone)
+    private milestoneRepository: Repository<Milestone>,
+    @InjectRepository(FeatureRequest)
+    private featureRequestRepository: Repository<FeatureRequest>,
+  ) {}
 
   async generateKeyResults(objective: string): Promise<KeyResultType[]> {
     const prompt = `Generate up to 5 key results for the following objective:
@@ -318,5 +337,128 @@ export class AiService {
       },
     });
     return response.data.workItems;
+  }
+
+  async generateWorkItemDescription(
+    workItem: string,
+    workItemType: string,
+    initiativeId: string,
+    issueId: string,
+  ) {
+    let prompt = `Generate a description for the following work item:
+    
+    Work Item Title: ${workItem}
+    Work Item Type: ${workItemType}
+    `;
+    if (initiativeId) {
+      const initiative = await this.featureRepository.findOneOrFail({
+        where: { id: initiativeId },
+      });
+      prompt += `Linked Initiative title: ${initiative.title}
+      Linked Initiative description: ${initiative.description}
+      `;
+    }
+    if (issueId) {
+      const issue = await this.issueRepository.findOneOrFail({
+        where: { id: issueId },
+      });
+      prompt += `Linked Issue title: ${issue.title}
+      Linked Issue description: ${issue.description}
+      `;
+    }
+    prompt += `
+    The user story type should be used for work items that are about a job that needs to be done by a user.
+    The task type should be used for work items that are about a task that is not a user story.
+    The bug type should be used for work items that are about a something that is broken.
+    The spike type should be used for work items that are about investigating an idea or a concept.
+    
+    In the description, include:
+    - What is the goal of the work item?
+    - Why is it important?
+    - Implementation details
+    - Acceptance criteria
+    
+    Separate the description into sections, each with a heading.
+    
+    Format the description as an HTML string.
+    `;
+
+    const response = await this.openaiService.generateCompletion<{
+      description: string;
+    }>(prompt, {
+      name: 'workItemDescription',
+      schema: {
+        type: 'object',
+        properties: {
+          description: {
+            type: 'string',
+          },
+        },
+        required: ['description'],
+        additionalProperties: false,
+      },
+    });
+    return response.data.description;
+  }
+
+  async generateInitiativeDescription(
+    initiative: string,
+    keyResultId: string,
+    milestoneId: string,
+    featureRequestId: string,
+  ) {
+    let prompt = `Generate a description for the following initiative:
+    
+    Initiative Title: ${initiative}
+    `;
+    if (keyResultId) {
+      const keyResult = await this.keyResultRepository.findOneOrFail({
+        where: { id: keyResultId },
+      });
+      prompt += `Linked Key Result title: ${keyResult.title}
+      `;
+    }
+    if (milestoneId) {
+      const milestone = await this.milestoneRepository.findOneOrFail({
+        where: { id: milestoneId },
+      });
+      prompt += `Linked Milestone title: ${milestone.title}
+      `;
+    }
+    if (featureRequestId) {
+      const featureRequest = await this.featureRequestRepository.findOneOrFail({
+        where: { id: featureRequestId },
+      });
+      prompt += `Linked Feature Request title: ${featureRequest.title}
+      Linked Feature Request description: ${featureRequest.description}
+      `;
+    }
+    prompt += `
+    In the description, include:
+    - What is the goal of the initiative?
+    - Why is it important?
+    - What is the expected outcome of the initiative?
+   
+    Separate the description into sections, each with a heading.
+    
+    Format the description as an HTML string.
+    `;
+
+    const response = await this.openaiService.generateCompletion<{
+      description: string;
+    }>(prompt, {
+      name: 'initiativeDescription',
+      schema: {
+        type: 'object',
+        properties: {
+          description: {
+            type: 'string',
+          },
+        },
+        required: ['description'],
+        additionalProperties: false,
+      },
+    });
+    return response.data.description;
   }
 }

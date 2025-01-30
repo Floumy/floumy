@@ -14,6 +14,9 @@ import { UsersModule } from '../users/users.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Org } from '../orgs/org.entity';
 import { Project } from '../projects/project.entity';
+import { Issue } from '../issues/issue.entity';
+import { Milestone } from '../roadmap/milestones/milestone.entity';
+import { FeatureRequest } from '../feature-requests/feature-request.entity';
 
 @Module({
   imports: [
@@ -29,6 +32,10 @@ import { Project } from '../projects/project.entity';
       User,
       WorkItem,
       KeyResult,
+      Issue,
+      Milestone,
+      Milestone,
+      FeatureRequest,
     ]),
   ],
   controllers: [AiController],

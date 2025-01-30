@@ -81,4 +81,42 @@ export class AiController {
       throw new BadRequestException(e.message);
     }
   }
+
+  @Get('work-item-description')
+  async getWorkItemDescription(
+    @Query('workItem') workItem: string,
+    @Query('workItemType') workItemType: string,
+    @Query('initiativeId') initiativeId: string,
+    @Query('issueId') issueId: string,
+  ) {
+    try {
+      return await this.aiService.generateWorkItemDescription(
+        workItem,
+        workItemType,
+        initiativeId,
+        issueId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get('initiative-description')
+  async getInitiativeDescription(
+    @Query('initiative') initiative: string,
+    @Query('keyResultId') keyResultId: string,
+    @Query('milestoneId') milestoneId: string,
+    @Query('featureRequestId') featureRequestId: string,
+  ) {
+    try {
+      return await this.aiService.generateInitiativeDescription(
+        initiative,
+        keyResultId,
+        milestoneId,
+        featureRequestId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }
