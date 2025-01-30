@@ -15,6 +15,8 @@ import CardHeaderDetails from "../components/CardHeaderDetails";
 import {getOrg} from "../../../services/org/orgs.service";
 import {listFeatureRequests} from "../../../services/feature-requests/feature-requests.service";
 import RichTextEditor from "../../../components/RichTextEditor/RichTextEditor";
+import AIButton from "../../../components/AI/AIButton";
+import {getInitiativeDescription} from "../../../services/ai/ai.service";
 
 function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   const { orgId, projectId } = useParams();
@@ -349,6 +351,14 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                     >
                       Description
                     </label>
+                    <AIButton
+                    text="Fill with AI"
+                    disabled={values.title.length === 0}
+                    onClick={async () => {
+                      const response = await getInitiativeDescription(values.title, keyResult, milestone, featureRequest);
+                      setDescriptionText(response);
+                    }}
+                    />
                     <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
                         setDescriptionText(text);
                         setMentions(mentions);
