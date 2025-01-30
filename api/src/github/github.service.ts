@@ -492,11 +492,11 @@ export class GithubService {
     await this.githubPullRequestRepository.save(githubPullRequest);
   }
 
-  private async onPullRequestChangeState(project: Project, pr: any) {
+  private async getPullRequestForProject(project: Project, pr: any) {
     const workItemReference = await this.getPullRequestWorkItemReference(pr);
 
     if (!workItemReference) {
-      return;
+      return null;
     }
 
     const org = await project.org;
@@ -509,10 +509,10 @@ export class GithubService {
     });
 
     if (!workItem) {
-      return;
+      return null;
     }
 
-    const githubPullRequest = await this.githubPullRequestRepository.findOne({
+    return await this.githubPullRequestRepository.findOne({
       where: {
         githubId: pr.id,
         org: { id: org.id },
@@ -520,6 +520,10 @@ export class GithubService {
         workItem: { id: workItem.id },
       },
     });
+  }
+
+  private async onPullRequestChangeState(project: Project, pr: any) {
+    const githubPullRequest = await this.getPullRequestForProject(project, pr);
 
     if (!githubPullRequest) {
       return;
@@ -605,33 +609,7 @@ export class GithubService {
   }
 
   private async onPullRequestUpdated(project: Project, pr: any) {
-    const workItemReference = await this.getPullRequestWorkItemReference(pr);
-
-    if (!workItemReference) {
-      return;
-    }
-
-    const org = await project.org;
-    const workItem = await this.workItemRepository.findOne({
-      where: {
-        reference: workItemReference.toUpperCase(),
-        org: { id: org.id },
-        project: { id: project.id },
-      },
-    });
-
-    if (!workItem) {
-      return;
-    }
-
-    const githubPullRequest = await this.githubPullRequestRepository.findOne({
-      where: {
-        githubId: pr.id,
-        org: { id: org.id },
-        project: { id: project.id },
-        workItem: { id: workItem.id },
-      },
-    });
+    const githubPullRequest = await this.getPullRequestForProject(project, pr);
 
     if (!githubPullRequest) {
       return await this.onNewPullRequest(project, pr);
