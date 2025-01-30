@@ -105,9 +105,7 @@ export class WorkItem {
     lazy: true,
   })
   githubBranches: Promise<GithubBranch[]>;
-  @ManyToMany(() => User, {
-    lazy: true,
-  })
+
   @OneToMany(
     () => GithubPullRequest,
     (githubPullRequest) => githubPullRequest.workItem,
@@ -117,6 +115,9 @@ export class WorkItem {
   )
   githubPullRequests: Promise<GithubPullRequest[]>;
 
+  @ManyToMany(() => User, {
+    lazy: true,
+  })
   @JoinTable({
     name: 'work_item_description_mentions',
     joinColumn: {
