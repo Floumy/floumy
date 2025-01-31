@@ -5,18 +5,18 @@ import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import React, { useEffect, useState } from "react";
 import Select2 from "react-select2-wrapper";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { listPublicIterationsWithWorkItemsForTimeline } from "../../../services/iterations/iterations.service";
-import { formatDate, getIterationEndDate, getIterationStartDate, sortByPriority } from "../../../services/utils/utils";
+import { listPublicSprintsWithWorkItemsForTimeline } from "../../../services/sprints/sprints.service";
+import { formatDate, getSprintEndDate, getSprintStartDate, sortByPriority } from "../../../services/utils/utils";
 import PublicWorkItemsList from "../backlog/PublicWorkItemsList";
 import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
 
-function PublicIterations() {
+function PublicSprints() {
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get("timeline");
-  const [isLoadingIterations, setIsLoadingIterations] = useState(false);
+  const [isLoadingSprints, setIsLoadingSprints] = useState(false);
   const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || "this-quarter");
-  const [iterations, setIterations] = useState([]);
+  const [sprints, setSprints] = useState([]);
   const [showWorkItems, setShowWorkItems] = useState({});
   const navigate = useNavigate();
   const { orgId, projectId } = useParams();
@@ -24,25 +24,25 @@ function PublicIterations() {
   useEffect(() => {
     document.title = "Floumy | Sprints";
 
-    async function fetchIterations() {
-      setIsLoadingIterations(true);
+    async function fetchSprints() {
+      setIsLoadingSprints(true);
       try {
-        const iterations = await listPublicIterationsWithWorkItemsForTimeline(orgId, projectId, timelineFilterValue);
-        setIterations(iterations);
+        const sprints = await listPublicSprintsWithWorkItemsForTimeline(orgId, projectId, timelineFilterValue);
+        setSprints(sprints);
         // Show all work items by default
         const displayWorkItems = {};
-        iterations.forEach(iteration => {
-          displayWorkItems[iteration.id] = true;
+        sprints.forEach(sprint => {
+          displayWorkItems[sprint.id] = true;
         });
         setShowWorkItems(displayWorkItems);
       } catch (e) {
         console.error(e);
       } finally {
-        setIsLoadingIterations(false);
+        setIsLoadingSprints(false);
       }
     }
 
-    fetchIterations();
+    fetchSprints();
 
   }, [orgId, projectId, timelineFilterValue]);
 
@@ -59,7 +59,7 @@ function PublicIterations() {
 
   return (
     <>
-      {isLoadingIterations && <InfiniteLoadingBar />}
+      {isLoadingSprints && <InfiniteLoadingBar />}
       <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
         <Row>
@@ -95,75 +95,75 @@ function PublicIterations() {
                 </Row>
               </CardHeader>
               <div className="pt-3 pb-2">
-                {iterations.length === 0 && !isLoadingIterations && (
+                {sprints.length === 0 && !isLoadingSprints && (
                   <div className="text-center">
                     <h3>No sprints found for this timeline.</h3>
                   </div>
                 )}
-                {iterations.length > 0 && !isLoadingIterations && iterations.map((iteration) => (
-                  <div key={iteration.id} className="mb-5">
+                {sprints.length > 0 && !isLoadingSprints && sprints.map((sprint) => (
+                  <div key={sprint.id} className="mb-5">
                     <Row className="pl-4 pt-2 pr-4">
                       <Col>
                         <h3 className="mb-0">
                           <button onClick={() => {
                             const displayWorkItems = showWorkItems;
-                            displayWorkItems[iteration.id] = !displayWorkItems[iteration.id];
+                            displayWorkItems[sprint.id] = !displayWorkItems[sprint.id];
                             setShowWorkItems({ ...displayWorkItems });
                           }}
                                   className="btn btn-sm btn-outline-light shadow-none shadow-none--hover pt-1 pb-0 pl-2 pr-2">
-                            {!showWorkItems[iteration.id] && <i className="ni ni-bold-right" />}
-                            {showWorkItems[iteration.id] && <i className="ni ni-bold-down" />}
+                            {!showWorkItems[sprint.id] && <i className="ni ni-bold-right" />}
+                            {showWorkItems[sprint.id] && <i className="ni ni-bold-down" />}
                           </button>
-                          <Link to={`/public/orgs/${orgId}/projects/${projectId}/iterations/detail/${iteration.id}`}
+                          <Link to={`/public/orgs/${orgId}/projects/${projectId}/sprints/detail/${sprint.id}`}
                                 className="mr-2">
                             <span
-                              className="text-muted">{formatDate(getIterationStartDate(iteration))} - {formatDate(getIterationEndDate(iteration))}</span> | {iteration.title}
+                              className="text-muted">{formatDate(getSprintStartDate(sprint))} - {formatDate(getSprintEndDate(sprint))}</span> | {sprint.title}
                           </Link>
-                          {iteration.status === "active" && <span className="badge badge-info">Active</span>}
-                          {iteration.status === "completed" &&
+                          {sprint.status === "active" && <span className="badge badge-info">Active</span>}
+                          {sprint.status === "completed" &&
                             <span className="badge badge-success">Completed</span>}
-                          {iteration.status === "planned" &&
+                          {sprint.status === "planned" &&
                             <span className="badge badge-primary text-white">Planned</span>}
                         </h3>
                       </Col>
                     </Row>
                     <Row className="pl-4 pr-4">
                       <Col>
-                        <span className="text-muted text-sm p-0 m-0">Work Items Count: {iteration.workItems.length}, Estimated Effort: {estimationTotal(iteration.workItems)}</span>
+                        <span className="text-muted text-sm p-0 m-0">Work Items Count: {sprint.workItems.length}, Estimated Effort: {estimationTotal(sprint.workItems)}</span>
                       </Col>
                     </Row>
-                    {iteration.goal && <Row className="pl-4 pr-4">
+                    {sprint.goal && <Row className="pl-4 pr-4">
                       <Col>
-                        <div className="text-muted mb-0 text-sm">Goal: {iteration.goal}</div>
+                        <div className="text-muted mb-0 text-sm">Goal: {sprint.goal}</div>
                       </Col>
                     </Row>}
-                    {iteration.status === "completed" &&
-                      <div hidden={!showWorkItems[iteration.id]}>
+                    {sprint.status === "completed" &&
+                      <div hidden={!showWorkItems[sprint.id]}>
                         <CardBody className="pb-2 pt-2 font-italic"><Row><Col className="text-sm">Completed Work
                           Items</Col></Row></CardBody>
                         <PublicWorkItemsList
                           orgId={orgId}
-                          id={"completed-" + iteration.id}
-                          workItems={sortByPriority(iteration.workItems.filter(workItem => workItem.status === "done" || workItem.status === "closed"))}
+                          id={"completed-" + sprint.id}
+                          workItems={sortByPriority(sprint.workItems.filter(workItem => workItem.status === "done" || workItem.status === "closed"))}
                           headerClassName={"thead"}
                         />
                         <CardBody className="pt-2 pb-2 font-italic"><Row><Col className="text-sm">Unfinished Work
                           Items</Col></Row></CardBody>
                         <PublicWorkItemsList
                           orgId={orgId}
-                          id={"unfinished-" + iteration.id}
-                          workItems={sortByPriority(iteration.workItems.filter(workItem => workItem.status !== "done" && workItem.status !== "closed"))}
+                          id={"unfinished-" + sprint.id}
+                          workItems={sortByPriority(sprint.workItems.filter(workItem => workItem.status !== "done" && workItem.status !== "closed"))}
                           headerClassName={"thead"}
                         />
                       </div>
                     }
-                    {iteration.status !== "completed" &&
-                      <div className="pt-2" hidden={!showWorkItems[iteration.id]}>
+                    {sprint.status !== "completed" &&
+                      <div className="pt-2" hidden={!showWorkItems[sprint.id]}>
                         <PublicWorkItemsList
                           orgId={orgId}
-                          id={iteration.id}
+                          id={sprint.id}
                           showAssignedTo={true}
-                          workItems={sortByPriority(iteration.workItems)}
+                          workItems={sortByPriority(sprint.workItems)}
                           headerClassName={"thead"}
                         />
                       </div>
@@ -171,7 +171,7 @@ function PublicIterations() {
                   </div>
                 ))}
               </div>
-              {isLoadingIterations && <LoadingSpinnerBox />}
+              {isLoadingSprints && <LoadingSpinnerBox />}
             </Card>
           </Col>
         </Row>
@@ -180,4 +180,4 @@ function PublicIterations() {
   );
 }
 
-export default PublicIterations;
+export default PublicSprints;

@@ -7,19 +7,19 @@ import { useParams } from "react-router-dom";
 import {
   formatDate,
   formatHyphenatedString,
-  getIterationEndDate,
-  getIterationStartDate,
+  getSprintEndDate,
+  getSprintStartDate,
   workItemStatusColorClassName
 } from "../../../services/utils/utils";
-import { getPublicActiveIteration } from "../../../services/iterations/iterations.service";
+import { getPublicActiveSprint } from "../../../services/sprints/sprints.service";
 import DevelopmentStats from "./DevelopmentStats";
 import PublicWorkItemsList from "../backlog/PublicWorkItemsList";
 import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
 import { getWorkItemsGroupedByStatus } from "../../../services/utils/workItemUtils";
 
-function PublicActiveIteration() {
+function PublicActiveSprint() {
   const [isLoading, setIsLoading] = useState(false);
-  const [activeIteration, setActiveIteration] = useState(null);
+  const [activeSprint, setActiveSprint] = useState(null);
   const [workItemsByStatus, setWorkItemsByStatus] = useState({});
   const { orgId, projectId } = useParams();
 
@@ -34,10 +34,10 @@ function PublicActiveIteration() {
     async function fetchData() {
       try {
         setIsLoading(true);
-        const activeIteration = await getPublicActiveIteration(orgId, projectId);
-        setActiveIteration(activeIteration);
-        if (activeIteration && activeIteration.workItems.length > 0) {
-          setWorkItemsGroupedByStatus(activeIteration.workItems);
+        const activeSprint = await getPublicActiveSprint(orgId, projectId);
+        setActiveSprint(activeSprint);
+        if (activeSprint && activeSprint.workItems.length > 0) {
+          setWorkItemsGroupedByStatus(activeSprint.workItems);
         }
         setIsLoading(false);
       } catch (e) {
@@ -56,11 +56,11 @@ function PublicActiveIteration() {
       <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
         {isLoading && <Card><CardHeader><h3>Active Sprint</h3></CardHeader><LoadingSpinnerBox /></Card>}
-        {!isLoading && activeIteration && activeIteration.workItems && activeIteration.workItems.length > 0 &&
-          <DevelopmentStats iteration={activeIteration} />}
+        {!isLoading && activeSprint && activeSprint.workItems && activeSprint.workItems.length > 0 &&
+          <DevelopmentStats sprint={activeSprint} />}
         <Row>
           <Col>
-            {!isLoading && !activeIteration && (
+            {!isLoading && !activeSprint && (
               <Card>
                 <CardHeader>
                   <Row>
@@ -76,18 +76,18 @@ function PublicActiveIteration() {
                 </Row>
               </Card>
             )}
-            {activeIteration && (
+            {activeSprint && (
               <Card>
                 <CardHeader>
                   <Row>
                     <Col xs={12}>
                       <h3>
                           <span
-                            className="text-muted">{formatDate(getIterationStartDate(activeIteration))} - {formatDate(getIterationEndDate(activeIteration))}</span> | {activeIteration.title}
+                            className="text-muted">{formatDate(getSprintStartDate(activeSprint))} - {formatDate(getSprintEndDate(activeSprint))}</span> | {activeSprint.title}
                       </h3>
-                      <p className="text-muted mb-0">{activeIteration.goal}</p>
-                      {activeIteration &&
-                        <div className="py-2"><PublicShareButtons title={activeIteration.title} /></div>}
+                      <p className="text-muted mb-0">{activeSprint.goal}</p>
+                      {activeSprint &&
+                        <div className="py-2"><PublicShareButtons title={activeSprint.title} /></div>}
                     </Col>
                   </Row>
                 </CardHeader>
@@ -125,4 +125,4 @@ function PublicActiveIteration() {
   );
 }
 
-export default PublicActiveIteration;
+export default PublicActiveSprint;

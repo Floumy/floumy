@@ -1,24 +1,24 @@
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import { Card, Col, Container, Row } from "reactstrap";
 import React, { useEffect, useState } from "react";
-import CreateUpdateDeleteIteration from "./CreateUpdateDeleteIteration";
+import CreateUpdateDeleteSprint from "./CreateUpdateDeleteSprint";
 import { useParams } from "react-router-dom";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { getIteration, updateIteration } from "../../../services/iterations/iterations.service";
+import { getSprint, updateSprint } from "../../../services/sprints/sprints.service";
 import NotFoundCard from "../components/NotFoundCard";
 
-function EditIteration() {
+function EditSprint() {
   const { orgId, projectId, id } = useParams();
-  const [iteration, setIteration] = useState(null);
+  const [sprint, setSprint] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchIteration() {
+    async function fetchSprint() {
       setIsLoading(true);
       try {
-        const iteration = await getIteration(orgId, projectId, id);
-        setIteration(iteration);
+        const sprint = await getSprint(orgId, projectId, id);
+        setSprint(sprint);
       } catch (e) {
         console.error(e);
       } finally {
@@ -26,11 +26,11 @@ function EditIteration() {
       }
     }
 
-    fetchIteration();
+    fetchSprint();
   }, [orgId, projectId, id]);
 
-  const handleSubmit = async (iteration) => {
-    await updateIteration(orgId, projectId, id, iteration);
+  const handleSubmit = async (sprint) => {
+    await updateSprint(orgId, projectId, id, sprint);
   };
 
   return (
@@ -50,8 +50,8 @@ function EditIteration() {
           <Col>
             <div className="card-wrapper">
               {isLoading && <Card><LoadingSpinnerBox /></Card>}
-              {iteration && <CreateUpdateDeleteIteration iteration={iteration} onSubmit={handleSubmit} />}
-              {!iteration && !isLoading && <NotFoundCard message={"Sprint not found"} />}
+              {sprint && <CreateUpdateDeleteSprint sprint={sprint} onSubmit={handleSubmit} />}
+              {!sprint && !isLoading && <NotFoundCard message={"Sprint not found"} />}
             </div>
           </Col>
         </Row>
@@ -60,4 +60,4 @@ function EditIteration() {
   );
 }
 
-export default EditIteration;
+export default EditSprint;

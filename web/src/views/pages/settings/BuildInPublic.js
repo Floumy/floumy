@@ -33,8 +33,8 @@ function BuildInPublic() {
         setBuildInPublicSettings({
           isObjectivesPagePublic: buildInPublicSettings.isObjectivesPagePublic,
           isRoadmapPagePublic: buildInPublicSettings.isRoadmapPagePublic,
-          isIterationsPagePublic: buildInPublicSettings.isIterationsPagePublic,
-          isActiveIterationsPagePublic: buildInPublicSettings.isActiveIterationsPagePublic,
+          isSprintsPagePublic: buildInPublicSettings.isSprintsPagePublic,
+          isActiveSprintsPagePublic: buildInPublicSettings.isActiveSprintsPagePublic,
           isFeedPagePublic: buildInPublicSettings.isFeedPagePublic,
           isIssuesPagePublic: buildInPublicSettings.isIssuesPagePublic,
           isFeatureRequestsPagePublic: buildInPublicSettings.isFeatureRequestsPagePublic,
@@ -86,10 +86,10 @@ function BuildInPublic() {
       setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/okrs`));
     } else if (buildInPublicSettings.isRoadmapPagePublic) {
       setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/roadmap`));
-    } else if (buildInPublicSettings.isIterationsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/iterations`));
-    } else if (buildInPublicSettings.isActiveIterationsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-iteration`));
+    } else if (buildInPublicSettings.isSprintsPagePublic) {
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/sprints`));
+    } else if (buildInPublicSettings.isActiveSprintsPagePublic) {
+      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-sprint`));
     } else if (buildInPublicSettings.isIssuesPagePublic) {
       setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/issues`));
     } else if (buildInPublicSettings.isFeatureRequestsPagePublic) {
@@ -102,8 +102,8 @@ function BuildInPublic() {
       const settings = {
         isObjectivesPagePublic: !isBuildInPublicEnabled,
         isRoadmapPagePublic: !isBuildInPublicEnabled,
-        isIterationsPagePublic: !isBuildInPublicEnabled,
-        isActiveIterationsPagePublic: !isBuildInPublicEnabled,
+        isSprintsPagePublic: !isBuildInPublicEnabled,
+        isActiveSprintsPagePublic: !isBuildInPublicEnabled,
         isFeedPagePublic: !isBuildInPublicEnabled,
         isIssuesPagePublic: !isBuildInPublicEnabled,
         isFeatureRequestsPagePublic: !isBuildInPublicEnabled
@@ -261,8 +261,8 @@ function BuildInPublic() {
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle mr-1">
-                          <input checked={buildInPublicSettings.isIterationsPagePublic}
-                                 onChange={togglePublicPage("isIterationsPagePublic")}
+                          <input checked={buildInPublicSettings.isSprintsPagePublic}
+                                 onChange={togglePublicPage("isSprintsPagePublic")}
                                  type="checkbox" />
                           <span
                             className="custom-toggle-slider"
@@ -278,8 +278,8 @@ function BuildInPublic() {
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle">
-                          <input checked={buildInPublicSettings.isActiveIterationsPagePublic}
-                                 onChange={togglePublicPage("isActiveIterationsPagePublic")} type="checkbox" />
+                          <input checked={buildInPublicSettings.isActiveSprintsPagePublic}
+                                 onChange={togglePublicPage("isActiveSprintsPagePublic")} type="checkbox" />
                           <span
                             className="custom-toggle-slider"
                             data-label-off="No"
