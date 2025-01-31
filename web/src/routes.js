@@ -162,20 +162,20 @@ const routes = [
     collapse: false,
     name: "Sprints",
     icon: "fa fa-refresh",
-    path: "/iterations",
+    path: "/sprints",
     component: <Iterations />,
     layout: "/admin",
     shortcut: "4"
   },
   {
     redirect: true,
-    path: "/iterations/new",
+    path: "/sprints/new",
     component: <NewIteration />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/iterations/edit/:id",
+    path: "/sprints/edit/:id",
     component: <EditIteration />,
     layout: "/admin"
   },
@@ -349,13 +349,13 @@ export const publicRoutes = [
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/iterations",
+    path: "/orgs/:orgId/projects/:projectId/sprints",
     component: <PublicIterations />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/iterations/detail/:iterationId",
+    path: "/orgs/:orgId/projects/:projectId/sprints/detail/:iterationId",
     component: <PublicIteration />,
     layout: "/public"
   },

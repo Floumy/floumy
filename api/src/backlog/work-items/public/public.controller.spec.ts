@@ -2,7 +2,7 @@ import { PublicController } from './public.controller';
 import { Org } from '../../../orgs/org.entity';
 import { User } from '../../../users/user.entity';
 import { FeaturesService } from '../../../roadmap/features/features.service';
-import { IterationsService } from '../../../iterations/iterations.service';
+import { SprintsService } from '../../../sprints/sprints.service';
 import { Repository } from 'typeorm';
 import { File } from '../../../files/file.entity';
 import { setupTestingModule } from '../../../../test/test.utils';
@@ -12,7 +12,7 @@ import { KeyResult } from '../../../okrs/key-result.entity';
 import { Feature } from '../../../roadmap/features/feature.entity';
 import { WorkItem } from '../work-item.entity';
 import { Milestone } from '../../../roadmap/milestones/milestone.entity';
-import { Iteration } from '../../../iterations/Iteration.entity';
+import { Sprint } from '../../../sprints/sprint.entity';
 import { FeatureFile } from '../../../roadmap/features/feature-file.entity';
 import { WorkItemFile } from '../work-item-file.entity';
 import { UsersModule } from '../../../users/users.module';
@@ -49,7 +49,7 @@ describe('PublicController', () => {
           Feature,
           WorkItem,
           Milestone,
-          Iteration,
+          Sprint,
           File,
           FeatureFile,
           WorkItemFile,
@@ -65,7 +65,7 @@ describe('PublicController', () => {
         FeaturesService,
         MilestonesService,
         WorkItemsService,
-        IterationsService,
+        SprintsService,
         FilesService,
         FilesStorageRepository,
         PublicService,

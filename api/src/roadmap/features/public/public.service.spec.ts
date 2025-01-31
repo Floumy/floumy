@@ -15,7 +15,7 @@ import { KeyResult } from '../../../okrs/key-result.entity';
 import { Feature } from '../feature.entity';
 import { Milestone } from '../../milestones/milestone.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
-import { Iteration } from '../../../iterations/Iteration.entity';
+import { Sprint } from '../../../sprints/sprint.entity';
 import { File } from '../../../files/file.entity';
 import { WorkItemFile } from '../../../backlog/work-items/work-item-file.entity';
 import { FeatureFile } from '../feature-file.entity';
@@ -49,7 +49,7 @@ describe('PublicService', () => {
           User,
           Milestone,
           WorkItem,
-          Iteration,
+          Sprint,
           File,
           WorkItemFile,
           FeatureFile,

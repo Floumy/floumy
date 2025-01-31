@@ -29,7 +29,7 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
         const iterations = await listIterations(orgId, projectId);
         setIterations(iterations.filter((iteration) => (iteration.status === "active" || iteration.status === "planned")));
       } catch (e) {
-        console.error("The iterations could not be loaded");
+        console.error("The sprints could not be loaded");
       } finally {
         setIsLoadingIterations(false);
       }

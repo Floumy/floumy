@@ -19,8 +19,8 @@ import { MilestonesService } from '../../roadmap/milestones/milestones.service';
 import { WorkItemsService } from './work-items.service';
 import { WorkItemStatus } from './work-item-status.enum';
 import { FeatureStatus } from '../../roadmap/features/featurestatus.enum';
-import { Iteration } from '../../iterations/Iteration.entity';
-import { IterationsService } from '../../iterations/iterations.service';
+import { Sprint } from '../../sprints/sprint.entity';
+import { SprintsService } from '../../sprints/sprints.service';
 import { File } from '../../files/file.entity';
 import { Repository } from 'typeorm';
 import { WorkItemFile } from './work-item-file.entity';
@@ -39,7 +39,7 @@ describe('WorkItemsController', () => {
   let controller: WorkItemsController;
   let cleanup: () => Promise<void>;
   let featureService: FeaturesService;
-  let iterationsService: IterationsService;
+  let sprintsService: SprintsService;
   let fileRepository: Repository<File>;
   let orgsRepository: Repository<Org>;
   let usersRepository: Repository<User>;
@@ -55,7 +55,7 @@ describe('WorkItemsController', () => {
           Feature,
           WorkItem,
           Milestone,
-          Iteration,
+          Sprint,
           File,
           FeatureFile,
           WorkItemFile,
@@ -69,7 +69,7 @@ describe('WorkItemsController', () => {
         FeaturesService,
         MilestonesService,
         WorkItemsService,
-        IterationsService,
+        SprintsService,
         FilesService,
         FilesStorageRepository,
       ],
@@ -87,7 +87,7 @@ describe('WorkItemsController', () => {
     org = await orgsService.createForUser(user);
     project = (await org.projects)[0];
     featureService = module.get<FeaturesService>(FeaturesService);
-    iterationsService = module.get<IterationsService>(IterationsService);
+    sprintsService = module.get<SprintsService>(SprintsService);
     fileRepository = module.get<Repository<File>>(getRepositoryToken(File));
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
     usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
@@ -561,7 +561,7 @@ describe('WorkItemsController', () => {
           status: WorkItemStatus.PLANNED,
         },
       );
-      const workItems = await controller.listOpenWithoutIterations(
+      const workItems = await controller.listOpenWithoutSprints(
         org.id,
         project.id,
         {
@@ -583,7 +583,7 @@ describe('WorkItemsController', () => {
     });
   });
   describe('when patching a work item', () => {
-    it('should update the iteration', async () => {
+    it('should update the sprint', async () => {
       const workItem = await controller.create(
         org.id,
         project.id,
@@ -601,8 +601,8 @@ describe('WorkItemsController', () => {
           status: WorkItemStatus.PLANNED,
         },
       );
-      const iteration = await iterationsService.create(org.id, project.id, {
-        goal: 'my iteration description',
+      const sprint = await sprintsService.create(org.id, project.id, {
+        goal: 'my sprint description',
         startDate: '2019-01-01',
         duration: 2,
       });
@@ -616,11 +616,11 @@ describe('WorkItemsController', () => {
         },
         workItem.id,
         {
-          iteration: iteration.id,
+          sprint: sprint.id,
         },
       );
       expect(updatedWorkItem.id).toEqual(workItem.id);
-      expect(updatedWorkItem.iteration.id).toEqual(iteration.id);
+      expect(updatedWorkItem.sprint.id).toEqual(sprint.id);
     });
     it('should update the status', async () => {
       const workItem = await controller.create(

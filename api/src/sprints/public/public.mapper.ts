@@ -1,4 +1,4 @@
-import { Iteration } from '../Iteration.entity';
+import { Sprint } from '../sprint.entity';
 import { TimelineService } from '../../common/timeline.service';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 
@@ -7,24 +7,24 @@ function formatDate(date: Date) {
   return date.toISOString().split('T')[0];
 }
 
-export class IterationMapper {
-  static async toDto(iteration: Iteration) {
-    const workItems = await iteration.workItems;
+export class SprintMapper {
+  static async toDto(sprint: Sprint) {
+    const workItems = await sprint.workItems;
     return {
-      id: iteration.id,
-      title: iteration.title,
-      goal: iteration.goal,
-      startDate: formatDate(iteration.startDate),
-      endDate: formatDate(iteration.endDate),
-      actualStartDate: formatDate(iteration.actualStartDate),
-      actualEndDate: formatDate(iteration.actualEndDate),
-      timeline: TimelineService.convertDateToTimeline(iteration.startDate),
+      id: sprint.id,
+      title: sprint.title,
+      goal: sprint.goal,
+      startDate: formatDate(sprint.startDate),
+      endDate: formatDate(sprint.endDate),
+      actualStartDate: formatDate(sprint.actualStartDate),
+      actualEndDate: formatDate(sprint.actualEndDate),
+      timeline: TimelineService.convertDateToTimeline(sprint.startDate),
       workItems: await Promise.all(workItems.map(WorkItemMapper.toDto)),
-      velocity: iteration.velocity,
-      duration: iteration.duration,
-      createdAt: iteration.createdAt,
-      updatedAt: iteration.updatedAt,
-      status: iteration.status,
+      velocity: sprint.velocity,
+      duration: sprint.duration,
+      createdAt: sprint.createdAt,
+      updatedAt: sprint.updatedAt,
+      status: sprint.status,
     };
   }
 }
@@ -32,7 +32,7 @@ export class IterationMapper {
 class WorkItemMapper {
   static async toDto(workItem: WorkItem) {
     const feature = await workItem.feature;
-    const iteration = await workItem.iteration;
+    const sprint = await workItem.sprint;
     return {
       id: workItem.id,
       reference: workItem.reference,
@@ -42,10 +42,10 @@ class WorkItemMapper {
       type: workItem.type,
       status: workItem.status,
       estimation: workItem.estimation,
-      iteration: iteration
+      sprint: sprint
         ? {
-            id: iteration.id,
-            title: iteration.title,
+            id: sprint.id,
+            title: sprint.title,
           }
         : null,
       feature: feature

@@ -16,7 +16,7 @@ import { KeyResult } from '../okrs/key-result.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { Iteration } from '../iterations/Iteration.entity';
+import { Sprint } from '../sprints/sprint.entity';
 import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
 import { FeedItem } from '../feed/feed-item.entity';
@@ -72,8 +72,8 @@ export class Project {
     lazy: true,
   })
   featureRequests: Promise<FeatureRequest[]>;
-  @OneToMany(() => Iteration, (iteration) => iteration.project, { lazy: true })
-  iterations: Promise<Iteration[]>;
+  @OneToMany(() => Sprint, (sprint) => sprint.project, { lazy: true })
+  sprints: Promise<Sprint[]>;
   @OneToMany(() => File, (file) => file.project, { lazy: true })
   files: Promise<File[]>;
   @OneToMany(() => FeedItem, (feedItem) => feedItem.project, { lazy: true })

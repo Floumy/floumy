@@ -16,9 +16,9 @@ import { Priority } from '../../common/priority.enum';
 import { WorkItemType } from './work-item-type.enum';
 import { Repository } from 'typeorm';
 import { WorkItemStatus } from './work-item-status.enum';
-import { Iteration } from '../../iterations/Iteration.entity';
+import { Sprint } from '../../sprints/sprint.entity';
 import { WorkItem } from './work-item.entity';
-import { IterationsService } from '../../iterations/iterations.service';
+import { SprintsService } from '../../sprints/sprints.service';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { FeatureFile } from '../../roadmap/features/feature-file.entity';
@@ -48,7 +48,7 @@ describe('WorkItemQueryBuilder', () => {
           Feature,
           User,
           Milestone,
-          Iteration,
+          Sprint,
           WorkItem,
           File,
           FeatureFile,
@@ -63,7 +63,7 @@ describe('WorkItemQueryBuilder', () => {
         UsersService,
         MilestonesService,
         WorkItemsService,
-        IterationsService,
+        SprintsService,
         FilesService,
         FilesStorageRepository,
         IssuesService,

@@ -3,7 +3,7 @@ import { CommentMapper } from '../../../comments/mappers';
 export class PublicWorkItemMapper {
   static async toDto(workItem) {
     const feature = await workItem.feature;
-    const iteration = await workItem.iteration;
+    const sprint = await workItem.sprint;
     const org = await workItem.org;
     const comments = await workItem.comments;
     const issue = await workItem.issue;
@@ -19,8 +19,8 @@ export class PublicWorkItemMapper {
       estimation: workItem.estimation,
       org: { id: org.id, name: org.name, paymentPlan: org.paymentPlan },
       feature: feature ? { id: feature.id, title: feature.title } : null,
-      iteration: iteration
-        ? { id: iteration.id, title: iteration.title }
+      sprint: sprint
+        ? { id: sprint.id, title: sprint.title }
         : null,
       issue: issue ? { id: issue.id, title: issue.title } : null,
       comments: await CommentMapper.toDtoList(comments),

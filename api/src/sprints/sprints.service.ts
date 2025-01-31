@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrUpdateIterationDto } from './dtos';
-import { Iteration } from './Iteration.entity';
+import { CreateOrUpdateSprintDto } from './dtos';
+import { Sprint } from './sprint.entity';
 import {
   And,
   IsNull,
@@ -12,18 +12,18 @@ import {
 } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IterationMapper } from './iteration.mapper';
+import { SprintMapper } from './sprint.mapper';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { IterationStatus } from './iteration-status.enum';
+import { SprintStatus } from './sprint-status.enum';
 import { Timeline } from '../common/timeline.enum';
 import { TimelineService } from '../common/timeline.service';
 import { Project } from '../projects/project.entity';
 
 @Injectable()
-export class IterationsService {
+export class SprintsService {
   constructor(
-    @InjectRepository(Iteration)
-    private iterationRepository: Repository<Iteration>,
+    @InjectRepository(Sprint)
+    private sprintRepository: Repository<Sprint>,
     @InjectRepository(WorkItem)
     private workItemsRepository: Repository<WorkItem>,
     @InjectRepository(Org) private orgRepository: Repository<Org>,
@@ -43,7 +43,7 @@ export class IterationsService {
     return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
   }
 
-  getIterationCalendarWeekNumbersForTitle(startDate: Date, endDate: Date) {
+  getSprintCalendarWeekNumbersForTitle(startDate: Date, endDate: Date) {
     const startWeekNumber = this.getWeekNumber(startDate);
     const endWeekNumber = this.getWeekNumber(endDate);
     if (startWeekNumber === endWeekNumber) {
@@ -56,30 +56,30 @@ export class IterationsService {
   async create(
     orgId: string,
     projectId: string,
-    iterationDto: CreateOrUpdateIterationDto,
+    sprintDto: CreateOrUpdateSprintDto,
   ) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
     const project = await this.projectsRepository.findOneByOrFail({
       id: projectId,
       org: { id: orgId },
     });
-    const iteration = new Iteration();
-    iteration.goal = iterationDto.goal;
-    iteration.startDate = new Date(iterationDto.startDate);
-    iteration.startDate.setUTCHours(0, 0, 0, 0);
+    const sprint = new Sprint();
+    sprint.goal = sprintDto.goal;
+    sprint.startDate = new Date(sprintDto.startDate);
+    sprint.startDate.setUTCHours(0, 0, 0, 0);
     // Duration is in weeks
-    iteration.duration = iterationDto.duration;
-    iteration.endDate = this.getIterationEndDate(iteration);
-    iteration.endDate.setUTCHours(23, 59, 59, 999);
-    iteration.title = this.getIterationTitle(iteration);
-    iteration.org = Promise.resolve(org);
-    iteration.project = Promise.resolve(project);
-    const savedIteration = await this.iterationRepository.save(iteration);
-    return await IterationMapper.toDto(savedIteration);
+    sprint.duration = sprintDto.duration;
+    sprint.endDate = this.getSprintEndDate(sprint);
+    sprint.endDate.setUTCHours(23, 59, 59, 999);
+    sprint.title = this.getSprintTitle(sprint);
+    sprint.org = Promise.resolve(org);
+    sprint.project = Promise.resolve(project);
+    const savedSprint = await this.sprintRepository.save(sprint);
+    return await SprintMapper.toDto(savedSprint);
   }
 
   async listWithWorkItems(orgId: string, projectId: string) {
-    const iterations = await this.iterationRepository.find({
+    const sprints = await this.sprintRepository.find({
       where: {
         org: {
           id: orgId,
@@ -93,13 +93,13 @@ export class IterationsService {
       },
     });
     return await Promise.all(
-      iterations.map((iteration) => IterationMapper.toDto(iteration)),
+      sprints.map((sprint) => SprintMapper.toDto(sprint)),
     );
   }
 
-  async findIteration(orgId: string, projectId: string, iterationId: string) {
-    return await this.iterationRepository.findOneByOrFail({
-      id: iterationId,
+  async findSprint(orgId: string, projectId: string, sprintId: string) {
+    return await this.sprintRepository.findOneByOrFail({
+      id: sprintId,
       org: {
         id: orgId,
       },
@@ -110,17 +110,17 @@ export class IterationsService {
   }
 
   async get(orgId: string, projectId: string, id: string) {
-    const iteration = await this.findIteration(orgId, projectId, id);
-    return await IterationMapper.toDto(iteration);
+    const sprint = await this.findSprint(orgId, projectId, id);
+    return await SprintMapper.toDto(sprint);
   }
 
   async update(
     orgId: string,
     projectId: string,
     id: string,
-    updateIterationDto: CreateOrUpdateIterationDto,
+    updateSprintDto: CreateOrUpdateSprintDto,
   ) {
-    const iteration = await this.iterationRepository.findOneByOrFail({
+    const sprint = await this.sprintRepository.findOneByOrFail({
       id,
       org: {
         id: orgId,
@@ -129,33 +129,33 @@ export class IterationsService {
         id: projectId,
       },
     });
-    iteration.goal = updateIterationDto.goal;
-    iteration.startDate = new Date(updateIterationDto.startDate);
-    iteration.startDate.setUTCHours(0, 0, 0, 0);
+    sprint.goal = updateSprintDto.goal;
+    sprint.startDate = new Date(updateSprintDto.startDate);
+    sprint.startDate.setUTCHours(0, 0, 0, 0);
     // Duration is in weeks
-    iteration.duration = updateIterationDto.duration;
-    iteration.endDate = this.getIterationEndDate(iteration);
-    iteration.title = this.getIterationTitle(iteration);
-    const savedIteration = await this.iterationRepository.save(iteration);
-    return await IterationMapper.toDto(savedIteration);
+    sprint.duration = updateSprintDto.duration;
+    sprint.endDate = this.getSprintEndDate(sprint);
+    sprint.title = this.getSprintTitle(sprint);
+    const savedSprint = await this.sprintRepository.save(sprint);
+    return await SprintMapper.toDto(savedSprint);
   }
 
-  getIterationTitle(iteration: Iteration) {
-    return `Sprint ${this.getIterationCalendarWeekNumbersForTitle(
-      iteration.startDate,
-      iteration.endDate,
-    )} ${iteration.endDate.getFullYear()}`;
+  getSprintTitle(sprint: Sprint) {
+    return `Sprint ${this.getSprintCalendarWeekNumbersForTitle(
+      sprint.startDate,
+      sprint.endDate,
+    )} ${sprint.endDate.getFullYear()}`;
   }
 
-  getIterationEndDate(iteration: Iteration) {
-    const startDate = iteration.actualStartDate || iteration.startDate;
+  getSprintEndDate(sprint: Sprint) {
+    const startDate = sprint.actualStartDate || sprint.startDate;
     return new Date(
-      startDate.getTime() + iteration.duration * 7 * 24 * 60 * 60 * 1000 - 1,
+      startDate.getTime() + sprint.duration * 7 * 24 * 60 * 60 * 1000 - 1,
     );
   }
 
   async delete(orgId: string, projectId: string, id: string) {
-    const iteration = await this.iterationRepository.findOneByOrFail({
+    const sprint = await this.sprintRepository.findOneByOrFail({
       id,
       org: {
         id: orgId,
@@ -164,14 +164,14 @@ export class IterationsService {
         id: projectId,
       },
     });
-    await this.removeWorkItemsFromIteration(iteration);
-    await this.iterationRepository.remove(iteration);
+    await this.removeWorkItemsFromSprint(sprint);
+    await this.sprintRepository.remove(sprint);
   }
 
-  async startIteration(orgId: string, projectId: string, id: string) {
-    await this.completeActiveIterationIfExists(orgId);
+  async startSprint(orgId: string, projectId: string, id: string) {
+    await this.completeActiveSprintIfExists(orgId);
 
-    const iteration = await this.iterationRepository.findOneByOrFail({
+    const sprint = await this.sprintRepository.findOneByOrFail({
       id,
       org: {
         id: orgId,
@@ -180,32 +180,32 @@ export class IterationsService {
         id: projectId,
       },
     });
-    iteration.actualStartDate = new Date();
-    iteration.endDate = this.getIterationEndDate(iteration);
-    iteration.status = IterationStatus.ACTIVE;
-    const savedIteration = await this.iterationRepository.save(iteration);
-    return await IterationMapper.toDto(savedIteration);
+    sprint.actualStartDate = new Date();
+    sprint.endDate = this.getSprintEndDate(sprint);
+    sprint.status = SprintStatus.ACTIVE;
+    const savedSprint = await this.sprintRepository.save(sprint);
+    return await SprintMapper.toDto(savedSprint);
   }
 
-  async findActiveIteration(orgId: string, projectId: string) {
-    return await this.iterationRepository.findOneBy({
+  async findActiveSprint(orgId: string, projectId: string) {
+    return await this.sprintRepository.findOneBy({
       org: {
         id: orgId,
       },
       project: {
         id: projectId,
       },
-      status: IterationStatus.ACTIVE,
+      status: SprintStatus.ACTIVE,
     });
   }
 
-  async getActiveIteration(orgId: string, projectId: string) {
-    const iteration = await this.findActiveIteration(orgId, projectId);
-    return iteration ? await IterationMapper.toDto(iteration) : null;
+  async getActiveSprint(orgId: string, projectId: string) {
+    const sprint = await this.findActiveSprint(orgId, projectId);
+    return sprint ? await SprintMapper.toDto(sprint) : null;
   }
 
-  async completeIteration(orgId: string, projectId: string, id: string) {
-    const iteration = await this.iterationRepository.findOneByOrFail({
+  async completeSprint(orgId: string, projectId: string, id: string) {
+    const sprint = await this.sprintRepository.findOneByOrFail({
       id,
       org: {
         id: orgId,
@@ -214,15 +214,15 @@ export class IterationsService {
         id: projectId,
       },
     });
-    iteration.actualEndDate = new Date();
-    iteration.status = IterationStatus.COMPLETED;
-    iteration.velocity = await this.calculateIterationVelocity(iteration);
-    const savedIteration = await this.iterationRepository.save(iteration);
-    return await IterationMapper.toDto(savedIteration);
+    sprint.actualEndDate = new Date();
+    sprint.status = SprintStatus.COMPLETED;
+    sprint.velocity = await this.calculateSprintVelocity(sprint);
+    const savedSprint = await this.sprintRepository.save(sprint);
+    return await SprintMapper.toDto(savedSprint);
   }
 
   async list(orgId: string, projectId: string) {
-    const iterations = await this.iterationRepository.find({
+    const sprints = await this.sprintRepository.find({
       where: {
         org: {
           id: orgId,
@@ -236,22 +236,22 @@ export class IterationsService {
       },
     });
     return await Promise.all(
-      iterations.map((iteration) => IterationMapper.toListItemDto(iteration)),
+      sprints.map((sprint) => SprintMapper.toListItemDto(sprint)),
     );
   }
 
   async listForTimeline(orgId: string, projectId: string, timeline: Timeline) {
-    const iterations = await this.findIterationsForTimeline(
+    const sprints = await this.findSprintsForTimeline(
       orgId,
       projectId,
       timeline,
     );
     return await Promise.all(
-      iterations.map((iteration) => IterationMapper.toDto(iteration)),
+      sprints.map((sprint) => SprintMapper.toDto(sprint)),
     );
   }
 
-  async findIterationsForTimeline(
+  async findSprintsForTimeline(
     orgId: string,
     projectId: string,
     timeline: Timeline | Timeline.THIS_QUARTER | Timeline.NEXT_QUARTER,
@@ -314,7 +314,7 @@ export class IterationsService {
         break;
       }
     }
-    return await this.iterationRepository.find({
+    return await this.sprintRepository.find({
       where,
       order: {
         startDate: 'DESC',
@@ -328,31 +328,31 @@ export class IterationsService {
     });
   }
 
-  private async removeWorkItemsFromIteration(iteration: Iteration) {
-    const workItems = await iteration.workItems;
+  private async removeWorkItemsFromSprint(sprint: Sprint) {
+    const workItems = await sprint.workItems;
     for (const workItem of workItems) {
-      workItem.iteration = Promise.resolve(null);
+      workItem.sprint = Promise.resolve(null);
       await this.workItemsRepository.save(workItem);
     }
   }
 
-  private async completeActiveIterationIfExists(orgId: string) {
-    const activeIteration = await this.iterationRepository.findOneBy({
+  private async completeActiveSprintIfExists(orgId: string) {
+    const activeSprint = await this.sprintRepository.findOneBy({
       org: {
         id: orgId,
       },
-      status: IterationStatus.ACTIVE,
+      status: SprintStatus.ACTIVE,
     });
 
-    if (activeIteration) {
-      activeIteration.actualEndDate = new Date();
-      activeIteration.status = IterationStatus.COMPLETED;
-      await this.iterationRepository.save(activeIteration);
+    if (activeSprint) {
+      activeSprint.actualEndDate = new Date();
+      activeSprint.status = SprintStatus.COMPLETED;
+      await this.sprintRepository.save(activeSprint);
     }
   }
 
-  private async calculateIterationVelocity(iteration: Iteration) {
-    const workItems = await iteration.workItems;
+  private async calculateSprintVelocity(sprint: Sprint) {
+    const workItems = await sprint.workItems;
     return workItems
       .filter((workItem) => workItem.estimation)
       .reduce((sum, workItem) => sum + workItem.estimation, 0);

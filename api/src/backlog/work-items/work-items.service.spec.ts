@@ -17,9 +17,9 @@ import { WorkItemType } from './work-item-type.enum';
 import { EntityNotFoundError, Repository } from 'typeorm';
 import { WorkItemStatus } from './work-item-status.enum';
 import { FeatureStatus } from '../../roadmap/features/featurestatus.enum';
-import { Iteration } from '../../iterations/Iteration.entity';
+import { Sprint } from '../../sprints/sprint.entity';
 import { WorkItem } from './work-item.entity';
-import { IterationsService } from '../../iterations/iterations.service';
+import { SprintsService } from '../../sprints/sprints.service';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { FeatureFile } from '../../roadmap/features/feature-file.entity';
@@ -34,7 +34,7 @@ describe('WorkItemsService', () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
   let featuresService: FeaturesService;
-  let iterationService: IterationsService;
+  let sprintService: SprintsService;
   let filesRepository: Repository<File>;
   let workItemCommentsRepository: Repository<WorkItemComment>;
   let workItemsRepository: Repository<WorkItem>;
@@ -59,7 +59,7 @@ describe('WorkItemsService', () => {
           Feature,
           User,
           Milestone,
-          Iteration,
+          Sprint,
           WorkItem,
           File,
           FeatureFile,
@@ -74,7 +74,7 @@ describe('WorkItemsService', () => {
         UsersService,
         MilestonesService,
         WorkItemsService,
-        IterationsService,
+        SprintsService,
         FilesService,
         FilesStorageRepository,
         IssuesService,
@@ -82,7 +82,7 @@ describe('WorkItemsService', () => {
     );
     cleanup = dbCleanup;
     service = module.get<WorkItemsService>(WorkItemsService);
-    iterationService = module.get<IterationsService>(IterationsService);
+    sprintService = module.get<SprintsService>(SprintsService);
     featuresService = module.get<FeaturesService>(FeaturesService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
@@ -940,7 +940,7 @@ describe('WorkItemsService', () => {
         feature: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
-      const workItems = await service.listOpenWorkItemsWithoutIterations(
+      const workItems = await service.listOpenWorkItemsWithoutSprints(
         org.id,
         project.id,
       );
@@ -970,9 +970,9 @@ describe('WorkItemsService', () => {
         ]),
       );
     });
-    it('should return the open work items that are not associated with an iteration', async () => {
-      const iteration = await iterationService.create(org.id, project.id, {
-        goal: 'my iteration description',
+    it('should return the open work items that are not associated with an sprint', async () => {
+      const sprint = await sprintService.create(org.id, project.id, {
+        goal: 'my sprint description',
         startDate: '2020-01-01',
         duration: 7,
       });
@@ -1005,7 +1005,7 @@ describe('WorkItemsService', () => {
         type: WorkItemType.USER_STORY,
         feature: feature1.id,
         status: WorkItemStatus.PLANNED,
-        iteration: iteration.id,
+        sprint: sprint.id,
       });
       await service.createWorkItem(org.id, project.id, user.id, {
         title: 'my other work item',
@@ -1015,7 +1015,7 @@ describe('WorkItemsService', () => {
         feature: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
-      const workItems = await service.listOpenWorkItemsWithoutIterations(
+      const workItems = await service.listOpenWorkItemsWithoutSprints(
         org.id,
         project.id,
       );
@@ -1476,14 +1476,14 @@ describe('WorkItemsService', () => {
     });
   });
   describe('when patching a work item', () => {
-    it('should allow to patch the iteration', async () => {
-      await iterationService.create(org.id, project.id, {
-        goal: 'my iteration description',
+    it('should allow to patch the sprint', async () => {
+      await sprintService.create(org.id, project.id, {
+        goal: 'my sprint description',
         startDate: '2020-01-01',
         duration: 7,
       });
-      const iteration2 = await iterationService.create(org.id, project.id, {
-        goal: 'my iteration description',
+      const sprint2 = await sprintService.create(org.id, project.id, {
+        goal: 'my sprint description',
         startDate: '2020-01-01',
         duration: 7,
       });
@@ -1501,14 +1501,14 @@ describe('WorkItemsService', () => {
         },
       );
       await service.patchWorkItem(org.id, project.id, workItem.id, {
-        iteration: iteration2.id,
+        sprint: sprint2.id,
       });
       const foundWorkItem = await service.getWorkItem(
         org.id,
         project.id,
         workItem.id,
       );
-      expect(foundWorkItem.iteration.id).toEqual(iteration2.id);
+      expect(foundWorkItem.sprint.id).toEqual(sprint2.id);
     });
     it('should allow to patch the status', async () => {
       const workItem = await service.createWorkItem(
