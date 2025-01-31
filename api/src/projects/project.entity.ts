@@ -24,6 +24,8 @@ import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
 import { Org } from '../orgs/org.entity';
 import { Notification } from '../notifications/notification.entity';
+import { GithubPullRequest } from '../github/github-pull-request.entity';
+import { GithubBranch } from '../github/github-branch.entity';
 
 @Entity()
 export class Project {
@@ -31,6 +33,14 @@ export class Project {
   id: string;
   @Column()
   name: string;
+  @Column({ nullable: true })
+  githubRepositoryId: string;
+  @Column({ nullable: true })
+  githubRepositoryFullName: string;
+  @Column({ nullable: true })
+  githubRepositoryUrl: string;
+  @Column({ nullable: true })
+  githubRepositoryWebhookId: string;
   @ManyToMany(() => User, (user) => user.projects, { lazy: true })
   @JoinTable({
     name: 'project_user',
@@ -80,4 +90,14 @@ export class Project {
     lazy: true,
   })
   notifications: Promise<Notification[]>;
+  @OneToMany(
+    () => GithubPullRequest,
+    (githubPullRequest) => githubPullRequest.project,
+    { lazy: true },
+  )
+  githubPullRequests: Promise<GithubPullRequest[]>;
+  @OneToMany(() => GithubBranch, (githubBranch) => githubBranch.project, {
+    lazy: true,
+  })
+  githubBranches: Promise<GithubBranch[]>;
 }
