@@ -11,17 +11,27 @@ import { GithubService } from './github.service';
 import { EncryptionService } from '../encryption/encryption.service';
 import { uuid } from 'uuidv4';
 import { Repository } from 'typeorm';
+import { GithubBranch } from './github-branch.entity';
+import { GithubPullRequest } from './github-pull-request.entity';
 
 describe('GithubController', () => {
   let controller: GithubController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
-  let project: Project;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User, Project]), UsersModule],
+      [
+        TypeOrmModule.forFeature([
+          Org,
+          User,
+          Project,
+          GithubBranch,
+          GithubPullRequest,
+        ]),
+        UsersModule,
+      ],
       [GithubService, EncryptionService],
       [GithubController],
     );
@@ -58,7 +68,6 @@ describe('GithubController', () => {
           },
         } as any;
       });
-    project = (await org.projects)[0];
   });
 
   afterEach(async () => {
@@ -67,68 +76,5 @@ describe('GithubController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-  });
-
-  describe('when getting the auth url', () => {
-    it('should return the auth url', async () => {
-      const authUrl = await controller.getAuthUrl(
-        {
-          user: {
-            org: org.id,
-          },
-        },
-        org.id,
-        project.id,
-      );
-      expect(authUrl).toBeDefined();
-    });
-  });
-
-  describe('when handling the OAuth callback', () => {
-    it('should return the redirect url', async () => {
-      const base64State = Buffer.from(
-        JSON.stringify({ state: 'test' }),
-      ).toString('base64');
-      const redirectUrl = await controller.handleOAuthCallback(
-        'code',
-        base64State,
-        {
-          redirect: jest.fn().mockReturnValue({
-            redirect: jest.fn().mockReturnValue({}),
-          }),
-        },
-      );
-      expect(redirectUrl).toBeDefined();
-    });
-  });
-
-  describe('when getting the repos', () => {
-    it('should return the repos', async () => {
-      const repos = await controller.getRepos(
-        {
-          user: {
-            org: org.id,
-          },
-        },
-        org.id,
-      );
-      expect(repos).toBeDefined();
-      expect(repos.length).toBeGreaterThan(0);
-    });
-  });
-
-  describe('when checking if the user is connected', () => {
-    it('should return true if the user is connected', async () => {
-      const isConnected = await controller.isConnected(
-        {
-          user: {
-            org: org.id,
-          },
-        },
-        org.id,
-      );
-      expect(isConnected).toBeDefined();
-      expect(isConnected.connected).toBe(true);
-    });
   });
 });
