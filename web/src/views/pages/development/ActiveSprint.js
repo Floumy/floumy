@@ -7,20 +7,20 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   formatDate,
   formatHyphenatedString,
-  getIterationEndDate,
-  getIterationStartDate,
+  getSprintEndDate,
+  getSprintStartDate,
   workItemStatusColorClassName
 } from "../../../services/utils/utils";
-import { completeIteration, getActiveIteration } from "../../../services/iterations/iterations.service";
+import { completeSprint, getActiveSprint } from "../../../services/sprints/sprints.service";
 import DevelopmentStats from "./DevelopmentStats";
 import WorkItemsList from "../backlog/WorkItemsList";
 import { getWorkItemsGroupedByStatus } from "../../../services/utils/workItemUtils";
 
-function ActiveIteration() {
+function ActiveSprint() {
   const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const [activeIteration, setActiveIteration] = useState(null);
+  const [activeSprint, setActiveSprint] = useState(null);
   const [workItemsByStatus, setWorkItemsByStatus] = useState({});
 
   const setWorkItemsGroupedByStatus = useCallback((workItems) => {
@@ -34,10 +34,10 @@ function ActiveIteration() {
     async function fetchData() {
       try {
         setIsLoading(true);
-        const activeIteration = await getActiveIteration(orgId, projectId);
-        setActiveIteration(activeIteration);
-        if (activeIteration && activeIteration.workItems.length > 0) {
-          setWorkItemsGroupedByStatus(activeIteration.workItems);
+        const activeSprint = await getActiveSprint(orgId, projectId);
+        setActiveSprint(activeSprint);
+        if (activeSprint && activeSprint.workItems.length > 0) {
+          setWorkItemsGroupedByStatus(activeSprint.workItems);
         }
         setIsLoading(false);
       } catch (e) {
@@ -50,25 +50,25 @@ function ActiveIteration() {
     fetchData();
   }, [orgId, projectId, setWorkItemsGroupedByStatus]);
 
-  function removeWorkItemsFromActiveIteration(workItems) {
+  function removeWorkItemsFromActiveSprint(workItems) {
     const newWorkItems = [];
-    activeIteration.workItems.forEach(workItem => {
+    activeSprint.workItems.forEach(workItem => {
       if (!workItems.some(w => w.id === workItem.id)) {
         newWorkItems.push(workItem);
       }
     });
-    activeIteration.workItems = newWorkItems;
-    setActiveIteration({ ...activeIteration });
-    setWorkItemsGroupedByStatus(activeIteration.workItems);
+    activeSprint.workItems = newWorkItems;
+    setActiveSprint({ ...activeSprint });
+    setWorkItemsGroupedByStatus(activeSprint.workItems);
   }
 
-  function handleChangeIteration(workItems, newIterationId) {
-    if (activeIteration.id === newIterationId) return;
-    removeWorkItemsFromActiveIteration(workItems);
+  function handleChangeSprint(workItems, newSprintId) {
+    if (activeSprint.id === newSprintId) return;
+    removeWorkItemsFromActiveSprint(workItems);
   }
 
   function updateWorkItemsStatus(workItems, status) {
-    const updatedWorkItems = activeIteration.workItems.map(workItem => {
+    const updatedWorkItems = activeSprint.workItems.map(workItem => {
       if (workItems.some(w => w.id === workItem.id)) {
         workItem.status = status;
         workItem.completedAt = null;
@@ -79,12 +79,12 @@ function ActiveIteration() {
       return workItem;
     });
     setWorkItemsGroupedByStatus(updatedWorkItems);
-    setActiveIteration({ ...activeIteration, workItems: updatedWorkItems });
+    setActiveSprint({ ...activeSprint, workItems: updatedWorkItems });
   }
 
   function updateWorkItemsPriority(workItems, priority) {
     const updatedWorkItems = [];
-    activeIteration.workItems.forEach(workItem => {
+    activeSprint.workItems.forEach(workItem => {
       if (workItems.some(w => w.id === workItem.id)) {
         workItem.priority = priority;
       }
@@ -92,18 +92,18 @@ function ActiveIteration() {
     });
 
     setWorkItemsGroupedByStatus(updatedWorkItems);
-    setActiveIteration({ ...activeIteration, workItems: updatedWorkItems });
+    setActiveSprint({ ...activeSprint, workItems: updatedWorkItems });
   }
 
   function updateWorkItemAssignee(workItems, assignee) {
     const updatedWorkItems = [];
-    for (const workItem of activeIteration.workItems) {
+    for (const workItem of activeSprint.workItems) {
       if (workItems.some((wi) => (wi.id === workItem.id))) {
         workItem.assignedTo = assignee.id === null ? undefined : assignee;
       }
       updatedWorkItems.push(workItem);
     }
-    setActiveIteration({ ...activeIteration, workItems: updatedWorkItems });
+    setActiveSprint({ ...activeSprint, workItems: updatedWorkItems });
   }
 
   return (
@@ -121,11 +121,11 @@ function ActiveIteration() {
       ]} />
       <Container className="mt--6" fluid id="OKRs">
         {isLoading && <Card><CardHeader><h2>Active Sprint</h2></CardHeader><LoadingSpinnerBox /></Card>}
-        {!isLoading && activeIteration && activeIteration.workItems && activeIteration.workItems.length > 0 &&
-          <DevelopmentStats iteration={activeIteration} />}
+        {!isLoading && activeSprint && activeSprint.workItems && activeSprint.workItems.length > 0 &&
+          <DevelopmentStats sprint={activeSprint} />}
         <Row>
           <Col>
-            {!isLoading && !activeIteration && (
+            {!isLoading && !activeSprint && (
               <Card>
                 <CardHeader>
                   <Row>
@@ -141,7 +141,7 @@ function ActiveIteration() {
                       you focused on immediate priorities and ensure steady progress. Review your active sprint
                       regularly to stay on track and adjust as needed for optimal performance.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/iterations`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/sprints`}
                             className="text-blue font-weight-bold">Manage the Active
                         Sprint</Link>
                     </p>
@@ -149,23 +149,23 @@ function ActiveIteration() {
                 </CardBody>
               </Card>
             )}
-            {activeIteration && (
+            {activeSprint && (
               <Card>
                 <CardHeader>
                   <Row>
                     <Col xs={12} sm={10}>
                       <h3>
-                          <a href={`/admin/orgs/${orgId}/projects/${projectId}/iterations/edit/${activeIteration.id}`}
+                          <a href={`/admin/orgs/${orgId}/projects/${projectId}/sprints/edit/${activeSprint.id}`}
                              >
-                            <span className="text-muted">{formatDate(getIterationStartDate(activeIteration))} - {formatDate(getIterationEndDate(activeIteration))}</span> | {activeIteration.title}</a>
+                            <span className="text-muted">{formatDate(getSprintStartDate(activeSprint))} - {formatDate(getSprintEndDate(activeSprint))}</span> | {activeSprint.title}</a>
                       </h3>
-                      <p className="text-muted mb-0">{activeIteration.goal}</p>
+                      <p className="text-muted mb-0">{activeSprint.goal}</p>
                     </Col>
                     <Col xs={12} sm={2} className="text-left text-lg-right pt-3 pb-3">
                       <Button color="primary" size="sm" type="button"
                               onClick={async () => {
-                                await completeIteration(orgId, projectId, activeIteration.id);
-                                navigate(`/admin/orgs/${orgId}/projects/${projectId}/iterations`);
+                                await completeSprint(orgId, projectId, activeSprint.id);
+                                navigate(`/admin/orgs/${orgId}/projects/${projectId}/sprints`);
                               }}>
                         Complete Sprint
                       </Button>
@@ -176,7 +176,7 @@ function ActiveIteration() {
                   {Object.keys(workItemsByStatus).length === 0 && !isLoading && (
                     <div className="text-center m-3">
                       <h3 className="">No work items found in this sprint. Add them <Link
-                        to={`/admin/orgs/${orgId}/projects/${projectId}/iterations`}
+                        to={`/admin/orgs/${orgId}/projects/${projectId}/sprints`}
                         className="text-blue">here</Link>
                       </h3>
                     </div>
@@ -195,7 +195,7 @@ function ActiveIteration() {
                       <WorkItemsList workItems={workItemsByStatus[status]}
                                      showFeature={true}
                                      showAssignedTo={true}
-                                     onChangeIteration={handleChangeIteration}
+                                     onChangeSprint={handleChangeSprint}
                                      onChangeStatus={updateWorkItemsStatus}
                                      onChangePriority={updateWorkItemsPriority}
                                      onChangeAssignee={updateWorkItemAssignee}
@@ -212,4 +212,4 @@ function ActiveIteration() {
   );
 }
 
-export default ActiveIteration;
+export default ActiveSprint;

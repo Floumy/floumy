@@ -23,8 +23,8 @@ function PublicLayout() {
   const [buildInPublicSettings, setBuildInPublicSettings] = React.useState({
     isObjectivesPagePublic: false,
     isRoadmapPagePublic: false,
-    isIterationsPagePublic: false,
-    isActiveIterationsPagePublic: false,
+    isSprintsPagePublic: false,
+    isActiveSprintsPagePublic: false,
     isFeedPagePublic: false,
     isIssuesPagePublic: false,
     isFeatureRequestsPagePublic: false

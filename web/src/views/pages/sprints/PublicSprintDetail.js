@@ -5,10 +5,10 @@ import ExecutionStats from "../components/stats/ExecutionStats";
 import PublicWorkItemsListCard from "../backlog/PublicWorkItemsListCard";
 import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
 
-function PublicIterationDetail(
+function PublicSprintDetail(
   {
     orgId,
-    iteration = {
+    sprint = {
       id: "",
       goal: "",
       startDate: "",
@@ -21,10 +21,10 @@ function PublicIterationDetail(
   useEffect(() => {
     document.title = "Floumy | Sprint";
 
-    if (iteration.id) {
-      setWorkItems(sortByPriority(iteration.workItems));
+    if (sprint.id) {
+      setWorkItems(sortByPriority(sprint.workItems));
     }
-  }, [iteration]);
+  }, [sprint]);
 
   function getDisplayDuration(duration) {
     return duration + " week" + (duration > 1 ? "s" : "");
@@ -32,16 +32,16 @@ function PublicIterationDetail(
 
   return (
     <>
-      {workItems && workItems.length > 0 && <ExecutionStats workItems={workItems} dueDate={iteration?.endDate} />}
+      {workItems && workItems.length > 0 && <ExecutionStats workItems={workItems} dueDate={sprint?.endDate} />}
       <Card>
         <CardHeader>
-          <h3 className="mb-0"><span className="mr-2">{iteration.title}</span>
-            {iteration.status === "active" && <span className="badge badge-info">Active</span>}
-            {iteration.status === "completed" && <span className="badge badge-success">Completed</span>}
-            {iteration.status === "planned" &&
+          <h3 className="mb-0"><span className="mr-2">{sprint.title}</span>
+            {sprint.status === "active" && <span className="badge badge-info">Active</span>}
+            {sprint.status === "completed" && <span className="badge badge-success">Completed</span>}
+            {sprint.status === "planned" &&
               <span className="badge badge-primary text-white">Planned</span>}
           </h3>
-          {iteration && <div className="py-2"><PublicShareButtons title={iteration.title} /></div>}
+          {sprint && <div className="py-2"><PublicShareButtons title={sprint.title} /></div>}
         </CardHeader>
         <CardBody>
           <Row>
@@ -56,7 +56,7 @@ function PublicIterationDetail(
                 id="goal"
                 name="goal"
                 type="text"
-                value={iteration.goal}
+                value={sprint.goal}
               />
             </Col>
           </Row>
@@ -71,7 +71,7 @@ function PublicIterationDetail(
                 disabled={true}
                 className="bg-white"
                 type="text"
-                value={iteration.startDate} />
+                value={sprint.startDate} />
             </Col>
             <Col>
               <FormGroup>
@@ -85,13 +85,13 @@ function PublicIterationDetail(
                   name="duration"
                   className="bg-white"
                   disabled={true}
-                  value={getDisplayDuration(iteration.duration)} />
+                  value={getDisplayDuration(sprint.duration)} />
               </FormGroup>
             </Col>
           </Row>
         </CardBody>
       </Card>
-      {iteration && workItems && <PublicWorkItemsListCard
+      {sprint && workItems && <PublicWorkItemsListCard
         orgId={orgId}
         title={"Work Items"}
         workItems={workItems}
@@ -100,4 +100,4 @@ function PublicIterationDetail(
   );
 }
 
-export default PublicIterationDetail;
+export default PublicSprintDetail;
