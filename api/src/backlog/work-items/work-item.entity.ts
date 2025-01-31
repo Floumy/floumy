@@ -17,7 +17,7 @@ import { WorkItemStatus } from './work-item-status.enum';
 import { Org } from '../../orgs/org.entity';
 import { Feature } from '../../roadmap/features/feature.entity';
 import { WorkItemType } from './work-item-type.enum';
-import { Iteration } from '../../iterations/Iteration.entity';
+import { Sprint } from '../../sprints/sprint.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { User } from '../../users/user.entity';
 import { WorkItemsStatusStats } from './work-items-status-stats.entity';
@@ -78,10 +78,10 @@ export class WorkItem {
   org: Promise<Org>;
   @ManyToOne(() => Feature, (feature) => feature.workItems, { lazy: false })
   feature: Promise<Feature>;
-  @ManyToOne(() => Iteration, (iteration) => iteration.workItems, {
+  @ManyToOne(() => Sprint, (sprint) => sprint.workItems, {
     lazy: true,
   })
-  iteration: Promise<Iteration>;
+  sprint: Promise<Sprint>;
   @OneToMany(
     () => WorkItemComment,
     (workItemComment) => workItemComment.workItem,

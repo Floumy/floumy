@@ -12,9 +12,9 @@ import { KeyResult } from '../../okrs/key-result.entity';
 import { Feature } from '../../roadmap/features/feature.entity';
 import { User } from '../../users/user.entity';
 import { Milestone } from '../../roadmap/milestones/milestone.entity';
-import { Iteration } from '../../iterations/Iteration.entity';
+import { Sprint } from '../../sprints/sprint.entity';
 import { WorkItem } from './work-item.entity';
-import { IterationsService } from '../../iterations/iterations.service';
+import { SprintsService } from '../../sprints/sprints.service';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { FeatureFile } from '../../roadmap/features/feature-file.entity';
@@ -38,7 +38,7 @@ describe('WorkItemsEventHandler', () => {
           Feature,
           User,
           Milestone,
-          Iteration,
+          Sprint,
           WorkItem,
           File,
           FeatureFile,
@@ -54,7 +54,7 @@ describe('WorkItemsEventHandler', () => {
         UsersService,
         MilestonesService,
         WorkItemsService,
-        IterationsService,
+        SprintsService,
         WorkItemsEventHandler,
         FilesService,
         FilesStorageRepository,

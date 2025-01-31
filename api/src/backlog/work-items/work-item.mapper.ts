@@ -1,7 +1,7 @@
 import { WorkItem } from './work-item.entity';
 import { SearchWorkItem, SearchWorkItemDto, WorkItemDto } from './dtos';
 import { Feature } from '../../roadmap/features/feature.entity';
-import { Iteration } from '../../iterations/Iteration.entity';
+import { Sprint } from '../../sprints/sprint.entity';
 import { User } from '../../users/user.entity';
 
 class FeatureMapper {
@@ -13,11 +13,11 @@ class FeatureMapper {
   }
 }
 
-class IterationMapper {
-  static toDto(iteration: Iteration) {
+class SprintMapper {
+  static toDto(sprint: Sprint) {
     return {
-      id: iteration.id,
-      title: iteration.title,
+      id: sprint.id,
+      title: sprint.title,
     };
   }
 }
@@ -34,7 +34,7 @@ class UserMapper {
 export default class WorkItemMapper {
   static async toDto(workItem: WorkItem): Promise<WorkItemDto> {
     const feature = await workItem.feature;
-    const iteration = await workItem.iteration;
+    const sprint = await workItem.sprint;
     const createdBy = await workItem.createdBy;
     const assignedTo = await workItem.assignedTo;
     const issue = await workItem.issue;
@@ -52,7 +52,7 @@ export default class WorkItemMapper {
       status: workItem.status,
       estimation: workItem.estimation,
       feature: feature ? FeatureMapper.toDto(feature) : undefined,
-      iteration: iteration ? IterationMapper.toDto(iteration) : undefined,
+      sprint: sprint ? SprintMapper.toDto(sprint) : undefined,
       files: await Promise.all(
         (await workItem.workItemFiles).map(async (workItemFile) => {
           const file = await workItemFile.file;
