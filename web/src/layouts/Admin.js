@@ -43,6 +43,7 @@ function Admin() {
   useNavigationHotKey('5', `/admin/orgs/${orgId}/projects/${projectId}/active-iteration`);
   useNavigationHotKey('6', `/admin/orgs/${orgId}/projects/${projectId}/work-items`);
   useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/features`);
+  useNavigationHotKey('8', `/admin/orgs/${orgId}/projects/${projectId}/code`);
   useNavigationHotKey('w', `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`, isNavigationReplace());
   useNavigationHotKey('i', `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`, isNavigationReplace());
   useNavigationHotKey('m', `/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`, isNavigationReplace());
