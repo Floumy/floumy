@@ -3,6 +3,7 @@ import { SearchWorkItem, SearchWorkItemDto, WorkItemDto } from './dtos';
 import { Feature } from '../../roadmap/features/feature.entity';
 import { Iteration } from '../../iterations/Iteration.entity';
 import { User } from '../../users/user.entity';
+import { GithubPullRequest } from '../../github/github-pull-request.entity';
 
 class FeatureMapper {
   static toDto(feature: Feature) {
@@ -40,6 +41,7 @@ export default class WorkItemMapper {
     const issue = await workItem.issue;
     const org = await workItem.org;
     const project = await workItem.project;
+    const pullRequests = await workItem.githubPullRequests;
     return {
       id: workItem.id,
       org: org ? { id: org.id } : undefined,
@@ -71,6 +73,9 @@ export default class WorkItemMapper {
             id: issue.id,
             title: issue.title,
           }
+        : undefined,
+      pullRequests: pullRequests
+        ? PullRequestMapper.toDto(pullRequests)
         : undefined,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
@@ -143,5 +148,20 @@ export default class WorkItemMapper {
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt,
     };
+  }
+}
+
+class PullRequestMapper {
+  static toDto(pullRequests: GithubPullRequest[]) {
+    return pullRequests.map((pullRequest) => {
+      return {
+        id: pullRequest.id,
+        title: pullRequest.title,
+        url: pullRequest.url,
+        state: pullRequest.state,
+        createdAt: pullRequest.createdAt,
+        updatedAt: pullRequest.updatedAt,
+      };
+    });
   }
 }

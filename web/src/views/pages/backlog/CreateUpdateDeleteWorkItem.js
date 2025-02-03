@@ -1,67 +1,66 @@
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import { Button, Card, CardBody, CardHeader, Col, Input, Row } from "reactstrap";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import InputError from "../../../components/Errors/InputError";
-import Select2 from "react-select2-wrapper";
-import ReactQuill from "react-quill";
-import React, { useCallback, useEffect, useState } from "react";
-import * as Yup from "yup";
-import { listAllFeatures } from "../../../services/roadmap/roadmap.service";
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import InputError from '../../../components/Errors/InputError';
+import Select2 from 'react-select2-wrapper';
+import React, { useCallback, useEffect, useState } from 'react';
+import * as Yup from 'yup';
+import { listAllFeatures } from '../../../services/roadmap/roadmap.service';
 import {
   addComment,
   deleteComment,
   deleteWorkItem,
   listComments,
-  updateComment
-} from "../../../services/backlog/backlog.service";
-import { listIterations } from "../../../services/iterations/iterations.service";
-import FloumyDropZone from "../components/FloumyDropZone";
-import { formatHyphenatedString } from "../../../services/utils/utils";
-import DeleteWarning from "../components/DeleteWarning";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import CardHeaderDetails from "../components/CardHeaderDetails";
-import { getOrg } from "../../../services/org/orgs.service";
-import Comments from "../../../components/Comments/Comments";
-import { listIssues } from "../../../services/issues/issues.service";
-import RichTextEditor from "../../../components/RichTextEditor/RichTextEditor";
-import {generateKeyResults, getWorkItemDescription} from "../../../services/ai/ai.service";
-import AIButton from "../../../components/AI/AIButton";
+  updateComment,
+} from '../../../services/backlog/backlog.service';
+import { listIterations } from '../../../services/iterations/iterations.service';
+import FloumyDropZone from '../components/FloumyDropZone';
+import { formatHyphenatedString } from '../../../services/utils/utils';
+import DeleteWarning from '../components/DeleteWarning';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import CardHeaderDetails from '../components/CardHeaderDetails';
+import { getOrg } from '../../../services/org/orgs.service';
+import Comments from '../../../components/Comments/Comments';
+import { listIssues } from '../../../services/issues/issues.service';
+import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
+import { getWorkItemDescription } from '../../../services/ai/ai.service';
+import AIButton from '../../../components/AI/AIButton';
 
 function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [priority, setPriority] = useState(workItem.priority || "");
+  const [priority, setPriority] = useState(workItem.priority || '');
   const [title, setTitle] = useState(workItem.title);
   const [descriptionText, setDescriptionText] = useState(workItem.description);
   const [mentions, setMentions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [type, setType] = useState(workItem.type || "");
-  const [status, setStatus] = useState(workItem.status || "");
-  const [features, setFeatures] = useState([{ id: "", text: "None" }]);
-  const [iterations, setIterations] = useState([{ id: "", text: "None" }]);
-  const [feature, setFeature] = useState(workItem.feature ? workItem.feature.id : "");
-  const [iteration, setIteration] = useState(workItem.iteration ? workItem.iteration.id : "");
+  const [type, setType] = useState(workItem.type || '');
+  const [status, setStatus] = useState(workItem.status || '');
+  const [features, setFeatures] = useState([{ id: '', text: 'None' }]);
+  const [iterations, setIterations] = useState([{ id: '', text: 'None' }]);
+  const [feature, setFeature] = useState(workItem.feature ? workItem.feature.id : '');
+  const [iteration, setIteration] = useState(workItem.iteration ? workItem.iteration.id : '');
   const [deleteWarning, setDeleteWarning] = useState(false);
   const [files, setFiles] = useState([]);
-  const [members, setMembers] = useState([{ id: "", text: "None" }]);
-  const [assignedTo, setAssignedTo] = useState("");
+  const [members, setMembers] = useState([{ id: '', text: 'None' }]);
+  const [assignedTo, setAssignedTo] = useState('');
   const uploadedFiles = workItem.files || [];
   const navigate = useNavigate();
-  const paymentPlan = localStorage.getItem("paymentPlan");
+  const paymentPlan = localStorage.getItem('paymentPlan');
   const [comments, setComments] = useState([]);
-  const [issues, setIssues] = useState([{ id: "", text: "None" }]);
-  const [issue, setIssue] = useState(workItem.issue ? workItem.issue.id : "");
+  const [issues, setIssues] = useState([{ id: '', text: 'None' }]);
+  const [issue, setIssue] = useState(workItem.issue ? workItem.issue.id : '');
 
   const loadAndSetIssues = useCallback(async () => {
     const fetchedIssues = await listIssues(orgId, projectId, 1, 0);
     const mappedIssues = fetchedIssues.map(issue => {
       return { id: issue.id, text: `${issue.title}` };
     });
-    mappedIssues.push({ id: "", text: "None" });
+    mappedIssues.push({ id: '', text: 'None' });
     setIssues(mappedIssues);
-    setIssue(workItem.issue ? workItem.issue.id : "");
+    setIssue(workItem.issue ? workItem.issue.id : '');
   }, [workItem.issue]);
 
   const loadAndSetFeatures = useCallback(async () => {
@@ -70,9 +69,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       .map(feature => {
         return { id: feature.id, text: `${feature.reference}: ${feature.title}` };
       });
-    mappedFeatures.push({ id: "", text: "None" });
+    mappedFeatures.push({ id: '', text: 'None' });
     setFeatures(mappedFeatures);
-    setFeature(workItem.feature ? workItem.feature.id : "");
+    setFeature(workItem.feature ? workItem.feature.id : '');
   }, [workItem.feature]);
 
   const loadAndSetIterations = useCallback(async () => {
@@ -81,12 +80,12 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       .map(iteration => {
         return {
           id: iteration.id,
-          text: `${iteration.startDate} | ${iteration.title} [${formatHyphenatedString(iteration.status)}]`
+          text: `${iteration.startDate} | ${iteration.title} [${formatHyphenatedString(iteration.status)}]`,
         };
       });
-    mappedIterations.push({ id: "", text: "None" });
+    mappedIterations.push({ id: '', text: 'None' });
     setIterations(mappedIterations);
-    setIteration(workItem.iteration ? workItem.iteration.id : "");
+    setIteration(workItem.iteration ? workItem.iteration.id : '');
   }, [workItem.iteration]);
 
   const loadAndSetMembers = useCallback(async () => {
@@ -96,7 +95,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       .map(user => {
         return { id: user.id, text: user.name };
       });
-    mappedUsers.push({ id: "", text: "None" });
+    mappedUsers.push({ id: '', text: 'None' });
     setMembers(mappedUsers);
   }, [workItem.assignedTo]);
 
@@ -106,7 +105,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   }, [orgId, projectId, workItem.id]);
 
   useEffect(() => {
-    document.title = "Floumy | Work Item";
+    document.title = 'Floumy | Work Item';
 
     async function fetchData() {
       setIsLoading(true);
@@ -115,10 +114,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
           loadAndSetFeatures(),
           loadAndSetIterations(),
           loadAndSetMembers(),
-          loadAndSetIssues()
+          loadAndSetIssues(),
         ]);
       } catch (e) {
-        toast.error("The work item details could not be loaded");
+        toast.error('The work item details could not be loaded');
       } finally {
         setIsLoading(false);
       }
@@ -149,10 +148,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       setIsSubmitting(true);
       await deleteWorkItem(orgId, projectId, id);
       navigate(-1);
-      setTimeout(() => toast.success("The work item has been deleted"), 1000);
+      setTimeout(() => toast.success('The work item has been deleted'), 1000);
     } catch (e) {
       setDeleteWarning(false);
-      toast.error("The work item could not be deleted");
+      toast.error('The work item could not be deleted');
     } finally {
       setIsSubmitting(false);
     }
@@ -173,13 +172,13 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         status: status,
         files: files,
         assignedTo: assignedTo,
-        issue: issue
+        issue: issue,
       };
       await onSubmit(workItem);
       navigate(-1);
-      setTimeout(() => toast.success("The work item has been saved"), 100);
+      setTimeout(() => toast.success('The work item has been saved'), 100);
     } catch (e) {
-      toast.error("The work item could not be saved");
+      toast.error('The work item could not be saved');
     } finally {
       setIsSubmitting(false);
     }
@@ -187,11 +186,11 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
 
   const validationSchema = Yup.object({
     title: Yup.string()
-      .required("The title is required"),
+      .required('The title is required'),
     estimation: Yup.number()
       .nullable()
-      .positive("The estimation must be a positive number")
-      .typeError("The estimation must be a number")
+      .positive('The estimation must be a positive number')
+      .typeError('The estimation must be a number'),
   });
 
   const handleFilesChanged = useCallback((files) => {
@@ -202,9 +201,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     try {
       const addedComment = await addComment(orgId, projectId, workItem.id, comment);
       setComments([...comments, addedComment]);
-      toast.success("Comment added successfully");
+      toast.success('Comment added successfully');
     } catch (e) {
-      toast.error("Failed to add comment");
+      toast.error('Failed to add comment');
     }
   };
 
@@ -212,9 +211,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     try {
       const updatedComment = await updateComment(orgId, projectId, workItem.id, commentId, comment);
       setComments(comments.map(c => c.id === commentId ? updatedComment : c));
-      toast.success("Comment updated successfully");
+      toast.success('Comment updated successfully');
     } catch (e) {
-      toast.error("Failed to update comment");
+      toast.error('Failed to update comment');
     }
   };
 
@@ -222,9 +221,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     try {
       await deleteComment(orgId, projectId, workItem.id, commentId);
       setComments(comments.filter(comment => comment.id !== commentId));
-      toast.success("Comment deleted successfully");
+      toast.success('Comment deleted successfully');
     } catch (e) {
-      toast.error("Failed to delete comment");
+      toast.error('Failed to delete comment');
     }
   };
 
@@ -234,10 +233,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       <DeleteWarning
         isOpen={deleteWarning}
         toggle={() => setDeleteWarning(!deleteWarning)}
-        entity={"work item"}
+        entity={'work item'}
         onDelete={() => onDelete(workItem.id)} />
       <Row>
-        <Col>
+        <Col lg={8} md={12}>
           <Card>
             <CardHeader>
               {!isUpdate && <h3 className="mb-0">New Work Item</h3>}
@@ -249,7 +248,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
             </CardHeader>
             <CardBody>
               <Formik
-                initialValues={{ title: workItem.title || "", estimation: workItem.estimation || "" }}
+                initialValues={{ title: workItem.title || '', estimation: workItem.estimation || '' }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
               >
@@ -279,7 +278,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           invalid={!!(errors.title && touched.title)}
                           autoComplete="off"
                         />
-                        <ErrorMessage name={"title"} component={InputError} />
+                        <ErrorMessage name={'title'} component={InputError} />
                       </Col>
                     </Row>
                     <Row>
@@ -295,11 +294,11 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           defaultValue={type}
                           name="type"
                           data={[
-                            { id: "user-story", text: "User Story" },
-                            { id: "task", text: "Task" },
-                            { id: "bug", text: "Bug" },
-                            { id: "spike", text: "Spike" },
-                            { id: "technical-debt", text: "Technical Debt" }
+                            { id: 'user-story', text: 'User Story' },
+                            { id: 'task', text: 'Task' },
+                            { id: 'bug', text: 'Bug' },
+                            { id: 'spike', text: 'Spike' },
+                            { id: 'technical-debt', text: 'Technical Debt' },
                           ]}
                           onChange={(e) => setType(e.target.value)}></Select2>
                       </Col>
@@ -315,9 +314,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           defaultValue={priority}
                           name="priority"
                           data={[
-                            { id: "high", text: "High" },
-                            { id: "medium", text: "Medium" },
-                            { id: "low", text: "Low" }
+                            { id: 'high', text: 'High' },
+                            { id: 'medium', text: 'Medium' },
+                            { id: 'low', text: 'Low' },
                           ]}
                           onChange={(e) => setPriority(e.target.value)}></Select2>
                       </Col>
@@ -333,17 +332,17 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           defaultValue={status}
                           name="status"
                           data={[
-                            { id: "planned", text: "Planned" },
-                            { id: "ready-to-start", text: "Ready to Start" },
-                            { id: "in-progress", text: "In Progress" },
-                            { id: "blocked", text: "Blocked" },
-                            { id: "code-review", text: "Code Review" },
-                            { id: "testing", text: "Testing" },
-                            { id: "revisions", text: "Revisions" },
-                            { id: "ready-for-deployment", text: "Ready for Deployment" },
-                            { id: "deployed", text: "Deployed" },
-                            { id: "done", text: "Done" },
-                            { id: "closed", text: "Closed" }
+                            { id: 'planned', text: 'Planned' },
+                            { id: 'ready-to-start', text: 'Ready to Start' },
+                            { id: 'in-progress', text: 'In Progress' },
+                            { id: 'blocked', text: 'Blocked' },
+                            { id: 'code-review', text: 'Code Review' },
+                            { id: 'testing', text: 'Testing' },
+                            { id: 'revisions', text: 'Revisions' },
+                            { id: 'ready-for-deployment', text: 'Ready for Deployment' },
+                            { id: 'deployed', text: 'Deployed' },
+                            { id: 'done', text: 'Done' },
+                            { id: 'closed', text: 'Closed' },
                           ]}
                           onChange={(e) => setStatus(e.target.value)}>
                         </Select2>
@@ -363,7 +362,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           invalid={!!(errors.estimation && touched.estimation)}
                           autoComplete="off"
                         />
-                        <ErrorMessage name={"estimation"} component={InputError} />
+                        <ErrorMessage name={'estimation'} component={InputError} />
                       </Col>
                     </Row>
                     <Row className="mb-3">
@@ -400,7 +399,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         ></Select2>
                       </Col>
                     </Row>
-                    {paymentPlan === "premium" && <Row className="mb-3">
+                    {paymentPlan === 'premium' && <Row className="mb-3">
                       <Col>
                         <label
                           className="form-control-label"
@@ -426,26 +425,26 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           Description
                         </label>
                         <AIButton
-                            text="Fill with AI"
-                            disabled={title.length === 0}
-                            onClick={async () => {
-                              setDescriptionText(await getWorkItemDescription(title, type, feature, issue));
-                            }}
+                          text="Fill with AI"
+                          disabled={title.length === 0}
+                          onClick={async () => {
+                            setDescriptionText(await getWorkItemDescription(title, type, feature, issue));
+                          }}
                         />
                         <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
                           setDescriptionText(text);
                           setMentions(mentions);
                         }} toolbar={[
-                          ["bold", "italic"],
-                          ["link", "blockquote", "code", "image", "video"],
+                          ['bold', 'italic'],
+                          ['link', 'blockquote', 'code', 'image', 'video'],
                           [
                             {
-                              list: "ordered"
+                              list: 'ordered',
                             },
                             {
-                              list: "bullet"
-                            }
-                          ]
+                              list: 'bullet',
+                            },
+                          ],
                         ]} placeholder="Describe this work item..." />
                       </Col>
                     </Row>
@@ -477,7 +476,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                       </Col>
                     </Row>
                     <Button
-                      id={"save-work-item"}
+                      id={'save-work-item'}
                       color="primary"
                       type="submit"
                       className="mr-3 mb-3"
@@ -486,7 +485,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                       Save Work Item
                     </Button>
                     {isUpdate && <Button
-                      id={"delete-work-item"}
+                      id={'delete-work-item'}
                       color="secondary"
                       type="button"
                       className="ml-0 mb-3"
@@ -501,10 +500,71 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
             </CardBody>
           </Card>
         </Col>
+        <Col lg={4} md={12}>
+          <Card>
+            <CardHeader>
+              <h3 className="mb-0">
+                Links
+              </h3>
+            </CardHeader>
+            <CardBody>
+              <Row>
+                <Col>
+                  <div className="mb-3">
+                    {workItem.iteration && (
+                      <div className="mb-3">
+                        <h4>SPRINT</h4>
+                        <Link
+                          to={`/admin/orgs/${orgId}/projects/${projectId}/iterations/detail/${workItem.iteration.id}`}
+                          className="text-blue">
+                          {workItem.iteration.title}
+                        </Link>
+                      </div>
+                    )}
+                    {workItem.feature && (
+                      <div className="mb-3">
+                        <h4>INITIATIVE</h4>
+                        <Link
+                          to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${workItem.feature.id}`}
+                          className="text-blue">
+                          {workItem.feature.title}
+                        </Link>
+                      </div>
+                    )}
+                    {workItem.issue && (
+                      <div className="mb-3">
+                        <h4>ISSUE</h4>
+                        <Link to={`/admin/orgs/${orgId}/projects/${projectId}/issues/detail/${workItem.issue.id}`}
+                              className="text-blue">
+                          {workItem.issue.title}
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mb-3" hidden={!workItem.pullRequests?.length}>
+                    <h4>PULL REQUESTS</h4>
+                    <div>
+                      <ul className="list-unstyled">
+                        {workItem.pullRequests?.map((pullRequest) => (
+                          <li key={pullRequest.id} className="mb-2">
+                            <a href={pullRequest.url} target="_blank" rel="noreferrer" className="text-blue">
+                              <span className="mr-2">{pullRequest.title}</span>
+                              <i className="fa fa-external-link-alt mr-1" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+            </CardBody>
+          </Card>
+        </Col>
       </Row>
       <Row>
         {workItem.id && !isLoading &&
-          <Col>
+          <Col md={12} lg={8}>
             <Comments comments={comments}
                       onCommentAdd={handleCommentSubmit}
                       onCommentDelete={handleCommentDelete}
@@ -517,14 +577,14 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
 }
 
 const defaultWorkItem = {
-  title: "",
-  description: "",
-  priority: "medium",
-  type: "user-story",
+  title: '',
+  description: '',
+  priority: 'medium',
+  type: 'user-story',
   estimation: null,
-  status: "planned",
-  feature: { id: "" },
-  iteration: { id: "" }
+  status: 'planned',
+  feature: { id: '' },
+  iteration: { id: '' },
 };
 
 export default CreateUpdateDeleteWorkItem;
