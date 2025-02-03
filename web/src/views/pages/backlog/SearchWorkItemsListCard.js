@@ -256,7 +256,7 @@ function SearchWorkItemsListCard({
           {workItems.map((workItem) => (
             <tr key={workItem.id}>
               <td>
-                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/backlog/work-items/detail/${workItem.id}`}>
+                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`}>
                   {workItem.reference}
                 </Link>
               </td>
