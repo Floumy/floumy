@@ -1,7 +1,7 @@
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestDto } from './dtos';
 import { CommentMapper } from '../comments/mappers';
-import { FeatureMapper } from '../roadmap/features/feature.mapper';
+import { InitiativeMapper } from '../roadmap/initiatives/initiative.mapper';
 
 export class FeatureRequestsMapper {
   static async toFeatureRequestDto(
@@ -10,7 +10,7 @@ export class FeatureRequestsMapper {
     const org = await featureRequest.org;
     const createdBy = await featureRequest.createdBy;
     const comments = await featureRequest.comments;
-    const features = await featureRequest.features;
+    const features = await featureRequest.initiatives;
 
     return {
       id: featureRequest.id,
@@ -31,7 +31,7 @@ export class FeatureRequestsMapper {
       createdAt: featureRequest.createdAt,
       updatedAt: featureRequest.updatedAt,
       comments: await CommentMapper.toDtoList(comments),
-      features: await Promise.all(features.map(FeatureMapper.toDto)),
+      initiatives: await Promise.all(features.map(InitiativeMapper.toDto)),
     };
   }
 

@@ -1,4 +1,4 @@
-import { FeaturesController } from './features.controller';
+import { InitiativesController } from './initiatives.controller';
 import { OrgsService } from '../../orgs/orgs.service';
 import { setupTestingModule } from '../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
@@ -6,25 +6,25 @@ import { Org } from '../../orgs/org.entity';
 import { KeyResult } from '../../okrs/key-result.entity';
 import { OkrsService } from '../../okrs/okrs.service';
 import { TokensService } from '../../auth/tokens.service';
-import { Feature } from './feature.entity';
+import { Initiative } from './initiative.entity';
 import { Objective } from '../../okrs/objective.entity';
 import { Priority } from '../../common/priority.enum';
-import { FeaturesService } from './features.service';
+import { InitiativesService } from './initiatives.service';
 import { UsersService } from '../../users/users.service';
 import { UsersModule } from '../../users/users.module';
 import { MilestonesService } from '../milestones/milestones.service';
 import { Milestone } from '../milestones/milestone.entity';
 import { BacklogModule } from '../../backlog/backlog.module';
-import { FeatureStatus } from './featurestatus.enum';
+import { InitiativeStatus } from './initiativestatus.enum';
 import { Sprint } from '../../sprints/sprint.entity';
 import { File } from '../../files/file.entity';
-import { FeatureFile } from './feature-file.entity';
+import { InitiativeFile } from './initiative-file.entity';
 import { User } from '../../users/user.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
-import { FeatureComment } from './feature-comment.entity';
+import { InitiativeComment } from './initiative-comment.entity';
 import { Repository } from 'typeorm';
 import { PaymentPlan } from '../../auth/payment.plan';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
@@ -32,8 +32,8 @@ import { FeatureRequestComment } from '../../feature-requests/feature-request-co
 import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
 import { Project } from '../../projects/project.entity';
 
-describe('FeaturesController', () => {
-  let controller: FeaturesController;
+describe('InitiativesController', () => {
+  let controller: InitiativesController;
   let milestoneService: MilestonesService;
   let orgsRepository: Repository<Org>;
   let cleanup: () => Promise<void>;
@@ -49,14 +49,14 @@ describe('FeaturesController', () => {
           Org,
           Objective,
           KeyResult,
-          Feature,
+          Initiative,
           Milestone,
           Sprint,
           File,
-          FeatureFile,
+          InitiativeFile,
           WorkItem,
           WorkItemFile,
-          FeatureComment,
+          InitiativeComment,
           FeatureRequest,
           FeatureRequestComment,
           FeatureRequestVote,
@@ -69,15 +69,15 @@ describe('FeaturesController', () => {
         OkrsService,
         OrgsService,
         TokensService,
-        FeaturesService,
+        InitiativesService,
         MilestonesService,
         FilesService,
         FilesStorageRepository,
       ],
-      [FeaturesController],
+      [InitiativesController],
     );
     cleanup = dbCleanup;
-    controller = module.get<FeaturesController>(FeaturesController);
+    controller = module.get<InitiativesController>(InitiativesController);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
     milestoneService = module.get<MilestonesService>(MilestonesService);
@@ -107,9 +107,9 @@ describe('FeaturesController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('when creating a feature', () => {
+  describe('when creating a initiative', () => {
     it('should return 201', async () => {
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -119,17 +119,17 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.CLOSED,
+          status: InitiativeStatus.CLOSED,
         },
       );
-      expect(featureResponse.title).toEqual('my feature');
-      expect(featureResponse.description).toEqual('my feature description');
-      expect(featureResponse.priority).toEqual(Priority.HIGH);
-      expect(featureResponse.status).toEqual(FeatureStatus.CLOSED);
-      expect(featureResponse.createdAt).toBeDefined();
+      expect(initiativeResponse.title).toEqual('my initiative');
+      expect(initiativeResponse.description).toEqual('my initiative description');
+      expect(initiativeResponse.priority).toEqual(Priority.HIGH);
+      expect(initiativeResponse.status).toEqual(InitiativeStatus.CLOSED);
+      expect(initiativeResponse.createdAt).toBeDefined();
     });
     it('should return 400 if title is missing', async () => {
       try {
@@ -144,9 +144,9 @@ describe('FeaturesController', () => {
           },
           {
             title: null,
-            description: 'my feature description',
+            description: 'my initiative description',
             priority: Priority.HIGH,
-            status: FeatureStatus.PLANNED,
+            status: InitiativeStatus.PLANNED,
           },
         );
       } catch (e) {
@@ -154,7 +154,7 @@ describe('FeaturesController', () => {
       }
     });
   });
-  describe('when getting features', () => {
+  describe('when getting initiatives', () => {
     it('should return 200', async () => {
       await controller.create(
         org.id,
@@ -166,25 +166,25 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const features = await controller.list(org.id, project.id, {
+      const initiatives = await controller.list(org.id, project.id, {
         user: {
           org: org.id,
         },
       });
-      expect(features[0].title).toEqual('my feature');
-      expect(features[0].priority).toEqual(Priority.HIGH);
-      expect(features[0].progress).toEqual(0);
-      expect(features[0].workItemsCount).toEqual(0);
-      expect(features[0].createdAt).toBeDefined();
-      expect(features[0].updatedAt).toBeDefined();
+      expect(initiatives[0].title).toEqual('my initiative');
+      expect(initiatives[0].priority).toEqual(Priority.HIGH);
+      expect(initiatives[0].progress).toEqual(0);
+      expect(initiatives[0].workItemsCount).toEqual(0);
+      expect(initiatives[0].createdAt).toBeDefined();
+      expect(initiatives[0].updatedAt).toBeDefined();
     });
-    it('should return features paginated', async () => {
+    it('should return initiatives paginated', async () => {
       await controller.create(
         org.id,
         project.id,
@@ -195,10 +195,10 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await controller.create(
@@ -211,13 +211,13 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature 2',
-          description: 'my feature description 2',
+          title: 'my initiative 2',
+          description: 'my initiative description 2',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const features = await controller.list(
+      const initiatives = await controller.list(
         org.id,
         project.id,
         {
@@ -228,10 +228,10 @@ describe('FeaturesController', () => {
         1,
         1,
       );
-      expect(features.length).toEqual(1);
+      expect(initiatives.length).toEqual(1);
     });
   });
-  describe('when getting features without milestone', () => {
+  describe('when getting initiatives without milestone', () => {
     it('should return 200', async () => {
       await controller.create(
         org.id,
@@ -243,13 +243,13 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const features = await controller.listWithoutMilestone(
+      const initiatives = await controller.listWithoutMilestone(
         org.id,
         project.id,
         {
@@ -258,15 +258,15 @@ describe('FeaturesController', () => {
           },
         },
       );
-      expect(features[0].title).toEqual('my feature');
-      expect(features[0].priority).toEqual(Priority.HIGH);
-      expect(features[0].createdAt).toBeDefined();
-      expect(features[0].updatedAt).toBeDefined();
+      expect(initiatives[0].title).toEqual('my initiative');
+      expect(initiatives[0].priority).toEqual(Priority.HIGH);
+      expect(initiatives[0].createdAt).toBeDefined();
+      expect(initiatives[0].updatedAt).toBeDefined();
     });
   });
-  describe('when getting a feature', () => {
+  describe('when getting a initiative', () => {
     it('should return 200', async () => {
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -276,13 +276,13 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature = await controller.get(
+      const initiative = await controller.get(
         org.id,
         project.id,
         {
@@ -290,17 +290,17 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
       );
-      expect(feature.title).toEqual('my feature');
-      expect(feature.priority).toEqual(Priority.HIGH);
-      expect(feature.createdAt).toBeDefined();
-      expect(feature.updatedAt).toBeDefined();
+      expect(initiative.title).toEqual('my initiative');
+      expect(initiative.priority).toEqual(Priority.HIGH);
+      expect(initiative.createdAt).toBeDefined();
+      expect(initiative.updatedAt).toBeDefined();
     });
   });
-  describe('when updating a feature', () => {
+  describe('when updating a initiative', () => {
     it('should return 200', async () => {
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -310,13 +310,13 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature = await controller.update(
+      const initiative = await controller.update(
         org.id,
         project.id,
         {
@@ -324,25 +324,25 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           mentions: [user.id],
           priority: Priority.HIGH,
-          status: FeatureStatus.CLOSED,
+          status: InitiativeStatus.CLOSED,
         },
       );
-      expect(feature.title).toEqual('my feature');
-      expect(feature.priority).toEqual(Priority.HIGH);
-      expect(feature.status).toEqual(FeatureStatus.CLOSED);
-      expect(feature.createdAt).toBeDefined();
-      expect(feature.updatedAt).toBeDefined();
+      expect(initiative.title).toEqual('my initiative');
+      expect(initiative.priority).toEqual(Priority.HIGH);
+      expect(initiative.status).toEqual(InitiativeStatus.CLOSED);
+      expect(initiative.createdAt).toBeDefined();
+      expect(initiative.updatedAt).toBeDefined();
     });
   });
-  describe('when deleting a feature', () => {
+  describe('when deleting a initiative', () => {
     it('should return 200', async () => {
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -352,10 +352,10 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await controller.delete(
@@ -366,13 +366,13 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
       );
     });
   });
-  describe('when patching the feature', () => {
+  describe('when patching the initiative', () => {
     it('should update the status', async () => {
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -382,13 +382,13 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature = await controller.patch(
+      const initiative = await controller.patch(
         org.id,
         project.id,
         {
@@ -396,19 +396,19 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         {
-          status: FeatureStatus.CLOSED,
+          status: InitiativeStatus.CLOSED,
         },
       );
-      expect(feature.title).toEqual('my feature');
-      expect(feature.priority).toEqual(Priority.HIGH);
-      expect(feature.status).toEqual(FeatureStatus.CLOSED);
-      expect(feature.createdAt).toBeDefined();
-      expect(feature.updatedAt).toBeDefined();
+      expect(initiative.title).toEqual('my initiative');
+      expect(initiative.priority).toEqual(Priority.HIGH);
+      expect(initiative.status).toEqual(InitiativeStatus.CLOSED);
+      expect(initiative.createdAt).toBeDefined();
+      expect(initiative.updatedAt).toBeDefined();
     });
     it('should update the priority', async () => {
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -418,13 +418,13 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature = await controller.patch(
+      const initiative = await controller.patch(
         org.id,
         project.id,
         {
@@ -432,16 +432,16 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         {
           priority: Priority.LOW,
         },
       );
-      expect(feature.title).toEqual('my feature');
-      expect(feature.priority).toEqual(Priority.LOW);
-      expect(feature.status).toEqual(FeatureStatus.PLANNED);
-      expect(feature.createdAt).toBeDefined();
-      expect(feature.updatedAt).toBeDefined();
+      expect(initiative.title).toEqual('my initiative');
+      expect(initiative.priority).toEqual(Priority.LOW);
+      expect(initiative.status).toEqual(InitiativeStatus.PLANNED);
+      expect(initiative.createdAt).toBeDefined();
+      expect(initiative.updatedAt).toBeDefined();
     });
     it('should update the milestone', async () => {
       const milestone = await milestoneService.createMilestone(
@@ -453,7 +453,7 @@ describe('FeaturesController', () => {
           dueDate: '2020-01-01',
         },
       );
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -463,13 +463,13 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature = await controller.patch(
+      const initiative = await controller.patch(
         org.id,
         project.id,
         {
@@ -477,20 +477,20 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         {
           milestone: milestone.id,
         },
       );
-      expect(feature.title).toEqual('my feature');
-      expect(feature.priority).toEqual(Priority.HIGH);
-      expect(feature.status).toEqual(FeatureStatus.PLANNED);
-      expect(feature.milestone.id).toEqual(milestone.id);
-      expect(feature.createdAt).toBeDefined();
-      expect(feature.updatedAt).toBeDefined();
+      expect(initiative.title).toEqual('my initiative');
+      expect(initiative.priority).toEqual(Priority.HIGH);
+      expect(initiative.status).toEqual(InitiativeStatus.PLANNED);
+      expect(initiative.milestone.id).toEqual(milestone.id);
+      expect(initiative.createdAt).toBeDefined();
+      expect(initiative.updatedAt).toBeDefined();
     });
   });
-  describe('when searching features', () => {
+  describe('when searching initiatives', () => {
     it('should return 200', async () => {
       await controller.create(
         org.id,
@@ -502,13 +502,13 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const features = await controller.search(
+      const initiatives = await controller.search(
         org.id,
         project.id,
         {
@@ -516,19 +516,19 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        'my feature',
+        'my initiative',
       );
-      expect(features[0].title).toEqual('my feature');
-      expect(features[0].priority).toEqual(Priority.HIGH);
-      expect(features[0].createdAt).toBeDefined();
-      expect(features[0].updatedAt).toBeDefined();
+      expect(initiatives[0].title).toEqual('my initiative');
+      expect(initiatives[0].priority).toEqual(Priority.HIGH);
+      expect(initiatives[0].createdAt).toBeDefined();
+      expect(initiatives[0].updatedAt).toBeDefined();
     });
   });
-  describe('when listing feature comments', () => {
+  describe('when listing initiative comments', () => {
     it('should return the list of comments', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -538,10 +538,10 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await controller.addComment(
@@ -551,22 +551,22 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         {
           content: 'my comment',
           mentions: [],
         },
       );
-      const comments = await controller.listComments(featureResponse.id);
+      const comments = await controller.listComments(initiativeResponse.id);
       expect(comments[0].content).toEqual('my comment');
       expect(comments[0].createdAt).toBeDefined();
     });
   });
-  describe('when adding a comment to a feature', () => {
+  describe('when adding a comment to a initiative', () => {
     it('should return the newly added comment', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -576,10 +576,10 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const comment = await controller.addComment(
@@ -589,7 +589,7 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         {
           content: 'my comment',
           mentions: [user.id],
@@ -599,11 +599,11 @@ describe('FeaturesController', () => {
       expect(comment.createdAt).toBeDefined();
     });
   });
-  describe('when deleting a comment from a feature', () => {
+  describe('when deleting a comment from a initiative', () => {
     it('should delete it successfully', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -613,10 +613,10 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const comment = await controller.addComment(
@@ -626,7 +626,7 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         {
           content: 'my comment',
           mentions: [],
@@ -639,16 +639,16 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         comment.id,
       );
     });
   });
-  describe('when updating a comment from a feature', () => {
+  describe('when updating a comment from a initiative', () => {
     it('should return the updated comment', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -658,10 +658,10 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const comment = await controller.addComment(
@@ -671,7 +671,7 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         {
           content: 'my comment',
           mentions: [],
@@ -684,7 +684,7 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
         comment.id,
         {
           content: 'my updated comment',
@@ -695,11 +695,11 @@ describe('FeaturesController', () => {
       expect(updatedComment.createdAt).toBeDefined();
     });
   });
-  describe('when changing the assigned user of a feature', () => {
+  describe('when changing the assigned user of a initiative', () => {
     it('should update the assigned user', async () => {
       org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
-      const featureResponse = await controller.create(
+      const initiativeResponse = await controller.create(
         org.id,
         project.id,
         {
@@ -709,10 +709,10 @@ describe('FeaturesController', () => {
           },
         },
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await controller.changeAssignee(
@@ -724,12 +724,12 @@ describe('FeaturesController', () => {
         },
         org.id,
         project.id,
-        featureResponse.id,
+        initiativeResponse.id,
         {
           assignee: secondUser.id,
         },
       );
-      const updatedFeature = await controller.get(
+      const updatedInitiative = await controller.get(
         org.id,
         project.id,
         {
@@ -737,9 +737,9 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
       );
-      expect(updatedFeature.assignedTo.id).toEqual(secondUser.id);
+      expect(updatedInitiative.assignedTo.id).toEqual(secondUser.id);
       await controller.changeAssignee(
         {
           user: {
@@ -749,12 +749,12 @@ describe('FeaturesController', () => {
         },
         org.id,
         project.id,
-        featureResponse.id,
+        initiativeResponse.id,
         {
           assignee: '',
         },
       );
-      const updatedFeatureWithNoAssignee = await controller.get(
+      const updatedInitiativeWithNoAssignee = await controller.get(
         org.id,
         project.id,
         {
@@ -762,9 +762,9 @@ describe('FeaturesController', () => {
             org: org.id,
           },
         },
-        featureResponse.id,
+        initiativeResponse.id,
       );
-      expect(updatedFeatureWithNoAssignee.assignedTo).toBeUndefined();
+      expect(updatedInitiativeWithNoAssignee.assignedTo).toBeUndefined();
     });
   });
 });

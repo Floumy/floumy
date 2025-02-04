@@ -1,4 +1,4 @@
-export interface FeatureDto {
+export interface InitiativeDto {
   id: string;
   reference: string;
   title: string;

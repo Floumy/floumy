@@ -105,9 +105,9 @@ function FeaturesContextMenu({
         await updateFeatureMilestone(orgId, projectId, feature.id, milestoneId);
       }
       callChangeMilestoneCallbacks(milestoneId, props.features);
-      toast.success("The features have been moved to the milestone");
+      toast.success("The initiatives have been moved to the milestone");
     } catch (e) {
-      toast.error("The features could not be moved to the milestone");
+      toast.error("The initiatives could not be moved to the milestone");
     }
   };
 
@@ -131,9 +131,9 @@ function FeaturesContextMenu({
         await updateFeatureKeyResult(orgId, projectId, feature.id, keyResultId);
       }
       callChangeKeyResultCallbacks(keyResultId, props.features);
-      toast.success("The features have been moved to the key result");
+      toast.success("The initiatives have been moved to the key result");
     } catch (e) {
-      toast.error("The features could not be moved to the key result");
+      toast.error("The initiatives could not be moved to the key result");
     }
   };
 
@@ -143,9 +143,9 @@ function FeaturesContextMenu({
       for (const feature of props.features) {
         await changeAssignee(orgId, projectId, feature.id, userId);
       }
-      toast.success("The features have been assigned to the user");
+      toast.success("The initiatives have been assigned to the user");
     } catch (e) {
-      toast.error("The features could not be assigned to the user");
+      toast.error("The initiatives could not be assigned to the user");
     }
   }
 
@@ -169,9 +169,9 @@ function FeaturesContextMenu({
         await updateFeatureStatus(orgId, projectId, feature.id, status);
       }
       callChangeStatusCallbacks(status, props.features);
-      toast.success("The features have been updated");
+      toast.success("The initiatives have been updated");
     } catch (e) {
-      toast.error("The features could not be updated");
+      toast.error("The initiatives could not be updated");
     }
   };
 
@@ -195,9 +195,9 @@ function FeaturesContextMenu({
         await updateFeaturePriority(orgId, projectId, feature.id, priority);
       }
       callChangePriorityCallbacks(priority, props.features);
-      toast.success("The features have been updated");
+      toast.success("The initiatives have been updated");
     } catch (e) {
-      toast.error("The features could not be updated");
+      toast.error("The initiatives could not be updated");
     }
   };
 

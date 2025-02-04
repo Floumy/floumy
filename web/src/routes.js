@@ -116,19 +116,19 @@ const routes = [
   },
   {
     redirect: true,
-    path: "/roadmap/features/new",
+    path: "/roadmap/initiatives/new",
     component: <NewFeature />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/roadmap/features/edit/:id",
+    path: "/roadmap/initiatives/edit/:id",
     component: <EditFeature />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/roadmap/features/detail/:id",
+    path: "/roadmap/initiatives/detail/:id",
     component: <DetailFeature />,
     layout: "/admin"
   },
@@ -201,7 +201,7 @@ const routes = [
     collapse: false,
     name: "All Initiatives",
     icon: "fa fa-list-alt",
-    path: "/features",
+    path: "/initiatives",
     component: <Features />,
     layout: "/admin",
     shortcut: "7"
@@ -319,7 +319,7 @@ export const publicRoutes = [
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap/features/detail/:featureId",
+    path: "/orgs/:orgId/projects/:projectId/roadmap/initiatives/detail/:featureId",
     component: <PublicDetailFeature />,
     layout: "/public"
   },

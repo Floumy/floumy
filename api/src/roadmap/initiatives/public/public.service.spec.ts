@@ -1,6 +1,6 @@
 import { PublicService } from './public.service';
 import { UsersService } from '../../../users/users.service';
-import { FeaturesService } from '../features.service';
+import { InitiativesService } from '../initiatives.service';
 import { WorkItemsService } from '../../../backlog/work-items/work-items.service';
 import { MilestonesService } from '../../milestones/milestones.service';
 import { OkrsService } from '../../../okrs/okrs.service';
@@ -12,13 +12,13 @@ import { setupTestingModule } from '../../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../../../okrs/objective.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
-import { Feature } from '../feature.entity';
+import { Initiative } from '../initiative.entity';
 import { Milestone } from '../../milestones/milestone.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
 import { Sprint } from '../../../sprints/sprint.entity';
 import { File } from '../../../files/file.entity';
 import { WorkItemFile } from '../../../backlog/work-items/work-item-file.entity';
-import { FeatureFile } from '../feature-file.entity';
+import { InitiativeFile } from '../initiative-file.entity';
 import { FilesStorageRepository } from '../../../files/files-storage.repository';
 import { BipSettings } from '../../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
@@ -31,7 +31,7 @@ describe('PublicService', () => {
   let user: User;
   let org: Org;
   let project: Project;
-  let featuresRepository: Repository<Feature>;
+  let initiativesRepository: Repository<Initiative>;
   let bipRepository: Repository<BipSettings>;
   let orgsRepository: Repository<Org>;
   let projectsRepository: Repository<Project>;
@@ -45,14 +45,14 @@ describe('PublicService', () => {
           Objective,
           Org,
           KeyResult,
-          Feature,
+          Initiative,
           User,
           Milestone,
           WorkItem,
           Sprint,
           File,
           WorkItemFile,
-          FeatureFile,
+          InitiativeFile,
           BipSettings,
           Project,
         ]),
@@ -60,7 +60,7 @@ describe('PublicService', () => {
       [
         OkrsService,
         OrgsService,
-        FeaturesService,
+        InitiativesService,
         UsersService,
         MilestonesService,
         WorkItemsService,
@@ -73,8 +73,8 @@ describe('PublicService', () => {
     service = module.get<PublicService>(PublicService);
     usersService = module.get<UsersService>(UsersService);
     orgsService = module.get<OrgsService>(OrgsService);
-    featuresRepository = module.get<Repository<Feature>>(
-      getRepositoryToken(Feature),
+    initiativesRepository = module.get<Repository<Initiative>>(
+      getRepositoryToken(Initiative),
     );
     bipRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
@@ -105,14 +105,14 @@ describe('PublicService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('when getting a feature', () => {
-    it('should return a feature', async () => {
-      const feature = new Feature();
-      feature.title = 'Test Feature';
-      feature.org = Promise.resolve(org);
-      feature.project = Promise.resolve(project);
-      await featuresRepository.save(feature);
-      const actual = await service.getFeature(org.id, project.id, feature.id);
+  describe('when getting a initiative', () => {
+    it('should return a initiative', async () => {
+      const initiative = new Initiative();
+      initiative.title = 'Test Feature';
+      initiative.org = Promise.resolve(org);
+      initiative.project = Promise.resolve(project);
+      await initiativesRepository.save(initiative);
+      const actual = await service.getInitiative(org.id, project.id, initiative.id);
       expect(actual).toBeDefined();
     });
     it('should throw an error if the org is not public', async () => {
@@ -128,29 +128,29 @@ describe('PublicService', () => {
       bipSettings.isBuildInPublicEnabled = false;
       bipSettings.org = Promise.resolve(newOrg);
       await bipRepository.save(bipSettings);
-      const feature = new Feature();
-      feature.title = 'Test Feature';
-      feature.org = Promise.resolve(newOrg);
-      feature.project = Promise.resolve(newProject);
-      await featuresRepository.save(feature);
+      const initiative = new Initiative();
+      initiative.title = 'Test Feature';
+      initiative.org = Promise.resolve(newOrg);
+      initiative.project = Promise.resolve(newProject);
+      await initiativesRepository.save(initiative);
       await expect(
-        service.getFeature(newOrg.id, newProject.id, feature.id),
+        service.getInitiative(newOrg.id, newProject.id, initiative.id),
       ).rejects.toThrow('Roadmap page is not public');
     });
-    it('should throw an error if the feature does not belong to the org', async () => {
+    it('should throw an error if the initiative does not belong to the org', async () => {
       const newUser = await usersService.createUserWithOrg(
         'Test User',
         'new-user@example.com',
         'testtesttest',
       );
       const newOrg = await orgsService.createForUser(newUser);
-      const feature = new Feature();
-      feature.title = 'Test Feature';
-      feature.org = Promise.resolve(newOrg);
-      feature.project = Promise.resolve(project);
-      await featuresRepository.save(feature);
+      const initiative = new Initiative();
+      initiative.title = 'Test Feature';
+      initiative.org = Promise.resolve(newOrg);
+      initiative.project = Promise.resolve(project);
+      await initiativesRepository.save(initiative);
       await expect(
-        service.getFeature(org.id, project.id, feature.id),
+        service.getInitiative(org.id, project.id, initiative.id),
       ).rejects.toThrow();
     });
   });

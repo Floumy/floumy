@@ -15,16 +15,16 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { FeaturesService } from './features.service';
-import { CreateUpdateFeatureDto, PatchFeatureDto } from './dtos';
+import { InitiativesService } from './initiatives.service';
+import { CreateUpdateInitiativeDto, PatchInitiativeDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
 
-@Controller('/orgs/:orgId/projects/:projectId/features')
+@Controller('/orgs/:orgId/projects/:projectId/initiatives')
 @UseGuards(AuthGuard)
-export class FeaturesController {
-  constructor(private featuresService: FeaturesService) {}
+export class InitiativesController {
+  constructor(private initiativesService: InitiativesService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -32,18 +32,18 @@ export class FeaturesController {
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Request() request,
-    @Body() featureDto: CreateUpdateFeatureDto,
+    @Body() initiativeDto: CreateUpdateInitiativeDto,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.featuresService.createFeature(
+      return await this.initiativesService.createInitiative(
         orgId,
         projectId,
         request.user.sub,
-        featureDto,
+        initiativeDto,
       );
     } catch (e) {
       throw new BadRequestException();
@@ -65,7 +65,7 @@ export class FeaturesController {
 
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.listFeatures(
+      return await this.initiativesService.listInitiatives(
         orgId,
         projectId,
         page,
@@ -93,7 +93,7 @@ export class FeaturesController {
 
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.searchFeatures(
+      return await this.initiativesService.searchInitiatives(
         orgId,
         projectId,
         query,
@@ -119,7 +119,7 @@ export class FeaturesController {
 
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.listFeaturesWithoutMilestone(
+      return await this.initiativesService.listInitiativesWithoutMilestone(
         orgId,
         projectId,
       );
@@ -142,7 +142,7 @@ export class FeaturesController {
 
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.getFeature(orgId, projectId, id);
+      return await this.initiativesService.getInitiative(orgId, projectId, id);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -155,7 +155,7 @@ export class FeaturesController {
     @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
-    @Body() updateFeatureDto: CreateUpdateFeatureDto,
+    @Body() updateInitiativeDto: CreateUpdateInitiativeDto,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
@@ -163,12 +163,12 @@ export class FeaturesController {
 
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.updateFeature(
+      return await this.initiativesService.updateInitiative(
         request.user.sub,
         orgId,
         projectId,
         id,
-        updateFeatureDto,
+        updateInitiativeDto,
       );
     } catch (e) {
       throw new BadRequestException();
@@ -189,7 +189,7 @@ export class FeaturesController {
 
     try {
       const { org: orgId } = request.user;
-      await this.featuresService.deleteFeature(orgId, projectId, id);
+      await this.initiativesService.deleteInitiative(orgId, projectId, id);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -202,7 +202,7 @@ export class FeaturesController {
     @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
-    @Body() patchFeatureDto: PatchFeatureDto,
+    @Body() patchInitiativeDto: PatchInitiativeDto,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
@@ -210,11 +210,11 @@ export class FeaturesController {
 
     try {
       const { org: orgId } = request.user;
-      return await this.featuresService.patchFeature(
+      return await this.initiativesService.patchInitiative(
         orgId,
         projectId,
         id,
-        patchFeatureDto,
+        patchInitiativeDto,
       );
     } catch (e) {
       throw new BadRequestException();
@@ -228,7 +228,7 @@ export class FeaturesController {
     @Body() createCommentDto: CreateUpdateCommentDto,
   ) {
     try {
-      return await this.featuresService.createFeatureComment(
+      return await this.initiativesService.createInitiativeComment(
         request.user.sub,
         id,
         createCommentDto,
@@ -242,7 +242,7 @@ export class FeaturesController {
   @Public()
   async listComments(@Param('id') id: string) {
     try {
-      return await this.featuresService.listFeatureComments(id);
+      return await this.initiativesService.listInitiativeComments(id);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -251,13 +251,13 @@ export class FeaturesController {
   @Delete(':id/comments/:commentId')
   async deleteComment(
     @Request() request,
-    @Param('id') featureId: string,
+    @Param('id') initiativeId: string,
     @Param('commentId') commentId: string,
   ) {
     try {
-      await this.featuresService.deleteFeatureComment(
+      await this.initiativesService.deleteInitiativeComment(
         request.user.sub,
-        featureId,
+        initiativeId,
         commentId,
       );
     } catch (e) {
@@ -268,14 +268,14 @@ export class FeaturesController {
   @Put(':id/comments/:commentId')
   async updateComment(
     @Request() request,
-    @Param('id') featureId: string,
+    @Param('id') initiativeId: string,
     @Param('commentId') commentId: string,
     @Body() updateCommentDto: CreateUpdateCommentDto,
   ) {
     try {
-      return await this.featuresService.updateFeatureComment(
+      return await this.initiativesService.updateInitiativeComment(
         request.user.sub,
-        featureId,
+        initiativeId,
         commentId,
         updateCommentDto,
       );
@@ -297,7 +297,7 @@ export class FeaturesController {
     }
 
     try {
-      await this.featuresService.changeAssignee(
+      await this.initiativesService.changeAssignee(
         orgId,
         projectId,
         id,

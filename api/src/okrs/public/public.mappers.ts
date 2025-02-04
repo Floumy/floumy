@@ -2,7 +2,7 @@ import { ObjectiveDto } from './dtos';
 import { Objective } from '../objective.entity';
 import { TimelineService } from '../../common/timeline.service';
 import { KeyResult } from '../key-result.entity';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { CommentMapper } from '../../comments/mappers';
 
@@ -50,7 +50,7 @@ export class PublicOkrMapper {
   }
 
   static async toKeyResultDto(keyResult: KeyResult) {
-    const features = (await keyResult.features) || [];
+    const features = (await keyResult.initiatives) || [];
     const comments = await keyResult.comments;
 
     return {
@@ -66,7 +66,7 @@ export class PublicOkrMapper {
     };
   }
 
-  static async toFeatureDto(feature: Feature) {
+  static async toFeatureDto(feature: Initiative) {
     const workItems = (await feature.workItems) || [];
     return {
       id: feature.id,

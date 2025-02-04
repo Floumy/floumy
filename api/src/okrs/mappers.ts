@@ -1,9 +1,9 @@
 import { KeyResult } from './key-result.entity';
 import { Objective } from './objective.entity';
 import { TimelineService } from '../common/timeline.service';
-import { FeatureDto, KeyResultDto, OKRDto } from './dtos';
+import { InitiativeDto, KeyResultDto, OKRDto } from './dtos';
 import { CommentMapper } from '../comments/mappers';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 
 export class OKRMapper {
   static async toDTO(
@@ -88,7 +88,7 @@ export class OKRMapper {
 }
 
 class FeatureMapper {
-  static async toDTO(feature: Feature): Promise<FeatureDto> {
+  static async toDTO(feature: Initiative): Promise<InitiativeDto> {
     return {
       id: feature.id,
       reference: feature.reference,
@@ -124,7 +124,7 @@ class WorkItemMapper {
 export class KeyResultMapper {
   static async toDTO(keyResult: KeyResult): Promise<KeyResultDto> {
     const objective = await keyResult.objective;
-    const features = await keyResult.features;
+    const features = await keyResult.initiatives;
     const org = await keyResult.org;
     const project = await keyResult.project;
 
@@ -154,7 +154,7 @@ export class KeyResultMapper {
       createdAt: keyResult.createdAt,
       updatedAt: keyResult.updatedAt,
       status: keyResult.status,
-      features: await Promise.all(features.map(FeatureMapper.toDTO)),
+      initiatives: await Promise.all(features.map(FeatureMapper.toDTO)),
     };
   }
 

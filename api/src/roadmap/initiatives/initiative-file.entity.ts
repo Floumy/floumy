@@ -6,15 +6,15 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { File } from '../../files/file.entity';
-import { Feature } from './feature.entity';
+import { Initiative } from './initiative.entity';
 
 @Entity()
-export class FeatureFile {
+export class InitiativeFile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Feature, (feature) => feature.featureFiles, { lazy: true })
-  feature: Promise<Feature>;
+  @ManyToOne(() => Initiative, (initiative) => initiative.initiativeFiles, { lazy: true })
+  initiatives: Promise<Initiative>;
 
   @OneToOne(() => File, { lazy: true })
   @JoinColumn()

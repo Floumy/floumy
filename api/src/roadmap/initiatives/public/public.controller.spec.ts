@@ -6,11 +6,11 @@ import { setupTestingModule } from '../../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../../../okrs/objective.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
-import { Feature } from '../feature.entity';
+import { Initiative } from '../initiative.entity';
 import { Milestone } from '../../milestones/milestone.entity';
 import { Sprint } from '../../../sprints/sprint.entity';
 import { File } from '../../../files/file.entity';
-import { FeatureFile } from '../feature-file.entity';
+import { InitiativeFile } from '../initiative-file.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
 import { WorkItemFile } from '../../../backlog/work-items/work-item-file.entity';
 import { UsersModule } from '../../../users/users.module';
@@ -18,7 +18,7 @@ import { BacklogModule } from '../../../backlog/backlog.module';
 import { OkrsService } from '../../../okrs/okrs.service';
 import { OrgsService } from '../../../orgs/orgs.service';
 import { TokensService } from '../../../auth/tokens.service';
-import { FeaturesService } from '../features.service';
+import { InitiativesService } from '../initiatives.service';
 import { FilesService } from '../../../files/files.service';
 import { FilesStorageRepository } from '../../../files/files-storage.repository';
 import { UsersService } from '../../../users/users.service';
@@ -30,7 +30,7 @@ import { Project } from '../../../projects/project.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
-  let featuresRepository: Repository<Feature>;
+  let initiativesRepository: Repository<Initiative>;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
@@ -45,11 +45,11 @@ describe('PublicController', () => {
           Org,
           Objective,
           KeyResult,
-          Feature,
+          Initiative,
           Milestone,
           Sprint,
           File,
-          FeatureFile,
+          InitiativeFile,
           WorkItem,
           WorkItemFile,
           BipSettings,
@@ -61,7 +61,7 @@ describe('PublicController', () => {
         OkrsService,
         OrgsService,
         TokensService,
-        FeaturesService,
+        InitiativesService,
         MilestonesService,
         FilesService,
         FilesStorageRepository,
@@ -76,8 +76,8 @@ describe('PublicController', () => {
     const bipRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
-    featuresRepository = module.get<Repository<Feature>>(
-      getRepositoryToken(Feature),
+    initiativesRepository = module.get<Repository<Initiative>>(
+      getRepositoryToken(Initiative),
     );
 
     user = await usersService.createUserWithOrg(
@@ -98,35 +98,35 @@ describe('PublicController', () => {
     await cleanup();
   });
 
-  describe('when getting the feature of an org', () => {
-    it('should return the feature', async () => {
-      const feature = new Feature();
-      feature.title = 'Test Feature';
-      feature.org = Promise.resolve(org);
-      feature.project = Promise.resolve(project);
-      await featuresRepository.save(feature);
+  describe('when getting the initiative of an org', () => {
+    it('should return the initiative', async () => {
+      const initiative = new Initiative();
+      initiative.title = 'Test Feature';
+      initiative.org = Promise.resolve(org);
+      initiative.project = Promise.resolve(project);
+      await initiativesRepository.save(initiative);
       const result = await controller.getFeature(
         org.id,
         project.id,
-        feature.id,
+        initiative.id,
       );
       expect(result).toBeDefined();
-      expect(result.id).toEqual(feature.id);
+      expect(result.id).toEqual(initiative.id);
     });
-    it('should throw an error if the feature does not belong to the org', async () => {
+    it('should throw an error if the initiative does not belong to the org', async () => {
       const newUser = await usersService.createUserWithOrg(
         'Test User',
         'new-user@example.com',
         'testtesttest',
       );
       const newOrg = await orgsService.createForUser(newUser);
-      const feature = new Feature();
-      feature.title = 'Test Feature';
-      feature.org = Promise.resolve(newOrg);
-      feature.project = Promise.resolve(project);
-      await featuresRepository.save(feature);
+      const initiative = new Initiative();
+      initiative.title = 'Test Feature';
+      initiative.org = Promise.resolve(newOrg);
+      initiative.project = Promise.resolve(project);
+      await initiativesRepository.save(initiative);
       await expect(
-        controller.getFeature(org.id, project.id, feature.id),
+        controller.getFeature(org.id, project.id, initiative.id),
       ).rejects.toThrow(NotFoundException);
     });
   });

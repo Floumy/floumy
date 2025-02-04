@@ -10,7 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { File } from './file.entity';
 import { Org } from '../orgs/org.entity';
 import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
-import { FeatureFile } from '../roadmap/features/feature-file.entity';
+import { InitiativeFile } from '../roadmap/initiatives/initiative-file.entity';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
 import { OrgsModule } from '../orgs/orgs.module';
@@ -48,7 +48,7 @@ const s3ClientProvider = {
       Org,
       File,
       WorkItemFile,
-      FeatureFile,
+      InitiativeFile,
       User,
       Project,
     ]),

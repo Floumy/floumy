@@ -1,12 +1,12 @@
 import {Entity, JoinTable, ManyToMany, ManyToOne} from 'typeorm';
 import { Comment } from '../../comments/comment-entity';
-import { Feature } from './feature.entity';
+import { Initiative } from './initiative.entity';
 import {User} from "../../users/user.entity";
 
 @Entity()
-export class FeatureComment extends Comment {
-  @ManyToOne(() => Feature, (feature) => feature.comments, { lazy: true })
-  feature: Promise<Feature>;
+export class InitiativeComment extends Comment {
+  @ManyToOne(() => Initiative, (initiative) => initiative.comments, { lazy: true })
+  initiatives: Promise<Initiative>;
 
   @ManyToMany(() => User, {
     lazy: true,

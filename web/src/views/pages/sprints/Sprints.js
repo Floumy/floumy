@@ -28,7 +28,7 @@ function Sprints() {
   const [showWorkItems, setShowWorkItems] = useState({});
   const navigate = useNavigate();
 
-  // on b hotkey press scroll to the features backlog section
+  // on b hotkey press scroll to the initiatives backlog section
   useHotkeys("b", () => {
     document.getElementById("work-items-backlog").scrollIntoView();
   });

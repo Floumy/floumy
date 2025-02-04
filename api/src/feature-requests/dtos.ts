@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { CommentDto } from '../comments/dtos';
-import { FeatureDto } from '../okrs/dtos';
+import { InitiativeDto } from '../okrs/dtos';
 
 export class CreateFeatureRequestDto {
   @IsNotEmpty()
@@ -48,5 +48,5 @@ export interface FeatureRequestDto {
   createdAt: Date;
   updatedAt: Date;
   comments: CommentDto[];
-  features: FeatureDto[];
+  features: InitiativeDto[];
 }
