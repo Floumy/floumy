@@ -193,21 +193,21 @@ function calculateEndDate(startDate, duration) {
   return date;
 }
 
-export function getIterationStartDate(iteration) {
-  if (iteration.actualStartDate) {
-    return new Date(iteration.actualStartDate);
+export function getSprintStartDate(sprint) {
+  if (sprint.actualStartDate) {
+    return new Date(sprint.actualStartDate);
   }
-  return new Date(iteration.startDate);
+  return new Date(sprint.startDate);
 }
 
-export function getIterationEndDate(iteration) {
-  if (iteration.actualEndDate) {
-    return new Date(iteration.actualEndDate);
+export function getSprintEndDate(sprint) {
+  if (sprint.actualEndDate) {
+    return new Date(sprint.actualEndDate);
   }
-  if (iteration.actualStartDate) {
-    return calculateEndDate(iteration.actualStartDate, iteration.duration);
+  if (sprint.actualStartDate) {
+    return calculateEndDate(sprint.actualStartDate, sprint.duration);
   }
-  return new Date(iteration.endDate);
+  return new Date(sprint.endDate);
 }
 
 export function workItemTypeName(type) {

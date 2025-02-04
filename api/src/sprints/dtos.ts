@@ -1,10 +1,10 @@
-export interface CreateOrUpdateIterationDto {
+export interface CreateOrUpdateSprintDto {
   goal: string;
   startDate: string;
   duration: number;
 }
 
-export interface IterationDto {
+export interface SprintDto {
   id: string;
   title: string;
   goal: string;

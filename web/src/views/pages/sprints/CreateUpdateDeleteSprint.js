@@ -5,7 +5,7 @@ import { Field, Form, Formik } from "formik";
 import InputError from "../../../components/Errors/InputError";
 import ReactDatetime from "react-datetime";
 import Select2 from "react-select2-wrapper";
-import { deleteIteration, startIteration } from "../../../services/iterations/iterations.service";
+import { deleteSprint, startSprint } from "../../../services/sprints/sprints.service";
 import DeleteWarning from "../components/DeleteWarning";
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from "react-toastify";
@@ -14,10 +14,10 @@ import { addWorkItem } from "../../../services/backlog/backlog.service";
 import { sortByPriority } from "../../../services/utils/utils";
 import ExecutionStats from "../components/stats/ExecutionStats";
 
-function CreateUpdateDeleteIteration(
+function CreateUpdateDeleteSprint(
   {
     onSubmit,
-    iteration = {
+    sprint = {
       id: "",
       goal: "",
       startDate: "",
@@ -27,14 +27,14 @@ function CreateUpdateDeleteIteration(
 ) {
   const { orgId, projectId } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [startDate, setStartDate] = useState(iteration?.startDate);
+  const [startDate, setStartDate] = useState(sprint?.startDate);
   const [isStartDateTouched, setIsStartDateTouched] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [duration, setDuration] = useState(iteration?.duration);
+  const [duration, setDuration] = useState(sprint?.duration);
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
   const [workItems, setWorkItems] = useState([]);
-  const [iterationStatus, setIterationStatus] = useState(iteration?.status);
+  const [sprintStatus, setSprintStatus] = useState(sprint?.status);
 
   const navigate = useNavigate();
 
@@ -65,11 +65,11 @@ function CreateUpdateDeleteIteration(
   useEffect(() => {
     document.title = "Floumy | Sprint";
 
-    if (iteration.id) {
+    if (sprint.id) {
       setIsUpdate(true);
-      setWorkItems(sortByPriority(iteration.workItems));
+      setWorkItems(sortByPriority(sprint.workItems));
     }
-  }, [iteration]);
+  }, [sprint]);
 
   function getDueDateClassName() {
     if (isStartDateTouched && startDate === "") {
@@ -80,7 +80,7 @@ function CreateUpdateDeleteIteration(
 
   const onDelete = async (id) => {
     try {
-      await deleteIteration(id);
+      await deleteSprint(id);
       navigate(-1);
       setTimeout(() => toast.success("The sprint has been deleted"), 100);
     } catch (e) {
@@ -105,17 +105,17 @@ function CreateUpdateDeleteIteration(
   }
 
   async function handleAddWorkItem(workItem) {
-    workItem.iteration = iteration.id;
+    workItem.sprint = sprint.id;
     const savedWorkItem = await addWorkItem(workItem);
     setWorkItems([...workItems, savedWorkItem]);
   }
 
-  function handleChangeIteration(workItems, newIterationId) {
-    if (iteration.id === newIterationId) return;
-    removeWorkItemFromIteration(workItems);
+  function handleChangeSprint(workItems, newSprintId) {
+    if (sprint.id === newSprintId) return;
+    removeWorkItemFromSprint(workItems);
   }
 
-  function removeWorkItemFromIteration(workItems) {
+  function removeWorkItemFromSprint(workItems) {
     const newWorkItems = [];
     workItems.forEach(workItem => {
       if (!workItems.some(w => w.id === workItem.id)) {
@@ -150,10 +150,10 @@ function CreateUpdateDeleteIteration(
     setWorkItems(sortByPriority(workItemsToUpdate));
   }
 
-  async function start(iterationId) {
+  async function start(sprintId) {
     try {
-      await startIteration(iterationId);
-      setIterationStatus("active");
+      await startSprint(sprintId);
+      setSprintStatus("active");
       toast.success("The sprint has been started");
     } catch (e) {
       toast.error("The sprint could not be started");
@@ -166,18 +166,18 @@ function CreateUpdateDeleteIteration(
         isOpen={isDeleteWarningOpen}
         entity={"sprint"}
         toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
-        onDelete={() => onDelete(iteration.id)}
+        onDelete={() => onDelete(sprint.id)}
       />
       {isLoading && <InfiniteLoadingBar />}
-      {workItems && workItems.length > 0 && <ExecutionStats workItems={workItems} dueDate={iteration?.endDate} />}
+      {workItems && workItems.length > 0 && <ExecutionStats workItems={workItems} dueDate={sprint?.endDate} />}
       <Card>
         <CardHeader>
-          {isUpdate && <h3 className="mb-0"><span className="mr-2">Edit {iteration.title}</span>
-            {iterationStatus === "active" && <span className="badge badge-info">Active</span>}
-            {iterationStatus === "completed" && <span className="badge badge-success">Completed</span>}
-            {iterationStatus === "planned" &&
+          {isUpdate && <h3 className="mb-0"><span className="mr-2">Edit {sprint.title}</span>
+            {sprintStatus === "active" && <span className="badge badge-info">Active</span>}
+            {sprintStatus === "completed" && <span className="badge badge-success">Completed</span>}
+            {sprintStatus === "planned" &&
               <button onClick={async () => {
-                await start(orgId, projectId, iteration.id);
+                await start(orgId, projectId, sprint.id);
               }} className="btn btn-sm btn-outline-primary mr-0">Start Sprint
               </button>}
           </h3>}
@@ -186,7 +186,7 @@ function CreateUpdateDeleteIteration(
         </CardHeader>
         <CardBody>
           <Formik
-            initialValues={{ goal: iteration?.goal }}
+            initialValues={{ goal: sprint?.goal }}
             onSubmit={handleSubmit}
           >
             {({ values, handleChange }) => (
@@ -263,7 +263,7 @@ function CreateUpdateDeleteIteration(
                   </Col>
                 </Row>
                 <Button
-                  id={"save-iteration"}
+                  id={"save-sprint"}
                   color="primary"
                   type="submit"
                   className="mt-3"
@@ -272,7 +272,7 @@ function CreateUpdateDeleteIteration(
                   Save Sprint
                 </Button>
                 {isUpdate && <Button
-                  id={"delete-iteration"}
+                  id={"delete-sprint"}
                   color="secondary"
                   type="button"
                   className="mt-3"
@@ -286,11 +286,11 @@ function CreateUpdateDeleteIteration(
           </Formik>
         </CardBody>
       </Card>
-      {isUpdate && iteration && workItems && <WorkItemsListCard
+      {isUpdate && sprint && workItems && <WorkItemsListCard
         title={"Work Items"}
         workItems={workItems}
         onAddWorkItem={handleAddWorkItem}
-        onChangeIteration={handleChangeIteration}
+        onChangeSprint={handleChangeSprint}
         onChangeStatus={updateWorkItemsStatusAndCompletedAt}
         onChangePriority={updateWorkItemsPriority}
       />}
@@ -298,4 +298,4 @@ function CreateUpdateDeleteIteration(
   );
 }
 
-export default CreateUpdateDeleteIteration;
+export default CreateUpdateDeleteSprint;

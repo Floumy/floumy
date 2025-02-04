@@ -8,8 +8,8 @@ export const BuildInPublicProvider = ({ children, orgId, projectId }) => {
   const [settings, setSettings] = useState({
     isObjectivesPagePublic: false,
     isRoadmapPagePublic: false,
-    isIterationsPagePublic: false,
-    isActiveIterationsPagePublic: false,
+    isSprintsPagePublic: false,
+    isActiveSprintsPagePublic: false,
     isFeedPagePublic: false,
     isIssuesPagePublic: false,
     isFeatureRequestsPagePublic: false,

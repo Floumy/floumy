@@ -17,7 +17,7 @@ import { WorkItemsService } from '../../backlog/work-items/work-items.service';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { WorkItemType } from '../../backlog/work-items/work-item-type.enum';
 import { FeatureStatus } from './featurestatus.enum';
-import { Iteration } from '../../iterations/Iteration.entity';
+import { Sprint } from '../../sprints/sprint.entity';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { FilesService } from '../../files/files.service';
@@ -59,7 +59,7 @@ describe('FeaturesService', () => {
           User,
           Milestone,
           WorkItem,
-          Iteration,
+          Sprint,
           File,
           WorkItemFile,
           FeatureFile,

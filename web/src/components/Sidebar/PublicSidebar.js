@@ -53,8 +53,8 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, orgId, pro
     return buildingInPublicSettings.isFeedPagePublic ||
       buildingInPublicSettings.isObjectivesPagePublic ||
       buildingInPublicSettings.isRoadmapPagePublic ||
-      buildingInPublicSettings.isIterationsPagePublic ||
-      buildingInPublicSettings.isActiveIterationsPagePublic;
+      buildingInPublicSettings.isSprintsPagePublic ||
+      buildingInPublicSettings.isActiveSprintsPagePublic;
   }
 
   const scrollBarInner = (
@@ -147,9 +147,9 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, orgId, pro
                 <span className="nav-link-text">Initiatives Roadmap</span>
               </NavLink>
             </NavItem>}
-            {buildingInPublicSettings.isIterationsPagePublic && <NavItem>
+            {buildingInPublicSettings.isSprintsPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${orgId}/projects/${project.id}/iterations`}
+                to={`/public/orgs/${orgId}/projects/${project.id}/sprints`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >
@@ -157,9 +157,9 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, orgId, pro
                 <span className="nav-link-text">Sprints</span>
               </NavLink>
             </NavItem>}
-            {buildingInPublicSettings.isActiveIterationsPagePublic && <NavItem>
+            {buildingInPublicSettings.isActiveSprintsPagePublic && <NavItem>
               <NavLink
-                to={`/public/orgs/${orgId}/projects/${project.id}/active-iteration`}
+                to={`/public/orgs/${orgId}/projects/${project.id}/active-sprint`}
                 onClick={closeSidenav}
                 tag={NavLinkRRD}
               >

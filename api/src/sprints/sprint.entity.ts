@@ -9,11 +9,11 @@ import {
 } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { IterationStatus } from './iteration-status.enum';
+import { SprintStatus } from './sprint-status.enum';
 import { Project } from '../projects/project.entity';
 
 @Entity()
-export class Iteration {
+export class Sprint {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column()
@@ -34,18 +34,18 @@ export class Iteration {
   velocity: number;
   @Column({
     type: 'enum',
-    enum: IterationStatus,
-    default: IterationStatus.PLANNED,
+    enum: SprintStatus,
+    default: SprintStatus.PLANNED,
   })
-  status: IterationStatus;
+  status: SprintStatus;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @ManyToOne(() => Org, (org) => org.iterations, { lazy: true })
+  @ManyToOne(() => Org, (org) => org.sprints, { lazy: true })
   org: Promise<Org>;
-  @OneToMany(() => WorkItem, (workItem) => workItem.iteration, { lazy: false })
+  @OneToMany(() => WorkItem, (workItem) => workItem.sprint, { lazy: false })
   workItems: Promise<WorkItem[]>;
-  @ManyToOne(() => Project, (project) => project.iterations, { lazy: false })
+  @ManyToOne(() => Project, (project) => project.sprints, { lazy: false })
   project: Promise<Project>;
 }

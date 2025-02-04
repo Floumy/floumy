@@ -41,8 +41,8 @@ export function getWorkItemUpdates(item) {
     updates.push(`Asignee changed to "${current?.assignedTo?.name || "None"}"`);
   }
 
-  if (current?.iteration?.id !== previous?.iteration?.id) {
-    updates.push(`Iteration changed to "${current?.iteration?.title || "None"}"`);
+  if (current?.sprint?.id !== previous?.sprint?.id) {
+    updates.push(`Sprint changed to "${current?.sprint?.title || "None"}"`);
   }
 
   if (current?.feature?.id !== previous?.feature?.id) {
