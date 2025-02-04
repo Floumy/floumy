@@ -23,7 +23,7 @@ function WorkItemsList({
                          showAssignedTo = false,
                          headerClassName = "thead-light",
                          onAddNewWorkItem,
-                         onChangeIteration,
+                         onChangeSprint,
                          onChangeStatus,
                          onChangePriority,
                          onChangeAssignee,
@@ -78,7 +78,7 @@ function WorkItemsList({
         priority: priority,
         type: type,
         feature: null,
-        iteration: null,
+        sprint: null,
         estimation: values.estimation ? values.estimation : null,
         status: "planned"
       };
@@ -136,7 +136,7 @@ function WorkItemsList({
   return (<>
     {enableContextMenu && <WorkItemsContextMenu
       menuId={id}
-      onChangeIteration={onChangeIteration}
+      onChangeSprint={onChangeSprint}
       onChangeStatus={onChangeStatus}
       onChangePriority={onChangePriority}
       onChangeAssignee={onChangeAssignee}

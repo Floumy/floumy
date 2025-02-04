@@ -11,7 +11,7 @@ import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { OrgsModule } from '../orgs/orgs.module';
 import { OkrsModule } from '../okrs/okrs.module';
 import { WorkItem } from './work-items/work-item.entity';
-import { Iteration } from '../iterations/Iteration.entity';
+import { Sprint } from '../sprints/sprint.entity';
 import { File } from '../files/file.entity';
 import { WorkItemFile } from './work-items/work-item-file.entity';
 import { User } from '../users/user.entity';
@@ -38,7 +38,7 @@ import { Project } from '../projects/project.entity';
       Objective,
       Milestone,
       WorkItem,
-      Iteration,
+      Sprint,
       File,
       WorkItemFile,
       User,

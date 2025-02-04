@@ -163,7 +163,7 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                       type="text"
                       disabled={true}
                       className="bg-white"
-                      defaultValue={workItem.iteration?.title || "None"}
+                      defaultValue={workItem.sprint?.title || "None"}
                       placeholder="Select a sprint" />
                   </Col>
                 </Row>
@@ -226,7 +226,7 @@ const defaultWorkItem = {
   estimation: "",
   status: "planned",
   feature: { id: "" },
-  iteration: { id: "" }
+  sprint: { id: "" }
 };
 
 export default PublicWorkItem;

@@ -1,15 +1,15 @@
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import { Col, Container, Row } from "reactstrap";
 import React from "react";
-import CreateUpdateDeleteIteration from "./CreateUpdateDeleteIteration";
-import { addIteration } from "../../../services/iterations/iterations.service";
+import CreateUpdateDeleteSprint from "./CreateUpdateDeleteSprint";
+import { addSprint } from "../../../services/sprints/sprints.service";
 import { useParams } from "react-router-dom";
 
-function NewIteration() {
+function NewSprint() {
   const { orgId, projectId } = useParams();
 
-  const handleSubmit = async (iteration) => {
-    await addIteration(orgId, projectId, iteration);
+  const handleSubmit = async (sprint) => {
+    await addSprint(orgId, projectId, sprint);
   };
 
   return (
@@ -27,7 +27,7 @@ function NewIteration() {
         <Row>
           <Col>
             <div className="card-wrapper">
-              <CreateUpdateDeleteIteration onSubmit={handleSubmit} />
+              <CreateUpdateDeleteSprint onSubmit={handleSubmit} />
             </div>
           </Col>
         </Row>
@@ -36,4 +36,4 @@ function NewIteration() {
   );
 }
 
-export default NewIteration;
+export default NewSprint;

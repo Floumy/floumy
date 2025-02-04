@@ -14,7 +14,7 @@ import {
   listComments,
   updateComment
 } from "../../../services/backlog/backlog.service";
-import { listIterations } from "../../../services/iterations/iterations.service";
+import { listSprints } from "../../../services/sprints/sprints.service";
 import FloumyDropZone from "../components/FloumyDropZone";
 import { formatHyphenatedString } from "../../../services/utils/utils";
 import DeleteWarning from "../components/DeleteWarning";
@@ -40,9 +40,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const [type, setType] = useState(workItem.type || "");
   const [status, setStatus] = useState(workItem.status || "");
   const [features, setFeatures] = useState([{ id: "", text: "None" }]);
-  const [iterations, setIterations] = useState([{ id: "", text: "None" }]);
+  const [sprints, setSprints] = useState([{ id: "", text: "None" }]);
   const [feature, setFeature] = useState(workItem.feature ? workItem.feature.id : "");
-  const [iteration, setIteration] = useState(workItem.iteration ? workItem.iteration.id : "");
+  const [sprint, setSprint] = useState(workItem.sprint ? workItem.sprint.id : "");
   const [deleteWarning, setDeleteWarning] = useState(false);
   const [files, setFiles] = useState([]);
   const [members, setMembers] = useState([{ id: "", text: "None" }]);
@@ -75,19 +75,19 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     setFeature(workItem.feature ? workItem.feature.id : "");
   }, [workItem.feature]);
 
-  const loadAndSetIterations = useCallback(async () => {
-    const iterations = await listIterations(orgId, projectId);
-    const mappedIterations = iterations
-      .map(iteration => {
+  const loadAndSetSprints = useCallback(async () => {
+    const sprints = await listSprints(orgId, projectId);
+    const mappedSprints = sprints
+      .map(sprint => {
         return {
-          id: iteration.id,
-          text: `${iteration.startDate} | ${iteration.title} [${formatHyphenatedString(iteration.status)}]`
+          id: sprint.id,
+          text: `${sprint.startDate} | ${sprint.title} [${formatHyphenatedString(sprint.status)}]`
         };
       });
-    mappedIterations.push({ id: "", text: "None" });
-    setIterations(mappedIterations);
-    setIteration(workItem.iteration ? workItem.iteration.id : "");
-  }, [workItem.iteration]);
+    mappedSprints.push({ id: "", text: "None" });
+    setSprints(mappedSprints);
+    setSprint(workItem.sprint ? workItem.sprint.id : "");
+  }, [workItem.sprint]);
 
   const loadAndSetMembers = useCallback(async () => {
     const org = await getOrg();
@@ -113,7 +113,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       try {
         await Promise.all([
           loadAndSetFeatures(),
-          loadAndSetIterations(),
+          loadAndSetSprints(),
           loadAndSetMembers(),
           loadAndSetIssues()
         ]);
@@ -130,7 +130,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
 
     fetchData();
 
-  }, [loadAndSetFeatures, loadAndSetIterations, loadAndSetMembers, loadAndSetComments, workItem.id, loadAndSetIssues]);
+  }, [loadAndSetFeatures, loadAndSetSprints, loadAndSetMembers, loadAndSetComments, workItem.id, loadAndSetIssues]);
 
   useEffect(() => {
     if (workItem.title) {
@@ -168,7 +168,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         priority: priority,
         type: type,
         feature: feature,
-        iteration: iteration,
+        sprint: sprint,
         estimation: values.estimation || null,
         status: status,
         files: files,
@@ -393,10 +393,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         </label>
                         <Select2
                           className="react-select-container"
-                          defaultValue={iteration}
+                          defaultValue={sprint}
                           placeholder="Select a sprint"
-                          data={iterations}
-                          onChange={(e) => setIteration(e.target.value)}
+                          data={sprints}
+                          onChange={(e) => setSprint(e.target.value)}
                         ></Select2>
                       </Col>
                     </Row>
@@ -524,7 +524,7 @@ const defaultWorkItem = {
   estimation: null,
   status: "planned",
   feature: { id: "" },
-  iteration: { id: "" }
+  sprint: { id: "" }
 };
 
 export default CreateUpdateDeleteWorkItem;

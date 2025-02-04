@@ -4,9 +4,9 @@ import { burndownChartOptions, chartOptions, parseOptions } from "../../../varia
 import React, { useEffect, useState } from "react";
 import Chart from "chart.js";
 import PropTypes from "prop-types";
-import { getIterationEndDate } from "../../../services/utils/utils";
+import { getSprintEndDate } from "../../../services/utils/utils";
 
-function DevelopmentStats({ iteration }) {
+function DevelopmentStats({ sprint }) {
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
   }
@@ -32,10 +32,10 @@ function DevelopmentStats({ iteration }) {
     }, 0);
   }
 
-  function calculateDaysLeft(iteration) {
+  function calculateDaysLeft(sprint) {
     const currentDate = new Date();
     currentDate.setHours(23, 59, 59, 999);
-    return Math.ceil((getIterationEndDate(iteration) - currentDate) / (24 * 60 * 60 * 1000));
+    return Math.ceil((getSprintEndDate(sprint) - currentDate) / (24 * 60 * 60 * 1000));
   }
 
   useEffect(() => {
@@ -63,9 +63,9 @@ function DevelopmentStats({ iteration }) {
 
     function setBurndownLabels() {
       const labels = [];
-      let numberOfDays = iteration.duration * 7;
-      const startDate = new Date(iteration.actualStartDate);
-      const daysLeft = calculateDaysLeft(iteration);
+      let numberOfDays = sprint.duration * 7;
+      const startDate = new Date(sprint.actualStartDate);
+      const daysLeft = calculateDaysLeft(sprint);
       if (daysLeft < 0) {
         numberOfDays += Math.abs(daysLeft);
       }
@@ -81,12 +81,12 @@ function DevelopmentStats({ iteration }) {
     function calculateIdealBurndown() {
       const idealBurndown = [];
 
-      let numberOfDays = iteration.duration * 7;
-      const daysLeft = calculateDaysLeft(iteration);
+      let numberOfDays = sprint.duration * 7;
+      const daysLeft = calculateDaysLeft(sprint);
       if (daysLeft < 0) {
         numberOfDays += Math.abs(daysLeft);
       }
-      const totalEstimation = getTotalEstimation(iteration.workItems);
+      const totalEstimation = getTotalEstimation(sprint.workItems);
       const dailyEffort = totalEstimation / (numberOfDays - 1);
 
       for (let i = 0; i < numberOfDays; i++) {
@@ -98,9 +98,9 @@ function DevelopmentStats({ iteration }) {
 
     function calculateBurndown(workItems) {
       const data = [];
-      const startDate = new Date(iteration.actualStartDate);
+      const startDate = new Date(sprint.actualStartDate);
       let numberOfDays = Math.ceil((new Date() - startDate) / (24 * 60 * 60 * 1000));
-      const daysLeft = calculateDaysLeft(iteration);
+      const daysLeft = calculateDaysLeft(sprint);
       if (daysLeft < 0) {
         numberOfDays += Math.abs(daysLeft);
       }
@@ -117,15 +117,15 @@ function DevelopmentStats({ iteration }) {
       setData(data);
     }
 
-    if (iteration.workItems.length > 0) {
-      calculateTotalEstimation(iteration.workItems);
-      calculateOverallCompletion(iteration.workItems);
-      calculateEstimatedEffortLeft(iteration.workItems);
+    if (sprint.workItems.length > 0) {
+      calculateTotalEstimation(sprint.workItems);
+      calculateOverallCompletion(sprint.workItems);
+      calculateEstimatedEffortLeft(sprint.workItems);
       setBurndownLabels();
-      calculateBurndown(iteration.workItems);
+      calculateBurndown(sprint.workItems);
       calculateIdealBurndown();
     }
-  }, [iteration]);
+  }, [sprint]);
 
   if (totalEstimation === 0) {
     return null;
@@ -214,7 +214,7 @@ function DevelopmentStats({ iteration }) {
 }
 
 DevelopmentStats.propTypes = {
-  iteration: PropTypes.object.isRequired
+  sprint: PropTypes.object.isRequired
 };
 
 export default DevelopmentStats;

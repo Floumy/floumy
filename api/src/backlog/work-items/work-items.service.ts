@@ -6,7 +6,7 @@ import { In, Repository } from 'typeorm';
 import { WorkItem } from './work-item.entity';
 import WorkItemMapper from './work-item.mapper';
 import { WorkItemStatus } from './work-item-status.enum';
-import { Iteration } from '../../iterations/Iteration.entity';
+import { Sprint } from '../../sprints/sprint.entity';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { User } from '../../users/user.entity';
@@ -32,8 +32,8 @@ export class WorkItemsService {
     @InjectRepository(WorkItem)
     private workItemsRepository: Repository<WorkItem>,
     @InjectRepository(Feature) private featuresRepository: Repository<Feature>,
-    @InjectRepository(Iteration)
-    private iterationsRepository: Repository<Iteration>,
+    @InjectRepository(Sprint)
+    private sprintRepository: Repository<Sprint>,
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(File) private filesRepository: Repository<File>,
     @InjectRepository(WorkItemFile)
@@ -201,7 +201,7 @@ export class WorkItemsService {
     );
   }
 
-  async listOpenWorkItemsWithoutIterations(orgId: string, projectId: string) {
+  async listOpenWorkItemsWithoutSprints(orgId: string, projectId: string) {
     const workItems = await this.workItemsRepository
       .createQueryBuilder('workItem')
       .leftJoinAndSelect('workItem.feature', 'feature')
@@ -212,7 +212,7 @@ export class WorkItemsService {
         closedStatus: WorkItemStatus.CLOSED,
         doneStatus: WorkItemStatus.DONE,
       })
-      .andWhere('workItem.iterationId IS NULL')
+      .andWhere('workItem.sprintId IS NULL')
       .getMany();
     return await WorkItemMapper.toListDto(workItems);
   }
@@ -229,13 +229,13 @@ export class WorkItemsService {
       project: { id: projectId },
     });
     const previous = await WorkItemMapper.toDto(workItem);
-    const currentIteration = await workItem.iteration;
+    const currentSprint = await workItem.sprint;
 
-    await this.updateIteration(
+    await this.updateSprint(
       workItem,
       workItemPatchDto,
       orgId,
-      currentIteration,
+      currentSprint,
     );
     this.updateStatusAndCompletionDate(workItem, workItemPatchDto);
     this.updatePriority(workItem, workItemPatchDto);
@@ -469,7 +469,7 @@ export class WorkItemsService {
       workItem.completedAt = new Date();
     }
     workItem.feature = Promise.resolve(null);
-    workItem.iteration = Promise.resolve(null);
+    workItem.sprint = Promise.resolve(null);
     if (workItemDto.feature) {
       const feature = await this.featuresRepository.findOneByOrFail({
         id: workItemDto.feature,
@@ -477,12 +477,12 @@ export class WorkItemsService {
       });
       workItem.feature = Promise.resolve(feature);
     }
-    if (workItemDto.iteration) {
-      const iteration = await this.iterationsRepository.findOneByOrFail({
-        id: workItemDto.iteration,
+    if (workItemDto.sprint) {
+      const sprint = await this.sprintRepository.findOneByOrFail({
+        id: workItemDto.sprint,
         org: { id: orgId },
       });
-      workItem.iteration = Promise.resolve(iteration);
+      workItem.sprint = Promise.resolve(sprint);
     }
     if (workItemDto.assignedTo) {
       const assignedTo = await this.usersRepository.findOneByOrFail({
@@ -523,23 +523,23 @@ export class WorkItemsService {
     }
   }
 
-  private async updateIteration(
+  private async updateSprint(
     workItem: WorkItem,
     workItemPatchDto: WorkItemPatchDto,
     orgId: string,
-    currentIteration: Iteration,
+    currentSprint: Sprint,
   ) {
-    if (workItemPatchDto.iteration) {
-      const iteration = await this.iterationsRepository.findOneByOrFail({
-        id: workItemPatchDto.iteration,
+    if (workItemPatchDto.sprint) {
+      const sprint = await this.sprintRepository.findOneByOrFail({
+        id: workItemPatchDto.sprint,
         org: { id: orgId },
       });
-      workItem.iteration = Promise.resolve(iteration);
+      workItem.sprint = Promise.resolve(sprint);
     } else if (
-      currentIteration != null &&
-      workItemPatchDto.iteration === null
+      currentSprint != null &&
+      workItemPatchDto.sprint === null
     ) {
-      workItem.iteration = Promise.resolve(null);
+      workItem.sprint = Promise.resolve(null);
     }
   }
 

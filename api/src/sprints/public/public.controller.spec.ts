@@ -9,7 +9,7 @@ import { KeyResult } from '../../okrs/key-result.entity';
 import { Feature } from '../../roadmap/features/feature.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { Milestone } from '../../roadmap/milestones/milestone.entity';
-import { Iteration } from '../Iteration.entity';
+import { Sprint } from '../sprint.entity';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { FeatureFile } from '../../roadmap/features/feature-file.entity';
@@ -19,7 +19,7 @@ import { OrgsService } from '../../orgs/orgs.service';
 import { TokensService } from '../../auth/tokens.service';
 import { FeaturesService } from '../../roadmap/features/features.service';
 import { MilestonesService } from '../../roadmap/milestones/milestones.service';
-import { IterationsService } from '../iterations.service';
+import { SprintsService } from '../sprints.service';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { UsersService } from '../../users/users.service';
@@ -31,7 +31,7 @@ import { Project } from '../../projects/project.entity';
 
 describe('PublicController', () => {
   let controller: PublicController;
-  let iterationsService: IterationsService;
+  let sprintsService: SprintsService;
   let bipSettingsRepository: Repository<BipSettings>;
   let orgsService: OrgsService;
   let cleanup: () => Promise<void>;
@@ -49,7 +49,7 @@ describe('PublicController', () => {
           Feature,
           WorkItem,
           Milestone,
-          Iteration,
+          Sprint,
           File,
           WorkItemFile,
           FeatureFile,
@@ -65,7 +65,7 @@ describe('PublicController', () => {
         FeaturesService,
         MilestonesService,
         WorkItemsService,
-        IterationsService,
+        SprintsService,
         FilesService,
         FilesStorageRepository,
         PublicService,
@@ -78,7 +78,7 @@ describe('PublicController', () => {
     bipSettingsRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
-    iterationsService = module.get<IterationsService>(IterationsService);
+    sprintsService = module.get<SprintsService>(SprintsService);
     const usersService = module.get<UsersService>(UsersService);
     user = await usersService.createUserWithOrg(
       'Test User',
@@ -102,14 +102,14 @@ describe('PublicController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('When getting iterations for timeline', () => {
-    it('should return a list of iterations', async () => {
-      await iterationsService.create(org.id, project.id, {
+  describe('When getting sprints for timeline', () => {
+    it('should return a list of sprints', async () => {
+      await sprintsService.create(org.id, project.id, {
         goal: 'Test Goal',
         startDate: new Date().toString(),
         duration: 1,
       });
-      const result = await controller.listIterationsForTimeline(
+      const result = await controller.listSprintsForTimeline(
         org.id,
         project.id,
         Timeline.THIS_QUARTER,
@@ -118,52 +118,52 @@ describe('PublicController', () => {
     });
   });
 
-  describe('When getting an iteration by id', () => {
-    it('should return an iteration', async () => {
-      const iteration = await iterationsService.create(org.id, project.id, {
+  describe('When getting an sprint by id', () => {
+    it('should return an sprint', async () => {
+      const sprint = await sprintsService.create(org.id, project.id, {
         goal: 'Test Goal',
         startDate: new Date().toString(),
         duration: 1,
       });
-      const result = await controller.getIterationById(
+      const result = await controller.getSprintById(
         org.id,
         project.id,
-        iteration.id,
+        sprint.id,
       );
       expect(result).toBeDefined();
     });
   });
 
-  describe('When getting the active iteration', () => {
-    it('should return an iteration', async () => {
-      const orgWithActiveIteration = await orgsService.createForUser(user);
-      const projectWithActiveIteration = (
-        await orgWithActiveIteration.projects
+  describe('When getting the active sprint', () => {
+    it('should return an sprint', async () => {
+      const orgWithActiveSprint = await orgsService.createForUser(user);
+      const projectWithActiveSprint = (
+        await orgWithActiveSprint.projects
       )[0];
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
-      bipSettings.isActiveIterationsPagePublic = true;
-      bipSettings.org = Promise.resolve(orgWithActiveIteration);
-      bipSettings.project = Promise.resolve(projectWithActiveIteration);
+      bipSettings.isActiveSprintsPagePublic = true;
+      bipSettings.org = Promise.resolve(orgWithActiveSprint);
+      bipSettings.project = Promise.resolve(projectWithActiveSprint);
       await bipSettingsRepository.save(bipSettings);
 
-      const iteration = await iterationsService.create(
-        orgWithActiveIteration.id,
-        projectWithActiveIteration.id,
+      const sprint = await sprintsService.create(
+        orgWithActiveSprint.id,
+        projectWithActiveSprint.id,
         {
           goal: 'Test Goal',
           startDate: new Date().toString(),
           duration: 1,
         },
       );
-      await iterationsService.startIteration(
-        orgWithActiveIteration.id,
-        projectWithActiveIteration.id,
-        iteration.id,
+      await sprintsService.startSprint(
+        orgWithActiveSprint.id,
+        projectWithActiveSprint.id,
+        sprint.id,
       );
-      const result = await controller.getActiveIteration(
-        orgWithActiveIteration.id,
-        projectWithActiveIteration.id,
+      const result = await controller.getActiveSprint(
+        orgWithActiveSprint.id,
+        projectWithActiveSprint.id,
       );
       expect(result).toBeDefined();
     });

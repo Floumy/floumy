@@ -13,7 +13,7 @@ import { KeyResult } from '../okrs/key-result.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { Iteration } from '../iterations/Iteration.entity';
+import { Sprint } from '../sprints/sprint.entity';
 import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
 import { PaymentPlan } from '../auth/payment.plan';
@@ -77,8 +77,8 @@ export class Org {
     lazy: true,
   })
   featureRequests: Promise<FeatureRequest[]>;
-  @OneToMany(() => Iteration, (iteration) => iteration.org, { lazy: true })
-  iterations: Promise<Iteration[]>;
+  @OneToMany(() => Sprint, (sprint) => sprint.org, { lazy: true })
+  sprints: Promise<Sprint[]>;
   @OneToMany(() => Invoice, (invoice) => invoice.org, { lazy: true })
   invoices: Promise<Invoice[]>;
   @OneToMany(() => File, (file) => file.org, { lazy: true })

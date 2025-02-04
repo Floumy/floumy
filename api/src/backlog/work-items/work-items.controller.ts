@@ -107,7 +107,7 @@ export class WorkItemsController {
 
   @Get('open')
   @HttpCode(HttpStatus.OK)
-  async listOpenWithoutIterations(
+  async listOpenWithoutSprints(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Request() request,
@@ -116,7 +116,7 @@ export class WorkItemsController {
       throw new UnauthorizedException();
     }
 
-    return await this.workItemsService.listOpenWorkItemsWithoutIterations(
+    return await this.workItemsService.listOpenWorkItemsWithoutSprints(
       orgId,
       projectId,
     );
