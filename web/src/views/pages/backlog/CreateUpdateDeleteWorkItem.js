@@ -17,7 +17,7 @@ import { listIterations } from '../../../services/iterations/iterations.service'
 import FloumyDropZone from '../components/FloumyDropZone';
 import { formatHyphenatedString } from '../../../services/utils/utils';
 import DeleteWarning from '../components/DeleteWarning';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import CardHeaderDetails from '../components/CardHeaderDetails';
 import { getOrg } from '../../../services/org/orgs.service';
@@ -235,8 +235,8 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         toggle={() => setDeleteWarning(!deleteWarning)}
         entity={'work item'}
         onDelete={() => onDelete(workItem.id)} />
-      <Row>
-        <Col lg={8} md={12}>
+      <Row className="flex-column flex-lg-row">
+        <Col lg={workItem?.id ? 7 : 12} md={12}>
           <Card>
             <CardHeader>
               {!isUpdate && <h3 className="mb-0">New Work Item</h3>}
@@ -500,77 +500,38 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
             </CardBody>
           </Card>
         </Col>
-        <Col lg={4} md={12}>
+        <Col lg={5} md={12} hidden={!workItem?.id}>
           <Card>
             <CardHeader>
               <h3 className="mb-0">
-                Links
+                Pull Requests
               </h3>
             </CardHeader>
             <CardBody>
               <Row>
                 <Col>
-                  <div className="mb-3">
-                    {workItem.iteration && (
-                      <div className="mb-3">
-                        <h4>SPRINT</h4>
-                        <Link
-                          to={`/admin/orgs/${orgId}/projects/${projectId}/iterations/detail/${workItem.iteration.id}`}
-                          className="text-blue">
-                          {workItem.iteration.title}
-                        </Link>
-                      </div>
-                    )}
-                    {workItem.feature && (
-                      <div className="mb-3">
-                        <h4>INITIATIVE</h4>
-                        <Link
-                          to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${workItem.feature.id}`}
-                          className="text-blue">
-                          {workItem.feature.title}
-                        </Link>
-                      </div>
-                    )}
-                    {workItem.issue && (
-                      <div className="mb-3">
-                        <h4>ISSUE</h4>
-                        <Link to={`/admin/orgs/${orgId}/projects/${projectId}/issues/detail/${workItem.issue.id}`}
-                              className="text-blue">
-                          {workItem.issue.title}
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                  <div className="mb-3" hidden={!workItem.pullRequests?.length}>
-                    <h4>PULL REQUESTS</h4>
-                    <div>
-                      <ul className="list-unstyled">
-                        {workItem.pullRequests?.map((pullRequest) => (
-                          <li key={pullRequest.id} className="mb-2">
-                            <a href={pullRequest.url} target="_blank" rel="noreferrer" className="text-blue">
-                              <span className="mr-2">{pullRequest.title}</span>
-                              <i className="fa fa-external-link-alt mr-1" />
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                  <ul className="list-unstyled">
+                    {workItem.pullRequests?.map((pullRequest) => (
+                      <li key={pullRequest.id} className="mb-2">
+                        <a href={pullRequest.url} target="_blank" rel="noreferrer" className="text-blue">
+                          <span className="mr-2">{pullRequest.title}</span>
+                          <i className="fa fa-external-link-alt mr-1" />
+                        </a>
+                      </li>
+                    ))}
+                    {workItem.pullRequests?.length === 0 && <li className="mb-2">No pull requests found</li>}
+                  </ul>
                 </Col>
               </Row>
             </CardBody>
           </Card>
-        </Col>
-      </Row>
-      <Row>
-        {workItem.id && !isLoading &&
-          <Col md={12} lg={8}>
+          {workItem.id && !isLoading &&
             <Comments comments={comments}
                       onCommentAdd={handleCommentSubmit}
                       onCommentDelete={handleCommentDelete}
                       onCommentEdit={handleCommentEditSubmit}
-            />
-          </Col>}
+            />}
+        </Col>
       </Row>
     </>
   );
