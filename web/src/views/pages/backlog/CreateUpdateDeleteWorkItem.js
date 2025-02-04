@@ -282,45 +282,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                       </Col>
                     </Row>
                     <Row>
-                      <Col xs={12} sm={3} className="mb-3">
-                        <label
-                          className="form-control-label"
-                          htmlFor="validationCustom01"
-                        >
-                          Type
-                        </label>
-                        <Select2
-                          className="react-select-container"
-                          defaultValue={type}
-                          name="type"
-                          data={[
-                            { id: 'user-story', text: 'User Story' },
-                            { id: 'task', text: 'Task' },
-                            { id: 'bug', text: 'Bug' },
-                            { id: 'spike', text: 'Spike' },
-                            { id: 'technical-debt', text: 'Technical Debt' },
-                          ]}
-                          onChange={(e) => setType(e.target.value)}></Select2>
-                      </Col>
-                      <Col xs={12} sm={3} className="mb-3">
-                        <label
-                          className="form-control-label"
-                          htmlFor="validationCustom01"
-                        >
-                          Priority
-                        </label>
-                        <Select2
-                          className="react-select-container"
-                          defaultValue={priority}
-                          name="priority"
-                          data={[
-                            { id: 'high', text: 'High' },
-                            { id: 'medium', text: 'Medium' },
-                            { id: 'low', text: 'Low' },
-                          ]}
-                          onChange={(e) => setPriority(e.target.value)}></Select2>
-                      </Col>
-                      <Col xs={12} sm={3} className="mb-3">
+                      <Col xs={12} className="mb-3">
                         <label
                           className="form-control-label"
                           htmlFor="validationCustom01"
@@ -347,7 +309,46 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           onChange={(e) => setStatus(e.target.value)}>
                         </Select2>
                       </Col>
-                      <Col xs={12} sm={3} className="mb-3">
+                      <Col xs={12} sm={4} className="mb-3">
+                        <label
+                          className="form-control-label"
+                          htmlFor="validationCustom01"
+                        >
+                          Type
+                        </label>
+                        <Select2
+                          className="react-select-container"
+                          defaultValue={type}
+                          name="type"
+                          data={[
+                            { id: 'user-story', text: 'User Story' },
+                            { id: 'task', text: 'Task' },
+                            { id: 'bug', text: 'Bug' },
+                            { id: 'spike', text: 'Spike' },
+                            { id: 'technical-debt', text: 'Technical Debt' },
+                          ]}
+                          onChange={(e) => setType(e.target.value)}></Select2>
+                      </Col>
+                      <Col xs={12} sm={4} className="mb-3">
+                        <label
+                          className="form-control-label"
+                          htmlFor="validationCustom01"
+                        >
+                          Priority
+                        </label>
+                        <Select2
+                          className="react-select-container"
+                          defaultValue={priority}
+                          name="priority"
+                          data={[
+                            { id: 'high', text: 'High' },
+                            { id: 'medium', text: 'Medium' },
+                            { id: 'low', text: 'Low' },
+                          ]}
+                          onChange={(e) => setPriority(e.target.value)}></Select2>
+                      </Col>
+
+                      <Col xs={12} sm={4} className="mb-3">
                         <label className="form-control-label">
                           Estimation
                         </label>
@@ -355,7 +356,6 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           as={Input}
                           id="estimation"
                           name="estimation"
-                          placeholder="What is the estimation?"
                           type="text"
                           value={values.estimation}
                           onChange={handleChange}
