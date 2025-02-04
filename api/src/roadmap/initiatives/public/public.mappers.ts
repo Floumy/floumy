@@ -1,33 +1,33 @@
 import { Milestone } from '../../milestones/milestone.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
-import { Feature } from '../feature.entity';
+import { Initiative } from '../initiative.entity';
 import { CommentMapper } from '../../../comments/mappers';
 import { PaymentPlan } from '../../../auth/payment.plan';
 
 export class FeatureMapper {
-  static async toDto(feature: Feature) {
-    const workItems = (await feature.workItems) || [];
-    const comments = await feature.comments;
-    const org = await feature.org;
-    const featureRequest = await feature.featureRequest;
+  static async toDto(initiative: Initiative) {
+    const workItems = (await initiative.workItems) || [];
+    const comments = await initiative.comments;
+    const org = await initiative.org;
+    const featureRequest = await initiative.featureRequest;
     const mappedFeature = {
-      id: feature.id,
-      reference: feature.reference,
-      title: feature.title,
-      description: feature.description,
-      priority: feature.priority,
-      status: feature.status,
-      progress: feature.progress,
-      workItemsCount: feature.workItemsCount,
+      id: initiative.id,
+      reference: initiative.reference,
+      title: initiative.title,
+      description: initiative.description,
+      priority: initiative.priority,
+      status: initiative.status,
+      progress: initiative.progress,
+      workItemsCount: initiative.workItemsCount,
       workItems: workItems.map((workItem) =>
         this.mapWorkItemToWorkItemDto(workItem),
       ),
       comments: await CommentMapper.toDtoList(comments),
-      createdAt: feature.createdAt,
-      updatedAt: feature.updatedAt,
-      keyResult: this.mapKeyResultToKeyResultDto(await feature.keyResult),
-      milestone: this.mapMilestoneToMilestoneDto(await feature.milestone),
+      createdAt: initiative.createdAt,
+      updatedAt: initiative.updatedAt,
+      keyResult: this.mapKeyResultToKeyResultDto(await initiative.keyResult),
+      milestone: this.mapMilestoneToMilestoneDto(await initiative.milestone),
       featureRequest: undefined,
     };
     if (org.paymentPlan === PaymentPlan.PREMIUM) {

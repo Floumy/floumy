@@ -13,7 +13,7 @@ function PublicFeaturesListCard({
     return (
       <PublicFeaturesList
         orgId={orgId}
-        id={"features-list-card"}
+        id={"initiatives-list-card"}
         features={filteredFeatures}
       />
     );

@@ -42,7 +42,7 @@ function FeaturesListCard({
   function renderFeatureList(filteredFeatures) {
     return (
       <FeaturesList
-        id={"features-list-card"}
+        id={"initiatives-list-card"}
         features={filteredFeatures}
         onAddFeature={onAddFeature}
         showAssignedTo={showAssignedTo}

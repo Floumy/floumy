@@ -1,30 +1,30 @@
-import { Feature } from './feature.entity';
+import { Initiative } from './initiative.entity';
 import { Repository } from 'typeorm';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Org } from '../../orgs/org.entity';
 import { User } from '../../users/user.entity';
 import { Project } from '../../projects/project.entity';
 import { setupTestingModule } from '../../../test/test.utils';
-import { FeaturesService } from './features.service';
+import { InitiativesService } from './initiatives.service';
 import { UsersService } from '../../users/users.service';
 import { OrgsService } from '../../orgs/orgs.service';
 import { PaymentPlan } from '../../auth/payment.plan';
-import { FeatureQueryBuilder } from './feature.query-builder';
+import { InitiativeQueryBuilder } from './initiative.query-builder';
 import { OkrsService } from '../../okrs/okrs.service';
 import { MilestonesService } from '../milestones/milestones.service';
 import { WorkItemsService } from '../../backlog/work-items/work-items.service';
-import { FeatureFile } from './feature-file.entity';
+import { InitiativeFile } from './initiative-file.entity';
 import { File } from '../../files/file.entity';
 import { FilesService } from '../../files/files.service';
 import { Sprint } from '../../sprints/sprint.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
-import { FeatureStatus } from './featurestatus.enum';
+import { InitiativeStatus } from './initiativestatus.enum';
 import { Priority } from '../../common/priority.enum';
 
 describe('FeatureQueryBuilder', () => {
-  let featuresRepository: Repository<Feature>;
+  let initiativesRepository: Repository<Initiative>;
   let orgsRepository: Repository<Org>;
   let usersRepository: Repository<User>;
   let projectsRepository: Repository<Project>;
@@ -35,11 +35,11 @@ describe('FeatureQueryBuilder', () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [
         TypeOrmModule.forFeature([
-          Feature,
+          Initiative,
           Org,
           User,
           Project,
-          FeatureFile,
+          InitiativeFile,
           File,
           Sprint,
           WorkItem,
@@ -47,7 +47,7 @@ describe('FeatureQueryBuilder', () => {
         ]),
       ],
       [
-        FeaturesService,
+        InitiativesService,
         UsersService,
         OrgsService,
         OkrsService,
@@ -58,8 +58,8 @@ describe('FeatureQueryBuilder', () => {
       ],
     );
     cleanup = dbCleanup;
-    featuresRepository = module.get<Repository<Feature>>(
-      getRepositoryToken(Feature),
+    initiativesRepository = module.get<Repository<Initiative>>(
+      getRepositoryToken(Initiative),
     );
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
     usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
@@ -95,26 +95,26 @@ describe('FeatureQueryBuilder', () => {
   }
 
   describe('when executing a query with term and filters', () => {
-    it('should return the features', async () => {
+    it('should return the initiatives', async () => {
       const { org, user, project } = await getTestPremiumOrgAndUser();
-      const feature = new Feature();
-      feature.title = 'my feature';
-      feature.description = 'my feature description';
-      feature.status = FeatureStatus.COMPLETED;
-      feature.priority = Priority.HIGH;
-      feature.org = Promise.resolve(org);
-      feature.project = Promise.resolve(project);
-      feature.completedAt = new Date();
-      feature.assignedTo = Promise.resolve(user);
-      await featuresRepository.save(feature);
+      const initiative = new Initiative();
+      initiative.title = 'my initiative';
+      initiative.description = 'my initiative description';
+      initiative.status = InitiativeStatus.COMPLETED;
+      initiative.priority = Priority.HIGH;
+      initiative.org = Promise.resolve(org);
+      initiative.project = Promise.resolve(project);
+      initiative.completedAt = new Date();
+      initiative.assignedTo = Promise.resolve(user);
+      await initiativesRepository.save(initiative);
 
-      const featureQueryBuilder = new FeatureQueryBuilder(
+      const initiativeQueryBuilder = new InitiativeQueryBuilder(
         org.id,
         project.id,
         {
-          term: 'my feature',
+          term: 'my initiative',
         },
-        featuresRepository,
+        initiativesRepository,
         {
           status: ['completed'],
           priority: ['high'],
@@ -126,43 +126,43 @@ describe('FeatureQueryBuilder', () => {
         },
       );
 
-      const features = await featureQueryBuilder.execute(1, 10);
-      expect(features).toBeDefined();
-      expect(features.length).toEqual(1);
-      expect(features[0].id).toEqual(feature.id);
-      expect(features[0].reference).toBeDefined();
-      expect(features[0].title).toEqual(feature.title);
-      expect(features[0].priority).toEqual(feature.priority);
-      expect(features[0].status).toEqual(feature.status);
-      expect(features[0].createdAt).toEqual(feature.createdAt);
-      expect(features[0].updatedAt).toEqual(feature.updatedAt);
-      expect(features[0].assignedTo.id).toEqual(user.id);
-      expect(features[0].assignedTo.name).toEqual(user.name);
+      const initiatives = await initiativeQueryBuilder.execute(1, 10);
+      expect(initiatives).toBeDefined();
+      expect(initiatives.length).toEqual(1);
+      expect(initiatives[0].id).toEqual(initiative.id);
+      expect(initiatives[0].reference).toBeDefined();
+      expect(initiatives[0].title).toEqual(initiative.title);
+      expect(initiatives[0].priority).toEqual(initiative.priority);
+      expect(initiatives[0].status).toEqual(initiative.status);
+      expect(initiatives[0].createdAt).toEqual(initiative.createdAt);
+      expect(initiatives[0].updatedAt).toEqual(initiative.updatedAt);
+      expect(initiatives[0].assignedTo.id).toEqual(user.id);
+      expect(initiatives[0].assignedTo.name).toEqual(user.name);
     });
   });
 
   describe('when executing a query with reference and filters', () => {
-    it('should return the features', async () => {
+    it('should return the initiatives', async () => {
       const { org, user, project } = await getTestPremiumOrgAndUser();
-      const feature = new Feature();
-      feature.title = 'my feature';
-      feature.description = 'my feature description';
-      feature.status = FeatureStatus.COMPLETED;
-      feature.priority = Priority.HIGH;
-      feature.org = Promise.resolve(org);
-      feature.project = Promise.resolve(project);
-      feature.completedAt = new Date();
-      feature.assignedTo = Promise.resolve(user);
+      const initiative = new Initiative();
+      initiative.title = 'my initiative';
+      initiative.description = 'my initiative description';
+      initiative.status = InitiativeStatus.COMPLETED;
+      initiative.priority = Priority.HIGH;
+      initiative.org = Promise.resolve(org);
+      initiative.project = Promise.resolve(project);
+      initiative.completedAt = new Date();
+      initiative.assignedTo = Promise.resolve(user);
 
-      const savedFeature = await featuresRepository.save(feature);
+      const savedFeature = await initiativesRepository.save(initiative);
 
-      const featureQueryBuilder = new FeatureQueryBuilder(
+      const initiativeQueryBuilder = new InitiativeQueryBuilder(
         org.id,
         project.id,
         {
           reference: savedFeature.reference,
         },
-        featuresRepository,
+        initiativesRepository,
         {
           status: ['completed'],
           priority: ['high'],
@@ -174,38 +174,38 @@ describe('FeatureQueryBuilder', () => {
         },
       );
 
-      const features = await featureQueryBuilder.execute(1, 10);
-      expect(features).toBeDefined();
-      expect(features.length).toEqual(1);
-      expect(features[0].id).toEqual(feature.id);
-      expect(features[0].reference).toBeDefined();
-      expect(features[0].title).toEqual(feature.title);
-      expect(features[0].priority).toEqual(feature.priority);
-      expect(features[0].status).toEqual(feature.status);
+      const initiatives = await initiativeQueryBuilder.execute(1, 10);
+      expect(initiatives).toBeDefined();
+      expect(initiatives.length).toEqual(1);
+      expect(initiatives[0].id).toEqual(initiative.id);
+      expect(initiatives[0].reference).toBeDefined();
+      expect(initiatives[0].title).toEqual(initiative.title);
+      expect(initiatives[0].priority).toEqual(initiative.priority);
+      expect(initiatives[0].status).toEqual(initiative.status);
     });
   });
 
-  describe('when counting the features', () => {
+  describe('when counting the initiatives', () => {
     it('should return the count', async () => {
       const { org, user, project } = await getTestPremiumOrgAndUser();
-      const feature = new Feature();
-      feature.title = 'my feature';
-      feature.description = 'my feature description';
-      feature.status = FeatureStatus.COMPLETED;
-      feature.priority = Priority.HIGH;
-      feature.org = Promise.resolve(org);
-      feature.project = Promise.resolve(project);
-      feature.completedAt = new Date();
-      feature.assignedTo = Promise.resolve(user);
-      await featuresRepository.save(feature);
+      const initiative = new Initiative();
+      initiative.title = 'my initiative';
+      initiative.description = 'my initiative description';
+      initiative.status = InitiativeStatus.COMPLETED;
+      initiative.priority = Priority.HIGH;
+      initiative.org = Promise.resolve(org);
+      initiative.project = Promise.resolve(project);
+      initiative.completedAt = new Date();
+      initiative.assignedTo = Promise.resolve(user);
+      await initiativesRepository.save(initiative);
 
-      const featureQueryBuilder = new FeatureQueryBuilder(
+      const initiativeQueryBuilder = new InitiativeQueryBuilder(
         org.id,
         project.id,
         {
-          term: 'my feature',
+          term: 'my initiative',
         },
-        featuresRepository,
+        initiativesRepository,
         {
           status: ['completed'],
           priority: ['high'],
@@ -217,7 +217,7 @@ describe('FeatureQueryBuilder', () => {
         },
       );
 
-      const count = await featureQueryBuilder.count();
+      const count = await initiativeQueryBuilder.count();
       expect(count).toEqual(1);
     });
   });

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../../../orgs/org.entity';
 import { Repository } from 'typeorm';
-import { Feature } from '../feature.entity';
+import { Initiative } from '../initiative.entity';
 import { FeatureMapper } from './public.mappers';
 import { Project } from '../../../projects/project.entity';
 
@@ -10,12 +10,12 @@ import { Project } from '../../../projects/project.entity';
 export class PublicService {
   constructor(
     @InjectRepository(Org) private orgRepository: Repository<Org>,
-    @InjectRepository(Feature) private featuresRepository: Repository<Feature>,
+    @InjectRepository(Initiative) private initiativesRepository: Repository<Initiative>,
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
   ) {}
 
-  async getFeature(orgId: string, projectId: string, featureId: string) {
+  async getInitiative(orgId: string, projectId: string, initiativeId: string) {
     const project = await this.projectsRepository.findOneByOrFail({
       id: projectId,
       org: { id: orgId },
@@ -26,11 +26,11 @@ export class PublicService {
     if (!bipSettings?.isBuildInPublicEnabled) {
       throw new Error('Roadmap page is not public');
     }
-    const feature = await this.featuresRepository.findOneByOrFail({
+    const initiative = await this.initiativesRepository.findOneByOrFail({
       org: { id: orgId },
       project: { id: projectId },
-      id: featureId,
+      id: initiativeId,
     });
-    return await FeatureMapper.toDto(feature);
+    return await FeatureMapper.toDto(initiative);
   }
 }

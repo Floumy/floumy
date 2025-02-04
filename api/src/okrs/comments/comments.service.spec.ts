@@ -1,6 +1,6 @@
 import { OkrsService } from '../okrs.service';
 import { Repository } from 'typeorm';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { setupTestingModule } from '../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../objective.entity';
@@ -33,7 +33,7 @@ describe('CommentsService', () => {
           Objective,
           Org,
           KeyResult,
-          Feature,
+          Initiative,
           User,
           KeyResultComment,
           Project,

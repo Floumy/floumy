@@ -7,7 +7,7 @@ import { WorkItemDto } from '../backlog/work-items/dtos';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { KeyResultDto, OKRDto } from '../okrs/dtos';
-import { FeatureDto } from '../roadmap/features/dtos';
+import { InitiativeDto } from '../roadmap/initiatives/dtos';
 import { Project } from '../projects/project.entity';
 
 @Injectable()
@@ -218,7 +218,7 @@ export class FeedEventHandler {
   }
 
   @OnEvent('feature.created')
-  async handleFeatureCreated(event: FeatureDto) {
+  async handleFeatureCreated(event: InitiativeDto) {
     const feedItem = new FeedItem();
     const org = await this.orgRepository.findOneByOrFail({
       id: event.org.id,
@@ -238,7 +238,7 @@ export class FeedEventHandler {
   }
 
   @OnEvent('feature.deleted')
-  async handleFeatureDeleted(event: FeatureDto) {
+  async handleFeatureDeleted(event: InitiativeDto) {
     const feedItem = new FeedItem();
     const org = await this.orgRepository.findOneByOrFail({
       id: event.org.id,
@@ -259,8 +259,8 @@ export class FeedEventHandler {
 
   @OnEvent('feature.updated')
   async handleFeatureUpdated(event: {
-    previous: FeatureDto;
-    current: FeatureDto;
+    previous: InitiativeDto;
+    current: InitiativeDto;
   }) {
     const feedItem = new FeedItem();
     const org = await this.orgRepository.findOneByOrFail({

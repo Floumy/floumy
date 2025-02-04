@@ -1,7 +1,7 @@
-import { FeatureMapper } from './feature.mapper';
-import { FeaturesListDto } from './dtos';
+import { InitiativeMapper } from './initiative.mapper';
+import { InitiativesListDto } from './dtos';
 import { Repository } from 'typeorm';
-import { Feature } from './feature.entity';
+import { Initiative } from './initiative.entity';
 
 export interface FilterOptions {
   status?: string[];
@@ -18,7 +18,7 @@ export interface SearchOptions {
   reference?: string; // For reference search
 }
 
-export class FeatureQueryBuilder {
+export class InitiativeQueryBuilder {
   private baseQuery = `
       SELECT f2.*
       FROM (SELECT DISTINCT f.*,
@@ -44,7 +44,7 @@ export class FeatureQueryBuilder {
     private readonly orgId: string,
     private readonly projectId: string,
     private readonly search: SearchOptions,
-    private readonly featuresRepository: Repository<Feature>,
+    private readonly initiativeRepository: Repository<Initiative>,
     private readonly filters?: FilterOptions,
   ) {
     // Initialize base params
@@ -156,10 +156,10 @@ export class FeatureQueryBuilder {
     };
   }
 
-  async execute(page = 1, limit = 0): Promise<FeaturesListDto[]> {
+  async execute(page = 1, limit = 0): Promise<InitiativesListDto[]> {
     const { query, params } = this.buildQuery(true, page, limit);
-    const features = await this.featuresRepository.query(query, params);
-    return FeatureMapper.toSearchListDto(features);
+    const initiatives = await this.initiativeRepository.query(query, params);
+    return InitiativeMapper.toSearchListDto(initiatives);
   }
 
   async count(): Promise<number> {
@@ -176,7 +176,7 @@ export class FeatureQueryBuilder {
       countQuery += ` AND ${this.whereConditions.join(' AND ')}`;
     }
 
-    const result = await this.featuresRepository.query(
+    const result = await this.initiativeRepository.query(
       countQuery,
       this.queryParams,
     );

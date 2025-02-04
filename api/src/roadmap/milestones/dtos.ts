@@ -10,7 +10,7 @@ export interface MilestoneDto {
   description: string;
   dueDate: string;
   timeline: string;
-  features: FeatureListItemDto[];
+  initiatives: InitiativeListItemDto[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,15 +21,15 @@ export interface MilestoneListItemDto {
   dueDate: string;
 }
 
-export interface MilestoneListWithFeaturesItemDto {
+export interface MilestoneListWithInitiativesItemDto {
   id: string;
   title: string;
   dueDate: string;
   timeline: string;
-  features: FeatureListItemDto[];
+  initiatives: InitiativeListItemDto[];
 }
 
-export interface FeatureListItemDto {
+export interface InitiativeListItemDto {
   id: string;
   title: string;
   priority: string;

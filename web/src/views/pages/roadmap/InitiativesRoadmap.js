@@ -27,9 +27,9 @@ function InitiativesRoadmap() {
   const [milestones, setMilestones] = useState([]);
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
   const [isLoadingFeatures, setIsLoadingFeatures] = useState(false);
-  // on b hotkey press scroll to the features backlog section
+  // on b hotkey press scroll to the initiatives backlog section
   useHotkeys("b", () => {
-    document.getElementById("features-backlog").scrollIntoView();
+    document.getElementById("initiatives-backlog").scrollIntoView();
   });
   useEffect(() => {
     document.title = "Floumy | Roadmap";
@@ -92,7 +92,7 @@ function InitiativesRoadmap() {
   }
 
   function updateBacklogFeaturesMilestone(updatedFeatures, newMilestoneId) {
-    // Remove feature from features list and add it to the new milestone
+    // Remove feature from initiatives list and add it to the new milestone
     const newMilestone = milestones.find(milestone => milestone.id === newMilestoneId);
     for (const feature of updatedFeatures) {
       newMilestone.features.push(feature);
@@ -216,7 +216,7 @@ function InitiativesRoadmap() {
                              onFeatureChangeMilestone={updateFeaturesMilestone} />))}
               </div>
             </Card>
-            <div id={"features-backlog"} />
+            <div id={"initiatives-backlog"} />
             <FeaturesListCard title="Initiatives Backlog"
                               features={features}
                               isLoading={isLoadingFeatures}

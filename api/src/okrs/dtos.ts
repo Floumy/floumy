@@ -35,7 +35,7 @@ export interface CreateOrUpdateKeyResultDto {
   status: string;
 }
 
-export interface FeatureDto {
+export interface InitiativeDto {
   id: string;
   reference: string;
   title: string;
@@ -68,7 +68,7 @@ export interface OrgDto {
 }
 
 export interface KeyResultDto {
-  features: FeatureDto[];
+  features: InitiativeDto[];
   org: OrgDto;
   project: {
     id: string;

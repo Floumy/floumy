@@ -1,11 +1,11 @@
 import { Priority } from '../../common/priority.enum';
-import { FeatureStatus } from './featurestatus.enum';
+import { InitiativeStatus } from './initiativestatus.enum';
 
-export interface CreateUpdateFeatureDto {
+export interface CreateUpdateInitiativeDto {
   featureRequest?: string;
   title: string;
   priority: Priority;
-  status: FeatureStatus;
+  status: InitiativeStatus;
   description?: string;
   mentions?: string[];
   milestone?: string;
@@ -14,15 +14,15 @@ export interface CreateUpdateFeatureDto {
   assignedTo?: string;
 }
 
-export interface PatchFeatureDto {
+export interface PatchInitiativeDto {
   priority?: Priority;
-  status?: FeatureStatus;
+  status?: InitiativeStatus;
   milestone?: string;
   keyResult?: string;
   featureRequest?: string;
 }
 
-export interface FeatureDto {
+export interface InitiativeDto {
   id: string;
   org: {
     id: string;
@@ -35,7 +35,7 @@ export interface FeatureDto {
   title: string;
   description?: string;
   priority: Priority;
-  status: FeatureStatus;
+  status: InitiativeStatus;
   progress: number;
   workItemsCount: number;
   keyResult?: {
@@ -69,7 +69,7 @@ export interface FeatureDto {
   completedAt?: Date;
 }
 
-export interface FeaturesListDto {
+export interface InitiativesListDto {
   id: string;
   reference: string;
   title: string;
@@ -85,7 +85,7 @@ export interface FeaturesListDto {
   updatedAt: Date;
 }
 
-export interface SearchFeature {
+export interface SearchInitiative {
   id: string;
   reference: string;
   title: string;

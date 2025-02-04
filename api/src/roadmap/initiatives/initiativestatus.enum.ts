@@ -1,4 +1,4 @@
-export enum FeatureStatus {
+export enum InitiativeStatus {
   PLANNED = "planned",
   READY_TO_START = "ready-to-start",
   IN_PROGRESS = "in-progress",

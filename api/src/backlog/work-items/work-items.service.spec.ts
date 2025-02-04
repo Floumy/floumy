@@ -1,6 +1,6 @@
 import { WorkItemsService } from './work-items.service';
 import { UsersService } from '../../users/users.service';
-import { FeaturesService } from '../../roadmap/features/features.service';
+import { InitiativesService } from '../../roadmap/initiatives/initiatives.service';
 import { MilestonesService } from '../../roadmap/milestones/milestones.service';
 import { OkrsService } from '../../okrs/okrs.service';
 import { OrgsService } from '../../orgs/orgs.service';
@@ -9,20 +9,20 @@ import { setupTestingModule } from '../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../../okrs/objective.entity';
 import { KeyResult } from '../../okrs/key-result.entity';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { User } from '../../users/user.entity';
 import { Milestone } from '../../roadmap/milestones/milestone.entity';
 import { Priority } from '../../common/priority.enum';
 import { WorkItemType } from './work-item-type.enum';
 import { EntityNotFoundError, Repository } from 'typeorm';
 import { WorkItemStatus } from './work-item-status.enum';
-import { FeatureStatus } from '../../roadmap/features/featurestatus.enum';
+import { InitiativeStatus } from '../../roadmap/initiatives/initiativestatus.enum';
 import { Sprint } from '../../sprints/sprint.entity';
 import { WorkItem } from './work-item.entity';
 import { SprintsService } from '../../sprints/sprints.service';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
-import { FeatureFile } from '../../roadmap/features/feature-file.entity';
+import { InitiativeFile } from '../../roadmap/initiatives/initiative-file.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { WorkItemComment } from './work-item-comment.entity';
@@ -33,7 +33,7 @@ import { Project } from '../../projects/project.entity';
 describe('WorkItemsService', () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
-  let featuresService: FeaturesService;
+  let featuresService: InitiativesService;
   let sprintService: SprintsService;
   let filesRepository: Repository<File>;
   let workItemCommentsRepository: Repository<WorkItemComment>;
@@ -56,13 +56,13 @@ describe('WorkItemsService', () => {
           Objective,
           Org,
           KeyResult,
-          Feature,
+          Initiative,
           User,
           Milestone,
           Sprint,
           WorkItem,
           File,
-          FeatureFile,
+          InitiativeFile,
           WorkItemFile,
           WorkItemComment,
         ]),
@@ -70,7 +70,7 @@ describe('WorkItemsService', () => {
       [
         OkrsService,
         OrgsService,
-        FeaturesService,
+        InitiativesService,
         UsersService,
         MilestonesService,
         WorkItemsService,
@@ -83,7 +83,7 @@ describe('WorkItemsService', () => {
     cleanup = dbCleanup;
     service = module.get<WorkItemsService>(WorkItemsService);
     sprintService = module.get<SprintsService>(SprintsService);
-    featuresService = module.get<FeaturesService>(FeaturesService);
+    featuresService = module.get<InitiativesService>(InitiativesService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     filesRepository = module.get<Repository<File>>(getRepositoryToken(File));
@@ -135,7 +135,7 @@ describe('WorkItemsService', () => {
 
   describe('when creating a work item', () => {
     it('should return the created work item', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -143,7 +143,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await service.createWorkItem(
@@ -155,7 +155,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -165,13 +165,13 @@ describe('WorkItemsService', () => {
       expect(workItem.description).toEqual('my work item description');
       expect(workItem.priority).toEqual(Priority.HIGH);
       expect(workItem.type).toEqual(WorkItemType.USER_STORY);
-      expect(workItem.feature.id).toBeDefined();
-      expect(workItem.feature.title).toEqual('my feature');
+      expect(workItem.initiative.id).toBeDefined();
+      expect(workItem.initiative.title).toEqual('my feature');
       expect(workItem.createdBy.id).toEqual(user.id);
       expect(workItem.createdBy.name).toEqual(user.name);
     });
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -179,7 +179,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -188,7 +188,7 @@ describe('WorkItemsService', () => {
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
         estimation: 13,
-        feature: feature.id,
+        initiative: feature.id,
         status: WorkItemStatus.DONE,
       });
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -197,10 +197,10 @@ describe('WorkItemsService', () => {
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
         estimation: 13,
-        feature: feature.id,
+        initiative: feature.id,
         status: WorkItemStatus.IN_PROGRESS,
       });
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -286,7 +286,7 @@ describe('WorkItemsService', () => {
   });
   describe('when listing work items', () => {
     it('should return the list of work items', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -294,7 +294,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -302,7 +302,7 @@ describe('WorkItemsService', () => {
         description: 'my work item description',
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
-        feature: feature.id,
+        initiative: feature.id,
         status: WorkItemStatus.PLANNED,
       });
       const workItems = await service.listWorkItems(org.id, project.id);
@@ -314,7 +314,7 @@ describe('WorkItemsService', () => {
       expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
     });
     it('should return the list of work items paginated', async () => {
-      const feature1 = await featuresService.createFeature(
+      const feature1 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -322,10 +322,10 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature2 = await featuresService.createFeature(
+      const feature2 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -333,7 +333,7 @@ describe('WorkItemsService', () => {
           title: 'my other feature',
           description: 'my other feature description',
           priority: Priority.MEDIUM,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -341,7 +341,7 @@ describe('WorkItemsService', () => {
         description: 'my work item description',
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
-        feature: feature1.id,
+        initiative: feature1.id,
         status: WorkItemStatus.PLANNED,
       });
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -349,7 +349,7 @@ describe('WorkItemsService', () => {
         description: 'my other work item description',
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
-        feature: feature2.id,
+        initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
       const workItems = await service.listWorkItems(org.id, project.id, 1, 1);
@@ -363,7 +363,7 @@ describe('WorkItemsService', () => {
   });
   describe('when getting a work item', () => {
     it('should return the work item', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -371,7 +371,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await service.createWorkItem(
@@ -383,7 +383,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -397,13 +397,13 @@ describe('WorkItemsService', () => {
       expect(foundWorkItem.description).toEqual('my work item description');
       expect(foundWorkItem.priority).toEqual(Priority.HIGH);
       expect(foundWorkItem.type).toEqual(WorkItemType.USER_STORY);
-      expect(foundWorkItem.feature.id).toBeDefined();
-      expect(foundWorkItem.feature.title).toEqual('my feature');
+      expect(foundWorkItem.initiative.id).toBeDefined();
+      expect(foundWorkItem.initiative.title).toEqual('my feature');
     });
   });
   describe('when updating a work item', () => {
     it('should return the updated work item', async () => {
-      const feature1 = await featuresService.createFeature(
+      const feature1 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -411,10 +411,10 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature2 = await featuresService.createFeature(
+      const feature2 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -422,7 +422,7 @@ describe('WorkItemsService', () => {
           title: 'my other feature',
           description: 'my other feature description',
           priority: Priority.MEDIUM,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await service.createWorkItem(
@@ -434,7 +434,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature1.id,
+          initiative: feature1.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -449,7 +449,7 @@ describe('WorkItemsService', () => {
           mentions: [user.id],
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature2.id,
+          initiative: feature2.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -460,11 +460,11 @@ describe('WorkItemsService', () => {
       );
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
       expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
-      expect(foundWorkItem.feature.id).toBeDefined();
-      expect(foundWorkItem.feature.title).toEqual('my other feature');
+      expect(foundWorkItem.initiative.id).toBeDefined();
+      expect(foundWorkItem.initiative.title).toEqual('my other feature');
     });
     it('should remove the association with the feature if the feature is not provided', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -472,7 +472,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await service.createWorkItem(
@@ -484,7 +484,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -509,7 +509,7 @@ describe('WorkItemsService', () => {
       );
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
       expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
-      expect(foundWorkItem.feature).toBeUndefined();
+      expect(foundWorkItem.initiative).toBeUndefined();
     });
     it('should update the completedAt field if the status is DONE', async () => {
       const workItem = await service.createWorkItem(
@@ -747,7 +747,7 @@ describe('WorkItemsService', () => {
   });
   describe('when deleting a work item', () => {
     it('should delete the work item', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -755,7 +755,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await service.createWorkItem(
@@ -767,7 +767,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -902,7 +902,7 @@ describe('WorkItemsService', () => {
   });
   describe('when listing open work items', () => {
     it('should return the list of open work items', async () => {
-      const feature1 = await featuresService.createFeature(
+      const feature1 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -910,10 +910,10 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature2 = await featuresService.createFeature(
+      const feature2 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -921,7 +921,7 @@ describe('WorkItemsService', () => {
           title: 'my other feature',
           description: 'my other feature description',
           priority: Priority.MEDIUM,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -929,7 +929,7 @@ describe('WorkItemsService', () => {
         description: 'my work item description',
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
-        feature: feature1.id,
+        initiative: feature1.id,
         status: WorkItemStatus.PLANNED,
       });
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -937,7 +937,7 @@ describe('WorkItemsService', () => {
         description: 'my other work item description',
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
-        feature: feature2.id,
+        initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
       const workItems = await service.listOpenWorkItemsWithoutSprints(
@@ -976,7 +976,7 @@ describe('WorkItemsService', () => {
         startDate: '2020-01-01',
         duration: 7,
       });
-      const feature1 = await featuresService.createFeature(
+      const feature1 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -984,10 +984,10 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature2 = await featuresService.createFeature(
+      const feature2 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -995,7 +995,7 @@ describe('WorkItemsService', () => {
           title: 'my other feature',
           description: 'my other feature description',
           priority: Priority.MEDIUM,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -1003,7 +1003,7 @@ describe('WorkItemsService', () => {
         description: 'my work item description',
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
-        feature: feature1.id,
+        initiative: feature1.id,
         status: WorkItemStatus.PLANNED,
         sprint: sprint.id,
       });
@@ -1012,7 +1012,7 @@ describe('WorkItemsService', () => {
         description: 'my other work item description',
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
-        feature: feature2.id,
+        initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
       const workItems = await service.listOpenWorkItemsWithoutSprints(
@@ -1027,13 +1027,13 @@ describe('WorkItemsService', () => {
       );
       expect(workItems[0].priority).toEqual(Priority.MEDIUM);
       expect(workItems[0].type).toEqual(WorkItemType.TECHNICAL_DEBT);
-      expect(workItems[0].feature.id).toBeDefined();
-      expect(workItems[0].feature.title).toEqual('my other feature');
+      expect(workItems[0].initiative.id).toBeDefined();
+      expect(workItems[0].initiative.title).toEqual('my other feature');
     });
   });
   describe('when creating a work item with a feature', () => {
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1041,7 +1041,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -1049,7 +1049,7 @@ describe('WorkItemsService', () => {
         description: 'my work item description',
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
-        feature: feature.id,
+        initiative: feature.id,
         estimation: 13,
         status: WorkItemStatus.DONE,
       });
@@ -1058,11 +1058,11 @@ describe('WorkItemsService', () => {
         description: 'my other work item description',
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
-        feature: feature.id,
+        initiative: feature.id,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
       });
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1070,7 +1070,7 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(50);
     });
     it('should update the feature workItemsCount', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1078,7 +1078,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -1086,7 +1086,7 @@ describe('WorkItemsService', () => {
         description: 'my work item description',
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
-        feature: feature.id,
+        initiative: feature.id,
         estimation: 13,
         status: WorkItemStatus.DONE,
       });
@@ -1095,11 +1095,11 @@ describe('WorkItemsService', () => {
         description: 'my other work item description',
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
-        feature: feature.id,
+        initiative: feature.id,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
       });
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1109,7 +1109,7 @@ describe('WorkItemsService', () => {
   });
   describe('when updating a work item with a feature', () => {
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1117,7 +1117,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
       const workItem1 = await service.createWorkItem(
@@ -1130,7 +1130,7 @@ describe('WorkItemsService', () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.DONE,
         },
       );
@@ -1154,7 +1154,7 @@ describe('WorkItemsService', () => {
         type: WorkItemType.USER_STORY,
         estimation: 13,
         status: WorkItemStatus.DONE,
-        feature: feature.id,
+        initiative: feature.id,
       });
       await service.updateWorkItem(user.id, org.id, project.id, workItem2.id, {
         title: 'my other work item',
@@ -1163,9 +1163,9 @@ describe('WorkItemsService', () => {
         type: WorkItemType.TECHNICAL_DEBT,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
-        feature: feature.id,
+        initiative: feature.id,
       });
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1173,7 +1173,7 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(50);
     });
     it('should update the feature workItemsCount', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1181,7 +1181,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
       const workItem1 = await service.createWorkItem(
@@ -1194,7 +1194,7 @@ describe('WorkItemsService', () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.DONE,
         },
       );
@@ -1208,7 +1208,7 @@ describe('WorkItemsService', () => {
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
@@ -1219,7 +1219,7 @@ describe('WorkItemsService', () => {
         type: WorkItemType.USER_STORY,
         estimation: 13,
         status: WorkItemStatus.DONE,
-        feature: feature.id,
+        initiative: feature.id,
       });
       await service.updateWorkItem(user.id, org.id, project.id, workItem2.id, {
         title: 'my other work item',
@@ -1228,9 +1228,9 @@ describe('WorkItemsService', () => {
         type: WorkItemType.TECHNICAL_DEBT,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
-        feature: null,
+        initiative: null,
       });
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1238,7 +1238,7 @@ describe('WorkItemsService', () => {
       expect(foundFeature.workItemsCount).toEqual(1);
     });
     it('should update the feature progress and count when changing the feature of a work item', async () => {
-      const feature1 = await featuresService.createFeature(
+      const feature1 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1246,10 +1246,10 @@ describe('WorkItemsService', () => {
           title: 'my feature 1',
           description: 'my feature description 1',
           priority: Priority.HIGH,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
-      const feature2 = await featuresService.createFeature(
+      const feature2 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1257,7 +1257,7 @@ describe('WorkItemsService', () => {
           title: 'my feature 2',
           description: 'my feature description 2',
           priority: Priority.HIGH,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
       const workItem1 = await service.createWorkItem(
@@ -1270,7 +1270,7 @@ describe('WorkItemsService', () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           estimation: 13,
-          feature: feature1.id,
+          initiative: feature1.id,
           status: WorkItemStatus.DONE,
         },
       );
@@ -1284,7 +1284,7 @@ describe('WorkItemsService', () => {
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           estimation: 13,
-          feature: feature2.id,
+          initiative: feature2.id,
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
@@ -1295,7 +1295,7 @@ describe('WorkItemsService', () => {
         type: WorkItemType.USER_STORY,
         estimation: 13,
         status: WorkItemStatus.DONE,
-        feature: feature2.id,
+        initiative: feature2.id,
       });
       await service.updateWorkItem(user.id, org.id, project.id, workItem2.id, {
         title: 'my work item 2',
@@ -1304,16 +1304,16 @@ describe('WorkItemsService', () => {
         type: WorkItemType.TECHNICAL_DEBT,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
-        feature: feature2.id,
+        initiative: feature2.id,
       });
-      const foundFeature1 = await featuresService.getFeature(
+      const foundFeature1 = await featuresService.getInitiative(
         org.id,
         project.id,
         feature1.id,
       );
       expect(foundFeature1.progress).toEqual(0);
       expect(foundFeature1.workItemsCount).toEqual(0);
-      const foundFeature2 = await featuresService.getFeature(
+      const foundFeature2 = await featuresService.getInitiative(
         org.id,
         project.id,
         feature2.id,
@@ -1324,7 +1324,7 @@ describe('WorkItemsService', () => {
   });
   describe('when deleting a work item with a feature', () => {
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1332,7 +1332,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
       const workItem1 = await service.createWorkItem(
@@ -1345,7 +1345,7 @@ describe('WorkItemsService', () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.DONE,
         },
       );
@@ -1359,13 +1359,13 @@ describe('WorkItemsService', () => {
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
       await service.deleteWorkItem(org.id, project.id, workItem1.id);
       await service.deleteWorkItem(org.id, project.id, workItem2.id);
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1373,7 +1373,7 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(0);
     });
     it('should update the feature workItemsCount', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1381,7 +1381,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
       const workItem1 = await service.createWorkItem(
@@ -1394,7 +1394,7 @@ describe('WorkItemsService', () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.DONE,
         },
       );
@@ -1408,13 +1408,13 @@ describe('WorkItemsService', () => {
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
       await service.deleteWorkItem(org.id, project.id, workItem1.id);
       await service.deleteWorkItem(org.id, project.id, workItem2.id);
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1424,7 +1424,7 @@ describe('WorkItemsService', () => {
   });
   describe('when closing a work item', () => {
     it('should update the feature progress', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1432,7 +1432,7 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.MEDIUM,
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
         },
       );
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -1441,7 +1441,7 @@ describe('WorkItemsService', () => {
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
         estimation: 13,
-        feature: feature.id,
+        initiative: feature.id,
         status: WorkItemStatus.DONE,
       });
       const workItem2 = await service.createWorkItem(
@@ -1454,7 +1454,7 @@ describe('WorkItemsService', () => {
           priority: Priority.MEDIUM,
           type: WorkItemType.TECHNICAL_DEBT,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
@@ -1464,10 +1464,10 @@ describe('WorkItemsService', () => {
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
         estimation: 13,
-        feature: feature.id,
+        initiative: feature.id,
         status: WorkItemStatus.CLOSED,
       });
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1535,14 +1535,14 @@ describe('WorkItemsService', () => {
       expect(foundWorkItem.status).toEqual(WorkItemStatus.IN_PROGRESS);
     });
     it('should update the feature progress when changing the status to DONE', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
         {
           title: 'my feature',
           description: 'my feature description',
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
           priority: Priority.LOW,
         },
       );
@@ -1556,14 +1556,14 @@ describe('WorkItemsService', () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
       await service.patchWorkItem(org.id, project.id, workItem.id, {
         status: WorkItemStatus.DONE,
       });
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1571,14 +1571,14 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(100);
     });
     it('should update the feature progress when changing the status to CLOSED', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
         {
           title: 'my feature',
           description: 'my feature description',
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
           priority: Priority.LOW,
         },
       );
@@ -1592,14 +1592,14 @@ describe('WorkItemsService', () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
         },
       );
       await service.patchWorkItem(org.id, project.id, workItem.id, {
         status: WorkItemStatus.CLOSED,
       });
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1607,14 +1607,14 @@ describe('WorkItemsService', () => {
       expect(foundFeature.progress).toEqual(100);
     });
     it('should update the feature progress when changing the status to IN_PROGRESS', async () => {
-      const feature = await featuresService.createFeature(
+      const feature = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
         {
           title: 'my feature',
           description: 'my feature description',
-          status: FeatureStatus.IN_PROGRESS,
+          status: InitiativeStatus.IN_PROGRESS,
           priority: Priority.LOW,
         },
       );
@@ -1628,14 +1628,14 @@ describe('WorkItemsService', () => {
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
           estimation: 13,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.DONE,
         },
       );
       await service.patchWorkItem(org.id, project.id, workItem.id, {
         status: WorkItemStatus.IN_PROGRESS,
       });
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await featuresService.getInitiative(
         org.id,
         project.id,
         feature.id,
@@ -1669,7 +1669,7 @@ describe('WorkItemsService', () => {
   });
   describe('when searching work items', () => {
     it('should return the work items that match the search query', async () => {
-      const feature1 = await featuresService.createFeature(
+      const feature1 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1677,10 +1677,10 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature2 = await featuresService.createFeature(
+      const feature2 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1688,7 +1688,7 @@ describe('WorkItemsService', () => {
           title: 'my other feature',
           description: 'my other feature description',
           priority: Priority.MEDIUM,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -1696,7 +1696,7 @@ describe('WorkItemsService', () => {
         description: 'my work item description',
         priority: Priority.HIGH,
         type: WorkItemType.USER_STORY,
-        feature: feature1.id,
+        initiative: feature1.id,
         status: WorkItemStatus.PLANNED,
       });
       await service.createWorkItem(org.id, project.id, user.id, {
@@ -1704,7 +1704,7 @@ describe('WorkItemsService', () => {
         description: 'my other work item description',
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
-        feature: feature2.id,
+        initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
       const workItems = await service.searchWorkItems(
@@ -1720,7 +1720,7 @@ describe('WorkItemsService', () => {
       expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
     });
     it('should return the work items that match the search query for the reference', async () => {
-      const feature1 = await featuresService.createFeature(
+      const feature1 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1728,10 +1728,10 @@ describe('WorkItemsService', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
-      const feature2 = await featuresService.createFeature(
+      const feature2 = await featuresService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -1739,7 +1739,7 @@ describe('WorkItemsService', () => {
           title: 'my other feature',
           description: 'my other feature description',
           priority: Priority.MEDIUM,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await service.createWorkItem(
@@ -1751,7 +1751,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.USER_STORY,
-          feature: feature1.id,
+          initiative: feature1.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -1760,7 +1760,7 @@ describe('WorkItemsService', () => {
         description: 'my other work item description',
         priority: Priority.MEDIUM,
         type: WorkItemType.TECHNICAL_DEBT,
-        feature: feature2.id,
+        initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
       const workItems = await service.searchWorkItems(

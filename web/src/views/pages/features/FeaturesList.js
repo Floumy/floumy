@@ -22,7 +22,7 @@ function FeaturesList({
                         features,
                         headerClassName = "thead-light",
                         onAddFeature,
-                        id = "features-context-menu",
+                        id = "initiatives-context-menu",
                         onChangePriority,
                         onChangeStatus,
                         onChangeMilestone,
