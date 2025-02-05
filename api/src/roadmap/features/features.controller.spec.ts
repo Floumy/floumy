@@ -16,7 +16,7 @@ import { MilestonesService } from '../milestones/milestones.service';
 import { Milestone } from '../milestones/milestone.entity';
 import { BacklogModule } from '../../backlog/backlog.module';
 import { FeatureStatus } from './featurestatus.enum';
-import { Iteration } from '../../iterations/Iteration.entity';
+import { Sprint } from '../../sprints/sprint.entity';
 import { File } from '../../files/file.entity';
 import { FeatureFile } from './feature-file.entity';
 import { User } from '../../users/user.entity';
@@ -51,7 +51,7 @@ describe('FeaturesController', () => {
           KeyResult,
           Feature,
           Milestone,
-          Iteration,
+          Sprint,
           File,
           FeatureFile,
           WorkItem,

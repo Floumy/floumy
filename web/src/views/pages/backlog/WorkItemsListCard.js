@@ -12,7 +12,7 @@ function WorkItemsListCard({
                              workItems,
                              isLoading,
                              onAddWorkItem,
-                             onChangeIteration,
+                             onChangeSprint,
                              onChangeStatus,
                              onChangePriority,
                              onChangeAssignee,
@@ -83,7 +83,7 @@ function WorkItemsListCard({
             enableContextMenu={enableContextMenu}
             workItems={filteredWorkItems}
             onAddNewWorkItem={onAddWorkItem}
-            onChangeIteration={onChangeIteration}
+            onChangeSprint={onChangeSprint}
             onChangeStatus={onChangeStatus}
             onChangePriority={onChangePriority}
             onChangeAssignee={onChangeAssignee}

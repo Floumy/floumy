@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Timeline } from '../../common/timeline.enum';
-import { IterationsService } from '../iterations.service';
-import { IterationMapper } from './public.mapper';
+import { SprintsService } from '../sprints.service';
+import { SprintMapper } from './public.mapper';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../../orgs/org.entity';
 import { Repository } from 'typeorm';
@@ -11,45 +11,45 @@ import { Project } from '../../projects/project.entity';
 export class PublicService {
   constructor(
     @InjectRepository(Org) private orgsRepository: Repository<Org>,
-    private iterationsService: IterationsService,
+    private sprintsService: SprintsService,
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
   ) {}
 
-  async listIterationsForTimeline(
+  async listSprintsForTimeline(
     orgId: string,
     projectId: string,
     timeline: Timeline,
   ) {
     await this.validateProjectHasBuildInPublicEnabled(orgId, projectId);
 
-    const iterations = await this.iterationsService.findIterationsForTimeline(
+    const sprints = await this.sprintsService.findSprintsForTimeline(
       orgId,
       projectId,
       timeline,
     );
 
     return await Promise.all(
-      iterations.map((iteration) => IterationMapper.toDto(iteration)),
+      sprints.map((sprint) => SprintMapper.toDto(sprint)),
     );
   }
 
-  async getIterationById(
+  async getSprintById(
     orgId: string,
     projectId: string,
-    iterationId: string,
+    sprintId: string,
   ) {
     await this.validateProjectHasBuildInPublicEnabled(orgId, projectId);
 
-    const iteration = await this.iterationsService.findIteration(
+    const sprint = await this.sprintsService.findSprint(
       orgId,
       projectId,
-      iterationId,
+      sprintId,
     );
-    return IterationMapper.toDto(iteration);
+    return SprintMapper.toDto(sprint);
   }
 
-  async getActiveIteration(orgId: string, projectId: string) {
+  async getActiveSprint(orgId: string, projectId: string) {
     const project = await this.projectsRepository.findOneByOrFail({
       id: projectId,
       org: { id: orgId },
@@ -59,16 +59,16 @@ export class PublicService {
     if (
       !bipSettings ||
       bipSettings.isBuildInPublicEnabled === false ||
-      bipSettings.isActiveIterationsPagePublic === false
+      bipSettings.isActiveSprintsPagePublic === false
     ) {
       throw new Error('Building in public is not enabled');
     }
 
-    const iteration = await this.iterationsService.findActiveIteration(
+    const sprint = await this.sprintsService.findActiveSprint(
       orgId,
       projectId,
     );
-    return iteration ? await IterationMapper.toDto(iteration) : null;
+    return sprint ? await SprintMapper.toDto(sprint) : null;
   }
 
   private async validateProjectHasBuildInPublicEnabled(

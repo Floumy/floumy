@@ -4,21 +4,21 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { getPublicIteration } from "../../../services/iterations/iterations.service";
+import { getPublicSprint } from "../../../services/sprints/sprints.service";
 import NotFoundCard from "../components/NotFoundCard";
-import PublicIterationDetail from "./PublicIterationDetail";
+import PublicSprintDetail from "./PublicSprintDetail";
 
-function PublicIteration() {
-  const { orgId, projectId, iterationId } = useParams();
-  const [iteration, setIteration] = useState(null);
+function PublicSprint() {
+  const { orgId, projectId, sprintId } = useParams();
+  const [sprint, setSprint] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchIteration() {
+    async function fetchSprint() {
       setIsLoading(true);
       try {
-        const iteration = await getPublicIteration(orgId, projectId, iterationId);
-        setIteration(iteration);
+        const sprint = await getPublicSprint(orgId, projectId, sprintId);
+        setSprint(sprint);
       } catch (e) {
         console.error(e);
       } finally {
@@ -26,8 +26,8 @@ function PublicIteration() {
       }
     }
 
-    fetchIteration();
-  }, [orgId, projectId, iterationId]);
+    fetchSprint();
+  }, [orgId, projectId, sprintId]);
 
   return (
     <>
@@ -46,10 +46,10 @@ function PublicIteration() {
           <Col>
             <div className="card-wrapper">
               {isLoading && <Card><LoadingSpinnerBox /></Card>}
-              {iteration && <PublicIterationDetail
+              {sprint && <PublicSprintDetail
                 orgId={orgId}
-                iteration={iteration} />}
-              {!iteration && !isLoading && <NotFoundCard message={"Sprint not found"} />}
+                sprint={sprint} />}
+              {!sprint && !isLoading && <NotFoundCard message={"Sprint not found"} />}
             </div>
           </Col>
         </Row>
@@ -58,4 +58,4 @@ function PublicIteration() {
   );
 }
 
-export default PublicIteration;
+export default PublicSprint;

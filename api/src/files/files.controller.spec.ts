@@ -14,7 +14,7 @@ import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { FeatureFile } from '../roadmap/features/feature-file.entity';
 import { WorkItemsService } from '../backlog/work-items/work-items.service';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { Iteration } from '../iterations/Iteration.entity';
+import { Sprint } from '../sprints/sprint.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 import { Project } from '../projects/project.entity';
 
@@ -34,7 +34,7 @@ describe('FilesController', () => {
           FeatureFile,
           WorkItem,
           Feature,
-          Iteration,
+          Sprint,
         ]),
         UsersModule,
         AuthModule,
