@@ -4,6 +4,7 @@ import { Feature } from '../../roadmap/features/feature.entity';
 import { Sprint } from '../../sprints/sprint.entity';
 import { User } from '../../users/user.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
+import { GithubBranch } from '../../github/github-branch.entity';
 
 class FeatureMapper {
   static toDto(feature: Feature) {
@@ -42,6 +43,7 @@ export default class WorkItemMapper {
     const org = await workItem.org;
     const project = await workItem.project;
     const pullRequests = await workItem.githubPullRequests;
+    const branches = await workItem.githubBranches;
     return {
       id: workItem.id,
       org: org ? { id: org.id } : undefined,
@@ -77,6 +79,7 @@ export default class WorkItemMapper {
       pullRequests: pullRequests
         ? PullRequestMapper.toDto(pullRequests)
         : undefined,
+      branches: branches ? BranchMapper.toDto(branches) : undefined,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
       updatedAt: workItem.updatedAt,
@@ -161,6 +164,21 @@ class PullRequestMapper {
         state: pullRequest.state,
         createdAt: pullRequest.createdAt,
         updatedAt: pullRequest.updatedAt,
+      };
+    });
+  }
+}
+
+class BranchMapper {
+  static toDto(branches: GithubBranch[]) {
+    return branches.map((branch) => {
+      return {
+        id: branch.id,
+        name: branch.name,
+        url: branch.url,
+        state: branch.state,
+        createdAt: branch.createdAt,
+        updatedAt: branch.updatedAt,
       };
     });
   }
