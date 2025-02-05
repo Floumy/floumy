@@ -1,12 +1,11 @@
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import { Button, Card, CardBody, CardHeader, Col, Input, Row } from "reactstrap";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import InputError from "../../../components/Errors/InputError";
-import Select2 from "react-select2-wrapper";
-import ReactQuill from "react-quill";
-import React, { useCallback, useEffect, useState } from "react";
-import * as Yup from "yup";
-import { listAllFeatures } from "../../../services/roadmap/roadmap.service";
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import InputError from '../../../components/Errors/InputError';
+import Select2 from 'react-select2-wrapper';
+import React, { useCallback, useEffect, useState } from 'react';
+import * as Yup from 'yup';
+import { listAllFeatures } from '../../../services/roadmap/roadmap.service';
 import {
   addComment,
   deleteComment,
@@ -32,7 +31,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [priority, setPriority] = useState(workItem.priority || "");
+  const [priority, setPriority] = useState(workItem.priority || '');
   const [title, setTitle] = useState(workItem.title);
   const [descriptionText, setDescriptionText] = useState(workItem.description);
   const [mentions, setMentions] = useState([]);
@@ -45,23 +44,23 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const [sprint, setSprint] = useState(workItem.sprint ? workItem.sprint.id : "");
   const [deleteWarning, setDeleteWarning] = useState(false);
   const [files, setFiles] = useState([]);
-  const [members, setMembers] = useState([{ id: "", text: "None" }]);
-  const [assignedTo, setAssignedTo] = useState("");
+  const [members, setMembers] = useState([{ id: '', text: 'None' }]);
+  const [assignedTo, setAssignedTo] = useState('');
   const uploadedFiles = workItem.files || [];
   const navigate = useNavigate();
-  const paymentPlan = localStorage.getItem("paymentPlan");
+  const paymentPlan = localStorage.getItem('paymentPlan');
   const [comments, setComments] = useState([]);
-  const [issues, setIssues] = useState([{ id: "", text: "None" }]);
-  const [issue, setIssue] = useState(workItem.issue ? workItem.issue.id : "");
+  const [issues, setIssues] = useState([{ id: '', text: 'None' }]);
+  const [issue, setIssue] = useState(workItem.issue ? workItem.issue.id : '');
 
   const loadAndSetIssues = useCallback(async () => {
     const fetchedIssues = await listIssues(orgId, projectId, 1, 0);
     const mappedIssues = fetchedIssues.map(issue => {
       return { id: issue.id, text: `${issue.title}` };
     });
-    mappedIssues.push({ id: "", text: "None" });
+    mappedIssues.push({ id: '', text: 'None' });
     setIssues(mappedIssues);
-    setIssue(workItem.issue ? workItem.issue.id : "");
+    setIssue(workItem.issue ? workItem.issue.id : '');
   }, [workItem.issue]);
 
   const loadAndSetFeatures = useCallback(async () => {
@@ -70,9 +69,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       .map(feature => {
         return { id: feature.id, text: `${feature.reference}: ${feature.title}` };
       });
-    mappedFeatures.push({ id: "", text: "None" });
+    mappedFeatures.push({ id: '', text: 'None' });
     setFeatures(mappedFeatures);
-    setFeature(workItem.feature ? workItem.feature.id : "");
+    setFeature(workItem.feature ? workItem.feature.id : '');
   }, [workItem.feature]);
 
   const loadAndSetSprints = useCallback(async () => {
@@ -96,7 +95,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       .map(user => {
         return { id: user.id, text: user.name };
       });
-    mappedUsers.push({ id: "", text: "None" });
+    mappedUsers.push({ id: '', text: 'None' });
     setMembers(mappedUsers);
   }, [workItem.assignedTo]);
 
@@ -106,7 +105,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   }, [orgId, projectId, workItem.id]);
 
   useEffect(() => {
-    document.title = "Floumy | Work Item";
+    document.title = 'Floumy | Work Item';
 
     async function fetchData() {
       setIsLoading(true);
@@ -115,10 +114,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
           loadAndSetFeatures(),
           loadAndSetSprints(),
           loadAndSetMembers(),
-          loadAndSetIssues()
+          loadAndSetIssues(),
         ]);
       } catch (e) {
-        toast.error("The work item details could not be loaded");
+        toast.error('The work item details could not be loaded');
       } finally {
         setIsLoading(false);
       }
@@ -149,10 +148,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       setIsSubmitting(true);
       await deleteWorkItem(orgId, projectId, id);
       navigate(-1);
-      setTimeout(() => toast.success("The work item has been deleted"), 1000);
+      setTimeout(() => toast.success('The work item has been deleted'), 1000);
     } catch (e) {
       setDeleteWarning(false);
-      toast.error("The work item could not be deleted");
+      toast.error('The work item could not be deleted');
     } finally {
       setIsSubmitting(false);
     }
@@ -173,13 +172,13 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         status: status,
         files: files,
         assignedTo: assignedTo,
-        issue: issue
+        issue: issue,
       };
       await onSubmit(workItem);
       navigate(-1);
-      setTimeout(() => toast.success("The work item has been saved"), 100);
+      setTimeout(() => toast.success('The work item has been saved'), 100);
     } catch (e) {
-      toast.error("The work item could not be saved");
+      toast.error('The work item could not be saved');
     } finally {
       setIsSubmitting(false);
     }
@@ -187,11 +186,11 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
 
   const validationSchema = Yup.object({
     title: Yup.string()
-      .required("The title is required"),
+      .required('The title is required'),
     estimation: Yup.number()
       .nullable()
-      .positive("The estimation must be a positive number")
-      .typeError("The estimation must be a number")
+      .positive('The estimation must be a positive number')
+      .typeError('The estimation must be a number'),
   });
 
   const handleFilesChanged = useCallback((files) => {
@@ -202,9 +201,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     try {
       const addedComment = await addComment(orgId, projectId, workItem.id, comment);
       setComments([...comments, addedComment]);
-      toast.success("Comment added successfully");
+      toast.success('Comment added successfully');
     } catch (e) {
-      toast.error("Failed to add comment");
+      toast.error('Failed to add comment');
     }
   };
 
@@ -212,9 +211,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     try {
       const updatedComment = await updateComment(orgId, projectId, workItem.id, commentId, comment);
       setComments(comments.map(c => c.id === commentId ? updatedComment : c));
-      toast.success("Comment updated successfully");
+      toast.success('Comment updated successfully');
     } catch (e) {
-      toast.error("Failed to update comment");
+      toast.error('Failed to update comment');
     }
   };
 
@@ -222,9 +221,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     try {
       await deleteComment(orgId, projectId, workItem.id, commentId);
       setComments(comments.filter(comment => comment.id !== commentId));
-      toast.success("Comment deleted successfully");
+      toast.success('Comment deleted successfully');
     } catch (e) {
-      toast.error("Failed to delete comment");
+      toast.error('Failed to delete comment');
     }
   };
 
@@ -234,10 +233,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       <DeleteWarning
         isOpen={deleteWarning}
         toggle={() => setDeleteWarning(!deleteWarning)}
-        entity={"work item"}
+        entity={'work item'}
         onDelete={() => onDelete(workItem.id)} />
-      <Row>
-        <Col>
+      <Row className="flex-column flex-lg-row">
+        <Col lg={workItem?.id ? 7 : 12} md={12}>
           <Card>
             <CardHeader>
               {!isUpdate && <h3 className="mb-0">New Work Item</h3>}
@@ -249,7 +248,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
             </CardHeader>
             <CardBody>
               <Formik
-                initialValues={{ title: workItem.title || "", estimation: workItem.estimation || "" }}
+                initialValues={{ title: workItem.title || '', estimation: workItem.estimation || '' }}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
               >
@@ -279,49 +278,11 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           invalid={!!(errors.title && touched.title)}
                           autoComplete="off"
                         />
-                        <ErrorMessage name={"title"} component={InputError} />
+                        <ErrorMessage name={'title'} component={InputError} />
                       </Col>
                     </Row>
                     <Row>
-                      <Col xs={12} sm={3} className="mb-3">
-                        <label
-                          className="form-control-label"
-                          htmlFor="validationCustom01"
-                        >
-                          Type
-                        </label>
-                        <Select2
-                          className="react-select-container"
-                          defaultValue={type}
-                          name="type"
-                          data={[
-                            { id: "user-story", text: "User Story" },
-                            { id: "task", text: "Task" },
-                            { id: "bug", text: "Bug" },
-                            { id: "spike", text: "Spike" },
-                            { id: "technical-debt", text: "Technical Debt" }
-                          ]}
-                          onChange={(e) => setType(e.target.value)}></Select2>
-                      </Col>
-                      <Col xs={12} sm={3} className="mb-3">
-                        <label
-                          className="form-control-label"
-                          htmlFor="validationCustom01"
-                        >
-                          Priority
-                        </label>
-                        <Select2
-                          className="react-select-container"
-                          defaultValue={priority}
-                          name="priority"
-                          data={[
-                            { id: "high", text: "High" },
-                            { id: "medium", text: "Medium" },
-                            { id: "low", text: "Low" }
-                          ]}
-                          onChange={(e) => setPriority(e.target.value)}></Select2>
-                      </Col>
-                      <Col xs={12} sm={3} className="mb-3">
+                      <Col xs={12} className="mb-3">
                         <label
                           className="form-control-label"
                           htmlFor="validationCustom01"
@@ -333,22 +294,61 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           defaultValue={status}
                           name="status"
                           data={[
-                            { id: "planned", text: "Planned" },
-                            { id: "ready-to-start", text: "Ready to Start" },
-                            { id: "in-progress", text: "In Progress" },
-                            { id: "blocked", text: "Blocked" },
-                            { id: "code-review", text: "Code Review" },
-                            { id: "testing", text: "Testing" },
-                            { id: "revisions", text: "Revisions" },
-                            { id: "ready-for-deployment", text: "Ready for Deployment" },
-                            { id: "deployed", text: "Deployed" },
-                            { id: "done", text: "Done" },
-                            { id: "closed", text: "Closed" }
+                            { id: 'planned', text: 'Planned' },
+                            { id: 'ready-to-start', text: 'Ready to Start' },
+                            { id: 'in-progress', text: 'In Progress' },
+                            { id: 'blocked', text: 'Blocked' },
+                            { id: 'code-review', text: 'Code Review' },
+                            { id: 'testing', text: 'Testing' },
+                            { id: 'revisions', text: 'Revisions' },
+                            { id: 'ready-for-deployment', text: 'Ready for Deployment' },
+                            { id: 'deployed', text: 'Deployed' },
+                            { id: 'done', text: 'Done' },
+                            { id: 'closed', text: 'Closed' },
                           ]}
                           onChange={(e) => setStatus(e.target.value)}>
                         </Select2>
                       </Col>
-                      <Col xs={12} sm={3} className="mb-3">
+                      <Col xs={12} sm={4} className="mb-3">
+                        <label
+                          className="form-control-label"
+                          htmlFor="validationCustom01"
+                        >
+                          Type
+                        </label>
+                        <Select2
+                          className="react-select-container"
+                          defaultValue={type}
+                          name="type"
+                          data={[
+                            { id: 'user-story', text: 'User Story' },
+                            { id: 'task', text: 'Task' },
+                            { id: 'bug', text: 'Bug' },
+                            { id: 'spike', text: 'Spike' },
+                            { id: 'technical-debt', text: 'Technical Debt' },
+                          ]}
+                          onChange={(e) => setType(e.target.value)}></Select2>
+                      </Col>
+                      <Col xs={12} sm={4} className="mb-3">
+                        <label
+                          className="form-control-label"
+                          htmlFor="validationCustom01"
+                        >
+                          Priority
+                        </label>
+                        <Select2
+                          className="react-select-container"
+                          defaultValue={priority}
+                          name="priority"
+                          data={[
+                            { id: 'high', text: 'High' },
+                            { id: 'medium', text: 'Medium' },
+                            { id: 'low', text: 'Low' },
+                          ]}
+                          onChange={(e) => setPriority(e.target.value)}></Select2>
+                      </Col>
+
+                      <Col xs={12} sm={4} className="mb-3">
                         <label className="form-control-label">
                           Estimation
                         </label>
@@ -356,7 +356,6 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           as={Input}
                           id="estimation"
                           name="estimation"
-                          placeholder="What is the estimation?"
                           type="text"
                           value={values.estimation}
                           onChange={handleChange}
@@ -501,16 +500,38 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
             </CardBody>
           </Card>
         </Col>
-      </Row>
-      <Row>
-        {workItem.id && !isLoading &&
-          <Col>
+        <Col lg={5} md={12} hidden={!workItem?.id}>
+          <Card>
+            <CardHeader>
+              <h3 className="mb-0">
+                Pull Requests
+              </h3>
+            </CardHeader>
+            <CardBody>
+              <Row>
+                <Col>
+                  <ul className="list-unstyled">
+                    {workItem.pullRequests?.map((pullRequest) => (
+                      <li key={pullRequest.id} className="mb-2">
+                        <a href={pullRequest.url} target="_blank" rel="noreferrer" className="text-blue">
+                          <span className="mr-2">{pullRequest.title}</span>
+                          <i className="fa fa-external-link-alt mr-1" />
+                        </a>
+                      </li>
+                    ))}
+                    {workItem.pullRequests?.length === 0 && <li className="mb-2">No pull requests found</li>}
+                  </ul>
+                </Col>
+              </Row>
+            </CardBody>
+          </Card>
+          {workItem.id && !isLoading &&
             <Comments comments={comments}
                       onCommentAdd={handleCommentSubmit}
                       onCommentDelete={handleCommentDelete}
                       onCommentEdit={handleCommentEditSubmit}
-            />
-          </Col>}
+            />}
+        </Col>
       </Row>
     </>
   );

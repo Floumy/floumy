@@ -126,7 +126,21 @@ export class GithubService {
     const octokit = await this.getAuthenticatedOctokit(token);
     const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser();
 
-    return repos;
+    return repos.map(
+      (repo: {
+        id: number;
+        name: string;
+        full_name: string;
+        url: string;
+        html_url: string;
+      }) => ({
+        id: repo.id,
+        name: repo.name,
+        full_name: repo.full_name,
+        url: repo.url,
+        html_url: repo.html_url,
+      }),
+    );
   }
 
   async getAuthUrl(orgId: string, projectId: string) {

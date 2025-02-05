@@ -51,6 +51,14 @@ export interface WorkItemDto {
     id: string;
     title: string;
   };
+  pullRequests?: {
+    id: string;
+    title: string;
+    url: string;
+    state: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
   createdBy: UserDto;
   assignedTo: UserDto;
   createdAt: Date;
