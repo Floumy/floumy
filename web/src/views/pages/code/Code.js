@@ -134,12 +134,13 @@ function Code() {
               <CardHeader>
                 <Row>
                   <Col md={12}>
-                    <CardTitle tag="h2" className="mb-3">Code {repo && <>
+                    <CardTitle tag="h2" className="mb-3"> {repo ? <>
+                      Pull Requests {" "}
                       <a className="btn-link text-blue mr-2" href={repo.url} target="_blank" rel="noreferrer">
                         | {repo.name}
                       </a>
                       <i className="fa fa-edit mr-2" onClick={editRepo} />
-                    </>}
+                    </> : <>Code</>}
                     </CardTitle>
                   </Col>
                 </Row>
@@ -196,7 +197,7 @@ function Code() {
                       <Col>
                         <h3>
                           <i className="fa fa-code-pull-request mr-2 text-success" />
-                          Pull Requests Open For 1 Day
+                          Open For Less Than 1 Day
                         </h3>
                         <div className="table-responsive">
                           <Table className="align-items-center table-flush border-bottom no-select"
@@ -210,7 +211,7 @@ function Code() {
                             </thead>
                             <tbody className="list">
                             {prs.openForOneDay.length === 0 && <tr>
-                              <td colSpan={3} className="text-center">No Pull Requests Open for 1 Day</td>
+                              <td colSpan={3} className="text-center">No Pull Requests</td>
                             </tr>}
                             {prs.openForOneDay.map((pr, index) => (
                               <tr key={index}>
@@ -234,7 +235,7 @@ function Code() {
                       <Col>
                         <h3>
                           <i className="fa fa-code-pull-request mr-2 text-warning" />
-                          Pull Requests Open for 3 Days
+                          Open For Less Than 3 Days
                         </h3>
                         <div className="table-responsive">
                           <Table className="align-items-center table-flush border-bottom no-select"
@@ -248,13 +249,14 @@ function Code() {
                             </thead>
                             <tbody className="list">
                             {prs.openForThreeDays.length === 0 && <tr>
-                              <td colSpan={3} className="text-center">No Pull Requests Open for 3 Days</td>
+                              <td colSpan={3} className="text-center">No Pull Requests</td>
                             </tr>}
                             {prs.openForThreeDays.map((pr, index) => (
                               <tr key={index}>
                                 <td>
                                   <a href={pr.url} target="_blank" rel="noreferrer">
-                                    {pr.title}
+                                    <span className="mr-2">{pr.title}</span>
+                                    <i className="fa fa-external-link-alt mr-1" />
                                   </a>
                                 </td>
                                 <td>
@@ -276,7 +278,7 @@ function Code() {
                       <Col>
                         <h3 className>
                           <i className="fa fa-code-pull-request mr-2 text-danger" />
-                          Stale Pull Requests (More than 3 Days)
+                          Open For More Than 3 Days
                         </h3>
                         <div className="table-responsive">
                           <Table className="align-items-center table-flush border-bottom no-select"
@@ -290,11 +292,16 @@ function Code() {
                             </thead>
                             <tbody className="list">
                             {prs.stale.length === 0 && <tr>
-                              <td colSpan={3} className="text-center">No Stale Pull Requests</td>
+                              <td colSpan={3} className="text-center">No Pull Requests</td>
                             </tr>}
                             {prs.stale.map((pr, index) => (
                               <tr key={index}>
-                                <td>{pr.title}</td>
+                                <td>
+                                  <a href={pr.url} target="_blank" rel="noreferrer">
+                                    <span className="mr-2">{pr.title}</span>
+                                    <i className="fa fa-external-link-alt mr-1" />
+                                  </a>
+                                </td>
                                 <td>
                                   <Link
                                     to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
@@ -328,7 +335,7 @@ function Code() {
                             </thead>
                             <tbody className="list">
                             {prs.closedInThePastSevenDays.length === 0 && <tr>
-                              <td colSpan={2} className="text-center">No Pull Requests Closed in the past 7 days</td>
+                              <td colSpan={3} className="text-center">No Pull Requests</td>
                             </tr>}
                             {prs.closedInThePastSevenDays.map((pr, index) => (
                               <tr key={index}>

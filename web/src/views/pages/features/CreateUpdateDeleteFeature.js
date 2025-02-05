@@ -1,66 +1,66 @@
-import {Button, Card, CardBody, CardHeader, Col, Input, Row} from "reactstrap";
-import {ErrorMessage, Field, Form, Formik} from "formik";
-import InputError from "../../../components/Errors/InputError";
-import Select2 from "react-select2-wrapper";
-import React, {useCallback, useEffect, useState} from "react";
-import {deleteFeature, listMilestones} from "../../../services/roadmap/roadmap.service";
-import {listKeyResults} from "../../../services/okrs/okrs.service";
-import * as Yup from "yup";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import DeleteWarning from "../components/DeleteWarning";
-import FloumyDropZone from "../components/FloumyDropZone";
-import {toast} from "react-toastify";
-import {useNavigate, useParams} from "react-router-dom";
-import CardHeaderDetails from "../components/CardHeaderDetails";
-import {getOrg} from "../../../services/org/orgs.service";
-import {listFeatureRequests} from "../../../services/feature-requests/feature-requests.service";
-import RichTextEditor from "../../../components/RichTextEditor/RichTextEditor";
-import AIButton from "../../../components/AI/AIButton";
-import {getInitiativeDescription} from "../../../services/ai/ai.service";
+import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import InputError from '../../../components/Errors/InputError';
+import Select2 from 'react-select2-wrapper';
+import React, { useCallback, useEffect, useState } from 'react';
+import { deleteFeature, listMilestones } from '../../../services/roadmap/roadmap.service';
+import { listKeyResults } from '../../../services/okrs/okrs.service';
+import * as Yup from 'yup';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import DeleteWarning from '../components/DeleteWarning';
+import FloumyDropZone from '../components/FloumyDropZone';
+import { toast } from 'react-toastify';
+import { useNavigate, useParams } from 'react-router-dom';
+import CardHeaderDetails from '../components/CardHeaderDetails';
+import { getOrg } from '../../../services/org/orgs.service';
+import { listFeatureRequests } from '../../../services/feature-requests/feature-requests.service';
+import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
+import AIButton from '../../../components/AI/AIButton';
+import { getInitiativeDescription } from '../../../services/ai/ai.service';
 
 function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   const { orgId, projectId } = useParams();
-  const [priority, setPriority] = useState("medium");
-  const [descriptionText, setDescriptionText] = useState("");
+  const [priority, setPriority] = useState('medium');
+  const [descriptionText, setDescriptionText] = useState('');
   const [mentions, setMentions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [keyResults, setKeyResults] = useState([{}]);
-  const [keyResult, setKeyResult] = useState("");
+  const [keyResult, setKeyResult] = useState('');
   const [milestones, setMilestones] = useState([{}]);
-  const [milestone, setMilestone] = useState("");
+  const [milestone, setMilestone] = useState('');
   const [isUpdate, setIsUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState("planned");
+  const [status, setStatus] = useState('planned');
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
   const [files, setFiles] = useState([]);
   const uploadedFiles = feature ? feature.files : [];
   const navigate = useNavigate();
-  const [members, setMembers] = useState([{ id: "", text: "None" }]);
-  const [assignedTo, setAssignedTo] = useState("");
+  const [members, setMembers] = useState([{ id: '', text: 'None' }]);
+  const [assignedTo, setAssignedTo] = useState('');
   const [featureRequests, setFeatureRequests] = useState([]);
-  const [featureRequest, setFeatureRequest] = useState("");
+  const [featureRequest, setFeatureRequest] = useState('');
 
-  const paymentPlan = localStorage.getItem("paymentPlan");
+  const paymentPlan = localStorage.getItem('paymentPlan');
 
   const fetchAndSetKeyResults = useCallback(async () => {
     const keyResults = await listKeyResults(orgId, projectId);
-    keyResults.push({ id: "", title: "None" });
+    keyResults.push({ id: '', title: 'None' });
     setKeyResults(keyResults);
     if (feature?.keyResult?.id) {
       setKeyResult(feature.keyResult.id);
     } else {
-      setKeyResult("");
+      setKeyResult('');
     }
   }, [feature?.keyResult?.id, orgId, projectId]);
 
   const fetchAndSetMilestones = useCallback(async () => {
     const milestones = await listMilestones(orgId, projectId);
-    milestones.push({ id: "", title: "None" });
+    milestones.push({ id: '', title: 'None' });
     setMilestones(milestones);
     if (feature?.milestone?.id) {
       setMilestone(feature.milestone.id);
     } else {
-      setMilestone("");
+      setMilestone('');
     }
   }, [feature?.milestone?.id, orgId, projectId]);
 
@@ -71,13 +71,13 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
       .map(user => {
         return { id: user.id, text: user.name };
       });
-    mappedUsers.push({ id: "", text: "None" });
+    mappedUsers.push({ id: '', text: 'None' });
     setMembers(mappedUsers);
   }, [feature?.assignedTo?.id]);
 
   const fetchAndSetFeatureRequests = useCallback(async () => {
     const featureRequests = await listFeatureRequests(orgId, projectId, 1, 0);
-    featureRequests.push({ id: "", title: "None" });
+    featureRequests.push({ id: '', title: 'None' });
     setFeatureRequests(featureRequests);
     if (feature?.featureRequest?.id) {
       setFeatureRequest(feature.featureRequest.id);
@@ -85,7 +85,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   }, [feature?.featureRequest?.id, orgId, projectId]);
 
   useEffect(() => {
-    document.title = "Floumy | Initiative";
+    document.title = 'Floumy | Initiative';
 
     async function fetchData() {
       setIsLoading(true);
@@ -94,10 +94,10 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
           fetchAndSetKeyResults(),
           fetchAndSetMilestones(),
           fetchAndSetMembers(),
-          fetchAndSetFeatureRequests()
+          fetchAndSetFeatureRequests(),
         ]);
       } catch (e) {
-        toast.error("The key results and milestones could not be loaded");
+        toast.error('The key results and milestones could not be loaded');
       } finally {
         setIsLoading(false);
       }
@@ -138,7 +138,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
 
   const validationSchema = Yup.object({
     title: Yup.string()
-      .required("The title is required")
+      .required('The title is required'),
   });
 
   function getMilestoneSelectItemText(milestone) {
@@ -160,21 +160,21 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
         status: status,
         files: files,
         assignedTo: assignedTo,
-        featureRequest: featureRequest
+        featureRequest: featureRequest,
       };
-      if (keyResult !== "") {
+      if (keyResult !== '') {
         feature.keyResult = keyResult;
       }
-      if (milestone !== "") {
+      if (milestone !== '') {
         feature.milestone = milestone;
       }
       await onSubmit(feature);
       setIsSubmitting(false);
       navigate(-1);
-      setTimeout(() => toast.success("The feature has been saved"), 100);
+      setTimeout(() => toast.success('The feature has been saved'), 100);
     } catch (e) {
       setIsSubmitting(false);
-      toast.error("The feature could not be saved");
+      toast.error('The feature could not be saved');
     }
   };
 
@@ -182,9 +182,9 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
     try {
       await deleteFeature(orgId, projectId, id);
       navigate(-1);
-      setTimeout(() => toast.success("The feature has been deleted"), 100);
+      setTimeout(() => toast.success('The feature has been deleted'), 100);
     } catch (e) {
-      toast.error("The feature could not be deleted");
+      toast.error('The feature could not be deleted');
       setIsDeleteWarningOpen(false);
     }
   };
@@ -197,7 +197,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
     <>
       <DeleteWarning
         isOpen={isDeleteWarningOpen}
-        entity={"initiative"}
+        entity={'initiative'}
         toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
         onDelete={() => onDelete(feature.id)}
       />
@@ -212,7 +212,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
         </CardHeader>
         <CardBody>
           <Formik
-            initialValues={{ title: feature?.title || "" }}
+            initialValues={{ title: feature?.title || '' }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -239,7 +239,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                       invalid={!!(errors.title && touched.title)}
                       autoComplete="off"
                     />
-                    <ErrorMessage name={"title"} component={InputError} />
+                    <ErrorMessage name={'title'} component={InputError} />
                   </Col>
                 </Row>
                 <Row>
@@ -255,9 +255,9 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                       defaultValue={priority}
                       name="priority"
                       data={[
-                        { id: "high", text: "High" },
-                        { id: "medium", text: "Medium" },
-                        { id: "low", text: "Low" }
+                        { id: 'high', text: 'High' },
+                        { id: 'medium', text: 'Medium' },
+                        { id: 'low', text: 'Low' },
                       ]}
                       onChange={(e) => setPriority(e.target.value)}></Select2>
                   </Col>
@@ -273,11 +273,11 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                       defaultValue={status}
                       name="status"
                       data={[
-                        { id: "planned", text: "Planned" },
-                        { id: "ready-to-start", text: "Ready to Start" },
-                        { id: "in-progress", text: "In Progress" },
-                        { id: "completed", text: "Completed" },
-                        { id: "closed", text: "Closed" }
+                        { id: 'planned', text: 'Planned' },
+                        { id: 'ready-to-start', text: 'Ready to Start' },
+                        { id: 'in-progress', text: 'In Progress' },
+                        { id: 'completed', text: 'Completed' },
+                        { id: 'closed', text: 'Closed' },
                       ]}
                       onChange={(e) => setStatus(e.target.value)}></Select2>
                   </Col>
@@ -296,7 +296,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                       placeholder="Select a key result"
                       data={keyResults.map((keyResult) => {
                         if (!keyResult.id) {
-                          return { id: "", text: "None" };
+                          return { id: '', text: 'None' };
                         }
 
                         return { id: keyResult.id, text: `${keyResult.reference}: ${keyResult.title}` };
@@ -324,7 +324,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                     ></Select2>
                   </Col>
                 </Row>
-                {paymentPlan === "premium" && <Row className="mb-3">
+                {paymentPlan === 'premium' && <Row className="mb-3">
                   <Col>
                     <label
                       className="form-control-label"
@@ -352,27 +352,27 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                       Description
                     </label>
                     <AIButton
-                    text="Fill with AI"
-                    disabled={values.title.length === 0}
-                    onClick={async () => {
-                      const response = await getInitiativeDescription(values.title, keyResult, milestone, featureRequest);
-                      setDescriptionText(response);
-                    }}
+                      text="Fill with AI"
+                      disabled={values.title.length === 0}
+                      onClick={async () => {
+                        const response = await getInitiativeDescription(values.title, keyResult, milestone, featureRequest);
+                        setDescriptionText(response);
+                      }}
                     />
                     <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
-                        setDescriptionText(text);
-                        setMentions(mentions);
+                      setDescriptionText(text);
+                      setMentions(mentions);
                     }} toolbar={[
-                      ["bold", "italic"],
-                      ["link", "blockquote", "code", "image", "video"],
+                      ['bold', 'italic'],
+                      ['link', 'blockquote', 'code', 'image', 'video'],
                       [
                         {
-                          list: "ordered"
+                          list: 'ordered',
                         },
                         {
-                          list: "bullet"
-                        }
-                      ]
+                          list: 'bullet',
+                        },
+                      ],
                     ]} placeholder="Describe your initiative and its impact ..." />
                   </Col>
                 </Row>
@@ -404,7 +404,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                   </Col>
                 </Row>
                 <Button
-                  id={"save-feature"}
+                  id={'save-feature'}
                   color="primary"
                   type="submit"
                   className="mt-3"
@@ -413,7 +413,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                   Save Initiative
                 </Button>
                 {isUpdate && <Button
-                  id={"delete-feature"}
+                  id={'delete-feature'}
                   color="secondary"
                   type="button"
                   className="mt-3"
