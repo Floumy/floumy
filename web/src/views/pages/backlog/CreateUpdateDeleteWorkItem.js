@@ -11,21 +11,21 @@ import {
   deleteComment,
   deleteWorkItem,
   listComments,
-  updateComment
-} from "../../../services/backlog/backlog.service";
-import { listSprints } from "../../../services/sprints/sprints.service";
-import FloumyDropZone from "../components/FloumyDropZone";
-import { formatHyphenatedString } from "../../../services/utils/utils";
-import DeleteWarning from "../components/DeleteWarning";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import CardHeaderDetails from "../components/CardHeaderDetails";
-import { getOrg } from "../../../services/org/orgs.service";
-import Comments from "../../../components/Comments/Comments";
-import { listIssues } from "../../../services/issues/issues.service";
-import RichTextEditor from "../../../components/RichTextEditor/RichTextEditor";
-import {generateKeyResults, getWorkItemDescription} from "../../../services/ai/ai.service";
-import AIButton from "../../../components/AI/AIButton";
+  updateComment,
+} from '../../../services/backlog/backlog.service';
+import { listSprints } from '../../../services/sprints/sprints.service';
+import FloumyDropZone from '../components/FloumyDropZone';
+import { formatHyphenatedString } from '../../../services/utils/utils';
+import DeleteWarning from '../components/DeleteWarning';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import CardHeaderDetails from '../components/CardHeaderDetails';
+import { getOrg } from '../../../services/org/orgs.service';
+import Comments from '../../../components/Comments/Comments';
+import { listIssues } from '../../../services/issues/issues.service';
+import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
+import { getWorkItemDescription } from '../../../services/ai/ai.service';
+import AIButton from '../../../components/AI/AIButton';
 
 function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const { orgId, projectId } = useParams();
@@ -61,7 +61,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     mappedIssues.push({ id: '', text: 'None' });
     setIssues(mappedIssues);
     setIssue(workItem.issue ? workItem.issue.id : '');
-  }, [workItem.issue]);
+  }, [workItem.issue, orgId, projectId]);
 
   const loadAndSetFeatures = useCallback(async () => {
     const features = await listAllFeatures(orgId, projectId);
@@ -72,7 +72,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     mappedFeatures.push({ id: '', text: 'None' });
     setFeatures(mappedFeatures);
     setFeature(workItem.feature ? workItem.feature.id : '');
-  }, [workItem.feature]);
+  }, [workItem.feature, orgId, projectId]);
 
   const loadAndSetSprints = useCallback(async () => {
     const sprints = await listSprints(orgId, projectId);
@@ -86,7 +86,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     mappedSprints.push({ id: "", text: "None" });
     setSprints(mappedSprints);
     setSprint(workItem.sprint ? workItem.sprint.id : "");
-  }, [workItem.sprint]);
+  }, [workItem.sprint, orgId, projectId]);
 
   const loadAndSetMembers = useCallback(async () => {
     const org = await getOrg();
@@ -504,12 +504,25 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
           <Card>
             <CardHeader>
               <h3 className="mb-0">
-                Pull Requests
+                Code
               </h3>
             </CardHeader>
             <CardBody>
               <Row>
                 <Col>
+                  <h4>Branches</h4>
+                  <ul className="list-unstyled">
+                    {workItem.branches?.length === 0 && <li className="mb-2">No branches found</li>}
+                    {workItem.branches?.map((branch) => (
+                    <li key={branch.id} className="mb-2">
+                      <a href={branch.url} target="_blank" rel="noreferrer" className="text-blue">
+                        <span className="mr-2">{branch.name}</span>
+                        <i className="fa fa-external-link-alt mr-1" />
+                      </a>
+                    </li>
+                  ))}
+                  </ul>
+                  <h4>Pull Requests</h4>
                   <ul className="list-unstyled">
                     {workItem.pullRequests?.map((pullRequest) => (
                       <li key={pullRequest.id} className="mb-2">
