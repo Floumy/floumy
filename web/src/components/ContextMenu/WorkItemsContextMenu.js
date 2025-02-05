@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {Item, Menu, Submenu} from "react-contexify";
 import "react-contexify/dist/ReactContexify.css";
-import {listIterations} from "../../services/iterations/iterations.service";
+import {listSprints} from "../../services/sprints/sprints.service";
 import {Badge, Spinner} from "reactstrap";
 import {
   changeWorkItemAssignee,
-  updateWorkItemIteration,
+  updateWorkItemSprint,
   updateWorkItemPriority,
   updateWorkItemStatus
 } from "../../services/backlog/backlog.service";
@@ -15,23 +15,23 @@ import PropTypes from "prop-types";
 import {useParams} from "react-router-dom";
 import {getOrg} from "../../services/org/orgs.service";
 
-function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onChangePriority, onChange, onChangeAssignee }) {
-  const [isLoadingIterations, setIsLoadingIterations] = useState(false);
+function WorkItemsContextMenu({ menuId, onChangeSprint, onChangeStatus, onChangePriority, onChange, onChangeAssignee }) {
+  const [isLoadingSprints, setIsLoadingSprints] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [users, setUsers] = useState([]);
-  const [iterations, setIterations] = useState([]);
+  const [sprints, setSprints] = useState([]);
   const { orgId, projectId } = useParams();
 
   useEffect(() => {
-    async function fetchIterations() {
+    async function fetchSprints() {
       try {
-        setIsLoadingIterations(true);
-        const iterations = await listIterations(orgId, projectId);
-        setIterations(iterations.filter((iteration) => (iteration.status === "active" || iteration.status === "planned")));
+        setIsLoadingSprints(true);
+        const sprints = await listSprints(orgId, projectId);
+        setSprints(sprints.filter((sprint) => (sprint.status === "active" || sprint.status === "planned")));
       } catch (e) {
-        console.error("The iterations could not be loaded");
+        console.error("The sprints could not be loaded");
       } finally {
-        setIsLoadingIterations(false);
+        setIsLoadingSprints(false);
       }
     }
     async function fetchUsers() {
@@ -52,29 +52,29 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
     }
 
     fetchUsers();
-    fetchIterations();
+    fetchSprints();
   }, []);
 
-  const handleChangeIteration = async ({ id: iterationId, event, props }) => {
+  const handleChangeSprint = async ({ id: sprintId, event, props }) => {
     try {
       event.preventDefault();
       for (const workItem of props.workItems) {
-        await updateWorkItemIteration(orgId, projectId, workItem.id, iterationId);
+        await updateWorkItemSprint(orgId, projectId, workItem.id, sprintId);
       }
-      callChangeIterationCallbacks(iterationId, props.workItems);
-      toast.success("The work items have been moved to the iteration");
+      callChangeSprintCallbacks(sprintId, props.workItems);
+      toast.success("The work items have been moved to the sprint");
     } catch (e) {
-      toast.error("The work items could not be moved to the iteration");
+      toast.error("The work items could not be moved to the sprint");
     }
   };
 
-  const callChangeIterationCallbacks = (iterationId, workItems) => {
+  const callChangeSprintCallbacks = (sprintId, workItems) => {
     try {
-      if (onChangeIteration) {
-        onChangeIteration(workItems, iterationId);
+      if (onChangeSprint) {
+        onChangeSprint(workItems, sprintId);
       }
       if (onChange) {
-        onChange(workItems.map(workItem => workItem.id), { iteration: iterationId });
+        onChange(workItems.map(workItem => workItem.id), { sprint: sprintId });
       }
     } catch (e) {
       console.error("The callbacks could not be called");
@@ -215,19 +215,19 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
           </Item>
         ))}
       </Submenu>
-      {isLoadingIterations &&
+      {isLoadingSprints &&
         <Item disabled className="text-center"><Spinner className="m-auto" color="primary" /></Item>}
-      {!isLoadingIterations && iterations.length === 0 && <Item disabled>Move to sprint</Item>}
-      {!isLoadingIterations && iterations.length > 0 &&
+      {!isLoadingSprints && sprints.length === 0 && <Item disabled>Move to sprint</Item>}
+      {!isLoadingSprints && sprints.length > 0 &&
         <Submenu label={"Move to sprint"} style={{ maxHeight: "200px", overflowY: "scroll" }}>
-          {iterations.map(iteration => (
-            <Item key={iteration.id} id={iteration.id}
-                  onClick={handleChangeIteration}
+          {sprints.map(sprint => (
+            <Item key={sprint.id} id={sprint.id}
+                  onClick={handleChangeSprint}
                   style={{ maxWidth: "300px", overflowX: "hidden", whiteSpace: "nowrap" }}>
-              {iteration.title} [{iteration.status}]
+              {sprint.title} [{sprint.status}]
             </Item>
           ))}
-          <Item key={"null"} id={null} onClick={handleChangeIteration}>None</Item>
+          <Item key={"null"} id={null} onClick={handleChangeSprint}>None</Item>
         </Submenu>}
 
     </Menu>
@@ -236,7 +236,7 @@ function WorkItemsContextMenu({ menuId, onChangeIteration, onChangeStatus, onCha
 
 WorkItemsContextMenu.propTypes = {
   menuId: PropTypes.string.isRequired,
-  onChangeIteration: PropTypes.func,
+  onChangeSprint: PropTypes.func,
   onChangePriority: PropTypes.func,
   onChangeStatus: PropTypes.func,
   onChange: PropTypes.func

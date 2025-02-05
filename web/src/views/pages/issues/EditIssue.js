@@ -78,11 +78,11 @@ export default function EditIssue() {
     setIssue({ ...issue, workItems: updatedWorkItems });
   }
 
-  function updateWorkItemsIteration(workItems, iterationId) {
+  function updateWorkItemsSprint(workItems, sprintId) {
     const updatedWorkItems = [];
     issue.workItems.forEach(workItem => {
       if (workItems.some(w => w.id === workItem.id)) {
-        workItem.iteration = iterationId;
+        workItem.sprint = sprintId;
       }
       updatedWorkItems.push(workItem);
     });
@@ -217,7 +217,7 @@ export default function EditIssue() {
                 onAddNewWorkItem={handleAddWorkItem}
                 onChangeStatus={updateWorkItemsStatus}
                 onChangePriority={updateWorkItemsPriority}
-                onChangeIteration={updateWorkItemsIteration}
+                onChangeSprint={updateWorkItemsSprint}
                 onChangeAssignee={updateWorkItemsAssignee}
               />
             </Card>

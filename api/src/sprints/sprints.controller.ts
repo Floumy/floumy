@@ -15,14 +15,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
-import { CreateOrUpdateIterationDto } from './dtos';
-import { IterationsService } from './iterations.service';
+import { CreateOrUpdateSprintDto } from './dtos';
+import { SprintsService } from './sprints.service';
 import { Timeline } from '../common/timeline.enum';
 
-@Controller('/orgs/:orgId/projects/:projectId/iterations')
+@Controller('/orgs/:orgId/projects/:projectId/sprints')
 @UseGuards(AuthGuard)
-export class IterationsController {
-  constructor(private iterationsService: IterationsService) {}
+export class SprintsController {
+  constructor(private sprintsService: SprintsService) {}
 
   @Post()
   @HttpCode(201)
@@ -30,14 +30,14 @@ export class IterationsController {
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Request() request,
-    @Body() body: CreateOrUpdateIterationDto,
+    @Body() body: CreateOrUpdateSprintDto,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.iterationsService.create(orgId, projectId, body);
+      return await this.sprintsService.create(orgId, projectId, body);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -54,7 +54,7 @@ export class IterationsController {
       throw new UnauthorizedException();
     }
 
-    return await this.iterationsService.listWithWorkItems(orgId, projectId);
+    return await this.sprintsService.listWithWorkItems(orgId, projectId);
   }
 
   @Get()
@@ -68,12 +68,12 @@ export class IterationsController {
       throw new UnauthorizedException();
     }
 
-    return await this.iterationsService.list(orgId, projectId);
+    return await this.sprintsService.list(orgId, projectId);
   }
 
   @Post(':id/start')
   @HttpCode(200)
-  async startIteration(
+  async startSprint(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Request() request,
@@ -84,7 +84,7 @@ export class IterationsController {
     }
 
     try {
-      return await this.iterationsService.startIteration(orgId, projectId, id);
+      return await this.sprintsService.startSprint(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -92,7 +92,7 @@ export class IterationsController {
 
   @Get('active')
   @HttpCode(200)
-  async getActiveIteration(
+  async getActiveSprint(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Request() request,
@@ -101,12 +101,12 @@ export class IterationsController {
       throw new UnauthorizedException();
     }
 
-    return await this.iterationsService.getActiveIteration(orgId, projectId);
+    return await this.sprintsService.getActiveSprint(orgId, projectId);
   }
 
   @Post(':id/complete')
   @HttpCode(200)
-  async completeIteration(
+  async completeSprint(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Request() request,
@@ -117,7 +117,7 @@ export class IterationsController {
     }
 
     try {
-      return await this.iterationsService.completeIteration(
+      return await this.sprintsService.completeSprint(
         orgId,
         projectId,
         id,
@@ -140,7 +140,7 @@ export class IterationsController {
     }
 
     try {
-      return await this.iterationsService.get(orgId, projectId, id);
+      return await this.sprintsService.get(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -153,14 +153,14 @@ export class IterationsController {
     @Param('projectId') projectId: string,
     @Request() request,
     @Param('id') id: string,
-    @Body() body: CreateOrUpdateIterationDto,
+    @Body() body: CreateOrUpdateSprintDto,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.iterationsService.update(orgId, projectId, id, body);
+      return await this.sprintsService.update(orgId, projectId, id, body);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -179,7 +179,7 @@ export class IterationsController {
     }
 
     try {
-      return await this.iterationsService.delete(orgId, projectId, id);
+      return await this.sprintsService.delete(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }
@@ -196,7 +196,7 @@ export class IterationsController {
       throw new UnauthorizedException();
     }
 
-    return await this.iterationsService.listForTimeline(
+    return await this.sprintsService.listForTimeline(
       orgId,
       projectId,
       timeline,

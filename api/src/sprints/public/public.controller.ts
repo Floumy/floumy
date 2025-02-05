@@ -10,20 +10,20 @@ import { PublicService } from './public.service';
 import { Public } from '../../auth/public.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-@Controller('public/orgs/:orgId/projects/:projectId/iterations')
+@Controller('public/orgs/:orgId/projects/:projectId/sprints')
 @Public()
 @UseInterceptors(CacheInterceptor)
 export class PublicController {
-  constructor(private publicIterationsService: PublicService) {}
+  constructor(private publicSprintsService: PublicService) {}
 
   @Get('/timeline/:timeline')
-  async listIterationsForTimeline(
+  async listSprintsForTimeline(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Param('timeline') timeline: Timeline,
   ) {
     try {
-      return await this.publicIterationsService.listIterationsForTimeline(
+      return await this.publicSprintsService.listSprintsForTimeline(
         orgId,
         projectId,
         timeline,
@@ -34,12 +34,12 @@ export class PublicController {
   }
 
   @Get('/active')
-  async getActiveIteration(
+  async getActiveSprint(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
   ) {
     try {
-      return await this.publicIterationsService.getActiveIteration(
+      return await this.publicSprintsService.getActiveSprint(
         orgId,
         projectId,
       );
@@ -48,17 +48,17 @@ export class PublicController {
     }
   }
 
-  @Get('/:iterationId')
-  async getIterationById(
+  @Get('/:sprintId')
+  async getSprintById(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
-    @Param('iterationId') iterationId: string,
+    @Param('sprintId') sprintId: string,
   ) {
     try {
-      return await this.publicIterationsService.getIterationById(
+      return await this.publicSprintsService.getSprintById(
         orgId,
         projectId,
-        iterationId,
+        sprintId,
       );
     } catch (e) {
       throw new BadRequestException();

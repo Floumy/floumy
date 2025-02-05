@@ -77,7 +77,7 @@ function Pricing() {
                 </div>
                 <div>
       <span className="pl-2 ">
-        Development Iterations
+        Development Sprints
       </span>
                 </div>
               </div>
@@ -223,7 +223,7 @@ function Pricing() {
                 </div>
                 <div>
       <span className="pl-2 text-white">
-        Public Development Iterations
+        Public Development Sprints
       </span>
                 </div>
               </div>

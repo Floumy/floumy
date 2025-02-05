@@ -104,9 +104,9 @@ export async function deleteWorkItem(orgId, projectId, id) {
   }
 }
 
-export async function updateWorkItemIteration(orgId, projectId, id, iterationId) {
+export async function updateWorkItemSprint(orgId, projectId, id, sprintId) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`, { iteration: iterationId });
+    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`, { sprint: sprintId });
   } catch (e) {
     throw new Error(e.message);
   }

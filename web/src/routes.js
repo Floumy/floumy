@@ -4,7 +4,7 @@ import DetailOKR from './views/pages/okrs/DetailOKR';
 import SignIn from './views/pages/auth/SignIn';
 import OrgSignUp from './views/pages/auth/OrgSignUp';
 import InitiativesRoadmap from './views/pages/roadmap/InitiativesRoadmap';
-import ActiveIteration from './views/pages/development/ActiveIteration';
+import ActiveSprint from './views/pages/development/ActiveSprint';
 import NewFeature from './views/pages/roadmap/NewFeature';
 import NewMilestone from './views/pages/roadmap/NewMilestone';
 import EditMilestone from './views/pages/roadmap/EditMilestone';
@@ -12,10 +12,10 @@ import EditFeature from './views/pages/features/EditFeature';
 import NewWorkItem from './views/pages/backlog/NewWorkItem';
 import EditWorkItem from './views/pages/backlog/EditWorkItem';
 import { DetailFeature } from './views/pages/features/DetailFeature';
-import Iterations from './views/pages/iterations/Iterations';
+import Sprints from './views/pages/sprints/Sprints';
 import WorkItems from './views/pages/backlog/WorkItems';
-import NewIteration from './views/pages/iterations/NewIteration';
-import EditIteration from './views/pages/iterations/EditIteration';
+import NewSprint from './views/pages/sprints/NewSprint';
+import EditSprint from './views/pages/sprints/EditSprint';
 import Features from './views/pages/features/Features';
 import DetailKeyResult from './views/pages/okrs/DetailKeyResult';
 import Members from './views/pages/settings/Members';
@@ -32,10 +32,10 @@ import PublicDetailWorkItem from './views/pages/backlog/PublicDetailWorkItem';
 import PublicOKRs from './views/pages/okrs/PublicOKRs';
 import PublicDetailOKR from './views/pages/okrs/PublicDetailOKR';
 import PublicDetailKeyResult from './views/pages/okrs/PublicDetailKeyResult';
-import PublicIterations from './views/pages/iterations/PublicIterations';
-import PublicIteration from './views/pages/iterations/PublicIteration';
+import PublicSprints from './views/pages/sprints/PublicSprints';
+import PublicSprint from './views/pages/sprints/PublicSprint';
 import PublicMilestone from './views/pages/roadmap/PublicMilestone';
-import PublicActiveIteration from './views/pages/development/PublicActiveIteration';
+import PublicActiveSprint from './views/pages/development/PublicActiveSprint';
 import Project from './views/pages/settings/Project';
 import MyProfile from './views/pages/users/MyProfile';
 import PrivateFeed from './views/pages/feed/PrivateFeed';
@@ -162,29 +162,29 @@ const routes = [
     collapse: false,
     name: "Sprints",
     icon: "fa fa-refresh",
-    path: "/iterations",
-    component: <Iterations />,
+    path: "/sprints",
+    component: <Sprints />,
     layout: "/admin",
     shortcut: "4"
   },
   {
     redirect: true,
-    path: "/iterations/new",
-    component: <NewIteration />,
+    path: "/sprints/new",
+    component: <NewSprint />,
     layout: "/admin"
   },
   {
     redirect: true,
-    path: "/iterations/edit/:id",
-    component: <EditIteration />,
+    path: "/sprints/edit/:id",
+    component: <EditSprint />,
     layout: "/admin"
   },
   {
     collapse: false,
     name: "Active Sprint",
     icon: "fa fa-rocket",
-    path: "/active-iteration",
-    component: <ActiveIteration />,
+    path: "/active-sprint",
+    component: <ActiveSprint />,
     layout: "/admin",
     shortcut: "5"
   },
@@ -349,14 +349,14 @@ export const publicRoutes = [
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/iterations",
-    component: <PublicIterations />,
+    path: "/orgs/:orgId/projects/:projectId/sprints",
+    component: <PublicSprints />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/iterations/detail/:iterationId",
-    component: <PublicIteration />,
+    path: "/orgs/:orgId/projects/:projectId/sprints/detail/:sprintId",
+    component: <PublicSprint />,
     layout: "/public"
   },
   {
@@ -367,8 +367,8 @@ export const publicRoutes = [
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/active-iteration",
-    component: <PublicActiveIteration />,
+    path: "/orgs/:orgId/projects/:projectId/active-sprint",
+    component: <PublicActiveSprint />,
     layout: "/public"
   },
   {

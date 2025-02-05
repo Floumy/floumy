@@ -7,7 +7,7 @@ import { OkrsModule } from './okrs/okrs.module';
 import { OrgsModule } from './orgs/orgs.module';
 import { RoadmapModule } from './roadmap/roadmap.module';
 import { BacklogModule } from './backlog/backlog.module';
-import { IterationsModule } from './iterations/iterations.module';
+import { SprintsModule } from './sprints/sprints.module';
 import { FilesModule } from './files/files.module';
 import { MailNotificationsModule } from './mail-notifications/mail-notifications.module';
 import databaseConfig from './config/database.config';
@@ -94,7 +94,7 @@ import githubConfig from './config/github.config';
     OrgsModule,
     RoadmapModule,
     BacklogModule,
-    IterationsModule,
+    SprintsModule,
     FilesModule,
     MailNotificationsModule,
     BipModule,

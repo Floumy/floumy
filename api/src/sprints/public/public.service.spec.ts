@@ -1,7 +1,7 @@
 import { PublicService } from './public.service';
 import { UsersService } from '../../users/users.service';
 import { OrgsService } from '../../orgs/orgs.service';
-import { IterationsService } from '../iterations.service';
+import { SprintsService } from '../sprints.service';
 import { WorkItemsService } from '../../backlog/work-items/work-items.service';
 import { Org } from '../../orgs/org.entity';
 import { User } from '../../users/user.entity';
@@ -12,7 +12,7 @@ import { KeyResult } from '../../okrs/key-result.entity';
 import { Feature } from '../../roadmap/features/feature.entity';
 import { Milestone } from '../../roadmap/milestones/milestone.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
-import { Iteration } from '../Iteration.entity';
+import { Sprint } from '../sprint.entity';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { FeatureFile } from '../../roadmap/features/feature-file.entity';
@@ -24,7 +24,7 @@ import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { BipSettings } from '../../bip/bip-settings.entity';
 import { Repository } from 'typeorm';
-import { CreateOrUpdateIterationDto } from '../dtos';
+import { CreateOrUpdateSprintDto } from '../dtos';
 import { Timeline } from '../../common/timeline.enum';
 import { OrgsModule } from '../../orgs/orgs.module';
 import { Project } from '../../projects/project.entity';
@@ -33,7 +33,7 @@ describe('PublicService', () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
   let service: PublicService;
-  let iterationsService: IterationsService;
+  let sprintsService: SprintsService;
   let org: Org;
   let bipSettingsRepository: Repository<BipSettings>;
   let user: User;
@@ -53,7 +53,7 @@ describe('PublicService', () => {
           User,
           Milestone,
           WorkItem,
-          Iteration,
+          Sprint,
           File,
           WorkItemFile,
           FeatureFile,
@@ -69,7 +69,7 @@ describe('PublicService', () => {
         UsersService,
         WorkItemsService,
         MilestonesService,
-        IterationsService,
+        SprintsService,
         PublicService,
         FilesService,
         FilesStorageRepository,
@@ -79,7 +79,7 @@ describe('PublicService', () => {
     service = module.get<PublicService>(PublicService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
-    iterationsService = module.get<IterationsService>(IterationsService);
+    sprintsService = module.get<SprintsService>(SprintsService);
     bipSettingsRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
@@ -108,23 +108,23 @@ describe('PublicService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('when listing iterations', () => {
-    it('should return an empty array if there are no iterations', async () => {
-      const result = await service.listIterationsForTimeline(
+  describe('when listing sprints', () => {
+    it('should return an empty array if there are no sprints', async () => {
+      const result = await service.listSprintsForTimeline(
         org.id,
         project.id,
         Timeline.THIS_QUARTER,
       );
       expect(result).toEqual([]);
     });
-    it('should return an array of iterations', async () => {
-      const iteration = {
+    it('should return an array of sprints', async () => {
+      const sprint = {
         goal: 'Test Goal',
         startDate: new Date().toString(),
         duration: 2,
-      } as CreateOrUpdateIterationDto;
-      await iterationsService.create(org.id, project.id, iteration);
-      const result = await service.listIterationsForTimeline(
+      } as CreateOrUpdateSprintDto;
+      await sprintsService.create(org.id, project.id, sprint);
+      const result = await service.listSprintsForTimeline(
         org.id,
         project.id,
         Timeline.THIS_QUARTER,
@@ -134,17 +134,17 @@ describe('PublicService', () => {
     });
   });
 
-  describe('when getting an iteration by id', () => {
-    it('should return an iteration', async () => {
-      const iteration = await iterationsService.create(org.id, project.id, {
+  describe('when getting an sprint by id', () => {
+    it('should return an sprint', async () => {
+      const sprint = await sprintsService.create(org.id, project.id, {
         goal: 'Test Goal',
         startDate: new Date().toString(),
         duration: 1,
       });
-      const result = await service.getIterationById(
+      const result = await service.getSprintById(
         org.id,
         project.id,
-        iteration.id,
+        sprint.id,
       );
       expect(result).toBeDefined();
     });
@@ -156,19 +156,19 @@ describe('PublicService', () => {
       await bipSettingsRepository.save(bipSettings);
       const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getIterationById(org.id, project.id, nonExistentUUID),
+        service.getSprintById(org.id, project.id, nonExistentUUID),
       ).rejects.toThrow();
     });
-    it('should throw an error if the iteration does not exist', async () => {
+    it('should throw an error if the sprint does not exist', async () => {
       const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getIterationById(org.id, project.id, nonExistentUUID),
+        service.getSprintById(org.id, project.id, nonExistentUUID),
       ).rejects.toThrow();
     });
     it('should throw an error if the org does not exist', async () => {
       const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getIterationById(
+        service.getSprintById(
           nonExistentUUID,
           nonExistentUUID,
           nonExistentUUID,
@@ -176,61 +176,61 @@ describe('PublicService', () => {
       ).rejects.toThrow();
     });
   });
-  describe('when getting the active iteration', () => {
-    it('should return the active iteration', async () => {
-      const orgWithActiveIterations = await orgsService.getOrCreateOrg('Test Project');
-      const projectWithActiveIterations = new Project();
-      projectWithActiveIterations.name = 'Test Project';
-      projectWithActiveIterations.org = Promise.resolve(
-        orgWithActiveIterations,
+  describe('when getting the active sprint', () => {
+    it('should return the active sprint', async () => {
+      const orgWithActiveSprints = await orgsService.getOrCreateOrg('Test Project');
+      const projectWithActiveSprints = new Project();
+      projectWithActiveSprints.name = 'Test Project';
+      projectWithActiveSprints.org = Promise.resolve(
+        orgWithActiveSprints,
       );
-      await projectsRepository.save(projectWithActiveIterations);
+      await projectsRepository.save(projectWithActiveSprints);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
-      bipSettings.isActiveIterationsPagePublic = true;
-      bipSettings.org = Promise.resolve(orgWithActiveIterations);
-      bipSettings.project = Promise.resolve(projectWithActiveIterations);
+      bipSettings.isActiveSprintsPagePublic = true;
+      bipSettings.org = Promise.resolve(orgWithActiveSprints);
+      bipSettings.project = Promise.resolve(projectWithActiveSprints);
       await bipSettingsRepository.save(bipSettings);
 
-      const iteration = await iterationsService.create(
-        orgWithActiveIterations.id,
-        projectWithActiveIterations.id,
+      const sprint = await sprintsService.create(
+        orgWithActiveSprints.id,
+        projectWithActiveSprints.id,
         {
           goal: 'Test Goal',
           startDate: new Date().toString(),
           duration: 1,
         },
       );
-      await iterationsService.startIteration(
-        orgWithActiveIterations.id,
-        projectWithActiveIterations.id,
-        iteration.id,
+      await sprintsService.startSprint(
+        orgWithActiveSprints.id,
+        projectWithActiveSprints.id,
+        sprint.id,
       );
-      const result = await service.getActiveIteration(
-        orgWithActiveIterations.id,
-        projectWithActiveIterations.id,
+      const result = await service.getActiveSprint(
+        orgWithActiveSprints.id,
+        projectWithActiveSprints.id,
       );
       expect(result).toBeDefined();
       expect(result.goal).toEqual('Test Goal');
     });
-    it('should return null if there is no active iteration', async () => {
-      const orgWithActiveIterations = await orgsService.getOrCreateOrg('Test Project');
-      const projectWithActiveIterations = new Project();
-      projectWithActiveIterations.name = 'Test Project';
-      projectWithActiveIterations.org = Promise.resolve(
-        orgWithActiveIterations,
+    it('should return null if there is no active sprint', async () => {
+      const orgWithActiveSprints = await orgsService.getOrCreateOrg('Test Project');
+      const projectWithActiveSprints = new Project();
+      projectWithActiveSprints.name = 'Test Project';
+      projectWithActiveSprints.org = Promise.resolve(
+        orgWithActiveSprints,
       );
-      await projectsRepository.save(projectWithActiveIterations);
+      await projectsRepository.save(projectWithActiveSprints);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
-      bipSettings.isActiveIterationsPagePublic = true;
-      bipSettings.org = Promise.resolve(orgWithActiveIterations);
-      bipSettings.project = Promise.resolve(projectWithActiveIterations);
+      bipSettings.isActiveSprintsPagePublic = true;
+      bipSettings.org = Promise.resolve(orgWithActiveSprints);
+      bipSettings.project = Promise.resolve(projectWithActiveSprints);
       await bipSettingsRepository.save(bipSettings);
 
-      await iterationsService.create(
-        orgWithActiveIterations.id,
-        projectWithActiveIterations.id,
+      await sprintsService.create(
+        orgWithActiveSprints.id,
+        projectWithActiveSprints.id,
         {
           goal: 'Test Goal',
           startDate: new Date().toString(),
@@ -238,9 +238,9 @@ describe('PublicService', () => {
         },
       );
 
-      const result = await service.getActiveIteration(
-        orgWithActiveIterations.id,
-        projectWithActiveIterations.id,
+      const result = await service.getActiveSprint(
+        orgWithActiveSprints.id,
+        projectWithActiveSprints.id,
       );
 
       expect(result).toBeNull();
@@ -250,31 +250,31 @@ describe('PublicService', () => {
       const newProject = (await newOrg.projects)[0];
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = false;
-      bipSettings.isIterationsPagePublic = true;
+      bipSettings.isSprintsPagePublic = true;
       bipSettings.org = Promise.resolve(newOrg);
       bipSettings.project = Promise.resolve(newProject);
       await bipSettingsRepository.save(bipSettings);
       await expect(
-        service.getActiveIteration(newOrg.id, newProject.id),
+        service.getActiveSprint(newOrg.id, newProject.id),
       ).rejects.toThrow();
     });
     it('should throw an error if the org does not exist', async () => {
       const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getActiveIteration(nonExistentUUID, nonExistentUUID),
+        service.getActiveSprint(nonExistentUUID, nonExistentUUID),
       ).rejects.toThrow();
     });
-    it('should throw an error if the org does not have active iterations page public enabled', async () => {
+    it('should throw an error if the org does not have active sprints page public enabled', async () => {
       const newOrg = await orgsService.createForUser(user);
       const newProject = (await newOrg.projects)[0];
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
-      bipSettings.isActiveIterationsPagePublic = false;
+      bipSettings.isActiveSprintsPagePublic = false;
       bipSettings.org = Promise.resolve(newOrg);
       bipSettings.project = Promise.resolve(newProject);
       await bipSettingsRepository.save(bipSettings);
       await expect(
-        service.getActiveIteration(newOrg.id, newProject.id),
+        service.getActiveSprint(newOrg.id, newProject.id),
       ).rejects.toThrow();
     });
   });

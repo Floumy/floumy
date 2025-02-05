@@ -8,7 +8,7 @@ import { KeyResult } from '../okrs/key-result.entity';
 import { Feature } from '../roadmap/features/feature.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
-import { Iteration } from '../iterations/Iteration.entity';
+import { Sprint } from '../sprints/sprint.entity';
 import { File } from '../files/file.entity';
 import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { FeatureFile } from '../roadmap/features/feature-file.entity';
@@ -18,7 +18,7 @@ import { OrgsService } from './orgs.service';
 import { TokensService } from '../auth/tokens.service';
 import { FeaturesService } from '../roadmap/features/features.service';
 import { MilestonesService } from '../roadmap/milestones/milestones.service';
-import { IterationsService } from '../iterations/iterations.service';
+import { SprintsService } from '../sprints/sprints.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { FilesService } from '../files/files.service';
@@ -40,7 +40,7 @@ describe('OrgsController', () => {
           Feature,
           WorkItem,
           Milestone,
-          Iteration,
+          Sprint,
           File,
           WorkItemFile,
           FeatureFile,
@@ -54,7 +54,7 @@ describe('OrgsController', () => {
         FeaturesService,
         MilestonesService,
         WorkItemsService,
-        IterationsService,
+        SprintsService,
         FilesService,
         FilesStorageRepository,
       ],

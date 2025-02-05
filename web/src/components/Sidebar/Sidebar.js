@@ -262,7 +262,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Row style={{ maxWidth: '100%', height: '47px' }}>
                       <Col xs={7}>
                         <NavLink
-                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/iterations`}
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/sprints`}
                           onClick={closeSidenav}
                           tag={NavLinkRRD}
                         >
@@ -272,7 +272,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         </NavLink>
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
-                        <div className={bipSettings.isIterationsPagePublic ? '' : 'd-none'}>
+                        <div className={bipSettings.isSprintsPagePublic ? '' : 'd-none'}>
                           <UncontrolledTooltip target="sprints-nav-item" placement="top">
                             This page is public and can be accessed by anyone.
                           </UncontrolledTooltip>
@@ -292,7 +292,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Row style={{ maxWidth: '100%', height: '47px' }}>
                       <Col xs={7}>
                         <NavLink
-                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/active-iteration`}
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/active-sprint`}
                           onClick={closeSidenav}
                           tag={NavLinkRRD}
                         >
@@ -302,7 +302,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         </NavLink>
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
-                        <div className={bipSettings.isActiveIterationsPagePublic ? '' : 'd-none'}>
+                        <div className={bipSettings.isActiveSprintsPagePublic ? '' : 'd-none'}>
                           <UncontrolledTooltip target="sprints-nav-item" placement="top" popperClassName="p-2">
                             This page is public and can be accessed by anyone.
                           </UncontrolledTooltip>

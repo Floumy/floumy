@@ -24,9 +24,9 @@ export class BipSettings {
   @Column({ default: false })
   isRoadmapPagePublic: boolean = false;
   @Column({ default: false })
-  isIterationsPagePublic: boolean = false;
+  isSprintsPagePublic: boolean = false;
   @Column({ default: false })
-  isActiveIterationsPagePublic: boolean = false;
+  isActiveSprintsPagePublic: boolean = false;
   @Column({ default: false })
   isFeedPagePublic: boolean = false;
   @Column({ default: false })

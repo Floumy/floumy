@@ -7,23 +7,23 @@ import Select2 from "react-select2-wrapper";
 import WorkItemsList from "../backlog/WorkItemsList";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
-  listIterationsWithWorkItemsForTimeline,
-  startIteration
-} from "../../../services/iterations/iterations.service";
-import { formatDate, getIterationEndDate, getIterationStartDate, sortByPriority } from "../../../services/utils/utils";
+  listSprintsWithWorkItemsForTimeline,
+  startSprint
+} from "../../../services/sprints/sprints.service";
+import { formatDate, getSprintEndDate, getSprintStartDate, sortByPriority } from "../../../services/utils/utils";
 import { addWorkItem, listOpenWorkItems } from "../../../services/backlog/backlog.service";
 import { useHotkeys } from "react-hotkeys-hook";
 import WorkItemsListCard from "../backlog/WorkItemsListCard";
 
-function Iterations() {
+function Sprints() {
   const { orgId, projectId } = useParams();
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get("timeline");
-  const [isLoadingIterations, setIsLoadingIterations] = useState(false);
+  const [isLoadingSprints, setIsLoadingSprints] = useState(false);
   const [isLoadingWorkItems, setIsLoadingWorkItems] = useState(false);
   const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || "this-quarter");
-  const [iterations, setIterations] = useState([]);
+  const [sprints, setSprints] = useState([]);
   const [backlogWorkItems, setBacklogWorkItems] = useState([]);
   const [showWorkItems, setShowWorkItems] = useState({});
   const navigate = useNavigate();
@@ -36,24 +36,24 @@ function Iterations() {
   useEffect(() => {
     document.title = "Floumy | Sprints";
 
-    async function fetchIterations() {
-      setIsLoadingIterations(true);
+    async function fetchSprints() {
+      setIsLoadingSprints(true);
       try {
-        const iterations = await listIterationsWithWorkItemsForTimeline(orgId, projectId, timelineFilterValue);
-        setIterations(iterations);
+        const sprints = await listSprintsWithWorkItemsForTimeline(orgId, projectId, timelineFilterValue);
+        setSprints(sprints);
         const showItems = {};
-        iterations.forEach(iteration => {
-          showItems[iteration.id] = true;
+        sprints.forEach(sprint => {
+          showItems[sprint.id] = true;
         });
         setShowWorkItems(showItems);
       } catch (e) {
         console.error(e);
       } finally {
-        setIsLoadingIterations(false);
+        setIsLoadingSprints(false);
       }
     }
 
-    fetchIterations();
+    fetchSprints();
 
   }, [orgId, projectId, timelineFilterValue]);
 
@@ -74,22 +74,22 @@ function Iterations() {
     fetchBacklogWorkItems();
   }, []);
 
-  async function start(orgId, projectId, iterationId) {
+  async function start(orgId, projectId, sprintId) {
     try {
-      await startIteration(orgId, projectId, iterationId);
-      navigate(`/admin/orgs/${orgId}/projects/${projectId}/active-iteration`);
+      await startSprint(orgId, projectId, sprintId);
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/active-sprint`);
     } catch (e) {
       console.error(e);
     }
   }
 
-  async function handleAddWorkItemWithIteration(workItem, iterationId) {
-    workItem.iteration = iterationId;
+  async function handleAddWorkItemWithSprint(workItem, sprintId) {
+    workItem.sprint = sprintId;
     const savedWorkItem = await addWorkItem(orgId, projectId, workItem);
-    const workItems = iterations.find(iteration => iteration.id === iterationId).workItems;
+    const workItems = sprints.find(sprint => sprint.id === sprintId).workItems;
     workItems.push(savedWorkItem);
     sortByPriority(workItems);
-    setIterations([...iterations]);
+    setSprints([...sprints]);
   }
 
   async function handleAddWorkItemToBacklog(workItem) {
@@ -110,20 +110,20 @@ function Iterations() {
     return total;
   }
 
-  function moveWorkItemsToIteration(workItems, newIterationId) {
-    const newIteration = iterations.find(iteration => iteration.id === newIterationId);
-    if (!newIteration) {
+  function moveWorkItemsToSprint(workItems, newSprintId) {
+    const newSprint = sprints.find(sprint => sprint.id === newSprintId);
+    if (!newSprint) {
       return;
     }
 
     workItems.forEach(workItem => {
-      workItem.iteration = {
-        id: newIteration.id
+      workItem.sprint = {
+        id: newSprint.id
       };
-      newIteration.workItems.push(workItem);
+      newSprint.workItems.push(workItem);
     });
-    sortByPriority(newIteration.workItems);
-    setIterations([...iterations]);
+    sortByPriority(newSprint.workItems);
+    setSprints([...sprints]);
   }
 
   function removeWorkItemsFromBacklog(workItems) {
@@ -136,82 +136,82 @@ function Iterations() {
     setBacklogWorkItems(newBacklogWorkItems);
   }
 
-  function moveWorkItemsFromBacklogToIteration(workItems, newIterationId) {
-    if (newIterationId) {
-      moveWorkItemsToIteration(workItems, newIterationId);
+  function moveWorkItemsFromBacklogToSprint(workItems, newSprintId) {
+    if (newSprintId) {
+      moveWorkItemsToSprint(workItems, newSprintId);
     }
     removeWorkItemsFromBacklog(workItems);
   }
 
   function moveWorkItemsToBacklog(workItems) {
     workItems.forEach(workItem => {
-      workItem.iteration = null;
+      workItem.sprint = null;
       backlogWorkItems.push(workItem);
     });
     setBacklogWorkItems([...backlogWorkItems]);
   }
 
-  function removeWorkItemsFromIteration(workItems, oldIterationId) {
-    const oldIteration = iterations.find(iteration => iteration.id === oldIterationId);
-    if (!oldIteration) {
+  function removeWorkItemsFromSprint(workItems, oldSprintId) {
+    const oldSprint = sprints.find(sprint => sprint.id === oldSprintId);
+    if (!oldSprint) {
       return;
     }
 
     const newWorkItems = [];
-    oldIteration.workItems.forEach(workItem => {
-      workItem.iteration = null;
+    oldSprint.workItems.forEach(workItem => {
+      workItem.sprint = null;
       if (!workItems.some(w => w.id === workItem.id)) {
         newWorkItems.push(workItem);
       }
     });
-    oldIteration.workItems = newWorkItems;
-    sortByPriority(oldIteration.workItems);
-    setIterations([...iterations]);
+    oldSprint.workItems = newWorkItems;
+    sortByPriority(oldSprint.workItems);
+    setSprints([...sprints]);
   }
 
-  function moveWorkItemsFromIterationToBacklog(workItems) {
-    const oldIterationId = workItems[0].iteration.id;
-    if (oldIterationId) {
-      removeWorkItemsFromIteration(workItems, oldIterationId);
+  function moveWorkItemsFromSprintToBacklog(workItems) {
+    const oldSprintId = workItems[0].sprint.id;
+    if (oldSprintId) {
+      removeWorkItemsFromSprint(workItems, oldSprintId);
     }
 
     moveWorkItemsToBacklog(workItems);
   }
 
-  function moveWorkItemsFromOldIterationToNewIteration(workItems, newIterationId) {
-    const oldIterationId = workItems[0].iteration.id;
-    if (oldIterationId) {
-      removeWorkItemsFromIteration(workItems, oldIterationId);
+  function moveWorkItemsFromOldSprintToNewSprint(workItems, newSprintId) {
+    const oldSprintId = workItems[0].sprint.id;
+    if (oldSprintId) {
+      removeWorkItemsFromSprint(workItems, oldSprintId);
     }
 
-    moveWorkItemsToIteration(workItems, newIterationId);
+    moveWorkItemsToSprint(workItems, newSprintId);
   }
 
-  function handleChangeWorkItemsIteration(workItems, newIterationId) {
-    const backlogWorkItems = workItems.filter(workItem => !workItem.iteration);
+  function handleChangeWorkItemsSprint(workItems, newSprintId) {
+    const backlogWorkItems = workItems.filter(workItem => !workItem.sprint);
     if (backlogWorkItems.length > 0) {
-      return moveWorkItemsFromBacklogToIteration(backlogWorkItems, newIterationId);
+      return moveWorkItemsFromBacklogToSprint(backlogWorkItems, newSprintId);
     }
 
-    if (newIterationId === null) {
-      return moveWorkItemsFromIterationToBacklog(workItems);
+    if (newSprintId === null) {
+      return moveWorkItemsFromSprintToBacklog(workItems);
     }
 
-    // Add the work item to the new iteration
-    moveWorkItemsFromOldIterationToNewIteration(workItems, newIterationId);
+    // Add the work item to the new sprint
+    moveWorkItemsFromOldSprintToNewSprint(workItems, newSprintId);
   }
 
-  function updateWorkItemsStatusInIteration(workItems, status, iterationId) {
-    const iteration = iterations.find(iteration => iteration.id === iterationId);
+  function updateWorkItemsStatusInSprint(workItems, status, sprintId) {
+    const sprint = sprints.find(sprint => sprint.id === sprintId);
     const updatedWorkItems = [];
-    for (const workItem of iteration.workItems) {
+    for (const workItem of sprint.workItems) {
       if (workItems.some((wi) => (wi.id === workItem.id))) {
         workItem.status = status;
       }
       updatedWorkItems.push(workItem);
     }
-    iteration.workItems = updatedWorkItems;
-    setIterations([...iterations]);
+    sprint.workItems = updatedWorkItems;
+    setSprints([...sprints]);
   }
 
   function updateWorkItemsStatusInBacklog(workItems, status) {
@@ -229,30 +229,30 @@ function Iterations() {
     setBacklogWorkItems(updatedWorkItems);
   }
 
-  function updateWorkItemsPriorityInIteration(workItems, priority, iterationId) {
-    const iteration = iterations.find(iteration => iteration.id === iterationId);
+  function updateWorkItemsPriorityInSprint(workItems, priority, sprintId) {
+    const sprint = sprints.find(sprint => sprint.id === sprintId);
     const updatedWorkItems = [];
-    for (const workItem of iteration.workItems) {
+    for (const workItem of sprint.workItems) {
       if (workItems.some((wi) => (wi.id === workItem.id))) {
         workItem.priority = priority;
       }
       updatedWorkItems.push(workItem);
     }
-    iteration.workItems = updatedWorkItems;
-    setIterations([...iterations]);
+    sprint.workItems = updatedWorkItems;
+    setSprints([...sprints]);
   }
 
-  function updateWorkItemAssigneeInIteration(workItems, assignee, iterationId) {
-    const iteration = iterations.find(iteration => iteration.id === iterationId);
+  function updateWorkItemAssigneeInSprint(workItems, assignee, sprintId) {
+    const sprint = sprints.find(sprint => sprint.id === sprintId);
     const updatedWorkItems = [];
-    for (const workItem of iteration.workItems) {
+    for (const workItem of sprint.workItems) {
       if (workItems.some((wi) => (wi.id === workItem.id))) {
         workItem.assignedTo = assignee.id === null ? undefined : assignee;
       }
       updatedWorkItems.push(workItem);
     }
-    iteration.workItems = updatedWorkItems;
-    setIterations([...iterations]);
+    sprint.workItems = updatedWorkItems;
+    setSprints([...sprints]);
   }
 
   function updateWorkItemsPriorityInBacklog(workItems, priority) {
@@ -280,15 +280,15 @@ function Iterations() {
 
   return (
     <>
-      {isLoadingIterations && <InfiniteLoadingBar />}
+      {isLoadingSprints && <InfiniteLoadingBar />}
       <SimpleHeader headerButtons={
         [
           {
             name: "New Sprint",
             shortcut: "s",
-            id: "new-iteration",
+            id: "new-sprint",
             action: () => {
-              navigate(`/admin/orgs/${orgId}/projects/${projectId}/iterations/new`);
+              navigate(`/admin/orgs/${orgId}/projects/${projectId}/sprints/new`);
             }
           },
           {
@@ -334,14 +334,14 @@ function Iterations() {
                 </Row>
               </CardHeader>
               <div className="p-4">
-                {iterations.length === 0 && !isLoadingIterations && (
+                {sprints.length === 0 && !isLoadingSprints && (
                   <div style={{ maxWidth: "600px" }} className="mx-auto font-italic">
                     <h3>Sprints</h3>
                     <p>Sprints are short, time-boxed periods during which your team works to complete specific
                       work items. They help you deliver incremental progress and adapt quickly to changes. Plan your
                       sprints to maintain a steady development pace and ensure continuous improvement.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/iterations/new`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/sprints/new`}
                             className="text-blue font-weight-bold">Plan a Sprint</Link>
                     </p>
                     <h3>Work Items</h3>
@@ -355,31 +355,31 @@ function Iterations() {
                     </p>
                   </div>
                 )}
-                {iterations.length > 0 && !isLoadingIterations && iterations.map((iteration) => (
-                  <div key={iteration.id} className="mb-5">
+                {sprints.length > 0 && !isLoadingSprints && sprints.map((sprint) => (
+                  <div key={sprint.id} className="mb-5">
                     <Row className="pl-4 pt-2 pr-4">
                       <Col>
                         <h3 className="mb-0">
                           <button onClick={() => {
                             const displayWorkItems = showWorkItems;
-                            displayWorkItems[iteration.id] = !displayWorkItems[iteration.id];
+                            displayWorkItems[sprint.id] = !displayWorkItems[sprint.id];
                             setShowWorkItems({ ...displayWorkItems });
                           }}
                                   className="btn btn-sm btn-outline-light shadow-none shadow-none--hover pt-1 pb-0 pl-2 pr-2">
-                            {!showWorkItems[iteration.id] && <i className="ni ni-bold-right" />}
-                            {showWorkItems[iteration.id] && <i className="ni ni-bold-down" />}
+                            {!showWorkItems[sprint.id] && <i className="ni ni-bold-right" />}
+                            {showWorkItems[sprint.id] && <i className="ni ni-bold-down" />}
                           </button>
-                          <Link to={`/admin/orgs/${orgId}/projects/${projectId}/iterations/edit/${iteration.id}`}
+                          <Link to={`/admin/orgs/${orgId}/projects/${projectId}/sprints/edit/${sprint.id}`}
                                 className="mr-2">
                             <span
-                              className="text-muted">{formatDate(getIterationStartDate(iteration))} - {formatDate(getIterationEndDate(iteration))}</span> | {iteration.title}
+                              className="text-muted">{formatDate(getSprintStartDate(sprint))} - {formatDate(getSprintEndDate(sprint))}</span> | {sprint.title}
                           </Link>
-                          {iteration.status === "active" && <span className="badge badge-info">Active</span>}
-                          {iteration.status === "completed" &&
+                          {sprint.status === "active" && <span className="badge badge-info">Active</span>}
+                          {sprint.status === "completed" &&
                             <span className="badge badge-success">Completed</span>}
-                          {iteration.status === "planned" &&
+                          {sprint.status === "planned" &&
                             <button onClick={async () => {
-                              await start(orgId, projectId, iteration.id);
+                              await start(orgId, projectId, sprint.id);
                             }} className="btn btn-sm btn-outline-primary mr-0">Start Sprint
                             </button>}
                         </h3>
@@ -387,73 +387,73 @@ function Iterations() {
                     </Row>
                     <Row className="pl-4 pr-4">
                       <Col>
-                        <span className="text-muted text-sm p-0 m-0">Work Items Count: {iteration.workItems.length}, Estimated Effort: {estimationTotal(iteration.workItems)}</span>
+                        <span className="text-muted text-sm p-0 m-0">Work Items Count: {sprint.workItems.length}, Estimated Effort: {estimationTotal(sprint.workItems)}</span>
                       </Col>
                     </Row>
-                    {iteration.goal && <Row className="pl-4 pr-4">
+                    {sprint.goal && <Row className="pl-4 pr-4">
                       <Col>
-                        <div className="text-muted mb-0 text-sm">Goal: {iteration.goal}</div>
+                        <div className="text-muted mb-0 text-sm">Goal: {sprint.goal}</div>
                       </Col>
                     </Row>}
-                    {iteration.status === "completed" &&
-                      <div hidden={!showWorkItems[iteration.id]}>
+                    {sprint.status === "completed" &&
+                      <div hidden={!showWorkItems[sprint.id]}>
                         <CardBody className="pb-2 pt-2 font-italic"><Row><Col className="text-sm">Completed Work
                           Items</Col></Row></CardBody>
                         <WorkItemsList
-                          id={"completed-" + iteration.id}
+                          id={"completed-" + sprint.id}
                           showAssignedTo={true}
-                          workItems={sortByPriority(iteration.workItems.filter(workItem => workItem.status === "done" || workItem.status === "closed"))}
+                          workItems={sortByPriority(sprint.workItems.filter(workItem => workItem.status === "done" || workItem.status === "closed"))}
                           headerClassName={"thead"}
-                          onChangeIteration={handleChangeWorkItemsIteration}
+                          onChangeSprint={handleChangeWorkItemsSprint}
                           onChangeStatus={(workItems, status) => {
-                            updateWorkItemsStatusInIteration(workItems, status, iteration.id);
+                            updateWorkItemsStatusInSprint(workItems, status, sprint.id);
                           }}
                           onChangePriority={(workItems, priority) => {
-                            updateWorkItemsPriorityInIteration(workItems, priority, iteration.id);
+                            updateWorkItemsPriorityInSprint(workItems, priority, sprint.id);
                           }}
                           onChangeAssignee={(workItems, assignee) => {
-                            updateWorkItemAssigneeInIteration(workItems, assignee, iteration.id);
+                            updateWorkItemAssigneeInSprint(workItems, assignee, sprint.id);
                           }}
                         />
                         <CardBody className="pt-2 pb-2 font-italic"><Row><Col className="text-sm">Unfinished Work
                           Items</Col></Row></CardBody>
                         <WorkItemsList
-                          id={"unfinished-" + iteration.id}
+                          id={"unfinished-" + sprint.id}
                           showAssignedTo={true}
-                          workItems={sortByPriority(iteration.workItems.filter(workItem => workItem.status !== "done" && workItem.status !== "closed"))}
+                          workItems={sortByPriority(sprint.workItems.filter(workItem => workItem.status !== "done" && workItem.status !== "closed"))}
                           headerClassName={"thead"}
-                          onChangeIteration={handleChangeWorkItemsIteration}
+                          onChangeSprint={handleChangeWorkItemsSprint}
                           onChangeStatus={(workItems, status) => {
-                            updateWorkItemsStatusInIteration(workItems, status, iteration.id);
+                            updateWorkItemsStatusInSprint(workItems, status, sprint.id);
                           }}
                           onChangePriority={(workItems, priority) => {
-                            updateWorkItemsPriorityInIteration(workItems, priority, iteration.id);
+                            updateWorkItemsPriorityInSprint(workItems, priority, sprint.id);
                           }}
                           onChangeAssignee={(workItems, assignee) => {
-                            updateWorkItemAssigneeInIteration(workItems, assignee, iteration.id);
+                            updateWorkItemAssigneeInSprint(workItems, assignee, sprint.id);
                           }}
                         />
                       </div>
                     }
-                    {iteration.status !== "completed" &&
-                      <div className="pt-2" hidden={!showWorkItems[iteration.id]}>
+                    {sprint.status !== "completed" &&
+                      <div className="pt-2" hidden={!showWorkItems[sprint.id]}>
                         <WorkItemsList
-                          id={iteration.id}
+                          id={sprint.id}
                           showAssignedTo={true}
-                          workItems={sortByPriority(iteration.workItems)}
+                          workItems={sortByPriority(sprint.workItems)}
                           headerClassName={"thead"}
                           onAddNewWorkItem={async (workItem) => {
-                            await handleAddWorkItemWithIteration(workItem, iteration.id);
+                            await handleAddWorkItemWithSprint(workItem, sprint.id);
                           }}
-                          onChangeIteration={handleChangeWorkItemsIteration}
+                          onChangeSprint={handleChangeWorkItemsSprint}
                           onChangeStatus={(workItems, status) => {
-                            updateWorkItemsStatusInIteration(workItems, status, iteration.id);
+                            updateWorkItemsStatusInSprint(workItems, status, sprint.id);
                           }}
                           onChangePriority={(workItems, priority) => {
-                            updateWorkItemsPriorityInIteration(workItems, priority, iteration.id);
+                            updateWorkItemsPriorityInSprint(workItems, priority, sprint.id);
                           }}
                           onChangeAssignee={(workItems, assignee) => {
-                            updateWorkItemAssigneeInIteration(workItems, assignee, iteration.id);
+                            updateWorkItemAssigneeInSprint(workItems, assignee, sprint.id);
                           }}
 
                         />
@@ -462,7 +462,7 @@ function Iterations() {
                   </div>
                 ))}
               </div>
-              {isLoadingIterations && <LoadingSpinnerBox />}
+              {isLoadingSprints && <LoadingSpinnerBox />}
             </Card>
             <div id={"work-items-backlog"} />
             <WorkItemsListCard
@@ -471,7 +471,7 @@ function Iterations() {
               title={"Work Items Backlog"}
               isLoading={isLoadingWorkItems}
               onAddWorkItem={handleAddWorkItemToBacklog}
-              onChangeIteration={handleChangeWorkItemsIteration}
+              onChangeSprint={handleChangeWorkItemsSprint}
               onChangeStatus={(workItems, status) => {
                 updateWorkItemsStatusInBacklog(workItems, status);
               }}
@@ -487,4 +487,4 @@ function Iterations() {
   );
 }
 
-export default Iterations;
+export default Sprints;
