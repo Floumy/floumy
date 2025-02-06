@@ -45,8 +45,8 @@ export function getWorkItemUpdates(item) {
     updates.push(`Sprint changed to "${current?.sprint?.title || "None"}"`);
   }
 
-  if (current?.feature?.id !== previous?.feature?.id) {
-    updates.push(`Initiative changed to "${current?.feature?.title || "None"}"`);
+  if (current?.initiative?.id !== previous?.initiative?.id) {
+    updates.push(`Initiative changed to "${current?.initiative?.title || "None"}"`);
   }
 
   if (updates.length === 0) {
@@ -121,7 +121,7 @@ export function getKeyResultUpdates(item) {
 
 }
 
-export function getFeatureUpdates(item) {
+export function getInitiativeUpdates(item) {
   const updates = [];
   const current = item.content.current;
   const previous = item.content.previous;
@@ -177,7 +177,7 @@ export function getTitle(item) {
   return `${item.content.reference}: ${item.content.title}`;
 }
 
-export function getFeatureTitle(item) {
+export function getInitiativeTitle(item) {
   if (item.action === "updated") {
     return `${item.content.current.reference}: ${item.content.current.title}`;
   }

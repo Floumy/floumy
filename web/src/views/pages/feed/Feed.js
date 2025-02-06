@@ -8,8 +8,8 @@ import { formatDateWithTime } from "../../../services/utils/utils";
 import { Link, useParams } from "react-router-dom";
 import {
   addTextFeedItem,
-  getFeatureTitle,
-  getFeatureUpdates,
+  getInitiativeTitle,
+  getInitiativeUpdates,
   getKeyResultUpdates,
   getOkrTitle,
   getOkrUpdates,
@@ -68,8 +68,8 @@ export default function Feed({ listFeedItems, getLinkUrl, showPageExplanation = 
       return getTitle(item);
     }
 
-    if (item.entity === "feature") {
-      return getFeatureTitle(item);
+    if (item.entity === "initiative") {
+      return getInitiativeTitle(item);
     }
 
     return "";
@@ -112,8 +112,8 @@ export default function Feed({ listFeedItems, getLinkUrl, showPageExplanation = 
       return getKeyResultUpdates(item);
     }
 
-    if (item.entity === "feature") {
-      return getFeatureUpdates(item);
+    if (item.entity === "initiative") {
+      return getInitiativeUpdates(item);
     }
 
     return [];

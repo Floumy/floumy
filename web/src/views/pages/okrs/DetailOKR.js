@@ -459,7 +459,7 @@ function DetailOKR() {
                               </div>
                             </td>
                             <td>
-                              {keyResult.features.length}
+                              {keyResult.initiatives.length}
                             </td>
                             <td>
                               <Badge color="" className="badge-dot mr-4">

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Badge, Progress, UncontrolledTooltip } from "reactstrap";
 import {
-  featureStatusColorClassName,
+  initiativeStatusColorClassName,
   formatHyphenatedString,
   formatProgress,
   memberNameInitials,
@@ -11,19 +11,19 @@ import {
 } from "../../../services/utils/utils";
 import React, { useEffect, useState } from "react";
 
-function PublicFeaturesList({
+function PublicInitiativesList({
                               orgId,
                               projectId,
-                              features,
+                              initiatives,
                               headerClassName = "thead-light",
                               showAssignedTo = false
                             }) {
-  const [sortedFeatures, setSortedFeatures] = useState([]);
+  const [sortedInitiatives, setSortedInitiatives] = useState([]);
 
   useEffect(() => {
-    const sortedFeatures = sortByPriority(features);
-    setSortedFeatures(sortedFeatures);
-  }, [features]);
+    const sortedInitiatives = sortByPriority(initiatives);
+    setSortedInitiatives(sortedInitiatives);
+  }, [initiatives]);
 
 
   return (
@@ -42,61 +42,61 @@ function PublicFeaturesList({
           </tr>
           </thead>
           <tbody className="list">
-          {sortedFeatures.length === 0 &&
+          {sortedInitiatives.length === 0 &&
             <tr>
               <td colSpan={7} className={"text-center"}>
                 No initiatives found.
               </td>
             </tr>
           }
-          {sortedFeatures.map((feature) => (
-            <tr key={feature.id}>
+          {sortedInitiatives.map((initiative) => (
+            <tr key={initiative.id}>
               <td>
-                <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
-                      className={"feature-detail"}>
-                  {feature.reference}
+                <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
+                      className={"initiative-detail"}>
+                  {initiative.reference}
                 </Link>
               </td>
               <td className="title-cell">
-                <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
-                      className={"feature-detail"}>
-                  {feature.title}
+                <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
+                      className={"initiative-detail"}>
+                  {initiative.title}
                 </Link>
               </td>
               <td>
                 <div className="d-flex align-items-center">
-                  <span className="mr-2">{formatProgress(feature.progress)}%</span>
+                  <span className="mr-2">{formatProgress(initiative.progress)}%</span>
                   <div>
-                    <Progress max="100" value={feature.progress} color="primary" />
+                    <Progress max="100" value={initiative.progress} color="primary" />
                   </div>
                 </div>
               </td>
               <td>
-                {feature.workItemsCount}
+                {initiative.workItemsCount}
               </td>
               <td>
                 <Badge color="" className="badge-dot mr-4">
-                  <i className={featureStatusColorClassName(feature.status)} />
-                  <span className="status">{formatHyphenatedString(feature.status)}</span>
+                  <i className={initiativeStatusColorClassName(initiative.status)} />
+                  <span className="status">{formatHyphenatedString(initiative.status)}</span>
                 </Badge>
               </td>
               {showAssignedTo && <td>
-                {feature.assignedTo && feature.assignedTo.name &&
+                {initiative.assignedTo && initiative.assignedTo.name &&
                   <>
-                    <UncontrolledTooltip target={"assigned-to-" + feature.id} placement="top">
-                      {feature.assignedTo.name}
+                    <UncontrolledTooltip target={"assigned-to-" + initiative.id} placement="top">
+                      {initiative.assignedTo.name}
                     </UncontrolledTooltip>
                     <span
                       className="avatar avatar-xs rounded-circle"
-                      style={{ backgroundColor: textToColor(feature.assignedTo.name) }}
-                      id={"assigned-to-" + feature.id}>{memberNameInitials(feature.assignedTo.name)}
+                      style={{ backgroundColor: textToColor(initiative.assignedTo.name) }}
+                      id={"assigned-to-" + initiative.id}>{memberNameInitials(initiative.assignedTo.name)}
                 </span>
                   </>}
-                {!feature.assignedTo && "-"}
+                {!initiative.assignedTo && "-"}
               </td>}
               <td>
-                <Badge color={priorityColor(feature.priority)} pill={true}>
-                  {feature.priority}
+                <Badge color={priorityColor(initiative.priority)} pill={true}>
+                  {initiative.priority}
                 </Badge>
               </td>
             </tr>
@@ -107,4 +107,4 @@ function PublicFeaturesList({
     </>);
 }
 
-export default PublicFeaturesList;
+export default PublicInitiativesList;

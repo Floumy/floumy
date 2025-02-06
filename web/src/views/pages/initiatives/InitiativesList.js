@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { Badge, Button, Col, Input, Progress, Row, UncontrolledTooltip } from "reactstrap";
 import {
-  featureStatusColorClassName,
+  initiativeStatusColorClassName,
   formatHyphenatedString,
   formatProgress,
   memberNameInitials,
@@ -13,15 +13,15 @@ import React, { useEffect, useState } from "react";
 import * as Yup from "yup";
 import { Field, Form, Formik } from "formik";
 import Select2 from "react-select2-wrapper";
-import FeaturesContextMenu from "../../../components/ContextMenu/FeaturesContextMenu";
+import InitiativesContextMenu from "../../../components/ContextMenu/InitiativesContextMenu";
 import { useContextMenu } from "react-contexify";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
-function FeaturesList({
-                        features,
+function InitiativesList({
+                        initiatives,
                         headerClassName = "thead-light",
-                        onAddFeature,
+                        onAddInitiative,
                         id = "initiatives-context-menu",
                         onChangePriority,
                         onChangeStatus,
@@ -34,9 +34,9 @@ function FeaturesList({
   const { orgId, projectId } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [priority, setPriority] = useState("medium");
-  const [sortedFeatures, setSortedFeatures] = useState([]);
-  const [selectedFeatures, setSelectedFeatures] = useState([]);
-  const [lastSelectedFeature, setLastSelectedFeature] = useState(null);
+  const [sortedInitiatives, setSortedInitiatives] = useState([]);
+  const [selectedInitiatives, setSelectedInitiatives] = useState([]);
+  const [lastSelectedInitiative, setLastSelectedInitiative] = useState(null);
 
   const validationSchema = Yup.object({
     title: Yup.string()
@@ -44,92 +44,92 @@ function FeaturesList({
   });
 
   useEffect(() => {
-    const sortedFeatures = sortByPriority(features);
-    setSortedFeatures(sortedFeatures);
-  }, [features]);
+    const sortedInitiatives = sortByPriority(initiatives);
+    setSortedInitiatives(sortedInitiatives);
+  }, [initiatives]);
 
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      const feature = {
+      const initiative = {
         title: values.title,
         priority: priority,
         status: "planned"
       };
-      await onAddFeature(feature);
+      await onAddInitiative(initiative);
       setPriority("medium");
       setIsSubmitting(false);
-      toast.success("The feature has been added");
+      toast.success("The initiative has been added");
     } catch (e) {
       setIsSubmitting(false);
-      toast.error("The feature could not be saved");
+      toast.error("The initiative could not be saved");
     }
   };
 
   const { show } = useContextMenu({ id });
 
-  function handleContextMenu(event, feature) {
+  function handleContextMenu(event, initiative) {
     if (!enableContextMenu) {
       event.preventDefault();
       return;
     }
 
-    // If feature is not selected, select it and deselect all others
-    let contextMenuSelectedFeatures = [...selectedFeatures];
-    if (!contextMenuSelectedFeatures.includes(feature.id)) {
-      contextMenuSelectedFeatures = [feature.id];
-      setSelectedFeatures(contextMenuSelectedFeatures);
+    // If initiative is not selected, select it and deselect all others
+    let contextMenuSelectedInitiatives = [...selectedInitiatives];
+    if (!contextMenuSelectedInitiatives.includes(initiative.id)) {
+      contextMenuSelectedInitiatives = [initiative.id];
+      setSelectedInitiatives(contextMenuSelectedInitiatives);
       // Set index of row to be used for shift+click
-      setLastSelectedFeature([features.findIndex(f => f.id === feature.id)]);
+      setLastSelectedInitiative([initiatives.findIndex(f => f.id === initiative.id)]);
     }
 
-    const contextMenuFeatures = contextMenuSelectedFeatures.length > 0 ? features.filter(feature => contextMenuSelectedFeatures.includes(feature.id)) : [feature];
+    const contextMenuInitiatives = contextMenuSelectedInitiatives.length > 0 ? initiatives.filter(initiative => contextMenuSelectedInitiatives.includes(initiative.id)) : [initiative];
     show({
-      event, props: { features: contextMenuFeatures }
+      event, props: { initiatives: contextMenuInitiatives }
     });
   }
 
-  const handleRowClick = (featureId, index, event) => {
+  const handleRowClick = (initiativeId, index, event) => {
     if (!enableContextMenu) {
       event.preventDefault();
       return;
     }
 
-    let newSelectedFeatures;
+    let newSelectedInitiatives;
 
-    if (event.shiftKey && lastSelectedFeature !== null) {
-      const [startIndex, endIndex] = [Math.min(index, lastSelectedFeature), Math.max(index, lastSelectedFeature)];
-      const rowsToToggle = features.slice(startIndex, endIndex + 1).map(row => row.id);
+    if (event.shiftKey && lastSelectedInitiative !== null) {
+      const [startIndex, endIndex] = [Math.min(index, lastSelectedInitiative), Math.max(index, lastSelectedInitiative)];
+      const rowsToToggle = initiatives.slice(startIndex, endIndex + 1).map(row => row.id);
 
-      const shouldSelect = !selectedFeatures.includes(featureId);
-      newSelectedFeatures = selectedFeatures.filter(id => !rowsToToggle.includes(id));
+      const shouldSelect = !selectedInitiatives.includes(initiativeId);
+      newSelectedInitiatives = selectedInitiatives.filter(id => !rowsToToggle.includes(id));
 
       if (shouldSelect) {
-        newSelectedFeatures = [...new Set([...newSelectedFeatures, ...rowsToToggle])];
+        newSelectedInitiatives = [...new Set([...newSelectedInitiatives, ...rowsToToggle])];
       }
     } else {
-      newSelectedFeatures = selectedFeatures.includes(featureId)
-        ? selectedFeatures.filter(id => id !== featureId)
-        : [...selectedFeatures, featureId];
+      newSelectedInitiatives = selectedInitiatives.includes(initiativeId)
+        ? selectedInitiatives.filter(id => id !== initiativeId)
+        : [...selectedInitiatives, initiativeId];
     }
 
-    setSelectedFeatures(newSelectedFeatures);
-    setLastSelectedFeature(index);
+    setSelectedInitiatives(newSelectedInitiatives);
+    setLastSelectedInitiative(index);
   };
 
-  function handleChange(feature, changes) {
-    setSelectedFeatures([]);
-    setLastSelectedFeature(null);
+  function handleChange(initiative, changes) {
+    setSelectedInitiatives([]);
+    setLastSelectedInitiative(null);
     if (onChange) {
-      onChange(feature, changes);
+      onChange(initiative, changes);
     }
   }
 
   return (
     <>
-      {enableContextMenu && <FeaturesContextMenu menuId={id} onChange={handleChange} onChangePriority={onChangePriority}
-                                                 onChangeStatus={onChangeStatus} onChangeMilestone={onChangeMilestone}
-                                                 onChangeKeyResult={onChangeKeyResult} />}
+      {enableContextMenu && <InitiativesContextMenu menuId={id} onChange={handleChange} onChangePriority={onChangePriority}
+                                                    onChangeStatus={onChangeStatus} onChangeMilestone={onChangeMilestone}
+                                                    onChangeKeyResult={onChangeKeyResult} />}
       <div className="table-responsive border-bottom">
         <table className="table align-items-center no-select" style={{ minWidth: "700px" }}>
           <thead className={headerClassName}>
@@ -144,71 +144,71 @@ function FeaturesList({
           </tr>
           </thead>
           <tbody className="list">
-          {sortedFeatures.length === 0 &&
+          {sortedInitiatives.length === 0 &&
             <tr>
               <td colSpan={7} className={"text-center"}>
                 No initiatives found.
               </td>
             </tr>
           }
-          {sortedFeatures.map((feature, index) => (
-            <tr key={feature.id}
-                onClick={(e) => handleRowClick(feature.id, index, e)}
+          {sortedInitiatives.map((initiative, index) => (
+            <tr key={initiative.id}
+                onClick={(e) => handleRowClick(initiative.id, index, e)}
                 onContextMenu={(e) => {
-                  handleContextMenu(e, feature);
+                  handleContextMenu(e, initiative);
                 }}
-                className={selectedFeatures.includes(feature.id) ? "selected-row" : ""}>
+                className={selectedInitiatives.includes(initiative.id) ? "selected-row" : ""}>
               <td>
-                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
-                      className={"feature-detail"}>
-                  {feature.reference}
+                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
+                      className={"initiative-detail"}>
+                  {initiative.reference}
                 </Link>
               </td>
               <td className="title-cell">
-                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
-                      className={"feature-detail"}>
-                  {feature.title}
+                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
+                      className={"initiative-detail"}>
+                  {initiative.title}
                 </Link>
               </td>
               <td>
                 <div className="d-flex align-items-center">
-                  <span className="mr-2">{formatProgress(feature.progress)}%</span>
+                  <span className="mr-2">{formatProgress(initiative.progress)}%</span>
                   <div>
-                    <Progress style={{ maxWidth: "80px" }} max="100" value={feature.progress} color="primary" />
+                    <Progress style={{ maxWidth: "80px" }} max="100" value={initiative.progress} color="primary" />
                   </div>
                 </div>
               </td>
               <td>
-                {feature.workItemsCount}
+                {initiative.workItemsCount}
               </td>
               <td>
                 <Badge color="" className="badge-dot mr-4">
-                  <i className={featureStatusColorClassName(feature.status)} />
-                  <span className="status">{formatHyphenatedString(feature.status)}</span>
+                  <i className={initiativeStatusColorClassName(initiative.status)} />
+                  <span className="status">{formatHyphenatedString(initiative.status)}</span>
                 </Badge>
               </td>
               {showAssignedTo && <td>
-                {feature.assignedTo && feature.assignedTo.name &&
+                {initiative.assignedTo && initiative.assignedTo.name &&
                   <>
-                    <UncontrolledTooltip target={"assigned-to-" + feature.id} placement="top">
-                      {feature.assignedTo.name}
+                    <UncontrolledTooltip target={"assigned-to-" + initiative.id} placement="top">
+                      {initiative.assignedTo.name}
                     </UncontrolledTooltip>
                     <span
                       className="avatar avatar-xs rounded-circle"
-                      style={{ backgroundColor: textToColor(feature.assignedTo.name) }}
-                      id={"assigned-to-" + feature.id}>{memberNameInitials(feature.assignedTo.name)}
+                      style={{ backgroundColor: textToColor(initiative.assignedTo.name) }}
+                      id={"assigned-to-" + initiative.id}>{memberNameInitials(initiative.assignedTo.name)}
                 </span>
                   </>}
-                {!feature.assignedTo && "-"}
+                {!initiative.assignedTo && "-"}
               </td>}
               <td>
-                <Badge color={priorityColor(feature.priority)} pill={true}>
-                  {feature.priority}
+                <Badge color={priorityColor(initiative.priority)} pill={true}>
+                  {initiative.priority}
                 </Badge>
               </td>
             </tr>
           ))}
-          {onAddFeature &&
+          {onAddInitiative &&
             <tr>
               <td colSpan={7}>
                 <Formik
@@ -251,7 +251,7 @@ function FeaturesList({
                         </Col>
                         <Col xs={2} className="text-right">
                           <Button
-                            id={"save-feature"}
+                            id={"save-initiative"}
                             color="primary"
                             type="submit"
                             disabled={isSubmitting}
@@ -270,11 +270,11 @@ function FeaturesList({
     </>);
 }
 
-export default FeaturesList;
+export default InitiativesList;
 
-FeaturesList.propTypes = {
-  features: PropTypes.array.isRequired,
-  onAddFeature: PropTypes.func,
+InitiativesList.propTypes = {
+  initiatives: PropTypes.array.isRequired,
+  onAddInitiative: PropTypes.func,
   onChangePriority: PropTypes.func,
   onChangeStatus: PropTypes.func,
   onChangeMilestone: PropTypes.func,

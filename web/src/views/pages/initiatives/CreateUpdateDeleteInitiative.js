@@ -3,7 +3,7 @@ import { ErrorMessage, Field, Form, Formik } from 'formik';
 import InputError from '../../../components/Errors/InputError';
 import Select2 from 'react-select2-wrapper';
 import React, { useCallback, useEffect, useState } from 'react';
-import { deleteFeature, listMilestones } from '../../../services/roadmap/roadmap.service';
+import { deleteInitiative, listMilestones } from '../../../services/roadmap/roadmap.service';
 import { listKeyResults } from '../../../services/okrs/okrs.service';
 import * as Yup from 'yup';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
@@ -18,7 +18,7 @@ import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
 import AIButton from '../../../components/AI/AIButton';
 import { getInitiativeDescription } from '../../../services/ai/ai.service';
 
-function CreateUpdateDeleteFeature({ onSubmit, feature }) {
+function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
   const { orgId, projectId } = useParams();
   const [priority, setPriority] = useState('medium');
   const [descriptionText, setDescriptionText] = useState('');
@@ -33,7 +33,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   const [status, setStatus] = useState('planned');
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
   const [files, setFiles] = useState([]);
-  const uploadedFiles = feature ? feature.files : [];
+  const uploadedFiles = initiative ? initiative.files : [];
   const navigate = useNavigate();
   const [members, setMembers] = useState([{ id: '', text: 'None' }]);
   const [assignedTo, setAssignedTo] = useState('');
@@ -46,43 +46,43 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
     const keyResults = await listKeyResults(orgId, projectId);
     keyResults.push({ id: '', title: 'None' });
     setKeyResults(keyResults);
-    if (feature?.keyResult?.id) {
-      setKeyResult(feature.keyResult.id);
+    if (initiative?.keyResult?.id) {
+      setKeyResult(initiative.keyResult.id);
     } else {
       setKeyResult('');
     }
-  }, [feature?.keyResult?.id, orgId, projectId]);
+  }, [initiative?.keyResult?.id, orgId, projectId]);
 
   const fetchAndSetMilestones = useCallback(async () => {
     const milestones = await listMilestones(orgId, projectId);
     milestones.push({ id: '', title: 'None' });
     setMilestones(milestones);
-    if (feature?.milestone?.id) {
-      setMilestone(feature.milestone.id);
+    if (initiative?.milestone?.id) {
+      setMilestone(initiative.milestone.id);
     } else {
       setMilestone('');
     }
-  }, [feature?.milestone?.id, orgId, projectId]);
+  }, [initiative?.milestone?.id, orgId, projectId]);
 
   const fetchAndSetMembers = useCallback(async () => {
     const org = await getOrg();
     const mappedUsers = org.members
-      .filter(user => user.isActive || user.id === feature?.assignedTo?.id)
+      .filter(user => user.isActive || user.id === initiative?.assignedTo?.id)
       .map(user => {
         return { id: user.id, text: user.name };
       });
     mappedUsers.push({ id: '', text: 'None' });
     setMembers(mappedUsers);
-  }, [feature?.assignedTo?.id]);
+  }, [initiative?.assignedTo?.id]);
 
   const fetchAndSetFeatureRequests = useCallback(async () => {
     const featureRequests = await listFeatureRequests(orgId, projectId, 1, 0);
     featureRequests.push({ id: '', title: 'None' });
     setFeatureRequests(featureRequests);
-    if (feature?.featureRequest?.id) {
-      setFeatureRequest(feature.featureRequest.id);
+    if (initiative?.featureRequest?.id) {
+      setFeatureRequest(initiative.featureRequest.id);
     }
-  }, [feature?.featureRequest?.id, orgId, projectId]);
+  }, [initiative?.featureRequest?.id, orgId, projectId]);
 
   useEffect(() => {
     document.title = 'Floumy | Initiative';
@@ -107,34 +107,34 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   }, [fetchAndSetKeyResults, fetchAndSetMilestones, fetchAndSetMembers, fetchAndSetFeatureRequests]);
 
   useEffect(() => {
-    if (feature?.id) {
+    if (initiative?.id) {
       setIsUpdate(true);
-      setPriority(feature.priority);
-      setStatus(feature.status);
-      setDescriptionText(feature.description);
-      setKeyResult(feature?.keyResult?.id);
-      setMilestone(feature?.milestone?.id);
-      setAssignedTo(feature?.assignedTo?.id);
+      setPriority(initiative.priority);
+      setStatus(initiative.status);
+      setDescriptionText(initiative.description);
+      setKeyResult(initiative?.keyResult?.id);
+      setMilestone(initiative?.milestone?.id);
+      setAssignedTo(initiative?.assignedTo?.id);
     }
-  }, [feature]);
+  }, [initiative]);
 
   useEffect(() => {
-    if (feature?.assignedTo?.id) {
-      setAssignedTo(feature.assignedTo.id);
+    if (initiative?.assignedTo?.id) {
+      setAssignedTo(initiative.assignedTo.id);
     }
-  }, [feature?.assignedTo?.id, members]);
+  }, [initiative?.assignedTo?.id, members]);
 
   useEffect(() => {
-    if (feature?.milestone?.id) {
-      setMilestone(feature.milestone.id);
+    if (initiative?.milestone?.id) {
+      setMilestone(initiative.milestone.id);
     }
-  }, [feature?.milestone?.id, milestones]);
+  }, [initiative?.milestone?.id, milestones]);
 
   useEffect(() => {
-    if (feature?.keyResult?.id) {
-      setKeyResult(feature.keyResult.id);
+    if (initiative?.keyResult?.id) {
+      setKeyResult(initiative.keyResult.id);
     }
-  }, [feature?.keyResult?.id, keyResults]);
+  }, [initiative?.keyResult?.id, keyResults]);
 
   const validationSchema = Yup.object({
     title: Yup.string()
@@ -152,7 +152,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      const feature = {
+      const initiative = {
         title: values.title,
         description: descriptionText,
         mentions: mentions.map(mention => mention.id),
@@ -163,28 +163,28 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
         featureRequest: featureRequest,
       };
       if (keyResult !== '') {
-        feature.keyResult = keyResult;
+        initiative.keyResult = keyResult;
       }
       if (milestone !== '') {
-        feature.milestone = milestone;
+          initiative.milestone = milestone;
       }
-      await onSubmit(feature);
+      await onSubmit(initiative);
       setIsSubmitting(false);
       navigate(-1);
-      setTimeout(() => toast.success('The feature has been saved'), 100);
+      setTimeout(() => toast.success('The initiative has been saved'), 100);
     } catch (e) {
       setIsSubmitting(false);
-      toast.error('The feature could not be saved');
+      toast.error('The initiative could not be saved');
     }
   };
 
   const onDelete = async (id) => {
     try {
-      await deleteFeature(orgId, projectId, id);
+      await deleteInitiative(orgId, projectId, id);
       navigate(-1);
-      setTimeout(() => toast.success('The feature has been deleted'), 100);
+      setTimeout(() => toast.success('The initiative has been deleted'), 100);
     } catch (e) {
-      toast.error('The feature could not be deleted');
+      toast.error('The initiative could not be deleted');
       setIsDeleteWarningOpen(false);
     }
   };
@@ -199,20 +199,20 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
         isOpen={isDeleteWarningOpen}
         entity={'initiative'}
         toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
-        onDelete={() => onDelete(feature.id)}
+        onDelete={() => onDelete(initiative.id)}
       />
       {isLoading && <InfiniteLoadingBar />}
       <Card>
         <CardHeader>
           {!isUpdate && <h3 className="mb-0">New Initiative</h3>}
-          {isUpdate && <h3 className="mb-0">Edit Initiative {feature.reference}</h3>}
-          {isUpdate && <CardHeaderDetails createdAt={feature.createdAt}
-                                          updatedAt={feature.updatedAt}
-                                          createdBy={feature.createdBy} />}
+          {isUpdate && <h3 className="mb-0">Edit Initiative {initiative.reference}</h3>}
+          {isUpdate && <CardHeaderDetails createdAt={initiative.createdAt}
+                                          updatedAt={initiative.updatedAt}
+                                          createdBy={initiative.createdBy} />}
         </CardHeader>
         <CardBody>
           <Formik
-            initialValues={{ title: feature?.title || '' }}
+            initialValues={{ title: initiative?.title || '' }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -404,7 +404,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                   </Col>
                 </Row>
                 <Button
-                  id={'save-feature'}
+                  id={'save-initiative'}
                   color="primary"
                   type="submit"
                   className="mt-3"
@@ -413,7 +413,7 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                   Save Initiative
                 </Button>
                 {isUpdate && <Button
-                  id={'delete-feature'}
+                  id={'delete-initiative'}
                   color="secondary"
                   type="button"
                   className="mt-3"
@@ -431,4 +431,4 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
   );
 }
 
-export default CreateUpdateDeleteFeature;
+export default CreateUpdateDeleteInitiative;

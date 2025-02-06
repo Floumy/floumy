@@ -1,7 +1,7 @@
 import { Card, CardHeader, Col, Container, Row } from "reactstrap";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getFeature, updateFeature } from "../../../services/roadmap/roadmap.service";
+import { getInitiative, updateInitiative } from "../../../services/roadmap/roadmap.service";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
@@ -9,31 +9,31 @@ import { sortByPriority } from "../../../services/utils/utils";
 import WorkItemsList from "../backlog/WorkItemsList";
 import NotFoundCard from "../components/NotFoundCard";
 import { addWorkItem } from "../../../services/backlog/backlog.service";
-import CreateUpdateDeleteFeature from "./CreateUpdateDeleteFeature";
+import CreateUpdateDeleteInitiative from "./CreateUpdateDeleteInitiative";
 import ExecutionStats from "../components/stats/ExecutionStats";
 import Comments from "../../../components/Comments/Comments";
 import { toast } from "react-toastify";
-import useFeatureComments from "../../../hooks/useFeatureComments";
+import useInitiativeComments from "../../../hooks/useInitiativeComments";
 import AIButton from '../../../components/AI/AIButton';
 import { generateWorkItemsForInitiative } from '../../../services/ai/ai.service';
 
-export function DetailFeature() {
+export function DetailInitiative() {
   const { orgId, projectId } = useParams();
-  const [feature, setFeature] = useState(null);
+  const [initiative, setInitiative] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
   const {
     addComment,
     updateComment,
     deleteComment
-  } = useFeatureComments(feature, setFeature, toast);
+  } = useInitiativeComments(initiative, setInitiative, toast);
 
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const feature = await getFeature(orgId, projectId, id);
-        setFeature(feature);
+        const initiative = await getInitiative(orgId, projectId, id);
+        setInitiative(initiative);
       } catch (e) {
         toast.error("Failed to fetch initiative");
       } finally {
@@ -45,57 +45,57 @@ export function DetailFeature() {
   }, [id]);
 
   async function handleAddWorkItem(workItem) {
-    workItem.feature = feature.id;
+    workItem.initiative = initiative.id;
     const savedWorkItem = await addWorkItem(orgId, projectId, workItem);
-    feature.workItems.push(savedWorkItem);
-    sortByPriority(feature.workItems);
-    setFeature({ ...feature });
+    initiative.workItems.push(savedWorkItem);
+    sortByPriority(initiative.workItems);
+    setInitiative({ ...initiative });
   }
 
-  const handleSubmit = async (feature) => {
-    await updateFeature(orgId, projectId, id, feature);
+  const handleSubmit = async (initiative) => {
+    await updateInitiative(orgId, projectId, id, initiative);
   };
 
   function updateWorkItemsChangeStatus(workItems, status) {
     const updatedWorkItems = [];
-    for (const workItem of feature.workItems) {
+    for (const workItem of initiative.workItems) {
       if (workItems.some((wi) => (wi.id === workItem.id))) {
         workItem.status = status;
       }
       updatedWorkItems.push(workItem);
     }
-    feature.workItems = updatedWorkItems;
-    setFeature({ ...feature });
+    initiative.workItems = updatedWorkItems;
+    setInitiative({ ...initiative });
   }
 
   function updateWorkItemsPriority(workItems, priority) {
     const updatedWorkItems = [];
-    for (const workItem of feature.workItems) {
+    for (const workItem of initiative.workItems) {
       if (workItems.some((wi) => (wi.id === workItem.id))) {
         workItem.priority = priority;
       }
       updatedWorkItems.push(workItem);
     }
-    feature.workItems = updatedWorkItems;
-    setFeature({ ...feature });
+    initiative.workItems = updatedWorkItems;
+    setInitiative({ ...initiative });
   }
 
   function isPlaceholderWorkItemOnly() {
-    return feature && (!feature.workItems || feature.workItems.length === 1 || !feature.workItems[0]?.title);
+    return initiative && (!initiative.workItems || initiative.workItems.length === 1 || !initiative.workItems[0]?.title);
   }
 
   const addWorkItemsWithAi = async () => {
     try {
-      const workItemsToAdd = (await generateWorkItemsForInitiative(feature.title, feature.description))
+      const workItemsToAdd = (await generateWorkItemsForInitiative(initiative.title, initiative.description))
         .map(workItem => {
           return { title: workItem.title, type: workItem.type, priority: workItem.priority, description: workItem.description };
         });
       const savedWorkItems = [];
       for (const workItem of workItemsToAdd) {
-        workItem.feature = feature.id;
+        workItem.initiative = initiative.id;
         savedWorkItems.push(await addWorkItem(orgId, projectId, workItem));
       }
-      setFeature({ ...feature, workItems: savedWorkItems });
+      setInitiative({ ...initiative, workItems: savedWorkItems });
       toast.success('The work items have been added');
     } catch (e) {
       toast.error('The work items could not be saved');
@@ -117,21 +117,21 @@ export function DetailFeature() {
         ]}
       />
       <Container className="mt--6" fluid id="OKRs">
-        {feature && feature.workItems && feature.workItems.length > 0 &&
-          <ExecutionStats workItems={feature.workItems} dueDate={feature?.milestone?.dueDate} />}
+        {initiative && initiative.workItems && initiative.workItems.length > 0 &&
+          <ExecutionStats workItems={initiative.workItems} dueDate={initiative?.milestone?.dueDate} />}
         <Row>
           <Col>
-            {!isLoading && !feature && <NotFoundCard message="Initiative not found" />}
-            {!isLoading && feature && <CreateUpdateDeleteFeature onSubmit={handleSubmit} feature={feature} />}
+            {!isLoading && !initiative && <NotFoundCard message="Initiative not found" />}
+            {!isLoading && initiative && <CreateUpdateDeleteInitiative onSubmit={handleSubmit} initiative={initiative} />}
             <Card>
               {isLoading && <LoadingSpinnerBox />}
-              {!isLoading && feature &&
+              {!isLoading && initiative &&
                 <>
                   <CardHeader className="border-1">
                     <div className="row">
                       <div className="col-12">
                         <h3 className="mb-0">Related Work Items {isPlaceholderWorkItemOnly() && <AIButton
-                          disabled={feature?.title?.length === 0 || feature?.description?.length === 0}
+                          disabled={initiative?.title?.length === 0 || initiative?.description?.length === 0}
                           onClick={addWorkItemsWithAi}
                         />}
                         </h3>
@@ -139,8 +139,8 @@ export function DetailFeature() {
                     </div>
                   </CardHeader>
                   <WorkItemsList
-                    workItems={sortByPriority(feature.workItems)}
-                    showFeature={false}
+                    workItems={sortByPriority(initiative.workItems)}
+                    showInitiative={false}
                     onAddNewWorkItem={handleAddWorkItem}
                     onChangeStatus={updateWorkItemsChangeStatus}
                     onChangePriority={updateWorkItemsPriority}
@@ -153,7 +153,7 @@ export function DetailFeature() {
         <Row>
           {!isLoading &&
             <Col>
-              <Comments comments={feature?.comments}
+              <Comments comments={initiative?.comments}
                         onCommentAdd={addComment}
                         onCommentEdit={updateComment}
                         onCommentDelete={deleteComment} />

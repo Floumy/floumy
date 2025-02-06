@@ -1,14 +1,14 @@
 import { Button, Card, CardBody, CardHeader, Col, Container, Input, Row } from 'reactstrap';
 import FloumySlider from '../../../components/Sliders/FloumySlider';
 import Select2 from 'react-select2-wrapper';
-import FeaturesList from '../features/FeaturesList';
+import InitiativesList from '../initiatives/InitiativesList';
 import React, { useEffect } from 'react';
 import DeleteWarning from '../components/DeleteWarning';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import InputError from '../../../components/Errors/InputError';
-import { addFeature } from '../../../services/roadmap/roadmap.service';
+import { addInitiative } from '../../../services/roadmap/roadmap.service';
 import { sortByPriority } from '../../../services/utils/utils';
 import {
   addKeyResultComment,
@@ -106,11 +106,11 @@ function DetailKeyResult() {
     }
   };
 
-  async function handleAddFeature(keyResultId, feature) {
-    feature.keyResult = keyResultId;
-    const savedFeature = await addFeature(orgId, projectId, feature);
-    keyResult.features.push(savedFeature);
-    sortByPriority(keyResult.features);
+  async function handleAddInitiative(keyResultId, initiative) {
+    initiative.keyResult = keyResultId;
+    const savedInitiative = await addInitiative(orgId, projectId, initiative);
+    keyResult.initiatives.push(savedInitiative);
+    sortByPriority(keyResult.initiatives);
     setKeyResult({ ...keyResult });
   }
 
@@ -119,33 +119,33 @@ function DetailKeyResult() {
       .required('The key result title is required'),
   });
 
-  function updateFeaturesKeyResult(updatedFeatures, keyResultId) {
+  function updateInitiativesKeyResult(updatedInitiatives, keyResultId) {
     if (keyResultId === null || keyResultId !== keyResult.id) {
-      const newFeatures = keyResult.features.filter(feature => !updatedFeatures.some(f => f.id === feature.id));
-      setKeyResult({ ...keyResult, features: newFeatures });
+      const newInitiatives = keyResult.initiatives.filter(initiative => !updatedInitiatives.some(f => f.id === initiative.id));
+      setKeyResult({ ...keyResult, initiatives: newInitiatives });
     }
   }
 
-  function updateFeaturesPriority(updatedFeatures, priority) {
-    const updatedFeaturesIds = updatedFeatures.map(feature => feature.id);
-    const updatedFeaturesPriority = keyResult.features.map(feature => {
-      if (updatedFeaturesIds.includes(feature.id)) {
-        feature.priority = priority;
+  function updateInitiativesPriority(updatedInitiatives, priority) {
+    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
+    const updatedInitiativesPriority = keyResult.initiatives.map(initiative => {
+      if (updatedInitiativesIds.includes(initiative.id)) {
+        initiative.priority = priority;
       }
-      return feature;
+      return initiative;
     });
-    setKeyResult({ ...keyResult, features: sortByPriority(updatedFeaturesPriority) });
+    setKeyResult({ ...keyResult, initiatives: sortByPriority(updatedInitiativesPriority) });
   }
 
-  function updateFeaturesStatus(updatedFeatures, status) {
-    const updatedFeaturesIds = updatedFeatures.map(feature => feature.id);
-    const updatedFeaturesStatus = keyResult.features.map(feature => {
-      if (updatedFeaturesIds.includes(feature.id)) {
-        feature.status = status;
+  function updateInitiativesStatus(updatedInitiatives, status) {
+    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
+    const updatedInitiativesStatus = keyResult.initiatives.map(initiative => {
+      if (updatedInitiativesIds.includes(initiative.id)) {
+        initiative.status = status;
       }
-      return feature;
+      return initiative;
     });
-    setKeyResult({ ...keyResult, features: sortByPriority(updatedFeaturesStatus) });
+    setKeyResult({ ...keyResult, initiatives: sortByPriority(updatedInitiativesStatus) });
   }
 
   async function handleCommentAdd(comment) {
@@ -185,7 +185,7 @@ function DetailKeyResult() {
   }
 
   function isPlaceholderInitiativeOnly() {
-    return keyResult && (!keyResult.features || keyResult.features.length === 1 || !keyResult.features[0]?.title);
+    return keyResult && (!keyResult.initiatives || keyResult.initiatives.length === 1 || !keyResult.initiatives[0]?.title);
   }
 
   const addInitiativesWithAi = async () => {
@@ -196,9 +196,9 @@ function DetailKeyResult() {
         });
       const savedInitiatives = [];
       for (const initiative of initiativesToAdd) {
-        savedInitiatives.push(await addFeature(orgId, projectId, initiative));
+        savedInitiatives.push(await addInitiative(orgId, projectId, initiative));
       }
-      setKeyResult({ ...keyResult, features: savedInitiatives });
+      setKeyResult({ ...keyResult, initiatives: savedInitiatives });
       toast.success('The initiatives have been added');
     } catch (e) {
       toast.error('The initiatives could not be saved');
@@ -326,7 +326,7 @@ function DetailKeyResult() {
                   </Formik>}
               </CardBody>
             </Card>
-            {!isLoading && keyResult && keyResult.features && <>
+            {!isLoading && keyResult && keyResult.initiatives && <>
               <Card>
                 <CardHeader className="border-1">
                   <div className="row">
@@ -341,14 +341,14 @@ function DetailKeyResult() {
                     </div>
                   </div>
                 </CardHeader>
-                <FeaturesList
-                  features={keyResult.features}
-                  onAddFeature={async (feature) => {
-                    await handleAddFeature(keyResult.id, feature);
+                <InitiativesList
+                  initiatives={keyResult.initiatives}
+                  onAddInitiative={async (initiative) => {
+                    await handleAddInitiative(keyResult.id, initiative);
                   }}
-                  onChangeStatus={updateFeaturesStatus}
-                  onChangePriority={updateFeaturesPriority}
-                  onChangeKeyResult={updateFeaturesKeyResult}
+                  onChangeStatus={updateInitiativesStatus}
+                  onChangePriority={updateInitiativesPriority}
+                  onChangeKeyResult={updateInitiativesKeyResult}
                 />
               </Card>
             </>}
