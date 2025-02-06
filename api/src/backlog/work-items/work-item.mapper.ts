@@ -6,10 +6,10 @@ import { User } from '../../users/user.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
 
 class FeatureMapper {
-  static toDto(feature: Initiative) {
+  static toDto(initiative: Initiative) {
     return {
-      id: feature.id,
-      title: feature.title,
+      id: initiative.id,
+      title: initiative.title,
     };
   }
 }
@@ -34,7 +34,7 @@ class UserMapper {
 
 export default class WorkItemMapper {
   static async toDto(workItem: WorkItem): Promise<WorkItemDto> {
-    const initiative = await workItem.initiatives;
+    const initiative = await workItem.initiative;
     const sprint = await workItem.sprint;
     const createdBy = await workItem.createdBy;
     const assignedTo = await workItem.assignedTo;
@@ -84,7 +84,7 @@ export default class WorkItemMapper {
   }
 
   static async toListItemDto(workItem: WorkItem) {
-    const initiative = await workItem.initiatives;
+    const initiative = await workItem.initiative;
     const assignedTo = await workItem.assignedTo;
     return {
       id: workItem.id,

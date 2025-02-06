@@ -10,7 +10,7 @@ function formatDate(date: Date) {
 
 class WorkItemMapper {
   static async toDto(workItem: WorkItem) {
-    const feature = await workItem.initiatives;
+    const initiative = await workItem.initiative;
     const sprint = await workItem.sprint;
     const assignedTo = await workItem.assignedTo;
     return {
@@ -25,7 +25,7 @@ class WorkItemMapper {
       sprint: sprint
         ? { id: sprint.id, title: sprint.title }
         : null,
-      feature: feature ? FeatureMapper.toDto(feature) : null,
+      initiative: initiative ? InitiativeMapper.toDto(initiative) : null,
       assignedTo: assignedTo
         ? { id: assignedTo.id, name: assignedTo.name }
         : null,
@@ -36,11 +36,11 @@ class WorkItemMapper {
   }
 }
 
-class FeatureMapper {
-  static toDto(feature: Initiative) {
+class InitiativeMapper {
+  static toDto(initiative: Initiative) {
     return {
-      id: feature.id,
-      title: feature.title,
+      id: initiative.id,
+      title: initiative.title,
     };
   }
 }

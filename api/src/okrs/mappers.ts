@@ -88,18 +88,18 @@ export class OKRMapper {
 }
 
 class FeatureMapper {
-  static async toDTO(feature: Initiative): Promise<InitiativeDto> {
+  static async toDTO(initiative: Initiative): Promise<InitiativeDto> {
     return {
-      id: feature.id,
-      reference: feature.reference,
-      title: feature.title,
-      priority: feature.priority,
-      status: feature.status,
-      workItemsCount: feature.workItemsCount,
-      progress: feature.progress,
-      workItems: (await feature.workItems).map(WorkItemMapper.toDto),
-      createdAt: feature.createdAt,
-      updatedAt: feature.updatedAt,
+      id: initiative.id,
+      reference: initiative.reference,
+      title: initiative.title,
+      priority: initiative.priority,
+      status: initiative.status,
+      workItemsCount: initiative.workItemsCount,
+      progress: initiative.progress,
+      workItems: (await initiative.workItems).map(WorkItemMapper.toDto),
+      createdAt: initiative.createdAt,
+      updatedAt: initiative.updatedAt,
     };
   }
 }

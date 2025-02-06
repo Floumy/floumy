@@ -144,16 +144,16 @@ export class InitiativesService {
   ) {
     let query = `
             SELECT *
-            FROM feature
-            WHERE feature."orgId" = $1
-              AND feature."projectId" = $2
+            FROM initiative
+            WHERE initiative."orgId" = $1
+              AND initiative."projectId" = $2
             ORDER BY CASE
-                         WHEN feature."priority" = 'high' THEN 1
-                         WHEN feature."priority" = 'medium' THEN 2
-                         WHEN feature."priority" = 'low' THEN 3
+                         WHEN initiative."priority" = 'high' THEN 1
+                         WHEN initiative."priority" = 'medium' THEN 2
+                         WHEN initiative."priority" = 'low' THEN 3
                          ELSE 4
                          END,
-                     feature."createdAt" DESC
+                     initiative."createdAt" DESC
         `;
     let params = [orgId, projectId] as any[];
     if (limit > 0) {
@@ -404,7 +404,7 @@ export class InitiativesService {
     comment.content = createCommentDto.content;
     comment.createdBy = Promise.resolve(user);
     comment.org = Promise.resolve(org);
-    comment.initiatives = Promise.resolve(initiative);
+    comment.initiative = Promise.resolve(initiative);
     comment.mentions = Promise.resolve(
       await this.usersRepository.findBy({
         id: In(createCommentDto.mentions),
@@ -435,7 +435,7 @@ export class InitiativesService {
   ) {
     const comment = await this.initiativeCommentRepository.findOneByOrFail({
       id: commentId,
-      initiatives: { id: initiativeId },
+      initiative: { id: initiativeId },
       createdBy: { id: userId },
     });
     await this.initiativeCommentRepository.remove(comment);
@@ -452,7 +452,7 @@ export class InitiativesService {
     }
     const comment = await this.initiativeCommentRepository.findOneByOrFail({
       id: commentId,
-      initiatives: { id: initiativeId },
+      initiative: { id: initiativeId },
       createdBy: { id: userId },
     });
     comment.content = createCommentDto.content;
@@ -468,7 +468,7 @@ export class InitiativesService {
         mentions,
         createdBy: await this.userRepository.findOneByOrFail({ id: userId }),
         org: await savedComment.org,
-        project: await (await savedComment.initiatives).project,
+        project: await (await savedComment.initiative).project,
         action: ActionType.UPDATE,
         entity: EntityType.INITIATIVE_COMMENT,
         status: StatusType.UNREAD,
@@ -518,10 +518,10 @@ export class InitiativesService {
     const files = await this.filesRepository.findBy({
       id: In(initiativeDto.files.map((file) => file.id)),
     });
-    await this.initiativeFileRepository.delete({ initiatives: { id: initiative.id } });
+    await this.initiativeFileRepository.delete({ initiative: { id: initiative.id } });
     const initiativeFiles = files.map((file) => {
       const initiativeFile = new InitiativeFile();
-      initiativeFile.initiatives = Promise.resolve(initiative);
+      initiativeFile.initiative = Promise.resolve(initiative);
       initiativeFile.file = Promise.resolve(file);
       return initiativeFile;
     });
@@ -666,7 +666,7 @@ export class InitiativesService {
     id: string,
   ) {
     const initiativeFiles = await this.initiativeFileRepository.findBy({
-      initiatives: { id, org: { id: orgId } },
+      initiative: { id, org: { id: orgId } },
     });
 
     for (const initiativeFile of initiativeFiles) {

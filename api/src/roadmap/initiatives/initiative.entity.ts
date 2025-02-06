@@ -73,13 +73,13 @@ export class Initiative {
     lazy: true,
   })
   milestone: Promise<Milestone>;
-  @OneToMany(() => WorkItem, (workItem) => workItem.initiatives, { lazy: true })
+  @OneToMany(() => WorkItem, (workItem) => workItem.initiative, { lazy: true })
   workItems: Promise<WorkItem[]>;
-  @OneToMany(() => InitiativeFile, (initiativeFile) => initiativeFile.initiatives)
+  @OneToMany(() => InitiativeFile, (initiativeFile) => initiativeFile.initiative)
   initiativeFiles: Promise<InitiativeFile[]>;
   @OneToMany(
     () => InitiativeComment,
-    (initiativeComment) => initiativeComment.initiatives,
+    (initiativeComment) => initiativeComment.initiative,
     {
       lazy: true,
     },
@@ -98,9 +98,9 @@ export class Initiative {
     lazy: true,
   })
   @JoinTable({
-    name: 'feature_description_mentions',
+    name: 'initiative_description_mentions',
     joinColumn: {
-      name: 'featureId',
+      name: 'initiativeId',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {

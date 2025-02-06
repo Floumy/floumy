@@ -30,7 +30,7 @@ export class InitiativeQueryBuilder {
                                 END as priority_order,
                             u.id    as "assignedToId",
                             u.name  as "assignedToName"
-            FROM feature f
+            FROM initiative f
                      LEFT JOIN "user" u ON u.id = f."assignedToId"
             WHERE f."orgId" = $1
               AND f."projectId" = $2
@@ -165,7 +165,7 @@ export class InitiativeQueryBuilder {
   async count(): Promise<number> {
     let countQuery = `
       SELECT COUNT(DISTINCT f.id) as total 
-      FROM feature f
+      FROM initiative f
      LEFT JOIN "user" u ON u.id = f."assignedToId"
       WHERE f."orgId" = $1
         AND f."projectId" = $2

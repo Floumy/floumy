@@ -14,7 +14,7 @@ export class InitiativeFile {
   id: string;
 
   @ManyToOne(() => Initiative, (initiative) => initiative.initiativeFiles, { lazy: true })
-  initiatives: Promise<Initiative>;
+  initiative: Promise<Initiative>;
 
   @OneToOne(() => File, { lazy: true })
   @JoinColumn()

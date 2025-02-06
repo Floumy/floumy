@@ -76,8 +76,8 @@ export class WorkItem {
   assignedTo: Promise<User>;
   @ManyToOne(() => Org, (org) => org.workItems, { lazy: false })
   org: Promise<Org>;
-  @ManyToOne(() => Initiative, (feature) => feature.workItems, { lazy: false })
-  initiatives: Promise<Initiative>;
+  @ManyToOne(() => Initiative, (initiative) => initiative.workItems, { lazy: false })
+  initiative: Promise<Initiative>;
   @ManyToOne(() => Sprint, (sprint) => sprint.workItems, {
     lazy: true,
   })
