@@ -60,7 +60,7 @@ export class MilestonesService {
     const milestones = await this.milestoneRepository.find({
       where: { org: { id: orgId }, project: { id: projectId } },
       order: { dueDate: 'DESC' },
-      relations: ['features'],
+      relations: ['initiatives'],
     });
     return await MilestoneMapper.toListWithInitiativesDto(milestones);
   }

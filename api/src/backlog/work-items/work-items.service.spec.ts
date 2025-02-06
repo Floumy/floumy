@@ -952,7 +952,7 @@ describe('WorkItemsService', () => {
             description: 'my work item description',
             priority: Priority.HIGH,
             type: WorkItemType.USER_STORY,
-            feature: expect.objectContaining({
+            initiative: expect.objectContaining({
               id: expect.any(String), // or whatever type id is
               title: 'my feature',
             }),
@@ -962,7 +962,7 @@ describe('WorkItemsService', () => {
             description: 'my other work item description',
             priority: Priority.MEDIUM,
             type: WorkItemType.TECHNICAL_DEBT,
-            feature: expect.objectContaining({
+            initiative: expect.objectContaining({
               id: expect.any(String),
               title: 'my other feature',
             }),

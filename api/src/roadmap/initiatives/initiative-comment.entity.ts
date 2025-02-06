@@ -6,15 +6,15 @@ import {User} from "../../users/user.entity";
 @Entity()
 export class InitiativeComment extends Comment {
   @ManyToOne(() => Initiative, (initiative) => initiative.comments, { lazy: true })
-  initiatives: Promise<Initiative>;
+  initiative: Promise<Initiative>;
 
   @ManyToMany(() => User, {
     lazy: true,
   })
   @JoinTable({
-    name: 'feature_comment_mentions',
+    name: 'initiative_comment_mentions',
     joinColumn: {
-      name: 'featureCommentId',
+      name: 'initiativeCommentId',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {

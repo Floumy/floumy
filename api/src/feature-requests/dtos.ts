@@ -48,5 +48,5 @@ export interface FeatureRequestDto {
   createdAt: Date;
   updatedAt: Date;
   comments: CommentDto[];
-  features: InitiativeDto[];
+  initiatives: InitiativeDto[];
 }

@@ -68,7 +68,7 @@ export interface OrgDto {
 }
 
 export interface KeyResultDto {
-  features: InitiativeDto[];
+  initiatives: InitiativeDto[];
   org: OrgDto;
   project: {
     id: string;

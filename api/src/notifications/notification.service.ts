@@ -79,9 +79,9 @@ export class NotificationService {
             const featureComment =
               await this.featureCommentsRepository.findOneOrFail({
                 where: { id: notification.entityId },
-                relations: ['feature'],
+                relations: ['initiative'],
               });
-            const feature = await featureComment.initiatives;
+            const feature = await featureComment.initiative;
             entityName = feature.reference + ': ' + feature.title;
             entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`;
             break;

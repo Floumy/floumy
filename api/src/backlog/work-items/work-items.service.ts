@@ -82,7 +82,7 @@ export class WorkItemsService {
       };
       this.eventEmitter.emit('mention.created', notification);
     }
-    const initiative = await savedWorkItem.initiatives;
+    const initiative = await savedWorkItem.initiative;
     await this.updateInitiativeProgress(initiative);
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
     this.eventEmitter.emit(
@@ -144,7 +144,7 @@ export class WorkItemsService {
       project: { id: projectId },
     });
     const previous = await WorkItemMapper.toDto(workItem);
-    const oldFeature = await workItem.initiatives;
+    const oldFeature = await workItem.initiative;
     await this.setWorkItemData(workItem, workItemDto, orgId);
     const savedWorkItem = await this.workItemsRepository.save(workItem);
     const savedMentions = await savedWorkItem.mentions;
@@ -161,7 +161,7 @@ export class WorkItemsService {
       };
       this.eventEmitter.emit('mention.created', notification);
     }
-    const newFeature = await savedWorkItem.initiatives;
+    const newFeature = await savedWorkItem.initiative;
     await this.updateInitiativeProgress(oldFeature);
     if (newFeature && (!oldFeature || oldFeature.id !== newFeature.id)) {
       await this.updateInitiativeProgress(newFeature);
@@ -184,7 +184,7 @@ export class WorkItemsService {
     const deletedWorkItem = await WorkItemMapper.toDto(workItem);
     await this.deleteWorkItemFiles(orgId, projectId, workItem.id);
 
-    const initiative = await workItem.initiatives;
+    const initiative = await workItem.initiative;
 
     await this.workItemsRepository.remove(workItem);
 
@@ -196,15 +196,15 @@ export class WorkItemsService {
 
   removeInitiativeFromWorkItems(orgId: string, projectId: string, id: string) {
     return this.workItemsRepository.update(
-      { org: { id: orgId }, initiatives: { id }, project: { id: projectId } },
-      { initiatives: null },
+      { org: { id: orgId }, initiative: { id }, project: { id: projectId } },
+      { initiative: null },
     );
   }
 
   async listOpenWorkItemsWithoutSprints(orgId: string, projectId: string) {
     const workItems = await this.workItemsRepository
       .createQueryBuilder('workItem')
-      .leftJoinAndSelect('workItem.feature', 'feature')
+      .leftJoinAndSelect('workItem.initiative', 'initiative')
       .leftJoinAndSelect('workItem.assignedTo', 'assignedTo')
       .where('workItem.orgId = :orgId', { orgId })
       .andWhere('workItem.projectId = :projectId', { projectId })
@@ -241,7 +241,7 @@ export class WorkItemsService {
     this.updatePriority(workItem, workItemPatchDto);
 
     const savedWorkItem = await this.workItemsRepository.save(workItem);
-    await this.updateInitiativeProgress(await savedWorkItem.initiatives);
+    await this.updateInitiativeProgress(await savedWorkItem.initiative);
     const current = await WorkItemMapper.toDto(savedWorkItem);
     this.eventEmitter.emit('workItem.updated', {
       previous,
@@ -468,14 +468,14 @@ export class WorkItemsService {
     ) {
       workItem.completedAt = new Date();
     }
-    workItem.initiatives = Promise.resolve(null);
+    workItem.initiative = Promise.resolve(null);
     workItem.sprint = Promise.resolve(null);
     if (workItemDto.initiative) {
       const initiative = await this.initiativeRepository.findOneByOrFail({
         id: workItemDto.initiative,
         org: { id: orgId },
       });
-      workItem.initiatives = Promise.resolve(initiative);
+      workItem.initiative = Promise.resolve(initiative);
     }
     if (workItemDto.sprint) {
       const sprint = await this.sprintRepository.findOneByOrFail({
