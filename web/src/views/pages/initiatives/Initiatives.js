@@ -1,18 +1,18 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { Col, Container, Row } from 'reactstrap';
 import React, { useEffect, useState } from 'react';
-import { searchFeaturesWithOptions } from '../../../services/roadmap/roadmap.service';
+import { searchInitiativesWithOptions } from '../../../services/roadmap/roadmap.service';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import SearchFeaturesListCard from './SearchFeaturesListCard';
+import SearchInitiativesListCard from './SearchInitiativesListCard';
 
-function Features() {
+function Initiatives() {
   const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
-  const [features, setFeatures] = useState([]);
+  const [initiatives, setInitiatives] = useState([]);
   const navigate = useNavigate();
-  const [hasMoreFeatures, setHasMoreFeatures] = useState(true);
+  const [hasMoreInitiatives, setHasMoreInitiatives] = useState(true);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState({ text: '' });
 
@@ -23,14 +23,14 @@ function Features() {
     document.title = 'Floumy | Initiatives';
   }, []);
 
-  async function searchFeatures(searchOptions, page, features = []) {
+  async function searchInitiatives(searchOptions, page, initiatives = []) {
     setIsLoading(true);
     try {
-      const response = await searchFeaturesWithOptions(orgId, projectId, searchOptions, page);
+      const response = await searchInitiativesWithOptions(orgId, projectId, searchOptions, page);
       if (response.length === 0) {
-        setHasMoreFeatures(false);
+        setHasMoreInitiatives(false);
       } else {
-        setFeatures([...features, ...response]);
+        setInitiatives([...initiatives, ...response]);
         setPage(page + 1);
       }
     } catch (e) {
@@ -41,14 +41,14 @@ function Features() {
   }
 
   async function loadNextPage() {
-    await searchFeatures(search, page, features);
+    await searchInitiatives(search, page, initiatives);
   }
 
   async function handleSearch(searchOptions) {
     setSearch(searchOptions);
-    setFeatures([]);
+    setInitiatives([]);
     setPage(1);
-    await searchFeatures(searchOptions, 1);
+    await searchInitiatives(searchOptions, 1);
   }
 
   return (
@@ -58,9 +58,9 @@ function Features() {
         {
           name: 'New Initiative',
           shortcut: 'i',
-          id: 'new-feature',
+          id: 'new-initiative',
           action: () => {
-            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`);
+            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`);
           },
         },
       ]} />
@@ -68,19 +68,19 @@ function Features() {
         <Row>
           <Col>
             <InfiniteScroll next={loadNextPage}
-                            hasMore={hasMoreFeatures}
+                            hasMore={hasMoreInitiatives}
                             loader={<></>}
-                            dataLength={features.length}
+                            dataLength={initiatives.length}
                             style={{ minHeight: '500px', overflow: 'visible' }}>
-              <SearchFeaturesListCard title="All Initiatives"
-                                      features={features}
-                                      isLoading={isLoading}
-                                      onSearch={handleSearch}
-                                      searchPlaceholder={'Search by title, description, or reference'}
-                                      filterByPriority={filterByPriority}
-                                      setFilterByPriority={setFilterByPriority}
-                                      filterByStatus={filterByStatus}
-                                      setFilterByStatus={setFilterByStatus}
+              <SearchInitiativesListCard title="All Initiatives"
+                                         initiatives={initiatives}
+                                         isLoading={isLoading}
+                                         onSearch={handleSearch}
+                                         searchPlaceholder={'Search by title, description, or reference'}
+                                         filterByPriority={filterByPriority}
+                                         setFilterByPriority={setFilterByPriority}
+                                         filterByStatus={filterByStatus}
+                                         setFilterByStatus={setFilterByStatus}
               />
             </InfiniteScroll>
           </Col>
@@ -90,4 +90,4 @@ function Features() {
   );
 }
 
-export default Features;
+export default Initiatives;

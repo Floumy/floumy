@@ -11,7 +11,7 @@ import {
   UncontrolledTooltip,
 } from 'reactstrap';
 import {
-  featureStatusColorClassName,
+  initiativeStatusColorClassName,
   formatHyphenatedString,
   formatProgress,
   memberNameInitials,
@@ -24,8 +24,8 @@ import useDebounceSearch from '../../../hooks/useDebounceSearch';
 import ReactDatetime from 'react-datetime';
 import { getOrg } from '../../../services/org/orgs.service';
 
-function SearchFeaturesListCard({
-                                  features,
+function SearchInitiativesListCard({
+                                  initiatives,
                                   title,
                                   onSearch,
                                   searchPlaceholder = 'Search by title',
@@ -217,61 +217,61 @@ function SearchFeaturesListCard({
           </tr>
           </thead>
           <tbody className="list">
-          {features.length === 0 &&
+          {initiatives.length === 0 &&
             <tr>
               <td colSpan={7} className={'text-center'}>
                 No initiatives found.
               </td>
             </tr>
           }
-          {features.map((feature) => (
-            <tr key={feature.id}>
+          {initiatives.map((initiative) => (
+            <tr key={initiative.id}>
               <td>
-                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
-                      className={'feature-detail'}>
-                  {feature.reference}
+                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
+                      className={'initiative-detail'}>
+                  {initiative.reference}
                 </Link>
               </td>
               <td className="title-cell">
-                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`}
-                      className={'feature-detail'}>
-                  {feature.title}
+                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
+                      className={'initiative-detail'}>
+                  {initiative.title}
                 </Link>
               </td>
               <td>
                 <div className="d-flex align-items-center">
-                  <span className="mr-2">{formatProgress(feature.progress)}%</span>
+                  <span className="mr-2">{formatProgress(initiative.progress)}%</span>
                   <div>
-                    <Progress style={{ maxWidth: '80px' }} max="100" value={feature.progress} color="primary" />
+                    <Progress style={{ maxWidth: '80px' }} max="100" value={initiative.progress} color="primary" />
                   </div>
                 </div>
               </td>
               <td>
-                {feature.workItemsCount}
+                {initiative.workItemsCount}
               </td>
               <td>
                 <Badge color="" className="badge-dot mr-4">
-                  <i className={featureStatusColorClassName(feature.status)} />
-                  <span className="status">{formatHyphenatedString(feature.status)}</span>
+                  <i className={initiativeStatusColorClassName(initiative.status)} />
+                  <span className="status">{formatHyphenatedString(initiative.status)}</span>
                 </Badge>
               </td>
               <td>
-                {feature.assignedTo && feature.assignedTo.name &&
+                {initiative.assignedTo && initiative.assignedTo.name &&
                   <>
-                    <UncontrolledTooltip target={'assigned-to-' + feature.id} placement="top">
-                      {feature.assignedTo.name}
+                    <UncontrolledTooltip target={'assigned-to-' + initiative.id} placement="top">
+                      {initiative.assignedTo.name}
                     </UncontrolledTooltip>
                     <span
                       className="avatar avatar-xs rounded-circle"
-                      style={{ backgroundColor: textToColor(feature.assignedTo.name) }}
-                      id={'assigned-to-' + feature.id}>{memberNameInitials(feature.assignedTo.name)}
+                      style={{ backgroundColor: textToColor(initiative.assignedTo.name) }}
+                      id={'assigned-to-' + initiative.id}>{memberNameInitials(initiative.assignedTo.name)}
                 </span>
                   </>}
-                {!feature.assignedTo && '-'}
+                {!initiative.assignedTo && '-'}
               </td>
               <td>
-                <Badge color={priorityColor(feature.priority)} pill={true}>
-                  {feature.priority}
+                <Badge color={priorityColor(initiative.priority)} pill={true}>
+                  {initiative.priority}
                 </Badge>
               </td>
             </tr>
@@ -283,4 +283,4 @@ function SearchFeaturesListCard({
   );
 }
 
-export default SearchFeaturesListCard;
+export default SearchInitiativesListCard;

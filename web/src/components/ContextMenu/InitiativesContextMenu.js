@@ -3,7 +3,7 @@ import { Item, Menu, Submenu } from "react-contexify";
 import "react-contexify/dist/ReactContexify.css";
 import { Badge, Spinner } from "reactstrap";
 import {
-  featureStatusColorClassName,
+  initiativeStatusColorClassName,
   formatDate,
   formatHyphenatedString,
   priorityColor
@@ -11,10 +11,10 @@ import {
 import {
   changeAssignee,
   listMilestones,
-  updateFeatureKeyResult,
-  updateFeatureMilestone,
-  updateFeaturePriority,
-  updateFeatureStatus
+  updateInitiativeKeyResult,
+  updateInitiativeMilestone,
+  updateInitiativePriority,
+  updateInitiativeStatus
 } from "../../services/roadmap/roadmap.service";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
@@ -22,7 +22,7 @@ import { listKeyResults } from "../../services/okrs/okrs.service";
 import { useParams } from "react-router-dom";
 import {getOrg} from "../../services/org/orgs.service";
 
-function FeaturesContextMenu({
+function InitiativesContextMenu({
                                menuId,
                                onChangeMilestone,
                                onChangeKeyResult,
@@ -85,13 +85,13 @@ function FeaturesContextMenu({
     fetchUsers();
   }, []);
 
-  function callChangeMilestoneCallbacks(milestoneId, features) {
+  function callChangeMilestoneCallbacks(milestoneId, initiatives) {
     try {
       if (onChangeMilestone) {
-        onChangeMilestone(features, milestoneId);
+        onChangeMilestone(initiatives, milestoneId);
       }
       if (onChange) {
-        onChange(features.map(feature => feature.id), { milestone: milestoneId });
+        onChange(initiatives.map(initiative => initiative.id), { milestone: milestoneId });
       }
     } catch (e) {
       console.error("The callbacks could not be called");
@@ -101,23 +101,23 @@ function FeaturesContextMenu({
   const handleChangeMilestone = async ({ id: milestoneId, event, props }) => {
     try {
       event.preventDefault();
-      for (const feature of props.features) {
-        await updateFeatureMilestone(orgId, projectId, feature.id, milestoneId);
+      for (const initiative of props.initiatives) {
+        await updateInitiativeMilestone(orgId, projectId, initiative.id, milestoneId);
       }
-      callChangeMilestoneCallbacks(milestoneId, props.features);
+      callChangeMilestoneCallbacks(milestoneId, props.initiatives);
       toast.success("The initiatives have been moved to the milestone");
     } catch (e) {
       toast.error("The initiatives could not be moved to the milestone");
     }
   };
 
-  function callChangeKeyResultCallbacks(keyResultId, features) {
+  function callChangeKeyResultCallbacks(keyResultId, initiatives) {
     try {
       if (onChangeKeyResult) {
-        onChangeKeyResult(features, keyResultId);
+        onChangeKeyResult(initiatives, keyResultId);
       }
       if (onChange) {
-        onChange(features.map(feature => feature.id), { keyResult: keyResultId });
+        onChange(initiatives.map(initiative => initiative.id), { keyResult: keyResultId });
       }
     } catch (e) {
       console.error("The callbacks could not be called");
@@ -127,10 +127,10 @@ function FeaturesContextMenu({
   const handleChangeKeyResult = async ({ id: keyResultId, event, props }) => {
     try {
       event.preventDefault();
-      for (const feature of props.features) {
-        await updateFeatureKeyResult(orgId, projectId, feature.id, keyResultId);
+      for (const initiative of props.initiatives) {
+        await updateInitiativeKeyResult(orgId, projectId, initiative.id, keyResultId);
       }
-      callChangeKeyResultCallbacks(keyResultId, props.features);
+      callChangeKeyResultCallbacks(keyResultId, props.initiatives);
       toast.success("The initiatives have been moved to the key result");
     } catch (e) {
       toast.error("The initiatives could not be moved to the key result");
@@ -140,8 +140,8 @@ function FeaturesContextMenu({
   const handleAssignTo = async ({ id: userId, event, props }) => {
     try {
       event.preventDefault();
-      for (const feature of props.features) {
-        await changeAssignee(orgId, projectId, feature.id, userId);
+      for (const initiative of props.initiatives) {
+        await changeAssignee(orgId, projectId, initiative.id, userId);
       }
       toast.success("The initiatives have been assigned to the user");
     } catch (e) {
@@ -149,13 +149,13 @@ function FeaturesContextMenu({
     }
   }
 
-  function callChangeStatusCallbacks(status, features) {
+  function callChangeStatusCallbacks(status, initiatives) {
     try {
       if (onChangeStatus) {
-        onChangeStatus(features, status);
+        onChangeStatus(initiatives, status);
       }
       if (onChange) {
-        onChange(features.map(feature => feature.id), { status });
+        onChange(initiatives.map(initiative => initiative.id), { status });
       }
     } catch (e) {
       console.error("The callbacks could not be called");
@@ -165,23 +165,23 @@ function FeaturesContextMenu({
   const handleChangeStatus = async ({ id: status, event, props }) => {
     try {
       event.preventDefault();
-      for (const feature of props.features) {
-        await updateFeatureStatus(orgId, projectId, feature.id, status);
+      for (const initiative of props.initiatives) {
+        await updateInitiativeStatus(orgId, projectId, initiative.id, status);
       }
-      callChangeStatusCallbacks(status, props.features);
+      callChangeStatusCallbacks(status, props.initiatives);
       toast.success("The initiatives have been updated");
     } catch (e) {
       toast.error("The initiatives could not be updated");
     }
   };
 
-  function callChangePriorityCallbacks(priority, features) {
+  function callChangePriorityCallbacks(priority, initiatives) {
     try {
       if (onChangePriority) {
-        onChangePriority(features, priority);
+        onChangePriority(initiatives, priority);
       }
       if (onChange) {
-        onChange(features.map(feature => feature.id), { priority });
+        onChange(initiatives.map(initiative => initiative.id), { priority });
       }
     } catch (e) {
       console.error("The callbacks could not be called");
@@ -191,17 +191,17 @@ function FeaturesContextMenu({
   const handleChangePriority = async ({ id: priority, event, props }) => {
     try {
       event.preventDefault();
-      for (const feature of props.features) {
-        await updateFeaturePriority(orgId, projectId, feature.id, priority);
+      for (const initiative of props.initiatives) {
+        await updateInitiativePriority(orgId, projectId, initiative.id, priority);
       }
-      callChangePriorityCallbacks(priority, props.features);
+      callChangePriorityCallbacks(priority, props.initiatives);
       toast.success("The initiatives have been updated");
     } catch (e) {
       toast.error("The initiatives could not be updated");
     }
   };
 
-  const featureStatuses = [
+  const initiativeStatuses = [
     "planned",
     "ready-to-start",
     "in-progress",
@@ -218,10 +218,10 @@ function FeaturesContextMenu({
   return (
     <Menu id={menuId} theme="dark">
       <Submenu label={"Change status"} style={{ maxHeight: "200px", overflowY: "scroll" }}>
-        {featureStatuses.map(status => (
+        {initiativeStatuses.map(status => (
           <Item key={status} id={status} onClick={handleChangeStatus}>
             <Badge color="" className="badge-dot mr-4">
-              <i className={featureStatusColorClassName(status)} />
+              <i className={initiativeStatusColorClassName(status)} />
               <span className="status">{formatHyphenatedString(status)}</span>
             </Badge>
           </Item>
@@ -279,7 +279,7 @@ function FeaturesContextMenu({
   );
 }
 
-FeaturesContextMenu.propTypes = {
+InitiativesContextMenu.propTypes = {
   menuId: PropTypes.string.isRequired,
   onChangeMilestone: PropTypes.func,
   onChangeKeyResult: PropTypes.func,
@@ -288,4 +288,4 @@ FeaturesContextMenu.propTypes = {
   onChange: PropTypes.func
 };
 
-export default FeaturesContextMenu;
+export default InitiativesContextMenu;

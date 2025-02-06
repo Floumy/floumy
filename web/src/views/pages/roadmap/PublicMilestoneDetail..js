@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Card, CardBody, CardHeader, Col, Input, Row } from "reactstrap";
-import PublicFeaturesListCard from "../features/PublicFeaturesListCard";
+import PublicInitiativesListCard from "../initiatives/PublicInitiativesListCard";
 import { useParams } from "react-router-dom";
 import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
 
@@ -72,10 +72,10 @@ function PublicMilestoneDetail({ milestone = { id: "", title: "", description: "
           </Row>
         </CardBody>
       </Card>
-      {milestone?.features && <PublicFeaturesListCard
+      {milestone?.initiatives && <PublicInitiativesListCard
         orgId={orgId}
         title="Initiatives"
-        features={milestone.features}
+        initiatives={milestone.initiatives}
         showAssignedTo={false}
       />}
     </>

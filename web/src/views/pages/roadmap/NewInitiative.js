@@ -1,14 +1,14 @@
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import { Container, Row } from "reactstrap";
 import React from "react";
-import { addFeature } from "../../../services/roadmap/roadmap.service";
-import CreateUpdateDeleteFeature from "../features/CreateUpdateDeleteFeature";
+import { addInitiative } from "../../../services/roadmap/roadmap.service";
+import CreateUpdateDeleteInitiative from "../initiatives/CreateUpdateDeleteInitiative";
 import { useParams } from "react-router-dom";
 
-function NewFeature() {
+function NewInitiative() {
   const { orgId, projectId } = useParams();
-  const handleSubmit = async (feature) => {
-    await addFeature(orgId, projectId, feature);
+  const handleSubmit = async (initiative) => {
+    await addInitiative(orgId, projectId, initiative);
   };
 
   return (
@@ -26,7 +26,7 @@ function NewFeature() {
         <Row>
           <div className="col">
             <div className="card-wrapper">
-              <CreateUpdateDeleteFeature onSubmit={handleSubmit} />
+              <CreateUpdateDeleteInitiative onSubmit={handleSubmit} />
             </div>
           </div>
         </Row>
@@ -35,4 +35,4 @@ function NewFeature() {
   );
 }
 
-export default NewFeature;
+export default NewInitiative;

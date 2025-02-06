@@ -1,35 +1,35 @@
 import { Card, CardHeader, Col, Container, Row } from "reactstrap";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getPublicFeature } from "../../../services/roadmap/roadmap.service";
+import { getPublicInitiative } from "../../../services/roadmap/roadmap.service";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import { sortByPriority } from "../../../services/utils/utils";
 import NotFoundCard from "../components/NotFoundCard";
 import ExecutionStats from "../components/stats/ExecutionStats";
-import PublicFeature from "./PublicFeature";
+import PublicInitiative from "./PublicInitiative";
 import PublicWorkItemsList from "../backlog/PublicWorkItemsList";
 import { toast } from "react-toastify";
 import Comments from "../../../components/Comments/Comments";
-import useFeatureComments from "../../../hooks/useFeatureComments";
+import useInitiativeComments from "../../../hooks/useInitiativeComments";
 
-export function PublicDetailFeature() {
-  const [feature, setFeature] = useState(null);
+export function PublicDetailInitiative() {
+  const [initiative, setInitiative] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { orgId, projectId, featureId } = useParams();
+  const { orgId, projectId, initiativeId } = useParams();
   const {
     addComment,
     updateComment,
     deleteComment
-  } = useFeatureComments(feature, setFeature, toast);
+  } = useInitiativeComments(initiative, setInitiative, toast);
 
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const feature = await getPublicFeature(orgId, projectId, featureId);
-        setFeature(feature);
+        const initiative = await getPublicInitiative(orgId, projectId, initiativeId);
+        setInitiative(initiative);
       } catch (e) {
         console.error(e.message);
       } finally {
@@ -38,7 +38,7 @@ export function PublicDetailFeature() {
     }
 
     fetchData();
-  }, [orgId, projectId, featureId]);
+  }, [orgId, projectId, initiativeId]);
 
   return (
     <>
@@ -55,15 +55,15 @@ export function PublicDetailFeature() {
         ]}
       />
       <Container className="mt--6" fluid id="OKRs">
-        {feature && feature.workItems && feature.workItems.length > 0 &&
-          <ExecutionStats workItems={feature.workItems} dueDate={feature?.milestone?.dueDate} />}
+        {initiative && initiative.workItems && initiative.workItems.length > 0 &&
+          <ExecutionStats workItems={initiative.workItems} dueDate={initiative?.milestone?.dueDate} />}
         <Row>
           <Col>
-            {!isLoading && !feature && <NotFoundCard message="Initiative not found" />}
-            {!isLoading && feature && <PublicFeature feature={feature} />}
+            {!isLoading && !initiative && <NotFoundCard message="Initiative not found" />}
+            {!isLoading && initiative && <PublicInitiative initiative={initiative} />}
             <Card>
               {isLoading && <LoadingSpinnerBox />}
-              {!isLoading && feature &&
+              {!isLoading && initiative &&
                 <>
                   <CardHeader className="border-1">
                     <div className="row">
@@ -74,8 +74,8 @@ export function PublicDetailFeature() {
                   </CardHeader>
                   <PublicWorkItemsList
                     orgId={orgId}
-                    workItems={sortByPriority(feature.workItems)}
-                    showFeature={false}
+                    workItems={sortByPriority(initiative.workItems)}
+                    showInitiative={false}
                   />
                 </>
               }
@@ -85,7 +85,7 @@ export function PublicDetailFeature() {
         <Row>
           {!isLoading &&
             <Col>
-              <Comments comments={feature?.comments}
+              <Comments comments={initiative?.comments}
                         onCommentAdd={addComment}
                         onCommentEdit={updateComment}
                         onCommentDelete={deleteComment} />

@@ -2,18 +2,18 @@ import { Card, CardBody, CardHeader, Col, Form, Input, Row } from "reactstrap";
 import ReactQuill from "react-quill";
 import React from "react";
 import CardHeaderDetails from "../components/CardHeaderDetails";
-import { featureStatusName, priorityName } from "../../../services/utils/utils";
+import { initiativeStatusName, priorityName } from "../../../services/utils/utils";
 import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
 
-function PublicFeature({ feature }) {
+function PublicInitiative({ initiative }) {
   return (
     <>
       <Card>
         <CardHeader>
-          <h3 className="mb-0">Initiative {feature.reference}</h3>
-          <CardHeaderDetails createdAt={feature.createdAt}
-                             updatedAt={feature.updatedAt} />
-          {feature && <div className="py-2"><PublicShareButtons title={feature.title} /></div>}
+          <h3 className="mb-0">Initiative {initiative.reference}</h3>
+          <CardHeaderDetails createdAt={initiative.createdAt}
+                             updatedAt={initiative.updatedAt} />
+          {initiative && <div className="py-2"><PublicShareButtons title={initiative.title} /></div>}
         </CardHeader>
         <CardBody>
           <Form
@@ -31,7 +31,7 @@ function PublicFeature({ feature }) {
                   id="title"
                   name="title"
                   type="text"
-                  value={feature.title}
+                  value={initiative.title}
                   autoComplete="off"
                   disabled={true}
                   className="bg-white"
@@ -50,7 +50,7 @@ function PublicFeature({ feature }) {
                   type="text"
                   disabled={true}
                   className="bg-white"
-                  defaultValue={priorityName(feature?.priority)}
+                  defaultValue={priorityName(initiative?.priority)}
                   name="priority"></Input>
               </Col>
               <Col xs={12} sm={6} className="mb-3">
@@ -64,7 +64,7 @@ function PublicFeature({ feature }) {
                   disabled={true}
                   type="text"
                   className="bg-white"
-                  defaultValue={featureStatusName(feature?.status)}
+                  defaultValue={initiativeStatusName(initiative?.status)}
                   name="status"
                 ></Input>
               </Col>
@@ -81,7 +81,7 @@ function PublicFeature({ feature }) {
                   type="text"
                   disabled={true}
                   className="bg-white"
-                  defaultValue={feature.keyResult?.title || "None"}
+                  defaultValue={initiative.keyResult?.title || "None"}
                 ></Input>
               </Col>
             </Row>
@@ -97,11 +97,11 @@ function PublicFeature({ feature }) {
                   type="text"
                   disabled={true}
                   className="bg-white"
-                  defaultValue={feature.milestone?.title || "None"}
+                  defaultValue={initiative.milestone?.title || "None"}
                 ></Input>
               </Col>
             </Row>
-            {feature.featureRequest !== undefined && <Row className="mb-3">
+            {initiative.featureRequest !== undefined && <Row className="mb-3">
               <Col>
                 <label
                   className="form-control-label"
@@ -113,7 +113,7 @@ function PublicFeature({ feature }) {
                   type="text"
                   disabled={true}
                   className="bg-white"
-                  defaultValue={feature.featureRequest?.title || "None"}
+                  defaultValue={initiative.featureRequest?.title || "None"}
                 ></Input>
               </Col>
             </Row>}
@@ -126,7 +126,7 @@ function PublicFeature({ feature }) {
                   Description
                 </label>
                 <ReactQuill
-                  value={feature.description}
+                  value={initiative.description}
                   readOnly={true}
                   theme="snow"
                   modules={{
@@ -142,4 +142,4 @@ function PublicFeature({ feature }) {
   );
 }
 
-export default PublicFeature;
+export default PublicInitiative;

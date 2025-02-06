@@ -7,7 +7,7 @@ import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import NotFoundCard from "../components/NotFoundCard";
 import { toast } from "react-toastify";
-import PublicFeaturesList from "../features/PublicFeaturesList";
+import PublicInitiativesList from "../initiatives/PublicInitiativesList";
 import {
   addKeyResultComment,
   deleteKeyResultComment,
@@ -145,7 +145,7 @@ function PublicDetailKeyResult() {
                 </>}
               </CardBody>
             </Card>
-            {!isLoading && keyResult && keyResult.features && <>
+            {!isLoading && keyResult && keyResult.initiatives && <>
               <Card>
                 <CardHeader className="border-1">
                   <div className="row">
@@ -154,10 +154,10 @@ function PublicDetailKeyResult() {
                     </div>
                   </div>
                 </CardHeader>
-                <PublicFeaturesList
+                <PublicInitiativesList
                   orgId={orgId}
                   projectId={projectId}
-                  features={keyResult.features}
+                  initiatives={keyResult.initiatives}
                 />
               </Card>
             </>}

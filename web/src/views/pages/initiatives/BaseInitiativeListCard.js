@@ -16,40 +16,40 @@ import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import { sortByPriority } from "../../../services/utils/utils";
 import useDebounceSearch from "../../../hooks/useDebounceSearch";
 
-function BaseFeatureListCard({
+function BaseInitiativeListCard({
                                title,
-                               features,
+                               initiatives,
                                isLoading,
                                showFilters = true,
                                onSearch,
                                searchPlaceholder = "Search by title",
-                               renderFeatureList
+                               renderInitiativeList
                              }) {
   const [filterByPriority, setFilterByPriority] = useState("all");
   const [filterByStatus, setFilterByStatus] = useState("all");
   const [searchText, handleSearch] = useDebounceSearch(onSearch);
-  const [filteredFeatures, setFilteredFeatures] = useState([]);
+  const [filteredInitiatives, setFilteredInitiatives] = useState([]);
 
   useEffect(() => {
-    setFilteredFeatures(features
-      .filter(feature => {
+    setFilteredInitiatives(initiatives
+      .filter(initiative => {
         if (filterByPriority === "all") return true;
-        return feature.priority === filterByPriority;
+        return initiative.priority === filterByPriority;
       })
-      .filter(feature => {
+      .filter(initiative => {
         if (filterByStatus === "all") return true;
-        return feature.status === filterByStatus;
+        return initiative.status === filterByStatus;
       })
-      .filter(feature => {
+      .filter(initiative => {
         if (onSearch) return true;
-        return feature.title.toLowerCase().includes(searchText.toLowerCase());
+        return initiative.title.toLowerCase().includes(searchText.toLowerCase());
       })
     );
-  }, [onSearch, searchText, filterByPriority, filterByStatus, features]);
+  }, [onSearch, searchText, filterByPriority, filterByStatus, initiatives]);
 
   useEffect(() => {
-    setFilteredFeatures(sortByPriority(features));
-  }, [features]);
+    setFilteredInitiatives(sortByPriority(initiatives));
+  }, [initiatives]);
 
   return (
     <Card>
@@ -120,11 +120,11 @@ function BaseFeatureListCard({
         </FormGroup>
       </CardHeader>
       <div>
-        {(!isLoading || filteredFeatures.length > 0) && renderFeatureList(filteredFeatures)}
+        {(!isLoading || filteredInitiatives.length > 0) && renderInitiativeList(filteredInitiatives)}
         {isLoading && <LoadingSpinnerBox />}
       </div>
     </Card>
   );
 }
 
-export default BaseFeatureListCard;
+export default BaseInitiativeListCard;

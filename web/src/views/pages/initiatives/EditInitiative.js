@@ -1,24 +1,24 @@
 import { useParams } from "react-router-dom";
-import { getFeature, updateFeature } from "../../../services/roadmap/roadmap.service";
+import { getInitiative, updateInitiative } from "../../../services/roadmap/roadmap.service";
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
 import { Card, Container, Row } from "reactstrap";
-import CreateUpdateDeleteFeature from "./CreateUpdateDeleteFeature";
+import CreateUpdateDeleteInitiative from "./CreateUpdateDeleteInitiative";
 import React, { useEffect, useState } from "react";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import NotFoundCard from "../components/NotFoundCard";
 
-function EditFeature() {
+function EditInitiative() {
   const { orgId, projectId, id } = useParams();
-  const [feature, setFeature] = useState(null);
+  const [initiative, setInitiative] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        const feature = await getFeature(orgId, projectId, id);
-        setFeature(feature);
+        const initiative = await getInitiative(orgId, projectId, id);
+        setInitiative(initiative);
         setLoading(false);
       } catch (error) {
         setLoading(false);
@@ -28,8 +28,8 @@ function EditFeature() {
     fetchData();
   }, [id]);
 
-  const handleSubmit = async (feature) => {
-    await updateFeature(orgId, projectId, id, feature);
+  const handleSubmit = async (initiative) => {
+    await updateInitiative(orgId, projectId, id, initiative);
   };
 
   return (
@@ -49,8 +49,8 @@ function EditFeature() {
           <div className="col">
             <div className="card-wrapper">
               {loading && <Card><LoadingSpinnerBox /></Card>}
-              {feature && <CreateUpdateDeleteFeature onSubmit={handleSubmit} feature={feature} />}
-              {!feature && !loading && <NotFoundCard message={"Initiative not found"} />}
+              {initiative && <CreateUpdateDeleteInitiative onSubmit={handleSubmit} initiative={initiative} />}
+              {!initiative && !loading && <NotFoundCard message={"Initiative not found"} />}
             </div>
           </div>
         </Row>
@@ -59,4 +59,4 @@ function EditFeature() {
   );
 }
 
-export default EditFeature;
+export default EditInitiative;

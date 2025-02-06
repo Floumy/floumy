@@ -20,7 +20,7 @@ function WorkItemsListCard({
                              enableContextMenu = true,
                              showFilters = true,
                              showAssignedTo = true,
-                             showFeature = true,
+                             showInitiative = true,
                              searchPlaceholder = "Search by title"
                            }) {
   const [filterByPriority, setFilterByPriority] = useState("all");
@@ -79,7 +79,7 @@ function WorkItemsListCard({
           <WorkItemsList
             id={id}
             showAssignedTo={showAssignedTo}
-            showFeature={showFeature}
+            showInitiative={showInitiative}
             enableContextMenu={enableContextMenu}
             workItems={filteredWorkItems}
             onAddNewWorkItem={onAddWorkItem}

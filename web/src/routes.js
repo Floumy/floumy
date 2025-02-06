@@ -5,18 +5,18 @@ import SignIn from './views/pages/auth/SignIn';
 import OrgSignUp from './views/pages/auth/OrgSignUp';
 import InitiativesRoadmap from './views/pages/roadmap/InitiativesRoadmap';
 import ActiveSprint from './views/pages/development/ActiveSprint';
-import NewFeature from './views/pages/roadmap/NewFeature';
+import NewInitiative from './views/pages/roadmap/NewInitiative';
 import NewMilestone from './views/pages/roadmap/NewMilestone';
 import EditMilestone from './views/pages/roadmap/EditMilestone';
-import EditFeature from './views/pages/features/EditFeature';
+import EditInitiative from './views/pages/initiatives/EditInitiative';
 import NewWorkItem from './views/pages/backlog/NewWorkItem';
 import EditWorkItem from './views/pages/backlog/EditWorkItem';
-import { DetailFeature } from './views/pages/features/DetailFeature';
+import { DetailInitiative } from './views/pages/initiatives/DetailInitiative';
 import Sprints from './views/pages/sprints/Sprints';
 import WorkItems from './views/pages/backlog/WorkItems';
 import NewSprint from './views/pages/sprints/NewSprint';
 import EditSprint from './views/pages/sprints/EditSprint';
-import Features from './views/pages/features/Features';
+import Initiatives from './views/pages/initiatives/Initiatives';
 import DetailKeyResult from './views/pages/okrs/DetailKeyResult';
 import Members from './views/pages/settings/Members';
 import ActivationRequired from './views/pages/auth/ActivationRequired';
@@ -27,7 +27,7 @@ import ResetEmailSent from './views/pages/auth/ResetEmailSent';
 import PasswordReset from './views/pages/auth/PasswordReset';
 import BuildInPublic from './views/pages/settings/BuildInPublic';
 import PublicRoadmap from './views/pages/roadmap/PublicRoadmap';
-import { PublicDetailFeature } from './views/pages/features/PublicDetailFeature';
+import { PublicDetailInitiative } from './views/pages/initiatives/PublicDetailInitiative';
 import PublicDetailWorkItem from './views/pages/backlog/PublicDetailWorkItem';
 import PublicOKRs from './views/pages/okrs/PublicOKRs';
 import PublicDetailOKR from './views/pages/okrs/PublicDetailOKR';
@@ -117,19 +117,19 @@ const routes = [
   {
     redirect: true,
     path: "/roadmap/initiatives/new",
-    component: <NewFeature />,
+    component: <NewInitiative />,
     layout: "/admin"
   },
   {
     redirect: true,
     path: "/roadmap/initiatives/edit/:id",
-    component: <EditFeature />,
+    component: <EditInitiative />,
     layout: "/admin"
   },
   {
     redirect: true,
     path: "/roadmap/initiatives/detail/:id",
-    component: <DetailFeature />,
+    component: <DetailInitiative />,
     layout: "/admin"
   },
   {
@@ -202,7 +202,7 @@ const routes = [
     name: "All Initiatives",
     icon: "fa fa-list-alt",
     path: "/initiatives",
-    component: <Features />,
+    component: <Initiatives />,
     layout: "/admin",
     shortcut: "7"
   },
@@ -319,8 +319,8 @@ export const publicRoutes = [
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap/initiatives/detail/:featureId",
-    component: <PublicDetailFeature />,
+    path: "/orgs/:orgId/projects/:projectId/roadmap/initiatives/detail/:initiativeId",
+    component: <PublicDetailInitiative />,
     layout: "/public"
   },
   {

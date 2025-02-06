@@ -111,7 +111,7 @@ function PublicActiveSprint() {
                       <PublicWorkItemsList
                         orgId={orgId}
                         workItems={workItemsByStatus[status]}
-                        showFeature={true}
+                        showInitiative={true}
                         headerClassName={"thead"} />
                     </div>
                   ))}
