@@ -1,38 +1,40 @@
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Card, CardHeader, CardTitle, Col, Container, Row } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import Milestone from "./Milestone";
-import "./Roadmap.scss";
-import Select2 from "react-select2-wrapper";
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Card, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import Milestone from './Milestone';
+import './Roadmap.scss';
+import Select2 from 'react-select2-wrapper';
 import {
   addFeature,
   listFeaturesWithoutMilestone,
-  listMilestonesWithFeatures
-} from "../../../services/roadmap/roadmap.service";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { useHotkeys } from "react-hotkeys-hook";
-import { sortByPriority } from "../../../services/utils/utils";
-import FeaturesListCard from "../features/FeaturesListCard";
+  listMilestonesWithFeatures,
+} from '../../../services/roadmap/roadmap.service';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { sortByPriority } from '../../../services/utils/utils';
+import FeaturesListCard from '../features/FeaturesListCard';
+import AIButton from '../../../components/AI/AIButton';
+import { generateRoadmapMilestones } from '../../../services/ai/ai.service';
 
 function InitiativesRoadmap() {
   const { orgId, projectId } = useParams();
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const timelineQueryFilter = searchParams.get("timeline");
+  const timelineQueryFilter = searchParams.get('timeline');
   const navigate = useNavigate();
-  const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || "this-quarter");
+  const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || 'this-quarter');
   const [features, setFeatures] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
   const [isLoadingFeatures, setIsLoadingFeatures] = useState(false);
   // on b hotkey press scroll to the features backlog section
-  useHotkeys("b", () => {
-    document.getElementById("features-backlog").scrollIntoView();
+  useHotkeys('b', () => {
+    document.getElementById('features-backlog').scrollIntoView();
   });
   useEffect(() => {
-    document.title = "Floumy | Roadmap";
+    document.title = 'Floumy | Roadmap';
 
     async function fetchFeatures() {
       setIsLoadingFeatures(true);
@@ -109,7 +111,7 @@ function InitiativesRoadmap() {
     const updatedFeaturesIds = updatedFeatures.map(f => f.id);
     const updatedFeaturesList = features.map(feature => {
       // If the feature is closed or completed, we remove it from the backlog
-      if (feature.status === "closed" || feature.status === "completed") {
+      if (feature.status === 'closed' || feature.status === 'completed') {
         return null;
       }
       if (updatedFeaturesIds.includes(feature.id)) {
@@ -134,21 +136,21 @@ function InitiativesRoadmap() {
       {isLoadingMilestones && <InfiniteLoadingBar />}
       <SimpleHeader headerButtons={[
         {
-          name: "New Milestone",
-          shortcut: "m",
-          id: "new-milestone",
+          name: 'New Milestone',
+          shortcut: 'm',
+          id: 'new-milestone',
           action: () => {
             navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`);
-          }
+          },
         },
         {
-          name: "New Initiative",
-          shortcut: "i",
-          id: "new-feature",
+          name: 'New Initiative',
+          shortcut: 'i',
+          id: 'new-feature',
           action: () => {
             navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`);
-          }
-        }
+          },
+        },
       ]} />
       <Container className="mt--6" fluid>
         <Row>
@@ -157,20 +159,29 @@ function InitiativesRoadmap() {
               <CardHeader className="rounded-lg">
                 <Row>
                   <Col xs={12} sm={8}>
-                    <CardTitle tag="h2">Roadmap</CardTitle>
+                    <CardTitle tag="h2">
+                      Roadmap
+                      {!isLoadingMilestones &&
+                        milestones.length === 0 &&
+                        (timelineFilterValue === 'this-quarter' || timelineFilterValue === 'next-quarter') &&
+                        <AIButton text="Build with AI" onClick={async () => {
+                          const milestones = await generateRoadmapMilestones(orgId, projectId, timelineFilterValue);
+                          console.log(milestones);
+                      }} />}
+                    </CardTitle>
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2
                       className="form-control"
-                      defaultValue={"this-quarter"}
+                      defaultValue={'this-quarter'}
                       data={[
-                        { id: "past", text: "Past" },
-                        { id: "this-quarter", text: "This Quarter" },
-                        { id: "next-quarter", text: "Next Quarter" },
-                        { id: "later", text: "Later" }
+                        { id: 'past', text: 'Past' },
+                        { id: 'this-quarter', text: 'This Quarter' },
+                        { id: 'next-quarter', text: 'Next Quarter' },
+                        { id: 'later', text: 'Later' },
                       ]}
                       options={{
-                        placeholder: "Filter by timeline"
+                        placeholder: 'Filter by timeline',
                       }}
                       value={timelineFilterValue}
                       onSelect={(e) => {
@@ -185,7 +196,7 @@ function InitiativesRoadmap() {
               <div className="p-4">
                 {isLoadingMilestones && <LoadingSpinnerBox />}
                 {!isLoadingMilestones && milestones.length === 0 && (
-                  <div style={{ maxWidth: "600px" }} className="mx-auto font-italic">
+                  <div style={{ maxWidth: '600px' }} className="mx-auto font-italic">
                     <h3>Roadmap</h3>
                     <p>The Roadmap is your project's strategic plan that outlines the vision, direction, and
                       progress over time. It helps you communicate your plans and priorities to stakeholders. Start
@@ -216,7 +227,7 @@ function InitiativesRoadmap() {
                              onFeatureChangeMilestone={updateFeaturesMilestone} />))}
               </div>
             </Card>
-            <div id={"features-backlog"} />
+            <div id={'features-backlog'} />
             <FeaturesListCard title="Initiatives Backlog"
                               features={features}
                               isLoading={isLoadingFeatures}

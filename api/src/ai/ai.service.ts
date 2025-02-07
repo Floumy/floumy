@@ -8,6 +8,9 @@ import { Issue } from '../issues/issue.entity';
 import { KeyResult } from '../okrs/key-result.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Objective } from '../okrs/objective.entity';
+import { TimelineService } from '../common/timeline.service';
+import { Timeline } from '../common/timeline.enum';
 
 @Injectable()
 export class AiService {
@@ -23,6 +26,8 @@ export class AiService {
     private milestoneRepository: Repository<Milestone>,
     @InjectRepository(FeatureRequest)
     private featureRequestRepository: Repository<FeatureRequest>,
+    @InjectRepository(Objective)
+    private objectiveRepository: Repository<Objective>,
   ) {}
 
   async generateKeyResults(objective: string): Promise<KeyResultType[]> {
@@ -460,5 +465,111 @@ export class AiService {
       },
     });
     return response.data.description;
+  }
+
+  async generateRoadmapMilestonesForTimeline(
+    orgId: string,
+    projectId: string,
+    timeline: string,
+  ) {
+    if (
+      !timeline ||
+      [Timeline.PAST.valueOf(), Timeline.LATER.valueOf()].includes(timeline)
+    ) {
+      return [];
+    }
+
+    const { startDate, endDate } =
+      TimelineService.getStartAndEndDatesByTimelineValue(timeline);
+
+    const features = await this.objectiveRepository
+      .createQueryBuilder('objective')
+      .leftJoinAndSelect('objective.keyResults', 'keyResult')
+      .leftJoinAndSelect('objective.features', 'feature')
+      .leftJoinAndSelect('feature.milestone', 'milestone')
+      .where('objective.org.id = :orgId', { orgId })
+      .andWhere('objective.project.id = :projectId', { projectId })
+      .andWhere('feature.milestone.id IS NULL')
+      .andWhere('milestone.dueDate >= :startDate', {
+        startDate,
+      })
+      .andWhere('milestone.dueDate < :endDate', {
+        endDate,
+      })
+      .select(
+        'feature.id, feature.title, feature.description, feature.priority, feature.status, feature.progress, feature.workItemsCount',
+      )
+      .getMany();
+
+    if (features.length === 0) {
+      return [];
+    }
+
+    const prompt = `Generate up to 5 roadmap milestones for the following features:
+    The milestones should be organized by due date and their due date should be between the following dates:
+    - Start Date: ${startDate}
+    - End Date: ${endDate}
+    
+    The features are:
+      ${JSON.stringify(features)}
+    
+    For each milestone, include:
+      - Title
+      - Description
+      - Due Date
+      - List of feature ids
+      
+    Have a preference for a lower number of milestones.
+    
+    Do not include any timelines or deadlines or money amounts.
+    Make the milestones simple and to the point.
+    `;
+
+    const response = await this.openaiService.generateCompletion<{
+      milestones: {
+        title: string;
+        description: string;
+        dueDate: string;
+        featureIds: string[];
+      }[];
+    }>(prompt, {
+      name: 'milestones',
+      schema: {
+        type: 'object',
+        properties: {
+          milestones: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                title: {
+                  type: 'string',
+                },
+                description: {
+                  type: 'string',
+                },
+                dueDate: {
+                  type: 'string',
+                },
+                featureIds: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                  },
+                },
+              },
+              required: ['title', 'description', 'dueDate', 'featureIds'],
+              additionalProperties: false,
+            },
+            minItems: 1,
+            maxItems: 5,
+          },
+        },
+        required: ['milestones'],
+        additionalProperties: false,
+      },
+    });
+
+    return response.data.milestones;
   }
 }
