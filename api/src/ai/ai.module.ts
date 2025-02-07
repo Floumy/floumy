@@ -17,6 +17,7 @@ import { Project } from '../projects/project.entity';
 import { Issue } from '../issues/issue.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Objective } from '../okrs/objective.entity';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { FeatureRequest } from '../feature-requests/feature-request.entity';
       Milestone,
       Milestone,
       FeatureRequest,
+      Objective,
     ]),
   ],
   controllers: [AiController],
