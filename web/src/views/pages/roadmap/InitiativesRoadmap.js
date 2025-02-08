@@ -13,7 +13,7 @@ import {
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { sortByPriority } from '../../../services/utils/utils';
+import { formatTimeline, sortByPriority } from '../../../services/utils/utils';
 import FeaturesListCard from '../features/FeaturesListCard';
 import AIButton from '../../../components/AI/AIButton';
 import { generateRoadmapMilestones } from '../../../services/ai/ai.service';
@@ -144,6 +144,12 @@ function InitiativesRoadmap() {
 
   async function handleAiRoadmapBuild() {
     const milestones = await generateRoadmapMilestones(orgId, projectId, timelineFilterValue);
+
+    if (milestones.length === 0) {
+      toast.error(`No initiatives found for ${formatTimeline(timelineFilterValue).toLowerCase()}`);
+      return;
+    }
+
     for (const milestone of milestones) {
       const savedMilestone = await addMilestone(orgId, projectId, {
         title: milestone.title,
