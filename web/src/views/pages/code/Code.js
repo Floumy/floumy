@@ -291,10 +291,10 @@ function Code() {
                             </tr>
                             </thead>
                             <tbody className="list">
-                            {prs.stale.length === 0 && <tr>
+                            {prs.openForMoreThanThreeDays.length === 0 && <tr>
                               <td colSpan={3} className="text-center">No Pull Requests</td>
                             </tr>}
-                            {prs.stale.map((pr, index) => (
+                            {prs.openForMoreThanThreeDays.map((pr, index) => (
                               <tr key={index}>
                                 <td>
                                   <a href={pr.url} target="_blank" rel="noreferrer">
