@@ -107,7 +107,8 @@ export async function deleteFeature(orgId, projectId, id) {
 
 export async function addMilestone(orgId, projectId, milestone) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones`, milestone);
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones`, milestone);
+    return response.data;
   } catch (e) {
     throw new Error(e.message);
   }

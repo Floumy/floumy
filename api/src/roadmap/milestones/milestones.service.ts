@@ -1,7 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUpdateMilestoneDto } from './dtos';
 import { Milestone } from './milestone.entity';
-import { Between, IsNull, LessThan, MoreThan, Repository } from 'typeorm';
+import {
+  And,
+  IsNull,
+  LessThan,
+  LessThanOrEqual,
+  MoreThan,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrgsService } from '../../orgs/orgs.service';
 import { MilestoneMapper } from './milestone.mapper';
@@ -118,9 +126,9 @@ export class MilestonesService {
           TimelineService.getStartAndEndDatesByTimelineValue(
             timeline.valueOf(),
           );
-        where.dueDate = Between(
-          startDate.toISOString().split('T')[0],
-          endDate.toISOString().split('T')[0],
+        where.dueDate = And(
+          MoreThanOrEqual(startDate.toISOString().split('T')[0]),
+          LessThanOrEqual(endDate.toISOString().split('T')[0]),
         );
         break;
       }
