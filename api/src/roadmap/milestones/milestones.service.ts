@@ -40,7 +40,8 @@ export class MilestonesService {
     const milestone = new Milestone();
     milestone.title = createMilestoneDto.title;
     milestone.description = createMilestoneDto.description;
-    milestone.dueDate = new Date(createMilestoneDto.dueDate);
+    // Set year, month, and day only
+    milestone.dueDate = new Date(createMilestoneDto.dueDate.split('T')[0]);
     milestone.org = Promise.resolve(org);
     milestone.project = Promise.resolve(project);
     const savedMilestone = await this.milestoneRepository.save(milestone);
