@@ -351,14 +351,14 @@ function CreateUpdateDeleteFeature({ onSubmit, feature }) {
                     >
                       Description
                     </label>
-                    <AIButton
+                    {!feature.description && <AIButton
                       text="Fill with AI"
                       disabled={values.title.length === 0}
                       onClick={async () => {
                         const response = await getInitiativeDescription(values.title, keyResult, milestone, featureRequest);
                         setDescriptionText(response);
                       }}
-                    />
+                    />}
                     <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
                       setDescriptionText(text);
                       setMentions(mentions);

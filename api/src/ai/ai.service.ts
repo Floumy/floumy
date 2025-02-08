@@ -482,48 +482,79 @@ export class AiService {
     const { startDate, endDate } =
       TimelineService.getStartAndEndDatesByTimelineValue(timeline);
 
-    const features = await this.objectiveRepository
-      .createQueryBuilder('objective')
-      .leftJoinAndSelect('objective.keyResults', 'keyResult')
-      .leftJoinAndSelect('objective.features', 'feature')
-      .leftJoinAndSelect('feature.milestone', 'milestone')
-      .where('objective.org.id = :orgId', { orgId })
-      .andWhere('objective.project.id = :projectId', { projectId })
-      .andWhere('feature.milestone.id IS NULL')
-      .andWhere('milestone.dueDate >= :startDate', {
-        startDate,
-      })
-      .andWhere('milestone.dueDate < :endDate', {
-        endDate,
-      })
-      .select(
-        'feature.id, feature.title, feature.description, feature.priority, feature.status, feature.progress, feature.workItemsCount',
-      )
+    const features = await this.featureRepository
+      .createQueryBuilder('feature')
+      .leftJoinAndSelect('feature.keyResult', 'keyResult')
+      .leftJoinAndSelect('keyResult.objective', 'objective')
+      .leftJoin('feature.milestone', 'milestone')
+      .where('milestone.id IS NULL')
+      .andWhere('objective.startDate >= :startDate', { startDate })
+      .andWhere('objective.endDate <= :endDate', { endDate })
+      .select(['feature.id', 'feature.title', 'feature.description'])
       .getMany();
 
     if (features.length === 0) {
       return [];
     }
 
-    const prompt = `Generate up to 5 roadmap milestones for the following features:
-    The milestones should be organized by due date and their due date should be between the following dates:
-    - Start Date: ${startDate}
-    - End Date: ${endDate}
+    const prompt = `Generate up to 5 roadmap milestones for the following initiatives.
+    Each milestone should be a clear, functional deliverable that moves the project forward.
+      •	Organize milestones sequentially, considering initiative dependencies.
+      •	Group related initiatives together when possible to minimize the number of milestones.
+      •	Ensure each milestone represents a meaningful step towards usability (e.g., “First working version of X”).
+      •	Prefer delivering working functionality rather than isolated backend or frontend tasks.
     
-    The features are:
-      ${JSON.stringify(features)}
+    Constraints:
+      •	Start Date: ${startDate}
+      •	End Date: ${endDate}
     
-    For each milestone, include:
-      - Title
-      - Description
-      - Due Date
-      - List of feature ids
-      
-    Have a preference for a lower number of milestones.
+    Input Initiatives (JSON format):
     
-    Do not include any timelines or deadlines or money amounts.
-    Make the milestones simple and to the point.
-    `;
+    ${JSON.stringify(features)}
+    
+    Each initiative object has the following structure:
+    
+    {
+      "id": 101,
+      "title": "User Authentication",
+      "description": "Allow users to sign up, log in, and reset passwords.",
+    }
+    
+    Instructions for Initiative Selection in Milestones:
+      1.	Prioritize initiatives with no dependencies in earlier milestones.
+      2.	Unlock dependent initiatives by placing prerequisite initiatives in earlier milestones.
+      3.	Group logically connected initiatives in the same milestone (e.g., “User Authentication” and “User Profile Setup”).
+      4.	Avoid breaking initiatives into unnecessary steps unless they are too large for one milestone.
+      5.	Assign the correct initiative IDs from the provided input when defining milestones.
+      6.  Make sure to include all initiatives provided in the input.
+    
+    For Each Milestone, Return:
+      •	Title: Concise and descriptive milestone name.
+      •	Description: What will be achieved? Be specific.
+      •	Due Date: A realistic due date within the given range.
+      •	Initiative IDs: A list of initiative IDs that should be completed in this milestone.
+    
+    Example of Well-Structured Milestones:
+    
+    [
+      {
+        "title": "Core Authentication & User Setup",
+        "description": "Implement user authentication, account creation, and basic profile setup.",
+        "due_date": "YYYY-MM-DD",
+        "initiative_ids": [101, 102, 103]
+      },
+      {
+        "title": "Project Management Basics",
+        "description": "Enable project creation, task assignment, and basic collaboration tools.",
+        "due_date": "YYYY-MM-DD",
+        "initiative_ids": [201, 202, 204]
+      }
+    ]
+    
+    🚫 Avoid vague milestones like:
+    ❌ “Start working on X”
+    ❌ “General improvements”
+    ❌ “Polish UI”`;
 
     const response = await this.openaiService.generateCompletion<{
       milestones: {
