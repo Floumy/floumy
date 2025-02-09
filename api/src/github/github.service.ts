@@ -2,13 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
-import {
-  And,
-  LessThanOrEqual,
-  MoreThan,
-  MoreThanOrEqual,
-  Repository,
-} from 'typeorm';
+import { And, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Project } from '../projects/project.entity';
 import crypto from 'crypto';
@@ -192,7 +186,7 @@ export class GithubService {
       where: {
         org: { id: orgId },
         project: { id: projectId },
-        createdAt: MoreThan(
+        createdAt: MoreThanOrEqual(
           new Date(new Date().setDate(new Date().getDate() - 1)),
         ),
         state: 'open',
@@ -206,10 +200,8 @@ export class GithubService {
         org: { id: orgId },
         project: { id: projectId },
         createdAt: And(
+          LessThan(new Date(new Date().setDate(new Date().getDate() - 1))),
           MoreThanOrEqual(
-            new Date(new Date().setDate(new Date().getDate() - 1)),
-          ),
-          LessThanOrEqual(
             new Date(new Date().setDate(new Date().getDate() - 3)),
           ),
         ),
@@ -227,7 +219,7 @@ export class GithubService {
           org: { id: orgId },
           project: { id: projectId },
           state: 'open',
-          createdAt: MoreThan(
+          createdAt: LessThan(
             new Date(new Date().setDate(new Date().getDate() - 3)),
           ),
         },
@@ -241,7 +233,7 @@ export class GithubService {
           org: { id: orgId },
           project: { id: projectId },
           state: 'closed',
-          createdAt: MoreThan(
+          createdAt: MoreThanOrEqual(
             new Date(new Date().setDate(new Date().getDate() - 7)),
           ),
         },
