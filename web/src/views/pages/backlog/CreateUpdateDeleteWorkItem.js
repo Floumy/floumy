@@ -11,21 +11,21 @@ import {
   deleteComment,
   deleteWorkItem,
   listComments,
-  updateComment
-} from "../../../services/backlog/backlog.service";
-import { listSprints } from "../../../services/sprints/sprints.service";
-import FloumyDropZone from "../components/FloumyDropZone";
-import { formatHyphenatedString } from "../../../services/utils/utils";
-import DeleteWarning from "../components/DeleteWarning";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import CardHeaderDetails from "../components/CardHeaderDetails";
-import { getOrg } from "../../../services/org/orgs.service";
-import Comments from "../../../components/Comments/Comments";
-import { listIssues } from "../../../services/issues/issues.service";
-import RichTextEditor from "../../../components/RichTextEditor/RichTextEditor";
-import {generateKeyResults, getWorkItemDescription} from "../../../services/ai/ai.service";
-import AIButton from "../../../components/AI/AIButton";
+  updateComment,
+} from '../../../services/backlog/backlog.service';
+import { listSprints } from '../../../services/sprints/sprints.service';
+import FloumyDropZone from '../components/FloumyDropZone';
+import { formatHyphenatedString } from '../../../services/utils/utils';
+import DeleteWarning from '../components/DeleteWarning';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import CardHeaderDetails from '../components/CardHeaderDetails';
+import { getOrg } from '../../../services/org/orgs.service';
+import Comments from '../../../components/Comments/Comments';
+import { listIssues } from '../../../services/issues/issues.service';
+import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
+import { getWorkItemDescription } from '../../../services/ai/ai.service';
+import AIButton from '../../../components/AI/AIButton';
 
 function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const { orgId, projectId } = useParams();
@@ -61,7 +61,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     mappedIssues.push({ id: '', text: 'None' });
     setIssues(mappedIssues);
     setIssue(workItem.issue ? workItem.issue.id : '');
-  }, [workItem.issue]);
+  }, [orgId, projectId, workItem.issue]);
 
   const loadAndSetFeatures = useCallback(async () => {
     const features = await listAllFeatures(orgId, projectId);
@@ -72,7 +72,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     mappedFeatures.push({ id: '', text: 'None' });
     setFeatures(mappedFeatures);
     setFeature(workItem.feature ? workItem.feature.id : '');
-  }, [workItem.feature]);
+  }, [orgId, projectId, workItem.feature]);
 
   const loadAndSetSprints = useCallback(async () => {
     const sprints = await listSprints(orgId, projectId);
@@ -86,7 +86,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     mappedSprints.push({ id: "", text: "None" });
     setSprints(mappedSprints);
     setSprint(workItem.sprint ? workItem.sprint.id : "");
-  }, [workItem.sprint]);
+  }, [orgId, projectId, workItem.sprint]);
 
   const loadAndSetMembers = useCallback(async () => {
     const org = await getOrg();
@@ -236,7 +236,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         entity={'work item'}
         onDelete={() => onDelete(workItem.id)} />
       <Row className="flex-column flex-lg-row">
-        <Col lg={workItem?.id ? 7 : 12} md={12}>
+        <Col lg={workItem?.id ? 8 : 12} md={12}>
           <Card>
             <CardHeader>
               {!isUpdate && <h3 className="mb-0">New Work Item</h3>}
@@ -500,7 +500,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
             </CardBody>
           </Card>
         </Col>
-        <Col lg={5} md={12} hidden={!workItem?.id}>
+        <Col lg={4} md={12} hidden={!workItem?.id}>
           <Card>
             <CardHeader>
               <h3 className="mb-0">
