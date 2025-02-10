@@ -8,13 +8,15 @@ import { Issue } from '../issues/issue.entity';
 import { KeyResult } from '../okrs/key-result.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { TimelineService } from '../common/timeline.service';
+import { Timeline } from '../common/timeline.enum';
 
 @Injectable()
 export class AiService {
   constructor(
     private openaiService: OpenaiService,
     @InjectRepository(Initiative)
-    private featureRepository: Repository<Initiative>,
+    private initiativeRepository: Repository<Initiative>,
     @InjectRepository(Issue)
     private issueRepository: Repository<Issue>,
     @InjectRepository(KeyResult)
@@ -351,7 +353,7 @@ export class AiService {
     Work Item Type: ${workItemType}
     `;
     if (initiativeId) {
-      const initiative = await this.featureRepository.findOneOrFail({
+      const initiative = await this.initiativeRepository.findOneOrFail({
         where: { id: initiativeId },
       });
       prompt += `Linked Initiative title: ${initiative.title}
@@ -460,5 +462,144 @@ export class AiService {
       },
     });
     return response.data.description;
+  }
+
+  async generateRoadmapMilestonesForTimeline(
+    orgId: string,
+    projectId: string,
+    timeline: string,
+  ) {
+    if (
+      !timeline ||
+      [Timeline.PAST.valueOf(), Timeline.LATER.valueOf()].includes(timeline)
+    ) {
+      return [];
+    }
+
+    const { startDate, endDate } =
+      TimelineService.getStartAndEndDatesByTimelineValue(timeline);
+
+    const initiatives = await this.initiativeRepository
+      .createQueryBuilder('initiative')
+      .leftJoinAndSelect('initiative.keyResult', 'keyResult')
+      .leftJoinAndSelect('keyResult.objective', 'objective')
+      .leftJoin('initiative.milestone', 'milestone')
+      .where('milestone.id IS NULL')
+      .andWhere('objective.startDate >= :startDate', { startDate })
+      .andWhere('objective.endDate <= :endDate', { endDate })
+      .andWhere('initiative.orgId = :orgId', { orgId })
+      .andWhere('initiative.projectId = :projectId', { projectId })
+      .select(['initiative.id', 'initiative.title', 'initiative.description'])
+      .getMany();
+
+    if (initiatives.length === 0) {
+      return [];
+    }
+
+    const prompt = `Generate up to 5 roadmap milestones for the following initiatives.
+    Each milestone should be a clear, functional deliverable that moves the project forward.
+      •	Organize milestones sequentially, considering initiative dependencies.
+      •	Group related initiatives together when possible to minimize the number of milestones.
+      •	Ensure each milestone represents a meaningful step towards usability (e.g., “First working version of X”).
+      •	Prefer delivering working functionality rather than isolated backend or frontend tasks.
+    
+    Constraints:
+      •	Start Date: ${startDate}
+      •	End Date: ${endDate}
+    
+    Input Initiatives (JSON format):
+    
+    ${JSON.stringify(initiatives)}
+    
+    Each initiative object has the following structure:
+    
+    {
+      "id": 101,
+      "title": "User Authentication",
+      "description": "Allow users to sign up, log in, and reset passwords.",
+    }
+    
+    Instructions for Initiative Selection in Milestones:
+      1.	Prioritize initiatives with no dependencies in earlier milestones.
+      2.	Unlock dependent initiatives by placing prerequisite initiatives in earlier milestones.
+      3.	Group logically connected initiatives in the same milestone (e.g., “User Authentication” and “User Profile Setup”).
+      4.	Avoid breaking initiatives into unnecessary steps unless they are too large for one milestone.
+      5.	Assign the correct initiative IDs from the provided input when defining milestones.
+      6.  Make sure to include all initiatives provided in the input.
+    
+    For Each Milestone, Return:
+      •	Title: Concise and descriptive milestone name.
+      •	Description: What will be achieved? Be specific.
+      •	Due Date: A realistic due date within the given range.
+      •	Initiative IDs: A list of initiative IDs that should be completed in this milestone.
+    
+    Example of Well-Structured Milestones:
+    
+    [
+      {
+        "title": "Core Authentication & User Setup",
+        "description": "Implement user authentication, account creation, and basic profile setup.",
+        "due_date": "YYYY-MM-DD",
+        "initiative_ids": [101, 102, 103]
+      },
+      {
+        "title": "Project Management Basics",
+        "description": "Enable project creation, task assignment, and basic collaboration tools.",
+        "due_date": "YYYY-MM-DD",
+        "initiative_ids": [201, 202, 204]
+      }
+    ]
+    
+    🚫 Avoid vague milestones like:
+    ❌ “Start working on X”
+    ❌ “General improvements”
+    ❌ “Polish UI”`;
+
+    const response = await this.openaiService.generateCompletion<{
+      milestones: {
+        title: string;
+        description: string;
+        dueDate: string;
+        initiativeIds: string[];
+      }[];
+    }>(prompt, {
+      name: 'milestones',
+      schema: {
+        type: 'object',
+        properties: {
+          milestones: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                title: {
+                  type: 'string',
+                },
+                description: {
+                  type: 'string',
+                },
+                dueDate: {
+                  type: 'string',
+                },
+                initiativeIds: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                  },
+                },
+              },
+              required: ['title', 'description', 'dueDate', 'initiativeIds'],
+              additionalProperties: false,
+            },
+            minItems: 1,
+            maxItems: 5,
+          },
+        },
+        required: ['milestones'],
+        additionalProperties: false,
+      },
+    });
+
+    return response.data.milestones;
   }
 }

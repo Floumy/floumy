@@ -1,38 +1,43 @@
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Card, CardHeader, CardTitle, Col, Container, Row } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import Milestone from "./Milestone";
-import "./Roadmap.scss";
-import Select2 from "react-select2-wrapper";
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Card, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import Milestone from './Milestone';
+import './Roadmap.scss';
+import Select2 from 'react-select2-wrapper';
 import {
   addInitiative,
+  addMilestone,
   listInitiativesWithoutMilestone,
-  listMilestonesWithInitiatives
-} from "../../../services/roadmap/roadmap.service";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { useHotkeys } from "react-hotkeys-hook";
-import { sortByPriority } from "../../../services/utils/utils";
-import InitiativesListCard from "../initiatives/InitiativesListCard";
+  listMilestonesWithInitiatives,
+  updateInitiativeMilestone,
+} from '../../../services/roadmap/roadmap.service';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { formatTimeline, sortByPriority } from '../../../services/utils/utils';
+import InitiativesListCard from '../initiatives/InitiativesListCard';
+import AIButton from '../../../components/AI/AIButton';
+import { generateRoadmapMilestones } from '../../../services/ai/ai.service';
+import { toast } from 'react-toastify';
 
 function InitiativesRoadmap() {
   const { orgId, projectId } = useParams();
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const timelineQueryFilter = searchParams.get("timeline");
+  const timelineQueryFilter = searchParams.get('timeline');
   const navigate = useNavigate();
-  const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || "this-quarter");
+  const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || 'this-quarter');
   const [initiatives, setInitiatives] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
   const [isLoadingInitiatives, setIsLoadingInitiatives] = useState(false);
   // on b hotkey press scroll to the initiatives backlog section
-  useHotkeys("b", () => {
-    document.getElementById("initiatives-backlog").scrollIntoView();
+  useHotkeys('b', () => {
+    document.getElementById('initiatives-backlog').scrollIntoView();
   });
   useEffect(() => {
-    document.title = "Floumy | Roadmap";
+    document.title = 'Floumy | Roadmap';
 
     async function fetchInitiatives() {
       setIsLoadingInitiatives(true);
@@ -109,7 +114,7 @@ function InitiativesRoadmap() {
     const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
     const updatedInitiativesList = initiatives.map(initiative => {
       // If the initiative is closed or completed, we remove it from the backlog
-      if (initiative.status === "closed" || initiative.status === "completed") {
+      if (initiative.status === 'closed' || initiative.status === 'completed') {
         return null;
       }
       if (updatedInitiativesIds.includes(initiative.id)) {
@@ -129,26 +134,59 @@ function InitiativesRoadmap() {
     };
   }
 
+  async function refreshMilestonesAndBacklogInitiatives() {
+    setIsLoadingMilestones(true);
+    const milestones = await listMilestonesWithInitiatives(orgId, projectId, timelineFilterValue);
+    setMilestones(milestones);
+    const initiatives = await listInitiativesWithoutMilestone(orgId, projectId);
+    const sortedInitiatives = sortByPriority(initiatives);
+    setInitiatives(sortedInitiatives);
+    setIsLoadingMilestones(false);
+  }
+
+  async function handleAiRoadmapBuild() {
+    const milestones = await generateRoadmapMilestones(orgId, projectId, timelineFilterValue);
+
+    if (milestones.length === 0) {
+      toast.error(`No initiatives found for ${formatTimeline(timelineFilterValue).toLowerCase()}`);
+      return;
+    }
+
+    for (const milestone of milestones) {
+      const savedMilestone = await addMilestone(orgId, projectId, {
+        title: milestone.title,
+        description: milestone.description,
+        dueDate: milestone.dueDate,
+      });
+      for (const initiativeId of milestone.initiativeIds) {
+        await updateInitiativeMilestone(orgId, projectId, initiativeId, savedMilestone.id);
+      }
+    }
+
+    setTimeout(() => toast.success('The milestones have been added'), 1000);
+    await refreshMilestonesAndBacklogInitiatives();
+  }
+
   return (
     <>
       {isLoadingMilestones && <InfiniteLoadingBar />}
       <SimpleHeader headerButtons={[
         {
-          name: "New Milestone",
-          shortcut: "m",
-          id: "new-milestone",
+          name: 'New Milestone',
+          shortcut: 'm',
+          id: 'new-milestone',
           action: () => {
             navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`);
-          }
+          },
         },
         {
-          name: "New Initiative",
-          shortcut: "i",
-          id: "new-initiative",
+          name: 'New Initiative',
+          shortcut: 'i',
+          id: 'new-initiative',
           action: () => {
             navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`);
-          }
-        }
+          },
+        },
       ]} />
       <Container className="mt--6" fluid>
         <Row>
@@ -157,20 +195,26 @@ function InitiativesRoadmap() {
               <CardHeader className="rounded-lg">
                 <Row>
                   <Col xs={12} sm={8}>
-                    <CardTitle tag="h2">Roadmap</CardTitle>
+                    <CardTitle tag="h2">
+                      Roadmap
+                      {!isLoadingMilestones &&
+                        milestones.length === 0 &&
+                        (timelineFilterValue === 'this-quarter' || timelineFilterValue === 'next-quarter') &&
+                        <AIButton text="Build with AI" onClick={async () => await handleAiRoadmapBuild()} />}
+                    </CardTitle>
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2
                       className="form-control"
-                      defaultValue={"this-quarter"}
+                      defaultValue={'this-quarter'}
                       data={[
-                        { id: "past", text: "Past" },
-                        { id: "this-quarter", text: "This Quarter" },
-                        { id: "next-quarter", text: "Next Quarter" },
-                        { id: "later", text: "Later" }
+                        { id: 'past', text: 'Past' },
+                        { id: 'this-quarter', text: 'This Quarter' },
+                        { id: 'next-quarter', text: 'Next Quarter' },
+                        { id: 'later', text: 'Later' },
                       ]}
                       options={{
-                        placeholder: "Filter by timeline"
+                        placeholder: 'Filter by timeline',
                       }}
                       value={timelineFilterValue}
                       onSelect={(e) => {
@@ -185,7 +229,7 @@ function InitiativesRoadmap() {
               <div className="p-4">
                 {isLoadingMilestones && <LoadingSpinnerBox />}
                 {!isLoadingMilestones && milestones.length === 0 && (
-                  <div style={{ maxWidth: "600px" }} className="mx-auto font-italic">
+                  <div style={{ maxWidth: '600px' }} className="mx-auto font-italic">
                     <h3>Roadmap</h3>
                     <p>The Roadmap is your project's strategic plan that outlines the vision, direction, and
                       progress over time. It helps you communicate your plans and priorities to stakeholders. Start
@@ -216,7 +260,7 @@ function InitiativesRoadmap() {
                              onInitiativeChangeMilestone={updateInitiativesMilestone} />))}
               </div>
             </Card>
-            <div id={"initiatives-backlog"} />
+            <div id={'initiatives-backlog'} />
             <InitiativesListCard title="Initiatives Backlog"
                                  initiatives={initiatives}
                                  isLoading={isLoadingInitiatives}

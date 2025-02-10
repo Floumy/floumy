@@ -64,7 +64,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     mappedIssues.push({ id: '', text: 'None' });
     setIssues(mappedIssues);
     setIssue(workItem.issue ? workItem.issue.id : '');
-  }, [workItem.issue, orgId, projectId]);
+  }, [orgId, projectId, workItem.issue]);
 
   const loadAndSetInitiatives = useCallback(async () => {
     const initiatives = await listAllInitiatives(orgId, projectId);
@@ -90,7 +90,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     mappedSprints.push({ id: "", text: "None" });
     setSprints(mappedSprints);
     setSprint(workItem.sprint ? workItem.sprint.id : "");
-  }, [workItem.sprint, orgId, projectId]);
+  }, [orgId, projectId, workItem.sprint]);
 
   const loadAndSetMembers = useCallback(async () => {
     const org = await getOrg();
@@ -240,7 +240,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         entity={'work item'}
         onDelete={() => onDelete(workItem.id)} />
       <Row className="flex-column flex-lg-row">
-        <Col lg={workItem?.id ? 7 : 12} md={12}>
+        <Col lg={workItem?.id ? 8 : 12} md={12}>
           <Card>
             <CardHeader>
               {!isUpdate && <h3 className="mb-0">New Work Item</h3>}
@@ -504,7 +504,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
             </CardBody>
           </Card>
         </Col>
-        <Col lg={5} md={12} hidden={!workItem?.id}>
+        <Col lg={4} md={12} hidden={!workItem?.id}>
           <Card>
             <CardHeader>
               <h3 className="mb-0">
