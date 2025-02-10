@@ -2,11 +2,11 @@ import { Milestone } from './milestone.entity';
 import {
   MilestoneDto,
   MilestoneListItemDto,
-  MilestoneListWithFeaturesItemDto,
+  MilestoneListWithInitiativesItemDto,
 } from './dtos';
 import { TimelineService } from '../../common/timeline.service';
-import { Feature } from '../features/feature.entity';
-import { FeatureDto } from '../../okrs/dtos';
+import { Initiative } from '../initiatives/initiative.entity';
+import { InitiativeDto } from '../../okrs/dtos';
 
 export class MilestoneMapper {
   static async toDto(milestone: Milestone): Promise<MilestoneDto> {
@@ -18,8 +18,8 @@ export class MilestoneMapper {
       timeline: TimelineService.convertDateToTimeline(
         milestone.dueDate,
       ).valueOf(),
-      features: await Promise.all(
-        (await milestone.features).map(FeatureMapper.toDto),
+      initiatives: await Promise.all(
+        (await milestone.initiatives).map(InitiativesMapper.toDto),
       ),
       createdAt: milestone.createdAt,
       updatedAt: milestone.updatedAt,
@@ -38,9 +38,9 @@ export class MilestoneMapper {
     }));
   }
 
-  static async toListWithFeaturesDto(
+  static async toListWithInitiativesDto(
     milestones: Milestone[],
-  ): Promise<MilestoneListWithFeaturesItemDto[]> {
+  ): Promise<MilestoneListWithInitiativesItemDto[]> {
     return await Promise.all(
       milestones.map(async (milestone) => ({
         id: milestone.id,
@@ -50,8 +50,8 @@ export class MilestoneMapper {
         timeline: TimelineService.convertDateToTimeline(
           milestone.dueDate,
         ).valueOf(),
-        features: await Promise.all(
-          (await milestone.features).map(FeatureMapper.toDto),
+        initiatives: await Promise.all(
+          (await milestone.initiatives).map(InitiativesMapper.toDto),
         ),
       })),
     );
@@ -62,25 +62,25 @@ export class MilestoneMapper {
   }
 }
 
-class FeatureMapper {
-  static async toDto(feature: Feature): Promise<FeatureDto> {
-    const assignedTo = await feature.assignedTo;
+class InitiativesMapper {
+  static async toDto(initiative: Initiative): Promise<InitiativeDto> {
+    const assignedTo = await initiative.assignedTo;
     return {
-      id: feature.id,
-      reference: feature.reference,
-      title: feature.title,
-      priority: feature.priority.valueOf(),
-      status: feature.status.valueOf(),
-      progress: feature.progress,
-      workItemsCount: feature.workItemsCount,
+      id: initiative.id,
+      reference: initiative.reference,
+      title: initiative.title,
+      priority: initiative.priority.valueOf(),
+      status: initiative.status.valueOf(),
+      progress: initiative.progress,
+      workItemsCount: initiative.workItemsCount,
       assignedTo: assignedTo
         ? {
             id: assignedTo.id,
             name: assignedTo.name,
           }
         : null,
-      createdAt: feature.createdAt,
-      updatedAt: feature.updatedAt,
+      createdAt: initiative.createdAt,
+      updatedAt: initiative.updatedAt,
     };
   }
 }

@@ -15,7 +15,7 @@ import {
 import { Priority } from '../../common/priority.enum';
 import { WorkItemStatus } from './work-item-status.enum';
 import { Org } from '../../orgs/org.entity';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { WorkItemType } from './work-item-type.enum';
 import { Sprint } from '../../sprints/sprint.entity';
 import { WorkItemFile } from './work-item-file.entity';
@@ -76,8 +76,8 @@ export class WorkItem {
   assignedTo: Promise<User>;
   @ManyToOne(() => Org, (org) => org.workItems, { lazy: false })
   org: Promise<Org>;
-  @ManyToOne(() => Feature, (feature) => feature.workItems, { lazy: false })
-  feature: Promise<Feature>;
+  @ManyToOne(() => Initiative, (initiative) => initiative.workItems, { lazy: false })
+  initiative: Promise<Initiative>;
   @ManyToOne(() => Sprint, (sprint) => sprint.workItems, {
     lazy: true,
   })

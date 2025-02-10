@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Org } from '../../orgs/org.entity';
-import { Feature } from '../features/feature.entity';
+import { Initiative } from '../initiatives/initiative.entity';
 import { Project } from '../../projects/project.entity';
 
 @Entity()
@@ -27,8 +27,8 @@ export class Milestone {
   updatedAt: Date;
   @ManyToOne(() => Org, (org) => org.milestones, { lazy: true })
   org: Promise<Org>;
-  @OneToMany(() => Feature, (feature) => feature.milestone, { lazy: true })
-  features: Promise<Feature[]>;
+  @OneToMany(() => Initiative, (initiative) => initiative.milestone, { lazy: true })
+  initiatives: Promise<Initiative[]>;
   @ManyToOne(() => Project, (project) => project.milestones, { lazy: true })
   project: Promise<Project>;
 }

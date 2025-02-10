@@ -56,13 +56,13 @@ export class MilestonesService {
     );
   }
 
-  async listMilestonesWithFeatures(orgId: string, projectId: string) {
+  async listMilestonesWithInitiatives(orgId: string, projectId: string) {
     const milestones = await this.milestoneRepository.find({
       where: { org: { id: orgId }, project: { id: projectId } },
       order: { dueDate: 'DESC' },
-      relations: ['features'],
+      relations: ['initiatives'],
     });
-    return await MilestoneMapper.toListWithFeaturesDto(milestones);
+    return await MilestoneMapper.toListWithInitiativesDto(milestones);
   }
 
   async get(orgId: string, projectId: string, id: string) {
@@ -99,9 +99,9 @@ export class MilestonesService {
       project: { id: projectId },
       id: id,
     });
-    const features = await milestone.features;
-    features.forEach((feature) => (feature.milestone = null));
-    await this.milestoneRepository.manager.save(features);
+    const initiatives = await milestone.initiatives;
+    initiatives.forEach((initiative) => (initiative.milestone = null));
+    await this.milestoneRepository.manager.save(initiatives);
     await this.milestoneRepository.remove(milestone);
   }
 

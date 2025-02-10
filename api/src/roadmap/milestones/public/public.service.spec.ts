@@ -2,7 +2,7 @@ import { PublicService } from './public.service';
 import { UsersService } from '../../../users/users.service';
 import { MilestonesService } from '../milestones.service';
 import { OrgsService } from '../../../orgs/orgs.service';
-import { FeaturesService } from '../../features/features.service';
+import { InitiativesService } from '../../initiatives/initiatives.service';
 import { User } from '../../../users/user.entity';
 import { Org } from '../../../orgs/org.entity';
 import { setupTestingModule } from '../../../../test/test.utils';
@@ -10,9 +10,9 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../../../okrs/objective.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
 import { Milestone } from '../milestone.entity';
-import { Feature } from '../../features/feature.entity';
+import { Initiative } from '../../initiatives/initiative.entity';
 import { File } from '../../../files/file.entity';
-import { FeatureFile } from '../../features/feature-file.entity';
+import { InitiativeFile } from '../../initiatives/initiative-file.entity';
 import { BacklogModule } from '../../../backlog/backlog.module';
 import { FilesModule } from '../../../files/files.module';
 import { OkrsService } from '../../../okrs/okrs.service';
@@ -25,7 +25,7 @@ describe('PublicService', () => {
   let usersService: UsersService;
   let service: PublicService;
   let orgsService: OrgsService;
-  let featuresRepository: Repository<Feature>;
+  let initiativesRepository: Repository<Initiative>;
   let milestonesRepository: Repository<Milestone>;
   let user: User;
   let org: Org;
@@ -42,12 +42,12 @@ describe('PublicService', () => {
           Org,
           KeyResult,
           Milestone,
-          Feature,
+          Initiative,
           User,
           Objective,
           KeyResult,
           File,
-          FeatureFile,
+          InitiativeFile,
           BipSettings,
           Project,
         ]),
@@ -58,7 +58,7 @@ describe('PublicService', () => {
         OrgsService,
         PublicService,
         UsersService,
-        FeaturesService,
+        InitiativesService,
         OkrsService,
         MilestonesService,
       ],
@@ -75,8 +75,8 @@ describe('PublicService', () => {
     bipRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
-    featuresRepository = module.get<Repository<Feature>>(
-      getRepositoryToken(Feature),
+    initiativesRepository = module.get<Repository<Initiative>>(
+      getRepositoryToken(Initiative),
     );
     milestonesRepository = module.get<Repository<Milestone>>(
       getRepositoryToken(Milestone),
@@ -95,36 +95,36 @@ describe('PublicService', () => {
     await cleanup();
   });
 
-  async function createMilestone(title: string, features: Feature[] = []) {
+  async function createMilestone(title: string, initiatives: Initiative[] = []) {
     const milestone = new Milestone();
     milestone.org = Promise.resolve(org);
     milestone.project = Promise.resolve(project);
     milestone.title = title;
     milestone.description = 'Description';
     milestone.dueDate = new Date();
-    milestone.features = Promise.resolve(features);
+    milestone.initiatives = Promise.resolve(initiatives);
     return await milestonesRepository.save(milestone);
   }
 
-  async function createFeature(title: string) {
-    const feature = new Feature();
-    feature.org = Promise.resolve(org);
-    feature.project = Promise.resolve(project);
-    feature.title = title;
-    return await featuresRepository.save(feature);
+  async function createInitiative(title: string) {
+    const initiative = new Initiative();
+    initiative.org = Promise.resolve(org);
+    initiative.project = Promise.resolve(project);
+    initiative.title = title;
+    return await initiativesRepository.save(initiative);
   }
 
   describe('when listing milestones', () => {
     it('should return a list of milestones', async () => {
-      const feature1 = await createFeature('Feature 1');
-      const feature2 = await createFeature('Feature 2');
+      const initiative1 = await createInitiative('Initiative 1');
+      const initiative2 = await createInitiative('Initiative 2');
       const milestone1 = await createMilestone('Milestone 1', [
-        feature1,
-        feature2,
+        initiative1,
+        initiative2,
       ]);
 
-      const feature3 = await createFeature('Feature 3');
-      const milestone2 = await createMilestone('Milestone 2', [feature3]);
+      const initiative3 = await createInitiative('Initiative 3');
+      const milestone2 = await createMilestone('Milestone 2', [initiative3]);
 
       const milestones = await service.listMilestones(
         org.id,
@@ -133,13 +133,13 @@ describe('PublicService', () => {
       );
       expect(milestones).toBeDefined();
       expect(milestones[0].title).toBe(milestone2.title);
-      expect(milestones[0].features.length).toBe(1);
-      expect(milestones[0].features[0].title).toBe('Feature 3');
+      expect(milestones[0].initiatives.length).toBe(1);
+      expect(milestones[0].initiatives[0].title).toBe('Initiative 3');
       expect(milestones.length).toBe(2);
       expect(milestones[1].title).toBe(milestone1.title);
-      expect(milestones[1].features.length).toBe(2);
-      expect(milestones[1].features[0].title).toBe('Feature 1');
-      expect(milestones[1].features[1].title).toBe('Feature 2');
+      expect(milestones[1].initiatives.length).toBe(2);
+      expect(milestones[1].initiatives[0].title).toBe('Initiative 1');
+      expect(milestones[1].initiatives[1].title).toBe('Initiative 2');
     });
   });
 

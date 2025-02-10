@@ -1,7 +1,7 @@
 import { Sprint } from './sprint.entity';
 import { TimelineService } from '../common/timeline.service';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 
 function formatDate(date: Date) {
   if (!date) return null;
@@ -10,7 +10,7 @@ function formatDate(date: Date) {
 
 class WorkItemMapper {
   static async toDto(workItem: WorkItem) {
-    const feature = await workItem.feature;
+    const initiative = await workItem.initiative;
     const sprint = await workItem.sprint;
     const assignedTo = await workItem.assignedTo;
     return {
@@ -25,7 +25,7 @@ class WorkItemMapper {
       sprint: sprint
         ? { id: sprint.id, title: sprint.title }
         : null,
-      feature: feature ? FeatureMapper.toDto(feature) : null,
+      initiative: initiative ? InitiativeMapper.toDto(initiative) : null,
       assignedTo: assignedTo
         ? { id: assignedTo.id, name: assignedTo.name }
         : null,
@@ -36,11 +36,11 @@ class WorkItemMapper {
   }
 }
 
-class FeatureMapper {
-  static toDto(feature: Feature) {
+class InitiativeMapper {
+  static toDto(initiative: Initiative) {
     return {
-      id: feature.id,
-      title: feature.title,
+      id: initiative.id,
+      title: initiative.title,
     };
   }
 }

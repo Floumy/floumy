@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUpdateWorkItemDto, WorkItemPatchDto } from './dtos';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { In, Repository } from 'typeorm';
 import { WorkItem } from './work-item.entity';
 import WorkItemMapper from './work-item.mapper';
@@ -31,7 +31,7 @@ export class WorkItemsService {
   constructor(
     @InjectRepository(WorkItem)
     private workItemsRepository: Repository<WorkItem>,
-    @InjectRepository(Feature) private featuresRepository: Repository<Feature>,
+    @InjectRepository(Initiative) private initiativeRepository: Repository<Initiative>,
     @InjectRepository(Sprint)
     private sprintRepository: Repository<Sprint>,
     @InjectRepository(User) private usersRepository: Repository<User>,
@@ -82,8 +82,8 @@ export class WorkItemsService {
       };
       this.eventEmitter.emit('mention.created', notification);
     }
-    const feature = await savedWorkItem.feature;
-    await this.updateFeatureProgress(feature);
+    const initiative = await savedWorkItem.initiative;
+    await this.updateInitiativeProgress(initiative);
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
     this.eventEmitter.emit(
       'workItem.created',
@@ -144,7 +144,7 @@ export class WorkItemsService {
       project: { id: projectId },
     });
     const previous = await WorkItemMapper.toDto(workItem);
-    const oldFeature = await workItem.feature;
+    const oldFeature = await workItem.initiative;
     await this.setWorkItemData(workItem, workItemDto, orgId);
     const savedWorkItem = await this.workItemsRepository.save(workItem);
     const savedMentions = await savedWorkItem.mentions;
@@ -161,10 +161,10 @@ export class WorkItemsService {
       };
       this.eventEmitter.emit('mention.created', notification);
     }
-    const newFeature = await savedWorkItem.feature;
-    await this.updateFeatureProgress(oldFeature);
+    const newFeature = await savedWorkItem.initiative;
+    await this.updateInitiativeProgress(oldFeature);
     if (newFeature && (!oldFeature || oldFeature.id !== newFeature.id)) {
-      await this.updateFeatureProgress(newFeature);
+      await this.updateInitiativeProgress(newFeature);
     }
     await this.setWorkItemsFiles(workItem, workItemDto, savedWorkItem);
     const current = await WorkItemMapper.toDto(savedWorkItem);
@@ -184,27 +184,27 @@ export class WorkItemsService {
     const deletedWorkItem = await WorkItemMapper.toDto(workItem);
     await this.deleteWorkItemFiles(orgId, projectId, workItem.id);
 
-    const feature = await workItem.feature;
+    const initiative = await workItem.initiative;
 
     await this.workItemsRepository.remove(workItem);
 
-    if (feature) {
-      await this.updateFeatureProgress(feature);
+    if (initiative) {
+      await this.updateInitiativeProgress(initiative);
     }
     this.eventEmitter.emit('workItem.deleted', deletedWorkItem);
   }
 
-  removeFeatureFromWorkItems(orgId: string, projectId: string, id: string) {
+  removeInitiativeFromWorkItems(orgId: string, projectId: string, id: string) {
     return this.workItemsRepository.update(
-      { org: { id: orgId }, feature: { id }, project: { id: projectId } },
-      { feature: null },
+      { org: { id: orgId }, initiative: { id }, project: { id: projectId } },
+      { initiative: null },
     );
   }
 
   async listOpenWorkItemsWithoutSprints(orgId: string, projectId: string) {
     const workItems = await this.workItemsRepository
       .createQueryBuilder('workItem')
-      .leftJoinAndSelect('workItem.feature', 'feature')
+      .leftJoinAndSelect('workItem.initiative', 'initiative')
       .leftJoinAndSelect('workItem.assignedTo', 'assignedTo')
       .where('workItem.orgId = :orgId', { orgId })
       .andWhere('workItem.projectId = :projectId', { projectId })
@@ -241,7 +241,7 @@ export class WorkItemsService {
     this.updatePriority(workItem, workItemPatchDto);
 
     const savedWorkItem = await this.workItemsRepository.save(workItem);
-    await this.updateFeatureProgress(await savedWorkItem.feature);
+    await this.updateInitiativeProgress(await savedWorkItem.initiative);
     const current = await WorkItemMapper.toDto(savedWorkItem);
     this.eventEmitter.emit('workItem.updated', {
       previous,
@@ -468,14 +468,14 @@ export class WorkItemsService {
     ) {
       workItem.completedAt = new Date();
     }
-    workItem.feature = Promise.resolve(null);
+    workItem.initiative = Promise.resolve(null);
     workItem.sprint = Promise.resolve(null);
-    if (workItemDto.feature) {
-      const feature = await this.featuresRepository.findOneByOrFail({
-        id: workItemDto.feature,
+    if (workItemDto.initiative) {
+      const initiative = await this.initiativeRepository.findOneByOrFail({
+        id: workItemDto.initiative,
         org: { id: orgId },
       });
-      workItem.feature = Promise.resolve(feature);
+      workItem.initiative = Promise.resolve(initiative);
     }
     if (workItemDto.sprint) {
       const sprint = await this.sprintRepository.findOneByOrFail({
@@ -504,13 +504,13 @@ export class WorkItemsService {
     }
   }
 
-  private async updateFeatureProgress(feature: Feature) {
-    if (!feature) return;
+  private async updateInitiativeProgress(initiative: Initiative) {
+    if (!initiative) return;
 
-    const workItems = await feature.workItems;
-    feature.workItemsCount = workItems.length;
-    feature.progress = 0;
-    await this.featuresRepository.save(feature);
+    const workItems = await initiative.workItems;
+    initiative.workItemsCount = workItems.length;
+    initiative.progress = 0;
+    await this.initiativeRepository.save(initiative);
 
     if (workItems.length > 0) {
       const completedWorkItems = workItems.filter(
@@ -518,8 +518,8 @@ export class WorkItemsService {
           workItem.status === WorkItemStatus.DONE ||
           workItem.status === WorkItemStatus.CLOSED,
       );
-      feature.progress = (completedWorkItems.length / workItems.length) * 100;
-      await this.featuresRepository.save(feature);
+      initiative.progress = (completedWorkItems.length / workItems.length) * 100;
+      await this.initiativeRepository.save(initiative);
     }
   }
 

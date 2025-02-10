@@ -18,7 +18,7 @@ export class PublicWorkItemMapper {
       status: workItem.status,
       estimation: workItem.estimation,
       org: { id: org.id, name: org.name, paymentPlan: org.paymentPlan },
-      feature: feature ? { id: feature.id, title: feature.title } : null,
+      initiative: feature ? { id: feature.id, title: feature.title } : null,
       sprint: sprint
         ? { id: sprint.id, title: sprint.title }
         : null,

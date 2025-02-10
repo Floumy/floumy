@@ -340,7 +340,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Row style={{ maxWidth: '100%' }}>
                       <Col xs={10}>
                         <NavLink
-                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/features`}
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/initiatives`}
                           onClick={closeSidenav}
                           tag={NavLinkRRD}
                         >

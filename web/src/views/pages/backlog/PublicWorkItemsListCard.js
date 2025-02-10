@@ -13,7 +13,7 @@ function PublicWorkItemsListCard({
                                    isLoading,
                                    showFilters = true,
                                    showAssignedTo = true,
-                                   showFeature = true,
+                                   showInitiative = true,
                                    searchPlaceholder = "Search by title"
                                  }) {
   const [filterByPriority, setFilterByPriority] = useState("all");
@@ -76,7 +76,7 @@ function PublicWorkItemsListCard({
           <PublicWorkItemsList
             id={id}
             showAssignedTo={showAssignedTo}
-            showFeature={showFeature}
+            showInitiative={showInitiative}
             workItems={filteredWorkItems}
             orgId={orgId}
           />}
