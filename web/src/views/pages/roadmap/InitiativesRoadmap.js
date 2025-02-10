@@ -6,15 +6,15 @@ import Milestone from './Milestone';
 import './Roadmap.scss';
 import Select2 from 'react-select2-wrapper';
 import {
-  addFeature, addMilestone,
-  listFeaturesWithoutMilestone,
-  listMilestonesWithFeatures, updateFeatureMilestone,
-} from '../../../services/roadmap/roadmap.service';
-import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
-import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { formatTimeline, sortByPriority } from '../../../services/utils/utils';
-import FeaturesListCard from '../features/FeaturesListCard';
+  addInitiative,
+  listInitiativesWithoutMilestone,
+  listMilestonesWithInitiatives
+} from "../../../services/roadmap/roadmap.service";
+import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
+import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
+import { useHotkeys } from "react-hotkeys-hook";
+import { sortByPriority } from "../../../services/utils/utils";
+import InitiativesListCard from "../initiatives/InitiativesListCard";
 import AIButton from '../../../components/AI/AIButton';
 import { generateRoadmapMilestones } from '../../../services/ai/ai.service';
 import { toast } from 'react-toastify';
@@ -25,40 +25,40 @@ function InitiativesRoadmap() {
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get('timeline');
   const navigate = useNavigate();
-  const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || 'this-quarter');
-  const [features, setFeatures] = useState([]);
+  const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || "this-quarter");
+  const [initiatives, setInitiatives] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
-  const [isLoadingFeatures, setIsLoadingFeatures] = useState(false);
-  // on b hotkey press scroll to the features backlog section
-  useHotkeys('b', () => {
-    document.getElementById('features-backlog').scrollIntoView();
+  const [isLoadingInitiatives, setIsLoadingInitiatives] = useState(false);
+  // on b hotkey press scroll to the initiatives backlog section
+  useHotkeys("b", () => {
+    document.getElementById("initiatives-backlog").scrollIntoView();
   });
   useEffect(() => {
     document.title = 'Floumy | Roadmap';
 
-    async function fetchFeatures() {
-      setIsLoadingFeatures(true);
+    async function fetchInitiatives() {
+      setIsLoadingInitiatives(true);
       try {
-        const features = await listFeaturesWithoutMilestone(orgId, projectId);
-        const sortedFeatures = sortByPriority(features);
-        setFeatures(sortedFeatures);
+        const initiatives = await listInitiativesWithoutMilestone(orgId, projectId);
+        const sortedInitiatives = sortByPriority(initiatives);
+        setInitiatives(sortedInitiatives);
       } catch (e) {
         console.error(e.message);
       } finally {
-        setIsLoadingFeatures(false);
+        setIsLoadingInitiatives(false);
       }
 
     }
 
-    fetchFeatures();
+    fetchInitiatives();
   }, [orgId, projectId]);
 
   useEffect(() => {
     async function fetchMilestones() {
       setIsLoadingMilestones(true);
       try {
-        const milestones = await listMilestonesWithFeatures(orgId, projectId, timelineFilterValue);
+        const milestones = await listMilestonesWithInitiatives(orgId, projectId, timelineFilterValue);
         setMilestones(milestones);
       } catch (e) {
         console.error(e.message);
@@ -70,65 +70,65 @@ function InitiativesRoadmap() {
     fetchMilestones();
   }, [orgId, projectId, timelineFilterValue]);
 
-  function updateFeaturesMilestone(updatedFeatures, newMilestoneId) {
-    const previousMilestone = milestones.find(milestone => milestone.features.find(feature => feature.id === updatedFeatures[0].id));
+  function updateInitiativesMilestone(updatedInitiatives, newMilestoneId) {
+    const previousMilestone = milestones.find(milestone => milestone.initiatives.find(initiative => initiative.id === updatedInitiatives[0].id));
     if (previousMilestone.id === newMilestoneId) {
       return;
     }
 
     const newMilestone = milestones.find(milestone => milestone.id === newMilestoneId);
     if (newMilestone) {
-      for (const feature of updatedFeatures) {
-        newMilestone.features.push(feature);
+      for (const initiative of updatedInitiatives) {
+        newMilestone.initiatives.push(initiative);
       }
-      newMilestone.features = sortByPriority(newMilestone.features);
+      newMilestone.initiatives = sortByPriority(newMilestone.initiatives);
     } else {
-      for (const feature of updatedFeatures) {
-        features.push(feature);
+      for (const initiative of updatedInitiatives) {
+        initiatives.push(initiative);
       }
-      setFeatures([...sortByPriority(features)]);
+      setInitiatives([...sortByPriority(initiatives)]);
     }
 
-    previousMilestone.features = previousMilestone.features.filter(feature => !updatedFeatures.some(f => f.id === feature.id));
+    previousMilestone.initiatives = previousMilestone.initiatives.filter(initiative => !updatedInitiatives.some(f => f.id === initiative.id));
 
     setMilestones([...milestones]);
   }
 
-  function updateBacklogFeaturesMilestone(updatedFeatures, newMilestoneId) {
-    // Remove feature from features list and add it to the new milestone
+  function updateBacklogInitiativesMilestone(updatedInitiatives, newMilestoneId) {
+    // Remove initiative from initiatives list and add it to the new milestone
     const newMilestone = milestones.find(milestone => milestone.id === newMilestoneId);
-    for (const feature of updatedFeatures) {
-      newMilestone.features.push(feature);
+    for (const initiative of updatedInitiatives) {
+      newMilestone.initiatives.push(initiative);
     }
-    newMilestone.features = sortByPriority(newMilestone.features);
+    newMilestone.initiatives = sortByPriority(newMilestone.initiatives);
 
-    const filteredFeatures = features.filter(feature => !updatedFeatures.some(f => f.id === feature.id));
-    setFeatures(filteredFeatures);
+    const filteredInitiatives = initiatives.filter(initiative => !updatedInitiatives.some(f => f.id === initiative.id));
+    setInitiatives(filteredInitiatives);
 
     setMilestones([...milestones]);
   }
 
-  function updateBacklogFeaturesStatus(updatedFeatures, newStatus) {
-    const updatedFeaturesIds = updatedFeatures.map(f => f.id);
-    const updatedFeaturesList = features.map(feature => {
-      // If the feature is closed or completed, we remove it from the backlog
-      if (feature.status === 'closed' || feature.status === 'completed') {
+  function updateBacklogInitiativesStatus(updatedInitiatives, newStatus) {
+    const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
+    const updatedInitiativesList = initiatives.map(initiative => {
+      // If the initiative is closed or completed, we remove it from the backlog
+      if (initiative.status === "closed" || initiative.status === "completed") {
         return null;
       }
-      if (updatedFeaturesIds.includes(feature.id)) {
-        feature.status = newStatus;
+      if (updatedInitiativesIds.includes(initiative.id)) {
+        initiative.status = newStatus;
       }
-      return feature;
-    }).filter(feature => feature !== null);
+      return initiative;
+    }).filter(initiative => initiative !== null);
 
-    setFeatures([...sortByPriority(updatedFeaturesList)]);
+    setInitiatives([...sortByPriority(updatedInitiativesList)]);
   }
 
-  function onAddFeature() {
-    return async (feature) => {
-      const savedFeature = await addFeature(orgId, projectId, feature);
-      features.push(savedFeature);
-      setFeatures([...features]);
+  function onAddInitiative() {
+    return async (initiative) => {
+      const savedInitiative = await addInitiative(orgId, projectId, initiative);
+      initiatives.push(savedInitiative);
+      setInitiatives([...initiatives]);
     };
   }
 
@@ -178,13 +178,13 @@ function InitiativesRoadmap() {
           },
         },
         {
-          name: 'New Initiative',
-          shortcut: 'i',
-          id: 'new-feature',
+          name: "New Initiative",
+          shortcut: "i",
+          id: "new-initiative",
           action: () => {
-            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`);
-          },
-        },
+            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`);
+          }
+        }
       ]} />
       <Container className="mt--6" fluid>
         <Row>
@@ -247,7 +247,7 @@ function InitiativesRoadmap() {
                       towards a common objective. Define initiatives to prioritize efforts, allocate resources
                       effectively, and ensure your team is working towards the same strategic vision.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`}
+                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`}
                             className="text-blue font-weight-bold">Add an
                         Initiative</Link>
                     </p>
@@ -255,16 +255,16 @@ function InitiativesRoadmap() {
                 )}
                 {!isLoadingMilestones && milestones.length > 0 && milestones.map((milestone) => (
                   <Milestone key={milestone.id} milestone={milestone}
-                             onFeatureChangeMilestone={updateFeaturesMilestone} />))}
+                             onInitiativeChangeMilestone={updateInitiativesMilestone} />))}
               </div>
             </Card>
-            <div id={'features-backlog'} />
-            <FeaturesListCard title="Initiatives Backlog"
-                              features={features}
-                              isLoading={isLoadingFeatures}
-                              onAddFeature={onAddFeature()}
-                              onChangeMilestone={updateBacklogFeaturesMilestone}
-                              onChangeStatus={updateBacklogFeaturesStatus} />
+            <div id={"initiatives-backlog"} />
+            <InitiativesListCard title="Initiatives Backlog"
+                                 initiatives={initiatives}
+                                 isLoading={isLoadingInitiatives}
+                                 onAddInitiative={onAddInitiative()}
+                                 onChangeMilestone={updateBacklogInitiativesMilestone}
+                                 onChangeStatus={updateBacklogInitiativesStatus} />
           </Col>
         </Row>
       </Container>

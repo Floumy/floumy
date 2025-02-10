@@ -7,7 +7,7 @@ import { Org } from '../orgs/org.entity';
 import { Repository } from 'typeorm';
 import { File } from './file.entity';
 import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
-import { FeatureFile } from '../roadmap/features/feature-file.entity';
+import { InitiativeFile } from '../roadmap/initiatives/initiative-file.entity';
 import { Project } from '../projects/project.entity';
 
 @Injectable()
@@ -18,8 +18,8 @@ export class FilesService {
     @InjectRepository(File) private filesRepository: Repository<File>,
     @InjectRepository(WorkItemFile)
     private workItemFilesRepository: Repository<WorkItemFile>,
-    @InjectRepository(FeatureFile)
-    private featureFilesRepository: Repository<FeatureFile>,
+    @InjectRepository(InitiativeFile)
+    private featureFilesRepository: Repository<InitiativeFile>,
     private filesStorageRepository: FilesStorageRepository,
     @InjectRepository(Project) private projectsRepository: Repository<Project>,
   ) {}

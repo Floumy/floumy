@@ -10,7 +10,7 @@ export interface CreateUpdateWorkItemDto {
   type: WorkItemType;
   status: WorkItemStatus;
   estimation?: number;
-  feature?: string;
+  initiative?: string;
   sprint?: string;
   assignedTo?: string;
   issue?: string;
@@ -33,7 +33,7 @@ export interface WorkItemDto {
   type: WorkItemType;
   status: WorkItemStatus;
   estimation?: number;
-  feature?: {
+  initiative?: {
     id: string;
     title: string;
   };

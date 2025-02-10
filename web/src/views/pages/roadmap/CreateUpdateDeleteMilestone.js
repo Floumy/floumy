@@ -4,12 +4,12 @@ import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row } from "
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import InputError from "../../../components/Errors/InputError";
 import ReactDatetime from "react-datetime";
-import { addFeature, deleteMilestone } from "../../../services/roadmap/roadmap.service";
+import { addInitiative, deleteMilestone } from "../../../services/roadmap/roadmap.service";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import DeleteWarning from "../components/DeleteWarning";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import FeaturesListCard from "../features/FeaturesListCard";
+import InitiativesListCard from "../initiatives/InitiativesListCard";
 
 function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: "", description: "", dueDate: "" } }) {
   const { orgId, projectId } = useParams();
@@ -19,7 +19,7 @@ function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: ""
   const [isDueDateTouched, setIsDueDateTouched] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
-  const [features, setFeatures] = useState(milestone?.features);
+  const [initiatives, setInitiatives] = useState(milestone?.initiatives);
   const navigate = useNavigate();
 
   const validationSchema = Yup.object({
@@ -78,27 +78,27 @@ function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: ""
     return value && typeof value.format === "function";
   }
 
-  function updateFeaturesMilestone(updatedFeatures, newMilestoneId) {
+  function updateInitiativesMilestone(updatedInitiatives, newMilestoneId) {
     if (milestone.id === newMilestoneId) {
       return;
     }
-    const newFeatures = [];
-    for (const feature of features) {
-      if (!updatedFeatures.some(f => f.id === feature.id)) {
-        feature.milestone = newMilestoneId;
-        newFeatures.push(feature);
+    const newInitiatives = [];
+    for (const initiative of initiatives) {
+      if (!updatedInitiatives.some(f => f.id === initiative.id)) {
+        initiative.milestone = newMilestoneId;
+        newInitiatives.push(initiative);
       }
     }
 
-    setFeatures(newFeatures);
+    setInitiatives(newInitiatives);
   }
 
-  function onAddFeature() {
-    return async (feature) => {
-      feature.milestone = milestone.id;
-      const savedFeature = await addFeature(orgId, projectId, feature);
-      features.push(savedFeature);
-      setFeatures([...features]);
+  function onAddInitiative() {
+    return async (initiative) => {
+      initiative.milestone = milestone.id;
+      const savedInitiative = await addInitiative(orgId, projectId, initiative);
+      initiatives.push(savedInitiative);
+      setInitiatives([...initiatives]);
     };
   }
 
@@ -230,12 +230,12 @@ function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: ""
           </Formik>
         </CardBody>
       </Card>
-      {features && <FeaturesListCard
+      {initiatives && <InitiativesListCard
         title="Initiatives"
-        features={features}
+        initiatives={initiatives}
         showAssignedTo={true}
-        onAddFeature={onAddFeature()}
-        onChangeMilestone={updateFeaturesMilestone}
+        onAddInitiative={onAddInitiative()}
+        onChangeMilestone={updateInitiativesMilestone}
       />}
     </>
   );

@@ -321,8 +321,8 @@ export class SprintsService {
       },
       relations: [
         'workItems',
-        'workItems.feature',
-        'workItems.feature.milestone',
+        'workItems.initiative',
+        'workItems.initiative.milestone',
         'workItems.assignedTo',
       ],
     });

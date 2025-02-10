@@ -13,7 +13,7 @@ import { uuid } from 'uuidv4';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { FeatureRequestComment } from './feature-request-comment.entity';
 import { Project } from '../projects/project.entity';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 
 describe('FeatureRequestsService', () => {
   let usersService: UsersService;
@@ -21,7 +21,7 @@ describe('FeatureRequestsService', () => {
   let service: FeatureRequestsService;
   let orgsRepository: Repository<Org>;
   let projectsRepository: Repository<Project>;
-  let featuresRepository: Repository<Feature>;
+  let featuresRepository: Repository<Initiative>;
   let featureRequestsRepository: Repository<FeatureRequest>;
   let org: Org;
   let project: Project;
@@ -35,7 +35,7 @@ describe('FeatureRequestsService', () => {
         TypeOrmModule.forFeature([
           Org,
           User,
-          Feature,
+          Initiative,
           FeatureRequest,
           FeatureRequestVote,
           FeatureRequestComment,
@@ -51,8 +51,8 @@ describe('FeatureRequestsService', () => {
     projectsRepository = module.get<Repository<Project>>(
       getRepositoryToken(Project),
     );
-    featuresRepository = module.get<Repository<Feature>>(
-      getRepositoryToken(Feature),
+    featuresRepository = module.get<Repository<Initiative>>(
+      getRepositoryToken(Initiative),
     );
     featureRequestsRepository = module.get<Repository<FeatureRequest>>(
       getRepositoryToken(FeatureRequest),
@@ -463,14 +463,14 @@ describe('FeatureRequestsService', () => {
       'You need to upgrade your plan to delete a feature request',
     );
   });
-  it('should remove the feature request from the features', async () => {
+  it('should remove the feature request from the initiatives', async () => {
     const featureRequest = new FeatureRequest();
     featureRequest.title = 'Test Feature Request';
     featureRequest.description = 'Test Description';
     featureRequest.org = Promise.resolve(org);
     featureRequest.project = Promise.resolve(project);
     await featureRequestsRepository.save(featureRequest);
-    const feature = new Feature();
+    const feature = new Initiative();
     feature.title = 'Test Feature';
     feature.description = 'Test Description';
     feature.org = Promise.resolve(org);

@@ -6,7 +6,7 @@ import { Objective } from './objective.entity';
 import { OrgsModule } from '../orgs/orgs.module';
 import { AuthModule } from '../auth/auth.module';
 import { KeyResult } from './key-result.entity';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PublicController } from './public/public.controller';
@@ -23,7 +23,7 @@ import { Project } from '../projects/project.entity';
     TypeOrmModule.forFeature([
       Objective,
       KeyResult,
-      Feature,
+      Initiative,
       User,
       Org,
       KeyResultComment,

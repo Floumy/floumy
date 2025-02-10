@@ -7,7 +7,7 @@ import { KeyResult } from './key-result.entity';
 import { KeyResultMapper, OKRMapper } from './mappers';
 import { OKRStatus } from './okrstatus.enum';
 import { TimelineService } from '../common/timeline.service';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { User } from '../users/user.entity';
 import { Timeline } from '../common/timeline.enum';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -27,8 +27,8 @@ export class OkrsService {
     private objectiveRepository: Repository<Objective>,
     @InjectRepository(KeyResult)
     private keyResultRepository: Repository<KeyResult>,
-    @InjectRepository(Feature)
-    private featureRepository: Repository<Feature>,
+    @InjectRepository(Initiative)
+    private featureRepository: Repository<Initiative>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private orgsService: OrgsService,
@@ -293,7 +293,7 @@ export class OkrsService {
   async listKeyResults(orgId: string) {
     const keyResults = await this.keyResultRepository.find({
       where: { org: { id: orgId } },
-      relations: ['features', 'objective', 'org', 'features.workItems'],
+      relations: ['initiatives', 'objective', 'org', 'initiatives.workItems'],
     });
     return await KeyResultMapper.toListDTO(keyResults);
   }

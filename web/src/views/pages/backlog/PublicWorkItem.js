@@ -148,7 +148,7 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                       type="text"
                       disabled={true}
                       className="bg-white"
-                      defaultValue={workItem.feature?.title || "None"}
+                      defaultValue={workItem.initiative?.title || "None"}
                     />
                   </Col>
                 </Row>
@@ -225,7 +225,7 @@ const defaultWorkItem = {
   type: "user-story",
   estimation: "",
   status: "planned",
-  feature: { id: "" },
+  initiative: { id: "" },
   sprint: { id: "" }
 };
 

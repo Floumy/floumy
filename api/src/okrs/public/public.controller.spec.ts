@@ -5,7 +5,7 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../objective.entity';
 import { Org } from '../../orgs/org.entity';
 import { KeyResult } from '../key-result.entity';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { OkrsService } from '../okrs.service';
 import { TokensService } from '../../auth/tokens.service';
 import { BipSettings } from '../../bip/bip-settings.entity';
@@ -31,7 +31,7 @@ describe('PublicController', () => {
           Objective,
           Org,
           KeyResult,
-          Feature,
+          Initiative,
           BipSettings,
         ]),
       ],

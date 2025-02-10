@@ -1,38 +1,38 @@
 import React, { useEffect, useState } from "react";
-import FeaturesList from "../features/FeaturesList";
+import InitiativesList from "../initiatives/InitiativesList";
 import { Col, Row } from "reactstrap";
 import { Link, useParams } from "react-router-dom";
-import { addFeature } from "../../../services/roadmap/roadmap.service";
+import { addInitiative } from "../../../services/roadmap/roadmap.service";
 
-function Milestone({ milestone, onFeatureChangeMilestone }) {
+function Milestone({ milestone, onInitiativeChangeMilestone }) {
   const { orgId, projectId } = useParams();
-  const [features, setFeatures] = useState([]);
-  const [showFeatures, setShowFeatures] = useState(true);
+  const [initiatives, setInitiatives] = useState([]);
+  const [showInitiatives, setShowInitiatives] = useState(true);
   useEffect(() => {
     const priority = ["high", "medium", "low"];
-    const features = milestone.features.sort((a, b) => {
+    const initiatives = milestone.initiatives.sort((a, b) => {
       return priority.indexOf(a.priority) - priority.indexOf(b.priority);
     });
-    setFeatures(features);
-  }, [milestone?.features]);
+    setInitiatives(initiatives);
+  }, [milestone?.initiatives]);
 
   function getMilestoneHeader() {
     return <>
       <h3 className="pt-2 pr-4">
         <button onClick={(e) => {
           e.preventDefault();
-          setShowFeatures(!showFeatures);
+          setShowInitiatives(!showInitiatives);
         }}
                 className="btn btn-sm btn-outline-light shadow-none shadow-none--hover pt-1 pb-0 pr-2">
-          {!showFeatures && <i className="ni ni-bold-right" />}
-          {showFeatures && <i className="ni ni-bold-down" />}
+          {!showInitiatives && <i className="ni ni-bold-right" />}
+          {showInitiatives && <i className="ni ni-bold-down" />}
         </button>
         <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/edit/${milestone.id}`}>
           <span className="text-gray">{milestone.dueDate}</span> | {milestone.title} <span
           className="text-muted text-sm"></span>
         </Link>
       </h3>
-      <div className={"text-muted text-sm"}>Initiatives Count: {milestone.features.length}</div>
+      <div className={"text-muted text-sm"}>Initiatives Count: {milestone.initiatives.length}</div>
       {milestone.description &&
         <div className="text-sm text-muted">
           Description: {milestone.description}
@@ -40,33 +40,33 @@ function Milestone({ milestone, onFeatureChangeMilestone }) {
     </>;
   }
 
-  async function handleAddFeatureWithMilestone(feature, milestoneId) {
-    feature.milestone = milestoneId;
-    const savedFeature = await addFeature(feature, orgId, projectId);
-    features.push(savedFeature);
-    setFeatures([...features]);
+  async function handleAddInitiativeWithMilestone(initiative, milestoneId) {
+    initiative.milestone = milestoneId;
+    const savedInitiative = await addInitiative(initiative, orgId, projectId);
+    initiatives.push(savedInitiative);
+    setInitiatives([...initiatives]);
   }
 
-  function updateFeaturesStatus(updatedFeatures, status) {
-    const updatedFeaturesIds = updatedFeatures.map(feature => feature.id);
-    const updatedFeaturesStatus = features.map(feature => {
-      if (updatedFeaturesIds.includes(feature.id)) {
-        feature.status = status;
+  function updateInitiativesStatus(updatedInitiatives, status) {
+    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
+    const updatedInitiativesStatus = initiatives.map(initiative => {
+      if (updatedInitiativesIds.includes(initiative.id)) {
+        initiative.status = status;
       }
-      return feature;
+      return initiative;
     });
-    setFeatures(updatedFeaturesStatus);
+    setInitiatives(updatedInitiativesStatus);
   }
 
-  function updateFeaturesPriority(updatedFeatures, priority) {
-    const updatedFeaturesIds = updatedFeatures.map(feature => feature.id);
-    const updatedFeaturesPriority = features.map(feature => {
-      if (updatedFeaturesIds.includes(feature.id)) {
-        feature.priority = priority;
+  function updateInitiativesPriority(updatedInitiatives, priority) {
+    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
+    const updatedInitiativesPriority = initiatives.map(initiative => {
+      if (updatedInitiativesIds.includes(initiative.id)) {
+        initiative.priority = priority;
       }
-      return feature;
+      return initiative;
     });
-    setFeatures(updatedFeaturesPriority);
+    setInitiatives(updatedInitiativesPriority);
   }
 
   return (
@@ -79,18 +79,18 @@ function Milestone({ milestone, onFeatureChangeMilestone }) {
         </Row>
         <Row>
           <Col>
-            <div hidden={!showFeatures}>
-              <FeaturesList
-                id={`milestone-${milestone.id}-features-context-menu`}
-                features={features}
+            <div hidden={!showInitiatives}>
+              <InitiativesList
+                id={`milestone-${milestone.id}-initiatives-context-menu`}
+                initiatives={initiatives}
                 showAssignedTo={true}
                 headerClassName={"thead"}
-                onAddFeature={async (feature) => {
-                  await handleAddFeatureWithMilestone(feature, milestone.id);
+                onAddInitiative={async (initiative) => {
+                  await handleAddInitiativeWithMilestone(initiative, milestone.id);
                 }}
-                onChangePriority={updateFeaturesPriority}
-                onChangeStatus={updateFeaturesStatus}
-                onChangeMilestone={onFeatureChangeMilestone}
+                onChangePriority={updateInitiativesPriority}
+                onChangeStatus={updateInitiativesStatus}
+                onChangeMilestone={onInitiativeChangeMilestone}
               />
             </div>
           </Col>
