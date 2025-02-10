@@ -6,7 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RoadmapModule } from '../roadmap/roadmap.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { KeyResult } from '../okrs/key-result.entity';
 import { AuthModule } from '../auth/auth.module';
@@ -28,7 +28,7 @@ import { FeatureRequest } from '../feature-requests/feature-request.entity';
     TypeOrmModule.forFeature([
       Org,
       Project,
-      Feature,
+      Initiative,
       User,
       WorkItem,
       KeyResult,

@@ -1,8 +1,8 @@
 import { Milestone } from '../milestone.entity';
 import { MilestoneDto } from '../dtos';
 import { TimelineService } from '../../../common/timeline.service';
-import { Feature } from '../../features/feature.entity';
-import { FeatureDto } from '../../../okrs/dtos';
+import { Initiative } from '../../initiatives/initiative.entity';
+import { InitiativeDto } from '../../../okrs/dtos';
 
 export class PublicMilestoneMapper {
   static async toDto(milestone: Milestone): Promise<MilestoneDto> {
@@ -14,8 +14,8 @@ export class PublicMilestoneMapper {
       timeline: TimelineService.convertDateToTimeline(
         milestone.dueDate,
       ).valueOf(),
-      features: await Promise.all(
-        (await milestone.features).map(FeatureMapper.toDto),
+      initiatives: await Promise.all(
+        (await milestone.initiatives).map(InitiativeMapper.toDto),
       ),
       createdAt: milestone.createdAt,
       updatedAt: milestone.updatedAt,
@@ -27,18 +27,18 @@ export class PublicMilestoneMapper {
   }
 }
 
-class FeatureMapper {
-  static async toDto(feature: Feature): Promise<FeatureDto> {
+class InitiativeMapper {
+  static async toDto(initiative: Initiative): Promise<InitiativeDto> {
     return {
-      id: feature.id,
-      reference: feature.reference,
-      title: feature.title,
-      priority: feature.priority.valueOf(),
-      status: feature.status.valueOf(),
-      progress: feature.progress,
-      workItemsCount: feature.workItemsCount,
-      createdAt: feature.createdAt,
-      updatedAt: feature.updatedAt,
+      id: initiative.id,
+      reference: initiative.reference,
+      title: initiative.title,
+      priority: initiative.priority.valueOf(),
+      status: initiative.status.valueOf(),
+      progress: initiative.progress,
+      workItemsCount: initiative.workItemsCount,
+      createdAt: initiative.createdAt,
+      updatedAt: initiative.updatedAt,
     };
   }
 }

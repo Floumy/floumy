@@ -1,16 +1,16 @@
 import { WorkItem } from './work-item.entity';
 import { SearchWorkItem, SearchWorkItemDto, WorkItemDto } from './dtos';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { Sprint } from '../../sprints/sprint.entity';
 import { User } from '../../users/user.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
 import { GithubBranch } from '../../github/github-branch.entity';
 
 class FeatureMapper {
-  static toDto(feature: Feature) {
+  static toDto(initiative: Initiative) {
     return {
-      id: feature.id,
-      title: feature.title,
+      id: initiative.id,
+      title: initiative.title,
     };
   }
 }
@@ -35,7 +35,7 @@ class UserMapper {
 
 export default class WorkItemMapper {
   static async toDto(workItem: WorkItem): Promise<WorkItemDto> {
-    const feature = await workItem.feature;
+    const initiative = await workItem.initiative;
     const sprint = await workItem.sprint;
     const createdBy = await workItem.createdBy;
     const assignedTo = await workItem.assignedTo;
@@ -55,7 +55,7 @@ export default class WorkItemMapper {
       type: workItem.type,
       status: workItem.status,
       estimation: workItem.estimation,
-      feature: feature ? FeatureMapper.toDto(feature) : undefined,
+      initiative: initiative ? FeatureMapper.toDto(initiative) : undefined,
       sprint: sprint ? SprintMapper.toDto(sprint) : undefined,
       files: await Promise.all(
         (await workItem.workItemFiles).map(async (workItemFile) => {
@@ -87,7 +87,7 @@ export default class WorkItemMapper {
   }
 
   static async toListItemDto(workItem: WorkItem) {
-    const feature = await workItem.feature;
+    const initiative = await workItem.initiative;
     const assignedTo = await workItem.assignedTo;
     return {
       id: workItem.id,
@@ -98,7 +98,7 @@ export default class WorkItemMapper {
       type: workItem.type,
       status: workItem.status,
       estimation: workItem.estimation,
-      feature: feature ? FeatureMapper.toDto(feature) : undefined,
+      initiative: initiative ? FeatureMapper.toDto(initiative) : undefined,
       assignedTo: assignedTo ? UserMapper.toDto(assignedTo) : undefined,
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,

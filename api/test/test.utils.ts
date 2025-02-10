@@ -22,7 +22,7 @@ import { Invoice } from '../src/payments/invoice.entity';
 import { BipService } from '../src/bip/bip.service';
 import { BipSettings } from '../src/bip/bip-settings.entity';
 import { WorkItemComment } from '../src/backlog/work-items/work-item-comment.entity';
-import { FeatureComment } from '../src/roadmap/features/feature-comment.entity';
+import { InitiativeComment } from '../src/roadmap/initiatives/initiative-comment.entity';
 import { KeyResultComment } from '../src/okrs/key-result-comment.entity';
 import { CommentsService } from '../src/okrs/comments/comments.service';
 import { KeyResult } from '../src/okrs/key-result.entity';
@@ -36,7 +36,7 @@ import { IssueComment } from '../src/issues/issue-comment.entity';
 import { Project } from '../src/projects/project.entity';
 import { Milestone } from '../src/roadmap/milestones/milestone.entity';
 import { WorkItem } from '../src/backlog/work-items/work-item.entity';
-import { Feature } from '../src/roadmap/features/feature.entity';
+import { Initiative } from '../src/roadmap/initiatives/initiative.entity';
 import { githubClientMock } from './github-client.mock';
 
 const dataSource = new DataSource(testDbOptions);
@@ -133,7 +133,7 @@ export async function setupTestingModule(
         Invoice,
         BipSettings,
         WorkItemComment,
-        FeatureComment,
+        InitiativeComment,
         KeyResultComment,
         ObjectiveComment,
         KeyResult,
@@ -144,7 +144,7 @@ export async function setupTestingModule(
         Issue,
         IssueComment,
         WorkItem,
-        Feature,
+        Initiative,
         Issue,
         Milestone,
         Project,

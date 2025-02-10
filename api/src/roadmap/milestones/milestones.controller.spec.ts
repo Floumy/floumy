@@ -12,7 +12,7 @@ import { UsersService } from '../../users/users.service';
 import { MilestonesService } from './milestones.service';
 import { Milestone } from './milestone.entity';
 import { Timeline } from '../../common/timeline.enum';
-import { Feature } from '../features/feature.entity';
+import { Initiative } from '../initiatives/initiative.entity';
 import { BacklogModule } from '../../backlog/backlog.module';
 import { FilesModule } from '../../files/files.module';
 import { Project } from '../../projects/project.entity';
@@ -31,7 +31,7 @@ describe('MilestonesController', () => {
           Objective,
           KeyResult,
           Milestone,
-          Feature,
+          Initiative,
         ]),
         UsersModule,
         BacklogModule,
@@ -112,7 +112,7 @@ describe('MilestonesController', () => {
     });
   });
 
-  describe('when listing milestones with features', () => {
+  describe('when listing milestones with initiatives', () => {
     it('should return the milestones', async () => {
       await controller.create(
         org.id,

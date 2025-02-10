@@ -6,18 +6,18 @@ import { setupTestingModule } from '../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../../okrs/objective.entity';
 import { KeyResult } from '../../okrs/key-result.entity';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { Milestone } from '../../roadmap/milestones/milestone.entity';
 import { Sprint } from '../sprint.entity';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
-import { FeatureFile } from '../../roadmap/features/feature-file.entity';
+import { InitiativeFile } from '../../roadmap/initiatives/initiative-file.entity';
 import { UsersModule } from '../../users/users.module';
 import { OkrsService } from '../../okrs/okrs.service';
 import { OrgsService } from '../../orgs/orgs.service';
 import { TokensService } from '../../auth/tokens.service';
-import { FeaturesService } from '../../roadmap/features/features.service';
+import { InitiativesService } from '../../roadmap/initiatives/initiatives.service';
 import { MilestonesService } from '../../roadmap/milestones/milestones.service';
 import { SprintsService } from '../sprints.service';
 import { FilesService } from '../../files/files.service';
@@ -46,13 +46,13 @@ describe('PublicController', () => {
           Org,
           Objective,
           KeyResult,
-          Feature,
+          Initiative,
           WorkItem,
           Milestone,
           Sprint,
           File,
           WorkItemFile,
-          FeatureFile,
+          InitiativeFile,
           BipSettings,
           Project,
         ]),
@@ -62,7 +62,7 @@ describe('PublicController', () => {
         OkrsService,
         OrgsService,
         TokensService,
-        FeaturesService,
+        InitiativesService,
         MilestonesService,
         WorkItemsService,
         SprintsService,
