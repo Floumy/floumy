@@ -17,7 +17,7 @@ import { CommentMapper } from '../comments/mappers';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 import { FeatureRequestComment } from './feature-request-comment.entity';
 import { Project } from '../projects/project.entity';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { CreateNotificationDto } from '../notifications/dtos';
 import {
   ActionType,
@@ -41,8 +41,8 @@ export class FeatureRequestsService {
     private featureRequestCommentsRepository: Repository<FeatureRequestComment>,
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
-    @InjectRepository(Feature)
-    private featuresRepository: Repository<Feature>,
+    @InjectRepository(Initiative)
+    private featuresRepository: Repository<Initiative>,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -197,8 +197,8 @@ export class FeatureRequestsService {
       throw new Error('You are not allowed to delete this feature request');
     }
 
-    // Remove the feature request from the features
-    const features = await featureRequest.features;
+    // Remove the feature request from the initiatives
+    const features = await featureRequest.initiatives;
     for (const feature of features) {
       feature.featureRequest = null;
       await this.featuresRepository.save(feature);

@@ -124,9 +124,9 @@ function DetailOKRStats({ okr }) {
 
       if (okr.keyResults) {
         const workItems = okr.keyResults
-          .filter(keyResult => keyResult.features)
-          .flatMap(keyResult => keyResult.features)
-          .flatMap(feature => feature.workItems);
+          .filter(keyResult => keyResult.initiatives)
+          .flatMap(keyResult => keyResult.initiatives)
+          .flatMap(initiative => initiative.workItems);
         setWorkItems(workItems);
 
         const totalEstimation = getTotalEstimation(workItems);

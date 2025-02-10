@@ -16,7 +16,7 @@ import {
 } from "reactstrap";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { featureStatusColorClassName, formatHyphenatedString } from "../../../services/utils/utils";
+import { initiativeStatusColorClassName, formatHyphenatedString } from "../../../services/utils/utils";
 import {
   downvoteFeatureRequest,
   listCurrentUserFeatureRequestVotes,
@@ -246,7 +246,7 @@ export default function FeatureRequests({ isPublic = false }) {
                         </td>
                         <td>
                           <Badge color="" className="badge-dot mr-4">
-                            <i className={featureStatusColorClassName(featureRequest.status)} />
+                            <i className={initiativeStatusColorClassName(featureRequest.status)} />
                             <span className="status">{formatHyphenatedString(featureRequest.status)}</span>
                           </Badge>
                         </td>

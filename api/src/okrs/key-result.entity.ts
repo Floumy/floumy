@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Objective } from './objective.entity';
 import { Org } from '../orgs/org.entity';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { OKRStatus } from './okrstatus.enum';
 import { KeyResultComment } from './key-result-comment.entity';
 import { Project } from '../projects/project.entity';
@@ -44,8 +44,8 @@ export class KeyResult {
     lazy: true,
   })
   objective: Promise<Objective>;
-  @OneToMany(() => Feature, (feature) => feature.keyResult, { lazy: true })
-  features: Promise<Feature[]>;
+  @OneToMany(() => Initiative, (feature) => feature.keyResult, { lazy: true })
+  initiatives: Promise<Initiative[]>;
   @OneToMany(
     () => KeyResultComment,
     (keyResultComment) => keyResultComment.keyResult,

@@ -11,8 +11,8 @@ import {
   Notification,
   StatusType,
 } from './notification.entity';
-import { FeatureComment } from '../roadmap/features/feature-comment.entity';
-import { Feature } from '../roadmap/features/feature.entity';
+import { InitiativeComment } from '../roadmap/initiatives/initiative-comment.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { WorkItemComment } from '../backlog/work-items/work-item-comment.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { FeatureRequestComment } from '../feature-requests/feature-request-comment.entity';
@@ -41,8 +41,8 @@ describe('NotificationController', () => {
         TypeOrmModule.forFeature([
           Notification,
           User,
-          FeatureComment,
-          Feature,
+          InitiativeComment,
+          Initiative,
           WorkItemComment,
           WorkItem,
           FeatureRequestComment,

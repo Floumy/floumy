@@ -31,7 +31,7 @@ export class SprintMapper {
 
 class WorkItemMapper {
   static async toDto(workItem: WorkItem) {
-    const feature = await workItem.feature;
+    const initiative = await workItem.initiative;
     const sprint = await workItem.sprint;
     return {
       id: workItem.id,
@@ -48,10 +48,10 @@ class WorkItemMapper {
             title: sprint.title,
           }
         : null,
-      feature: feature
+      initiative: initiative
         ? {
-            id: feature.id,
-            title: feature.title,
+            id: initiative.id,
+            title: initiative.title,
           }
         : null,
       completedAt: workItem.completedAt,

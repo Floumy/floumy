@@ -23,8 +23,8 @@ export default function PrivateFeed() {
       return `/admin/orgs/${orgId}/projects/${projectId}/okrs/${item.content.objective.id}/kr/detail/${item.entityId}`;
     }
 
-    if (item.entity === "feature") {
-      return `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${item.entityId}`;
+    if (item.entity === "initiative") {
+      return `/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${item.entityId}`;
     }
   }
 

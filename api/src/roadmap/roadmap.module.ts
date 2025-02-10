@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { FeaturesController } from './features/features.controller';
-import { FeaturesService } from './features/features.service';
+import { InitiativesController } from './initiatives/initiatives.controller';
+import { InitiativesService } from './initiatives/initiatives.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrgsModule } from '../orgs/orgs.module';
-import { Feature } from './features/feature.entity';
+import { Initiative } from './initiatives/initiative.entity';
 import { OkrsModule } from '../okrs/okrs.module';
 import { OrgsService } from '../orgs/orgs.service';
 import { Org } from '../orgs/org.entity';
@@ -15,16 +15,16 @@ import { MilestonesService } from './milestones/milestones.service';
 import { Milestone } from './milestones/milestone.entity';
 import { BacklogModule } from '../backlog/backlog.module';
 import { File } from '../files/file.entity';
-import { FeatureFile } from './features/feature-file.entity';
+import { InitiativeFile } from './initiatives/initiative-file.entity';
 import { User } from '../users/user.entity';
 import { FilesModule } from '../files/files.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PublicController as MilestonesPublicController } from './milestones/public/public.controller';
 import { PublicService as MilestonesPublicService } from './milestones/public/public.service';
-import { PublicController as FeaturesPublicController } from './features/public/public.controller';
-import { PublicService as FeaturesPublicService } from './features/public/public.service';
+import { PublicController as FeaturesPublicController } from './initiatives/public/public.controller';
+import { PublicService as FeaturesPublicService } from './initiatives/public/public.service';
 import { StripeModule } from '../stripe/stripe.module';
-import { FeatureComment } from './features/feature-comment.entity';
+import { InitiativeComment } from './initiatives/initiative-comment.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Project } from '../projects/project.entity';
 import { NotificationListener } from '../notifications/notification.listener';
@@ -34,16 +34,16 @@ import { Notification } from '../notifications/notification.entity';
   imports: [
     CacheModule.register(),
     TypeOrmModule.forFeature([
-      Feature,
+      Initiative,
       Org,
       KeyResult,
       Objective,
       Milestone,
       File,
-      FeatureFile,
+      InitiativeFile,
       User,
-      Feature,
-      FeatureComment,
+      Initiative,
+      InitiativeComment,
       FeatureRequest,
       Project,
       Notification,
@@ -56,13 +56,13 @@ import { Notification } from '../notifications/notification.entity';
     StripeModule,
   ],
   controllers: [
-    FeaturesController,
+    InitiativesController,
     MilestonesController,
     FeaturesPublicController,
     MilestonesPublicController,
   ],
   providers: [
-    FeaturesService,
+    InitiativesService,
     OrgsService,
     OkrsModule,
     MilestonesService,
@@ -70,6 +70,6 @@ import { Notification } from '../notifications/notification.entity';
     MilestonesPublicService,
     NotificationListener,
   ],
-  exports: [FeaturesService],
+  exports: [InitiativesService],
 })
 export class RoadmapModule {}

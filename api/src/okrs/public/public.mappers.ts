@@ -2,7 +2,7 @@ import { ObjectiveDto } from './dtos';
 import { Objective } from '../objective.entity';
 import { TimelineService } from '../../common/timeline.service';
 import { KeyResult } from '../key-result.entity';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { CommentMapper } from '../../comments/mappers';
 
@@ -50,7 +50,7 @@ export class PublicOkrMapper {
   }
 
   static async toKeyResultDto(keyResult: KeyResult) {
-    const features = (await keyResult.features) || [];
+    const initiatives = (await keyResult.initiatives) || [];
     const comments = await keyResult.comments;
 
     return {
@@ -61,22 +61,24 @@ export class PublicOkrMapper {
       status: keyResult.status,
       createdAt: keyResult.createdAt,
       updatedAt: keyResult.updatedAt,
-      features: await Promise.all(features.map(PublicOkrMapper.toFeatureDto)),
+      initiatives: await Promise.all(
+        initiatives.map(PublicOkrMapper.toFeatureDto),
+      ),
       comments: await CommentMapper.toDtoList(comments),
     };
   }
 
-  static async toFeatureDto(feature: Feature) {
-    const workItems = (await feature.workItems) || [];
+  static async toFeatureDto(initiative: Initiative) {
+    const workItems = (await initiative.workItems) || [];
     return {
-      id: feature.id,
-      reference: feature.reference,
-      title: feature.title,
-      status: feature.status,
-      priority: feature.priority,
-      progress: parseFloat(feature.progress.toFixed(2)),
-      createdAt: feature.createdAt,
-      updatedAt: feature.updatedAt,
+      id: initiative.id,
+      reference: initiative.reference,
+      title: initiative.title,
+      status: initiative.status,
+      priority: initiative.priority,
+      progress: parseFloat(initiative.progress.toFixed(2)),
+      createdAt: initiative.createdAt,
+      updatedAt: initiative.updatedAt,
       workItems: workItems.map(PublicOkrMapper.toWorkItemDto),
     };
   }
