@@ -193,7 +193,7 @@ function ActiveSprint() {
                         </Col>
                       </Row>
                       <WorkItemsList workItems={workItemsByStatus[status]}
-                                     showFeature={true}
+                                     showInitiative={true}
                                      showAssignedTo={true}
                                      onChangeSprint={handleChangeSprint}
                                      onChangeStatus={updateWorkItemsStatus}

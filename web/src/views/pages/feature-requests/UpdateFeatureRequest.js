@@ -8,8 +8,8 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import InputError from "../../../components/Errors/InputError";
 import Select2 from "react-select2-wrapper";
-import FeaturesList from "../features/FeaturesList";
-import { addFeature } from "../../../services/roadmap/roadmap.service";
+import InitiativesList from "../initiatives/InitiativesList";
+import { addInitiative } from "../../../services/roadmap/roadmap.service";
 import AIButton from '../../../components/AI/AIButton';
 import { generateInitiativesForFeatureRequest } from '../../../services/ai/ai.service';
 
@@ -20,7 +20,7 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
   const [status, setStatus] = useState(featureRequest.status);
-  const [features, setFeatures] = useState(featureRequest.features);
+  const [initiatives, setInitiatives] = useState(featureRequest.initiatives);
 
   const navigate = useNavigate();
 
@@ -72,23 +72,23 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
       .typeError("The estimation must be a number")
   });
 
-  async function handleAddFeature(featureRequestId, feature) {
-    feature.featureRequest = featureRequestId;
-    const savedFeature = await addFeature(orgId, projectId, feature);
-    features.push(savedFeature);
-    features.sort(sortFeatures);
-    setFeatures([...features]);
+  async function handleAddFeature(featureRequestId, initiative) {
+    initiative.featureRequest = featureRequestId;
+    const savedFeature = await addInitiative(orgId, projectId, initiative);
+    initiatives.push(savedFeature);
+    initiatives.sort(sortFeatures);
+    setInitiatives([...initiatives]);
   }
 
   function updateFeaturesStatus(updatedFeatures, status) {
-    const updatedFeaturesIds = updatedFeatures.map(feature => feature.id);
-    const featureRequestFeatures = features.map(feature => {
-      if (updatedFeaturesIds.includes(feature.id)) {
-        feature.status = status;
+    const updatedFeaturesIds = updatedFeatures.map(initiative => initiative.id);
+    const featureRequestFeatures = initiatives.map(initiative => {
+      if (updatedFeaturesIds.includes(initiative.id)) {
+        initiative.status = status;
       }
-      return feature;
+      return initiative;
     });
-    setFeatures([...featureRequestFeatures]);
+    setInitiatives([...featureRequestFeatures]);
   }
 
   function sortFeatures(a, b) {
@@ -97,18 +97,18 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
   }
 
   function updateFeaturesPriority(updatedFeatures, priority) {
-    const updatedFeaturesIds = updatedFeatures.map(feature => feature.id);
-    const featureRequestFeatures = features.map(feature => {
-      if (updatedFeaturesIds.includes(feature.id)) {
-        feature.priority = priority;
+    const updatedFeaturesIds = updatedFeatures.map(initiative => initiative.id);
+    const featureRequestFeatures = initiatives.map(initiative => {
+      if (updatedFeaturesIds.includes(initiative.id)) {
+        initiative.priority = priority;
       }
-      return feature;
+      return initiative;
     }).sort(sortFeatures);
-    setFeatures([...featureRequestFeatures]);
+    setInitiatives([...featureRequestFeatures]);
   }
 
   function isPlaceholderInitiativeOnly() {
-    return featureRequest && (!features || features.length === 1 || !features[0]?.title);
+    return featureRequest && (!initiatives || initiatives.length === 1 || !initiatives[0]?.title);
   }
 
   const addInitiativesWithAi = async () => {
@@ -120,9 +120,9 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
       const savedInitiatives = [];
       for (const initiative of initiativesToAdd) {
         initiative.featureRequest = featureRequest.id;
-        savedInitiatives.push(await addFeature(orgId, projectId, initiative));
+        savedInitiatives.push(await addInitiative(orgId, projectId, initiative));
       }
-      setFeatures([...savedInitiatives]);
+      setInitiatives([...savedInitiatives]);
       toast.success('The initiatives have been added');
     } catch (e) {
       toast.error('The initiatives could not be saved');
@@ -275,7 +275,7 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
           </Formik>
         </CardBody>
       </Card>
-      {!isLoading && featureRequest && features && <>
+      {!isLoading && featureRequest && initiatives && <>
         <Card>
           <CardHeader className="border-1">
             <div className="row">
@@ -288,10 +288,10 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
               </div>
             </div>
           </CardHeader>
-          <FeaturesList
-            features={features}
-            onAddFeature={async (feature) => {
-              await handleAddFeature(featureRequest.id, feature);
+          <InitiativesList
+            initiatives={initiatives}
+            onAddInitiative={async (initiative) => {
+              await handleAddFeature(featureRequest.id, initiative);
             }}
             onChangeStatus={updateFeaturesStatus}
             onChangePriority={updateFeaturesPriority}

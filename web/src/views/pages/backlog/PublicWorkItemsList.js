@@ -12,7 +12,7 @@ import "react-contexify/ReactContexify.css";
 function PublicWorkItemsList({
                                orgId,
                                workItems,
-                               showFeature = true,
+                               showInitiative = true,
                                headerClassName = "thead-light"
                              }) {
   const { projectId } = useParams();
@@ -23,7 +23,7 @@ function PublicWorkItemsList({
         <tr>
           <th scope="col" width={"5%"}>Reference</th>
           <th scope="col" width={"40%"}>Work Item</th>
-          {showFeature && <th scope="col" width={"20%"}>Initiative</th>}
+          {showInitiative && <th scope="col" width={"20%"}>Initiative</th>}
           <th scope="col" width={"5%"}>Est.</th>
           <th scope="col" width={"10%"}>Status</th>
           <th scope="col" width={"5%"}>Priority</th>
@@ -31,7 +31,7 @@ function PublicWorkItemsList({
         </thead>
         <tbody className="list">
         {workItems.length === 0 && (<tr>
-          <td colSpan={showFeature ? 7 : 6} className="text-center">
+          <td colSpan={showInitiative ? 7 : 6} className="text-center">
             No work items found.
           </td>
         </tr>)}
@@ -48,13 +48,13 @@ function PublicWorkItemsList({
               {workItem.title}
             </Link>
           </td>
-          {showFeature && <td className="title-cell">
-            {workItem.feature && (
-              <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${workItem.feature.id}`}
+          {showInitiative && <td className="title-cell">
+            {workItem.initiative && (
+              <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${workItem.initiative.id}`}
                     className="text-gray">
-                {workItem.feature.title}
+                {workItem.initiative.title}
               </Link>)}
-            {!workItem.feature && "-"}
+            {!workItem.initiative && "-"}
           </td>}
           <td>
             {workItem.estimation && workItem.estimation > 0 ? workItem.estimation : "-"}

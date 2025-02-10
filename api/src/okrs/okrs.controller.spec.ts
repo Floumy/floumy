@@ -8,7 +8,7 @@ import { Org } from '../orgs/org.entity';
 import { TokensService } from '../auth/tokens.service';
 import { KeyResult } from './key-result.entity';
 import { NotFoundException } from '@nestjs/common';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Timeline } from '../common/timeline.enum';
 import { Repository } from 'typeorm';
 import { PaymentPlan } from '../auth/payment.plan';
@@ -29,7 +29,7 @@ describe('OkrsController', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Initiative])],
       [OkrsService, OrgsService, TokensService, UsersService],
       [OkrsController],
     );

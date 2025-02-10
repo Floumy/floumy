@@ -19,7 +19,7 @@ import { toast } from "react-toastify";
 
 function WorkItemsList({
                          workItems,
-                         showFeature = true,
+                         showInitiative = true,
                          showAssignedTo = false,
                          headerClassName = "thead-light",
                          onAddNewWorkItem,
@@ -77,7 +77,7 @@ function WorkItemsList({
         description: "",
         priority: priority,
         type: type,
-        feature: null,
+        initiative: null,
         sprint: null,
         estimation: values.estimation ? values.estimation : null,
         status: "planned"
@@ -147,7 +147,7 @@ function WorkItemsList({
         <tr>
           <th scope="col" width={"5%"}>Reference</th>
           <th scope="col" width={"40%"}>Work Item</th>
-          {showFeature && <th scope="col" width={"30%"}>Initiative</th>}
+          {showInitiative && <th scope="col" width={"30%"}>Initiative</th>}
           {showAssignedTo && <th scope="col" width={"5%"}>Assigned To</th>}
           <th scope="col" width={"5%"}>Est.</th>
           <th scope="col" width={"10%"}>Status</th>
@@ -156,7 +156,7 @@ function WorkItemsList({
         </thead>
         <tbody className="list">
         {workItems.length === 0 && (<tr>
-          <td colSpan={showFeature ? 7 : 6} className="text-center">
+          <td colSpan={showInitiative ? 7 : 6} className="text-center">
             No work items found.
           </td>
         </tr>)}
@@ -179,13 +179,13 @@ function WorkItemsList({
               {workItem.title}
             </Link>
           </td>
-          {showFeature && <td className="title-cell">
-            {workItem.feature && (
-              <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${workItem.feature.id}`}
+          {showInitiative && <td className="title-cell">
+            {workItem.initiative && (
+              <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${workItem.initiative.id}`}
                     className="text-gray">
-                {workItem.feature.title}
+                {workItem.initiative.title}
               </Link>)}
-            {!workItem.feature && "-"}
+            {!workItem.initiative && "-"}
           </td>}
           {showAssignedTo && <td>
             {workItem.assignedTo && workItem.assignedTo.name &&
@@ -217,7 +217,7 @@ function WorkItemsList({
           </td>
         </tr>))}
         {onAddNewWorkItem && <tr>
-          <td colSpan={showFeature ? 7 : 6}>
+          <td colSpan={showInitiative ? 7 : 6}>
             <Formik
               initialValues={{ title: "", estimation: "" }}
               validationSchema={validationSchema}

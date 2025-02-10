@@ -2,11 +2,11 @@ import { WorkItemsController } from './work-items.controller';
 import { Org } from '../../orgs/org.entity';
 import { setupTestingModule } from '../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { UsersModule } from '../../users/users.module';
 import { OrgsService } from '../../orgs/orgs.service';
 import { TokensService } from '../../auth/tokens.service';
-import { FeaturesService } from '../../roadmap/features/features.service';
+import { InitiativesService } from '../../roadmap/initiatives/initiatives.service';
 import { UsersService } from '../../users/users.service';
 import { WorkItem } from './work-item.entity';
 import { Priority } from '../../common/priority.enum';
@@ -18,13 +18,13 @@ import { Milestone } from '../../roadmap/milestones/milestone.entity';
 import { MilestonesService } from '../../roadmap/milestones/milestones.service';
 import { WorkItemsService } from './work-items.service';
 import { WorkItemStatus } from './work-item-status.enum';
-import { FeatureStatus } from '../../roadmap/features/featurestatus.enum';
+import { InitiativeStatus } from '../../roadmap/initiatives/initiativestatus.enum';
 import { Sprint } from '../../sprints/sprint.entity';
 import { SprintsService } from '../../sprints/sprints.service';
 import { File } from '../../files/file.entity';
 import { Repository } from 'typeorm';
 import { WorkItemFile } from './work-item-file.entity';
-import { FeatureFile } from '../../roadmap/features/feature-file.entity';
+import { InitiativeFile } from '../../roadmap/initiatives/initiative-file.entity';
 import { User } from '../../users/user.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
@@ -38,7 +38,7 @@ describe('WorkItemsController', () => {
   let project: Project;
   let controller: WorkItemsController;
   let cleanup: () => Promise<void>;
-  let featureService: FeaturesService;
+  let featureService: InitiativesService;
   let sprintsService: SprintsService;
   let fileRepository: Repository<File>;
   let orgsRepository: Repository<Org>;
@@ -52,12 +52,12 @@ describe('WorkItemsController', () => {
           Org,
           Objective,
           KeyResult,
-          Feature,
+          Initiative,
           WorkItem,
           Milestone,
           Sprint,
           File,
-          FeatureFile,
+          InitiativeFile,
           WorkItemFile,
         ]),
         UsersModule,
@@ -66,7 +66,7 @@ describe('WorkItemsController', () => {
         OkrsService,
         OrgsService,
         TokensService,
-        FeaturesService,
+        InitiativesService,
         MilestonesService,
         WorkItemsService,
         SprintsService,
@@ -86,7 +86,7 @@ describe('WorkItemsController', () => {
     );
     org = await orgsService.createForUser(user);
     project = (await org.projects)[0];
-    featureService = module.get<FeaturesService>(FeaturesService);
+    featureService = module.get<InitiativesService>(InitiativesService);
     sprintsService = module.get<SprintsService>(SprintsService);
     fileRepository = module.get<Repository<File>>(getRepositoryToken(File));
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
@@ -123,7 +123,7 @@ describe('WorkItemsController', () => {
 
   describe('when creating a work item', () => {
     it('should return the created work item', async () => {
-      const feature = await featureService.createFeature(
+      const feature = await featureService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -131,7 +131,7 @@ describe('WorkItemsController', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItemResponse = await controller.create(
@@ -148,7 +148,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -161,9 +161,9 @@ describe('WorkItemsController', () => {
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
-      expect(workItemResponse.feature).toBeDefined();
-      expect(workItemResponse.feature.id).toEqual(feature.id);
-      expect(workItemResponse.feature.title).toEqual(feature.title);
+      expect(workItemResponse.initiative).toBeDefined();
+      expect(workItemResponse.initiative.id).toEqual(feature.id);
+      expect(workItemResponse.initiative.title).toEqual(feature.title);
     });
     it('should create a work item with files', async () => {
       const file1Entity = new File();
@@ -226,7 +226,7 @@ describe('WorkItemsController', () => {
   });
   describe('when listing work items', () => {
     it('should return the list of work items', async () => {
-      const feature = await featureService.createFeature(
+      const feature = await featureService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -234,7 +234,7 @@ describe('WorkItemsController', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await controller.create(
@@ -251,7 +251,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -274,7 +274,7 @@ describe('WorkItemsController', () => {
   });
   describe('when getting a work item', () => {
     it('should return the work item', async () => {
-      const feature = await featureService.createFeature(
+      const feature = await featureService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -282,7 +282,7 @@ describe('WorkItemsController', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await controller.create(
@@ -299,7 +299,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -322,14 +322,14 @@ describe('WorkItemsController', () => {
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
-      expect(workItemResponse.feature).toBeDefined();
-      expect(workItemResponse.feature.id).toEqual(feature.id);
-      expect(workItemResponse.feature.title).toEqual(feature.title);
+      expect(workItemResponse.initiative).toBeDefined();
+      expect(workItemResponse.initiative.id).toEqual(feature.id);
+      expect(workItemResponse.initiative.title).toEqual(feature.title);
     });
   });
   describe('when updating a work item', () => {
     it('should return the updated work item', async () => {
-      const feature = await featureService.createFeature(
+      const feature = await featureService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -337,7 +337,7 @@ describe('WorkItemsController', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await controller.create(
@@ -354,7 +354,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -373,7 +373,7 @@ describe('WorkItemsController', () => {
           mentions: [user.id],
           priority: Priority.LOW,
           type: WorkItemType.BUG,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -388,9 +388,9 @@ describe('WorkItemsController', () => {
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
-      expect(workItemResponse.feature).toBeDefined();
-      expect(workItemResponse.feature.id).toEqual(feature.id);
-      expect(workItemResponse.feature.title).toEqual(feature.title);
+      expect(workItemResponse.initiative).toBeDefined();
+      expect(workItemResponse.initiative.id).toEqual(feature.id);
+      expect(workItemResponse.initiative.title).toEqual(feature.title);
     });
     it('should update the work item with files', async () => {
       const file1Entity = new File();
@@ -411,7 +411,7 @@ describe('WorkItemsController', () => {
       file2Entity.project = Promise.resolve(project);
       const file1 = await fileRepository.save(file1Entity);
       const file2 = await fileRepository.save(file2Entity);
-      const feature = await featureService.createFeature(
+      const feature = await featureService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -419,7 +419,7 @@ describe('WorkItemsController', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await controller.create(
@@ -436,7 +436,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -482,7 +482,7 @@ describe('WorkItemsController', () => {
   });
   describe('when deleting a work item', () => {
     it('should delete the work item', async () => {
-      const feature = await featureService.createFeature(
+      const feature = await featureService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -490,7 +490,7 @@ describe('WorkItemsController', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       const workItem = await controller.create(
@@ -507,7 +507,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -532,7 +532,7 @@ describe('WorkItemsController', () => {
   });
   describe('when getting open work items', () => {
     it('should return the open work items', async () => {
-      const feature = await featureService.createFeature(
+      const feature = await featureService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -540,7 +540,7 @@ describe('WorkItemsController', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await controller.create(
@@ -557,7 +557,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -659,7 +659,7 @@ describe('WorkItemsController', () => {
   });
   describe('when searching work items', () => {
     it('should return the work items', async () => {
-      const feature = await featureService.createFeature(
+      const feature = await featureService.createInitiative(
         org.id,
         project.id,
         user.id,
@@ -667,7 +667,7 @@ describe('WorkItemsController', () => {
           title: 'my feature',
           description: 'my feature description',
           priority: Priority.HIGH,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await controller.create(
@@ -684,7 +684,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description',
           priority: Priority.HIGH,
           type: WorkItemType.TECHNICAL_DEBT,
-          feature: feature.id,
+          initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );

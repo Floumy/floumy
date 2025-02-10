@@ -58,7 +58,7 @@ export class MilestonesController {
       throw new UnauthorizedException();
     }
 
-    return await this.milestonesService.listMilestonesWithFeatures(
+    return await this.milestonesService.listMilestonesWithInitiatives(
       orgId,
       projectId,
     );

@@ -3,7 +3,7 @@ import { OpenaiService } from './openai/openai.service';
 import { InitiativeType, KeyResultType, WorkItemType } from './types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Issue } from '../issues/issue.entity';
 import { KeyResult } from '../okrs/key-result.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
@@ -13,8 +13,8 @@ import { FeatureRequest } from '../feature-requests/feature-request.entity';
 export class AiService {
   constructor(
     private openaiService: OpenaiService,
-    @InjectRepository(Feature)
-    private featureRepository: Repository<Feature>,
+    @InjectRepository(Initiative)
+    private featureRepository: Repository<Initiative>,
     @InjectRepository(Issue)
     private issueRepository: Repository<Issue>,
     @InjectRepository(KeyResult)

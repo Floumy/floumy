@@ -11,7 +11,7 @@ import { FeatureRequestVoteService } from './feature-request-votes.service';
 import { FeatureRequestVote } from './feature-request-vote.entity';
 import { FeatureRequestComment } from './feature-request-comment.entity';
 import { Project } from '../projects/project.entity';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { Feature } from '../roadmap/features/feature.entity';
       FeatureRequest,
       FeatureRequestVote,
       FeatureRequestComment,
-      Feature,
+      Initiative,
       Project,
     ]),
     OrgsModule,

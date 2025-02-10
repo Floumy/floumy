@@ -1,7 +1,7 @@
 import { PublicController } from './public.controller';
 import { Org } from '../../../orgs/org.entity';
 import { User } from '../../../users/user.entity';
-import { FeaturesService } from '../../../roadmap/features/features.service';
+import { InitiativesService } from '../../../roadmap/initiatives/initiatives.service';
 import { SprintsService } from '../../../sprints/sprints.service';
 import { Repository } from 'typeorm';
 import { File } from '../../../files/file.entity';
@@ -9,11 +9,11 @@ import { setupTestingModule } from '../../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../../../okrs/objective.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
-import { Feature } from '../../../roadmap/features/feature.entity';
+import { Initiative } from '../../../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../work-item.entity';
 import { Milestone } from '../../../roadmap/milestones/milestone.entity';
 import { Sprint } from '../../../sprints/sprint.entity';
-import { FeatureFile } from '../../../roadmap/features/feature-file.entity';
+import { InitiativeFile } from '../../../roadmap/initiatives/initiative-file.entity';
 import { WorkItemFile } from '../work-item-file.entity';
 import { UsersModule } from '../../../users/users.module';
 import { OkrsService } from '../../../okrs/okrs.service';
@@ -46,12 +46,12 @@ describe('PublicController', () => {
           Org,
           Objective,
           KeyResult,
-          Feature,
+          Initiative,
           WorkItem,
           Milestone,
           Sprint,
           File,
-          FeatureFile,
+          InitiativeFile,
           WorkItemFile,
           BipSettings,
           Project,
@@ -62,7 +62,7 @@ describe('PublicController', () => {
         OkrsService,
         OrgsService,
         TokensService,
-        FeaturesService,
+        InitiativesService,
         MilestonesService,
         WorkItemsService,
         SprintsService,

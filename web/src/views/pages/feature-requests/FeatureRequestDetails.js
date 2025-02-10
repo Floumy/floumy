@@ -13,7 +13,7 @@ import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import Comments from "../../../components/Comments/Comments";
 import { toast } from "react-toastify";
-import PublicFeaturesList from "../features/PublicFeaturesList";
+import PublicInitiativesList from "../initiatives/PublicInitiativesList";
 
 export default function FeatureRequestDetails() {
   const { orgId, projectId, featureRequestId } = useParams();
@@ -93,16 +93,16 @@ export default function FeatureRequestDetails() {
           </div>
         </Col>
       </Row>
-      {featureRequest?.features && <Row>
+      {featureRequest?.initiatives && <Row>
         <Col>
           <Card>
             <CardHeader>
               <h3 className="mb-0">Related Initiatives</h3>
             </CardHeader>
-            <PublicFeaturesList
+            <PublicInitiativesList
               orgId={orgId}
               projectId={projectId}
-              features={featureRequest?.features}
+              initiatives={featureRequest?.initiatives}
               headerClassName={"thead"}
             />
           </Card>

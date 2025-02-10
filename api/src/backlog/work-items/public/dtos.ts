@@ -7,7 +7,7 @@ export interface WorkItemDto {
   type: string;
   status: string;
   estimation: number;
-  feature: {
+  initiative: {
     id: string;
     title: string;
   };

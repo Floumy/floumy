@@ -42,10 +42,10 @@ function Admin() {
   useNavigationHotKey('4', `/admin/orgs/${orgId}/projects/${projectId}/sprints`);
   useNavigationHotKey('5', `/admin/orgs/${orgId}/projects/${projectId}/active-sprint`);
   useNavigationHotKey('6', `/admin/orgs/${orgId}/projects/${projectId}/work-items`);
-  useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/features`);
+  useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/initiatives`);
   useNavigationHotKey('8', `/admin/orgs/${orgId}/projects/${projectId}/code`);
   useNavigationHotKey('w', `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`, isNavigationReplace());
-  useNavigationHotKey('i', `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/new`, isNavigationReplace());
+  useNavigationHotKey('i', `/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`, isNavigationReplace());
   useNavigationHotKey('m', `/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`, isNavigationReplace());
   useNavigationHotKey('s', `/admin/orgs/${orgId}/projects/${projectId}/sprints/new`, isNavigationReplace());
   useNavigationHotKey('o', `/admin/orgs/${orgId}/projects/${projectId}/okrs/new`, isNavigationReplace());
