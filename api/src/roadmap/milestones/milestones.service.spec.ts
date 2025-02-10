@@ -8,14 +8,14 @@ import { Objective } from '../../okrs/objective.entity';
 import { KeyResult } from '../../okrs/key-result.entity';
 import { User } from '../../users/user.entity';
 import { Milestone } from './milestone.entity';
-import { FeaturesService } from '../features/features.service';
-import { Feature } from '../features/feature.entity';
+import { InitiativesService } from '../initiatives/initiatives.service';
+import { Initiative } from '../initiatives/initiative.entity';
 import { Priority } from '../../common/priority.enum';
 import { OkrsService } from '../../okrs/okrs.service';
 import { BacklogModule } from '../../backlog/backlog.module';
-import { FeatureStatus } from '../features/featurestatus.enum';
+import { InitiativeStatus } from '../initiatives/initiativestatus.enum';
 import { File } from '../../files/file.entity';
-import { FeatureFile } from '../features/feature-file.entity';
+import { InitiativeFile } from '../initiatives/initiative-file.entity';
 import { FilesModule } from '../../files/files.module';
 import { Timeline } from '../../common/timeline.enum';
 import { TimelineService } from '../../common/timeline.service';
@@ -25,7 +25,7 @@ describe('MilestonesService', () => {
   let usersService: UsersService;
   let service: MilestonesService;
   let orgsService: OrgsService;
-  let featuresService: FeaturesService;
+  let initiativesService: InitiativesService;
   let user: User;
   let org: Org;
   let project: Project;
@@ -40,12 +40,12 @@ describe('MilestonesService', () => {
           Org,
           KeyResult,
           Milestone,
-          Feature,
+          Initiative,
           User,
           Objective,
           KeyResult,
           File,
-          FeatureFile,
+          InitiativeFile,
         ]),
         BacklogModule,
         FilesModule,
@@ -54,7 +54,7 @@ describe('MilestonesService', () => {
         OrgsService,
         MilestonesService,
         UsersService,
-        FeaturesService,
+        InitiativesService,
         OkrsService,
       ],
     );
@@ -62,7 +62,7 @@ describe('MilestonesService', () => {
     service = module.get<MilestonesService>(MilestonesService);
     usersService = module.get<UsersService>(UsersService);
     orgsService = module.get<OrgsService>(OrgsService);
-    featuresService = module.get<FeaturesService>(FeaturesService);
+    initiativesService = module.get<InitiativesService>(InitiativesService);
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -134,14 +134,14 @@ describe('MilestonesService', () => {
       expect(milestones[0].dueDate).toEqual('2020-01-01');
     });
   });
-  describe('when listing milestones with features', () => {
+  describe('when listing milestones with initiatives', () => {
     it('should return the milestones', async () => {
       await service.createMilestone(org.id, project.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      const milestones = await service.listMilestonesWithFeatures(
+      const milestones = await service.listMilestonesWithInitiatives(
         org.id,
         project.id,
       );
@@ -149,10 +149,10 @@ describe('MilestonesService', () => {
       expect(milestones[0].id).toBeDefined();
       expect(milestones[0].title).toEqual('my milestone');
       expect(milestones[0].dueDate).toEqual('2020-01-01');
-      expect(milestones[0].features.length).toEqual(0);
+      expect(milestones[0].initiatives.length).toEqual(0);
       expect(milestones[0].timeline).toEqual('past');
     });
-    it('should return the milestones with features', async () => {
+    it('should return the milestones with initiatives', async () => {
       const milestone = await service.createMilestone(org.id, project.id, {
         title: 'my milestone',
         description: 'my milestone',
@@ -163,14 +163,14 @@ describe('MilestonesService', () => {
         description: 'my milestone 2',
         dueDate: '2020-01-01',
       });
-      await featuresService.createFeature(org.id, project.id, user.id, {
-        title: 'my feature',
-        description: 'my feature description',
+      await initiativesService.createInitiative(org.id, project.id, user.id, {
+        title: 'my initiative',
+        description: 'my initiative description',
         priority: Priority.HIGH,
         milestone: milestone.id,
-        status: FeatureStatus.PLANNED,
+        status: InitiativeStatus.PLANNED,
       });
-      const milestones = await service.listMilestonesWithFeatures(
+      const milestones = await service.listMilestonesWithInitiatives(
         org.id,
         project.id,
       );
@@ -178,18 +178,18 @@ describe('MilestonesService', () => {
       expect(milestones[0].id).toBeDefined();
       expect(milestones[0].title).toEqual('my milestone');
       expect(milestones[0].dueDate).toEqual('2020-01-01');
-      expect(milestones[0].features.length).toEqual(1);
-      expect(milestones[0].features[0].id).toBeDefined();
-      expect(milestones[0].features[0].title).toEqual('my feature');
-      expect(milestones[0].features[0].priority).toEqual(
+      expect(milestones[0].initiatives.length).toEqual(1);
+      expect(milestones[0].initiatives[0].id).toBeDefined();
+      expect(milestones[0].initiatives[0].title).toEqual('my initiative');
+      expect(milestones[0].initiatives[0].priority).toEqual(
         Priority.HIGH.valueOf(),
       );
-      expect(milestones[0].features[0].createdAt).toBeDefined();
-      expect(milestones[0].features[0].updatedAt).toBeDefined();
+      expect(milestones[0].initiatives[0].createdAt).toBeDefined();
+      expect(milestones[0].initiatives[0].updatedAt).toBeDefined();
       expect(milestones[1].id).toBeDefined();
       expect(milestones[1].title).toEqual('my milestone 2');
       expect(milestones[1].dueDate).toEqual('2020-01-01');
-      expect(milestones[1].features.length).toEqual(0);
+      expect(milestones[1].initiatives.length).toEqual(0);
     });
   });
   describe('when getting a milestone', () => {
@@ -246,29 +246,29 @@ describe('MilestonesService', () => {
         service.get(org.id, project.id, milestone.id),
       ).rejects.toThrow();
     });
-    it('should not delete the features but remove the milestone reference', async () => {
+    it('should not delete the initiatives but remove the milestone reference', async () => {
       const milestone = await service.createMilestone(org.id, project.id, {
         title: 'my milestone',
         description: 'my milestone',
         dueDate: '2020-01-01',
       });
-      const feature = await featuresService.createFeature(
+      const initiative = await initiativesService.createInitiative(
         org.id,
         project.id,
         user.id,
         {
-          title: 'my feature',
-          description: 'my feature description',
+          title: 'my initiative',
+          description: 'my initiative description',
           priority: Priority.HIGH,
           milestone: milestone.id,
-          status: FeatureStatus.PLANNED,
+          status: InitiativeStatus.PLANNED,
         },
       );
       await service.delete(org.id, project.id, milestone.id);
-      const foundFeature = await featuresService.getFeature(
+      const foundFeature = await initiativesService.getInitiative(
         org.id,
         project.id,
-        feature.id,
+        initiative.id,
       );
       expect(foundFeature.milestone).toBeUndefined();
     });

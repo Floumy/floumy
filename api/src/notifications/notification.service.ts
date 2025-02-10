@@ -3,9 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityType, Notification, StatusType } from './notification.entity';
 import { ViewNotificationDto } from './dtos';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { FeatureComment } from '../roadmap/features/feature-comment.entity';
+import { InitiativeComment } from '../roadmap/initiatives/initiative-comment.entity';
 import { WorkItemComment } from '../backlog/work-items/work-item-comment.entity';
 import { FeatureRequestComment } from '../feature-requests/feature-request-comment.entity';
 import { IssueComment } from '../issues/issue-comment.entity';
@@ -17,10 +17,10 @@ export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private notificationsRepository: Repository<Notification>,
-    @InjectRepository(FeatureComment)
-    private featureCommentsRepository: Repository<FeatureComment>,
-    @InjectRepository(Feature)
-    private featuresRepository: Repository<Feature>,
+    @InjectRepository(InitiativeComment)
+    private featureCommentsRepository: Repository<InitiativeComment>,
+    @InjectRepository(Initiative)
+    private featuresRepository: Repository<Initiative>,
     @InjectRepository(WorkItemComment)
     private workItemCommentsRepository: Repository<WorkItemComment>,
     @InjectRepository(WorkItem)
@@ -79,9 +79,9 @@ export class NotificationService {
             const featureComment =
               await this.featureCommentsRepository.findOneOrFail({
                 where: { id: notification.entityId },
-                relations: ['feature'],
+                relations: ['initiative'],
               });
-            const feature = await featureComment.feature;
+            const feature = await featureComment.initiative;
             entityName = feature.reference + ': ' + feature.title;
             entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`;
             break;

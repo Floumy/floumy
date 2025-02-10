@@ -3,7 +3,7 @@ import { WorkItemsController } from './work-items/work-items.controller';
 import { WorkItemsService } from './work-items/work-items.service';
 import { AuthModule } from '../auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Org } from '../orgs/org.entity';
 import { KeyResult } from '../okrs/key-result.entity';
 import { Objective } from '../okrs/objective.entity';
@@ -32,7 +32,7 @@ import { Project } from '../projects/project.entity';
   imports: [
     CacheModule.register(),
     TypeOrmModule.forFeature([
-      Feature,
+      Initiative,
       Org,
       KeyResult,
       Objective,

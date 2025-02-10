@@ -10,7 +10,7 @@ import {
 import { User } from '../users/user.entity';
 import { Objective } from '../okrs/objective.entity';
 import { KeyResult } from '../okrs/key-result.entity';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Sprint } from '../sprints/sprint.entity';
@@ -67,8 +67,8 @@ export class Org {
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })
   keyResults: Promise<KeyResult[]>;
-  @OneToMany(() => Feature, (feature) => feature.org, { lazy: true })
-  features: Promise<Feature[]>;
+  @OneToMany(() => Initiative, (feature) => feature.org, { lazy: true })
+  initiatives: Promise<Initiative[]>;
   @OneToMany(() => Milestone, (milestone) => milestone.org, { lazy: true })
   milestones: Promise<Milestone[]>;
   @OneToMany(() => WorkItem, (workItem) => workItem.org, { lazy: true })

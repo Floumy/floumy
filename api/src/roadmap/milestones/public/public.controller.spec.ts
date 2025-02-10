@@ -5,7 +5,7 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from '../../../okrs/objective.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
 import { Milestone } from '../milestone.entity';
-import { Feature } from '../../features/feature.entity';
+import { Initiative } from '../../initiatives/initiative.entity';
 import { UsersModule } from '../../../users/users.module';
 import { BacklogModule } from '../../../backlog/backlog.module';
 import { FilesModule } from '../../../files/files.module';
@@ -36,7 +36,7 @@ describe('PublicController', () => {
           Objective,
           KeyResult,
           Milestone,
-          Feature,
+          Initiative,
           BipSettings,
           Project,
         ]),

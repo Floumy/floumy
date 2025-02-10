@@ -118,7 +118,7 @@ export function formatWorkItemStatusName(status) {
   return statusMap[status];
 }
 
-export function featureStatusColorClassName(status) {
+export function initiativeStatusColorClassName(status) {
   const statusMap = {
     "pending": "bg-warning",
     "approved": "bg-info",
@@ -250,7 +250,7 @@ export function workItemStatusName(status) {
   return statusMap[status];
 }
 
-export function featureStatusName(status) {
+export function initiativeStatusName(status) {
   if (!status) return "";
   const statusMap = {
     "planned": "Planned",

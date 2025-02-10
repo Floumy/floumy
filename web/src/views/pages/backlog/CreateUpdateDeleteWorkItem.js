@@ -1,3 +1,4 @@
+
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
@@ -5,7 +6,9 @@ import InputError from '../../../components/Errors/InputError';
 import Select2 from 'react-select2-wrapper';
 import React, { useCallback, useEffect, useState } from 'react';
 import * as Yup from 'yup';
-import { listAllFeatures } from '../../../services/roadmap/roadmap.service';
+import { listAllInitiatives } from '../../../services/roadmap/roadmap.service';
+
+
 import {
   addComment,
   deleteComment,
@@ -38,9 +41,9 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [type, setType] = useState(workItem.type || "");
   const [status, setStatus] = useState(workItem.status || "");
-  const [features, setFeatures] = useState([{ id: "", text: "None" }]);
+  const [initiatives, setInitiatives] = useState([{ id: "", text: "None" }]);
   const [sprints, setSprints] = useState([{ id: "", text: "None" }]);
-  const [feature, setFeature] = useState(workItem.feature ? workItem.feature.id : "");
+  const [initiative, setInitiative] = useState(workItem.initiative ? workItem.initiative.id : "");
   const [sprint, setSprint] = useState(workItem.sprint ? workItem.sprint.id : "");
   const [deleteWarning, setDeleteWarning] = useState(false);
   const [files, setFiles] = useState([]);
@@ -63,16 +66,17 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     setIssue(workItem.issue ? workItem.issue.id : '');
   }, [workItem.issue]);
 
-  const loadAndSetFeatures = useCallback(async () => {
-    const features = await listAllFeatures(orgId, projectId);
-    const mappedFeatures = features
-      .map(feature => {
-        return { id: feature.id, text: `${feature.reference}: ${feature.title}` };
+  const loadAndSetInitiatives = useCallback(async () => {
+    const initiatives = await listAllInitiatives(orgId, projectId);
+    const mappedInitiatives = initiatives
+      .map(initiative => {
+        return { id: initiative.id, text: `${initiative.reference}: ${initiative.title}` };
       });
-    mappedFeatures.push({ id: '', text: 'None' });
-    setFeatures(mappedFeatures);
-    setFeature(workItem.feature ? workItem.feature.id : '');
-  }, [workItem.feature]);
+    mappedInitiatives.push({ id: '', text: 'None' });
+    setInitiatives(mappedInitiatives);
+    setInitiatives(workItem.initiative ? workItem.initiative.id : '');
+  }, [workItem.initiative]);
+
 
   const loadAndSetSprints = useCallback(async () => {
     const sprints = await listSprints(orgId, projectId);
@@ -111,7 +115,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       setIsLoading(true);
       try {
         await Promise.all([
-          loadAndSetFeatures(),
+          loadAndSetInitiatives(),
           loadAndSetSprints(),
           loadAndSetMembers(),
           loadAndSetIssues(),
@@ -129,7 +133,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
 
     fetchData();
 
-  }, [loadAndSetFeatures, loadAndSetSprints, loadAndSetMembers, loadAndSetComments, workItem.id, loadAndSetIssues]);
+  }, [loadAndSetInitiatives, loadAndSetSprints, loadAndSetMembers, loadAndSetComments, workItem.id, loadAndSetIssues]);
 
   useEffect(() => {
     if (workItem.title) {
@@ -166,7 +170,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         mentions: mentions.map(mention => mention.id),
         priority: priority,
         type: type,
-        feature: feature,
+        initiative: initiative,
         sprint: sprint,
         estimation: values.estimation || null,
         status: status,
@@ -375,10 +379,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         </label>
                         <Select2
                           className="react-select-container"
-                          defaultValue={feature}
+                          defaultValue={initiative}
                           placeholder="Select an initiative"
-                          data={features}
-                          onChange={(e) => setFeature(e.target.value)}
+                          data={initiatives}
+                          onChange={(e) => setInitiative(e.target.value)}
                         ></Select2>
                       </Col>
                     </Row>
@@ -428,7 +432,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                             text="Fill with AI"
                             disabled={title.length === 0}
                             onClick={async () => {
-                              setDescriptionText(await getWorkItemDescription(title, type, feature, issue));
+                              setDescriptionText(await getWorkItemDescription(title, type, initiative, issue));
                             }}
                         />
                         <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
@@ -544,7 +548,7 @@ const defaultWorkItem = {
   type: "user-story",
   estimation: null,
   status: "planned",
-  feature: { id: "" },
+  initiative: { id: "" },
   sprint: { id: "" }
 };
 

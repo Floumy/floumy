@@ -35,42 +35,42 @@ const MapCustom = () => {
       zoomControl: true,
       styles: [
         {
-          featureType: "administrative",
+          initiativeType: "administrative",
           elementType: "labels.text.fill",
           stylers: [{ color: "#444444" }],
         },
         {
-          featureType: "landscape",
+          initiativeType: "landscape",
           elementType: "all",
           stylers: [{ color: "#f2f2f2" }],
         },
         {
-          featureType: "poi",
+          initiativeType: "poi",
           elementType: "all",
           stylers: [{ visibility: "off" }],
         },
         {
-          featureType: "road",
+          initiativeType: "road",
           elementType: "all",
           stylers: [{ saturation: -100 }, { lightness: 45 }],
         },
         {
-          featureType: "road.highway",
+          initiativeType: "road.highway",
           elementType: "all",
           stylers: [{ visibility: "simplified" }],
         },
         {
-          featureType: "road.arterial",
+          initiativeType: "road.arterial",
           elementType: "labels.icon",
           stylers: [{ visibility: "off" }],
         },
         {
-          featureType: "transit",
+          initiativeType: "transit",
           elementType: "all",
           stylers: [{ visibility: "off" }],
         },
         {
-          featureType: "water",
+          initiativeType: "water",
           elementType: "all",
           stylers: [{ color: "#5e72e4" }, { visibility: "on" }],
         },

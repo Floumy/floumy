@@ -7,7 +7,7 @@ import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
 import { KeyResult } from './key-result.entity';
 import { Repository } from 'typeorm';
-import { Feature } from '../roadmap/features/feature.entity';
+import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { UsersService } from '../users/users.service';
 import { Timeline } from '../common/timeline.enum';
 import { OKRStatus } from './okrstatus.enum';
@@ -16,7 +16,7 @@ import { Project } from '../projects/project.entity';
 describe('OkrsService', () => {
   let service: OkrsService;
   let orgsService: OrgsService;
-  let featuresRepository: Repository<Feature>;
+  let featuresRepository: Repository<Initiative>;
   let projectsRepository: Repository<Project>;
   let usersService: UsersService;
   let org: Org;
@@ -25,15 +25,15 @@ describe('OkrsService', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Feature, User])],
+      [TypeOrmModule.forFeature([Objective, Org, KeyResult, Initiative, User])],
       [OkrsService, OrgsService, UsersService],
     );
     cleanup = dbCleanup;
     service = module.get<OkrsService>(OkrsService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
-    featuresRepository = module.get<Repository<Feature>>(
-      getRepositoryToken(Feature),
+    featuresRepository = module.get<Repository<Initiative>>(
+      getRepositoryToken(Initiative),
     );
     projectsRepository = module.get<Repository<Project>>(
       getRepositoryToken(Project),
@@ -284,7 +284,7 @@ describe('OkrsService', () => {
         objective,
         'Test Key Result',
       );
-      const feature = new Feature();
+      const feature = new Initiative();
       feature.org = Promise.resolve(org);
       feature.title = 'Test Feature';
       feature.description = '';

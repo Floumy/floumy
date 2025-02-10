@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import "./Roadmap.scss";
 import Select2 from "react-select2-wrapper";
-import { listPublicMilestonesWithFeatures } from "../../../services/roadmap/roadmap.service";
+import { listPublicMilestonesWithInitiatives } from "../../../services/roadmap/roadmap.service";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
 import PublicMilestoneRoadmapItem from "./PublicMilestoneRoadmapItem";
@@ -24,7 +24,7 @@ function PublicRoadmap() {
     async function fetchMilestones() {
       setIsLoadingMilestones(true);
       try {
-        const milestones = await listPublicMilestonesWithFeatures(orgId, projectId, timelineFilterValue);
+        const milestones = await listPublicMilestonesWithInitiatives(orgId, projectId, timelineFilterValue);
         setMilestones(milestones.sort((a, b) => {
           return new Date(a.dueDate) - new Date(b.dueDate);
         }));

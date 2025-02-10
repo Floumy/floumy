@@ -2,7 +2,7 @@ import { PublicService } from './public.service';
 import { OkrsService } from '../okrs.service';
 import { OrgsService } from '../../orgs/orgs.service';
 import { Repository } from 'typeorm';
-import { Feature } from '../../roadmap/features/feature.entity';
+import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { UsersService } from '../../users/users.service';
 import { setupTestingModule } from '../../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
@@ -31,7 +31,7 @@ describe('PublicService', () => {
           Objective,
           Org,
           KeyResult,
-          Feature,
+          Initiative,
           User,
           BipSettings,
         ]),
@@ -202,7 +202,7 @@ describe('PublicService', () => {
       expect(result.createdAt).toBeDefined();
       expect(result.updatedAt).toBeDefined();
       expect(result.reference).toBeDefined();
-      expect(result.features).toEqual([]);
+      expect(result.initiatives).toEqual([]);
     });
     it('should validate that the building in public is enabled for the org', async () => {
       const newOrg = new Org();
