@@ -8,7 +8,6 @@ import { Issue } from '../issues/issue.entity';
 import { KeyResult } from '../okrs/key-result.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
-import { Objective } from '../okrs/objective.entity';
 import { TimelineService } from '../common/timeline.service';
 import { Timeline } from '../common/timeline.enum';
 
@@ -17,7 +16,7 @@ export class AiService {
   constructor(
     private openaiService: OpenaiService,
     @InjectRepository(Initiative)
-    private featureRepository: Repository<Initiative>,
+    private initiativeRepository: Repository<Initiative>,
     @InjectRepository(Issue)
     private issueRepository: Repository<Issue>,
     @InjectRepository(KeyResult)
@@ -26,8 +25,6 @@ export class AiService {
     private milestoneRepository: Repository<Milestone>,
     @InjectRepository(FeatureRequest)
     private featureRequestRepository: Repository<FeatureRequest>,
-    @InjectRepository(Objective)
-    private objectiveRepository: Repository<Objective>,
   ) {}
 
   async generateKeyResults(objective: string): Promise<KeyResultType[]> {
@@ -356,7 +353,7 @@ export class AiService {
     Work Item Type: ${workItemType}
     `;
     if (initiativeId) {
-      const initiative = await this.featureRepository.findOneOrFail({
+      const initiative = await this.initiativeRepository.findOneOrFail({
         where: { id: initiativeId },
       });
       prompt += `Linked Initiative title: ${initiative.title}
@@ -482,18 +479,20 @@ export class AiService {
     const { startDate, endDate } =
       TimelineService.getStartAndEndDatesByTimelineValue(timeline);
 
-    const features = await this.featureRepository
-      .createQueryBuilder('feature')
-      .leftJoinAndSelect('feature.keyResult', 'keyResult')
+    const initiatives = await this.initiativeRepository
+      .createQueryBuilder('initiative')
+      .leftJoinAndSelect('initiative.keyResult', 'keyResult')
       .leftJoinAndSelect('keyResult.objective', 'objective')
-      .leftJoin('feature.milestone', 'milestone')
+      .leftJoin('initiative.milestone', 'milestone')
       .where('milestone.id IS NULL')
       .andWhere('objective.startDate >= :startDate', { startDate })
       .andWhere('objective.endDate <= :endDate', { endDate })
-      .select(['feature.id', 'feature.title', 'feature.description'])
+      .andWhere('initiative.orgId = :orgId', { orgId })
+      .andWhere('initiative.projectId = :projectId', { projectId })
+      .select(['initiative.id', 'initiative.title', 'initiative.description'])
       .getMany();
 
-    if (features.length === 0) {
+    if (initiatives.length === 0) {
       return [];
     }
 
@@ -510,7 +509,7 @@ export class AiService {
     
     Input Initiatives (JSON format):
     
-    ${JSON.stringify(features)}
+    ${JSON.stringify(initiatives)}
     
     Each initiative object has the following structure:
     
@@ -561,7 +560,7 @@ export class AiService {
         title: string;
         description: string;
         dueDate: string;
-        featureIds: string[];
+        initiativeIds: string[];
       }[];
     }>(prompt, {
       name: 'milestones',
@@ -582,14 +581,14 @@ export class AiService {
                 dueDate: {
                   type: 'string',
                 },
-                featureIds: {
+                initiativeIds: {
                   type: 'array',
                   items: {
                     type: 'string',
                   },
                 },
               },
-              required: ['title', 'description', 'dueDate', 'featureIds'],
+              required: ['title', 'description', 'dueDate', 'initiativeIds'],
               additionalProperties: false,
             },
             minItems: 1,

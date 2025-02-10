@@ -7,14 +7,16 @@ import './Roadmap.scss';
 import Select2 from 'react-select2-wrapper';
 import {
   addInitiative,
+  addMilestone,
   listInitiativesWithoutMilestone,
-  listMilestonesWithInitiatives
-} from "../../../services/roadmap/roadmap.service";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { useHotkeys } from "react-hotkeys-hook";
-import { sortByPriority } from "../../../services/utils/utils";
-import InitiativesListCard from "../initiatives/InitiativesListCard";
+  listMilestonesWithInitiatives,
+  updateInitiativeMilestone,
+} from '../../../services/roadmap/roadmap.service';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { formatTimeline, sortByPriority } from '../../../services/utils/utils';
+import InitiativesListCard from '../initiatives/InitiativesListCard';
 import AIButton from '../../../components/AI/AIButton';
 import { generateRoadmapMilestones } from '../../../services/ai/ai.service';
 import { toast } from 'react-toastify';
@@ -25,14 +27,14 @@ function InitiativesRoadmap() {
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get('timeline');
   const navigate = useNavigate();
-  const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || "this-quarter");
+  const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || 'this-quarter');
   const [initiatives, setInitiatives] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
   const [isLoadingInitiatives, setIsLoadingInitiatives] = useState(false);
   // on b hotkey press scroll to the initiatives backlog section
-  useHotkeys("b", () => {
-    document.getElementById("initiatives-backlog").scrollIntoView();
+  useHotkeys('b', () => {
+    document.getElementById('initiatives-backlog').scrollIntoView();
   });
   useEffect(() => {
     document.title = 'Floumy | Roadmap';
@@ -112,7 +114,7 @@ function InitiativesRoadmap() {
     const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
     const updatedInitiativesList = initiatives.map(initiative => {
       // If the initiative is closed or completed, we remove it from the backlog
-      if (initiative.status === "closed" || initiative.status === "completed") {
+      if (initiative.status === 'closed' || initiative.status === 'completed') {
         return null;
       }
       if (updatedInitiativesIds.includes(initiative.id)) {
@@ -132,13 +134,13 @@ function InitiativesRoadmap() {
     };
   }
 
-  async function refreshMilestonesAndBacklogFeatures() {
+  async function refreshMilestonesAndBacklogInitiatives() {
     setIsLoadingMilestones(true);
-    const milestones = await listMilestonesWithFeatures(orgId, projectId, timelineFilterValue);
+    const milestones = await listMilestonesWithInitiatives(orgId, projectId, timelineFilterValue);
     setMilestones(milestones);
-    const features = await listFeaturesWithoutMilestone(orgId, projectId);
-    const sortedFeatures = sortByPriority(features);
-    setFeatures(sortedFeatures);
+    const initiatives = await listInitiativesWithoutMilestone(orgId, projectId);
+    const sortedInitiatives = sortByPriority(initiatives);
+    setInitiatives(sortedInitiatives);
     setIsLoadingMilestones(false);
   }
 
@@ -156,13 +158,13 @@ function InitiativesRoadmap() {
         description: milestone.description,
         dueDate: milestone.dueDate,
       });
-      for (const featureId of milestone.featureIds) {
-        await updateFeatureMilestone(orgId, projectId, featureId, savedMilestone.id);
+      for (const initiativeId of milestone.initiativeIds) {
+        await updateInitiativeMilestone(orgId, projectId, initiativeId, savedMilestone.id);
       }
     }
 
     setTimeout(() => toast.success('The milestones have been added'), 1000);
-    await refreshMilestonesAndBacklogFeatures();
+    await refreshMilestonesAndBacklogInitiatives();
   }
 
   return (
@@ -178,13 +180,13 @@ function InitiativesRoadmap() {
           },
         },
         {
-          name: "New Initiative",
-          shortcut: "i",
-          id: "new-initiative",
+          name: 'New Initiative',
+          shortcut: 'i',
+          id: 'new-initiative',
           action: () => {
             navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`);
-          }
-        }
+          },
+        },
       ]} />
       <Container className="mt--6" fluid>
         <Row>
@@ -258,7 +260,7 @@ function InitiativesRoadmap() {
                              onInitiativeChangeMilestone={updateInitiativesMilestone} />))}
               </div>
             </Card>
-            <div id={"initiatives-backlog"} />
+            <div id={'initiatives-backlog'} />
             <InitiativesListCard title="Initiatives Backlog"
                                  initiatives={initiatives}
                                  isLoading={isLoadingInitiatives}
