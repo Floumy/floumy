@@ -351,7 +351,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                     >
                       Description
                     </label>
-                    {!feature.description && <AIButton
+                    {!initiative.description && <AIButton
                       text="Fill with AI"
                       disabled={values.title.length === 0}
                       onClick={async () => {
