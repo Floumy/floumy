@@ -59,6 +59,14 @@ export interface WorkItemDto {
     createdAt: Date;
     updatedAt: Date;
   }[];
+  branches?: {
+    id: string;
+    name: string;
+    url: string;
+    state: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
   createdBy: UserDto;
   assignedTo: UserDto;
   createdAt: Date;

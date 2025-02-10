@@ -508,12 +508,25 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
           <Card>
             <CardHeader>
               <h3 className="mb-0">
-                Pull Requests
+                Code
               </h3>
             </CardHeader>
             <CardBody>
               <Row>
                 <Col>
+                  <h4>Branches</h4>
+                  <ul className="list-unstyled">
+                    {workItem.branches?.length === 0 && <li className="mb-2">No branches found</li>}
+                    {workItem.branches?.map((branch) => (
+                    <li key={branch.id} className="mb-2">
+                      <a href={branch.url} target="_blank" rel="noreferrer" className="text-blue">
+                        <span className="mr-2">{branch.name}</span>
+                        <i className="fa fa-external-link-alt mr-1" />
+                      </a>
+                    </li>
+                  ))}
+                  </ul>
+                  <h4>Pull Requests</h4>
                   <ul className="list-unstyled">
                     {workItem.pullRequests?.map((pullRequest) => (
                       <li key={pullRequest.id} className="mb-2">
