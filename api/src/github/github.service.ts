@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../orgs/org.entity';
-import { And, LessThanOrEqual, MoreThan, Repository } from 'typeorm';
+import { And, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Project } from '../projects/project.entity';
 import crypto from 'crypto';
@@ -186,7 +186,7 @@ export class GithubService {
       where: {
         org: { id: orgId },
         project: { id: projectId },
-        createdAt: MoreThan(
+        createdAt: MoreThanOrEqual(
           new Date(new Date().setDate(new Date().getDate() - 1)),
         ),
         state: 'open',
@@ -200,10 +200,10 @@ export class GithubService {
         org: { id: orgId },
         project: { id: projectId },
         createdAt: And(
-          LessThanOrEqual(
-            new Date(new Date().setDate(new Date().getDate() - 1)),
+          LessThan(new Date(new Date().setDate(new Date().getDate() - 1))),
+          MoreThanOrEqual(
+            new Date(new Date().setDate(new Date().getDate() - 3)),
           ),
-          MoreThan(new Date(new Date().setDate(new Date().getDate() - 3))),
         ),
         state: 'open',
       },
@@ -211,26 +211,29 @@ export class GithubService {
         createdAt: 'DESC',
       },
     });
-    const stale = await this.githubPullRequestRepository.find({
-      where: {
-        org: { id: orgId },
-        project: { id: projectId },
-        state: 'open',
-        createdAt: LessThanOrEqual(
-          new Date(new Date().setMonth(new Date().getMonth() - 1)),
-        ),
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+
+    // Older than 3 days
+    const openForMoreThanThreeDays =
+      await this.githubPullRequestRepository.find({
+        where: {
+          org: { id: orgId },
+          project: { id: projectId },
+          state: 'open',
+          createdAt: LessThan(
+            new Date(new Date().setDate(new Date().getDate() - 3)),
+          ),
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
     const closedInThePastSevenDays =
       await this.githubPullRequestRepository.find({
         where: {
           org: { id: orgId },
           project: { id: projectId },
           state: 'closed',
-          createdAt: MoreThan(
+          createdAt: MoreThanOrEqual(
             new Date(new Date().setDate(new Date().getDate() - 7)),
           ),
         },
@@ -245,7 +248,9 @@ export class GithubService {
       openForThreeDays: await Promise.all(
         openForThreeDays.map(GithubPullRequestMapper.toDto),
       ),
-      stale: await Promise.all(stale.map(GithubPullRequestMapper.toDto)),
+      openForMoreThanThreeDays: await Promise.all(
+        openForMoreThanThreeDays.map(GithubPullRequestMapper.toDto),
+      ),
       closedInThePastSevenDays: await Promise.all(
         closedInThePastSevenDays.map(GithubPullRequestMapper.toDto),
       ),
