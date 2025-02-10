@@ -74,7 +74,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       });
     mappedInitiatives.push({ id: '', text: 'None' });
     setInitiatives(mappedInitiatives);
-    setInitiatives(workItem.initiative ? workItem.initiative.id : '');
+    setInitiative(workItem.initiative ? workItem.initiative.id : '');
   }, [workItem.initiative]);
 
 
