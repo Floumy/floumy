@@ -1,5 +1,5 @@
 import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Container, Row } from "reactstrap";
+import { Col, Container, Row } from 'reactstrap';
 import React from "react";
 import { addInitiative } from "../../../services/roadmap/roadmap.service";
 import CreateUpdateDeleteInitiative from "../initiatives/CreateUpdateDeleteInitiative";
@@ -13,22 +13,14 @@ function NewInitiative() {
 
   return (
     <>
-      <SimpleHeader headerButtons={[
-        {
-          name: "Back",
-          shortcut: "←",
-          action: () => {
-            window.history.back();
-          }
-        }
-      ]} />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
-          <div className="col">
-            <div className="card-wrapper">
+          <Col>
+            <div className="card-wrapper" style={{ maxWidth: "800px", margin: "auto" }}>
               <CreateUpdateDeleteInitiative onSubmit={handleSubmit} />
             </div>
-          </div>
+          </Col>
         </Row>
       </Container>
     </>
