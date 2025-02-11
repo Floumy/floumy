@@ -1,47 +1,44 @@
-
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from 'react';
 // react library for routing
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 // core components
-import { publicRoutes } from "routes.js";
-import useLayoutHandler from "./useLayoutHandler";
-import useNavigationHotKey from "./useNavigationHotKey";
-import PublicSidebar from "../components/Sidebar/PublicSidebar";
-import { getBuildInPublicSettings } from "../services/bip/build-in-public.service";
-import PublicNavbar from "../components/Navbars/PublicNavbar";
-import Footer from "../components/Footers/Footer";
+import { publicRoutes } from 'routes.js';
+import useLayoutHandler from './useLayoutHandler';
+import useNavigationHotKey from './useNavigationHotKey';
+import PublicSidebar from '../components/Sidebar/PublicSidebar';
+import { getBuildInPublicSettings } from '../services/bip/build-in-public.service';
+import PublicNavbar from '../components/Navbars/PublicNavbar';
+import Footer from '../components/Footers/Footer';
 import { getPublicProject } from '../services/projects/projects.service';
 
 function PublicLayout() {
-  const { mainContentRef, location, getRoutes } = useLayoutHandler("public");
-  const [sidenavOpen, setSidenavOpen] = React.useState(true);
-  const urlSegments = window.location.pathname.split("/");
-  const orgId = urlSegments[3];
-  const projectId = urlSegments[5];
-  const [project, setProject] = React.useState();
+  const { mainContentRef, location, getRoutes } = useLayoutHandler('public');
+  const [sidenavOpen, setSidenavOpen] = useState(true);
+  const { orgId, projectId } = useParams();
+  const [project, setProject] = useState();
 
-  const [buildInPublicSettings, setBuildInPublicSettings] = React.useState({
+  const [buildInPublicSettings, setBuildInPublicSettings] = useState({
     isObjectivesPagePublic: false,
     isRoadmapPagePublic: false,
     isSprintsPagePublic: false,
     isActiveSprintsPagePublic: false,
     isFeedPagePublic: false,
     isIssuesPagePublic: false,
-    isFeatureRequestsPagePublic: false
+    isFeatureRequestsPagePublic: false,
   });
 
   function isNavigationReplace() {
     let replace = false;
-    if (location.pathname.includes("/new")) {
+    if (location.pathname.includes('/new')) {
       replace = true;
     }
     return replace;
   }
 
-  useNavigationHotKey("r", `/public/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace());
-  useNavigationHotKey("f", `/public/orgs/${orgId}/projects/${projectId}/feature-requests`, false);
-  useNavigationHotKey("left", -1);
-  useNavigationHotKey("right", 1);
+  useNavigationHotKey('r', `/public/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace());
+  useNavigationHotKey('f', `/public/orgs/${orgId}/projects/${projectId}/feature-requests`, false);
+  useNavigationHotKey('left', -1);
+  useNavigationHotKey('right', 1);
 
   useEffect(() => {
     getPublicProject(orgId, projectId)
@@ -50,38 +47,39 @@ function PublicLayout() {
       })
       .catch((e) => {
         console.error(e.message);
-        window.location.href = "/auth/sign-in";
+        window.location.href = '/auth/sign-in';
       });
     getBuildInPublicSettings(orgId, projectId)
       .then((buildInPublicSettings) => {
+        console.log(buildInPublicSettings);
         if (buildInPublicSettings.isBuildInPublicEnabled) {
           setBuildInPublicSettings(buildInPublicSettings);
         } else {
-          window.location.href = "/auth/sign-in";
+          window.location.href = '/auth/sign-in';
         }
       })
       .catch((e) => {
         console.error(e.message);
-        window.location.href = "/auth/sign-in";
+        window.location.href = '/auth/sign-in';
       });
   }, [orgId, projectId]);
 
   useEffect(() => {
     if (window.innerWidth < 1200) {
-      document.body.classList.add("g-sidenav-hidden");
-      document.body.classList.remove("g-sidenav-pinned");
+      document.body.classList.add('g-sidenav-hidden');
+      document.body.classList.remove('g-sidenav-pinned');
       setSidenavOpen(false);
     }
   }, []);
 
   // toggles collapse between mini sidenav and normal
   const toggleSidenav = () => {
-    if (document.body.classList.contains("g-sidenav-pinned")) {
-      document.body.classList.remove("g-sidenav-pinned");
-      document.body.classList.add("g-sidenav-hidden");
+    if (document.body.classList.contains('g-sidenav-pinned')) {
+      document.body.classList.remove('g-sidenav-pinned');
+      document.body.classList.add('g-sidenav-hidden');
     } else {
-      document.body.classList.add("g-sidenav-pinned");
-      document.body.classList.remove("g-sidenav-hidden");
+      document.body.classList.add('g-sidenav-pinned');
+      document.body.classList.remove('g-sidenav-hidden');
     }
     setSidenavOpen(!sidenavOpen);
   };
@@ -93,7 +91,7 @@ function PublicLayout() {
   return (
     <>
       <PublicNavbar
-        theme={"dark"}
+        theme={'dark'}
         toggleSidenav={toggleSidenav}
         sidenavOpen={sidenavOpen}
       />
@@ -104,9 +102,9 @@ function PublicLayout() {
         sidenavOpen={sidenavOpen}
         buildingInPublicSettings={buildInPublicSettings}
         logo={{
-          outterLink: "https://floumy.com",
-          imgSrc: require("assets/img/brand/logo.png"),
-          imgAlt: "Floumy Logo"
+          outterLink: 'https://floumy.com',
+          imgSrc: require('assets/img/brand/logo.png'),
+          imgAlt: 'Floumy Logo',
         }}
       />
       <div className="main-content" ref={mainContentRef}>
