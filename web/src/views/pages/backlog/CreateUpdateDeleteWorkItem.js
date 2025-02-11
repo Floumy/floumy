@@ -75,7 +75,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     mappedInitiatives.push({ id: '', text: 'None' });
     setInitiatives(mappedInitiatives);
     setInitiative(workItem.initiative ? workItem.initiative.id : '');
-  }, [workItem.initiative]);
+  }, [orgId, projectId, workItem.initiative]);
 
 
   const loadAndSetSprints = useCallback(async () => {
@@ -428,13 +428,13 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         >
                           Description
                         </label>
-                        <AIButton
+                        {!workItem?.description && <AIButton
                             text="Fill with AI"
                             disabled={title.length === 0}
                             onClick={async () => {
                               setDescriptionText(await getWorkItemDescription(title, type, initiative, issue));
                             }}
-                        />
+                        />}
                         <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
                           setDescriptionText(text);
                           setMentions(mentions);
