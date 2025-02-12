@@ -14,11 +14,10 @@ function TimelineHeader({ headerButtons }) {
           <div className="header-body">
             <Row className="align-items-center py-4">
               <Col className="mt-3 mt-md-0 text-md-right" lg="12" xs="12">
-                {headerButtons && headerButtons.map((button, index) => (
+                {headerButtons && headerButtons.map((button) => (
                   <Button
                     key={button.id}
-                    className="btn-neutral"
-                    color="default"
+                    color="info"
                     size="sm"
                     id={button.id}
                     onClick={button.action}
