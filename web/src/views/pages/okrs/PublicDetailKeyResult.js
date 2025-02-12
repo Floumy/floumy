@@ -38,7 +38,7 @@ function PublicDetailKeyResult() {
     }
 
     loadData();
-  }, [orgId, keyResultId, objectiveId]);
+  }, [orgId, keyResultId, objectiveId, projectId]);
 
   async function handleCommentAdd(comment) {
     try {
@@ -78,17 +78,7 @@ function PublicDetailKeyResult() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        headerButtons={[
-          {
-            name: "Back",
-            shortcut: "←",
-            action: () => {
-              window.history.back();
-            }
-          }
-        ]}
-      />
+      <SimpleHeader/>
       <Container className="mt--6" fluid id="OKRs">
         <Row>
           <Col>

@@ -91,17 +91,7 @@ function PublicDetailOKR() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        headerButtons={[
-          {
-            name: "Back",
-            shortcut: "←",
-            action: () => {
-              window.history.back();
-            }
-          }
-        ]}
-      />
+      <SimpleHeader/>
       <Container className="mt--6" fluid id="OKRs">
         {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
         <Row>
