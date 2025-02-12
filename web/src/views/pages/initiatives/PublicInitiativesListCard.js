@@ -4,6 +4,7 @@ import BaseInitiativeListCard from "./BaseInitiativeListCard";
 
 function PublicInitiativesListCard({
                                   orgId,
+                                  projectId,
                                   title,
                                   initiatives,
                                   isLoading,
@@ -13,6 +14,7 @@ function PublicInitiativesListCard({
     return (
       <PublicInitiativesList
         orgId={orgId}
+        projectId={projectId}
         id={"initiatives-list-card"}
         initiatives={filteredInitiatives}
       />
