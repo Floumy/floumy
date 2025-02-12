@@ -50,7 +50,7 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
   return (
     <>
       <Row>
-        <Col>
+        <Col lg={8} md={12}>
           <Card>
             <CardHeader>
               <h3 className="mb-0">Work Item {workItem.reference}</h3>
@@ -204,9 +204,7 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
             </CardBody>
           </Card>
         </Col>
-      </Row>
-      <Row>
-        <Col>
+        <Col lg={4} md={12}>
           <Comments comments={comments}
                     onCommentAdd={handleCommentSubmit}
                     onCommentDelete={handleCommentDelete}

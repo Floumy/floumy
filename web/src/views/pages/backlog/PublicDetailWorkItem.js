@@ -31,15 +31,7 @@ function PublicDetailWorkItem() {
   return (
     <>
       {loading && <InfiniteLoadingBar />}
-      <SimpleHeader headerButtons={[
-        {
-          name: "Back",
-          shortcut: "←",
-          action: () => {
-            window.history.back();
-          }
-        }
-      ]} />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">
