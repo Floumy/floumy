@@ -239,21 +239,11 @@ function DetailOKR() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        headerButtons={[
-          {
-            name: 'Back',
-            shortcut: '←',
-            action: () => {
-              window.history.back();
-            },
-          },
-        ]}
-      />
+      <SimpleHeader/>
       <Container className="mt--6" fluid id="OKRs">
         {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
         <Row>
-          <Col>
+          <Col lg={8} md={12}>
             {!isLoading && !okr && <NotFoundCard message="Objective not be found" />}
 
             <DeleteWarning
@@ -416,9 +406,6 @@ function DetailOKR() {
                           <th className="sort" scope="col" width="30%">
                             Progress
                           </th>
-                          <th scope="col" width="5%">
-                            Initiatives Count
-                          </th>
                           <th className="sort" scope="col" width="10%">
                             Status
                           </th>
@@ -427,7 +414,7 @@ function DetailOKR() {
                         <tbody className="list">
                         {okr && okr.keyResults && okr.keyResults.length === 0 &&
                           <tr>
-                            <td colSpan={5}>
+                            <td colSpan={4}>
                               <div className="text-center text-muted">
                                 No key results have been added yet
                               </div>
@@ -457,9 +444,6 @@ function DetailOKR() {
                                             color="primary" />
                                 </div>
                               </div>
-                            </td>
-                            <td>
-                              {keyResult.initiatives.length}
                             </td>
                             <td>
                               <Badge color="" className="badge-dot mr-4">
@@ -518,10 +502,8 @@ function DetailOKR() {
                 </Row>
               </Card>}
           </Col>
-        </Row>
-        <Row>
           {!isLoading &&
-            <Col>
+            <Col lg={4} md={12}>
               <Comments comments={okr?.objective?.comments}
                         onCommentAdd={handleAddComment}
                         onCommentDelete={handleDeleteComment}

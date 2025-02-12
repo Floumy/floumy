@@ -1,15 +1,14 @@
-import { Link } from "react-router-dom";
-import { Badge, Progress, UncontrolledTooltip } from "reactstrap";
+import { Link } from 'react-router-dom';
+import { Badge, UncontrolledTooltip } from 'reactstrap';
 import {
-  initiativeStatusColorClassName,
   formatHyphenatedString,
-  formatProgress,
+  initiativeStatusColorClassName,
   memberNameInitials,
   priorityColor,
   sortByPriority,
-  textToColor
-} from "../../../services/utils/utils";
-import React, { useEffect, useState } from "react";
+  textToColor,
+} from '../../../services/utils/utils';
+import React, { useEffect, useState } from 'react';
 
 function PublicInitiativesList({
                               orgId,
@@ -34,8 +33,6 @@ function PublicInitiativesList({
           <tr>
             <th scope="col" width="5%">Reference</th>
             <th scope="col" width="40%">Initiative</th>
-            <th scope="col" width="30%">Progress</th>
-            <th scope="col" width="5%">W.I. Count</th>
             <th scope="col" width="10%">Status</th>
             {showAssignedTo && <th scope="col" width={"10%"}>Assigned To</th>}
             <th scope="col" width="10%">Priority</th>
@@ -62,17 +59,6 @@ function PublicInitiativesList({
                       className={"initiative-detail"}>
                   {initiative.title}
                 </Link>
-              </td>
-              <td>
-                <div className="d-flex align-items-center">
-                  <span className="mr-2">{formatProgress(initiative.progress)}%</span>
-                  <div>
-                    <Progress max="100" value={initiative.progress} color="primary" />
-                  </div>
-                </div>
-              </td>
-              <td>
-                {initiative.workItemsCount}
               </td>
               <td>
                 <Badge color="" className="badge-dot mr-4">

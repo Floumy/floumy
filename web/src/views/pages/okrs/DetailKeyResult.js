@@ -209,20 +209,10 @@ function DetailKeyResult() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        headerButtons={[
-          {
-            name: 'Back',
-            shortcut: '←',
-            action: () => {
-              window.history.back();
-            },
-          },
-        ]}
-      />
+      <SimpleHeader/>
       <Container className="mt--6" fluid id="OKRs">
         <Row>
-          <Col>
+          <Col lg={8} md={12}>
             {!isLoading && !keyResult && <NotFoundCard message="Key result not be found" />}
             <DeleteWarning
               isOpen={isDeleteWarningOpen}
@@ -353,10 +343,8 @@ function DetailKeyResult() {
               </Card>
             </>}
           </Col>
-        </Row>
-        <Row>
           {!isLoading &&
-            <Col>
+            <Col lg={4} md={12}>
               <Comments
                 comments={keyResult?.comments || []}
                 onCommentAdd={handleCommentAdd}

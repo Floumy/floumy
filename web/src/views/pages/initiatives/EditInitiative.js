@@ -26,7 +26,7 @@ function EditInitiative() {
     }
 
     fetchData();
-  }, [id]);
+  }, [id, orgId, projectId]);
 
   const handleSubmit = async (initiative) => {
     await updateInitiative(orgId, projectId, id, initiative);
@@ -35,15 +35,7 @@ function EditInitiative() {
   return (
     <>
       {loading && <InfiniteLoadingBar />}
-      <SimpleHeader headerButtons={[
-        {
-          name: "Back",
-          shortcut: "←",
-          action: () => {
-            window.history.back();
-          }
-        }
-      ]} />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">

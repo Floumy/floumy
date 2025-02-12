@@ -82,18 +82,10 @@ export default function EditFeatureRequest() {
   };
 
   return (<>
-    <SimpleHeader headerButtons={[
-      {
-        name: "Back",
-        shortcut: "←",
-        action: () => {
-          window.history.back();
-        }
-      }
-    ]} />
+    <SimpleHeader/>
     <Container className="mt--6" fluid>
       <Row>
-        <Col>
+        <Col lg={8} md={12}>
           <div className="card-wrapper">
             {isLoading && <Card><CardHeader><h2>Feature Request</h2></CardHeader><LoadingSpinnerBox /></Card>}
             {!isLoading && featureRequest &&
@@ -104,10 +96,8 @@ export default function EditFeatureRequest() {
               />}
           </div>
         </Col>
-      </Row>
-      <Row>
         {!isLoading &&
-          <Col>
+          <Col lg={4} md={12}>
             <Comments comments={featureRequest?.comments}
                       onCommentAdd={handleCommentAdd}
                       onCommentEdit={handleCommentUpdate}

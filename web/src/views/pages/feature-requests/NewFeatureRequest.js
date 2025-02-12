@@ -13,16 +13,8 @@ export default function NewFeatureRequest() {
   };
 
   return (<>
-    <SimpleHeader headerButtons={[
-      {
-        name: "Back",
-        shortcut: "←",
-        action: () => {
-          window.history.back();
-        }
-      }
-    ]} />
-    <Container className="mt--6" fluid>
+    <SimpleHeader/>
+    <Container className="mt--6" style={{maxWidth: "800px", margin: "auto"}}>
       <Row>
         <Col>
           <div className="card-wrapper">
