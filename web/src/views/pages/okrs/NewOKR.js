@@ -22,7 +22,7 @@ function NewOKR() {
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">
-            <div className="card-wrapper" style={{maxWidth: "800px", margin: "auto"}}>
+            <div className="card-wrapper">
               <CreateUpdateDeleteOKR onSubmit={async (values) => {
                 await addOKR(orgId, projectId, {
                   objective: {

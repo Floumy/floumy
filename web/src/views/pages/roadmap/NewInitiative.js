@@ -17,7 +17,7 @@ function NewInitiative() {
       <Container className="mt--6" fluid>
         <Row>
           <Col>
-            <div className="card-wrapper" style={{ maxWidth: "800px", margin: "auto" }}>
+            <div className="card-wrapper">
               <CreateUpdateDeleteInitiative onSubmit={handleSubmit} />
             </div>
           </Col>

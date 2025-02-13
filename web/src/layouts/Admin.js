@@ -44,7 +44,7 @@ function Admin() {
   useNavigationHotKey('6', `/admin/orgs/${orgId}/projects/${projectId}/work-items`);
   useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/initiatives`);
   useNavigationHotKey('8', `/admin/orgs/${orgId}/projects/${projectId}/code`);
-  useNavigationHotKey('w', `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`, isNavigationReplace());
+  useNavigationHotKey('w', `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`);
   useNavigationHotKey('i', `/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`, isNavigationReplace());
   useNavigationHotKey('m', `/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`, isNavigationReplace());
   useNavigationHotKey('s', `/admin/orgs/${orgId}/projects/${projectId}/sprints/new`, isNavigationReplace());

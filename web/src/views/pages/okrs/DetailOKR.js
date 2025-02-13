@@ -241,9 +241,9 @@ function DetailOKR() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader/>
       <Container className="mt--6" fluid id="OKRs">
-        {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
         <Row>
           <Col lg={8} md={12}>
+            {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
             {!isLoading && !okr && <NotFoundCard message="Objective not be found" />}
 
             <DeleteWarning
