@@ -178,8 +178,8 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         assignedTo: assignedTo,
         issue: issue,
       };
-      await onSubmit(workItem);
-      navigate(-1);
+      const savedWorkItem = await onSubmit(workItem);
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${savedWorkItem.id}`, {replace: true});
       setTimeout(() => toast.success('The work item has been saved'), 100);
     } catch (e) {
       toast.error('The work item could not be saved');

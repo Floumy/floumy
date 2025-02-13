@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 function NewWorkItem() {
   const { orgId, projectId } = useParams();
   const handleSubmit = async (workItem) => {
-    await addWorkItem(orgId, projectId, workItem);
+    return await addWorkItem(orgId, projectId, workItem);
   };
 
   return (
@@ -17,7 +17,7 @@ function NewWorkItem() {
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">
-            <div className="card-wrapper" style={{ maxWidth: "800px", margin: "auto" }}>
+            <div className="card-wrapper">
               <CreateUpdateDeleteWorkItem onSubmit={handleSubmit} />
             </div>
           </div>

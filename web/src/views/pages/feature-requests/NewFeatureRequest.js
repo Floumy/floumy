@@ -14,7 +14,7 @@ export default function NewFeatureRequest() {
 
   return (<>
     <SimpleHeader/>
-    <Container className="mt--6" style={{maxWidth: "800px", margin: "auto"}}>
+    <Container className="mt--6">
       <Row>
         <Col>
           <div className="card-wrapper">

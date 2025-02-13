@@ -107,10 +107,10 @@ export function DetailInitiative() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader/>
       <Container className="mt--6" fluid id="OKRs">
-        {initiative && initiative.workItems && initiative.workItems.length > 0 &&
-          <ExecutionStats workItems={initiative.workItems} dueDate={initiative?.milestone?.dueDate} />}
         <Row>
           <Col lg={8} md={12}>
+            {initiative && initiative.workItems && initiative.workItems.length > 0 &&
+              <ExecutionStats workItems={initiative.workItems} dueDate={initiative?.milestone?.dueDate} />}
             {!isLoading && !initiative && <NotFoundCard message="Initiative not found" />}
             {!isLoading && initiative && <CreateUpdateDeleteInitiative onSubmit={handleSubmit} initiative={initiative} />}
             <Card>

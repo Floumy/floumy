@@ -13,7 +13,7 @@ function EditWorkItem() {
   const [workItem, setWorkItem] = useState(null);
   const { orgId, projectId, id } = useParams();
   const handleSubmit = async (workItem) => {
-    await updateWorkItem(orgId, projectId, id, workItem);
+    return await updateWorkItem(orgId, projectId, id, workItem);
   };
 
   useEffect(() => {
