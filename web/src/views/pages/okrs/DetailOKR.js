@@ -121,13 +121,13 @@ function DetailOKR() {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      await updateObjective(orgId, projectId, okr.objective.id, {
+      const updatedOKR = await updateObjective(orgId, projectId, okr.objective.id, {
         title: values.title,
         assignedTo,
         status,
         timeline,
       });
-      navigate(-1);
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${updatedOKR.objective.id}`, {replace: true});
       setTimeout(() => toast.success('The OKR has been saved'), 100);
     } catch (e) {
       toast.error('The OKR could not be saved');
@@ -236,15 +236,29 @@ function DetailOKR() {
     }
   };
 
+  if (!isLoading && !okr) {
+    return <>
+      <SimpleHeader />
+      <Container className="mt--6" fluid id="OKRs">
+        <Row>
+          <Col>
+            <div className="card-wrapper">
+              <NotFoundCard message="Objective not be found" />
+            </div>
+          </Col>
+        </Row>
+      </Container>
+    </>;
+  }
+
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader/>
+      <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
         <Row>
           <Col lg={8} md={12}>
             {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
-            {!isLoading && !okr && <NotFoundCard message="Objective not be found" />}
 
             <DeleteWarning
               isOpen={isDeleteWarningOpen}

@@ -65,7 +65,8 @@ export async function deleteOKR(orgId, projectId, id) {
 
 export async function updateObjective(orgId, projectId, id, objectiveData) {
   try {
-    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/objective/${id}`, objectiveData);
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/objective/${id}`, objectiveData);
+    return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
