@@ -24,7 +24,7 @@ function NewOKR() {
           <div className="col">
             <div className="card-wrapper">
               <CreateUpdateDeleteOKR onSubmit={async (values) => {
-                await addOKR(orgId, projectId, {
+                return await addOKR(orgId, projectId, {
                   objective: {
                     title: values.objective,
                     timeline: values.timeline,

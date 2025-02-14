@@ -44,8 +44,8 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
       // Remove empty key results
       const keyResults = fields
         .filter((field) => field.title);
-      await onSubmit({ ...values, timeline, assignedTo, keyResults: keyResults });
-      navigate(-1);
+      const savedOKR = await onSubmit({ ...values, timeline, assignedTo, keyResults: keyResults });
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${savedOKR.objective.id}`, {replace: true});
       setTimeout(() => toast.success('The OKR has been saved'), 100);
     } catch (e) {
       toast.error('The OKR could not be saved');
