@@ -9,7 +9,7 @@ function NewMilestone() {
   const { orgId, projectId } = useParams();
 
   const handleSubmit = async (milestone) => {
-    await addMilestone(orgId, projectId, milestone);
+    return await addMilestone(orgId, projectId, milestone);
   };
 
   return (

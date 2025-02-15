@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 function NewInitiative() {
   const { orgId, projectId } = useParams();
   const handleSubmit = async (initiative) => {
-    await addInitiative(orgId, projectId, initiative);
+    return await addInitiative(orgId, projectId, initiative);
   };
 
   return (

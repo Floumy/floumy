@@ -273,8 +273,8 @@ function DetailOKR() {
                 </h3>
               </CardHeader>
               <CardBody className="border-bottom">
-                {(isLoading || isSubmitting) && <LoadingSpinnerBox />}
-                {!isLoading && !isSubmitting && okr &&
+                {isLoading&& <LoadingSpinnerBox />}
+                {!isLoading && okr &&
                   <>
                     <Formik
                       initialValues={{ title: okr.objective.title || '' }}

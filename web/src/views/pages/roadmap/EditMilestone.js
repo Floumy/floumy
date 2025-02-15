@@ -29,7 +29,7 @@ function EditMilestone() {
   }, [id, orgId, projectId]);
 
   const handleSubmit = async (values) => {
-    await updateMilestone(orgId, projectId, id, values);
+    return await updateMilestone(orgId, projectId, id, values);
   };
 
   return (
