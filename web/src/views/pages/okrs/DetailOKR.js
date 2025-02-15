@@ -121,14 +121,14 @@ function DetailOKR() {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      const updatedOKR = await updateObjective(orgId, projectId, okr.objective.id, {
+      const updatedOkr = await updateObjective(orgId, projectId, okr.objective.id, {
         title: values.title,
         assignedTo,
         status,
         timeline,
       });
-      navigate(`/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${updatedOKR.objective.id}`, {replace: true});
-      setTimeout(() => toast.success('The OKR has been saved'), 100);
+      setOKR({ ...okr, objective: updatedOkr.objective });
+      toast.success('The OKR has been saved');
     } catch (e) {
       toast.error('The OKR could not be saved');
     } finally {
@@ -256,10 +256,10 @@ function DetailOKR() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
+        {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
+
         <Row>
           <Col lg={8} md={12}>
-            {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
-
             <DeleteWarning
               isOpen={isDeleteWarningOpen}
               entity={'objective'}
