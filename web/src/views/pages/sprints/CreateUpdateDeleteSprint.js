@@ -47,13 +47,17 @@ function CreateUpdateDeleteSprint(
       }
       setIsSubmitting(true);
       setIsStartDateTouched(false);
-      await onSubmit({
+      const savedSprint = await onSubmit({
         goal: values.goal,
         startDate,
         duration
       });
-      navigate(-1);
+
       setTimeout(() => toast.success("The sprint has been saved"), 100);
+
+      if(!sprint.id) {
+        navigate(`/admin/orgs/${orgId}/projects/${projectId}/sprints/edit/${savedSprint.id}`, {replace: true});
+      }
     } catch (e) {
       toast.error("The sprint could not be saved");
     } finally {
@@ -80,7 +84,7 @@ function CreateUpdateDeleteSprint(
 
   const onDelete = async (id) => {
     try {
-      await deleteSprint(id);
+      await deleteSprint(orgId, projectId, id);
       navigate(-1);
       setTimeout(() => toast.success("The sprint has been deleted"), 100);
     } catch (e) {
@@ -106,7 +110,7 @@ function CreateUpdateDeleteSprint(
 
   async function handleAddWorkItem(workItem) {
     workItem.sprint = sprint.id;
-    const savedWorkItem = await addWorkItem(workItem);
+    const savedWorkItem = await addWorkItem(orgId, projectId, workItem);
     setWorkItems([...workItems, savedWorkItem]);
   }
 

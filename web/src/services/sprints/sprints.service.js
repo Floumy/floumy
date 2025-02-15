@@ -21,7 +21,8 @@ export async function getPublicSprint(orgId, projectId, id) {
 
 export async function updateSprint(orgId, projectId, id, sprint) {
   try {
-    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints/${id}`, sprint);
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints/${id}`, sprint);
+    return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
@@ -29,7 +30,8 @@ export async function updateSprint(orgId, projectId, id, sprint) {
 
 export async function addSprint(orgId, projectId, sprint) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints`, sprint);
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints`, sprint);
+    return response.data;
   } catch (e) {
     throw new Error(e.message);
   }

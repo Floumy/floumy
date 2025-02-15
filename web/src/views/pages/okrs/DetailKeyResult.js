@@ -83,8 +83,8 @@ function DetailKeyResult() {
           status,
           progress,
         });
-      navigate(-1);
-      setTimeout(() => toast.success('The key result has been saved'), 100);
+
+      toast.success('The key result has been saved');
     } catch (e) {
       toast.error('The key result could not be saved');
     } finally {

@@ -30,7 +30,7 @@ function EditSprint() {
   }, [orgId, projectId, id]);
 
   const handleSubmit = async (sprint) => {
-    await updateSprint(orgId, projectId, id, sprint);
+    return await updateSprint(orgId, projectId, id, sprint);
   };
 
   return (

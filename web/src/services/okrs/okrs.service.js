@@ -74,7 +74,8 @@ export async function updateObjective(orgId, projectId, id, objectiveData) {
 
 export async function updateKeyResult(orgId, projectId, objectiveId, keyResultId, keyResultData) {
   try {
-    return await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/key-results/${keyResultId}`, keyResultData);
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/key-results/${keyResultId}`, keyResultData);
+    return response.data;
   } catch (e) {
     throw new Error(e.message);
   }

@@ -48,7 +48,7 @@ function PublicDetailOKR() {
     }
 
     fetchData();
-  }, [orgId, okrId]);
+  }, [orgId, okrId, projectId]);
 
   const handleAddComment = async (content) => {
     try {
@@ -95,7 +95,7 @@ function PublicDetailOKR() {
       <Container className="mt--6" fluid id="OKRs">
         {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
         <Row>
-          <Col>
+          <Col md={12} lg={8}>
             {!isLoading && !okr && <NotFoundCard message="Objective not be found" />}
             <Card>
               <CardHeader>
@@ -235,10 +235,8 @@ function PublicDetailOKR() {
                 </Row>
               </Card>}
           </Col>
-        </Row>
-        <Row>
           {!isLoading &&
-            <Col>
+            <Col md={12} lg={4}>
               <Comments comments={okr?.objective?.comments}
                         onCommentAdd={handleAddComment}
                         onCommentDelete={handleDeleteComment}

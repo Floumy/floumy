@@ -35,13 +35,17 @@ function CreateUpdateDeleteMilestone({ onSubmit, milestone = { id: "", title: ""
       }
       setIsSubmitting(true);
       setIsDueDateInvalid(false);
-      await onSubmit({
+      const savedMilestone = await onSubmit({
         title: values.title,
         description: values.description,
         dueDate: dueDate
       });
-      navigate(-1);
+
       setTimeout(() => toast.success("The milestone has been saved"), 100);
+
+      if(!milestone.id) {
+        navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/edit/${savedMilestone.id}`, {replace: true});
+      }
     } catch (e) {
       toast.error("The milestone could not be saved");
     } finally {

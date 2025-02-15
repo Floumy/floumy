@@ -152,7 +152,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      const initiative = {
+      const initiativeToBeSaved = {
         title: values.title,
         description: descriptionText,
         mentions: mentions.map(mention => mention.id),
@@ -163,16 +163,21 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
         featureRequest: featureRequest,
       };
       if (keyResult !== '') {
-        initiative.keyResult = keyResult;
+        initiativeToBeSaved.keyResult = keyResult;
       }
       if (milestone !== '') {
-          initiative.milestone = milestone;
+        initiativeToBeSaved.milestone = milestone;
       }
-      await onSubmit(initiative);
+      const savedInitiative = await onSubmit(initiativeToBeSaved);
+
       setIsSubmitting(false);
-      navigate(-1);
+
       setTimeout(() => toast.success('The initiative has been saved'), 100);
+      if(!initiative || !initiative.id) {
+        navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/edit/${savedInitiative.id}`, {replace: true});
+      }
     } catch (e) {
+      console.error(e);
       setIsSubmitting(false);
       toast.error('The initiative could not be saved');
     }

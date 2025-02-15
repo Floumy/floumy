@@ -1,4 +1,3 @@
-
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
@@ -39,12 +38,12 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const [descriptionText, setDescriptionText] = useState(workItem.description);
   const [mentions, setMentions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [type, setType] = useState(workItem.type || "");
-  const [status, setStatus] = useState(workItem.status || "");
-  const [initiatives, setInitiatives] = useState([{ id: "", text: "None" }]);
-  const [sprints, setSprints] = useState([{ id: "", text: "None" }]);
-  const [initiative, setInitiative] = useState(workItem.initiative ? workItem.initiative.id : "");
-  const [sprint, setSprint] = useState(workItem.sprint ? workItem.sprint.id : "");
+  const [type, setType] = useState(workItem.type || '');
+  const [status, setStatus] = useState(workItem.status || '');
+  const [initiatives, setInitiatives] = useState([{ id: '', text: 'None' }]);
+  const [sprints, setSprints] = useState([{ id: '', text: 'None' }]);
+  const [initiative, setInitiative] = useState(workItem.initiative ? workItem.initiative.id : '');
+  const [sprint, setSprint] = useState(workItem.sprint ? workItem.sprint.id : '');
   const [deleteWarning, setDeleteWarning] = useState(false);
   const [files, setFiles] = useState([]);
   const [members, setMembers] = useState([{ id: '', text: 'None' }]);
@@ -84,12 +83,12 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       .map(sprint => {
         return {
           id: sprint.id,
-          text: `${sprint.startDate} | ${sprint.title} [${formatHyphenatedString(sprint.status)}]`
+          text: `${sprint.startDate} | ${sprint.title} [${formatHyphenatedString(sprint.status)}]`,
         };
       });
-    mappedSprints.push({ id: "", text: "None" });
+    mappedSprints.push({ id: '', text: 'None' });
     setSprints(mappedSprints);
-    setSprint(workItem.sprint ? workItem.sprint.id : "");
+    setSprint(workItem.sprint ? workItem.sprint.id : '');
   }, [orgId, projectId, workItem.sprint]);
 
   const loadAndSetMembers = useCallback(async () => {
@@ -164,7 +163,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   async function handleSubmit(values) {
     try {
       setIsSubmitting(true);
-      const workItem = {
+      const workItemToBeSaved = {
         title: values.title,
         description: descriptionText,
         mentions: mentions.map(mention => mention.id),
@@ -178,9 +177,14 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         assignedTo: assignedTo,
         issue: issue,
       };
-      const savedWorkItem = await onSubmit(workItem);
-      navigate(`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${savedWorkItem.id}`, {replace: true});
+      const savedWorkItem = await onSubmit(workItemToBeSaved);
+
       setTimeout(() => toast.success('The work item has been saved'), 100);
+
+      if(!workItem.id) {
+        navigate(`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${savedWorkItem.id}`, {replace: true});
+      }
+
     } catch (e) {
       toast.error('The work item could not be saved');
     } finally {
@@ -366,7 +370,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           invalid={!!(errors.estimation && touched.estimation)}
                           autoComplete="off"
                         />
-                        <ErrorMessage name={"estimation"} component={InputError} />
+                        <ErrorMessage name={'estimation'} component={InputError} />
                       </Col>
                     </Row>
                     <Row className="mb-3">
@@ -403,7 +407,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         ></Select2>
                       </Col>
                     </Row>
-                    {paymentPlan === "premium" && <Row className="mb-3">
+                    {paymentPlan === 'premium' && <Row className="mb-3">
                       <Col>
                         <label
                           className="form-control-label"
@@ -429,26 +433,26 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           Description
                         </label>
                         {!workItem?.description && <AIButton
-                            text="Fill with AI"
-                            disabled={title.length === 0}
-                            onClick={async () => {
-                              setDescriptionText(await getWorkItemDescription(title, type, initiative, issue));
-                            }}
+                          text="Fill with AI"
+                          disabled={title.length === 0}
+                          onClick={async () => {
+                            setDescriptionText(await getWorkItemDescription(title, type, initiative, issue));
+                          }}
                         />}
                         <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
                           setDescriptionText(text);
                           setMentions(mentions);
                         }} toolbar={[
-                          ["bold", "italic"],
-                          ["link", "blockquote", "code", "image", "video"],
+                          ['bold', 'italic'],
+                          ['link', 'blockquote', 'code', 'image', 'video'],
                           [
                             {
-                              list: "ordered"
+                              list: 'ordered',
                             },
                             {
-                              list: "bullet"
-                            }
-                          ]
+                              list: 'bullet',
+                            },
+                          ],
                         ]} placeholder="Describe this work item..." />
                       </Col>
                     </Row>
@@ -480,7 +484,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                       </Col>
                     </Row>
                     <Button
-                      id={"save-work-item"}
+                      id={'save-work-item'}
                       color="primary"
                       type="submit"
                       className="mr-3 mb-3"
@@ -489,7 +493,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                       Save Work Item
                     </Button>
                     {isUpdate && <Button
-                      id={"delete-work-item"}
+                      id={'delete-work-item'}
                       color="secondary"
                       type="button"
                       className="ml-0 mb-3"
@@ -518,13 +522,13 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                   <ul className="list-unstyled">
                     {workItem.branches?.length === 0 && <li className="mb-2">No branches found</li>}
                     {workItem.branches?.map((branch) => (
-                    <li key={branch.id} className="mb-2">
-                      <a href={branch.url} target="_blank" rel="noreferrer" className="text-blue">
-                        <span className="mr-2">{branch.name}</span>
-                        <i className="fa fa-external-link-alt mr-1" />
-                      </a>
-                    </li>
-                  ))}
+                      <li key={branch.id} className="mb-2">
+                        <a href={branch.url} target="_blank" rel="noreferrer" className="text-blue">
+                          <span className="mr-2">{branch.name}</span>
+                          <i className="fa fa-external-link-alt mr-1" />
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                   <h4>Pull Requests</h4>
                   <ul className="list-unstyled">
@@ -555,14 +559,14 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
 }
 
 const defaultWorkItem = {
-  title: "",
-  description: "",
-  priority: "medium",
-  type: "user-story",
+  title: '',
+  description: '',
+  priority: 'medium',
+  type: 'user-story',
   estimation: null,
-  status: "planned",
-  initiative: { id: "" },
-  sprint: { id: "" }
+  status: 'planned',
+  initiative: { id: '' },
+  sprint: { id: '' },
 };
 
 export default CreateUpdateDeleteWorkItem;
