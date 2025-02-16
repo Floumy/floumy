@@ -28,8 +28,7 @@ export default function UpdateIssue({ issue, onUpdate, onDelete }) {
         priority: priority
       };
       await onUpdate(updatedIssue);
-      navigate(-1);
-      setTimeout(() => toast.success("The issue has been saved"), 100);
+      toast.success('The issue has been saved');
     } catch (e) {
       toast.error("The issue could not be saved");
     } finally {

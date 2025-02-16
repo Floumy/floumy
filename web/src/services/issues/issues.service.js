@@ -2,7 +2,8 @@ import api from "../api/api.service";
 
 export async function addIssue(orgId, projectId, issue) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/issues`, issue);
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/issues`, issue);
+    return response.data;
   } catch (e) {
     throw new Error(e.message);
   }

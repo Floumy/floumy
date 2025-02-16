@@ -51,7 +51,6 @@ function PublicLayout() {
       });
     getBuildInPublicSettings(orgId, projectId)
       .then((buildInPublicSettings) => {
-        console.log(buildInPublicSettings);
         if (buildInPublicSettings.isBuildInPublicEnabled) {
           setBuildInPublicSettings(buildInPublicSettings);
         } else {
