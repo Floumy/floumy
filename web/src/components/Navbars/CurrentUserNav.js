@@ -45,7 +45,7 @@ export default function CurrentUserNav() {
             </Media>
           </Media>
         </DropdownToggle>
-        <DropdownMenu right>
+        <DropdownMenu right className="border border-dark">
           <DropdownItem
             href={`/admin/orgs/${orgId}/projects/${projectId}/my-profile`}
           >

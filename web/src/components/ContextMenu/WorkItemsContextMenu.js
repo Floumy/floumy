@@ -53,7 +53,7 @@ function WorkItemsContextMenu({ menuId, onChangeSprint, onChangeStatus, onChange
 
     fetchUsers();
     fetchSprints();
-  }, []);
+  }, [orgId, projectId]);
 
   const handleChangeSprint = async ({ id: sprintId, event, props }) => {
     try {
@@ -156,7 +156,6 @@ function WorkItemsContextMenu({ menuId, onChangeSprint, onChangeStatus, onChange
         onChange(workItems.map(workItem => workItem.id), { assignee });
       }
     } catch (e) {
-      console.log(e);
       console.error("The callbacks could not be called");
     }
   };

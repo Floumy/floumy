@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from "react-toastify";
 import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
 import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row } from "reactstrap";
@@ -10,15 +10,24 @@ import InputError from "../../../components/Errors/InputError";
 export default function CreateFeatureRequest({ onSubmit }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { orgId, projectId } = useParams();
   const navigate = useNavigate();
+
+  const getDetailUrl = (featureRequestId) => {
+    const currentContextUrlSlug = window.location.pathname.split('/')[1];
+    if (currentContextUrlSlug === 'public') {
+      return `/public/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`;
+    }
+
+    return `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequestId}`;
+  };
 
   const handleSubmit = async (values) => {
     try {
       setIsLoading(true);
-      await onSubmit(values);
-      navigate(-1);
+      const savedFeatureRequest = await onSubmit(values);
       setTimeout(() => toast.success("The feature request has been saved"), 100);
+      navigate(getDetailUrl(savedFeatureRequest.id), {replace: true});
     } catch (e) {
       toast.error("The feature request could not be saved");
     } finally {

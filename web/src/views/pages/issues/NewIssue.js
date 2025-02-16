@@ -9,7 +9,7 @@ export default function NewIssue() {
   const { orgId, projectId } = useParams();
 
   const handleSubmit = async (issue) => {
-    await addIssue(orgId, projectId, issue);
+    return await addIssue(orgId, projectId, issue);
   };
 
   return (

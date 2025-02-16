@@ -9,7 +9,7 @@ export default function NewFeatureRequest() {
   const { orgId, projectId } = useParams();
 
   const handleSubmit = async (featureRequest) => {
-    await addFeatureRequest(orgId, projectId, featureRequest);
+    return await addFeatureRequest(orgId, projectId, featureRequest);
   };
 
   return (<>
