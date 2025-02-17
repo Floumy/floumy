@@ -201,14 +201,14 @@ function PublicDetailOKR() {
                           <tr key={keyResult.id}>
                             <td>
                               <Link
-                                to={`/public/orgs/${orgId}/projects/${projectId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
+                                to={`/public/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`}
                                 className={"okr-detail"}>
                                 {keyResult.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
                               <Link
-                                to={`/public/orgs/${orgId}/projects/${projectId}/objectives/${okrId}/kr/detail/${keyResult.id}`}
+                                to={`/public/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`}
                                 className={"okr-detail"}>
                                 {keyResult.title}
                               </Link>

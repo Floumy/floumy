@@ -18,7 +18,7 @@ import PublicShareButtons from "../../../components/PublicShareButtons/PublicSha
 import Comments from "../../../components/Comments/Comments";
 
 function PublicDetailKeyResult() {
-  const { orgId, projectId, objectiveId, keyResultId } = useParams();
+  const { orgId, projectId, keyResultId } = useParams();
   const [keyResult, setKeyResult] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -28,7 +28,7 @@ function PublicDetailKeyResult() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const keyResult = await getPublicKeyResult(orgId, projectId, objectiveId, keyResultId);
+        const keyResult = await getPublicKeyResult(orgId, projectId, keyResultId);
         setKeyResult(keyResult);
       } catch (e) {
         toast.error("The key result could not be loaded");
@@ -38,7 +38,7 @@ function PublicDetailKeyResult() {
     }
 
     loadData();
-  }, [orgId, keyResultId, objectiveId, projectId]);
+  }, [orgId, keyResultId, projectId]);
 
   async function handleCommentAdd(comment) {
     try {
@@ -81,7 +81,7 @@ function PublicDetailKeyResult() {
       <SimpleHeader/>
       <Container className="mt--6" fluid id="OKRs">
         <Row>
-          <Col>
+          <Col md={12} lg={8}>
             {!isLoading && !keyResult && <NotFoundCard message="Key result not be found" />}
             <Card>
               <CardHeader className="border-1">
@@ -152,10 +152,8 @@ function PublicDetailKeyResult() {
               </Card>
             </>}
           </Col>
-        </Row>
-        <Row>
           {!isLoading &&
-            <Col>
+            <Col md={12} lg={4}>
               <Comments
                 comments={keyResult?.comments || []}
                 onCommentAdd={handleCommentAdd}

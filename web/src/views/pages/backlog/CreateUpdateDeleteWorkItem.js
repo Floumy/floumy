@@ -19,7 +19,7 @@ import { listSprints } from '../../../services/sprints/sprints.service';
 import FloumyDropZone from '../components/FloumyDropZone';
 import { formatHyphenatedString } from '../../../services/utils/utils';
 import DeleteWarning from '../components/DeleteWarning';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import CardHeaderDetails from '../components/CardHeaderDetails';
 import { getOrg } from '../../../services/org/orgs.service';
@@ -379,7 +379,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           className="form-control-label"
                           htmlFor="validationCustom01"
                         >
-                          Initiative
+                          {initiative ? <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative}`}>
+                            Initiative
+                            <i className="fa fa-link ml-2"/>
+                          </Link> : 'Initiative'}
                         </label>
                         <Select2
                           className="react-select-container"
@@ -396,7 +399,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           className="form-control-label"
                           htmlFor="validationCustom01"
                         >
-                          Sprint
+                          {sprint ? <Link to={`/admin/orgs/${orgId}/projects/${projectId}/sprints/edit/${sprint}`}>
+                            Sprint
+                            <i className="fa fa-link ml-2"/>
+                          </Link> : 'Sprint'}
                         </label>
                         <Select2
                           className="react-select-container"
@@ -413,7 +419,10 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           className="form-control-label"
                           htmlFor="validationCustom01"
                         >
-                          Issue
+                          {issue ? <Link to={`/admin/orgs/${orgId}/projects/${projectId}/issues/edit/${issue}`}>
+                            Issue
+                            <i className="fa fa-link ml-2"/>
+                          </Link> : 'Issue'}
                         </label>
                         <Select2
                           className="react-select-container"
