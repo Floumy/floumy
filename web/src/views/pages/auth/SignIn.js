@@ -57,7 +57,7 @@ function SignIn() {
       const currentOrgId = localStorage.getItem("currentUserOrgId");
       const currentProjectId = localStorage.getItem("currentProjectId");
       if (localStorage.getItem("currentUser") && currentOrgId && currentProjectId) {
-        navigate(`/admin/orgs/${currentOrgId}/projects/${currentProjectId}/dashboard`);
+        navigate(`/admin/orgs/${currentOrgId}/projects/${currentProjectId}/active-sprint`);
       }
     };
 
