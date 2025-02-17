@@ -10,13 +10,13 @@ import { PublicService } from './public.service';
 import { Public } from '../../auth/public.guard';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 
-@Controller('public/orgs/:orgId/projects/:projectId/okrs')
+@Controller('public/orgs/:orgId/projects/:projectId')
 @Public()
 @UseInterceptors(CacheInterceptor)
 export class PublicController {
   constructor(private publicOkrsService: PublicService) {}
 
-  @Get('/timeline/:timeline')
+  @Get('/okrs/timeline/:timeline')
   async listObjectives(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
@@ -33,7 +33,7 @@ export class PublicController {
     }
   }
 
-  @Get('/:okrId')
+  @Get('/okrs/:okrId')
   async getObjective(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
@@ -46,7 +46,7 @@ export class PublicController {
     }
   }
 
-  @Get('/:okrId/key-results/:keyResultId')
+  @Get('/key-results/:keyResultId')
   async getKeyResult(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,

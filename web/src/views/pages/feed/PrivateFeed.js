@@ -15,12 +15,7 @@ export default function PrivateFeed() {
     }
 
     if (item.entity === "keyResult") {
-
-      if (item.action === "updated") {
-        return `/admin/orgs/${orgId}/projects/${projectId}/okrs/${item.content.current.objective.id}/kr/detail/${item.entityId}`;
-      }
-
-      return `/admin/orgs/${orgId}/projects/${projectId}/okrs/${item.content.objective.id}/kr/detail/${item.entityId}`;
+      return `/admin/orgs/${orgId}/projects/${projectId}/okrs/kr/detail/${item.entityId}`;
     }
 
     if (item.entity === "initiative") {

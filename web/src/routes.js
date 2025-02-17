@@ -220,7 +220,7 @@ const routes = [
   },
   {
     redirect: true,
-    path: "/okrs/:objectiveId/kr/detail/:keyResultId",
+    path: "/kr/detail/:keyResultId",
     component: <DetailKeyResult />,
     layout: "/admin"
   },
@@ -343,7 +343,7 @@ export const publicRoutes = [
   },
   {
     redirect: true,
-    path: "/objectives/:objectiveId/kr/detail/:keyResultId",
+    path: "/kr/detail/:keyResultId",
     component: <PublicDetailKeyResult />,
     layout: "/public"
   },

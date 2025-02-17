@@ -137,8 +137,7 @@ export class NotificationService {
               });
             const keyResult = await keyResultComment.keyResult;
             entityName = keyResult.reference + ': ' + keyResult.title;
-            const o = await keyResult.objective;
-            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/okrs/${o.id}/kr/detail/${keyResult.id}`;
+            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`;
             break;
           case EntityType.OBJECTIVE_COMMENT:
             const objectiveComment =

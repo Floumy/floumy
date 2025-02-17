@@ -290,9 +290,9 @@ export class OkrsService {
     return await this.objectiveRepository.findOneByOrFail({ id });
   }
 
-  async listKeyResults(orgId: string) {
+  async listKeyResults(orgId: string, projectId: string) {
     const keyResults = await this.keyResultRepository.find({
-      where: { org: { id: orgId } },
+      where: { org: { id: orgId }, project: { id: projectId } },
       relations: ['initiatives', 'objective', 'org', 'initiatives.workItems'],
     });
     return await KeyResultMapper.toListDTO(keyResults);
