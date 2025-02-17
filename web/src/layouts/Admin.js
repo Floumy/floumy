@@ -93,9 +93,10 @@ function Admin() {
             />
             <Routes>
               {getRoutes(routes)}
+              {/*TODO: Redirect to not found page here*/}
               <Route
                 path="*"
-                element={<Navigate to="/admin/dashboard" replace />}
+                element={<Navigate to={`/admin/orgs/${orgId}/projects/${projectId}/active-sprint`} replace />}
               />
             </Routes>
             <Footer />
