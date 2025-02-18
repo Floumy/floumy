@@ -31,7 +31,10 @@ function PublicDetailWorkItem() {
   return (
     <>
       {loading && <InfiniteLoadingBar />}
-      <SimpleHeader/>
+      <SimpleHeader
+        breadcrumbs={workItem?.breadcrumbs}
+        isPublic={true}
+      />
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">

@@ -7,7 +7,7 @@ import PublicShareButtons from "../../../components/PublicShareButtons/PublicSha
 import { addComment, deleteComment, updateComment } from "../../../services/backlog/backlog.service";
 import { toast } from "react-toastify";
 import Comments from "../../../components/Comments/Comments";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from 'react-router-dom';
 
 function PublicWorkItem({ workItem = defaultWorkItem }) {
   const [comments, setComments] = React.useState(workItem.comments || []);
@@ -142,7 +142,10 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                       className="form-control-label"
 
                     >
-                      Initiative
+                      {workItem && workItem.initiative ? <Link to={`/public/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${workItem.initiative.id}`}>
+                        Initiative
+                        <i className="fa fa-link ml-2"/>
+                      </Link> : 'Initiative'}
                     </label>
                     <Input
                       type="text"
@@ -157,7 +160,10 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                     <label
                       className="form-control-label"
                     >
-                      Sprint
+                      {workItem && workItem.sprint ? <Link to={`/public/orgs/${orgId}/projects/${projectId}/sprints/detail/${workItem.sprint.id}`}>
+                        Sprint
+                        <i className="fa fa-link ml-2"/>
+                      </Link> : 'Sprint'}
                     </label>
                     <Input
                       type="text"
@@ -173,7 +179,10 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                       className="form-control-label"
 
                     >
-                      Issue
+                      {workItem && workItem.issue ? <Link to={`/public/orgs/${orgId}/projects/${projectId}/issues/${workItem.issue.id}`}>
+                        Issue
+                        <i className="fa fa-link ml-2"/>
+                      </Link> : 'Issue'}
                     </label>
                     <Input
                       type="text"

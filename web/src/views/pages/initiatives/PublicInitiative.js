@@ -4,8 +4,11 @@ import React from "react";
 import CardHeaderDetails from "../components/CardHeaderDetails";
 import { initiativeStatusName, priorityName } from "../../../services/utils/utils";
 import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
+import { Link, useParams } from 'react-router-dom';
 
 function PublicInitiative({ initiative }) {
+  const { orgId, projectId } = useParams();
+
   return (
     <>
       <Card>
@@ -75,7 +78,11 @@ function PublicInitiative({ initiative }) {
                   className="form-control-label"
                   htmlFor="validationCustom01"
                 >
-                  Key Result
+                  {initiative && initiative.keyResult && initiative.keyResult.id ?
+                    <Link to={`/public/orgs/${orgId}/projects/${projectId}/kr/detail/${initiative.keyResult.id}`}>
+                    Key Result
+                    <i className="fa fa-link ml-2"/>
+                  </Link> : 'Key Result'}
                 </label>
                 <Input
                   type="text"
@@ -91,7 +98,11 @@ function PublicInitiative({ initiative }) {
                   className="form-control-label"
                   htmlFor="validationCustom01"
                 >
-                  Milestone
+                  {initiative && initiative.milestone && initiative.milestone.id ?
+                    <Link to={`/public/orgs/${orgId}/projects/${projectId}/milestones/detail/${initiative.milestone.id}`}>
+                      Milestone
+                      <i className="fa fa-link ml-2"/>
+                    </Link> : 'Milestone'}
                 </label>
                 <Input
                   type="text"
@@ -107,7 +118,11 @@ function PublicInitiative({ initiative }) {
                   className="form-control-label"
                   htmlFor="validationCustom01"
                 >
-                  Feature Request
+                  {initiative && initiative.featureRequest && initiative.featureRequest.id ?
+                    <Link to={`/public/orgs/${orgId}/projects/${projectId}/feature-requests/${initiative.featureRequest.id}`}>
+                      Feature Request
+                      <i className="fa fa-link ml-2"/>
+                    </Link> : 'Feature Request'}
                 </label>
                 <Input
                   type="text"

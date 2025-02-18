@@ -1,21 +1,21 @@
-import { Card, CardBody, CardHeader, Col, Container, Input, Progress, Row } from "reactstrap";
-import React, { useEffect } from "react";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { formatProgress, keyResultStatusName } from "../../../services/utils/utils";
-import { useParams } from "react-router-dom";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import NotFoundCard from "../components/NotFoundCard";
-import { toast } from "react-toastify";
-import PublicInitiativesList from "../initiatives/PublicInitiativesList";
+import { Card, CardBody, CardHeader, Col, Container, Input, Progress, Row } from 'reactstrap';
+import React, { useEffect } from 'react';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import { formatProgress, keyResultStatusName } from '../../../services/utils/utils';
+import { useParams } from 'react-router-dom';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import NotFoundCard from '../components/NotFoundCard';
+import { toast } from 'react-toastify';
+import PublicInitiativesList from '../initiatives/PublicInitiativesList';
 import {
   addKeyResultComment,
   deleteKeyResultComment,
   getPublicKeyResult,
-  updateKeyResultComment
-} from "../../../services/okrs/okrs.service";
-import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
-import Comments from "../../../components/Comments/Comments";
+  updateKeyResultComment,
+} from '../../../services/okrs/okrs.service';
+import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
+import Comments from '../../../components/Comments/Comments';
 
 function PublicDetailKeyResult() {
   const { orgId, projectId, keyResultId } = useParams();
@@ -23,7 +23,7 @@ function PublicDetailKeyResult() {
   const [isLoading, setIsLoading] = React.useState(false);
 
   useEffect(() => {
-    document.title = "Floumy | Key Result";
+    document.title = 'Floumy | Key Result';
 
     async function loadData() {
       try {
@@ -31,7 +31,7 @@ function PublicDetailKeyResult() {
         const keyResult = await getPublicKeyResult(orgId, projectId, keyResultId);
         setKeyResult(keyResult);
       } catch (e) {
-        toast.error("The key result could not be loaded");
+        toast.error('The key result could not be loaded');
       } finally {
         setIsLoading(false);
       }
@@ -45,21 +45,27 @@ function PublicDetailKeyResult() {
       const addedComment = await addKeyResultComment(orgId, projectId, keyResultId, comment);
       keyResult.comments.push(addedComment);
       setKeyResult({ ...keyResult });
-      toast.success("Comment added successfully");
+      toast.success('Comment added successfully');
     } catch (e) {
-      toast.error("Failed to add comment");
+      toast.error('Failed to add comment');
     }
   }
 
   async function handleCommentEditSubmit(commentId, content) {
     try {
-      await updateKeyResultComment(orgId, projectId, keyResultId, commentId, content);
-      const updatedComment = keyResult.comments.find(c => c.id === commentId);
-      updatedComment.content = content;
-      setKeyResult({ ...keyResult });
-      toast.success("Comment updated successfully");
+      const updatedComment = await updateKeyResultComment(orgId, projectId, keyResultId, commentId, content);
+
+      setKeyResult({
+        ...keyResult, comments: keyResult.comments.map(comment => {
+          if (comment.id === commentId) {
+            return updatedComment;
+          }
+          return comment;
+        }),
+      });
+      toast.success('Comment updated successfully');
     } catch (e) {
-      toast.error("Failed to update comment");
+      toast.error('Failed to update comment');
     }
   }
 
@@ -69,16 +75,19 @@ function PublicDetailKeyResult() {
       const index = keyResult.comments.findIndex(c => c.id === commentId);
       keyResult.comments.splice(index, 1);
       setKeyResult({ ...keyResult });
-      toast.success("Comment deleted successfully");
+      toast.success('Comment deleted successfully');
     } catch (e) {
-      toast.error("Failed to delete comment");
+      toast.error('Failed to delete comment');
     }
   }
 
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader/>
+      <SimpleHeader
+        breadcrumbs={keyResult?.breadcrumbs}
+        isPublic={true}
+      />
       <Container className="mt--6" fluid id="OKRs">
         <Row>
           <Col md={12} lg={8}>
