@@ -6,11 +6,11 @@ import {
 } from "reactstrap";
 import { Link, useParams } from 'react-router-dom';
 
-export default function Breadcrumbs({ breadcrumbs }) {
+export default function Breadcrumbs({ breadcrumbs, isPublic }) {
 
   const {orgId, projectId} = useParams();
 
-  const getBreadcrumbUrl = (breadcrumb) => {
+  const getAdminBreadcrumbUrl = (breadcrumb) => {
     if (breadcrumb.type === 'work-item') {
       return `/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${breadcrumb.id}`;
     }
@@ -23,6 +23,29 @@ export default function Breadcrumbs({ breadcrumbs }) {
     if (breadcrumb.type === 'objective') {
       return `/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${breadcrumb.id}`;
     }
+  }
+
+  const getPublicBreadcrumbUrl = (breadcrumb) => {
+    if (breadcrumb.type === 'work-item') {
+      return `/public/orgs/${orgId}/projects/${projectId}/work-item/detail/${breadcrumb.id}`;
+    }
+    if (breadcrumb.type === 'initiative') {
+      return `/public/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${breadcrumb.id}`;
+    }
+    if (breadcrumb.type === 'key-result') {
+      return `/public/orgs/${orgId}/projects/${projectId}/kr/detail/${breadcrumb.id}`;
+    }
+    if (breadcrumb.type === 'objective') {
+      return `/public/orgs/${orgId}/projects/${projectId}/okrs/detail/${breadcrumb.id}`;
+    }
+  }
+
+  const getBreadcrumbUrl = (breadcrumb) => {
+    if (isPublic) {
+      return getPublicBreadcrumbUrl(breadcrumb);
+    }
+
+    return getAdminBreadcrumbUrl(breadcrumb);
   }
 
   return (

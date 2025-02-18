@@ -43,7 +43,10 @@ export function PublicDetailInitiative() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader/>
+      <SimpleHeader
+        breadcrumbs={initiative?.breadcrumbs}
+        isPublic={true}
+      />
       <Container className="mt--6" fluid id="OKRs">
         {initiative && initiative.workItems && initiative.workItems.length > 0 &&
           <ExecutionStats workItems={initiative.workItems} dueDate={initiative?.milestone?.dueDate} />}

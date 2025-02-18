@@ -75,7 +75,6 @@ export default function Comments({
   }
 
   function formatCommentWithClickableLinks(comment) {
-    // TODO: Fix comment update on public page that fails here
     return comment.content.replace(/(https?:\/\/[^\s<>]+)/g, '<a href="$1" style="color: #06c;" target="_blank">$1</a>');
   }
 
