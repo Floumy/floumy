@@ -10,7 +10,7 @@ import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import DeleteWarning from '../components/DeleteWarning';
 import FloumyDropZone from '../components/FloumyDropZone';
 import { toast } from 'react-toastify';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import CardHeaderDetails from '../components/CardHeaderDetails';
 import { getOrg } from '../../../services/org/orgs.service';
 import { listFeatureRequests } from '../../../services/feature-requests/feature-requests.service';
@@ -174,7 +174,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
 
       setTimeout(() => toast.success('The initiative has been saved'), 100);
       if(!initiative || !initiative.id) {
-        navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/edit/${savedInitiative.id}`, {replace: true});
+        navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${savedInitiative.id}`, {replace: true});
       }
     } catch (e) {
       console.error(e);
@@ -293,7 +293,10 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                       className="form-control-label"
                       htmlFor="validationCustom01"
                     >
-                      Key Result
+                      {keyResult ? <Link to={`/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult}`}>
+                        Key Result
+                        <i className="fa fa-link ml-2"/>
+                      </Link> : 'Key Result'}
                     </label>
                     <Select2
                       className="react-select-container"
@@ -316,7 +319,10 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                       className="form-control-label"
                       htmlFor="validationCustom01"
                     >
-                      Milestone
+                      {milestone ? <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/edit/${milestone}`}>
+                        Milestone
+                        <i className="fa fa-link ml-2"/>
+                      </Link> : 'Milestone'}
                     </label>
                     <Select2
                       className="react-select-container"
@@ -335,7 +341,10 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                       className="form-control-label"
                       htmlFor="validationCustom01"
                     >
-                      Feature Request
+                      {featureRequest ? <Link to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequest}`}>
+                        Feature Request
+                        <i className="fa fa-link ml-2"/>
+                      </Link> : 'Feature Request'}
                     </label>
                     <Select2
                       className="react-select-container"

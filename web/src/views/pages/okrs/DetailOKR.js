@@ -72,10 +72,14 @@ function DetailOKR() {
         setAssignedTo(okr.objective?.assignedTo?.id || '');
         // We need this to show the past quarter in the timeline options
         if (okr.objective.timeline === 'past') {
-          setTimelineOptions([...timelineOptions, {
-            id: okr.objective.timeline,
-            text: dateToQuarterAndYear(new Date(okr.objective.startDate)),
-          }]);
+          setTimelineOptions([
+            { id: 'this-quarter', text: 'This Quarter' },
+            { id: 'next-quarter', text: 'Next Quarter' },
+            { id: 'later', text: 'Later' },
+            {
+              id: okr.objective.timeline,
+              text: dateToQuarterAndYear(new Date(okr.objective.startDate)),
+            }]);
         }
       } catch (e) {
         toast.error('The OKR could not be loaded');
@@ -89,7 +93,7 @@ function DetailOKR() {
     }
 
     fetchData();
-  }, [id, orgId, projectId, timelineOptions]);
+  }, [id, orgId, projectId]);
 
   useMemo(() => {
     const filteredOrgMembers =
@@ -273,7 +277,7 @@ function DetailOKR() {
                 </h3>
               </CardHeader>
               <CardBody className="border-bottom">
-                {isLoading&& <LoadingSpinnerBox />}
+                {isLoading && <LoadingSpinnerBox />}
                 {!isLoading && okr &&
                   <>
                     <Formik

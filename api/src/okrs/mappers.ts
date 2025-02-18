@@ -121,6 +121,32 @@ class WorkItemMapper {
   }
 }
 
+class KeyResultBreadcrumbMapper {
+  static async toDto(
+    keyResult: KeyResult,
+  ): Promise<{ reference: string; type: string; id: string }[]> {
+    const objective = await keyResult.objective;
+
+    const breadcrumbs = [
+      {
+        reference: keyResult.reference,
+        type: 'key-result',
+        id: keyResult.id,
+      },
+    ];
+
+    if (objective) {
+      breadcrumbs.push({
+        reference: objective.reference,
+        type: 'objective',
+        id: objective.id,
+      });
+    }
+
+    return breadcrumbs.reverse();
+  }
+}
+
 export class KeyResultMapper {
   static async toDTO(keyResult: KeyResult): Promise<KeyResultDto> {
     const objective = await keyResult.objective;
@@ -151,6 +177,7 @@ export class KeyResultMapper {
         objective.startDate,
         objective.endDate,
       ),
+      breadcrumbs: await KeyResultBreadcrumbMapper.toDto(keyResult),
       createdAt: keyResult.createdAt,
       updatedAt: keyResult.updatedAt,
       status: keyResult.status,
