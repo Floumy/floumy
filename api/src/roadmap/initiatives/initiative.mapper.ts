@@ -2,6 +2,42 @@ import { Initiative } from './initiative.entity';
 import { InitiativeDto, InitiativesListDto, SearchInitiative } from './dtos';
 import { CommentMapper } from '../../comments/mappers';
 
+class BreadcrumbMapper {
+  static async toDto(
+    initiative: Initiative,
+  ): Promise<{ reference: string; type: string; id: string }[]> {
+    const keyResult = await initiative.keyResult;
+    let objective = null;
+
+    const breadcrumbs = [
+      {
+        reference: initiative.reference,
+        type: 'initiative',
+        id: initiative.id,
+      },
+    ];
+
+    if (keyResult) {
+      breadcrumbs.push({
+        reference: keyResult.reference,
+        type: 'key-result',
+        id: keyResult.id,
+      });
+      objective = await keyResult.objective;
+    }
+
+    if (objective) {
+      breadcrumbs.push({
+        reference: objective.reference,
+        type: 'objective',
+        id: objective.id,
+      });
+    }
+
+    return breadcrumbs.reverse();
+  }
+}
+
 export class InitiativeMapper {
   static async toDto(initiative: Initiative): Promise<InitiativeDto> {
     const createdBy = await initiative.createdBy;
@@ -58,6 +94,7 @@ export class InitiativeMapper {
             name: assignedTo.name,
           }
         : undefined,
+      breadcrumbs: await BreadcrumbMapper.toDto(initiative),
       createdAt: initiative.createdAt,
       updatedAt: initiative.updatedAt,
       completedAt: initiative.completedAt,

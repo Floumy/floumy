@@ -1,5 +1,4 @@
-import api, { logoutUser } from "../api/api.service";
-import { cacheData, getCachedData } from "../cache/cache.service";
+import api, { logoutUser } from '../api/api.service';
 
 export async function getOrg() {
   try {

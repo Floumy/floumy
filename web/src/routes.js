@@ -8,7 +8,6 @@ import ActiveSprint from './views/pages/development/ActiveSprint';
 import NewInitiative from './views/pages/roadmap/NewInitiative';
 import NewMilestone from './views/pages/roadmap/NewMilestone';
 import EditMilestone from './views/pages/roadmap/EditMilestone';
-import EditInitiative from './views/pages/initiatives/EditInitiative';
 import NewWorkItem from './views/pages/backlog/NewWorkItem';
 import EditWorkItem from './views/pages/backlog/EditWorkItem';
 import { DetailInitiative } from './views/pages/initiatives/DetailInitiative';
@@ -118,12 +117,6 @@ const routes = [
     redirect: true,
     path: "/roadmap/initiatives/new",
     component: <NewInitiative />,
-    layout: "/admin"
-  },
-  {
-    redirect: true,
-    path: "/roadmap/initiatives/edit/:id",
-    component: <EditInitiative />,
     layout: "/admin"
   },
   {

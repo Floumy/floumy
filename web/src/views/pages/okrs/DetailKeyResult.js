@@ -208,7 +208,9 @@ function DetailKeyResult() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader/>
+      <SimpleHeader
+        breadcrumbs={keyResult?.breadcrumbs}
+      />
       <Container className="mt--6" fluid id="OKRs">
         <Row>
           <Col lg={8} md={12}>
