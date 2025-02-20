@@ -28,20 +28,39 @@ export class AiService {
   ) {}
 
   async generateKeyResults(objective: string): Promise<KeyResultType[]> {
-    const prompt = `Generate up to 5 key results for the following objective:
-    
-    Objective: ${objective}
+    const prompt = `Generate 2-4 key results for this objective:
 
-    For each key result, include only:
-    - Title
-    
-    Have a preference for a lower number of key results.
-    
-    Do not include any timelines or deadlines or money amounts.
-    Make the key results specific and measurable.
-    Make sure the key results are clear and concise.
-    Do not include any unnecessary details.
-    Keep the key results short and to the point.`;
+      ${objective}
+      
+      Format each as a single line starting with a measurable verb:
+      
+      [Verb] [specific metric] [meaningful outcome]
+      
+      Examples:
+      
+      Increase customer satisfaction score to 90%
+      
+      Reduce system errors to fewer than 5 per week
+      
+      Achieve 98% uptime across all services
+      
+      Requirements: 
+      • Include ONLY the most critical metrics that define success
+      • Each KR must be necessary - if removed, objective fails
+      • Start with actionable verbs (Increase, Reduce, Achieve, etc.) 
+      • Include specific, measurable metrics 
+      • Focus on outcomes, not activities 
+      • Avoid timelines and costs 
+      • Keep under 8 words per result 
+      • Ensure each result directly supports the objective
+      
+      Choose metrics that are: 
+      • Quantifiable 
+      • Clear to measure 
+      • Meaningful to stakeholders 
+      • Within team's influence
+      
+      Favor fewer, high-impact results over many small ones.`;
 
     const response = await this.openaiService.generateCompletion<{
       keyResults: KeyResultType[];
@@ -74,26 +93,45 @@ export class AiService {
   }
 
   async generateInitiativesForOKR(objective: string, keyResult: string) {
-    const prompt = `Generate up to 5 initiatives to achieve the following objective and key result:
-    
-    Objective: ${objective}
-    Key Result: ${keyResult}
+    const prompt = `Generate 2-3 high-impact initiatives for this objective and key result:
 
-    For each initiative, include:
-    - Title
-    - Description
-    - Priority (high/medium/low)
+    ${objective} ${keyResult}
     
-    In the description, include:
-    - What is the goal of the initiative?
-    - Why is it important?
-    - What is the expected outcome of the initiative?
-   
-    Separate the description into sections, each with a heading.
+    Format each initiative as:
     
-    Have a preference for a lower number of key results.
+    [Title]: Single clear phrase under 6 words 
+    [Priority]: high/medium/low 
+    [Description]: Structured HTML with 3 sections:
     
-    Format the description as an HTML string.`;
+    • Goal: One sentence stating concrete desired outcome 
+    • Rationale: Business value and strategic importance 
+    • Impact: Specific, measurable success metrics
+    
+    Requirements: 
+    • Each initiative must directly drive the key result 
+    • Focus on outcomes over activities 
+    • Include only essential initiatives - if removed, key result fails 
+    • Ensure initiatives are within team's control 
+    • Keep descriptions concise and actionable
+    
+    Choose initiatives that are: 
+    • Clear to implement 
+    • Measurable for success 
+    • Meaningful to stakeholders 
+    • Realistic with current resources
+    
+    Favor fewer, transformative initiatives over many incremental ones.
+    
+    Example format:
+    
+    Implement automated testing framework 
+    Priority: high 
+    <h3>Goal</h3> 
+    <p>Create end-to-end test coverage for critical paths</p> 
+    <h3>Rationale</h3> 
+    <p>Prevents production issues and enables faster releases</p> 
+    <h3>Impact</h3> 
+    <p>95% test coverage of core workflows</p>`;
 
     const response = await this.openaiService.generateCompletion<{
       initiatives: InitiativeType[];
@@ -135,26 +173,48 @@ export class AiService {
     featureRequest: string,
     featureRequestDescription: string,
   ) {
-    const prompt = `Generate up to 3 initiatives to achieve the following feature request:
-    
-    Feature Request: ${featureRequest}
-    Description: ${featureRequestDescription}
+    const prompt = `Generate 1-3 high-impact initiatives for this feature request:
 
-    For each initiative, include:
-    - Title
-    - Description
-    - Priority (high/medium/low)
+    Copy
+    ${featureRequest}
+    ${featureRequestDescription}
     
-    In the description, include:
-    - What is the goal of the initiative?
-    - Why is it important?
-    - What is the expected outcome of the initiative?
+    Format each initiative as:
     
-    Separate the description into sections, each with a heading.
+    [Title]: Single clear phrase under 6 words
+    [Priority]: high/medium/low
+    [Description]: Structured HTML with 3 sections:
     
-    Have a preference for a lower number of key results.
+    • Goal: One sentence stating concrete deliverable
+    • Rationale: Business value and user impact
+    • Outcome: Specific, measurable success criteria
     
-    Format the description as an HTML string.`;
+    Requirements:
+    • Each initiative must directly enable the feature
+    • Focus on user value over technical details
+    • Include only essential initiatives - if removed, feature fails
+    • Ensure initiatives are technically feasible
+    • Keep descriptions concise and actionable
+    
+    Choose initiatives that are:
+    • Clear to implement
+    • Measurable for success
+    • Valuable to users
+    • Realistic with current tech stack
+    
+    Favor fewer, complete initiatives over many partial ones.
+    
+    Example format:
+    
+    Implement user authentication flow
+    Priority: high
+    <h3>Goal</h3>
+    <p>Create secure login system with email/password</p>
+    <h3>Rationale</h3>
+    <p>Enables user accounts and personalized experience</p>
+    <h3>Outcome</h3>
+    <p>90% of users can successfully register and login</p>
+`;
 
     const response = await this.openaiService.generateCompletion<{
       initiatives: InitiativeType[];
