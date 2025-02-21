@@ -256,38 +256,71 @@ export class AiService {
     initiative: string,
     description: string,
   ) {
-    const prompt = `Generate up to 5 work items for the following initiative:
-    
+    const prompt = `Generate 2-4 essential work items for this initiative:
+
     Initiative: ${initiative}
     Description: ${description}
     
-    For each work item, include:
-    - Title
-    - Type (user-story/task/spike)
-    - Priority (high/medium/low)
-    - Description
+    Format each work item as:
     
-    Prefer to use the following types in this order: user-story, task, spike
+    [Title]: 
+    - For user stories: "As a [user], I want to [action], so that [benefit]"
+    - For tasks/spikes: Clear action phrase under 6 words
+    [Type]: user-story/task/spike
+    [Priority]: high/medium/low
+    [Description]: Structured HTML with sections:
     
-    As much as possible, slice the work items so that they are not dependent on each other.
-        
-    The user story type should be used for work items that are about a job that needs to be done by a user.
-    The task type should be used for work items that are about a task that is not a user story.
-    The bug type should be used for work items that are about a something that is broken.
-    The spike type should be used for work items that are about investigating an idea or a concept.
+    For user stories:
+    • Goal: One sentence stating concrete deliverable
+    • Value: Business impact and user benefit
+    • Implementation: Key technical considerations and approach
+    • Acceptance Criteria: Bulleted list of testable requirements
+
+    For tasks/spikes:
+    • Goal: One sentence describing the work
+    • Acceptance Criteria: Bulleted list of completion requirements
     
-    In the description, include:
-    - What is the goal of the work item?
-    - Why is it important?
-    - Implementation details
-    - Acceptance criteria
+    Requirements:
+    • Each work item must be independently deliverable
+    • Include only essential items - all directly enable initiative
+    • Ensure items are technically feasible
     
-    Separate the description into sections, each with a heading.
+    Work item types:
+    • user-story: User-facing functionality written from user perspective
+    • task: Technical work with no direct user impact
+    • spike: Research/investigation activities
     
-    Have a preference for a lower number of key results.
-    
-    Format the description as an HTML string.
-    `;
+    Example formats:
+
+    As a user, I want to customize the app's theme, so that I can make it more comfortable for my eyes
+    Type: user-story
+    Priority: high
+    <h3>Goal</h3>
+    <p>Enable users to switch between light and dark themes</p>
+    <h3>Value</h3>
+    <p>Improves user experience and accessibility for different lighting conditions</p>
+    <h3>Implementation</h3>
+    <p>Add theme toggle in user settings, implement CSS variables for theming</p>
+    <h3>Acceptance Criteria</h3>
+    <ul>
+        <li>User can switch between light and dark themes in settings</li>
+        <li>Theme preference persists across sessions</li>
+        <li>All UI elements respect the selected theme</li>
+        <li>Theme changes apply immediately without page reload</li>
+        <li>Default theme matches system preferences</li>
+    </ul>
+
+    Configure CI pipeline for theme builds
+    Type: task
+    Priority: medium
+    <h3>Goal</h3>
+    <p>Set up automated build process for theme compilation</p>
+    <h3>Acceptance Criteria</h3>
+    <ul>
+        <li>Theme files automatically compile on merge</li>
+        <li>Build artifacts stored in correct location</li>
+        <li>Failed builds trigger notifications</li>
+    </ul>`;
 
     const response = await this.openaiService.generateCompletion<{
       workItems: WorkItemType[];
@@ -329,38 +362,71 @@ export class AiService {
   }
 
   async generateWorkItemsForIssue(issue: string, description: string) {
-    const prompt = `Generate up to 3 work items for the following issue:
-    
+    const prompt = `Generate 1-3 essential work items for this issue:
+
     Issue: ${issue}
     Description: ${description}
+    
+    Format each work item as:
+    
+    [Title]:
+    - For user stories: "As a [user], I want to [action], so that [benefit]"
+    - For tasks/bugs/spikes: Clear action phrase under 6 words
+    [Type]: task/bug/user-story/spike (prefer in this order)
+    [Priority]: high/medium/low
+    [Description]: Structured HTML with sections:
+    
+    For user stories:
+    • Goal: One sentence stating concrete deliverable
+    • Value: Business impact and user benefit
+    • Implementation: Key technical considerations and approach
+    • Acceptance Criteria: Bulleted list of testable requirements
 
-    For each work item, include:
-    - Title
-    - Type (user-story/task/bug/spike)
-    - Priority (high/medium/low)
-    - Description
+    For tasks/bugs/spikes:
+    • Goal: One sentence describing the work
+    • Acceptance Criteria: Bulleted list of completion requirements
     
-    Prefer to use the following types in this order: task, bug, user-story, spike
+    Requirements:
+    • Each work item must be independently deliverable
+    • Include only essential items to resolve the issue
+    • Ensure items are technically feasible
     
-    As much as possible, slice the work items so that they are not dependent on each other.
-        
-    The user story type should be used for work items that are about a job that needs to be done by a user.
-    The task type should be used for work items that are about a task that is not a user story.
-    The bug type should be used for work items that are about a something that is broken.
-    The spike type should be used for work items that are about investigating an idea or a concept.
+    Work item types:
+    • task: Technical work with no direct user impact
+    • bug: Fix for broken functionality
+    • user-story: User-facing functionality written from user perspective
+    • spike: Research/investigation activities
     
-    In the description, include:
-    - What is the goal of the work item?
-    - Why is it important?
-    - Implementation details
-    - Acceptance criteria
-    
-    Separate the description into sections, each with a heading.
-    
-    Have a preference for a lower number of key results.
-    
-    Format the description as an HTML string.
-    `;
+    Example formats:
+
+    Fix memory leak in theme switcher
+    Type: bug
+    Priority: high
+    <h3>Goal</h3>
+    <p>Resolve memory leak when switching themes repeatedly</p>
+    <h3>Acceptance Criteria</h3>
+    <ul>
+        <li>Memory usage stable after 100+ theme switches</li>
+        <li>No DOM elements remain after component unmount</li>
+        <li>Performance profiling shows no memory growth</li>
+    </ul>
+
+    As a user, I want to reset my theme to default, so that I can easily restore standard appearance
+    Type: user-story
+    Priority: medium
+    <h3>Goal</h3>
+    <p>Provide option to reset theme customizations</p>
+    <h3>Value</h3>
+    <p>Allows users to easily recover from unwanted theme changes</p>
+    <h3>Implementation</h3>
+    <p>Add reset button to theme settings, restore default values</p>
+    <h3>Acceptance Criteria</h3>
+    <ul>
+        <li>Reset button visible in theme settings</li>
+        <li>Clicking reset restores all default values</li>
+        <li>Confirmation dialog prevents accidental reset</li>
+        <li>User receives feedback when reset completes</li>
+    </ul>`;
 
     const response = await this.openaiService.generateCompletion<{
       workItems: WorkItemType[];
@@ -407,7 +473,7 @@ export class AiService {
     initiativeId: string,
     issueId: string,
   ) {
-    let prompt = `Generate a description for the following work item:
+    let prompt = `Generate a detailed description for this work item:
     
     Work Item Title: ${workItem}
     Work Item Type: ${workItemType}
@@ -429,20 +495,56 @@ export class AiService {
       `;
     }
     prompt += `
-    The user story type should be used for work items that are about a job that needs to be done by a user.
-    The task type should be used for work items that are about a task that is not a user story.
-    The bug type should be used for work items that are about a something that is broken.
-    The spike type should be used for work items that are about investigating an idea or a concept.
+    Format the description based on work item type:
+
+    For user stories:
+    • Goal: One sentence stating concrete deliverable
+    • Value: Business impact and user benefit
+    • Implementation: Key technical considerations and approach
+    • Acceptance Criteria: Bulleted list of testable requirements
     
-    In the description, include:
-    - What is the goal of the work item?
-    - Why is it important?
-    - Implementation details
-    - Acceptance criteria
+    For tasks/bugs/spikes:
+    • Goal: One sentence describing the work
+    • Acceptance Criteria: Bulleted list of completion requirements
     
-    Separate the description into sections, each with a heading.
+    Work item types:
+    • user-story: User-facing functionality written from user perspective
+    • task: Technical work with no direct user impact
+    • bug: Fix for broken functionality
+    • spike: Research/investigation activities
     
-    Format the description as an HTML string.
+    Requirements:
+    • Focus on concrete, measurable outcomes
+    • Include only essential implementation details
+    • Write clear, testable acceptance criteria
+    • Align with linked initiative/issue goals
+    
+    Example formats:
+    
+    User Story Example:
+    <h3>Goal</h3>
+    <p>Enable users to export dashboard data to multiple formats</p>
+    <h3>Value</h3>
+    <p>Allows users to analyze data in their preferred tools</p>
+    <h3>Implementation</h3>
+    <p>Add export options for CSV, PDF, and Excel using DataExport library</p>
+    <h3>Acceptance Criteria</h3>
+    <ul>
+        <li>Export button available in dashboard header</li>
+        <li>User can select from three format options</li>
+        <li>Export completes within 5 seconds for standard datasets</li>
+        <li>Downloaded files contain all visible dashboard data</li>
+    </ul>
+    
+    Task/Bug/Spike Example:
+    <h3>Goal</h3>
+    <p>Implement rate limiting for export API endpoints</p>
+    <h3>Acceptance Criteria</h3>
+    <ul>
+        <li>Maximum 5 exports per minute per user</li>
+        <li>Appropriate error message on limit exceeded</li>
+        <li>Logging of all rate limit events</li>
+    </ul>
     `;
 
     const response = await this.openaiService.generateCompletion<{
@@ -469,41 +571,55 @@ export class AiService {
     milestoneId: string,
     featureRequestId: string,
   ) {
-    let prompt = `Generate a description for the following initiative:
-    
+    let prompt = `Generate a detailed description for this initiative:
     Initiative Title: ${initiative}
     `;
+
     if (keyResultId) {
       const keyResult = await this.keyResultRepository.findOneOrFail({
         where: { id: keyResultId },
       });
-      prompt += `Linked Key Result title: ${keyResult.title}
-      `;
+      prompt += `Linked Key Result: ${keyResult.title}\n`;
     }
+
     if (milestoneId) {
       const milestone = await this.milestoneRepository.findOneOrFail({
         where: { id: milestoneId },
       });
-      prompt += `Linked Milestone title: ${milestone.title}
-      `;
+      prompt += `Linked Milestone: ${milestone.title}\n`;
     }
+
     if (featureRequestId) {
       const featureRequest = await this.featureRequestRepository.findOneOrFail({
         where: { id: featureRequestId },
       });
-      prompt += `Linked Feature Request title: ${featureRequest.title}
-      Linked Feature Request description: ${featureRequest.description}
-      `;
+      prompt += `Linked Feature Request: ${featureRequest.title}
+      Description: ${featureRequest.description}\n`;
     }
+
     prompt += `
-    In the description, include:
-    - What is the goal of the initiative?
-    - Why is it important?
-    - What is the expected outcome of the initiative?
-   
-    Separate the description into sections, each with a heading.
+    Format the description as structured HTML with 3 sections:
     
-    Format the description as an HTML string.
+    <h3>Goal</h3>
+    <p>Single sentence stating the concrete deliverable</p>
+    
+    <h3>Rationale</h3>
+    <p>Business value and user impact</p>
+    
+    <h3>Outcome</h3>
+    <p>Specific, measurable success criteria</p>
+    
+    Requirements:
+    • Focus on user value over technical details
+    • Keep descriptions concise and actionable
+    • Include clear success metrics
+    • Ensure technical feasibility
+    
+    The description should be:
+    • Clear and implementable
+    • Tied to measurable outcomes
+    • Focused on user/business value
+    • Realistic within current capabilities
     `;
 
     const response = await this.openaiService.generateCompletion<{
