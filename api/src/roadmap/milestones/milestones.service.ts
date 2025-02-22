@@ -16,12 +16,15 @@ import { MilestoneMapper } from './milestone.mapper';
 import { Timeline } from '../../common/timeline.enum';
 import { TimelineService } from '../../common/timeline.service';
 import { Project } from '../../projects/project.entity';
+import { Initiative } from '../initiatives/initiative.entity';
 
 @Injectable()
 export class MilestonesService {
   constructor(
     @InjectRepository(Milestone)
     private milestoneRepository: Repository<Milestone>,
+    @InjectRepository(Initiative)
+    private initiativeRepository: Repository<Initiative>,
     private orgsService: OrgsService,
     @InjectRepository(Project) private projectsRepository: Repository<Project>,
   ) {}
@@ -108,9 +111,16 @@ export class MilestonesService {
       project: { id: projectId },
       id: id,
     });
-    const initiatives = await milestone.initiatives;
-    initiatives.forEach((initiative) => (initiative.milestone = null));
-    await this.milestoneRepository.manager.save(initiatives);
+    const initiatives = await this.initiativeRepository.find({
+      where: {
+        milestone: { id: id },
+      },
+    });
+    for (const initiative of initiatives) {
+      initiative.milestone = null;
+    }
+    await this.initiativeRepository.save(initiatives);
+
     await this.milestoneRepository.remove(milestone);
   }
 
