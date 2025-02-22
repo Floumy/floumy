@@ -189,7 +189,7 @@ function DetailOKRStats({ okr }) {
               <Row>
                 <Col>
                   <CardTitle className="text-uppercase text-muted mb-0 ">
-                    Overall Completion
+                    Completed Items
                   </CardTitle>
                   <span className="h2 font-weight-bold mb-0 ">
                       {overallCompletion}%

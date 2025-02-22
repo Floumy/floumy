@@ -32,7 +32,7 @@ function DetailKeyResult() {
   const [status, setStatus] = React.useState('');
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = React.useState(false);
   const [progress, setProgress] = React.useState('');
-  const { objectiveId, keyResultId, orgId, projectId } = useParams();
+  const {keyResultId, orgId, projectId } = useParams();
   const [keyResult, setKeyResult] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
@@ -56,7 +56,7 @@ function DetailKeyResult() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const keyResult = await getKeyResult(orgId, projectId, objectiveId, keyResultId);
+        const keyResult = await getKeyResult(orgId, projectId, keyResultId);
         setKeyResult(keyResult);
         setStatus(keyResult.status);
         setProgress(keyResult.progress);
@@ -68,7 +68,7 @@ function DetailKeyResult() {
     }
 
     loadData();
-  }, [orgId, projectId, keyResultId, objectiveId]);
+  }, [orgId, projectId, keyResultId]);
 
   const handleSubmit = async (values) => {
     try {
@@ -76,15 +76,14 @@ function DetailKeyResult() {
       await updateKeyResult(
         orgId,
         projectId,
-        objectiveId,
         keyResultId,
         {
           title: values.title,
           status,
           progress,
         });
-      navigate(-1);
-      setTimeout(() => toast.success('The key result has been saved'), 100);
+
+      toast.success('The key result has been saved');
     } catch (e) {
       toast.error('The key result could not be saved');
     } finally {
@@ -95,7 +94,7 @@ function DetailKeyResult() {
   const handleDelete = async () => {
     try {
       setIsSubmitting(true);
-      await deleteKeyResult(orgId, projectId, objectiveId, keyResultId);
+      await deleteKeyResult(orgId, projectId, keyResultId);
       navigate(-1);
       setTimeout(() => toast.success('The key result has been deleted'), 100);
     } catch (e) {
@@ -150,7 +149,7 @@ function DetailKeyResult() {
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addKeyResultComment(orgId, projectId, objectiveId, keyResultId, comment);
+      const addedComment = await addKeyResultComment(orgId, projectId, keyResultId, comment);
       keyResult.comments.push(addedComment);
       setKeyResult({ ...keyResult });
       toast.success('Comment added successfully');
@@ -161,7 +160,7 @@ function DetailKeyResult() {
 
   async function handleCommentEditSubmit(commentId, comment) {
     try {
-      await updateKeyResultComment(orgId, projectId, objectiveId, keyResultId, commentId, comment);
+      await updateKeyResultComment(orgId, projectId, keyResultId, commentId, comment);
       const updatedComment = keyResult.comments.find(c => c.id === commentId);
       updatedComment.content = comment.content;
       updatedComment.mentions = comment.mentions;
@@ -174,7 +173,7 @@ function DetailKeyResult() {
 
   async function handCommentDelete(commentId) {
     try {
-      await deleteKeyResultComment(orgId, projectId, objectiveId, keyResultId, commentId);
+      await deleteKeyResultComment(orgId, projectId, keyResultId, commentId);
       const index = keyResult.comments.findIndex(c => c.id === commentId);
       keyResult.comments.splice(index, 1);
       setKeyResult({ ...keyResult });
@@ -210,19 +209,11 @@ function DetailKeyResult() {
     <>
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader
-        headerButtons={[
-          {
-            name: 'Back',
-            shortcut: '←',
-            action: () => {
-              window.history.back();
-            },
-          },
-        ]}
+        breadcrumbs={keyResult?.breadcrumbs}
       />
       <Container className="mt--6" fluid id="OKRs">
         <Row>
-          <Col>
+          <Col lg={8} md={12}>
             {!isLoading && !keyResult && <NotFoundCard message="Key result not be found" />}
             <DeleteWarning
               isOpen={isDeleteWarningOpen}
@@ -353,10 +344,8 @@ function DetailKeyResult() {
               </Card>
             </>}
           </Col>
-        </Row>
-        <Row>
           {!isLoading &&
-            <Col>
+            <Col lg={4} md={12}>
               <Comments
                 comments={keyResult?.comments || []}
                 onCommentAdd={handleCommentAdd}

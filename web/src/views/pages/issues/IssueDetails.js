@@ -76,114 +76,109 @@ export default function IssueDetails() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        headerButtons={[
-          {
-            name: 'Back',
-            shortcut: '←',
-            action: () => window.history.back(),
-          },
-        ]}
-      />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <Col>
-            <div className="card-wrapper">
-              {isLoading ? (
+            <Row>
+              <Col>
+                <div className="card-wrapper">
+                  {isLoading ? (
+                    <Card>
+                      <CardHeader>
+                        <h2>Issue</h2>
+                      </CardHeader>
+                      <LoadingSpinnerBox />
+                    </Card>
+                  ) : issue && (
+                    <Card>
+                      <CardHeader>
+                        <h3 className="mb-0">Issue</h3>
+                        <CardHeaderDetails createdAt={issue.createdAt} updatedAt={issue.updatedAt} />
+                      </CardHeader>
+                      <CardBody>
+                        <Form className="needs-validation" noValidate>
+                          <Row>
+                            <Col>
+                              <FormGroup>
+                                <label className="form-control-label">Title</label>
+                                <Input
+                                  type="text"
+                                  value={issue.title}
+                                  className="bg-white"
+                                  disabled
+                                  readOnly
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col>
+                              <FormGroup>
+                                <label className="form-control-label">Status</label>
+                                <Input
+                                  type="text"
+                                  className="bg-white"
+                                  value={formatHyphenatedString(issue.status)}
+                                  disabled
+                                  readOnly
+                                />
+                              </FormGroup>
+                            </Col>
+                            <Col>
+                              <FormGroup>
+                                <label className="form-control-label">Priority</label>
+                                <Input
+                                  type="text"
+                                  className="bg-white"
+                                  value={formatHyphenatedString(issue.priority)}
+                                  disabled
+                                  readOnly
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col>
+                              <FormGroup>
+                                <label className="form-control-label">Description</label>
+                                <Input
+                                  type="textarea"
+                                  rows={5}
+                                  className="bg-white"
+                                  value={issue.description}
+                                  disabled
+                                  readOnly
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                        </Form>
+                      </CardBody>
+                    </Card>
+                  )}
+                </div>
+              </Col>
+            </Row>
+            {issue && issue.workItems && <Row>
+              <Col>
                 <Card>
                   <CardHeader>
-                    <h2>Issue</h2>
+                    <h3 className="mb-0">Related Work Items</h3>
                   </CardHeader>
-                  <LoadingSpinnerBox />
+                  {isPublicPage ? <PublicWorkItemsList
+                     showInitiative={false}
+                      orgId={orgId}
+                      workItems={issue?.workItems}
+                      headerClassName={'thead'}
+                    /> :
+                    <WorkItemsList
+                      workItems={issue?.workItems}
+                    />}
                 </Card>
-              ) : issue && (
-                <Card>
-                  <CardHeader>
-                    <h3 className="mb-0">Issue</h3>
-                    <CardHeaderDetails createdAt={issue.createdAt} updatedAt={issue.updatedAt} />
-                  </CardHeader>
-                  <CardBody>
-                    <Form className="needs-validation" noValidate>
-                      <Row>
-                        <Col>
-                          <FormGroup>
-                            <label className="form-control-label">Title</label>
-                            <Input
-                              type="text"
-                              value={issue.title}
-                              className="bg-white"
-                              disabled
-                              readOnly
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col>
-                          <FormGroup>
-                            <label className="form-control-label">Status</label>
-                            <Input
-                              type="text"
-                              className="bg-white"
-                              value={formatHyphenatedString(issue.status)}
-                              disabled
-                              readOnly
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col>
-                          <FormGroup>
-                            <label className="form-control-label">Priority</label>
-                            <Input
-                              type="text"
-                              className="bg-white"
-                              value={formatHyphenatedString(issue.priority)}
-                              disabled
-                              readOnly
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col>
-                          <FormGroup>
-                            <label className="form-control-label">Description</label>
-                            <Input
-                              type="textarea"
-                              rows={5}
-                              className="bg-white"
-                              value={issue.description}
-                              disabled
-                              readOnly
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                    </Form>
-                  </CardBody>
-                </Card>
-              )}
-            </div>
+              </Col>
+            </Row>}
           </Col>
-        </Row>
-        {issue && issue.workItems && <Row>
-          <Col>
-            <Card>
-              <CardHeader>
-                <h3 className="mb-0">Related Work Items</h3>
-              </CardHeader>
-              {isPublicPage ? <PublicWorkItemsList
-                  orgId={orgId}
-                  workItems={issue?.workItems}
-                  headerClassName={'thead'}
-                /> :
-                <WorkItemsList
-                  workItems={issue?.workItems}
-                />}
-            </Card>
-          </Col>
-        </Row>}
-        <Row>
           <Col>
             <Comments
               comments={issue?.comments}

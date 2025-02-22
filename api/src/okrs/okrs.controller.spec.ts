@@ -476,11 +476,15 @@ describe('OkrsController', () => {
           ],
         },
       );
-      const keyResults = await controller.listKeyResults({
-        user: {
-          org: org.id,
+      const keyResults = await controller.listKeyResults(
+        {
+          user: {
+            org: org.id,
+          },
         },
-      });
+        org.id,
+        project.id,
+      );
       expect(keyResults.length).toEqual(3);
       // check that the items are in the list regardless of the order
       expect(

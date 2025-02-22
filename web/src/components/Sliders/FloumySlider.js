@@ -23,10 +23,10 @@ function FloumySlider({ initialValue, onSliderValueChange }) {
     <>
       <div className="input-slider-container">
         <Row>
-          <Col xs={3} sm={2}>
+          <Col sm={3}>
             <div className="input-slider-value text-center pt-2 pb-2">{formatProgress(sliderValue)}%</div>
           </Col>
-          <Col xs={9} sm={10}>
+          <Col sm={9}>
             <div className="input-slider" ref={sliderRef} />
           </Col>
         </Row>

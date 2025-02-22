@@ -212,8 +212,9 @@ function ExecutionStats({ workItems, dueDate }) {
         <Col sm={6}>
           <Card>
             <CardHeader>
-              <h5 className="h3 mb-0">Work Items
-                <UncontrolledDropdown className="ml-3 ">
+              <h5 className="h3 mb-0">
+                <span className="mr-2">Work Items</span>
+                <UncontrolledDropdown>
                   <DropdownToggle caret color="secondary" className="p-0 px-2">
                     by {showWorkItemsBy === 'status' ? 'Status' : 'Type'}
                   </DropdownToggle>
@@ -298,13 +299,13 @@ function ExecutionStats({ workItems, dueDate }) {
         </Col>
       </Row>
       <Row>
-        <Col md={12} lg={4}>
+        <Col md={12} lg={6}>
           <Card>
             <CardBody>
               <Row>
                 <div className="col">
                   <CardTitle className="text-uppercase text-muted mb-0 ">
-                    Overall Completion
+                    Completed Items
                   </CardTitle>
                   <span className="h2 font-weight-bold mb-0 ">
                       {overallCompletion}%
@@ -319,7 +320,7 @@ function ExecutionStats({ workItems, dueDate }) {
             </CardBody>
           </Card>
         </Col>
-        <Col md={12} lg={4}>
+        <Col md={12} lg={6}>
           <Card>
             <CardBody>
               <Row>
@@ -334,27 +335,6 @@ function ExecutionStats({ workItems, dueDate }) {
                 <Col className="col-auto">
                   <div className="icon icon-shape bg-white text-primary rounded-circle bg-lighter">
                     <i className="ni ni-building" />
-                  </div>
-                </Col>
-              </Row>
-            </CardBody>
-          </Card>
-        </Col>
-        <Col md={12} lg={4}>
-          <Card>
-            <CardBody>
-              <Row>
-                <div className="col">
-                  <CardTitle className="text-uppercase text-muted mb-0 ">
-                    Due date
-                  </CardTitle>
-                  <span className="h2 font-weight-bold mb-0 ">
-                      {dueDate ? formatDate(new Date(dueDate)) : 'No due date'}
-                    </span>
-                </div>
-                <Col className="col-auto">
-                  <div className="icon icon-shape bg-white text-primary rounded-circle bg-lighter">
-                    <i className="ni ni-calendar-grid-58" />
                   </div>
                 </Col>
               </Row>

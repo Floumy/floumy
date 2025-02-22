@@ -67,6 +67,10 @@ export interface WorkItemDto {
     createdAt: Date;
     updatedAt: Date;
   }[];
+  breadcrumbs?: {
+    reference: string;
+    id: string;
+  }[];
   createdBy: UserDto;
   assignedTo: UserDto;
   createdAt: Date;

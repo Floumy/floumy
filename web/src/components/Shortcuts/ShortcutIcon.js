@@ -12,12 +12,12 @@ const ShortcutContainer = styled.div`
 const ItemName = styled.span`
     font-size: 12px;
     margin-right: 8px;
-    color: #1e232b;
+    color: #ffffff;
 `;
 
 const ShortcutKey = styled.span`
     background-color: #1e232b;
-    color: #bbbaba;
+    color: #e1e1e1;
     font-weight: bold;
     padding: 4px;
     text-align: center;

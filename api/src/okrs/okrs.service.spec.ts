@@ -486,7 +486,7 @@ describe('OkrsService', () => {
   });
   describe('when listing key results', () => {
     it('should return an empty array', async () => {
-      const keyResults = await service.listKeyResults(org.id);
+      const keyResults = await service.listKeyResults(org.id, project.id);
       expect(keyResults).toEqual([]);
     });
     it('should return an array of key results', async () => {
@@ -494,7 +494,7 @@ describe('OkrsService', () => {
         title: 'Test Objective',
       });
       await service.createKeyResultFor(objective, 'Test Key Result');
-      const keyResults = await service.listKeyResults(org.id);
+      const keyResults = await service.listKeyResults(org.id, project.id);
       expect(keyResults).toHaveLength(1);
       expect(keyResults[0].title).toEqual('Test Key Result');
     });

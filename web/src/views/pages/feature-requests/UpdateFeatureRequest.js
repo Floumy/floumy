@@ -34,8 +34,7 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
         estimation: values.estimation || null
       };
       await onUpdate(updatedFeatureRequest);
-      navigate(-1);
-      setTimeout(() => toast.success("The feature request has been saved"), 100);
+      toast.success('The feature request has been saved');
     } catch (e) {
       toast.error("The feature request could not be saved");
     } finally {

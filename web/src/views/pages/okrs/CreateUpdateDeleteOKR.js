@@ -44,8 +44,8 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
       // Remove empty key results
       const keyResults = fields
         .filter((field) => field.title);
-      await onSubmit({ ...values, timeline, assignedTo, keyResults: keyResults });
-      navigate(-1);
+      const savedOKR = await onSubmit({ ...values, timeline, assignedTo, keyResults: keyResults });
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${savedOKR.objective.id}`, {replace: true});
       setTimeout(() => toast.success('The OKR has been saved'), 100);
     } catch (e) {
       toast.error('The OKR could not be saved');
@@ -175,7 +175,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                 className="needs-validation"
                 noValidate>
                 <Row>
-                  <Col className="mb-3" md="8">
+                  <Col className="mb-3" md={12} lg={12}>
                     <label
                       className="form-control-label"
                       htmlFor="validationCustom01"
@@ -195,7 +195,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                     />
                     <ErrorMessage name={'objective'} component={InputError} />
                   </Col>
-                  <Col className="mb-3">
+                  <Col className="mb-3" md={12} lg={6}>
                     <label
                       className="form-control-label"
                       htmlFor="validationCustom01"
@@ -213,9 +213,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                       ]}
                       onChange={handleTimelineChange}></Select2>
                   </Col>
-                </Row>
-                <Row className="mb-3">
-                  <Col>
+                  <Col className="mb-3" md={12} lg={6}>
                     <label
                       className="form-control-label"
                       htmlFor="validationCustom01"
@@ -231,7 +229,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                   </Col>
                 </Row>
                 <div className="form-row">
-                  <Col className="mb-3" md="12">
+                  <Col className="mb-3" md={12} lg={12}>
                     <label
                       className="form-control-label"
                       htmlFor="validationCustom01"

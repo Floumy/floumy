@@ -26,8 +26,6 @@ import ProjectSelector from './ProjectSelector';
 
 function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
-  const { settings: buildInPublicSettings } = useBuildInPublic();
-  const isBuildInPublicEnabled = buildInPublicSettings.isBuildInPublicEnabled;
   const { currentProject, projects, orgId, loading } = useProjects();
   const { settings: bipSettings } = useBuildInPublic();
 
@@ -95,12 +93,6 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                   onNewProject={toggleNewProjectModal}
                   showNewProject={true}
                 />
-                {isBuildInPublicEnabled &&
-                  <a href={`/public/orgs/${orgId}/projects/${currentProject.id}/feed`} target="_blank"
-                     className="nav-link text-green text-lg p-0 pb-4 no-visited no-active" rel="noreferrer">
-                    <span className="nav-link-text">Build In Public<i className="fa fa-external-link px-2" /> </span>
-                  </a>
-                }
                 <div className="mb-3">
                   <h6 className="navbar-heading p-0 text-muted">
                     <span className="docs-normal" style={{ whiteSpace: 'nowrap' }}>Feedback</span>
@@ -123,11 +115,13 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                             <UncontrolledTooltip target="feed-nav-item" placement="top">
                               This page is public and can be accessed by anyone.
                             </UncontrolledTooltip>
-                            <Badge id="feed-nav-item"
-                                   color="success" pill={true}
-                                   style={{ cursor: 'default' }}>
-                              PUBLIC
-                            </Badge>
+                            <Link to={`/public/orgs/${orgId}/projects/${currentProject.id}/issues`} target="_blank"
+                                  role="button">
+                              <Badge id="feed-nav-item"
+                                     color="success" pill={true}>
+                                PUBLIC
+                              </Badge>
+                            </Link>
                           </div>
                         </Col>
                         <Col xs={2} className="text-right pr-2 pt-2">
@@ -152,11 +146,13 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                             <UncontrolledTooltip target="feed-nav-item" placement="top">
                               This page is public and can be accessed by anyone.
                             </UncontrolledTooltip>
-                            <Badge id="feed-nav-item"
-                                   color="success" pill={true}
-                                   style={{ cursor: 'default' }}>
-                              PUBLIC
-                            </Badge>
+                            <Link to={`/public/orgs/${orgId}/projects/${currentProject.id}/feature-requests`}
+                                  target="_blank" role="button">
+                              <Badge id="feed-nav-item"
+                                     color="success" pill={true}>
+                                PUBLIC
+                              </Badge>
+                            </Link>
                           </div>
                         </Col><Col xs={2} className="text-right pr-2 pt-2">
                       </Col>
@@ -183,14 +179,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                         <div className={bipSettings.isFeedPagePublic ? '' : 'd-none'}>
-                          <UncontrolledTooltip target="feed-nav-item" placement="top">
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge id="feed-nav-item"
-                                 color="success" pill={true}
-                                 style={{ cursor: 'default' }}>
-                            PUBLIC
-                          </Badge>
+                          <Link to={`/public/orgs/${orgId}/projects/${currentProject.id}/feed`} target="_blank"
+                                role="button">
+                            <UncontrolledTooltip target="feed-nav-item" placement="top">
+                              This page is public and can be accessed by anyone.
+                            </UncontrolledTooltip>
+                            <Badge id="feed-nav-item"
+                                   color="success" pill={true}>
+                              PUBLIC
+                            </Badge>
+                          </Link>
                         </div>
                       </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">
@@ -213,14 +211,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                         <div className={bipSettings.isObjectivesPagePublic ? '' : 'd-none'}>
-                          <UncontrolledTooltip target="objectives-nav-item" placement="top">
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge id="objectives-nav-item"
-                                 color="success" pill={true}
-                                 style={{ cursor: 'default' }}>
-                            PUBLIC
-                          </Badge>
+                          <Link to={`/public/orgs/${orgId}/projects/${currentProject.id}/objectives`} target="_blank"
+                                role="button">
+                            <UncontrolledTooltip target="objectives-nav-item" placement="top">
+                              This page is public and can be accessed by anyone.
+                            </UncontrolledTooltip>
+                            <Badge id="objectives-nav-item"
+                                   color="success" pill={true}>
+                              PUBLIC
+                            </Badge>
+                          </Link>
                         </div>
                       </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">
@@ -243,14 +243,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                         <div className={bipSettings.isRoadmapPagePublic ? '' : 'd-none'}>
-                          <UncontrolledTooltip target="roadmap-nav-item" placement="top">
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge id="roadmap-nav-item"
-                                 color="success" pill={true}
-                                 style={{ cursor: 'default' }}>
-                            PUBLIC
-                          </Badge>
+                          <Link to={`/public/orgs/${orgId}/projects/${currentProject.id}/roadmap`} target="_blank"
+                                role="button">
+                            <UncontrolledTooltip target="roadmap-nav-item" placement="top">
+                              This page is public and can be accessed by anyone.
+                            </UncontrolledTooltip>
+                            <Badge id="roadmap-nav-item"
+                                   color="success" pill={true}>
+                              PUBLIC
+                            </Badge>
+                          </Link>
                         </div>
                       </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">
@@ -273,14 +275,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                         <div className={bipSettings.isSprintsPagePublic ? '' : 'd-none'}>
-                          <UncontrolledTooltip target="sprints-nav-item" placement="top">
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge id="sprints-nav-item"
-                                 color="success" pill={true}
-                                 style={{ cursor: 'default' }}>
-                            PUBLIC
-                          </Badge>
+                          <Link to={`/public/orgs/${orgId}/projects/${currentProject.id}/sprints`} target="_blank"
+                                role="button">
+                            <UncontrolledTooltip target="sprints-nav-item" placement="top">
+                              This page is public and can be accessed by anyone.
+                            </UncontrolledTooltip>
+                            <Badge id="sprints-nav-item"
+                                   color="success" pill={true}>
+                              PUBLIC
+                            </Badge>
+                          </Link>
                         </div>
                       </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">
@@ -303,14 +307,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </Col>
                       <Col xs={3} style={{ padding: '0.675rem 1.5rem' }} className="text-right">
                         <div className={bipSettings.isActiveSprintsPagePublic ? '' : 'd-none'}>
-                          <UncontrolledTooltip target="sprints-nav-item" placement="top" popperClassName="p-2">
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge id="sprints-nav-item"
-                                 color="success" pill={true}
-                                 style={{ cursor: 'default' }}>
-                            PUBLIC
-                          </Badge>
+                          <Link to={`/public/orgs/${orgId}/projects/${currentProject.id}/active-sprint`} target="_blank"
+                                role="button">
+                            <UncontrolledTooltip target="sprints-nav-item" placement="top" popperClassName="p-2">
+                              This page is public and can be accessed by anyone.
+                            </UncontrolledTooltip>
+                            <Badge id="sprints-nav-item"
+                                   color="success" pill={true}>
+                              PUBLIC
+                            </Badge>
+                          </Link>
                         </div>
                       </Col>
                       <Col xs={2} className="text-right pr-2 pt-2">

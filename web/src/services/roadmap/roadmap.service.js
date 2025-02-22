@@ -4,16 +4,6 @@ import axios from "axios";
 export async function addInitiative(orgId, projectId, initiative) {
   try {
     const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives`, initiative);
-
-    return response.data;
-  } catch (e) {
-    throw new Error(e.message);
-  }
-}
-
-export async function listInitiatives(orgId, projectId, page = 1, limit = 50) {
-  try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives?page=${page}&limit=${limit}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -170,7 +160,8 @@ export async function getPublicMilestone(orgId, projectId, milestoneId) {
 
 export async function updateMilestone(orgId, projectId, id, milestone) {
   try {
-    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`, milestone);
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`, milestone);
+    return response.data;
   } catch (e) {
     throw new Error(e.message);
   }

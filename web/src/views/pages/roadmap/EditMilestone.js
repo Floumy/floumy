@@ -26,24 +26,16 @@ function EditMilestone() {
     }
 
     fetchData();
-  }, [id]);
+  }, [id, orgId, projectId]);
 
   const handleSubmit = async (values) => {
-    await updateMilestone(orgId, projectId, id, values);
+    return await updateMilestone(orgId, projectId, id, values);
   };
 
   return (
     <>
       {loading && <InfiniteLoadingBar />}
-      <SimpleHeader headerButtons={[
-        {
-          name: "Back",
-          shortcut: "←",
-          action: () => {
-            window.history.back();
-          }
-        }
-      ]} />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <Col>

@@ -36,7 +36,7 @@ root.render(
             <AdminLayout />
           </AuthGuard>
         } />
-        <Route path="/public/*" element={
+        <Route path="/public/orgs/:orgId/projects/:projectId/*" element={
           <PublicLayout />
         } />
         <Route path="/auth/*" element={<AuthLayout />} />

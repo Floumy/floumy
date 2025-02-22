@@ -9,22 +9,12 @@ export default function NewIssue() {
   const { orgId, projectId } = useParams();
 
   const handleSubmit = async (issue) => {
-    await addIssue(orgId, projectId, issue);
+    return await addIssue(orgId, projectId, issue);
   };
 
   return (
     <>
-      <SimpleHeader
-        headerButtons={[
-          {
-            name: "Back",
-            shortcut: "←",
-            action: () => {
-              window.history.back();
-            }
-          }
-        ]}
-      />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <Col>

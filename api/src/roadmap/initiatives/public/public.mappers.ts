@@ -5,6 +5,42 @@ import { Initiative } from '../initiative.entity';
 import { CommentMapper } from '../../../comments/mappers';
 import { PaymentPlan } from '../../../auth/payment.plan';
 
+class BreadcrumbMapper {
+  static async toDto(
+    initiative: Initiative,
+  ): Promise<{ reference: string; type: string; id: string }[]> {
+    const keyResult = await initiative.keyResult;
+    let objective = null;
+
+    const breadcrumbs = [
+      {
+        reference: initiative.reference,
+        type: 'initiative',
+        id: initiative.id,
+      },
+    ];
+
+    if (keyResult) {
+      breadcrumbs.push({
+        reference: keyResult.reference,
+        type: 'key-result',
+        id: keyResult.id,
+      });
+      objective = await keyResult.objective;
+    }
+
+    if (objective) {
+      breadcrumbs.push({
+        reference: objective.reference,
+        type: 'objective',
+        id: objective.id,
+      });
+    }
+
+    return breadcrumbs.reverse();
+  }
+}
+
 export class FeatureMapper {
   static async toDto(initiative: Initiative) {
     const workItems = (await initiative.workItems) || [];
@@ -29,6 +65,7 @@ export class FeatureMapper {
       keyResult: this.mapKeyResultToKeyResultDto(await initiative.keyResult),
       milestone: this.mapMilestoneToMilestoneDto(await initiative.milestone),
       featureRequest: undefined,
+      breadcrumbs: await BreadcrumbMapper.toDto(initiative),
     };
     if (org.paymentPlan === PaymentPlan.PREMIUM) {
       mappedFeature.featureRequest = featureRequest

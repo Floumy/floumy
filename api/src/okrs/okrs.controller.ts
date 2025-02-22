@@ -27,7 +27,7 @@ import {
 import { CommentsService } from './comments/comments.service';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 
-@Controller('/orgs/:orgId/projects/:projectId/okrs')
+@Controller('/orgs/:orgId/projects/:projectId')
 @UseGuards(AuthGuard)
 export class OkrsController {
   constructor(
@@ -35,7 +35,7 @@ export class OkrsController {
     private readonly commentsService: CommentsService,
   ) {}
 
-  @Post()
+  @Post('okrs')
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Param('orgId') orgId: string,
@@ -56,7 +56,7 @@ export class OkrsController {
     }
   }
 
-  @Get()
+  @Get('okrs')
   @HttpCode(HttpStatus.OK)
   async list(
     @Param('orgId') orgId: string,
@@ -74,12 +74,21 @@ export class OkrsController {
 
   @Get('key-results')
   @HttpCode(HttpStatus.OK)
-  async listKeyResults(@Request() request) {
-    const { org: orgId } = request.user;
-    return await this.okrsService.listKeyResults(orgId);
+  async listKeyResults(
+    @Request() request,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    const { org } = request.user;
+
+    if (org !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.okrsService.listKeyResults(orgId, projectId);
   }
 
-  @Get(':id')
+  @Get('okrs/:id')
   @HttpCode(HttpStatus.OK)
   async get(
     @Param('orgId') orgId: string,
@@ -99,7 +108,7 @@ export class OkrsController {
     }
   }
 
-  @Delete(':id')
+  @Delete('okrs/:id')
   @HttpCode(HttpStatus.OK)
   async delete(
     @Param('orgId') orgId: string,
@@ -116,7 +125,7 @@ export class OkrsController {
     await this.okrsService.delete(orgId, projectId, id);
   }
 
-  @Patch(':objectiveId/key-results/:keyResultId')
+  @Patch('key-results/:keyResultId')
   @HttpCode(HttpStatus.OK)
   async patchKeyResult(
     @Param('orgId') orgId: string,
@@ -145,7 +154,7 @@ export class OkrsController {
     }
   }
 
-  @Put('objective/:objectiveId')
+  @Put('okrs/objective/:objectiveId')
   @HttpCode(HttpStatus.OK)
   async updateObjective(
     @Param('orgId') orgId: string,
@@ -172,7 +181,7 @@ export class OkrsController {
     }
   }
 
-  @Put(':objectiveId/key-results/:keyResultId')
+  @Put('key-results/:keyResultId')
   @HttpCode(HttpStatus.OK)
   async updateKeyResult(
     @Param('orgId') orgId: string,
@@ -201,7 +210,7 @@ export class OkrsController {
     }
   }
 
-  @Delete(':objectiveId/key-results/:keyResultId')
+  @Delete('key-results/:keyResultId')
   @HttpCode(HttpStatus.OK)
   async deleteKeyResult(
     @Param('orgId') orgId: string,
@@ -224,7 +233,7 @@ export class OkrsController {
     );
   }
 
-  @Post(':objectiveId/key-results')
+  @Post('okrs/:objectiveId/key-results')
   @HttpCode(HttpStatus.CREATED)
   async createKeyResult(
     @Param('objectiveId') objectiveId: string,
@@ -243,7 +252,7 @@ export class OkrsController {
     }
   }
 
-  @Get(':objectiveId/key-results/:keyResultId')
+  @Get('key-results/:keyResultId')
   @HttpCode(HttpStatus.OK)
   async getKeyResult(
     @Param('orgId') orgId: string,
@@ -270,7 +279,7 @@ export class OkrsController {
     }
   }
 
-  @Get('timeline/:timeline')
+  @Get('okrs/timeline/:timeline')
   async listForTimeline(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
@@ -350,7 +359,7 @@ export class OkrsController {
     }
   }
 
-  @Post(':objectiveId/comments')
+  @Post('okrs/:objectiveId/comments')
   @HttpCode(HttpStatus.CREATED)
   async addCommentToObjective(
     @Param('orgId') orgId: string,
@@ -373,7 +382,7 @@ export class OkrsController {
     }
   }
 
-  @Put(':objectiveId/comments/:commentId')
+  @Put('okrs/:objectiveId/comments/:commentId')
   @HttpCode(HttpStatus.OK)
   async updateObjectiveComment(
     @Param('orgId') orgId: string,
@@ -396,7 +405,7 @@ export class OkrsController {
     }
   }
 
-  @Delete(':objectiveId/comments/:commentId')
+  @Delete('okrs/:objectiveId/comments/:commentId')
   @HttpCode(HttpStatus.OK)
   async deleteObjectiveComment(
     @Param('orgId') orgId: string,

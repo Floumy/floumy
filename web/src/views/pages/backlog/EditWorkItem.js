@@ -13,7 +13,7 @@ function EditWorkItem() {
   const [workItem, setWorkItem] = useState(null);
   const { orgId, projectId, id } = useParams();
   const handleSubmit = async (workItem) => {
-    await updateWorkItem(orgId, projectId, id, workItem);
+    return await updateWorkItem(orgId, projectId, id, workItem);
   };
 
   useEffect(() => {
@@ -29,20 +29,14 @@ function EditWorkItem() {
     }
 
     fetchData();
-  }, [id]);
+  }, [id, orgId, projectId]);
 
   return (
     <>
       {loading && <InfiniteLoadingBar />}
-      <SimpleHeader headerButtons={[
-        {
-          name: "Back",
-          shortcut: "←",
-          action: () => {
-            window.history.back();
-          }
-        }
-      ]} />
+      <SimpleHeader
+        breadcrumbs={workItem?.breadcrumbs}
+      />
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">

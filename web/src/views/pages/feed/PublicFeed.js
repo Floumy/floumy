@@ -15,12 +15,7 @@ export default function PublicFeed() {
     }
 
     if (item.entity === "keyResult") {
-
-      if (item.action === "updated") {
-        return `/public/orgs/${orgId}/projects/${projectId}/objectives/${item.content.current.objective.id}/kr/detail/${item.entityId}`;
-      }
-
-      return `/public/orgs/${orgId}/projects/${projectId}/objectives/${item.content.objective.id}/kr/detail/${item.entityId}`;
+      return `/public/orgs/${orgId}/projects/${projectId}/kr/detail/${item.entityId}`;
     }
 
     if (item.entity === "initiative") {

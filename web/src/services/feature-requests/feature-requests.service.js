@@ -3,7 +3,8 @@ import { isAuthenticated } from "../auth/auth.service";
 
 export async function addFeatureRequest(orgId, projectId, featureRequest) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests`, featureRequest);
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests`, featureRequest);
+    return response.data;
   } catch (e) {
     throw new Error(e.message);
   }

@@ -18,23 +18,13 @@ function NewOKR() {
 
   return (
     <>
-      <SimpleHeader
-        headerButtons={[
-          {
-            name: "Back",
-            shortcut: "←",
-            action: () => {
-              window.history.back();
-            }
-          }
-        ]}
-      />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">
             <div className="card-wrapper">
               <CreateUpdateDeleteOKR onSubmit={async (values) => {
-                await addOKR(orgId, projectId, {
+                return await addOKR(orgId, projectId, {
                   objective: {
                     title: values.objective,
                     timeline: values.timeline,
