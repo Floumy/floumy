@@ -72,10 +72,14 @@ function DetailOKR() {
         setAssignedTo(okr.objective?.assignedTo?.id || '');
         // We need this to show the past quarter in the timeline options
         if (okr.objective.timeline === 'past') {
-          setTimelineOptions([...timelineOptions, {
-            id: okr.objective.timeline,
-            text: dateToQuarterAndYear(new Date(okr.objective.startDate)),
-          }]);
+          setTimelineOptions([
+            { id: 'this-quarter', text: 'This Quarter' },
+            { id: 'next-quarter', text: 'Next Quarter' },
+            { id: 'later', text: 'Later' },
+            {
+              id: okr.objective.timeline,
+              text: dateToQuarterAndYear(new Date(okr.objective.startDate)),
+            }]);
         }
       } catch (e) {
         toast.error('The OKR could not be loaded');
@@ -89,7 +93,7 @@ function DetailOKR() {
     }
 
     fetchData();
-  }, [id, orgId, projectId, timelineOptions]);
+  }, [id, orgId, projectId]);
 
   useMemo(() => {
     const filteredOrgMembers =
@@ -121,14 +125,14 @@ function DetailOKR() {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      await updateObjective(orgId, projectId, okr.objective.id, {
+      const updatedOkr = await updateObjective(orgId, projectId, okr.objective.id, {
         title: values.title,
         assignedTo,
         status,
         timeline,
       });
-      navigate(-1);
-      setTimeout(() => toast.success('The OKR has been saved'), 100);
+      setOKR({ ...okr, objective: updatedOkr.objective });
+      toast.success('The OKR has been saved');
     } catch (e) {
       toast.error('The OKR could not be saved');
     } finally {
@@ -236,26 +240,30 @@ function DetailOKR() {
     }
   };
 
+  if (!isLoading && !okr) {
+    return <>
+      <SimpleHeader />
+      <Container className="mt--6" fluid id="OKRs">
+        <Row>
+          <Col>
+            <div className="card-wrapper">
+              <NotFoundCard message="Objective not be found" />
+            </div>
+          </Col>
+        </Row>
+      </Container>
+    </>;
+  }
+
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        headerButtons={[
-          {
-            name: 'Back',
-            shortcut: '←',
-            action: () => {
-              window.history.back();
-            },
-          },
-        ]}
-      />
+      <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
         {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
-        <Row>
-          <Col>
-            {!isLoading && !okr && <NotFoundCard message="Objective not be found" />}
 
+        <Row>
+          <Col lg={8} md={12}>
             <DeleteWarning
               isOpen={isDeleteWarningOpen}
               entity={'objective'}
@@ -269,8 +277,8 @@ function DetailOKR() {
                 </h3>
               </CardHeader>
               <CardBody className="border-bottom">
-                {(isLoading || isSubmitting) && <LoadingSpinnerBox />}
-                {!isLoading && !isSubmitting && okr &&
+                {isLoading && <LoadingSpinnerBox />}
+                {!isLoading && okr &&
                   <>
                     <Formik
                       initialValues={{ title: okr.objective.title || '' }}
@@ -416,9 +424,6 @@ function DetailOKR() {
                           <th className="sort" scope="col" width="30%">
                             Progress
                           </th>
-                          <th scope="col" width="5%">
-                            Initiatives Count
-                          </th>
                           <th className="sort" scope="col" width="10%">
                             Status
                           </th>
@@ -427,7 +432,7 @@ function DetailOKR() {
                         <tbody className="list">
                         {okr && okr.keyResults && okr.keyResults.length === 0 &&
                           <tr>
-                            <td colSpan={5}>
+                            <td colSpan={4}>
                               <div className="text-center text-muted">
                                 No key results have been added yet
                               </div>
@@ -437,14 +442,14 @@ function DetailOKR() {
                           <tr key={keyResult.id}>
                             <td>
                               <Link
-                                to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/${id}/kr/detail/${keyResult.id}`}
+                                to={`/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`}
                                 className={'okr-detail'}>
                                 {keyResult.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
                               <Link
-                                to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/${id}/kr/detail/${keyResult.id}`}
+                                to={`/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`}
                                 className={'okr-detail'}>
                                 {keyResult.title}
                               </Link>
@@ -457,9 +462,6 @@ function DetailOKR() {
                                             color="primary" />
                                 </div>
                               </div>
-                            </td>
-                            <td>
-                              {keyResult.initiatives.length}
                             </td>
                             <td>
                               <Badge color="" className="badge-dot mr-4">
@@ -518,10 +520,8 @@ function DetailOKR() {
                 </Row>
               </Card>}
           </Col>
-        </Row>
-        <Row>
           {!isLoading &&
-            <Col>
+            <Col lg={4} md={12}>
               <Comments comments={okr?.objective?.comments}
                         onCommentAdd={handleAddComment}
                         onCommentDelete={handleDeleteComment}

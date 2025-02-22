@@ -137,7 +137,6 @@ function InitiativesList({
             <th scope="col" width="5%">Reference</th>
             <th scope="col" width="40%">Initiative</th>
             <th scope="col" width="20%">Progress</th>
-            <th scope="col" width="5%">W.I. Count</th>
             <th scope="col" width="10%">Status</th>
             {showAssignedTo && <th scope="col" width={"10%"}>Assigned To</th>}
             <th scope="col" width="10%">Priority</th>
@@ -146,7 +145,7 @@ function InitiativesList({
           <tbody className="list">
           {sortedInitiatives.length === 0 &&
             <tr>
-              <td colSpan={7} className={"text-center"}>
+              <td colSpan={6} className={"text-center"}>
                 No initiatives found.
               </td>
             </tr>
@@ -177,9 +176,6 @@ function InitiativesList({
                     <Progress style={{ maxWidth: "80px" }} max="100" value={initiative.progress} color="primary" />
                   </div>
                 </div>
-              </td>
-              <td>
-                {initiative.workItemsCount}
               </td>
               <td>
                 <Badge color="" className="badge-dot mr-4">

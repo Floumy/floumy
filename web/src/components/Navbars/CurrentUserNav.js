@@ -1,22 +1,13 @@
-import {
-    Col,
-    DropdownItem,
-    DropdownMenu,
-    DropdownToggle,
-    ListGroup, ListGroupItem,
-    Media,
-    Nav,
-    NavItem, Row,
-    UncontrolledDropdown
-} from "reactstrap";
-import { memberNameInitials, textToColor } from "../../services/utils/utils";
-import { logoutUser } from "../../services/api/api.service";
-import React from "react";
+import { DropdownItem, DropdownMenu, DropdownToggle, Media, Nav, NavItem, UncontrolledDropdown } from 'reactstrap';
+import { memberNameInitials, textToColor } from '../../services/utils/utils';
+import { logoutUser } from '../../services/api/api.service';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import Notifications from "./Notifications";
+import Notifications from './Notifications';
 
 export default function CurrentUserNav() {
   const {orgId, projectId} = useParams();
+
   const currentUserName = localStorage.getItem("currentUserName");
 
   if (!currentUserName) {
@@ -54,7 +45,7 @@ export default function CurrentUserNav() {
             </Media>
           </Media>
         </DropdownToggle>
-        <DropdownMenu right>
+        <DropdownMenu right className="border border-dark">
           <DropdownItem
             href={`/admin/orgs/${orgId}/projects/${projectId}/my-profile`}
           >

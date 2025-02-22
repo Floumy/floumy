@@ -49,7 +49,7 @@ $grays: map-merge((
 
 $blue: #81b8fc !default;
 $indigo: #5603ad !default;
-$purple: #ae91ff !default;
+$purple: #9671ff !default;
 $pink: #f3a4b5 !default;
 $red: #f5365c !default;
 $orange: #fb9e40 !default;
@@ -348,7 +348,7 @@ $icon-font-family: NucleoIcons, sans-serif !default;
 $font-family-sans-serif: Open Sans, sans-serif !default;
 $font-family-base: $font-family-sans-serif !default;
 
-$font-size-base: 1rem !default; // Assumes the browser default, typically `16px`
+$font-size-base: 0.875rem !default;
 $font-size-xl: ($font-size-base * 1.5);
 $font-size-lg: ($font-size-base * 1.25);
 $font-size-sm: ($font-size-base * .875);
@@ -738,7 +738,7 @@ $navbar-light-toggler-border-color: transparent !default;
 $navbar-vertical-box-shadow: 0 0 2rem 0 rgba(136, 152, 170, .15) !default;
 $navbar-vertical-border-color: rgba($black, .05) !default;
 $navbar-vertical-width: 62px !default;
-$navbar-vertical-open-width: 380px !default;
+$navbar-vertical-open-width: 360px !default;
 $navbar-vertical-padding-x: 1.5rem !default;
 $navbar-vertical-nav-link-padding-x: 1.5rem !default;
 $navbar-vertical-nav-link-padding-y: .675rem !default;
@@ -1024,9 +1024,8 @@ $breadcrumb-padding-y: .5rem !default;
 $breadcrumb-padding-x: 1rem !default;
 $breadcrumb-item-padding: .5rem !default;
 $breadcrumb-margin-bottom: 1rem !default;
-$breadcrumb-bg: $gray-100 !default;
-$breadcrumb-divider-color: $gray-600 !default;
-$breadcrumb-active-color: $gray-600 !default;
+$breadcrumb-divider-color: $white !default;
+$breadcrumb-active-color: $gray-800 !default;
 $breadcrumb-divider: quote("-") !default;
 $breadcrumb-border-radius: $border-radius !default;
 

@@ -8,7 +8,6 @@ import ActiveSprint from './views/pages/development/ActiveSprint';
 import NewInitiative from './views/pages/roadmap/NewInitiative';
 import NewMilestone from './views/pages/roadmap/NewMilestone';
 import EditMilestone from './views/pages/roadmap/EditMilestone';
-import EditInitiative from './views/pages/initiatives/EditInitiative';
 import NewWorkItem from './views/pages/backlog/NewWorkItem';
 import EditWorkItem from './views/pages/backlog/EditWorkItem';
 import { DetailInitiative } from './views/pages/initiatives/DetailInitiative';
@@ -122,12 +121,6 @@ const routes = [
   },
   {
     redirect: true,
-    path: "/roadmap/initiatives/edit/:id",
-    component: <EditInitiative />,
-    layout: "/admin"
-  },
-  {
-    redirect: true,
     path: "/roadmap/initiatives/detail/:id",
     component: <DetailInitiative />,
     layout: "/admin"
@@ -220,7 +213,7 @@ const routes = [
   },
   {
     redirect: true,
-    path: "/okrs/:objectiveId/kr/detail/:keyResultId",
+    path: "/kr/detail/:keyResultId",
     component: <DetailKeyResult />,
     layout: "/admin"
   },
@@ -313,98 +306,98 @@ const routes = [
 export const publicRoutes = [
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap",
+    path: "/roadmap",
     component: <PublicRoadmap />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/roadmap/initiatives/detail/:initiativeId",
+    path: "/roadmap/initiatives/detail/:initiativeId",
     component: <PublicDetailInitiative />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/work-item/detail/:workItemId",
+    path: "/work-item/detail/:workItemId",
     component: <PublicDetailWorkItem />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/objectives",
+    path: "/objectives",
     component: <PublicOKRs />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/okrs/detail/:okrId",
+    path: "/okrs/detail/:okrId",
     component: <PublicDetailOKR />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/objectives/:objectiveId/kr/detail/:keyResultId",
+    path: "/kr/detail/:keyResultId",
     component: <PublicDetailKeyResult />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/sprints",
+    path: "/sprints",
     component: <PublicSprints />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/sprints/detail/:sprintId",
+    path: "/sprints/detail/:sprintId",
     component: <PublicSprint />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/milestones/detail/:milestoneId",
+    path: "/milestones/detail/:milestoneId",
     component: <PublicMilestone />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/active-sprint",
+    path: "/active-sprint",
     component: <PublicActiveSprint />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/feed",
+    path: "/feed",
     component: <PublicFeed />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/feature-requests",
+    path: "/feature-requests",
     component: <FeatureRequests isPublic={true} />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/issues",
+    path: "/issues",
     component: <Issues isPublic={true} />,
     layout: "/public"
   },
-  { redirect: true, path: "/orgs/:orgId/projects/:projectId/issues/new", component: <NewIssue />, layout: "/public" },
+  { redirect: true, path: "/issues/new", component: <NewIssue />, layout: "/public" },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/feature-requests/new",
+    path: "/feature-requests/new",
     component: <NewFeatureRequest />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/feature-requests/:featureRequestId",
+    path: "/feature-requests/:featureRequestId",
     component: <FeatureRequestDetails />,
     layout: "/public"
   },
   {
     redirect: true,
-    path: "/orgs/:orgId/projects/:projectId/issues/:issueId",
+    path: "/issues/:issueId",
     component: <IssueDetails />,
     layout: "/public"
   }

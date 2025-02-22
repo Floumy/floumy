@@ -90,7 +90,8 @@ export async function getPublicWorkItem(orgId, projectId, workItemId) {
 
 export async function updateWorkItem(orgId, projectId, id, workItem) {
   try {
-    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`, workItem);
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`, workItem);
+    return response.data;
   } catch (e) {
     throw new Error(e.message);
   }

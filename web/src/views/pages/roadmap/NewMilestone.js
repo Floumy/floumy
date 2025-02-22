@@ -9,20 +9,12 @@ function NewMilestone() {
   const { orgId, projectId } = useParams();
 
   const handleSubmit = async (milestone) => {
-    await addMilestone(orgId, projectId, milestone);
+    return await addMilestone(orgId, projectId, milestone);
   };
 
   return (
     <>
-      <SimpleHeader headerButtons={[
-        {
-          name: "Back",
-          shortcut: "←",
-          action: () => {
-            window.history.back();
-          }
-        }
-      ]} />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <Col>

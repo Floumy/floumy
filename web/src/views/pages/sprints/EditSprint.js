@@ -30,21 +30,13 @@ function EditSprint() {
   }, [orgId, projectId, id]);
 
   const handleSubmit = async (sprint) => {
-    await updateSprint(orgId, projectId, id, sprint);
+    return await updateSprint(orgId, projectId, id, sprint);
   };
 
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader headerButtons={[
-        {
-          name: "Back",
-          shortcut: "←",
-          action: () => {
-            window.history.back();
-          }
-        }
-      ]} />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <Col>

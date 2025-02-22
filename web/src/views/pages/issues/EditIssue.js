@@ -1,21 +1,21 @@
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Card, CardHeader, Col, Container, Row } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Card, CardHeader, Col, Container, Row } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   addIssueComment,
   deleteIssue,
   deleteIssueComment,
   getIssue,
   updateIssue,
-  updateIssueComment
-} from "../../../services/issues/issues.service";
-import UpdateIssue from "./UpdateIssue";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import Comments from "../../../components/Comments/Comments";
-import { toast } from "react-toastify";
-import { addWorkItem } from "../../../services/backlog/backlog.service";
-import WorkItemsList from "../backlog/WorkItemsList";
+  updateIssueComment,
+} from '../../../services/issues/issues.service';
+import UpdateIssue from './UpdateIssue';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import Comments from '../../../components/Comments/Comments';
+import { toast } from 'react-toastify';
+import { addWorkItem } from '../../../services/backlog/backlog.service';
+import WorkItemsList from '../backlog/WorkItemsList';
 import { generateWorkItemsForIssue } from '../../../services/ai/ai.service';
 import AIButton from '../../../components/AI/AIButton';
 
@@ -25,7 +25,7 @@ export default function EditIssue() {
   const [issue, setIssue] = useState(null);
 
   useEffect(() => {
-    document.title = "Floumy | Edit Issue";
+    document.title = 'Floumy | Edit Issue';
 
     async function fetchIssue(orgId, projectId, issueId) {
       try {
@@ -62,7 +62,7 @@ export default function EditIssue() {
   }
 
   function sortWorkItems(a, b) {
-    const priorityMap = ["high", "medium", "low"];
+    const priorityMap = ['high', 'medium', 'low'];
     return priorityMap.indexOf(a.priority) - priorityMap.indexOf(b.priority) || a.createdAt - b.createdAt;
   }
 
@@ -89,25 +89,25 @@ export default function EditIssue() {
     setIssue({ ...issue, workItems: updatedWorkItems });
   }
 
-    function updateWorkItemsAssignee(workItems, assignee) {
-      const updatedWorkItems = [];
-      for (const workItem of issue.workItems) {
-        if (workItems.some((wi) => (wi.id === workItem.id))) {
-          workItem.assignedTo = assignee.id === null ? undefined : assignee;
-        }
-        updatedWorkItems.push(workItem);
+  function updateWorkItemsAssignee(workItems, assignee) {
+    const updatedWorkItems = [];
+    for (const workItem of issue.workItems) {
+      if (workItems.some((wi) => (wi.id === workItem.id))) {
+        workItem.assignedTo = assignee.id === null ? undefined : assignee;
       }
-      setIssue({ ...issue, workItems: updatedWorkItems });
+      updatedWorkItems.push(workItem);
     }
+    setIssue({ ...issue, workItems: updatedWorkItems });
+  }
 
   async function handleCommentAdd(comment) {
     try {
       const addedComment = await addIssueComment(orgId, projectId, issueId, comment);
       issue.comments.push(addedComment);
       setIssue({ ...issue });
-      toast.success("Comment added successfully");
+      toast.success('Comment added successfully');
     } catch (e) {
-      toast.error("Failed to add comment");
+      toast.error('Failed to add comment');
     }
   }
 
@@ -117,9 +117,9 @@ export default function EditIssue() {
       const index = issue.comments.findIndex((c) => c.id === updatedComment.id);
       issue.comments[index] = updatedComment;
       setIssue({ ...issue });
-      toast.success("Comment updated successfully");
+      toast.success('Comment updated successfully');
     } catch (e) {
-      toast.error("Failed to update comment");
+      toast.error('Failed to update comment');
     }
   }
 
@@ -129,9 +129,9 @@ export default function EditIssue() {
       const index = issue.comments.findIndex((c) => c.id === commentId);
       issue.comments.splice(index, 1);
       setIssue({ ...issue });
-      toast.success("Comment deleted successfully");
+      toast.success('Comment deleted successfully');
     } catch (e) {
-      toast.error("Failed to delete comment");
+      toast.error('Failed to delete comment');
     }
   }
 
@@ -151,7 +151,12 @@ export default function EditIssue() {
     try {
       const workItemsToAdd = (await generateWorkItemsForIssue(issue.title, issue.description))
         .map(workItem => {
-          return { title: workItem.title, type: workItem.type, priority: workItem.priority, description: workItem.description };
+          return {
+            title: workItem.title,
+            type: workItem.type,
+            priority: workItem.priority,
+            description: workItem.description,
+          };
         });
       const savedWorkItems = [];
       for (const workItem of workItemsToAdd) {
@@ -164,67 +169,60 @@ export default function EditIssue() {
       toast.error('The work items could not be saved');
       console.error(e);
     }
-  }
+  };
 
   return (
     <>
-      <SimpleHeader
-        headerButtons={[
-          {
-            name: "Back",
-            shortcut: "←",
-            action: () => {
-              window.history.back();
-            }
-          }
-        ]}
-      />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
-          <Col>
-            <div className="card-wrapper">
-              {isLoading && (
+          <Col lg={8} md={12}>
+            <Row>
+              <Col>
+                <div className="card-wrapper">
+                  {isLoading && (
+                    <Card>
+                      <CardHeader>
+                        <h2>Issue</h2>
+                      </CardHeader>
+                      <LoadingSpinnerBox />
+                    </Card>
+                  )}
+                  {!isLoading && issue && (
+                    <UpdateIssue
+                      issue={issue}
+                      onUpdate={handleUpdate}
+                      onDelete={handleDelete}
+                    />
+                  )}
+                </div>
+              </Col>
+            </Row>
+            {issue && issue.workItems && <Row>
+              <Col>
                 <Card>
                   <CardHeader>
-                    <h2>Issue</h2>
+                    <h3 className="mb-0">Related Work Items {isPlaceholderWorkItemOnly() && <AIButton
+                      disabled={issue?.title?.length === 0 || issue?.description?.length === 0}
+                      onClick={addWorkItemsWithAi}
+                    />}
+                    </h3>
                   </CardHeader>
-                  <LoadingSpinnerBox />
+                  <WorkItemsList
+                    workItems={issue?.workItems}
+                    showAssignedTo={false}
+                    showInitiative={false}
+                    onAddNewWorkItem={handleAddWorkItem}
+                    onChangeStatus={updateWorkItemsStatus}
+                    onChangePriority={updateWorkItemsPriority}
+                    onChangeSprint={updateWorkItemsSprint}
+                    onChangeAssignee={updateWorkItemsAssignee}
+                  />
                 </Card>
-              )}
-              {!isLoading && issue && (
-                <UpdateIssue
-                  issue={issue}
-                  onUpdate={handleUpdate}
-                  onDelete={handleDelete}
-                />
-              )}
-            </div>
+              </Col>
+            </Row>}
           </Col>
-        </Row>
-        {issue && issue.workItems && <Row>
-          <Col>
-            <Card>
-              <CardHeader>
-                <h3 className="mb-0">Related Work Items {isPlaceholderWorkItemOnly() && <AIButton
-                  disabled={issue?.title?.length === 0 || issue?.description?.length === 0}
-                  onClick={addWorkItemsWithAi}
-                />}
-                </h3>
-              </CardHeader>
-              <WorkItemsList
-                workItems={issue?.workItems}
-                showAssignedTo={true}
-                onAddNewWorkItem={handleAddWorkItem}
-                onChangeStatus={updateWorkItemsStatus}
-                onChangePriority={updateWorkItemsPriority}
-                onChangeSprint={updateWorkItemsSprint}
-                onChangeAssignee={updateWorkItemsAssignee}
-              />
-            </Card>
-          </Col>
-        </Row>}
-        <Row>
-          <Col>
+          <Col lg={4} md={12}>
             <Comments comments={issue?.comments}
                       onCommentAdd={handleCommentAdd}
                       onCommentEdit={handleCommentUpdate}

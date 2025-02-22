@@ -1,14 +1,12 @@
-
-import React from "react";
+import React from 'react';
 // react library for routing
-import { Link, NavLink as NavLinkRRD } from "react-router-dom";
+import { Link, NavLink as NavLinkRRD } from 'react-router-dom';
 // nodejs library that concatenates classes
 // nodejs library to set properties for components
-import { PropTypes } from "prop-types";
 // react library that creates nice scrollbar on windows devices
-import PerfectScrollbar from "react-perfect-scrollbar";
+import PerfectScrollbar from 'react-perfect-scrollbar';
 // reactstrap components
-import { Col, Collapse, Nav, Navbar, NavbarBrand, NavItem, NavLink, Row } from "reactstrap";
+import { Col, Collapse, Nav, Navbar, NavbarBrand, NavItem, NavLink, Row } from 'reactstrap';
 
 function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, orgId, project, buildingInPublicSettings }) {
   // makes the sidenav normal on hover (actually when mouse enters on it)
@@ -190,31 +188,5 @@ function PublicSidebar({ toggleSidenav, sidenavOpen, logo, rtlActive, orgId, pro
     </Navbar>
   );
 }
-
-PublicSidebar.propTypes = {
-  // function used to make sidenav mini or normal
-  toggleSidenav: PropTypes.func,
-  // prop to know if the sidenav is mini or normal
-  sidenavOpen: PropTypes.bool,
-  // links that will be displayed inside the component
-  routes: PropTypes.arrayOf(PropTypes.object),
-  // logo
-  logo: PropTypes.shape({
-    // innerLink is for links that will direct the user within the app
-    // it will be rendered as <Link to="...">...</Link> tag
-    innerLink: PropTypes.string,
-    // outterLink is for links that will direct the user outside the app
-    // it will be rendered as simple <a href="...">...</a> tag
-    outterLink: PropTypes.string,
-    // the image src of the logo
-    imgSrc: PropTypes.string.isRequired,
-    // the alt for the img
-    imgAlt: PropTypes.string.isRequired
-  }),
-  // rtl active, this will make the sidebar to stay on the right side
-  rtlActive: PropTypes.bool,
-  org: PropTypes.object.isRequired,
-  buildingInPublicSettings: PropTypes.object.isRequired
-};
 
 export default PublicSidebar;

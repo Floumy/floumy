@@ -9,20 +9,12 @@ export default function NewFeatureRequest() {
   const { orgId, projectId } = useParams();
 
   const handleSubmit = async (featureRequest) => {
-    await addFeatureRequest(orgId, projectId, featureRequest);
+    return await addFeatureRequest(orgId, projectId, featureRequest);
   };
 
   return (<>
-    <SimpleHeader headerButtons={[
-      {
-        name: "Back",
-        shortcut: "←",
-        action: () => {
-          window.history.back();
-        }
-      }
-    ]} />
-    <Container className="mt--6" fluid>
+    <SimpleHeader/>
+    <Container className="mt--6">
       <Row>
         <Col>
           <div className="card-wrapper">

@@ -8,20 +8,12 @@ import { useParams } from "react-router-dom";
 function NewWorkItem() {
   const { orgId, projectId } = useParams();
   const handleSubmit = async (workItem) => {
-    await addWorkItem(orgId, projectId, workItem);
+    return await addWorkItem(orgId, projectId, workItem);
   };
 
   return (
     <>
-      <SimpleHeader headerButtons={[
-        {
-          name: "Back",
-          shortcut: "←",
-          action: () => {
-            window.history.back();
-          }
-        }
-      ]} />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">

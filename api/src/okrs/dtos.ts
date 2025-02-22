@@ -83,6 +83,11 @@ export interface KeyResultDto {
   title: string;
   progress: number;
   timeline: string;
+  breadcrumbs?: {
+    reference: string;
+    type: string;
+    id: string;
+  }[];
   createdAt: Date;
   updatedAt: Date;
   status: string;

@@ -49,6 +49,30 @@ export class PublicOkrMapper {
     };
   }
 
+  static async toKeyResultBreadcrumbs(
+    keyResult: KeyResult,
+  ): Promise<{ reference: string; type: string; id: string }[]> {
+    const objective = await keyResult.objective;
+
+    const breadcrumbs = [
+      {
+        reference: keyResult.reference,
+        type: 'key-result',
+        id: keyResult.id,
+      },
+    ];
+
+    if (objective) {
+      breadcrumbs.push({
+        reference: objective.reference,
+        type: 'objective',
+        id: objective.id,
+      });
+    }
+
+    return breadcrumbs.reverse();
+  }
+
   static async toKeyResultDto(keyResult: KeyResult) {
     const initiatives = (await keyResult.initiatives) || [];
     const comments = await keyResult.comments;
@@ -61,6 +85,7 @@ export class PublicOkrMapper {
       status: keyResult.status,
       createdAt: keyResult.createdAt,
       updatedAt: keyResult.updatedAt,
+      breadcrumbs: await PublicOkrMapper.toKeyResultBreadcrumbs(keyResult),
       initiatives: await Promise.all(
         initiatives.map(PublicOkrMapper.toFeatureDto),
       ),

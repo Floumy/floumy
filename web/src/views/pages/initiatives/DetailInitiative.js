@@ -42,7 +42,7 @@ export function DetailInitiative() {
     }
 
     fetchData();
-  }, [id]);
+  }, [id, orgId, projectId]);
 
   async function handleAddWorkItem(workItem) {
     workItem.initiative = initiative.id;
@@ -106,21 +106,13 @@ export function DetailInitiative() {
     <>
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader
-        headerButtons={[
-          {
-            name: "Back",
-            shortcut: "←",
-            action: () => {
-              window.history.back();
-            }
-          }
-        ]}
+        breadcrumbs={initiative?.breadcrumbs}
       />
       <Container className="mt--6" fluid id="OKRs">
         {initiative && initiative.workItems && initiative.workItems.length > 0 &&
           <ExecutionStats workItems={initiative.workItems} dueDate={initiative?.milestone?.dueDate} />}
         <Row>
-          <Col>
+          <Col lg={8} md={12}>
             {!isLoading && !initiative && <NotFoundCard message="Initiative not found" />}
             {!isLoading && initiative && <CreateUpdateDeleteInitiative onSubmit={handleSubmit} initiative={initiative} />}
             <Card>
@@ -149,10 +141,8 @@ export function DetailInitiative() {
               }
             </Card>
           </Col>
-        </Row>
-        <Row>
           {!isLoading &&
-            <Col>
+            <Col lg={4} md={12}>
               <Comments comments={initiative?.comments}
                         onCommentAdd={addComment}
                         onCommentEdit={updateComment}

@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
 
 function PublicMilestoneDetail({ milestone = { id: "", title: "", description: "", dueDate: "" } }) {
-  const { orgId } = useParams();
+  const { orgId, projectId } = useParams();
 
   useEffect(() => {
     document.title = "Floumy | Milestone";
@@ -74,6 +74,7 @@ function PublicMilestoneDetail({ milestone = { id: "", title: "", description: "
       </Card>
       {milestone?.initiatives && <PublicInitiativesListCard
         orgId={orgId}
+        projectId={projectId}
         title="Initiatives"
         initiatives={milestone.initiatives}
         showAssignedTo={false}

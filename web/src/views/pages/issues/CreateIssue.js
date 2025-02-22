@@ -1,26 +1,37 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row } from "reactstrap";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
-import InputError from "../../../components/Errors/InputError";
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row } from 'reactstrap';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+import InputError from '../../../components/Errors/InputError';
 
 export default function CreateIssue({ onSubmit }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { orgId, projectId } = useParams();
   const navigate = useNavigate();
+
+
+  const getDetailUrl = (issueId) => {
+    const currentContextUrlSlug = window.location.pathname.split('/')[1];
+    if (currentContextUrlSlug === 'public') {
+      return `/public/orgs/${orgId}/projects/${projectId}/issues/${issueId}`;
+    }
+
+    return `/admin/orgs/${orgId}/projects/${projectId}/issues/edit/${issueId}`;
+  };
 
   const handleSubmit = async (values) => {
     try {
       setIsLoading(true);
-      await onSubmit(values);
-      navigate(-1);
-      setTimeout(() => toast.success("The issue has been saved"), 100);
+      const savedIssue = await onSubmit(values);
+      setTimeout(() => toast.success('The issue has been saved'), 100);
+
+      navigate(getDetailUrl(savedIssue.id), {replace: true});
     } catch (e) {
-      toast.error("The issue could not be saved");
+      toast.error('The issue could not be saved');
     } finally {
       setIsSubmitting(false);
       setIsLoading(false);
@@ -28,10 +39,10 @@ export default function CreateIssue({ onSubmit }) {
   };
 
   useEffect(() => {
-    document.title = "Floumy | New Issue";
+    document.title = 'Floumy | New Issue';
   }, []);
 
-  const currentUserId = localStorage.getItem("currentUserId");
+  const currentUserId = localStorage.getItem('currentUserId');
 
   if (!currentUserId) {
     window.location.href = `/auth/sign-in?redirectTo=${encodeURI(window.location.pathname)}`;
@@ -39,8 +50,8 @@ export default function CreateIssue({ onSubmit }) {
   }
 
   const validationSchema = Yup.object({
-    title: Yup.string().required("The title is required"),
-    description: Yup.string().required("The description is required")
+    title: Yup.string().required('The title is required'),
+    description: Yup.string().required('The description is required'),
   });
 
   return (
@@ -52,7 +63,7 @@ export default function CreateIssue({ onSubmit }) {
         </CardHeader>
         <CardBody>
           <Formik
-            initialValues={{ title: "", description: "" }}
+            initialValues={{ title: '', description: '' }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -73,7 +84,7 @@ export default function CreateIssue({ onSubmit }) {
                         invalid={!!(errors.title && touched.title)}
                         autoComplete="off"
                       />
-                      <ErrorMessage name={"title"} component={InputError} />
+                      <ErrorMessage name={'title'} component={InputError} />
                     </FormGroup>
                   </Col>
                 </Row>
@@ -93,12 +104,12 @@ export default function CreateIssue({ onSubmit }) {
                         invalid={!!(errors.description && touched.description)}
                         autoComplete="off"
                       />
-                      <ErrorMessage name={"description"} component={InputError} />
+                      <ErrorMessage name={'description'} component={InputError} />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Button
-                  id={"save-issue"}
+                  id={'save-issue'}
                   color="primary"
                   type="submit"
                   className="mt-3"

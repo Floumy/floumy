@@ -9,20 +9,12 @@ function NewSprint() {
   const { orgId, projectId } = useParams();
 
   const handleSubmit = async (sprint) => {
-    await addSprint(orgId, projectId, sprint);
+    return await addSprint(orgId, projectId, sprint);
   };
 
   return (
     <>
-      <SimpleHeader headerButtons={[
-        {
-          name: "Back",
-          shortcut: "←",
-          action: () => {
-            window.history.back();
-          }
-        }
-      ]} />
+      <SimpleHeader/>
       <Container className="mt--6" fluid>
         <Row>
           <Col>
