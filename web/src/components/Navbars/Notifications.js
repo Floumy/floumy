@@ -134,7 +134,7 @@ export default function Notifications() {
         </h6>
       </div>
 
-      <ListGroup flush style={{ maxHeight: '500px', overflowY: 'scroll' }}>
+      <ListGroup flush style={{ maxHeight: '500px', overflowY: 'auto' }}>
         {notifications.map(notification => (
           <ListGroupItem
             className="list-group-item-action"
