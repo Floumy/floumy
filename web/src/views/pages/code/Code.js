@@ -221,9 +221,10 @@ function Code() {
                                     to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-item/edit/${pr.workItem.id}`}
                                     className="text-gray">
                                     {workItemTypeIcon(pr.workItem.type)}{pr.workItem.title}
+                                    <i className="fa fa-link ml-2"/>
                                   </Link>
                                 </td>
-                                <td>{pr.createdAt}</td>
+                                <td>{formatDate(pr.createdAt)}</td>
                               </tr>
                             ))}
                             </tbody>

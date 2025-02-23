@@ -5,9 +5,6 @@ import {
   Query,
   UseGuards,
   UseInterceptors,
-  Request,
-  Param,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { CacheInterceptor } from '@nestjs/cache-manager';
@@ -117,28 +114,6 @@ export class AiController {
         keyResultId,
         milestoneId,
         featureRequestId,
-      );
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
-  }
-
-  @Get('/orgs/:orgId/projects/:projectId/roadmap-milestones')
-  async generateRoadmapMilestones(
-    @Request() request: any,
-    @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
-    @Query('timeline') timeline: string,
-  ) {
-    if (orgId !== request.user.org) {
-      throw new UnauthorizedException();
-    }
-
-    try {
-      return await this.aiService.generateRoadmapMilestonesForTimeline(
-        orgId,
-        projectId,
-        timeline,
       );
     } catch (e) {
       throw new BadRequestException(e.message);
