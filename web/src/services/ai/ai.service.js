@@ -62,12 +62,3 @@ export async function getInitiativeDescription(initiative, keyResultId, mileston
         throw new Error(e.message);
     }
 }
-
-export async function generateRoadmapMilestones(orgId, projectId, timeline) {
-    try {
-        const response = await api.get(`${process.env.REACT_APP_API_URL}/ai/orgs/${orgId}/projects/${projectId}/roadmap-milestones?timeline=${timeline}`);
-        return response.data;
-    } catch (e) {
-        throw new Error(e.message);
-    }
-}

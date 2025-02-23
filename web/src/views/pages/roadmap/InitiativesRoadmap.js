@@ -7,19 +7,14 @@ import './Roadmap.scss';
 import Select2 from 'react-select2-wrapper';
 import {
   addInitiative,
-  addMilestone,
   listInitiativesWithoutMilestone,
   listMilestonesWithInitiatives,
-  updateInitiativeMilestone,
 } from '../../../services/roadmap/roadmap.service';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { formatTimeline, sortByPriority } from '../../../services/utils/utils';
+import { sortByPriority } from '../../../services/utils/utils';
 import InitiativesListCard from '../initiatives/InitiativesListCard';
-import AIButton from '../../../components/AI/AIButton';
-import { generateRoadmapMilestones } from '../../../services/ai/ai.service';
-import { toast } from 'react-toastify';
 
 function InitiativesRoadmap() {
   const { orgId, projectId } = useParams();
@@ -134,39 +129,6 @@ function InitiativesRoadmap() {
     };
   }
 
-  async function refreshMilestonesAndBacklogInitiatives() {
-    setIsLoadingMilestones(true);
-    const milestones = await listMilestonesWithInitiatives(orgId, projectId, timelineFilterValue);
-    setMilestones(milestones);
-    const initiatives = await listInitiativesWithoutMilestone(orgId, projectId);
-    const sortedInitiatives = sortByPriority(initiatives);
-    setInitiatives(sortedInitiatives);
-    setIsLoadingMilestones(false);
-  }
-
-  async function handleAiRoadmapBuild() {
-    const milestones = await generateRoadmapMilestones(orgId, projectId, timelineFilterValue);
-
-    if (milestones.length === 0) {
-      toast.error(`No initiatives found for ${formatTimeline(timelineFilterValue).toLowerCase()}`);
-      return;
-    }
-
-    for (const milestone of milestones) {
-      const savedMilestone = await addMilestone(orgId, projectId, {
-        title: milestone.title,
-        description: milestone.description,
-        dueDate: milestone.dueDate,
-      });
-      for (const initiativeId of milestone.initiativeIds) {
-        await updateInitiativeMilestone(orgId, projectId, initiativeId, savedMilestone.id);
-      }
-    }
-
-    setTimeout(() => toast.success('The milestones have been added'), 1000);
-    await refreshMilestonesAndBacklogInitiatives();
-  }
-
   return (
     <>
       {isLoadingMilestones && <InfiniteLoadingBar />}
@@ -196,11 +158,7 @@ function InitiativesRoadmap() {
                 <Row>
                   <Col xs={12} sm={8}>
                     <CardTitle tag="h2">
-                      Roadmap
-                      {!isLoadingMilestones &&
-                        milestones.length === 0 &&
-                        (timelineFilterValue === 'this-quarter' || timelineFilterValue === 'next-quarter') &&
-                        <AIButton text="Build with AI" onClick={async () => await handleAiRoadmapBuild()} />}
+                      Initiatives Roadmap
                     </CardTitle>
                   </Col>
                   <Col xs={12} sm={4}>
