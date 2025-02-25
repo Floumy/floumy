@@ -62,7 +62,11 @@ export class Org {
   githubAccessToken: string;
   @Column({ nullable: true })
   githubUsername: string;
-
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  gitlabToken: string;
   @OneToMany(() => Objective, (objective) => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })
