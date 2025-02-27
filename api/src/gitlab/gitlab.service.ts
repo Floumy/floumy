@@ -41,7 +41,7 @@ export class GitlabService {
     }));
   }
 
-  async addProject(orgId: string, projectId: string, gitlabProjectId: string) {
+  async setProject(orgId: string, projectId: string, gitlabProjectId: string) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
     const token = this.encryptionService.decrypt(org.gitlabToken);
     const gitlab = new Gitlab({
@@ -54,14 +54,52 @@ export class GitlabService {
       id: projectId,
       org: { id: orgId },
     });
+
     project.gitlabProjectId = gitlabProjectId;
     project.gitlabProjectUrl = projectUrl;
     project.gitlabProjectName = projectName;
     await this.projectRepository.save(project);
+
     return {
       id: gitlabProjectId,
       name: project.gitlabProjectName,
       url: project.gitlabProjectUrl,
     };
+  }
+
+  private async createProjectWebhook(
+    orgId: string,
+    projectId: string,
+    webhookUrl: string,
+  ) {
+    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const gitlab = new Gitlab({ token });
+
+    return await gitlab.ProjectHooks.add(projectId, webhookUrl, {
+      push_events: true,
+      merge_requests_events: true,
+      issues_events: true,
+    });
+  }
+
+  private async listProjectWebhooks(orgId: string, projectId: string) {
+    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const gitlab = new Gitlab({ token });
+
+    return await gitlab.ProjectHooks.all(projectId);
+  }
+
+  private async deleteProjectWebhook(
+    orgId: string,
+    projectId: string,
+    hookId: number,
+  ) {
+    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const gitlab = new Gitlab({ token });
+
+    await gitlab.ProjectHooks.remove(projectId, hookId);
   }
 }
