@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Gitlab } from '@gitbeaker/node';
 import { Project } from '../projects/project.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class GitlabService {
@@ -14,6 +15,7 @@ export class GitlabService {
     private readonly encryptionService: EncryptionService,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
+    private readonly configService: ConfigService,
   ) {}
 
   async setToken(orgId: string, token: string) {
@@ -67,19 +69,21 @@ export class GitlabService {
     };
   }
 
-  private async createProjectWebhook(
-    orgId: string,
-    projectId: string,
-    webhookUrl: string,
-  ) {
+  private async createProjectWebhook(orgId: string, projectId: string) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
     const token = this.encryptionService.decrypt(org.gitlabToken);
     const gitlab = new Gitlab({ token });
+
+    const gitlabWebhookUrlBase = this.configService.get(
+      'gitlab.webhookUrlBase',
+    );
+    const webhookUrl = `${gitlabWebhookUrlBase}/gitlab/orgs/${orgId}/projects/${projectId}/webhooks`;
 
     return await gitlab.ProjectHooks.add(projectId, webhookUrl, {
       push_events: true,
       merge_requests_events: true,
       issues_events: true,
+      secret: this.configService.get('gitlab.webhookSecret'),
     });
   }
 
