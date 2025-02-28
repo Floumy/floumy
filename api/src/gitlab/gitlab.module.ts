@@ -7,11 +7,13 @@ import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
 import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   providers: [GitlabService],
   controllers: [GitlabController],
   imports: [
+    ConfigModule,
     EncryptionModule,
     TypeOrmModule.forFeature([User, User, Org, Project, WorkItem]),
   ],

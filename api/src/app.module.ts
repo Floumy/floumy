@@ -36,6 +36,7 @@ import { GithubModule } from './github/github.module';
 import { EncryptionModule } from './encryption/encryption.module';
 import { GitlabModule } from './gitlab/gitlab.module';
 import githubConfig from './config/github.config';
+import gitlabConfig from './config/gitlab.config';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import githubConfig from './config/github.config';
         stripeConfig,
         aiConfig,
         githubConfig,
+        gitlabConfig,
       ],
     }),
     TypeOrmModule.forRootAsync({
