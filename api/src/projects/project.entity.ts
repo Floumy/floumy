@@ -47,6 +47,8 @@ export class Project {
   gitlabProjectUrl: string;
   @Column({ nullable: true })
   gitlabProjectName: string;
+  @Column({ nullable: true })
+  gitlabProjectWebhookId: number;
   @ManyToMany(() => User, (user) => user.projects, { lazy: true })
   @JoinTable({
     name: 'project_user',
