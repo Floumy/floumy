@@ -57,6 +57,18 @@ export class GitlabService {
       org: { id: orgId },
     });
 
+    if (project.gitlabProjectWebhookId) {
+      await this.deleteProjectWebhook(
+        orgId,
+        projectId,
+        project.gitlabProjectWebhookId,
+      );
+      project.gitlabProjectWebhookId = null;
+    }
+
+    const webhook = await this.createProjectWebhook(orgId, gitlabProjectId);
+    project.gitlabProjectWebhookId = webhook.id;
+
     project.gitlabProjectId = gitlabProjectId;
     project.gitlabProjectUrl = projectUrl;
     project.gitlabProjectName = projectName;
@@ -69,7 +81,7 @@ export class GitlabService {
     };
   }
 
-  private async createProjectWebhook(orgId: string, projectId: string) {
+  private async createProjectWebhook(orgId: string, gitlabProjectId: string) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
     const token = this.encryptionService.decrypt(org.gitlabToken);
     const gitlab = new Gitlab({ token });
@@ -77,22 +89,14 @@ export class GitlabService {
     const gitlabWebhookUrlBase = this.configService.get(
       'gitlab.webhookUrlBase',
     );
-    const webhookUrl = `${gitlabWebhookUrlBase}/gitlab/orgs/${orgId}/projects/${projectId}/webhooks`;
+    const webhookUrl = `${gitlabWebhookUrlBase}/gitlab/orgs/${orgId}/projects/${gitlabProjectId}/webhooks`;
 
-    return await gitlab.ProjectHooks.add(projectId, webhookUrl, {
+    return await gitlab.ProjectHooks.add(gitlabProjectId, webhookUrl, {
       push_events: true,
       merge_requests_events: true,
       issues_events: true,
       secret: this.configService.get('gitlab.webhookSecret'),
     });
-  }
-
-  private async listProjectWebhooks(orgId: string, projectId: string) {
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
-    const token = this.encryptionService.decrypt(org.gitlabToken);
-    const gitlab = new Gitlab({ token });
-
-    return await gitlab.ProjectHooks.all(projectId);
   }
 
   private async deleteProjectWebhook(
