@@ -6,6 +6,7 @@ import { EncryptionService } from '../encryption/encryption.service';
 import { Gitlab } from '@gitbeaker/node';
 import { Project } from '../projects/project.entity';
 import { ConfigService } from '@nestjs/config';
+import { MergeRequestEvent, PushEvent } from './dtos';
 
 @Injectable()
 export class GitlabService {
@@ -66,7 +67,11 @@ export class GitlabService {
       project.gitlabProjectWebhookId = null;
     }
 
-    const webhook = await this.createProjectWebhook(orgId, gitlabProjectId);
+    const webhook = await this.createProjectWebhook(
+      orgId,
+      projectId,
+      gitlabProjectId,
+    );
     project.gitlabProjectWebhookId = webhook.id;
 
     project.gitlabProjectId = gitlabProjectId;
@@ -81,7 +86,11 @@ export class GitlabService {
     };
   }
 
-  private async createProjectWebhook(orgId: string, gitlabProjectId: string) {
+  private async createProjectWebhook(
+    orgId: string,
+    projectId: string,
+    gitlabProjectId: string,
+  ) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
     const token = this.encryptionService.decrypt(org.gitlabToken);
     const gitlab = new Gitlab({ token });
@@ -89,7 +98,7 @@ export class GitlabService {
     const gitlabWebhookUrlBase = this.configService.get(
       'gitlab.webhookUrlBase',
     );
-    const webhookUrl = `${gitlabWebhookUrlBase}/gitlab/orgs/${orgId}/projects/${gitlabProjectId}/webhooks`;
+    const webhookUrl = `${gitlabWebhookUrlBase}/gitlab/orgs/${orgId}/projects/${projectId}/webhooks`;
 
     return await gitlab.ProjectHooks.add(gitlabProjectId, webhookUrl, {
       push_events: true,
@@ -109,5 +118,42 @@ export class GitlabService {
     const gitlab = new Gitlab({ token });
 
     await gitlab.ProjectHooks.remove(projectId, hookId);
+  }
+
+  async handleWebhook(
+    payload: MergeRequestEvent | PushEvent,
+    eventType: string,
+  ) {
+    switch (eventType) {
+      case 'Push Hook': {
+        const pushEvent = payload as PushEvent;
+        // Check if this is a new branch
+        if (pushEvent.before === '0000000000000000000000000') {
+          const branchName = pushEvent.ref.replace('refs/heads/', '');
+          console.log(`New branch created: ${branchName}`);
+          // Handle new branch logic here
+        }
+        break;
+      }
+
+      case 'Merge Request Hook': {
+        const mrEvent = payload as MergeRequestEvent;
+        switch (mrEvent.object_attributes.action) {
+          case 'open':
+            console.log(`New MR opened: ${mrEvent.object_attributes.title}`);
+            // Handle new MR logic
+            break;
+          case 'merge':
+            console.log(`MR merged: ${mrEvent.object_attributes.title}`);
+            // Handle merged MR logic
+            break;
+          case 'close':
+            console.log(`MR closed: ${mrEvent.object_attributes.title}`);
+            // Handle closed MR logic
+            break;
+        }
+        break;
+      }
+    }
   }
 }
