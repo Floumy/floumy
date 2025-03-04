@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Org } from '../orgs/org.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,6 +10,8 @@ import { MergeRequestEvent, PushEvent } from './dtos';
 
 @Injectable()
 export class GitlabService {
+  private readonly logger = new Logger(GitlabService.name);
+
   constructor(
     @InjectRepository(Org)
     private readonly orgRepository: Repository<Org>,
@@ -113,11 +115,16 @@ export class GitlabService {
     projectId: string,
     hookId: number,
   ) {
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
-    const token = this.encryptionService.decrypt(org.gitlabToken);
-    const gitlab = new Gitlab({ token });
+    try {
+      const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+      const token = this.encryptionService.decrypt(org.gitlabToken);
+      const gitlab = new Gitlab({ token });
 
-    await gitlab.ProjectHooks.remove(projectId, hookId);
+      await gitlab.ProjectHooks.remove(projectId, hookId);
+    } catch (e) {
+      this.logger.error('Failed to delete project webhook');
+      this.logger.error(e);
+    }
   }
 
   async handleWebhook(

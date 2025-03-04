@@ -8,6 +8,7 @@ import { Org } from '../orgs/org.entity';
 import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   providers: [GitlabService],
@@ -15,6 +16,7 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     ConfigModule,
     EncryptionModule,
+    AuthModule,
     TypeOrmModule.forFeature([User, User, Org, Project, WorkItem]),
   ],
 })

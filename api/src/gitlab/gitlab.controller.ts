@@ -1,23 +1,23 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   Post,
   Put,
-  Headers,
-  UnauthorizedException,
-  BadRequestException,
-  UseGuards,
   Request,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { GitlabService } from './gitlab.service';
-import { BasicAuthGuard } from '../auth/basic-auth.guard';
 import { Public } from '../auth/public.guard';
 import { MergeRequestEvent, PushEvent } from './dtos';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '../auth/auth.guard';
 
-@UseGuards(BasicAuthGuard)
+@UseGuards(AuthGuard)
 @Controller('gitlab')
 export class GitlabController {
   constructor(
@@ -32,7 +32,7 @@ export class GitlabController {
     @Body('token') token: string,
   ) {
     const org = request.user.org;
-    if (orgId !== org.id) {
+    if (orgId !== org) {
       throw new UnauthorizedException();
     }
 
@@ -51,7 +51,7 @@ export class GitlabController {
     @Body('project') gitlabProjectId: string,
   ) {
     const org = request.user.org;
-    if (orgId !== org.id) {
+    if (orgId !== org) {
       throw new UnauthorizedException();
     }
 
@@ -69,7 +69,7 @@ export class GitlabController {
   @Get('/projects/orgs/:orgId/')
   async getProject(@Request() request: any, @Param('orgId') orgId: string) {
     const org = request.user.org;
-    if (orgId !== org.id) {
+    if (orgId !== org) {
       throw new UnauthorizedException();
     }
 
@@ -80,8 +80,9 @@ export class GitlabController {
     }
   }
 
+  // TODO: Fix the 404 error
   @Public()
-  @Post('/projects/orgs/:orgId/projects/:projectId/webhooks')
+  @Post('/orgs/:orgId/projects/:projectId/webhooks')
   async handleWebhook(
     @Body() payload: MergeRequestEvent | PushEvent,
     @Headers('x-gitlab-event') eventType: string,
