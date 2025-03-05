@@ -87,6 +87,7 @@ export class GitlabController {
     @Body() payload: MergeRequestEvent | PushEvent,
     @Headers('x-gitlab-event') eventType: string,
     @Headers('x-gitlab-token') token: string,
+    @Request() request: any,
   ) {
     if (token !== this.configService.get('gitlab.webhookSecret')) {
       throw new UnauthorizedException('Invalid webhook token');
