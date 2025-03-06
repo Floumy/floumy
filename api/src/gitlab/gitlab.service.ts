@@ -63,7 +63,7 @@ export class GitlabService {
     if (project.gitlabProjectWebhookId) {
       await this.deleteProjectWebhook(
         orgId,
-        projectId,
+        project.gitlabProjectId,
         project.gitlabProjectWebhookId,
       );
       project.gitlabProjectWebhookId = null;
@@ -106,7 +106,7 @@ export class GitlabService {
       push_events: true,
       merge_requests_events: true,
       issues_events: true,
-      secret: this.configService.get('gitlab.webhookSecret'),
+      token: this.configService.get('gitlab.webhookSecret'),
     });
   }
 
