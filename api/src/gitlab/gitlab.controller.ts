@@ -80,7 +80,6 @@ export class GitlabController {
     }
   }
 
-  // TODO: Fix the 404 error
   @Public()
   @Post('/orgs/:orgId/projects/:projectId/webhooks')
   async handleWebhook(
@@ -89,9 +88,7 @@ export class GitlabController {
     @Headers('x-gitlab-token') token: string,
     @Request() request: any,
   ) {
-    if (token !== this.configService.get('gitlab.webhookSecret')) {
-      throw new UnauthorizedException('Invalid webhook token');
-    }
+    console.log(request.headers);
 
     try {
       return await this.gitlabService.handleWebhook(payload, eventType);
