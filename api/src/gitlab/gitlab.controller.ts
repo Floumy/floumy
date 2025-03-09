@@ -86,9 +86,8 @@ export class GitlabController {
     @Body() payload: MergeRequestEvent | PushEvent,
     @Headers('x-gitlab-event') eventType: string,
     @Headers('x-gitlab-token') token: string,
-    @Request() request: any,
   ) {
-    console.log(request.headers);
+    // TODO: Verify the token
 
     try {
       return await this.gitlabService.handleWebhook(payload, eventType);

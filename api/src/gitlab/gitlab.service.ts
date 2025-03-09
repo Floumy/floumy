@@ -81,6 +81,9 @@ export class GitlabService {
     project.gitlabProjectName = projectName;
     await this.projectRepository.save(project);
 
+    await this.processBranches(project);
+    await this.processMergeRequests(project);
+
     return {
       id: gitlabProjectId,
       name: project.gitlabProjectName,
@@ -163,4 +166,8 @@ export class GitlabService {
       }
     }
   }
+
+  private async processBranches(project: Project) {}
+
+  private async processMergeRequests(project: Project) {}
 }
