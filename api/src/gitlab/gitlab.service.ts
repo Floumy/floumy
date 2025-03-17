@@ -131,12 +131,18 @@ export class GitlabService {
   }
 
   async handleWebhook(
+    token: string,
     payload: MergeRequestEvent | PushEvent,
     eventType: string,
   ) {
+    if (token !== this.configService.get('GITLAB_TOKEN')) {
+      throw new Error('Invalid token');
+    }
+
     switch (eventType) {
       case 'Push Hook': {
         const pushEvent = payload as PushEvent;
+
         // Check if this is a new branch
         if (pushEvent.before === '0000000000000000000000000') {
           const branchName = pushEvent.ref.replace('refs/heads/', '');

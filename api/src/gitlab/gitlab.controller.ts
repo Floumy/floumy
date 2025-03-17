@@ -22,7 +22,6 @@ import { AuthGuard } from '../auth/auth.guard';
 export class GitlabController {
   constructor(
     private readonly gitlabService: GitlabService,
-    private readonly configService: ConfigService,
   ) {}
 
   @Put('/auth/orgs/:orgId/token')
@@ -87,10 +86,8 @@ export class GitlabController {
     @Headers('x-gitlab-event') eventType: string,
     @Headers('x-gitlab-token') token: string,
   ) {
-    // TODO: Verify the token
-
     try {
-      return await this.gitlabService.handleWebhook(payload, eventType);
+      return await this.gitlabService.handleWebhook(token, payload, eventType);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
