@@ -25,6 +25,8 @@ import { Project } from '../projects/project.entity';
 import { Notification } from '../notifications/notification.entity';
 import { GithubBranch } from '../github/github-branch.entity';
 import { GithubPullRequest } from '../github/github-pull-request.entity';
+import { GitlabBranch } from '../gitlab/gitlab-branch.entity';
+import { GitlabPullRequest } from '../gitlab/gitlab-pull-request.entity';
 
 @Entity()
 export class Org {
@@ -115,4 +117,14 @@ export class Org {
     { lazy: true },
   )
   githubPullRequests: Promise<GithubPullRequest[]>;
+  @OneToMany(() => GitlabBranch, (gitlabBranch) => gitlabBranch.org, {
+    lazy: true,
+  })
+  gitlabBranches: Promise<GitlabBranch[]>;
+  @OneToMany(
+    () => GitlabPullRequest,
+    (gitlabPullRequest) => gitlabPullRequest.org,
+    { lazy: true },
+  )
+  gitlabPullRequests: Promise<GitlabPullRequest[]>;
 }
