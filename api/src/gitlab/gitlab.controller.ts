@@ -14,15 +14,12 @@ import {
 import { GitlabService } from './gitlab.service';
 import { Public } from '../auth/public.guard';
 import { MergeRequestEvent, PushEvent } from './dtos';
-import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '../auth/auth.guard';
 
 @UseGuards(AuthGuard)
 @Controller('gitlab')
 export class GitlabController {
-  constructor(
-    private readonly gitlabService: GitlabService,
-  ) {}
+  constructor(private readonly gitlabService: GitlabService) {}
 
   @Put('/auth/orgs/:orgId/token')
   async setToken(
@@ -85,9 +82,17 @@ export class GitlabController {
     @Body() payload: MergeRequestEvent | PushEvent,
     @Headers('x-gitlab-event') eventType: string,
     @Headers('x-gitlab-token') token: string,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
   ) {
     try {
-      return await this.gitlabService.handleWebhook(token, payload, eventType);
+      return await this.gitlabService.handleWebhook(
+        orgId,
+        projectId,
+        token,
+        payload,
+        eventType,
+      );
     } catch (e) {
       throw new BadRequestException(e.message);
     }
