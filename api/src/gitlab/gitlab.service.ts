@@ -7,6 +7,8 @@ import { Gitlab } from '@gitbeaker/node';
 import { Project } from '../projects/project.entity';
 import { ConfigService } from '@nestjs/config';
 import { MergeRequestEvent, PushEvent } from './dtos';
+import { GitlabBranch } from './gitlab-branch.entity';
+import { GitlabPullRequest } from './gitlab-pull-request.entity';
 
 @Injectable()
 export class GitlabService {
@@ -18,6 +20,10 @@ export class GitlabService {
     private readonly encryptionService: EncryptionService,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
+    @InjectRepository(GitlabBranch)
+    private readonly gitlabBranchRepository: Repository<GitlabBranch>,
+    @InjectRepository(GitlabPullRequest)
+    private readonly gitlabPullRequestRepository: Repository<GitlabPullRequest>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -131,6 +137,8 @@ export class GitlabService {
   }
 
   async handleWebhook(
+    orgId: string,
+    projectId: string,
     token: string,
     payload: MergeRequestEvent | PushEvent,
     eventType: string,
@@ -138,6 +146,9 @@ export class GitlabService {
     if (token !== this.configService.get('GITLAB_TOKEN')) {
       throw new Error('Invalid token');
     }
+    const project = await this.projectRepository.findOne({
+      where: { org: { id: orgId }, id: projectId },
+    });
 
     switch (eventType) {
       case 'Push Hook': {
@@ -146,8 +157,7 @@ export class GitlabService {
         // Check if this is a new branch
         if (pushEvent.before === '0000000000000000000000000') {
           const branchName = pushEvent.ref.replace('refs/heads/', '');
-          console.log(`New branch created: ${branchName}`);
-          // Handle new branch logic here
+          await this.handleNewBranch(project, branchName);
         }
         break;
       }
@@ -173,7 +183,36 @@ export class GitlabService {
     }
   }
 
+  private async getWorkItemReference(text: string) {
+    const workItemReference = text.toLowerCase().match(/wi-\d+/);
+    if (!workItemReference || workItemReference.length === 0) {
+      return null;
+    }
+
+    return workItemReference[0];
+  }
+
   private async processBranches(project: Project) {}
 
   private async processMergeRequests(project: Project) {}
+
+  private async handleNewBranch(project: Project, branchName: string) {
+    const workItemReference = await this.getWorkItemReference(branchName);
+    if (!workItemReference) {
+      return;
+    }
+
+    const branch = await this.gitlabBranchRepository.findOne({
+      where: { name: branchName, project: { id: project.id } },
+    });
+    if (!branch) {
+      const branch = new GitlabBranch();
+      branch.name = branchName;
+      branch.project = Promise.resolve(project);
+      branch.org = Promise.resolve(await project.org);
+      branch.url = `${project.gitlabProjectUrl}/-/tree/${branchName}`;
+      branch.state = 'open';
+      await this.gitlabBranchRepository.save(branch);
+    }
+  }
 }
