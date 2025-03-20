@@ -9,6 +9,8 @@ import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
+import { GitlabMergeRequest } from './gitlab-pull-request.entity';
+import { GitlabBranch } from './gitlab-branch.entity';
 
 @Module({
   providers: [GitlabService],
@@ -17,7 +19,15 @@ import { AuthModule } from '../auth/auth.module';
     ConfigModule,
     EncryptionModule,
     AuthModule,
-    TypeOrmModule.forFeature([User, User, Org, Project, WorkItem]),
+    TypeOrmModule.forFeature([
+      User,
+      User,
+      Org,
+      Project,
+      GitlabBranch,
+      GitlabMergeRequest,
+      WorkItem,
+    ]),
   ],
 })
 export class GitlabModule {}
