@@ -27,7 +27,7 @@ import { Project } from '../../projects/project.entity';
 import { GithubBranch } from '../../github/github-branch.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
 import { GitlabBranch } from '../../gitlab/gitlab-branch.entity';
-import { GitlabPullRequest } from '../../gitlab/gitlab-pull-request.entity';
+import { GitlabMergeRequest } from '../../gitlab/gitlab-pull-request.entity';
 
 @Entity()
 @Unique(['reference', 'org'])
@@ -125,13 +125,13 @@ export class WorkItem {
   gitlabBranches: Promise<GitlabBranch[]>;
 
   @OneToMany(
-    () => GitlabPullRequest,
+    () => GitlabMergeRequest,
     (gitlabPullRequest) => gitlabPullRequest.workItem,
     {
       lazy: true,
     },
   )
-  gitlabPullRequests: Promise<GitlabPullRequest[]>;
+  gitlabPullRequests: Promise<GitlabMergeRequest[]>;
   @ManyToMany(() => User, {
     lazy: true,
   })

@@ -8,7 +8,8 @@ import { Project } from '../projects/project.entity';
 import { ConfigService } from '@nestjs/config';
 import { MergeRequestEvent, PushEvent } from './dtos';
 import { GitlabBranch } from './gitlab-branch.entity';
-import { GitlabPullRequest } from './gitlab-pull-request.entity';
+import { GitlabMergeRequest } from './gitlab-pull-request.entity';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
 
 @Injectable()
 export class GitlabService {
@@ -22,8 +23,10 @@ export class GitlabService {
     private readonly projectRepository: Repository<Project>,
     @InjectRepository(GitlabBranch)
     private readonly gitlabBranchRepository: Repository<GitlabBranch>,
-    @InjectRepository(GitlabPullRequest)
-    private readonly gitlabPullRequestRepository: Repository<GitlabPullRequest>,
+    @InjectRepository(GitlabMergeRequest)
+    private readonly gitlabMergeRequestRepository: Repository<GitlabMergeRequest>,
+    @InjectRepository(WorkItem)
+    private readonly workItemRepository: Repository<WorkItem>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -155,7 +158,7 @@ export class GitlabService {
         const pushEvent = payload as PushEvent;
 
         // Check if this is a new branch
-        if (pushEvent.before === '0000000000000000000000000') {
+        if (this.isNewBranch(pushEvent)) {
           const branchName = pushEvent.ref.replace('refs/heads/', '');
           await this.handleNewBranch(project, branchName);
         }
@@ -167,7 +170,7 @@ export class GitlabService {
         switch (mrEvent.object_attributes.action) {
           case 'open':
             console.log(`New MR opened: ${mrEvent.object_attributes.title}`);
-            // Handle new MR logic
+            await this.handleNewMergeRequest(project, mrEvent);
             break;
           case 'merge':
             console.log(`MR merged: ${mrEvent.object_attributes.title}`);
@@ -183,6 +186,10 @@ export class GitlabService {
     }
   }
 
+  private isNewBranch(pushEvent: PushEvent) {
+    return pushEvent.before === '0000000000000000000000000';
+  }
+
   private async getWorkItemReference(text: string) {
     const workItemReference = text.toLowerCase().match(/wi-\d+/);
     if (!workItemReference || workItemReference.length === 0) {
@@ -192,13 +199,74 @@ export class GitlabService {
     return workItemReference[0];
   }
 
-  private async processBranches(project: Project) {}
+  private async processBranches(project: Project) {
+    const org = await project.org;
+    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const gitlab = new Gitlab({
+      token,
+    });
+    const branches = await gitlab.Branches.all(project.gitlabProjectId);
 
-  private async processMergeRequests(project: Project) {}
+    for (const branch of branches) {
+      await this.handleNewBranch(project, branch.name);
+    }
+  }
+
+  private async processMergeRequests(project: Project) {
+    const org = await project.org;
+    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const gitlab = new Gitlab({
+      token,
+    });
+    const mergeRequests = await gitlab.MergeRequests.all({
+      projectId: project.gitlabProjectId,
+    });
+    for (const mergeRequest of mergeRequests) {
+      const workItemReference = await this.getWorkItemReference(
+        mergeRequest.title,
+      );
+      if (!workItemReference) {
+        return;
+      }
+      const org = await project.org;
+      const workItem = await this.workItemRepository.findOne({
+        where: {
+          reference: workItemReference.toUpperCase(),
+          org: { id: org.id },
+          project: { id: project.id },
+        },
+      });
+
+      if (!workItem) {
+        return;
+      }
+
+      const gitlabMergeRequest = new GitlabMergeRequest();
+      gitlabMergeRequest.title = mergeRequest.title;
+      gitlabMergeRequest.url = mergeRequest.web_url;
+      gitlabMergeRequest.state = mergeRequest.state;
+      gitlabMergeRequest.org = Promise.resolve(project.org);
+      gitlabMergeRequest.project = Promise.resolve(project);
+      gitlabMergeRequest.workItem = Promise.resolve(workItem);
+      await this.gitlabMergeRequestRepository.save(gitlabMergeRequest);
+    }
+  }
 
   private async handleNewBranch(project: Project, branchName: string) {
     const workItemReference = await this.getWorkItemReference(branchName);
     if (!workItemReference) {
+      return;
+    }
+    const org = await project.org;
+
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+    if (!workItem) {
       return;
     }
 
@@ -214,5 +282,38 @@ export class GitlabService {
       branch.state = 'open';
       await this.gitlabBranchRepository.save(branch);
     }
+  }
+
+  private async handleNewMergeRequest(
+    project: Project,
+    mergeRequestEvent: MergeRequestEvent,
+  ) {
+    const workItemReference = await this.getWorkItemReference(
+      mergeRequestEvent.object_attributes.title,
+    );
+    if (!workItemReference) {
+      return;
+    }
+    const org = await project.org;
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+
+    if (!workItem) {
+      return;
+    }
+
+    const gitlabMergeRequest = new GitlabMergeRequest();
+    gitlabMergeRequest.title = mergeRequestEvent.object_attributes.title;
+    gitlabMergeRequest.url = mergeRequestEvent.object_attributes.url;
+    gitlabMergeRequest.state = mergeRequestEvent.object_attributes.state;
+    gitlabMergeRequest.org = Promise.resolve(project.org);
+    gitlabMergeRequest.project = Promise.resolve(project);
+    gitlabMergeRequest.workItem = Promise.resolve(workItem);
+    await this.gitlabMergeRequestRepository.save(gitlabMergeRequest);
   }
 }

@@ -4,11 +4,9 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Org } from '../orgs/org.entity';
 
 @Entity()
-export class GitlabPullRequest {
+export class GitlabMergeRequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @Column({ nullable: true })
-  gitlabId: string;
   @Column()
   title: string;
   @Column()
