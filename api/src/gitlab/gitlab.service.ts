@@ -169,16 +169,13 @@ export class GitlabService {
         const mrEvent = payload as MergeRequestEvent;
         switch (mrEvent.object_attributes.action) {
           case 'open':
-            console.log(`New MR opened: ${mrEvent.object_attributes.title}`);
             await this.handleNewMergeRequest(project, mrEvent);
             break;
           case 'merge':
-            console.log(`MR merged: ${mrEvent.object_attributes.title}`);
-            // Handle merged MR logic
+            await this.handleMergeRequestStatusChange(project, mrEvent);
             break;
           case 'close':
-            console.log(`MR closed: ${mrEvent.object_attributes.title}`);
-            // Handle closed MR logic
+            await this.handleMergeRequestStatusChange(project, mrEvent);
             break;
         }
         break;
@@ -315,5 +312,33 @@ export class GitlabService {
     gitlabMergeRequest.project = Promise.resolve(project);
     gitlabMergeRequest.workItem = Promise.resolve(workItem);
     await this.gitlabMergeRequestRepository.save(gitlabMergeRequest);
+  }
+
+  private async handleMergeRequestStatusChange(
+    project: Project,
+    mergeRequestEvent: MergeRequestEvent,
+  ) {
+    const workItemReference = await this.getWorkItemReference(
+      mergeRequestEvent.object_attributes.title,
+    );
+    if (!workItemReference) {
+      return;
+    }
+
+    const org = await project.org;
+    const mergeRequest = await this.gitlabMergeRequestRepository.findOne({
+      where: {
+        url: mergeRequestEvent.object_attributes.url,
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+
+    if (!mergeRequest) {
+      return;
+    }
+
+    mergeRequest.state = mergeRequestEvent.object_attributes.state;
+    await this.gitlabMergeRequestRepository.save(mergeRequest);
   }
 }
