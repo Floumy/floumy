@@ -63,7 +63,7 @@ export class GitlabController {
   }
 
   @Get('/projects/orgs/:orgId/')
-  async getProject(@Request() request: any, @Param('orgId') orgId: string) {
+  async listProjects(@Request() request: any, @Param('orgId') orgId: string) {
     const org = request.user.org;
     if (orgId !== org) {
       throw new UnauthorizedException();
