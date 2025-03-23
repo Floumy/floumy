@@ -12,6 +12,7 @@ import {
   UnauthorizedException,
   UseGuards,
   Headers,
+  Delete,
 } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { AuthGuard } from '../auth/auth.guard';
@@ -144,6 +145,23 @@ export class GithubController {
 
     try {
       return await this.githubService.getPullRequests(orgId, projectId);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete('auth/orgs/:orgId/projects/:projectId/github/repo')
+  async deleteProjectGithubRepo(
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.githubService.deleteProjectGithubRepo(orgId, projectId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

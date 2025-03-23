@@ -4,6 +4,7 @@ import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import { Alert, Card, CardBody, CardHeader, CardTitle, Col, Container, Row, Table } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import {
+  deleteProjectGithubRepo,
   getGithubRepos,
   getGithubUrl,
   getIsGithubConnected,
@@ -30,6 +31,7 @@ function Code() {
   const [prs, setPrs] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [updateWarning, setUpdateWarning] = useState(false);
+  const [disconnectWarning, setDisconnectWarning] = useState(false);
 
   useEffect(() => {
     if (!currentProject?.id || !orgId) return;
@@ -91,6 +93,25 @@ function Code() {
     }
   };
 
+  const handleRepoDisconnect = async () => {
+    try {
+      await deleteProjectGithubRepo(orgId, currentProject.id, null);
+      setRepo(null);
+      setIsGithubConnected(false);
+      setCallbackUrl('');
+      setRepos([]);
+      setSelectedRepo('');
+      setRepo(null);
+      setPrs(null);
+      setIsEditing(false);
+      setUpdateWarning(false);
+      setDisconnectWarning(false);
+      toast.success('Project repository disconnected');
+    } catch (e) {
+      toast.error(e.message);
+    }
+  };
+
   const editRepo = async () => {
     setIsEditing(!isEditing);
     try {
@@ -128,6 +149,12 @@ function Code() {
           warningMessage={"It will take a few minutes for the pull requests on your repository to be processed."}
           entity={"project's repository"}
           onUpdate={async () => await handleRepoUpdate()} />
+        <UpdateWarning
+          isOpen={disconnectWarning}
+          toggle={() => setDisconnectWarning(!disconnectWarning)}
+          warningMessage={"Are you sure you want to disconnect from GitHub?"}
+          entity={"project's repository"}
+          onUpdate={async () => await handleRepoDisconnect()} />
         <Row>
           <Col>
             <Card className="mb-5">
@@ -139,7 +166,8 @@ function Code() {
                       <a className="btn-link text-blue mr-2" href={repo.url} target="_blank" rel="noreferrer">
                         | {repo.name}
                       </a>
-                      <i className="fa fa-edit mr-2" onClick={editRepo} />
+                      <i className="fa fa-edit mr-2" style={{ cursor: 'pointer' }} onClick={editRepo} />
+                      <i className="fa fa-xmark mr-2" style={{ cursor: 'pointer' }} onClick={() => setDisconnectWarning(true)} />
                     </> : <>Code</>}
                     </CardTitle>
                   </Col>

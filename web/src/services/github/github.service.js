@@ -36,6 +36,15 @@ export async function updateProjectGithubRepo(orgId, projectId, repoId) {
   }
 }
 
+export async function deleteProjectGithubRepo(orgId, projectId) {
+  try {
+    const response = await api.delete(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/repo`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
 export async function getPullRequests(orgId, projectId) {
   try {
     const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs`);
