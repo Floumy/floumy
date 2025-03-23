@@ -719,4 +719,19 @@ export class GithubService {
       await this.onNewPullRequest(project, pullRequest);
     }
   }
+
+  async deleteProjectGithubRepo(orgId: string, projectId: string) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+
+    await this.cleanupGithubRepoAssociation(orgId, project);
+
+    project.githubRepositoryId = null;
+    project.githubRepositoryFullName = null;
+    project.githubRepositoryUrl = null;
+    project.githubRepositoryWebhookId = null;
+    await this.projectRepository.save(project);
+  }
 }
