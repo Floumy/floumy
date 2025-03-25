@@ -21,6 +21,23 @@ import { AuthGuard } from '../auth/auth.guard';
 export class GitlabController {
   constructor(private readonly gitlabService: GitlabService) {}
 
+  @Get('auth/orgs/:orgId/projects/:projectId/is-connected')
+  async isConnected(
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.gitlabService.isConnected(orgId, projectId);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
   @Put('/auth/orgs/:orgId/token')
   async setToken(
     @Request() request: any,
