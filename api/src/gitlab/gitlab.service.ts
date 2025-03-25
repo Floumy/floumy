@@ -341,4 +341,46 @@ export class GitlabService {
     mergeRequest.state = mergeRequestEvent.object_attributes.state;
     await this.gitlabMergeRequestRepository.save(mergeRequest);
   }
+
+  async isConnected(orgId: string, projectId: string) {
+    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const gitlab = new Gitlab({
+      token,
+    });
+
+    try {
+      await gitlab.Projects.all({
+        membership: true,
+        archived: false,
+      });
+    } catch (error) {
+      return {
+        connected: false,
+        repo: null,
+      };
+    }
+
+    return {
+      connected: true,
+      repo: await this.getProjectRepo(orgId, projectId),
+    };
+  }
+
+  private async getProjectRepo(orgId: string, projectId: string) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+
+    if (project.gitlabProjectUrl) {
+      return {
+        id: project.gitlabProjectId,
+        name: project.gitlabProjectName,
+        url: project.gitlabProjectUrl,
+      };
+    }
+
+    return null;
+  }
 }
