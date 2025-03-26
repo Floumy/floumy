@@ -4,12 +4,15 @@ import { getIsGithubConnected } from '../../../services/github/github.service';
 import { useProjects } from '../../../contexts/ProjectsContext';
 import { toast } from 'react-toastify';
 import GitHub from './GitHub';
+import { getIsGitLabConnected } from '../../../services/gitlab/gitlab.service';
+import GitLab from './GitLab';
 
 function Code() {
   const { orgId, currentProject } = useProjects();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isGithubConnected, setIsGithubConnected] = useState(true);
+  const [isGithubConnected, setIsGithubConnected] = useState(false);
+  const [isGitlabConnected, setIsGitlabConnected] = useState(false);
 
   useEffect(() => {
     if (!currentProject?.id || !orgId) return;
@@ -17,11 +20,13 @@ function Code() {
     const fetchGithubData = async () => {
       setIsLoading(true);
       try {
-        const { connected } = await getIsGithubConnected(orgId, currentProject.id);
-        setIsGithubConnected(connected);
+        const { connected: githubConnected } = await getIsGithubConnected(orgId, currentProject.id);
+        setIsGithubConnected(githubConnected);
+        const { connected: gitlabConnected } = await getIsGitLabConnected(orgId, currentProject.id);
+        setIsGitlabConnected(gitlabConnected);
       } catch (error) {
         setIsGithubConnected(false);
-        toast.error('Failed to check Github connection');
+        toast.error('Failed to check code connections');
       } finally {
         setIsLoading(false);
       }
@@ -33,7 +38,9 @@ function Code() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      {isGithubConnected && <GitHub />}
+      {isGithubConnected && !isGitlabConnected && <GitHub />}
+      {!isGithubConnected && isGitlabConnected && <GitLab />}
+      {!isGithubConnected && !isGitlabConnected && <div>No code connected</div>}
     </>
   );
 }

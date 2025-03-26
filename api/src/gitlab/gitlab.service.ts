@@ -344,6 +344,13 @@ export class GitlabService {
 
   async isConnected(orgId: string, projectId: string) {
     const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+
+    if (!org.gitlabToken) {
+      return {
+        connected: false,
+      };
+    }
+
     const token = this.encryptionService.decrypt(org.gitlabToken);
     const gitlab = new Gitlab({
       token,
@@ -357,7 +364,6 @@ export class GitlabService {
     } catch (error) {
       return {
         connected: false,
-        repo: null,
       };
     }
 
