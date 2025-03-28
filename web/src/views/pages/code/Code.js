@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import GitHub from './GitHub';
 import { getIsGitLabConnected } from '../../../services/gitlab/gitlab.service';
 import GitLab from './GitLab';
+import RepositorySelector from './RepositorySelector';
 
 function Code() {
   const { orgId, currentProject } = useProjects();
@@ -40,7 +41,7 @@ function Code() {
       {isLoading && <InfiniteLoadingBar />}
       {isGithubConnected && !isGitlabConnected && <GitHub />}
       {!isGithubConnected && isGitlabConnected && <GitLab />}
-      {!isGithubConnected && !isGitlabConnected && <div>No code connected</div>}
+      {!isGithubConnected && !isGitlabConnected && <RepositorySelector />}
     </>
   );
 }
