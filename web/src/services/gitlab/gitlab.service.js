@@ -9,9 +9,9 @@ export async function getIsGitLabConnected(orgId, projectId) {
   }
 }
 
-export async function listProjects(orgId) {
+export async function listProjects(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/gitlab/orgs/${orgId}/projects`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/gitlab/projects/orgs/${orgId}/projects/${projectId}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -27,9 +27,9 @@ export async function setProject(orgId, projectId, gitlabProjectId) {
   }
 }
 
-export async function setToken(orgId, token) {
+export async function setToken(orgId, projectId, token) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/gitlab/auth/orgs/${orgId}/token`, { token });
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/gitlab/auth/orgs/${orgId}/projects/${projectId}/token`, { token });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
