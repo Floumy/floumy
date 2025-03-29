@@ -33,7 +33,7 @@ export class GithubService {
   ) {}
 
   async isConnected(orgId: string, projectId: string) {
-    const token = await this.getToken(orgId);
+    const token = await this.getToken(projectId);
 
     if (!token) {
       return {
@@ -56,7 +56,7 @@ export class GithubService {
   }
 
   async updateProjectRepo(projectId: string, orgId: string, repoId: number) {
-    const token = await this.getToken(orgId);
+    const token = await this.getToken(projectId);
 
     if (!token) {
       throw new Error('No token found');
@@ -77,7 +77,7 @@ export class GithubService {
     }
 
     if (project.githubRepositoryId) {
-      await this.cleanupGithubRepoAssociation(orgId, project);
+      await this.cleanupGithubRepoAssociation(project);
     }
 
     project.githubRepositoryId = repo.id;
@@ -116,8 +116,8 @@ export class GithubService {
     return null;
   }
 
-  async getRepos(orgId: string) {
-    const token = await this.getToken(orgId);
+  async getRepos(projectId: string) {
+    const token = await this.getToken(projectId);
 
     if (!token) {
       throw new Error('No token found');
@@ -166,7 +166,7 @@ export class GithubService {
 
       const user = await this.getUser(token);
 
-      await this.orgRepository.update(orgId, {
+      await this.projectRepository.update(projectId, {
         githubAccessToken: this.encryptionService.encrypt(token),
         githubUsername: user.login,
       });
@@ -279,9 +279,10 @@ export class GithubService {
     return JSON.parse(Buffer.from(state, 'base64').toString());
   }
 
-  private async getToken(orgId: string) {
-    const token = (await this.orgRepository.findOneByOrFail({ id: orgId }))
-      .githubAccessToken;
+  private async getToken(projectId: string) {
+    const token = (
+      await this.projectRepository.findOneByOrFail({ id: projectId })
+    ).githubAccessToken;
 
     if (!token) {
       return null;
@@ -393,7 +394,7 @@ export class GithubService {
   }
 
   private async setupWebhook(orgId: string, projectId: string) {
-    const token = await this.getToken(orgId);
+    const token = await this.getToken(projectId);
     if (!token) {
       throw new Error('No token found');
     }
@@ -642,8 +643,8 @@ export class GithubService {
     await this.githubPullRequestRepository.save(githubPullRequest);
   }
 
-  private async deleteWebhook(orgId: string, project: Project) {
-    const token = await this.getToken(orgId);
+  private async deleteWebhook(project: Project) {
+    const token = await this.getToken(project.id);
 
     if (!token) {
       throw new Error('No token found');
@@ -661,15 +662,15 @@ export class GithubService {
     });
   }
 
-  private async cleanupGithubRepoAssociation(orgId: string, project: Project) {
-    const token = await this.getToken(orgId);
+  private async cleanupGithubRepoAssociation(project: Project) {
+    const token = await this.getToken(project.id);
 
     if (!token) {
       throw new Error('No token found');
     }
 
     // Delete webhook
-    await this.deleteWebhook(orgId, project);
+    await this.deleteWebhook(project);
 
     // Delete project pull requests
     await this.githubPullRequestRepository.delete({
@@ -688,14 +689,14 @@ export class GithubService {
     project: Project;
   }) {
     try {
-      await this.processGithubPullRequests(payload.orgId, payload.project);
+      await this.processGithubPullRequests(payload.project);
     } catch (error) {
       console.error('Error processing pull requests:', error);
     }
   }
 
-  private async processGithubPullRequests(orgId: string, project: Project) {
-    const token = await this.getToken(orgId);
+  private async processGithubPullRequests(project: Project) {
+    const token = await this.getToken(project.id);
 
     if (!token) {
       throw new Error('No token found');
@@ -726,7 +727,7 @@ export class GithubService {
       org: { id: orgId },
     });
 
-    await this.cleanupGithubRepoAssociation(orgId, project);
+    await this.cleanupGithubRepoAssociation(project);
 
     project.githubRepositoryId = null;
     project.githubRepositoryFullName = null;

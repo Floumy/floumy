@@ -29,12 +29,12 @@ export default function CurrentUserNav() {
         <DropdownToggle className="nav-link pr-0" color="" tag="a">
           <Media className="align-items-center" style={{ cursor: "pointer" }}>
             <Media className="ml-2 d-none d-lg-block">
-                      <span className="mb-0 text-md font-weight-bold text-lighter float-right">
+                      <span className="mb-0 text-md font-weight-bold float-right">
                         {currentUserName}
                       </span>
             </Media>
             <Media className="ml-2 d-lg-none d-block">
-                      <span className="mb-0 text-md font-weight-bold text-lighter float-right">
+                      <span className="mb-0 text-md font-weight-bold float-right">
                         <span
                           style={{ backgroundColor: textToColor(currentUserName) }}
                           className="avatar avatar-xs rounded-circle mr-2 border border-white">

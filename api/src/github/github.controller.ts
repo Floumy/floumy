@@ -65,14 +65,14 @@ export class GithubController {
     }
   }
 
-  @Get('auth/orgs/:orgId/repos')
-  async getRepos(@Request() request: any, @Param('orgId') orgId: string) {
+  @Get('auth/orgs/:orgId/projects/:projectId/repos')
+  async getRepos(@Request() request: any, @Param('orgId') orgId: string, @Param('projectId') projectId: string) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.githubService.getRepos(orgId);
+      return await this.githubService.getRepos(projectId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

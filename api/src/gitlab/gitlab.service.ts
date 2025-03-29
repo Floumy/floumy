@@ -30,15 +30,19 @@ export class GitlabService {
     private readonly configService: ConfigService,
   ) {}
 
-  async setToken(orgId: string, token: string) {
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
-    org.gitlabToken = this.encryptionService.encrypt(token);
-    await this.orgRepository.save(org);
+  async setToken(projectId: string, token: string) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+    });
+    project.gitlabAccessToken = this.encryptionService.encrypt(token);
+    await this.projectRepository.save(project);
   }
 
-  async getProjects(orgId: string) {
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
-    const token = this.encryptionService.decrypt(org.gitlabToken);
+  async getProjects(projectId: string) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+    });
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
     const gitlab = new Gitlab({
       token,
     });
@@ -56,18 +60,17 @@ export class GitlabService {
   }
 
   async setProject(orgId: string, projectId: string, gitlabProjectId: string) {
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
-    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
     const gitlab = new Gitlab({
       token,
     });
     const gitlabProject = await gitlab.Projects.show(gitlabProjectId);
     const projectName = gitlabProject.name;
     const projectUrl = gitlabProject.web_url;
-    const project = await this.projectRepository.findOneByOrFail({
-      id: projectId,
-      org: { id: orgId },
-    });
 
     if (project.gitlabProjectWebhookId) {
       await this.deleteProjectWebhook(
@@ -105,8 +108,11 @@ export class GitlabService {
     projectId: string,
     gitlabProjectId: string,
   ) {
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
-    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
     const gitlab = new Gitlab({ token });
 
     const gitlabWebhookUrlBase = this.configService.get(
@@ -128,8 +134,11 @@ export class GitlabService {
     hookId: number,
   ) {
     try {
-      const org = await this.orgRepository.findOneByOrFail({ id: orgId });
-      const token = this.encryptionService.decrypt(org.gitlabToken);
+      const project = await this.projectRepository.findOneByOrFail({
+        id: projectId,
+        org: { id: orgId },
+      });
+      const token = this.encryptionService.decrypt(project.gitlabAccessToken);
       const gitlab = new Gitlab({ token });
 
       await gitlab.ProjectHooks.remove(projectId, hookId);
@@ -197,8 +206,7 @@ export class GitlabService {
   }
 
   private async processBranches(project: Project) {
-    const org = await project.org;
-    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
     const gitlab = new Gitlab({
       token,
     });
@@ -210,8 +218,7 @@ export class GitlabService {
   }
 
   private async processMergeRequests(project: Project) {
-    const org = await project.org;
-    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
     const gitlab = new Gitlab({
       token,
     });
@@ -343,15 +350,18 @@ export class GitlabService {
   }
 
   async isConnected(orgId: string, projectId: string) {
-    const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
 
-    if (!org.gitlabToken) {
+    if (!project.gitlabAccessToken) {
       return {
         connected: false,
       };
     }
 
-    const token = this.encryptionService.decrypt(org.gitlabToken);
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
     const gitlab = new Gitlab({
       token,
     });

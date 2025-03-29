@@ -1,8 +1,23 @@
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import { Button, Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useProjects } from '../../../contexts/ProjectsContext';
 
 function RepositorySelector() {
+
+  const { orgId, currentProject } = useProjects();
+
+  const navigate = useNavigate();
+
+  async function handleGitHub() {
+    navigate(`/admin/orgs/${orgId}/projects/${currentProject.id}/code/github`);
+  }
+
+  async function handleGitLab() {
+    navigate(`/admin/orgs/${orgId}/projects/${currentProject.id}/code/gitlab`);
+  }
+
   return (
     <>
       <SimpleHeader />
@@ -23,7 +38,7 @@ function RepositorySelector() {
                   <h2 className="mb-4 h2">Choose your repository platform</h2>
                   <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-4">
                     <Button
-                      onClick={() => window.location.href = '/github/connect'}
+                      onClick={handleGitHub}
                       color="light"
                       className="p-4 d-flex flex-column align-items-center m-0 mb-4 mr-md-4"
                       style={{
@@ -42,7 +57,7 @@ function RepositorySelector() {
                     </Button>
 
                     <Button
-                      onClick={() => window.location.href = '/gitlab/connect'}
+                      onClick={handleGitLab}
                       color="light"
                       className="p-4 d-flex flex-column align-items-center m-0 mb-4"
                       style={{

@@ -36,6 +36,12 @@ export class Project {
   @Column()
   name: string;
   @Column({ nullable: true })
+  githubAccessToken: string;
+  @Column({ nullable: true })
+  githubUsername: string;
+  @Column({ nullable: true })
+  gitlabAccessToken: string;
+  @Column({ nullable: true })
   githubRepositoryId: string;
   @Column({ nullable: true })
   githubRepositoryFullName: string;

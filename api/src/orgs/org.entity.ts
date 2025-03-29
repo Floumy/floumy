@@ -57,18 +57,6 @@ export class Org {
   stripeCustomerId: string;
   @Column({ default: null, nullable: true })
   stripeSubscriptionId: string;
-  @Column({
-    type: 'text',
-    nullable: true,
-  })
-  githubAccessToken: string;
-  @Column({ nullable: true })
-  githubUsername: string;
-  @Column({
-    type: 'text',
-    nullable: true,
-  })
-  gitlabToken: string;
   @OneToMany(() => Objective, (objective) => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })

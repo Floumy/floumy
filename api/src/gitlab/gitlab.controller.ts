@@ -38,10 +38,11 @@ export class GitlabController {
     }
   }
 
-  @Put('/auth/orgs/:orgId/token')
+  @Put('/auth/orgs/:orgId/projects/:projectId/token')
   async setToken(
     @Request() request: any,
     @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
     @Body('token') token: string,
   ) {
     const org = request.user.org;
@@ -50,7 +51,7 @@ export class GitlabController {
     }
 
     try {
-      await this.gitlabService.setToken(orgId, token);
+      await this.gitlabService.setToken(projectId, token);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -79,15 +80,19 @@ export class GitlabController {
     }
   }
 
-  @Get('/projects/orgs/:orgId/')
-  async listProjects(@Request() request: any, @Param('orgId') orgId: string) {
+  @Get('/projects/orgs/:orgId/projects/:projectId/')
+  async listProjects(
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
     const org = request.user.org;
     if (orgId !== org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.gitlabService.getProjects(orgId);
+      return await this.gitlabService.getProjects(projectId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

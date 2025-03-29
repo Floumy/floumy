@@ -63,7 +63,7 @@ function GitHub() {
           }
         } else if (!repo?.id) {
           try {
-            const repositories = await getGithubRepos(orgId);
+            const repositories = await getGithubRepos(orgId, currentProject.id);
             setRepos(repositories);
           } catch (error) {
             toast.error('Failed to fetch repositories');
@@ -98,6 +98,7 @@ function GitHub() {
       const prs = await getPullRequests(orgId, currentProject.id);
       setPrs(prs);
       setIsEditing(false);
+      setIsGithubConnected(true);
       toast.success('Project repository updated');
     } catch (e) {
       toast.error(e.message);
@@ -126,7 +127,7 @@ function GitHub() {
   const editRepo = async () => {
     setIsEditing(!isEditing);
     try {
-      const repositories = await getGithubRepos(orgId);
+      const repositories = await getGithubRepos(orgId, currentProject.id);
       setRepos(repositories);
     } catch (error) {
       toast.error('Failed to fetch repositories');
@@ -181,8 +182,8 @@ function GitHub() {
                       <UncontrolledTooltip target="disconnect-from-github" placement="top">
                         Disconnect from GitHub
                       </UncontrolledTooltip>
-                      <i className="fa fa-xmark mr-2" style={{ cursor: 'pointer' }} id="disconnect-from-github" onClick={() => setDisconnectWarning(true)} />
-                    </> : <span className="mr-2">Code</span>}
+                      <i className="fa fa-trash-alt mr-2" style={{ cursor: 'pointer' }} id="disconnect-from-github" onClick={() => setDisconnectWarning(true)} />
+                    </> : <span className="mr-2">GitHub Repository</span>}
                     </CardTitle>
                   </Col>
                 </Row>

@@ -12,10 +12,7 @@ function AdminNavbar({ theme, sidenavOpen, toggleSidenav }) {
     <>
       <Navbar
         className={classnames(
-          "navbar-top navbar-expand border-bottom",
-          { "navbar-dark bg-gray": theme === "dark" },
-          { "navbar-light bg-secondary": theme === "light" }
-        )}
+          "navbar-top navbar-expand border-bottom navbar-light")}
       >
         <Container fluid>
           <Collapse navbar isOpen={true}>

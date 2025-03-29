@@ -18,9 +18,9 @@ export async function getGithubUrl(orgId, projectId) {
   }
 }
 
-export async function getGithubRepos(orgId) {
+export async function getGithubRepos(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/repos`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/repos`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
