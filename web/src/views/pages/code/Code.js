@@ -6,6 +6,9 @@ import { toast } from 'react-toastify';
 import { getIsGitLabConnected } from '../../../services/gitlab/gitlab.service';
 import RepositorySelector from './RepositorySelector';
 import { useNavigate } from 'react-router-dom';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 
 function Code() {
   const { orgId, currentProject } = useProjects();
@@ -43,7 +46,30 @@ function Code() {
 
   return (
     <>
-      {isLoading && <InfiniteLoadingBar />}
+      {isLoading && <>
+        <InfiniteLoadingBar />
+        <SimpleHeader />
+        <Container className="mt--6" fluid id="OKRs">
+          <Row>
+            <Col>
+              <Card className="mb-5">
+                <CardHeader>
+                  <Row>
+                    <Col md={12}>
+                      <CardTitle tag="h2" className="mb-3">Code
+                      </CardTitle>
+                    </Col>
+                  </Row>
+                </CardHeader>
+                <CardBody>
+                    <LoadingSpinnerBox />
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+        </>
+      }
       {!isLoading && <RepositorySelector />}
     </>
   );

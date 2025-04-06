@@ -26,14 +26,15 @@ import { useProjects } from '../../../contexts/ProjectsContext';
 import Select2 from 'react-select2-wrapper';
 import { toast } from 'react-toastify';
 import { formatDate, workItemTypeIcon } from '../../../services/utils/utils';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import UpdateWarning from '../components/UpdateWarning';
+import DeleteWarning from '../components/DeleteWarning';
 
 function GitHub() {
   const { orgId, currentProject } = useProjects();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isGithubConnected, setIsGithubConnected] = useState(true);
+  const [isGithubConnected, setIsGithubConnected] = useState(false);
 
   const [callbackUrl, setCallbackUrl] = useState('');
   const [repos, setRepos] = useState([]);
@@ -43,6 +44,7 @@ function GitHub() {
   const [isEditing, setIsEditing] = useState(false);
   const [updateWarning, setUpdateWarning] = useState(false);
   const [disconnectWarning, setDisconnectWarning] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!currentProject?.id || !orgId) return;
@@ -92,6 +94,11 @@ function GitHub() {
 
   const handleRepoUpdate = async () => {
     try {
+      if (isEditing) {
+        setUpdateWarning(true);
+        return;
+      }
+
       const projectRepo = await updateProjectGithubRepo(orgId, currentProject.id, selectedRepo);
       setRepo(projectRepo);
       setUpdateWarning(false);
@@ -119,6 +126,7 @@ function GitHub() {
       setUpdateWarning(false);
       setDisconnectWarning(false);
       toast.success('Project repository disconnected');
+      navigate(`/admin/orgs/${orgId}/projects/${currentProject.id}/code`);
     } catch (e) {
       toast.error(e.message);
     }
@@ -135,21 +143,6 @@ function GitHub() {
     }
   };
 
-  const onRepoUpdateSave = async () => {
-    try {
-      if (isEditing) {
-        setUpdateWarning(true);
-        return;
-      }
-
-      const projectRepo = await updateProjectGithubRepo(orgId, currentProject.id, selectedRepo);
-      setRepo(projectRepo);
-      toast.success('Project repository updated');
-    } catch (e) {
-      toast.error(e.message);
-    }
-  };
-
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
@@ -161,12 +154,11 @@ function GitHub() {
           warningMessage={"It will take a few minutes for the pull requests on your repository to be processed."}
           entity={"project's repository"}
           onUpdate={async () => await handleRepoUpdate()} />
-        <UpdateWarning
+        <DeleteWarning
           isOpen={disconnectWarning}
           toggle={() => setDisconnectWarning(!disconnectWarning)}
-          warningMessage={"Are you sure you want to disconnect from GitHub?"}
           entity={"connection to GitHub"}
-          onUpdate={async () => await handleRepoDisconnect()} />
+          onDelete={async () => await handleRepoDisconnect()} />
         <Row>
           <Col>
             <Card className="mb-5">
@@ -230,7 +222,7 @@ function GitHub() {
                           setSelectedRepo(e.target.value);
                         }}
                       ></Select2>
-                      <button className="btn btn-primary my-3" type="button" onClick={onRepoUpdateSave} disabled={!selectedRepo}>Save</button>
+                      <button className="btn btn-primary my-3" type="button" onClick={handleRepoUpdate} disabled={!selectedRepo}>Save</button>
                       {isEditing && <button className="btn btn-white my-3" type="button" onClick={() => setIsEditing(false)}>Cancel</button>}
                     </Col>
                   </Row>}

@@ -3,6 +3,8 @@ import { Button, Card, CardBody, CardHeader, CardTitle, Col, Container, Row } fr
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjects } from '../../../contexts/ProjectsContext';
+import { getGithubUrl } from '../../../services/github/github.service';
+import { toast } from 'react-toastify';
 
 function RepositorySelector() {
 
@@ -11,7 +13,11 @@ function RepositorySelector() {
   const navigate = useNavigate();
 
   async function handleGitHub() {
-    navigate(`/admin/orgs/${orgId}/projects/${currentProject.id}/code/github`);
+    try {
+      window.location.href = await getGithubUrl(orgId, currentProject.id);
+    } catch (error) {
+      toast.error('Failed to connect to Github');
+    }
   }
 
   async function handleGitLab() {

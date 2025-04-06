@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Org } from '../orgs/org.entity';
 import { And, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Project } from '../projects/project.entity';
@@ -18,8 +17,6 @@ export class GithubService {
   constructor(
     @Inject('GITHUB_CLIENT') private readonly octokit: any,
     private readonly configService: ConfigService,
-    @InjectRepository(Org)
-    private readonly orgRepository: Repository<Org>,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
     private readonly encryptionService: EncryptionService,
@@ -729,6 +726,8 @@ export class GithubService {
 
     await this.cleanupGithubRepoAssociation(project);
 
+    project.githubAccessToken = null;
+    project.githubUsername = null;
     project.githubRepositoryId = null;
     project.githubRepositoryFullName = null;
     project.githubRepositoryUrl = null;
