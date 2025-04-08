@@ -98,6 +98,23 @@ export class GitlabController {
     }
   }
 
+  @Get('/merge-requests/orgs/:orgId/projects/:projectId/')
+  async listMergeRequests(
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.gitlabService.listMergeRequests(orgId, projectId);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
   @Public()
   @Post('/orgs/:orgId/projects/:projectId/webhooks')
   async handleWebhook(

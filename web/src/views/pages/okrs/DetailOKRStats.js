@@ -154,7 +154,7 @@ function DetailOKRStats({ okr }) {
         <Col className="d-none d-sm-block">
           <Card>
             <CardHeader>
-              <h5 className="h3 mb-0">Effort Burndown by Work Items Estimation</h5>
+              <h5 className="h3 mb-0">Effort Burndown based on Work Items Estimation</h5>
             </CardHeader>
             <CardBody>
               <div className="chart">

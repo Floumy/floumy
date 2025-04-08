@@ -41,7 +41,7 @@ function RepositorySelector() {
               </CardHeader>
               <CardBody>
                 <div className="text-center my-2 py-2">
-                  <h2 className="mb-4 h2">Choose your repository platform</h2>
+                  <h2 className="mb-4 h2">Choose your code repository platform</h2>
                   <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-4">
                     <Button
                       onClick={handleGitHub}

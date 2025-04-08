@@ -9,6 +9,15 @@ export async function getIsGitLabConnected(orgId, projectId) {
   }
 }
 
+export async function listMergeRequests(orgId, projectId) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
 export async function listProjects(orgId, projectId) {
   try {
     const response = await api.get(`${process.env.REACT_APP_API_URL}/gitlab/projects/orgs/${orgId}/projects/${projectId}`);
