@@ -137,7 +137,7 @@ function DevelopmentStats({ sprint }) {
         <Col className="d-none d-sm-block">
           <Card>
             <CardHeader>
-              <h5 className="h3 mb-0">Effort Burndown</h5>
+              <h5 className="h3 mb-0">Effort Burndown based on Work Items Estimation</h5>
             </CardHeader>
             <CardBody>
               <div className="chart">
@@ -172,7 +172,7 @@ function DevelopmentStats({ sprint }) {
               <Row>
                 <Col>
                   <CardTitle className="text-uppercase text-muted mb-0 ">
-                    Overall Completion
+                    Completed Items
                   </CardTitle>
                   <span className="h2 font-weight-bold mb-0 ">
                       {overallCompletion}%
