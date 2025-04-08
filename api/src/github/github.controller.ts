@@ -134,7 +134,7 @@ export class GithubController {
   }
 
   @Get('auth/orgs/:orgId/projects/:projectId/github/prs')
-  async getOpenPullRequests(
+  async listPullRequests(
     @Request() request: any,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
@@ -144,7 +144,7 @@ export class GithubController {
     }
 
     try {
-      return await this.githubService.getPullRequests(orgId, projectId);
+      return await this.githubService.listPullRequests(orgId, projectId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

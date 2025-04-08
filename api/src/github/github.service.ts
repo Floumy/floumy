@@ -178,7 +178,7 @@ export class GithubService {
     }
   }
 
-  async getPullRequests(orgId: string, projectId: string) {
+  async listPullRequests(orgId: string, projectId: string) {
     const openForOneDay = await this.githubPullRequestRepository.find({
       where: {
         org: { id: orgId },

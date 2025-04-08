@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Org } from '../orgs/org.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { And, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Gitlab } from '@gitbeaker/node';
 import { Project } from '../projects/project.entity';
@@ -10,6 +10,7 @@ import { MergeRequestEvent, PushEvent } from './dtos';
 import { GitlabBranch } from './gitlab-branch.entity';
 import { GitlabMergeRequest } from './gitlab-pull-request.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { GitlabMergeRequestMapper } from './mappers';
 
 @Injectable()
 export class GitlabService {
@@ -398,5 +399,80 @@ export class GitlabService {
     }
 
     return null;
+  }
+
+  async listMergeRequests(orgId: string, projectId: string) {
+    const openForOneDay = await this.gitlabMergeRequestRepository.find({
+      where: {
+        org: { id: orgId },
+        project: { id: projectId },
+        createdAt: MoreThanOrEqual(
+          new Date(new Date().setDate(new Date().getDate() - 1)),
+        ),
+        state: 'open',
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    const openForThreeDays = await this.gitlabMergeRequestRepository.find({
+      where: {
+        org: { id: orgId },
+        project: { id: projectId },
+        createdAt: And(
+          LessThan(new Date(new Date().setDate(new Date().getDate() - 1))),
+          MoreThanOrEqual(
+            new Date(new Date().setDate(new Date().getDate() - 3)),
+          ),
+        ),
+        state: 'open',
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    const openForMoreThanThreeDays =
+      await this.gitlabMergeRequestRepository.find({
+        where: {
+          org: { id: orgId },
+          project: { id: projectId },
+          state: 'open',
+          createdAt: LessThan(
+            new Date(new Date().setDate(new Date().getDate() - 3)),
+          ),
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+    const closedInThePastSevenDays =
+      await this.gitlabMergeRequestRepository.find({
+        where: {
+          org: { id: orgId },
+          project: { id: projectId },
+          state: 'closed',
+          createdAt: MoreThanOrEqual(
+            new Date(new Date().setDate(new Date().getDate() - 7)),
+          ),
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+
+    return {
+      openForOneDay: await Promise.all(
+        openForOneDay.map(GitlabMergeRequestMapper.toDto),
+      ),
+      openForThreeDays: await Promise.all(
+        openForThreeDays.map(GitlabMergeRequestMapper.toDto),
+      ),
+      openForMoreThanThreeDays: await Promise.all(
+        openForMoreThanThreeDays.map(GitlabMergeRequestMapper.toDto),
+      ),
+      closedInThePastSevenDays: await Promise.all(
+        closedInThePastSevenDays.map(GitlabMergeRequestMapper.toDto),
+      ),
+    };
   }
 }
