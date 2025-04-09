@@ -1,10 +1,16 @@
 import React, { useEffect } from 'react';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row, UncontrolledTooltip } from 'reactstrap';
+import { Alert, Card, CardBody, CardHeader, CardTitle, Col, Container, Row, UncontrolledTooltip } from 'reactstrap';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import UpdateWarning from '../components/UpdateWarning';
 import { useParams } from 'react-router-dom';
-import { getIsGitLabConnected, listMergeRequests } from '../../../services/gitlab/gitlab.service';
+import {
+  getIsGitLabConnected,
+  listMergeRequests,
+  listProjects, setProject,
+  setToken,
+} from '../../../services/gitlab/gitlab.service';
+import Select2 from 'react-select2-wrapper';
 
 function GitLab({repo}) {
   const { orgId, projectId } = useParams();
@@ -18,9 +24,36 @@ function GitLab({repo}) {
     openForMoreThanThreeDays: [],
     closedInThePastSevenDays: [],
   });
-  const handleSubmit = async (e) => {
+  const [projects, setProjects] = React.useState([]);
+  const [gitlabProjectId, setGitlabProjectId] = React.useState('');
+
+  const saveToken = async (e) => {
     e.preventDefault();
-    console.log(accessToken);
+    setIsLoading(true);
+    try {
+      await setToken(orgId, projectId, accessToken);
+      setIsGitLabConnected(true);
+
+      const gitLabProjects = await listProjects(orgId, projectId);
+      setProjects(gitLabProjects);
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
+    }
+  }
+
+  const saveGitlabProject = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await setProject(orgId, projectId, gitlabProjectId);
+      setIsGitLabConnected(true);
+      const { data: projects } = await listProjects(orgId, projectId);
+      setProjects(projects);
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -33,6 +66,11 @@ function GitLab({repo}) {
         if (isConnected && repo) {
           const mergeRequests = await listMergeRequests(orgId, projectId);
           setMergeRequests(mergeRequests);
+        }
+
+        if (isConnected && !repo) {
+          const projects = await listProjects(orgId, projectId);
+          setProjects(projects);
         }
 
       } catch (e) {
@@ -81,14 +119,40 @@ function GitLab({repo}) {
               </CardHeader>
               <CardBody>
                 {!isLoading && !isGitLabConnected &&
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={saveToken}>
                   <div className="form-group">
+                    <Alert variant="warning" color="warning" className="mb-3">
+                      <i className="fa fa-exclamation-triangle mr-2" />
+                      <span>The access token must have the <b>API</b> scope and <b>Maintainer</b> role.</span>
+                    </Alert>
                     <label htmlFor="access-token">Access Token</label>
                     <input className="form-control" id="access-token" type="password" value={accessToken} onChange={(e) => setAccessToken(e.target.value)} />
                   </div>
                   <button type="submit" className="btn btn-primary">Save</button>
                 </form>
                 }
+                {!isLoading && isGitLabConnected && projects.length > 0 && (
+                  <div className="mt-3">
+                    <form onSubmit={saveGitlabProject}>
+                    <Alert variant="info" color="info" className="mb-3">
+                      <i className="fa fa-info-circle mr-2" />
+                      <span>Select a project to see the merge requests.</span>
+                    </Alert>
+                    <Select2
+                      className="form-control"
+                      defaultValue={projects[0].id}
+                      data={projects.map(project => ({ id: project.id, text: project.name }))}
+                      options={{
+                        placeholder: 'Select a project',
+                      }}
+                      onSelect={(e) => {
+                        setGitlabProjectId(e.target.value);
+                      }}
+                    ></Select2>
+                      <button type="submit" className="btn btn-primary">Save</button>
+                    </form>
+                  </div>
+                )}
               </CardBody>
             </Card>
           </Col>
