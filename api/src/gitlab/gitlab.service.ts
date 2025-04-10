@@ -61,6 +61,10 @@ export class GitlabService {
   }
 
   async setProject(orgId: string, projectId: string, gitlabProjectId: string) {
+    if (!gitlabProjectId) {
+      throw new Error('GitLab project ID is required');
+    }
+
     const project = await this.projectRepository.findOneByOrFail({
       id: projectId,
       org: { id: orgId },
@@ -380,11 +384,11 @@ export class GitlabService {
 
     return {
       connected: true,
-      repo: await this.getProjectRepo(orgId, projectId),
+      gitlabProject: await this.getGitlabProject(orgId, projectId),
     };
   }
 
-  private async getProjectRepo(orgId: string, projectId: string) {
+  private async getGitlabProject(orgId: string, projectId: string) {
     const project = await this.projectRepository.findOneByOrFail({
       id: projectId,
       org: { id: orgId },

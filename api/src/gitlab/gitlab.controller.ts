@@ -57,7 +57,7 @@ export class GitlabController {
     }
   }
 
-  @Put('/projects/orgs/:orgId/projects/:projectId/')
+  @Put('/projects/orgs/:orgId/projects/:projectId')
   async setProject(
     @Request() request: any,
     @Param('orgId') orgId: string,
@@ -80,7 +80,7 @@ export class GitlabController {
     }
   }
 
-  @Get('/projects/orgs/:orgId/projects/:projectId/')
+  @Get('/projects/orgs/:orgId/projects/:projectId')
   async listProjects(
     @Request() request: any,
     @Param('orgId') orgId: string,
@@ -98,7 +98,7 @@ export class GitlabController {
     }
   }
 
-  @Get('/merge-requests/orgs/:orgId/projects/:projectId/')
+  @Get('/merge-requests/orgs/:orgId/projects/:projectId')
   async listMergeRequests(
     @Request() request: any,
     @Param('orgId') orgId: string,
