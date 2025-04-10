@@ -29,7 +29,7 @@ export async function listProjects(orgId, projectId) {
 
 export async function setProject(orgId, projectId, gitlabProjectId) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/gitlab/orgs/${orgId}/projects/${projectId}`, { gitlabProjectId });
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/gitlab/projects/orgs/${orgId}/projects/${projectId}`, { project: gitlabProjectId });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
