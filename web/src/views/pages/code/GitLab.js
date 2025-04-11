@@ -27,6 +27,7 @@ function GitLab() {
   const [mergeRequests, setMergeRequests] = React.useState(null);
   const [projects, setProjects] = React.useState([]);
   const [gitlabProjectId, setGitlabProjectId] = React.useState('');
+  const [isEditing, setIsEditing] = React.useState(false);
   const navigate = useNavigate();
 
   const saveToken = async (e) => {
@@ -48,6 +49,7 @@ function GitLab() {
   const saveGitlabProject = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setIsEditing(false);
     try {
       await setProject(orgId, projectId, gitlabProjectId);
       setIsGitLabConnected(true);
@@ -102,7 +104,25 @@ function GitLab() {
       toast.error(e.message);
     }
   };
-  const editRepo = async () => {
+
+  const editGitlabProject = async () => {
+    try {
+      setIsLoading(true);
+      const projects = await listProjects(orgId, projectId);
+      const { gitlabProject } = await getIsGitLabConnected(orgId, projectId);
+      setProjects(projects);
+      setGitlabProjectId(gitlabProject.id);
+      setIsEditing(true);
+    } catch (e) {
+      toast.error(e.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const cancelEditGitlabProject = async () => {
+    setProjects([]);
+    setIsEditing(false);
   };
 
   return (
@@ -127,7 +147,7 @@ function GitLab() {
                       <a className="btn-link text-blue mr-2" href={gitlabProject.url} target="_blank" rel="noreferrer">
                         | {gitlabProject.name}
                       </a>
-                      <i className="fa fa-edit mr-2" style={{ cursor: 'pointer' }} onClick={editRepo} />
+                      <i className="fa fa-edit mr-2" style={{ cursor: 'pointer' }} onClick={editGitlabProject} />
                       <UncontrolledTooltip target="disconnect-from-github" placement="top">
                         Disconnect from GitLab
                       </UncontrolledTooltip>
@@ -154,7 +174,7 @@ function GitLab() {
                     <button type="submit" className="btn btn-primary">Save</button>
                   </form>
                 }
-                {!isLoading && isGitLabConnected && projects.length > 0 && (
+                {((!isLoading && isGitLabConnected && projects.length > 0) || isEditing) && (
                   <div className="mt-3">
                     <form onSubmit={saveGitlabProject}>
                       <div className="form-group">
@@ -171,10 +191,13 @@ function GitLab() {
                         ></Select2>
                       </div>
                       <button type="submit" className="btn btn-primary">Save</button>
+                      <button type="button" className="btn btn-secondary" onClick={cancelEditGitlabProject}>
+                        Cancel
+                      </button>
                     </form>
                   </div>
                 )}
-                {!isLoading && isGitLabConnected && mergeRequests &&
+                {!isLoading && isGitLabConnected && mergeRequests && !isEditing &&
                   <PRs entity="merge requests" prs={mergeRequests} orgId={orgId} projectId={projectId} />}
               </CardBody>
             </Card>
