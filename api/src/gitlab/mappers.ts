@@ -1,4 +1,4 @@
-import { GitlabMergeRequest } from './gitlab-pull-request.entity';
+import { GitlabMergeRequest } from './gitlab-merge-request.entity';
 import { GithubPullRequestDto } from '../github/dtos';
 
 export class GitlabMergeRequestMapper {

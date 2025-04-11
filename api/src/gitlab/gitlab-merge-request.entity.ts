@@ -17,13 +17,13 @@ export class GitlabMergeRequest {
   createdAt: Date;
   @Column()
   updatedAt: Date;
-  @ManyToOne(() => Project, (project) => project.gitlabPullRequests, {
+  @ManyToOne(() => Project, (project) => project.gitlabMergeRequests, {
     lazy: true,
   })
   project: Promise<Project>;
-  @ManyToOne(() => Org, (org) => org.gitlabPullRequests, { lazy: true })
+  @ManyToOne(() => Org, (org) => org.gitlabMergeRequests, { lazy: true })
   org: Promise<Org>;
-  @ManyToOne(() => WorkItem, (workItem) => workItem.gitlabPullRequests, {
+  @ManyToOne(() => WorkItem, (workItem) => workItem.gitlabMergeRequests, {
     lazy: true,
   })
   workItem: Promise<WorkItem>;

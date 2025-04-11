@@ -27,7 +27,7 @@ import { Project } from '../../projects/project.entity';
 import { GithubBranch } from '../../github/github-branch.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
 import { GitlabBranch } from '../../gitlab/gitlab-branch.entity';
-import { GitlabMergeRequest } from '../../gitlab/gitlab-pull-request.entity';
+import { GitlabMergeRequest } from '../../gitlab/gitlab-merge-request.entity';
 
 @Entity()
 @Unique(['reference', 'org'])
@@ -131,7 +131,7 @@ export class WorkItem {
       lazy: true,
     },
   )
-  gitlabPullRequests: Promise<GitlabMergeRequest[]>;
+  gitlabMergeRequests: Promise<GitlabMergeRequest[]>;
   @ManyToMany(() => User, {
     lazy: true,
   })

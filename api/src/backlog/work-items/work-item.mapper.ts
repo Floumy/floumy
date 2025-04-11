@@ -5,6 +5,7 @@ import { Sprint } from '../../sprints/sprint.entity';
 import { User } from '../../users/user.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
 import { GithubBranch } from '../../github/github-branch.entity';
+import { GitlabMergeRequest } from '../../gitlab/gitlab-merge-request.entity';
 
 class FeatureMapper {
   static toDto(initiative: Initiative) {
@@ -84,8 +85,12 @@ export default class WorkItemMapper {
     const issue = await workItem.issue;
     const org = await workItem.org;
     const project = await workItem.project;
-    const pullRequests = await workItem.githubPullRequests;
-    const branches = await workItem.githubBranches;
+    const pullRequests =
+      (await workItem.githubPullRequests) ||
+      (await workItem.gitlabMergeRequests);
+    const branches =
+      (await workItem.githubBranches) || (await workItem.gitlabBranches);
+
     return {
       id: workItem.id,
       org: org ? { id: org.id } : undefined,
@@ -198,7 +203,7 @@ export default class WorkItemMapper {
 }
 
 class PullRequestMapper {
-  static toDto(pullRequests: GithubPullRequest[]) {
+  static toDto(pullRequests: GithubPullRequest[] | GitlabMergeRequest[]) {
     return pullRequests.map((pullRequest) => {
       return {
         id: pullRequest.id,

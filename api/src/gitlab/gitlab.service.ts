@@ -8,7 +8,7 @@ import { Project } from '../projects/project.entity';
 import { ConfigService } from '@nestjs/config';
 import { MergeRequestEvent, PushEvent } from './dtos';
 import { GitlabBranch } from './gitlab-branch.entity';
-import { GitlabMergeRequest } from './gitlab-pull-request.entity';
+import { GitlabMergeRequest } from './gitlab-merge-request.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { GitlabMergeRequestMapper } from './mappers';
 
