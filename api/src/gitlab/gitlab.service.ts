@@ -146,7 +146,7 @@ export class GitlabService {
       const token = this.encryptionService.decrypt(project.gitlabAccessToken);
       const gitlab = new Gitlab({ token });
 
-      await gitlab.ProjectHooks.remove(projectId, hookId);
+      await gitlab.ProjectHooks.remove(project.gitlabProjectId, hookId);
     } catch (e) {
       this.logger.error('Failed to delete project webhook');
       this.logger.error(e);
@@ -282,6 +282,7 @@ export class GitlabService {
     const branch = await this.gitlabBranchRepository.findOne({
       where: { name: branchName, project: { id: project.id } },
     });
+
     if (!branch) {
       const branch = new GitlabBranch();
       branch.name = branchName;
@@ -478,5 +479,35 @@ export class GitlabService {
         closedInThePastSevenDays.map(GitlabMergeRequestMapper.toDto),
       ),
     };
+  }
+
+  async disconnectGitlabProject(orgId: string, projectId: string) {
+    const project = await this.projectRepository.findOneOrFail({
+      where: {
+        id: projectId,
+        org: {
+          id: orgId,
+        },
+      },
+    });
+
+    if (!project.gitlabProjectId) {
+      return;
+    }
+
+    if (project.gitlabProjectWebhookId) {
+      await this.deleteProjectWebhook(
+        orgId,
+        projectId,
+        project.gitlabProjectWebhookId,
+      );
+    }
+
+    project.gitlabProjectId = null;
+    project.gitlabProjectWebhookId = null;
+    project.gitlabAccessToken = null;
+    project.gitlabProjectUrl = null;
+    project.gitlabProjectName = null;
+    await this.projectRepository.save(project);
   }
 }

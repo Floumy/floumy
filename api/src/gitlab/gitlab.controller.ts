@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Param,
@@ -33,6 +34,23 @@ export class GitlabController {
 
     try {
       return await this.gitlabService.isConnected(orgId, projectId);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete('/auth/orgs/:orgId/projects/:projectId')
+  async disconnectGitlabProject(
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    const org = request.user.org;
+    if (orgId !== org) {
+      throw new UnauthorizedException();
+    }
+    try {
+      return await this.gitlabService.disconnectGitlabProject(orgId, projectId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
