@@ -2,18 +2,20 @@ import React, { useEffect } from 'react';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import { Alert, Card, CardBody, CardHeader, CardTitle, Col, Container, Row, UncontrolledTooltip } from 'reactstrap';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
-import UpdateWarning from '../components/UpdateWarning';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
+  disconnectProject,
   getIsGitLabConnected,
   listMergeRequests,
-  listProjects, setProject,
+  listProjects,
+  setProject,
   setToken,
 } from '../../../services/gitlab/gitlab.service';
 import Select2 from 'react-select2-wrapper';
 import PRs from '../../../components/Code/PRs';
 import { toast } from 'react-toastify';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import DeleteWarning from '../components/DeleteWarning';
 
 function GitLab() {
   const { orgId, projectId } = useParams();
@@ -25,6 +27,7 @@ function GitLab() {
   const [mergeRequests, setMergeRequests] = React.useState(null);
   const [projects, setProjects] = React.useState([]);
   const [gitlabProjectId, setGitlabProjectId] = React.useState('');
+  const navigate = useNavigate();
 
   const saveToken = async (e) => {
     e.preventDefault();
@@ -50,7 +53,10 @@ function GitLab() {
       setIsGitLabConnected(true);
       const mergeRequests = await listMergeRequests(orgId, projectId);
       setMergeRequests(mergeRequests);
-      setIsGitLabConnected(true);
+
+      const { connected: isConnected, gitlabProject } = await getIsGitLabConnected(orgId, projectId);
+      setIsGitLabConnected(isConnected);
+      setGitlabProject(gitlabProject);
 
       setProjects([]);
       setIsLoading(false);
@@ -89,6 +95,12 @@ function GitLab() {
   }, [orgId, projectId]);
 
   const handleGitlabProjectDisconnect = async () => {
+    try {
+      await disconnectProject(orgId, projectId);
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/code`);
+    } catch (e) {
+      toast.error(e.message);
+    }
   };
   const editRepo = async () => {
   };
@@ -98,30 +110,30 @@ function GitLab() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
-        <UpdateWarning
+        <DeleteWarning
           isOpen={disconnectWarning}
           toggle={() => setDisconnectWarning(!disconnectWarning)}
           warningMessage={'Are you sure you want to disconnect from GitLab?'}
           entity={'connection to GitLab'}
-          onUpdate={async () => await handleGitlabProjectDisconnect()} />
+          onDelete={async () => await handleGitlabProjectDisconnect()} />
         <Row>
           <Col>
             <Card className="mb-5">
               <CardHeader>
                 <Row>
                   <Col md={12}>
-                    <CardTitle tag="h2" className="mb-3"> {mergeRequests ? <>
+                    <CardTitle tag="h2" className="mb-3"> {mergeRequests && gitlabProject ? <>
                       Merge Requests {' '}
                       <a className="btn-link text-blue mr-2" href={gitlabProject.url} target="_blank" rel="noreferrer">
                         | {gitlabProject.name}
                       </a>
                       <i className="fa fa-edit mr-2" style={{ cursor: 'pointer' }} onClick={editRepo} />
                       <UncontrolledTooltip target="disconnect-from-github" placement="top">
-                        Disconnect from GitHub
+                        Disconnect from GitLab
                       </UncontrolledTooltip>
                       <i className="fa fa-xmark mr-2" style={{ cursor: 'pointer' }} id="disconnect-from-github"
                          onClick={() => setDisconnectWarning(true)} />
-                    </> : <span className="mr-2">Code</span>}
+                    </> : <span className="mr-2">GitLab Integration</span>}
                     </CardTitle>
                   </Col>
                 </Row>
@@ -152,6 +164,7 @@ function GitLab() {
                           options={{
                             placeholder: 'Select a project',
                           }}
+                          value={gitlabProjectId}
                           onSelect={(e) => {
                             setGitlabProjectId(e.target.value);
                           }}

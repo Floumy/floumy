@@ -44,3 +44,12 @@ export async function setToken(orgId, projectId, token) {
     throw new Error(e.message);
   }
 }
+
+export async function disconnectProject(orgId, projectId) {
+  try {
+    const response = await api.delete(`${process.env.REACT_APP_API_URL}/gitlab/auth/orgs/${orgId}/projects/${projectId}`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
