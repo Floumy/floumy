@@ -80,7 +80,7 @@ export class GitlabService {
     if (project.gitlabProjectWebhookId) {
       await this.deleteProjectWebhook(
         orgId,
-        project.gitlabProjectId,
+        project.id,
         project.gitlabProjectWebhookId,
       );
       project.gitlabProjectWebhookId = null;
