@@ -27,7 +27,7 @@ import { Notification } from '../notifications/notification.entity';
 import { GithubPullRequest } from '../github/github-pull-request.entity';
 import { GithubBranch } from '../github/github-branch.entity';
 import { GitlabBranch } from '../gitlab/gitlab-branch.entity';
-import { GitlabMergeRequest } from '../gitlab/gitlab-pull-request.entity';
+import { GitlabMergeRequest } from '../gitlab/gitlab-merge-request.entity';
 
 @Entity()
 export class Project {
@@ -125,5 +125,5 @@ export class Project {
     (githubPullRequest) => githubPullRequest.project,
     { lazy: true },
   )
-  gitlabPullRequests: Promise<GitlabMergeRequest[]>;
+  gitlabMergeRequests: Promise<GitlabMergeRequest[]>;
 }
