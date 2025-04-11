@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Org } from '../orgs/org.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { And, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
@@ -17,8 +16,6 @@ export class GitlabService {
   private readonly logger = new Logger(GitlabService.name);
 
   constructor(
-    @InjectRepository(Org)
-    private readonly orgRepository: Repository<Org>,
     private readonly encryptionService: EncryptionService,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
