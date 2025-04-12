@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { formatDate, workItemTypeIcon } from '../../services/utils/utils';
 import React from 'react';
 
-export default function PRs({prs, orgId, projectId, entity = '{entity}'}) {
+export default function PRs({prs, orgId, projectId, entity = 'pull requests'}) {
   return (
     <>
       <Row className="mb-5">
