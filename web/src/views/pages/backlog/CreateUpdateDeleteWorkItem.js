@@ -539,7 +539,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                       </li>
                     ))}
                   </ul>
-                  <h4>Pull Requests</h4>
+                  <h4>{workItem.codeConnectionType === 'gitlab' ? 'Merge Requests' : 'Pull Requests'}</h4>
                   <ul className="list-unstyled">
                     {workItem.pullRequests?.map((pullRequest) => (
                       <li key={pullRequest.id} className="mb-2">
@@ -549,7 +549,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         </a>
                       </li>
                     ))}
-                    {workItem.pullRequests?.length === 0 && <li className="mb-2">No pull requests found</li>}
+                    {workItem.pullRequests?.length === 0 && <li className="mb-2">No {workItem.codeConnectionType === 'gitlab' ? 'merge requests' : 'pull requests'} found</li>}
                   </ul>
                 </Col>
               </Row>

@@ -49,10 +49,10 @@ export default function Breadcrumbs({ breadcrumbs, isPublic }) {
   }
 
   return (
-    <Breadcrumb listClassName="breadcrumb-links breadcrumb-links-light">
+    <Breadcrumb listClassName="breadcrumb-links breadcrumb-dark">
       {breadcrumbs.map((breadcrumb, index) => (
         <BreadcrumbItem key={index}>
-          <Link to={getBreadcrumbUrl(breadcrumb)}>
+          <Link to={getBreadcrumbUrl(breadcrumb)} className="text-dark">
             {breadcrumb.reference}
           </Link>
         </BreadcrumbItem>
