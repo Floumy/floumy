@@ -1,0 +1,552 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { And, In, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { EncryptionService } from '../encryption/encryption.service';
+import { Gitlab } from '@gitbeaker/node';
+import { Project } from '../projects/project.entity';
+import { ConfigService } from '@nestjs/config';
+import { MergeRequestEvent, PushEvent } from './dtos';
+import { GitlabBranch } from './gitlab-branch.entity';
+import { GitlabMergeRequest } from './gitlab-merge-request.entity';
+import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { GitlabMergeRequestMapper } from './mappers';
+
+@Injectable()
+export class GitlabService {
+  private readonly logger = new Logger(GitlabService.name);
+
+  constructor(
+    private readonly encryptionService: EncryptionService,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
+    @InjectRepository(GitlabBranch)
+    private readonly gitlabBranchRepository: Repository<GitlabBranch>,
+    @InjectRepository(GitlabMergeRequest)
+    private readonly gitlabMergeRequestRepository: Repository<GitlabMergeRequest>,
+    @InjectRepository(WorkItem)
+    private readonly workItemRepository: Repository<WorkItem>,
+    private readonly configService: ConfigService,
+  ) {}
+
+  async setToken(projectId: string, token: string) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+    });
+    project.gitlabAccessToken = this.encryptionService.encrypt(token);
+    await this.projectRepository.save(project);
+  }
+
+  async getProjects(projectId: string) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+    });
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
+    const gitlab = new Gitlab({
+      token,
+    });
+    const projects = await gitlab.Projects.all({
+      membership: true,
+      archived: false,
+    });
+
+    return projects.map((project) => ({
+      id: project.id,
+      name: project.name,
+      url: project.web_url,
+      visibility: project.visibility,
+    }));
+  }
+
+  async setProject(orgId: string, projectId: string, gitlabProjectId: string) {
+    if (!gitlabProjectId) {
+      throw new Error('GitLab project ID is required');
+    }
+
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
+    const gitlab = new Gitlab({
+      token,
+    });
+    const gitlabProject = await gitlab.Projects.show(gitlabProjectId);
+    const projectName = gitlabProject.name;
+    const projectUrl = gitlabProject.web_url;
+
+    if (project.gitlabProjectWebhookId) {
+      await this.deleteProjectWebhook(
+        orgId,
+        project.id,
+        project.gitlabProjectWebhookId,
+      );
+      project.gitlabProjectWebhookId = null;
+    }
+
+    const webhook = await this.createProjectWebhook(
+      orgId,
+      projectId,
+      gitlabProjectId,
+    );
+    project.gitlabProjectWebhookId = webhook.id;
+
+    project.gitlabProjectId = gitlabProjectId;
+    project.gitlabProjectUrl = projectUrl;
+    project.gitlabProjectName = projectName;
+    await this.projectRepository.save(project);
+
+    await this.processBranches(project);
+    await this.processMergeRequests(project);
+
+    return {
+      id: gitlabProjectId,
+      name: project.gitlabProjectName,
+      url: project.gitlabProjectUrl,
+    };
+  }
+
+  private async createProjectWebhook(
+    orgId: string,
+    projectId: string,
+    gitlabProjectId: string,
+  ) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
+    const gitlab = new Gitlab({ token });
+
+    const gitlabWebhookUrlBase = this.configService.get(
+      'gitlab.webhookUrlBase',
+    );
+    const webhookUrl = `${gitlabWebhookUrlBase}/gitlab/orgs/${orgId}/projects/${projectId}/webhooks`;
+
+    return await gitlab.ProjectHooks.add(gitlabProjectId, webhookUrl, {
+      push_events: true,
+      merge_requests_events: true,
+      issues_events: true,
+      token: this.configService.get('gitlab.webhookSecret'),
+    });
+  }
+
+  private async deleteProjectWebhook(
+    orgId: string,
+    projectId: string,
+    hookId: number,
+  ) {
+    try {
+      const project = await this.projectRepository.findOneByOrFail({
+        id: projectId,
+        org: { id: orgId },
+      });
+      const token = this.encryptionService.decrypt(project.gitlabAccessToken);
+      const gitlab = new Gitlab({ token });
+
+      await gitlab.ProjectHooks.remove(project.gitlabProjectId, hookId);
+    } catch (e) {
+      this.logger.error('Failed to delete project webhook');
+      this.logger.error(e);
+    }
+  }
+
+  async handleWebhook(
+    orgId: string,
+    projectId: string,
+    token: string,
+    payload: MergeRequestEvent | PushEvent,
+    eventType: string,
+  ) {
+    if (token !== this.configService.get('gitlab.webhookSecret')) {
+      throw new Error('Invalid token');
+    }
+    const project = await this.projectRepository.findOne({
+      where: { org: { id: orgId }, id: projectId },
+    });
+
+    switch (eventType) {
+      case 'Push Hook': {
+        const pushEvent = payload as PushEvent;
+
+        // Check if this is a new branch
+        if (this.isNewBranch(pushEvent)) {
+          const branchName = pushEvent.ref.replace('refs/heads/', '');
+          await this.handleNewBranch(project, branchName);
+        }
+        break;
+      }
+
+      case 'Merge Request Hook': {
+        const mrEvent = payload as MergeRequestEvent;
+        switch (mrEvent.object_attributes.action) {
+          case 'open':
+            await this.handleNewMergeRequest(project, mrEvent);
+            break;
+          case 'update':
+          case 'reopen':
+          case 'close':
+          case 'merge':
+            await this.handleMergeRequestUpdate(project, mrEvent);
+            break;
+        }
+        break;
+      }
+    }
+  }
+
+  private isNewBranch(pushEvent: PushEvent) {
+    return pushEvent.before === '0000000000000000000000000000000000000000';
+  }
+
+  private getWorkItemReferenceForMergeRequest(mergeRequest: any) {
+    const workItemReference = this.getWorkItemReference(mergeRequest.title);
+
+    if (workItemReference) {
+      return workItemReference;
+    }
+
+    const branchName = mergeRequest.source_branch.toLowerCase();
+
+    const workItemReferenceFromBranch = this.getWorkItemReference(branchName);
+
+    if (workItemReferenceFromBranch) {
+      return workItemReferenceFromBranch;
+    }
+
+    return null;
+  }
+
+  private getWorkItemReference(text: string) {
+    const workItemReference = text.toLowerCase().match(/wi-\d+/);
+    if (!workItemReference || workItemReference.length === 0) {
+      return null;
+    }
+
+    return workItemReference[0];
+  }
+
+  private async processBranches(project: Project) {
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
+    const gitlab = new Gitlab({
+      token,
+    });
+    const branches = await gitlab.Branches.all(project.gitlabProjectId);
+
+    for (const branch of branches) {
+      await this.handleNewBranch(project, branch.name);
+    }
+  }
+
+  private async processMergeRequests(project: Project) {
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
+    const gitlab = new Gitlab({
+      token,
+    });
+    const mergeRequests = await gitlab.MergeRequests.all({
+      projectId: project.gitlabProjectId,
+    });
+    for (const mergeRequest of mergeRequests) {
+      const workItemReference =
+        this.getWorkItemReferenceForMergeRequest(mergeRequest);
+      if (!workItemReference) {
+        return;
+      }
+      const org = await project.org;
+      const workItem = await this.workItemRepository.findOne({
+        where: {
+          reference: workItemReference.toUpperCase(),
+          org: { id: org.id },
+          project: { id: project.id },
+        },
+      });
+
+      if (!workItem) {
+        return;
+      }
+
+      const gitlabMergeRequest = new GitlabMergeRequest();
+      gitlabMergeRequest.title = mergeRequest.title;
+      gitlabMergeRequest.url = mergeRequest.web_url;
+      gitlabMergeRequest.state = mergeRequest.state;
+      gitlabMergeRequest.createdAt = new Date(mergeRequest.created_at);
+      gitlabMergeRequest.updatedAt = new Date(mergeRequest.updated_at);
+      gitlabMergeRequest.org = Promise.resolve(project.org);
+      gitlabMergeRequest.project = Promise.resolve(project);
+      gitlabMergeRequest.workItem = Promise.resolve(workItem);
+      await this.gitlabMergeRequestRepository.save(gitlabMergeRequest);
+    }
+  }
+
+  private async handleNewBranch(project: Project, branchName: string) {
+    const workItemReference = this.getWorkItemReference(branchName);
+    if (!workItemReference) {
+      return;
+    }
+    const org = await project.org;
+
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+    if (!workItem) {
+      return;
+    }
+
+    const branch = await this.gitlabBranchRepository.findOne({
+      where: { name: branchName, project: { id: project.id } },
+    });
+
+    if (!branch) {
+      const branch = new GitlabBranch();
+      branch.name = branchName;
+      branch.project = Promise.resolve(project);
+      branch.org = Promise.resolve(project.org);
+      branch.workItem = Promise.resolve(workItem);
+      branch.org = Promise.resolve(await project.org);
+      branch.url = `${project.gitlabProjectUrl}/-/tree/${branchName}`;
+      branch.state = 'open';
+      await this.gitlabBranchRepository.save(branch);
+    }
+  }
+
+  private async handleNewMergeRequest(
+    project: Project,
+    mergeRequestEvent: MergeRequestEvent,
+  ) {
+    const workItemReference = this.getWorkItemReferenceForMergeRequest(
+      mergeRequestEvent.object_attributes,
+    );
+    if (!workItemReference) {
+      return;
+    }
+    const org = await project.org;
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+
+    if (!workItem) {
+      return;
+    }
+
+    const gitlabMergeRequest = new GitlabMergeRequest();
+    gitlabMergeRequest.title = mergeRequestEvent.object_attributes.title;
+    gitlabMergeRequest.url = mergeRequestEvent.object_attributes.url;
+    gitlabMergeRequest.state = mergeRequestEvent.object_attributes.state;
+    gitlabMergeRequest.createdAt = new Date(
+      mergeRequestEvent.object_attributes.created_at,
+    );
+    gitlabMergeRequest.updatedAt = new Date(
+      mergeRequestEvent.object_attributes.updated_at,
+    );
+    gitlabMergeRequest.org = Promise.resolve(project.org);
+    gitlabMergeRequest.project = Promise.resolve(project);
+    gitlabMergeRequest.workItem = Promise.resolve(workItem);
+    await this.gitlabMergeRequestRepository.save(gitlabMergeRequest);
+  }
+
+  async isConnected(orgId: string, projectId: string) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+
+    if (!project.gitlabAccessToken) {
+      return {
+        connected: false,
+      };
+    }
+
+    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
+    const gitlab = new Gitlab({
+      token,
+    });
+
+    try {
+      await gitlab.Projects.all({
+        membership: true,
+        archived: false,
+      });
+    } catch (error) {
+      return {
+        connected: false,
+      };
+    }
+
+    return {
+      connected: true,
+      gitlabProject: await this.getGitlabProject(orgId, projectId),
+    };
+  }
+
+  private async getGitlabProject(orgId: string, projectId: string) {
+    const project = await this.projectRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+
+    if (project.gitlabProjectUrl) {
+      return {
+        id: project.gitlabProjectId,
+        name: project.gitlabProjectName,
+        url: project.gitlabProjectUrl,
+      };
+    }
+
+    return null;
+  }
+
+  async listMergeRequests(orgId: string, projectId: string) {
+    const openForOneDay = await this.gitlabMergeRequestRepository.find({
+      where: {
+        org: { id: orgId },
+        project: { id: projectId },
+        createdAt: MoreThanOrEqual(
+          new Date(new Date().setDate(new Date().getDate() - 1)),
+        ),
+        state: 'opened',
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    const openForThreeDays = await this.gitlabMergeRequestRepository.find({
+      where: {
+        org: { id: orgId },
+        project: { id: projectId },
+        createdAt: And(
+          LessThan(new Date(new Date().setDate(new Date().getDate() - 1))),
+          MoreThanOrEqual(
+            new Date(new Date().setDate(new Date().getDate() - 3)),
+          ),
+        ),
+        state: 'opened',
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    const openForMoreThanThreeDays =
+      await this.gitlabMergeRequestRepository.find({
+        where: {
+          org: { id: orgId },
+          project: { id: projectId },
+          state: 'opened',
+          createdAt: LessThan(
+            new Date(new Date().setDate(new Date().getDate() - 3)),
+          ),
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+    const closedInThePastSevenDays =
+      await this.gitlabMergeRequestRepository.find({
+        where: {
+          org: { id: orgId },
+          project: { id: projectId },
+          state: In(['closed', 'merged']),
+          createdAt: MoreThanOrEqual(
+            new Date(new Date().setDate(new Date().getDate() - 7)),
+          ),
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+
+    return {
+      openForOneDay: await Promise.all(
+        openForOneDay.map(GitlabMergeRequestMapper.toDto),
+      ),
+      openForThreeDays: await Promise.all(
+        openForThreeDays.map(GitlabMergeRequestMapper.toDto),
+      ),
+      openForMoreThanThreeDays: await Promise.all(
+        openForMoreThanThreeDays.map(GitlabMergeRequestMapper.toDto),
+      ),
+      closedInThePastSevenDays: await Promise.all(
+        closedInThePastSevenDays.map(GitlabMergeRequestMapper.toDto),
+      ),
+    };
+  }
+
+  async disconnectGitlabProject(orgId: string, projectId: string) {
+    const project = await this.projectRepository.findOneOrFail({
+      where: {
+        id: projectId,
+        org: {
+          id: orgId,
+        },
+      },
+    });
+
+    if (!project.gitlabProjectId) {
+      return;
+    }
+
+    if (project.gitlabProjectWebhookId) {
+      await this.deleteProjectWebhook(
+        orgId,
+        projectId,
+        project.gitlabProjectWebhookId,
+      );
+    }
+
+    project.gitlabProjectId = null;
+    project.gitlabProjectWebhookId = null;
+    project.gitlabAccessToken = null;
+    project.gitlabProjectUrl = null;
+    project.gitlabProjectName = null;
+    await this.projectRepository.save(project);
+  }
+
+  private async handleMergeRequestUpdate(
+    project: Project,
+    mrEvent: MergeRequestEvent,
+  ) {
+    const workItemReference = this.getWorkItemReferenceForMergeRequest(
+      mrEvent.object_attributes,
+    );
+    if (!workItemReference) {
+      return;
+    }
+
+    const org = await project.org;
+    const workItem = await this.workItemRepository.findOne({
+      where: {
+        reference: workItemReference.toUpperCase(),
+        org: { id: org.id },
+        project: { id: project.id },
+      },
+    });
+
+    if (!workItem) {
+      return;
+    }
+
+    const existingGitlabMergeRequest =
+      await this.gitlabMergeRequestRepository.findOne({
+        where: {
+          url: mrEvent.object_attributes.url,
+          workItem: { id: workItem.id },
+        },
+      });
+
+    if (existingGitlabMergeRequest) {
+      existingGitlabMergeRequest.state = mrEvent.object_attributes.state;
+      existingGitlabMergeRequest.title = mrEvent.object_attributes.title;
+      return await this.gitlabMergeRequestRepository.save(
+        existingGitlabMergeRequest,
+      );
+    }
+
+    return await this.handleNewMergeRequest(project, mrEvent);
+  }
+}

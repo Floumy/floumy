@@ -12,6 +12,7 @@ import {
   UnauthorizedException,
   UseGuards,
   Headers,
+  Delete,
 } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { AuthGuard } from '../auth/auth.guard';
@@ -64,14 +65,14 @@ export class GithubController {
     }
   }
 
-  @Get('auth/orgs/:orgId/repos')
-  async getRepos(@Request() request: any, @Param('orgId') orgId: string) {
+  @Get('auth/orgs/:orgId/projects/:projectId/repos')
+  async getRepos(@Request() request: any, @Param('orgId') orgId: string, @Param('projectId') projectId: string) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.githubService.getRepos(orgId);
+      return await this.githubService.getRepos(projectId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -133,7 +134,7 @@ export class GithubController {
   }
 
   @Get('auth/orgs/:orgId/projects/:projectId/github/prs')
-  async getOpenPullRequests(
+  async listPullRequests(
     @Request() request: any,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
@@ -143,7 +144,24 @@ export class GithubController {
     }
 
     try {
-      return await this.githubService.getPullRequests(orgId, projectId);
+      return await this.githubService.listPullRequests(orgId, projectId);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete('auth/orgs/:orgId/projects/:projectId/github/repo')
+  async deleteProjectGithubRepo(
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.githubService.deleteProjectGithubRepo(orgId, projectId);
     } catch (e) {
       throw new BadRequestException(e.message);
     }

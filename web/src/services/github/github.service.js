@@ -18,9 +18,9 @@ export async function getGithubUrl(orgId, projectId) {
   }
 }
 
-export async function getGithubRepos(orgId) {
+export async function getGithubRepos(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/repos`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/repos`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -30,6 +30,15 @@ export async function getGithubRepos(orgId) {
 export async function updateProjectGithubRepo(orgId, projectId, repoId) {
   try {
     const response = await api.put(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/repo`, { id: repoId });
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
+export async function deleteProjectGithubRepo(orgId, projectId) {
+  try {
+    const response = await api.delete(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/repo`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);

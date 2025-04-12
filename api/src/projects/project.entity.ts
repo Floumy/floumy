@@ -26,6 +26,8 @@ import { Org } from '../orgs/org.entity';
 import { Notification } from '../notifications/notification.entity';
 import { GithubPullRequest } from '../github/github-pull-request.entity';
 import { GithubBranch } from '../github/github-branch.entity';
+import { GitlabBranch } from '../gitlab/gitlab-branch.entity';
+import { GitlabMergeRequest } from '../gitlab/gitlab-merge-request.entity';
 
 @Entity()
 export class Project {
@@ -34,6 +36,12 @@ export class Project {
   @Column()
   name: string;
   @Column({ nullable: true })
+  githubAccessToken: string;
+  @Column({ nullable: true })
+  githubUsername: string;
+  @Column({ nullable: true })
+  gitlabAccessToken: string;
+  @Column({ nullable: true })
   githubRepositoryId: string;
   @Column({ nullable: true })
   githubRepositoryFullName: string;
@@ -41,6 +49,14 @@ export class Project {
   githubRepositoryUrl: string;
   @Column({ nullable: true })
   githubRepositoryWebhookId: string;
+  @Column({ nullable: true })
+  gitlabProjectId: string;
+  @Column({ nullable: true })
+  gitlabProjectUrl: string;
+  @Column({ nullable: true })
+  gitlabProjectName: string;
+  @Column({ nullable: true })
+  gitlabProjectWebhookId: number;
   @ManyToMany(() => User, (user) => user.projects, { lazy: true })
   @JoinTable({
     name: 'project_user',
@@ -100,4 +116,14 @@ export class Project {
     lazy: true,
   })
   githubBranches: Promise<GithubBranch[]>;
+  @OneToMany(() => GitlabBranch, (gitlabBranch) => gitlabBranch.project, {
+    lazy: true,
+  })
+  gitlabBranches: Promise<GitlabBranch[]>;
+  @OneToMany(
+    () => GithubPullRequest,
+    (githubPullRequest) => githubPullRequest.project,
+    { lazy: true },
+  )
+  gitlabMergeRequests: Promise<GitlabMergeRequest[]>;
 }

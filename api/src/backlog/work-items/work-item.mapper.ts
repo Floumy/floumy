@@ -5,6 +5,8 @@ import { Sprint } from '../../sprints/sprint.entity';
 import { User } from '../../users/user.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
 import { GithubBranch } from '../../github/github-branch.entity';
+import { GitlabMergeRequest } from '../../gitlab/gitlab-merge-request.entity';
+import { GitlabBranch } from '../../gitlab/gitlab-branch.entity';
 
 class FeatureMapper {
   static toDto(initiative: Initiative) {
@@ -84,8 +86,15 @@ export default class WorkItemMapper {
     const issue = await workItem.issue;
     const org = await workItem.org;
     const project = await workItem.project;
-    const pullRequests = await workItem.githubPullRequests;
-    const branches = await workItem.githubBranches;
+    const githubPullRequest = await workItem.githubPullRequests;
+    const gitlabMergeRequest = await workItem.gitlabMergeRequests;
+    const pullRequests = project.gitlabProjectId
+      ? gitlabMergeRequest
+      : githubPullRequest;
+    const githubBranches = await workItem.githubBranches;
+    const gitlabBranches = await workItem.gitlabBranches;
+    const branches = project.gitlabProjectId ? gitlabBranches : githubBranches;
+    const codeConnectionType = project.gitlabProjectId ? 'gitlab' : 'github';
     return {
       id: workItem.id,
       org: org ? { id: org.id } : undefined,
@@ -122,6 +131,7 @@ export default class WorkItemMapper {
         ? PullRequestMapper.toDto(pullRequests)
         : undefined,
       branches: branches ? BranchMapper.toDto(branches) : undefined,
+      codeConnectionType: codeConnectionType,
       breadcrumbs: await BreadcrumbMapper.toDto(workItem),
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
@@ -198,7 +208,7 @@ export default class WorkItemMapper {
 }
 
 class PullRequestMapper {
-  static toDto(pullRequests: GithubPullRequest[]) {
+  static toDto(pullRequests: GithubPullRequest[] | GitlabMergeRequest[]) {
     return pullRequests.map((pullRequest) => {
       return {
         id: pullRequest.id,
@@ -213,7 +223,7 @@ class PullRequestMapper {
 }
 
 class BranchMapper {
-  static toDto(branches: GithubBranch[]) {
+  static toDto(branches: GithubBranch[] | GitlabBranch[]) {
     return branches.map((branch) => {
       return {
         id: branch.id,

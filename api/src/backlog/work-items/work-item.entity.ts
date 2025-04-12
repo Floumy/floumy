@@ -26,6 +26,8 @@ import { Issue } from '../../issues/issue.entity';
 import { Project } from '../../projects/project.entity';
 import { GithubBranch } from '../../github/github-branch.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
+import { GitlabBranch } from '../../gitlab/gitlab-branch.entity';
+import { GitlabMergeRequest } from '../../gitlab/gitlab-merge-request.entity';
 
 @Entity()
 @Unique(['reference', 'org'])
@@ -76,7 +78,9 @@ export class WorkItem {
   assignedTo: Promise<User>;
   @ManyToOne(() => Org, (org) => org.workItems, { lazy: false })
   org: Promise<Org>;
-  @ManyToOne(() => Initiative, (initiative) => initiative.workItems, { lazy: false })
+  @ManyToOne(() => Initiative, (initiative) => initiative.workItems, {
+    lazy: false,
+  })
   initiative: Promise<Initiative>;
   @ManyToOne(() => Sprint, (sprint) => sprint.workItems, {
     lazy: true,
@@ -115,6 +119,19 @@ export class WorkItem {
   )
   githubPullRequests: Promise<GithubPullRequest[]>;
 
+  @OneToMany(() => GitlabBranch, (gitlabBranch) => gitlabBranch.workItem, {
+    lazy: true,
+  })
+  gitlabBranches: Promise<GitlabBranch[]>;
+
+  @OneToMany(
+    () => GitlabMergeRequest,
+    (gitlabPullRequest) => gitlabPullRequest.workItem,
+    {
+      lazy: true,
+    },
+  )
+  gitlabMergeRequests: Promise<GitlabMergeRequest[]>;
   @ManyToMany(() => User, {
     lazy: true,
   })

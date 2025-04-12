@@ -191,10 +191,12 @@ const burndownChartOptions = {
           color: colors.gray[200],
           zeroLineColor: colors.gray[200]
         },
-        ticks: {},
+        ticks: {
+          display: false
+        },
         scaleLabel: {
           display: true,
-          labelString: "Effort Left"
+          labelString: "Effort"
         }
       }
     ],
@@ -204,10 +206,12 @@ const burndownChartOptions = {
           color: colors.gray[200],
           zeroLineColor: colors.gray[200]
         },
-        ticks: {},
+        ticks: {
+          display: false
+        },
         scaleLabel: {
           display: true,
-          labelString: "Day"
+          labelString: "Time"
         }
       }
     ]

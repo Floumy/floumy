@@ -89,11 +89,6 @@ function PublicLayout() {
 
   return (
     <>
-      <PublicNavbar
-        theme={'dark'}
-        toggleSidenav={toggleSidenav}
-        sidenavOpen={sidenavOpen}
-      />
       <PublicSidebar
         orgId={orgId}
         project={project}
@@ -107,6 +102,11 @@ function PublicLayout() {
         }}
       />
       <div className="main-content" ref={mainContentRef}>
+        <PublicNavbar
+          theme={'dark'}
+          toggleSidenav={toggleSidenav}
+          sidenavOpen={sidenavOpen}
+        />
         <Routes>
           {getRoutes(publicRoutes)}
           <Route

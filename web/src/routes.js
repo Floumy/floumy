@@ -49,6 +49,8 @@ import NewIssue from './views/pages/issues/NewIssue';
 import EditIssue from './views/pages/issues/EditIssue';
 import IssueDetails from './views/pages/issues/IssueDetails';
 import Code from './views/pages/code/Code';
+import GitHub from './views/pages/code/GitHub';
+import GitLab from './views/pages/code/GitLab';
 
 const routes = [
   {
@@ -301,6 +303,18 @@ const routes = [
     component: <Code />,
     layout: "/admin"
   },
+  {
+    redirect: true,
+    path: "/code/github",
+    component: <GitHub />,
+    layout: "/admin"
+  },
+  {
+    redirect: true,
+    path: "/code/gitlab",
+    component: <GitLab />,
+    layout: "/admin"
+  }
 ];
 
 export const publicRoutes = [
