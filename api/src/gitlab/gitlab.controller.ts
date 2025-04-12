@@ -137,8 +137,8 @@ export class GitlabController {
   @Post('/orgs/:orgId/projects/:projectId/webhooks')
   async handleWebhook(
     @Body() payload: MergeRequestEvent | PushEvent,
-    @Headers('x-gitlab-event') eventType: string,
-    @Headers('x-gitlab-token') token: string,
+    @Headers('X-Gitlab-Event') eventType: string,
+    @Headers('X-Gitlab-Token') token: string,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
   ) {
