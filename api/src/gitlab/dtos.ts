@@ -8,6 +8,8 @@ export interface MergeRequestEvent {
     source_branch: string;
     target_branch: string;
     url: string;
+    created_at: string;
+    updated_at: string;
   };
   project: {
     id: number;

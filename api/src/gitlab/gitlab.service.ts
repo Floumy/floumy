@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { And, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { And, In, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Gitlab } from '@gitbeaker/node';
 import { Project } from '../projects/project.entity';
@@ -195,10 +195,28 @@ export class GitlabService {
   }
 
   private isNewBranch(pushEvent: PushEvent) {
-    return pushEvent.before === '0000000000000000000000000';
+    return pushEvent.before === '0000000000000000000000000000000000000000';
   }
 
-  private async getWorkItemReference(text: string) {
+  private getWorkItemReferenceForMergeRequest(mergeRequest: any) {
+    const workItemReference = this.getWorkItemReference(mergeRequest.title);
+
+    if (workItemReference) {
+      return workItemReference;
+    }
+
+    const branchName = mergeRequest.source_branch.toLowerCase();
+
+    const workItemReferenceFromBranch = this.getWorkItemReference(branchName);
+
+    if (workItemReferenceFromBranch) {
+      return workItemReferenceFromBranch;
+    }
+
+    return null;
+  }
+
+  private getWorkItemReference(text: string) {
     const workItemReference = text.toLowerCase().match(/wi-\d+/);
     if (!workItemReference || workItemReference.length === 0) {
       return null;
@@ -228,9 +246,8 @@ export class GitlabService {
       projectId: project.gitlabProjectId,
     });
     for (const mergeRequest of mergeRequests) {
-      const workItemReference = await this.getWorkItemReference(
-        mergeRequest.title,
-      );
+      const workItemReference =
+        this.getWorkItemReferenceForMergeRequest(mergeRequest);
       if (!workItemReference) {
         return;
       }
@@ -251,6 +268,8 @@ export class GitlabService {
       gitlabMergeRequest.title = mergeRequest.title;
       gitlabMergeRequest.url = mergeRequest.web_url;
       gitlabMergeRequest.state = mergeRequest.state;
+      gitlabMergeRequest.createdAt = new Date(mergeRequest.created_at);
+      gitlabMergeRequest.updatedAt = new Date(mergeRequest.updated_at);
       gitlabMergeRequest.org = Promise.resolve(project.org);
       gitlabMergeRequest.project = Promise.resolve(project);
       gitlabMergeRequest.workItem = Promise.resolve(workItem);
@@ -259,7 +278,7 @@ export class GitlabService {
   }
 
   private async handleNewBranch(project: Project, branchName: string) {
-    const workItemReference = await this.getWorkItemReference(branchName);
+    const workItemReference = this.getWorkItemReference(branchName);
     if (!workItemReference) {
       return;
     }
@@ -297,8 +316,8 @@ export class GitlabService {
     project: Project,
     mergeRequestEvent: MergeRequestEvent,
   ) {
-    const workItemReference = await this.getWorkItemReference(
-      mergeRequestEvent.object_attributes.title,
+    const workItemReference = this.getWorkItemReferenceForMergeRequest(
+      mergeRequestEvent.object_attributes,
     );
     if (!workItemReference) {
       return;
@@ -320,6 +339,12 @@ export class GitlabService {
     gitlabMergeRequest.title = mergeRequestEvent.object_attributes.title;
     gitlabMergeRequest.url = mergeRequestEvent.object_attributes.url;
     gitlabMergeRequest.state = mergeRequestEvent.object_attributes.state;
+    gitlabMergeRequest.createdAt = new Date(
+      mergeRequestEvent.object_attributes.created_at,
+    );
+    gitlabMergeRequest.updatedAt = new Date(
+      mergeRequestEvent.object_attributes.updated_at,
+    );
     gitlabMergeRequest.org = Promise.resolve(project.org);
     gitlabMergeRequest.project = Promise.resolve(project);
     gitlabMergeRequest.workItem = Promise.resolve(workItem);
@@ -385,7 +410,7 @@ export class GitlabService {
         createdAt: MoreThanOrEqual(
           new Date(new Date().setDate(new Date().getDate() - 1)),
         ),
-        state: 'open',
+        state: 'opened',
       },
       order: {
         createdAt: 'DESC',
@@ -401,7 +426,7 @@ export class GitlabService {
             new Date(new Date().setDate(new Date().getDate() - 3)),
           ),
         ),
-        state: 'open',
+        state: 'opened',
       },
       order: {
         createdAt: 'DESC',
@@ -412,7 +437,7 @@ export class GitlabService {
         where: {
           org: { id: orgId },
           project: { id: projectId },
-          state: 'open',
+          state: 'opened',
           createdAt: LessThan(
             new Date(new Date().setDate(new Date().getDate() - 3)),
           ),
@@ -426,7 +451,7 @@ export class GitlabService {
         where: {
           org: { id: orgId },
           project: { id: projectId },
-          state: 'closed',
+          state: In(['closed', 'merged']),
           createdAt: MoreThanOrEqual(
             new Date(new Date().setDate(new Date().getDate() - 7)),
           ),
@@ -486,8 +511,8 @@ export class GitlabService {
     project: Project,
     mrEvent: MergeRequestEvent,
   ) {
-    const workItemReference = await this.getWorkItemReference(
-      mrEvent.object_attributes.title,
+    const workItemReference = this.getWorkItemReferenceForMergeRequest(
+      mrEvent.object_attributes,
     );
     if (!workItemReference) {
       return;
