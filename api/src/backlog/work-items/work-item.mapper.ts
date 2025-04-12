@@ -6,6 +6,7 @@ import { User } from '../../users/user.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
 import { GithubBranch } from '../../github/github-branch.entity';
 import { GitlabMergeRequest } from '../../gitlab/gitlab-merge-request.entity';
+import { GitlabBranch } from '../../gitlab/gitlab-branch.entity';
 
 class FeatureMapper {
   static toDto(initiative: Initiative) {
@@ -85,12 +86,13 @@ export default class WorkItemMapper {
     const issue = await workItem.issue;
     const org = await workItem.org;
     const project = await workItem.project;
-    const pullRequests =
-      (await workItem.githubPullRequests) ||
-      (await workItem.gitlabMergeRequests);
-    const branches =
-      (await workItem.githubBranches) || (await workItem.gitlabBranches);
-
+    const githubPullRequest = await workItem.githubPullRequests;
+    const gitlabMergeRequest = await workItem.gitlabMergeRequests;
+    const pullRequests = githubPullRequest || gitlabMergeRequest;
+    const githubBranches = await workItem.githubBranches;
+    const gitlabBranches = await workItem.gitlabBranches;
+    const branches = gitlabBranches || githubBranches;
+    const codeConnectionType = project.gitlabProjectId ? 'gitlab' : 'github';
     return {
       id: workItem.id,
       org: org ? { id: org.id } : undefined,
@@ -127,6 +129,7 @@ export default class WorkItemMapper {
         ? PullRequestMapper.toDto(pullRequests)
         : undefined,
       branches: branches ? BranchMapper.toDto(branches) : undefined,
+      codeConnectionType: codeConnectionType,
       breadcrumbs: await BreadcrumbMapper.toDto(workItem),
       completedAt: workItem.completedAt,
       createdAt: workItem.createdAt,
@@ -218,7 +221,7 @@ class PullRequestMapper {
 }
 
 class BranchMapper {
-  static toDto(branches: GithubBranch[]) {
+  static toDto(branches: GithubBranch[] | GitlabBranch[]) {
     return branches.map((branch) => {
       return {
         id: branch.id,

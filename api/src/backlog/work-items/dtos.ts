@@ -67,6 +67,7 @@ export interface WorkItemDto {
     createdAt: Date;
     updatedAt: Date;
   }[];
+  codeConnectionType: 'github' | 'gitlab';
   breadcrumbs?: {
     reference: string;
     id: string;

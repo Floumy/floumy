@@ -284,6 +284,8 @@ export class GitlabService {
       const branch = new GitlabBranch();
       branch.name = branchName;
       branch.project = Promise.resolve(project);
+      branch.org = Promise.resolve(project.org);
+      branch.workItem = Promise.resolve(workItem);
       branch.org = Promise.resolve(await project.org);
       branch.url = `${project.gitlabProjectUrl}/-/tree/${branchName}`;
       branch.state = 'open';
