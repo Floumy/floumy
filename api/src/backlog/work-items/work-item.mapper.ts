@@ -88,10 +88,12 @@ export default class WorkItemMapper {
     const project = await workItem.project;
     const githubPullRequest = await workItem.githubPullRequests;
     const gitlabMergeRequest = await workItem.gitlabMergeRequests;
-    const pullRequests = githubPullRequest || gitlabMergeRequest;
+    const pullRequests = project.gitlabProjectId
+      ? gitlabMergeRequest
+      : githubPullRequest;
     const githubBranches = await workItem.githubBranches;
     const gitlabBranches = await workItem.gitlabBranches;
-    const branches = gitlabBranches || githubBranches;
+    const branches = project.gitlabProjectId ? gitlabBranches : githubBranches;
     const codeConnectionType = project.gitlabProjectId ? 'gitlab' : 'github';
     return {
       id: workItem.id,
