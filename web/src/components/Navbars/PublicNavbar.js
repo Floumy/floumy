@@ -24,7 +24,6 @@ function PublicNavbar({ theme, sidenavOpen, toggleSidenav }) {
                   className={classnames(
                     "pr-3 sidenav-toggler",
                     { active: sidenavOpen },
-                    { "sidenav-toggler-dark": theme === "dark" }
                   )}
                   onClick={toggleSidenav}
                   role="button"
