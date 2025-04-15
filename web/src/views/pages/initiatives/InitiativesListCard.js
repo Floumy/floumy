@@ -33,10 +33,17 @@ function InitiativesListCard({
     }
   }
 
-  function handleBacklogInitiativeChangePriority(initiativeId, newPriority) {
-    const initiative = filteredInitiatives.find(initiative => initiative.id === initiativeId);
-    initiative.priority = newPriority;
-    setFilteredInitiatives(sortByPriority(filteredInitiatives));
+  function handleBacklogInitiativeChangePriority(initiatives, priority) {
+    const updatedInitiatives = initiatives.map(initiative => {
+      if (initiative.priority !== priority) {
+        initiative.priority = priority;
+      }
+      return initiative;
+    });
+    setFilteredInitiatives(sortByPriority(updatedInitiatives));
+    if (onChangeStatus) {
+      onChangeStatus(updatedInitiatives, priority);
+    }
   }
 
   function renderInitiativeList(filteredInitiatives) {

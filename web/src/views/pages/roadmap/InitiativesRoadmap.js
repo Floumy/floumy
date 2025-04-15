@@ -224,7 +224,7 @@ function InitiativesRoadmap() {
                                  isLoading={isLoadingInitiatives}
                                  onAddInitiative={onAddInitiative()}
                                  onChangeMilestone={updateBacklogInitiativesMilestone}
-                                 onChangeStatus={updateBacklogInitiativesStatus} />
+                                 onChangeStatus={updateBacklogInitiativesStatus}/>
           </Col>
         </Row>
       </Container>
