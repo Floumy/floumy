@@ -23,6 +23,7 @@ import AuthLayout from 'layouts/Auth.js';
 import AuthGuard from './guards/AuthGuard';
 import { ToastContainer } from 'react-toastify';
 import PublicLayout from './layouts/Public';
+import OrgLayout from './layouts/Org';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -34,6 +35,11 @@ root.render(
         <Route path="/admin/orgs/:orgId/projects/:projectId/*" element={
           <AuthGuard>
             <AdminLayout />
+          </AuthGuard>
+        } />
+        <Route path="/orgs/:orgId/*" element={
+          <AuthGuard>
+            <OrgLayout />
           </AuthGuard>
         } />
         <Route path="/public/orgs/:orgId/projects/:projectId/*" element={

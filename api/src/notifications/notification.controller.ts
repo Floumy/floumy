@@ -14,24 +14,16 @@ import {
 import { AuthGuard } from '../auth/auth.guard';
 import { NotificationService } from './notification.service';
 
-@Controller('/orgs/:orgId/projects/:projectId/notifications')
+@Controller('/notifications')
 export class NotificationController {
   constructor(private notificationService: NotificationService) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  async listNotifications(
-    @Request() request,
-    @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
-  ) {
+  async listNotifications(@Request() request: any) {
     try {
-      return await this.notificationService.listNotifications(
-        request.user.sub,
-        orgId,
-        projectId,
-      );
+      return await this.notificationService.listNotifications(request.user.sub);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -40,16 +32,10 @@ export class NotificationController {
   @Get('unread')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  async countUnreadNotifications(
-    @Request() request,
-    @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
-  ) {
+  async countUnreadNotifications(@Request() request) {
     try {
       return await this.notificationService.countUnreadNotifications(
         request.user.sub,
-        orgId,
-        projectId,
       );
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -93,15 +79,7 @@ export class NotificationController {
   @Delete()
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
-  async deleteAllNotifications(
-    @Request() request,
-    @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
-  ) {
-    await this.notificationService.deleteAllNotifications(
-      request.user.sub,
-      orgId,
-      projectId,
-    );
+  async deleteAllNotifications(@Request() request) {
+    await this.notificationService.deleteAllNotifications(request.user.sub);
   }
 }

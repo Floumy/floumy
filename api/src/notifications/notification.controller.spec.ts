@@ -87,11 +87,7 @@ describe('NotificationController', () => {
   });
   describe('when listing notifications when there are none', () => {
     it('should return an empty list', async () => {
-      const notifications = await controller.listNotifications(
-        { user: user },
-        org.id,
-        project.id,
-      );
+      const notifications = await controller.listNotifications({ user: user });
       expect(notifications).toEqual([]);
     });
   });
@@ -122,15 +118,11 @@ describe('NotificationController', () => {
       });
     });
     it('should receive available notifications', async () => {
-      const notificationsList = await controller.listNotifications(
-        {
-          user: {
-            sub: secondUser.id,
-          },
+      const notificationsList = await controller.listNotifications({
+        user: {
+          sub: secondUser.id,
         },
-        org.id,
-        project.id,
-      );
+      });
       expect(notificationsList).toEqual([
         {
           id: notifications[0].id,
@@ -148,15 +140,11 @@ describe('NotificationController', () => {
           },
         },
       ]);
-      const notificationsList2 = await controller.listNotifications(
-        {
-          user: {
-            sub: thirdUser.id,
-          },
+      const notificationsList2 = await controller.listNotifications({
+        user: {
+          sub: thirdUser.id,
         },
-        org.id,
-        project.id,
-      );
+      });
       expect(notificationsList2).toEqual([
         {
           id: notifications[1].id,
@@ -185,15 +173,11 @@ describe('NotificationController', () => {
           },
           [notifications[0].id],
         );
-        const notificationsList = await controller.listNotifications(
-          {
-            user: {
-              sub: secondUser.id,
-            },
+        const notificationsList = await controller.listNotifications({
+          user: {
+            sub: secondUser.id,
           },
-          org.id,
-          project.id,
-        );
+        });
         expect(notificationsList).toEqual([
           {
             id: notifications[0].id,
@@ -215,15 +199,11 @@ describe('NotificationController', () => {
     });
     describe('when counting unread notifications', () => {
       it('should return the correct count', async () => {
-        const count = await controller.countUnreadNotifications(
-          {
-            user: {
-              sub: secondUser.id,
-            },
+        const count = await controller.countUnreadNotifications({
+          user: {
+            sub: secondUser.id,
           },
-          org.id,
-          project.id,
-        );
+        });
         expect(count).toEqual(1);
       });
     });
@@ -237,38 +217,26 @@ describe('NotificationController', () => {
           },
           notifications[0].id,
         );
-        const notificationsList = await controller.listNotifications(
-          {
-            user: {
-              sub: secondUser.id,
-            },
+        const notificationsList = await controller.listNotifications({
+          user: {
+            sub: secondUser.id,
           },
-          org.id,
-          project.id,
-        );
+        });
         expect(notificationsList).toEqual([]);
       });
     });
     describe('when deleting all notifications', () => {
       it('should delete all notifications', async () => {
-        await controller.deleteAllNotifications(
-          {
-            user: {
-              sub: secondUser.id,
-            },
+        await controller.deleteAllNotifications({
+          user: {
+            sub: secondUser.id,
           },
-          org.id,
-          project.id,
-        );
-        const notificationsList = await controller.listNotifications(
-          {
-            user: {
-              sub: secondUser.id,
-            },
+        });
+        const notificationsList = await controller.listNotifications({
+          user: {
+            sub: secondUser.id,
           },
-          org.id,
-          project.id,
-        );
+        });
         expect(notificationsList).toEqual([]);
       });
     });

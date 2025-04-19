@@ -7,15 +7,18 @@ import {
   DropdownToggle,
   ListGroup,
   ListGroupItem,
-  Row, UncontrolledTooltip,
+  Row,
+  UncontrolledTooltip,
 } from 'reactstrap';
 import React, { useEffect } from 'react';
 import {
-  countUnreadNotifications, deleteAllNotifications, deleteNotification,
+  countUnreadNotifications,
+  deleteAllNotifications,
+  deleteNotification,
   listNotifications,
   markAsRead,
 } from '../../services/notifications/notifications.service';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { memberNameInitials, textToColor } from '../../services/utils/utils';
 import moment from 'moment';
 
@@ -56,7 +59,6 @@ const notificationTextActions = {
 };
 
 export default function Notifications() {
-  const { orgId, projectId } = useParams();
   const [unreadNotificationsCount, setUnreadNotificationsCount] = React.useState(0);
   const [notifications, setNotifications] = React.useState([]);
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
@@ -66,24 +68,24 @@ export default function Notifications() {
   }
 
   async function fetchData() {
-    const unreadNotificationsCount = await countUnreadNotifications(orgId, projectId);
+    const unreadNotificationsCount = await countUnreadNotifications();
     setUnreadNotificationsCount(unreadNotificationsCount);
-    const notifications = await listNotifications(orgId, projectId);
+    const notifications = await listNotifications();
     setNotifications(notifications);
   }
 
   async function read(notificationId) {
-    await markAsRead(orgId, projectId, [notificationId]);
+    await markAsRead([notificationId]);
     await fetchData();
   }
 
   async function remove(notificationId) {
-    await deleteNotification(orgId, projectId, notificationId);
+    await deleteNotification(notificationId);
     await fetchData();
   }
 
   async function removeAll() {
-    await deleteAllNotifications(orgId, projectId);
+    await deleteAllNotifications();
     await fetchData();
   }
 
