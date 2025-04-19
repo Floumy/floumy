@@ -35,27 +35,17 @@ export class NotificationService {
     private objectiveCommentsRepository: Repository<ObjectiveComment>,
   ) {}
 
-  async listNotifications(
-    userId: string,
-    orgId: string,
-    projectId: string,
-  ): Promise<ViewNotificationDto[]> {
+  async listNotifications(userId: string): Promise<ViewNotificationDto[]> {
     const notifications = await this.notificationsRepository.find({
       where: {
         user: {
           id: userId,
         },
-        org: {
-          id: orgId,
-        },
-        project: {
-          id: projectId,
-        },
       },
       order: {
         createdAt: 'DESC',
       },
-      relations: ['createdBy'],
+      relations: ['createdBy', 'org', 'project'],
       select: {
         id: true,
         entity: true,
@@ -74,6 +64,8 @@ export class NotificationService {
       notifications.map(async (notification) => {
         let entityName: string;
         let entityUrl: string;
+        const org = await notification.org;
+        const project = await notification.project;
         switch (notification.entity) {
           case EntityType.INITIATIVE_COMMENT:
             const featureComment =
@@ -83,14 +75,14 @@ export class NotificationService {
               });
             const feature = await featureComment.initiative;
             entityName = feature.reference + ': ' + feature.title;
-            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${feature.id}`;
+            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/roadmap/features/detail/${feature.id}`;
             break;
           case EntityType.INITIATIVE_DESCRIPTION:
             const f = await this.featuresRepository.findOneOrFail({
               where: { id: notification.entityId },
             });
             entityName = f.reference + ': ' + f.title;
-            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/roadmap/features/detail/${f.id}`;
+            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/roadmap/features/detail/${f.id}`;
             break;
           case EntityType.WORK_ITEM_COMMENT:
             const workItemComment =
@@ -100,14 +92,14 @@ export class NotificationService {
               });
             const workItem = await workItemComment.workItem;
             entityName = workItem.reference + ': ' + workItem.title;
-            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`;
+            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/work-item/edit/${workItem.id}`;
             break;
           case EntityType.WORK_ITEM_DESCRIPTION:
             const wi = await this.workItemsRepository.findOneOrFail({
               where: { id: notification.entityId },
             });
             entityName = wi.reference + ': ' + wi.title;
-            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${wi.id}`;
+            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/work-item/edit/${wi.id}`;
             break;
           case EntityType.FEATURE_REQUEST_COMMENT:
             const featureRequestComment =
@@ -117,7 +109,7 @@ export class NotificationService {
               });
             const featureRequest = await featureRequestComment.featureRequest;
             entityName = featureRequest.title;
-            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequest.id}`;
+            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/feature-requests/edit/${featureRequest.id}`;
             break;
           case EntityType.ISSUE_COMMENT:
             const issueComment =
@@ -127,7 +119,7 @@ export class NotificationService {
               });
             const issue = await issueComment.issue;
             entityName = issue.title;
-            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/issues/edit/${issue.id}`;
+            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/issues/edit/${issue.id}`;
             break;
           case EntityType.KEY_RESULT_COMMENT:
             const keyResultComment =
@@ -137,7 +129,7 @@ export class NotificationService {
               });
             const keyResult = await keyResultComment.keyResult;
             entityName = keyResult.reference + ': ' + keyResult.title;
-            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`;
+            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/kr/detail/${keyResult.id}`;
             break;
           case EntityType.OBJECTIVE_COMMENT:
             const objectiveComment =
@@ -147,7 +139,7 @@ export class NotificationService {
               });
             const objective = await objectiveComment.objective;
             entityName = objective.reference + ': ' + objective.title;
-            entityUrl = `/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${objective.id}`;
+            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/okrs/detail/${objective.id}`;
             break;
           default:
             entityName = 'Unknown';
@@ -167,21 +159,11 @@ export class NotificationService {
     );
   }
 
-  async countUnreadNotifications(
-    userId: string,
-    orgId: string,
-    projectId: string,
-  ) {
+  async countUnreadNotifications(userId: string) {
     return await this.notificationsRepository.count({
       where: {
         user: {
           id: userId,
-        },
-        org: {
-          id: orgId,
-        },
-        project: {
-          id: projectId,
         },
         status: StatusType.UNREAD,
       },
@@ -207,15 +189,9 @@ export class NotificationService {
     });
   }
 
-  async deleteAllNotifications(
-    userId: string,
-    orgId: string,
-    projectId: string,
-  ) {
+  async deleteAllNotifications(userId: string) {
     await this.notificationsRepository.delete({
       user: { id: userId },
-      org: { id: orgId },
-      project: { id: projectId },
     });
   }
 }

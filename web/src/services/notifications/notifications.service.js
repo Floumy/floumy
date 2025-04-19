@@ -1,44 +1,44 @@
-import api from "../api/api.service";
+import api from '../api/api.service';
 
-export async function listNotifications(orgId, projectId) {
+export async function listNotifications() {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/notifications`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/notifications`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function countUnreadNotifications(orgId, projectId) {
+export async function countUnreadNotifications() {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/notifications/unread`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/notifications/unread`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function markAsRead(orgId, projectId, notificationIds) {
+export async function markAsRead(notificationIds) {
   try {
-    const response = await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/notifications/mark-as-read`, { notificationIds });
+    const response = await api.patch(`${process.env.REACT_APP_API_URL}/notifications/mark-as-read`, { notificationIds });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function deleteNotification(orgId, projectId, notificationId) {
+export async function deleteNotification(notificationId) {
   try {
-    const response = await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/notifications/${notificationId}`);
+    const response = await api.delete(`${process.env.REACT_APP_API_URL}/notifications/${notificationId}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function deleteAllNotifications(orgId, projectId) {
+export async function deleteAllNotifications() {
   try {
-    const response = await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/notifications`);
+    const response = await api.delete(`${process.env.REACT_APP_API_URL}/notifications`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
