@@ -23,11 +23,13 @@ import { useBuildInPublic } from '../../contexts/BuidInPublicContext';
 import { useProjects } from '../../contexts/ProjectsContext';
 import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
+import { useOrg } from '../../contexts/OrgContext';
 
 function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
-  const { currentProject, projects, orgId, loading } = useProjects();
+  const { currentProject, projects, orgId, loading: loadingProjects } = useProjects();
   const { settings: bipSettings } = useBuildInPublic();
+  const { currentOrg, loadingOrg } = useOrg();
 
   // makes the sidenav normal on hover (actually when mouse enters on it)
   const onMouseEnterSidenav = () => {
@@ -70,7 +72,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const scrollBarInner = (
       <div className="scrollbar-inner">
         <div className="sidenav-header d-flex align-items-center text-white">
-          {!loading && logo ? (
+          {!loadingProjects && !loadingOrg && logo ? (
             <NavbarBrand {...navbarBrandProps}>
               <img
                 alt={logo.imgAlt}
@@ -82,9 +84,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
             </NavbarBrand>
           ) : null}
         </div>
-        {orgId && currentProject && (
+        {currentOrg && currentProject && (
           <>
             <div className="navbar-inner mb-2">
+              <h2 className="py-2 text-muted">
+                <Link to={`/orgs/${orgId}`}>
+                  <span className="docs-normal" style={{ whiteSpace: 'nowrap' }}>
+                  {currentOrg.name}
+                </span>
+                </Link>
+              </h2>
               <Collapse navbar isOpen={true}>
                 <ProjectSelector
                   currentProject={currentProject}

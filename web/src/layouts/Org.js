@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 // react library for routing
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 // core components
-
 import routes from 'routes.js';
 import AdminNavbar from '../components/Navbars/AdminNavbar';
 import useLayoutHandler from './useLayoutHandler';
 import useNavigationHotKey from './useNavigationHotKey';
 import Footer from '../components/Footers/Footer';
-import OrgSidebar from 'components/Sidebar/Sidebar.js';
+import { OrgProvider } from '../contexts/OrgContext';
+import OrgSidebar from '../components/Sidebar/OrgSidebar';
 
 function OrgLayout() {
   const { mainContentRef, getRoutes } = useLayoutHandler('org');
@@ -48,7 +48,7 @@ function OrgLayout() {
   };
 
   return (
-    <>
+    <OrgProvider orgId={orgId}>
       <OrgSidebar
         toggleSidenav={toggleSidenav}
         logo={{
@@ -82,7 +82,7 @@ function OrgLayout() {
               style={helpButtonStyle}>Report
         a problem
       </button>
-    </>
+    </OrgProvider>
   );
 }
 

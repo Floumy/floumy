@@ -11,6 +11,7 @@ import useNavigationHotKey from './useNavigationHotKey';
 import Footer from '../components/Footers/Footer';
 import { BuildInPublicProvider } from '../contexts/BuidInPublicContext';
 import { ProjectsProvider } from '../contexts/ProjectsContext';
+import { OrgProvider } from '../contexts/OrgContext';
 
 function Admin() {
   const { location, mainContentRef, getRoutes } = useLayoutHandler('admin');
@@ -26,12 +27,12 @@ function Admin() {
   }
 
   const toggleSidenav = () => {
-    if (document.body.classList.contains("g-sidenav-pinned")) {
-      document.body.classList.remove("g-sidenav-pinned");
-      document.body.classList.add("g-sidenav-hidden");
+    if (document.body.classList.contains('g-sidenav-pinned')) {
+      document.body.classList.remove('g-sidenav-pinned');
+      document.body.classList.add('g-sidenav-hidden');
     } else {
-      document.body.classList.add("g-sidenav-pinned");
-      document.body.classList.remove("g-sidenav-hidden");
+      document.body.classList.add('g-sidenav-pinned');
+      document.body.classList.remove('g-sidenav-hidden');
     }
     setSidenavOpen(!sidenavOpen);
   };
@@ -75,41 +76,43 @@ function Admin() {
   return (
     <>
       <BuildInPublicProvider orgId={orgId} projectId={projectId}>
-        <ProjectsProvider orgId={orgId} projectId={projectId}>
-          <Sidebar
-            toggleSidenav={toggleSidenav}
-            logo={{
-              outterLink: 'https://floumy.com',
-              // innerLink: "/admin/okrs",
-              imgSrc: require('assets/img/brand/logo.png'),
-              imgAlt: 'Floumy Logo',
-            }}
-          />
-          <div className="main-content" ref={mainContentRef}>
-            <AdminNavbar
-              theme={'dark'}
-              sidenavOpen={sidenavOpen}
+        <OrgProvider orgId={orgId}>
+          <ProjectsProvider orgId={orgId} projectId={projectId}>
+            <Sidebar
               toggleSidenav={toggleSidenav}
+              logo={{
+                outterLink: 'https://floumy.com',
+                // innerLink: "/admin/okrs",
+                imgSrc: require('assets/img/brand/logo.png'),
+                imgAlt: 'Floumy Logo',
+              }}
             />
-            <Routes>
-              {getRoutes(routes)}
-              {/*TODO: Redirect to not found page here*/}
-              <Route
-                path="*"
-                element={<Navigate to={`/admin/orgs/${orgId}/projects/${projectId}/active-sprint`} replace />}
+            <div className="main-content" ref={mainContentRef}>
+              <AdminNavbar
+                theme={'dark'}
+                sidenavOpen={sidenavOpen}
+                toggleSidenav={toggleSidenav}
               />
-            </Routes>
-            <Footer />
-          </div>
-          {sidenavOpen ? (
-            <div className="backdrop d-xl-none" onClick={toggleSidenav} onKeyDown={toggleSidenav} role="button" />
-          ) : null}
-          <button id="userHelpButton" className="userHelpButtonMiddleRight" data-drawer-trigger="true"
-                  aria-controls="drawer-name" aria-expanded="false"
-                  style={helpButtonStyle}>Report
-            a problem
-          </button>
-        </ProjectsProvider>
+              <Routes>
+                {getRoutes(routes)}
+                {/*TODO: Redirect to not found page here*/}
+                <Route
+                  path="*"
+                  element={<Navigate to={`/admin/orgs/${orgId}/projects/${projectId}/active-sprint`} replace />}
+                />
+              </Routes>
+              <Footer />
+            </div>
+            {sidenavOpen ? (
+              <div className="backdrop d-xl-none" onClick={toggleSidenav} onKeyDown={toggleSidenav} role="button" />
+            ) : null}
+            <button id="userHelpButton" className="userHelpButtonMiddleRight" data-drawer-trigger="true"
+                    aria-controls="drawer-name" aria-expanded="false"
+                    style={helpButtonStyle}>Report
+              a problem
+            </button>
+          </ProjectsProvider>
+        </OrgProvider>
       </BuildInPublicProvider>
     </>
   );
