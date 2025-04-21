@@ -1,23 +1,24 @@
-
-import React from "react";
+import React from 'react';
 // nodejs library to set properties for components
-import PropTypes from "prop-types";
 // reactstrap components
-import { Button, Col, Container, Row } from "reactstrap";
-import ShortcutIcon from "../Shortcuts/ShortcutIcon";
+import { Button, Col, Container, Row } from 'reactstrap';
+import ShortcutIcon from '../Shortcuts/ShortcutIcon';
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs';
 
-function TimelineHeader({ headerButtons, breadcrumbs = [], isPublic = false }) {
+function SimpleHeader({ headerButtons, title, breadcrumbs = [], isPublic = false }) {
   return (
     <>
       <div className="header pb-6 content__title content__title--calendar">
         <Container fluid>
           <div className="header-body">
             <Row className="align-items-center py-4">
-              <Col className="mt-3 mt-md-0 text-md-right" lg="6" xs="12">
-                {breadcrumbs && breadcrumbs.length > 0 && <Breadcrumbs breadcrumbs={breadcrumbs} isPublic={isPublic} />}
-              </Col>
-              <Col className="mt-3 mt-md-0 text-md-right" lg="6" xs="12">
+              {title && <Col className="mt-3 mt-md-0 text-md-left" lg="6" xs="12">
+                <h1 className="my-1">{title}</h1>
+              </Col>}
+              {breadcrumbs && breadcrumbs.length > 0 && <Col className="mt-3 mt-md-0 text-md-right" lg="6" xs="12">
+                <Breadcrumbs breadcrumbs={breadcrumbs} isPublic={isPublic} />
+              </Col>}
+              <Col className="mt-3 mt-md-0 text-md-right" lg={(!breadcrumbs || breadcrumbs.length === 0) && !title ? 12 : 6} xs="12">
                 {headerButtons && headerButtons.map((button) => (
                   <Button
                     key={button.id}
@@ -39,9 +40,4 @@ function TimelineHeader({ headerButtons, breadcrumbs = [], isPublic = false }) {
   );
 }
 
-TimelineHeader.propTypes = {
-  newButtonAction: PropTypes.func,
-  newButtonName: PropTypes.string
-};
-
-export default TimelineHeader;
+export default SimpleHeader;

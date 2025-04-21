@@ -417,7 +417,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       <span className="nav-link-text">Build In Public</span>
                     </NavLink>
                   </NavItem>
-                  <NavItem>
+                  {!isFeatureEnabled(FEATURES.ORG_WIDE_APP_SECTION) && <NavItem>
                     <NavLink
                       to={`/admin/orgs/${orgId}/projects/${currentProject.id}/members`}
                       onClick={closeSidenav}
@@ -426,7 +426,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       <i className="fa fa-users" />
                       <span className="nav-link-text">Members</span>
                     </NavLink>
-                  </NavItem>
+                  </NavItem>}
                 </Nav>
               </Collapse>
             </div>
