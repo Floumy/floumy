@@ -72,9 +72,9 @@ function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
             <div className="navbar-inner mb-2">
               <Collapse navbar isOpen={true}>
                 <div className="mb-3">
-                  <h2 className="py-2 text-muted">
+                  <h2 className="py-2">
                     <Link to={`/orgs/${orgId}`}>
-                      <span className="docs-normal" style={{ whiteSpace: 'nowrap' }}>
+                      <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
                         {currentOrg.name}
                       </span>
                     </Link>

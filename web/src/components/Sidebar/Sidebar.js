@@ -24,12 +24,14 @@ import { useProjects } from '../../contexts/ProjectsContext';
 import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
 import { useOrg } from '../../contexts/OrgContext';
+import { FEATURES, useFeatureFlags } from '../../hooks/useFeatureFlags';
 
 function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
   const { currentProject, projects, orgId, loading: loadingProjects } = useProjects();
   const { settings: bipSettings } = useBuildInPublic();
   const { currentOrg, loadingOrg } = useOrg();
+  const { isFeatureEnabled } = useFeatureFlags()
 
   // makes the sidenav normal on hover (actually when mouse enters on it)
   const onMouseEnterSidenav = () => {
@@ -87,13 +89,13 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
         {currentOrg && currentProject && (
           <>
             <div className="navbar-inner mb-2">
-              <h2 className="py-2 text-muted">
-                <Link to={`/orgs/${orgId}`}>
-                  <span className="docs-normal" style={{ whiteSpace: 'nowrap' }}>
+              {isFeatureEnabled(FEATURES.ORG_WIDE_APP_SECTION) && <h2 className="py-2">
+                <Link to={`/orgs/${orgId}`} className='p-0'>
+                  <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
                   {currentOrg.name}
                 </span>
                 </Link>
-              </h2>
+              </h2>}
               <Collapse navbar isOpen={true}>
                 <ProjectSelector
                   currentProject={currentProject}
