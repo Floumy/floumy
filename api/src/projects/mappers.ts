@@ -6,6 +6,7 @@ export class ProjectMapper {
     return {
       id: project.id,
       name: project.name,
+      description: project.description,
     };
   }
 }

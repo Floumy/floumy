@@ -15,8 +15,16 @@ import { useNavigate } from 'react-router-dom';
 function Project() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedProjectName, setFocusedProjectName] = useState(false);
+  const [focusedProjectDescription, setFocusedProjectDescription] = useState(false);
   const [deleteWarning, setDeleteWarning] = useState(false);
-  const { currentProject: project, setCurrentProject, projects, setProjects, loading: loadingProject, orgId } = useProjects();
+  const {
+    currentProject: project,
+    setCurrentProject,
+    projects,
+    setProjects,
+    loading: loadingProject,
+    orgId,
+  } = useProjects();
 
   const navigate = useNavigate();
 
@@ -27,22 +35,25 @@ function Project() {
       .max(50, 'Project name cannot be longer than 50 characters')
       .matches(
         /^[a-zA-Z0-9_\- ]+$/,
-        'Project name can only contain letters, numbers, underscores, hyphens and spaces'
+        'Project name can only contain letters, numbers, underscores, hyphens and spaces',
       )
       .test(
         'unique',
         'Project name already exists',
         function(value) {
-          return !projects.some(project => project.name === value);
-        }
+          return !projects
+            .filter(p => p.id !== project.id)
+            .some(p => p.name === value);
+        },
       ),
   });
 
   async function handleSubmit(values, setErrors) {
     const projectName = values.projectName;
+    const projectDescription = values.projectDescription;
     try {
       setIsSubmitting(true);
-      const updatedProject = await updateProject(orgId, project.id, projectName);
+      const updatedProject = await updateProject(orgId, project.id, projectName, projectDescription);
       setProjects(projects.map(p => {
         if (p.id === updatedProject.id) {
           return updatedProject;
@@ -82,7 +93,7 @@ function Project() {
       <DeleteWarning
         isOpen={deleteWarning}
         toggle={() => setDeleteWarning(!deleteWarning)}
-        entity={"project"}
+        entity={'project'}
         onDelete={handleDeleteProject} />
       <SimpleHeader />
       <Container className="mt--6 pb-4" fluid>
@@ -94,7 +105,7 @@ function Project() {
           {!loadingProject && project && <Row className="p-4">
             <Col>
               <Formik
-                initialValues={{ projectName: project.name }}
+                initialValues={{ projectName: project.name, projectDescription: project.description }}
                 validationSchema={validationSchema}
                 onSubmit={async (values, { setErrors }) => {
                   try {
@@ -133,16 +144,38 @@ function Project() {
                       </InputGroup>
                       <ErrorMessage name="projectName" component={InputError} />
                     </FormGroup>
+                    <FormGroup
+                      className={classnames({
+                        focused: focusedProjectDescription,
+                      })}
+                    >
+                      <InputGroup className="input-group input-group-merge">
+                        <Field
+                          as={Input}
+                          name="projectDescription"
+                          placeholder="Describe your project's goals, scope, and key features (e.g., 'A web application for automated task management with team collaboration features')"
+                          type="textarea"
+                          onFocus={() => setFocusedProjectDescription(true)}
+                          onBlur={() => setFocusedProjectDescription(false)}
+                          value={values.projectDescription}
+                          rows={6}
+                          invalid={!!(errors.projectDescription && touched.projectDescription)}
+                          className="px-3"
+                          autoComplete="off"
+                        />
+                      </InputGroup>
+                      <ErrorMessage name="projectDescription" component={InputError} />
+                    </FormGroup>
                     <div>
                       <Button color="primary" type="submit"
                               disabled={isSubmitting}>
                         Save
                       </Button>
                       {projects && projects.length > 1 &&
-                      <Button color="danger" type="button"
-                              onClick={() => setDeleteWarning(true)}>
-                        Delete Project
-                      </Button>}
+                        <Button color="danger" type="button"
+                                onClick={() => setDeleteWarning(true)}>
+                          Delete Project
+                        </Button>}
                     </div>
                   </Form>
                 )}

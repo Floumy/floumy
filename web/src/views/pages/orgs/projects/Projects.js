@@ -1,77 +1,38 @@
-import {
-  Button,
-  Card,
-  CardBody,
-  CardText,
-  Col,
-  Container,
-  FormGroup,
-  Input,
-  Label,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-  Row,
-} from 'reactstrap';
+import { Card, CardBody, CardText, Col, Container, Row } from 'reactstrap';
 import SimpleHeader from '../../../../components/Headers/SimpleHeader';
-import { Form } from 'formik';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import NewProjectModal from '../../../../components/Sidebar/NewProjectModal';
+import { useParams } from 'react-router-dom';
+import { listProjects } from '../../../../services/projects/projects.service';
+import { toast } from 'react-toastify';
 
 const Projects = () => {
-  const [projects, setProjects] = useState([
-    {
-      id: '1',
-      title: 'Project Alpha',
-      description: 'A cutting-edge application with modern architecture',
-      status: 'active',
-      tags: ['React', 'JavaScript'],
-    },
-  ]);
+  const { orgId } = useParams();
+  const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [modal, setModal] = useState(false);
-  const [newProject, setNewProject] = useState({
-    title: '',
-    description: '',
-    status: 'planning',
-    tags: '',
-  });
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setIsLoading(true);
 
-  // Add hotkey for new project
-  useHotkeys('n', () => setModal(true));
+        const orgProjects = await listProjects(orgId);
+        setProjects(orgProjects);
 
-  const toggleModal = () => {
-    setModal(!modal);
-    if (!modal) {
-      setNewProject({
-        title: '',
-        description: '',
-        status: 'planning',
-        tags: '',
-      });
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewProject(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const projectToAdd = {
-      id: Date.now().toString(),
-      ...newProject,
-      tags: newProject.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+      } catch (e) {
+        toast.error(`Couldn't retrieve the list of projects`);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    setProjects(prev => [...prev, projectToAdd]);
-    toggleModal();
-  };
+    fetchProjects();
+  }, [orgId]);
+
+  const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+
+  useHotkeys('n', () => setIsNewProjectModalOpen(true));
 
   return (
     <>
@@ -83,72 +44,57 @@ const Projects = () => {
             shortcut: 'n',
             id: 'new-project',
             action: () => {
+              setIsNewProjectModalOpen(true);
             },
           },
         ]} />
       <Container fluid>
         <Row className="mt--6">
-          {projects.map((project) => (
-            <Col key={project.id} xs={12} md={6} lg={4} className="mb-4">
-              <Card className="shadow-sm h-100">
-                <CardBody>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h5 className="mb-0">{project.title}</h5>
+          {projects.length > 0 ? (
+            projects.map((project) => (
+              <Col key={project.id} xs={12} md={6} lg={4} className="mb-4">
+                <Card className="h-100">
+                  <CardBody>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h5 className="mb-0">{project.name}</h5>
+                    </div>
+                    <CardText>{project.description}</CardText>
+                  </CardBody>
+                </Card>
+              </Col>
+            ))
+          ) : (
+            <Col xs={12}>
+              <Card className="text-center py-5">
+                <div className="empty-state">
+                  <div className="empty-state-icon mb-4">
+                    <i className="fa fa-folder-open fa-3x text-muted"></i>
                   </div>
-                  <CardText>{project.description}</CardText>
-                </CardBody>
+                  <h3 className="empty-state-title">No Projects Yet</h3>
+                  <p className="empty-state-description text-muted mx-auto" style={{ maxWidth: '500px' }}>
+                    Get started by creating your first project. Projects help you organize and track your work
+                    effectively.
+                  </p>
+                  <button
+                    className="btn btn-primary mt-3"
+                    onClick={() => setIsNewProjectModalOpen(true)}
+                  >
+                    <i className="fa fa-plus mr-2"></i>
+                    Create New Project
+                  </button>
+                  <div className="mt-3">
+                    <small className="text-muted">
+                      Pro tip: Press 'N' to quickly create a new project
+                    </small>
+                  </div>
+                </div>
               </Card>
             </Col>
-          ))}
+          )}
         </Row>
       </Container>
-      <Modal isOpen={modal} toggle={toggleModal}>
-        <Form onSubmit={handleSubmit}>
-          <ModalHeader toggle={toggleModal}>Create New Project</ModalHeader>
-          <ModalBody>
-            <FormGroup>
-              <Label for="title">Project Title</Label>
-              <Input
-                id="title"
-                name="title"
-                value={newProject.title}
-                onChange={handleInputChange}
-                required
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label for="description">Description</Label>
-              <Input
-                id="description"
-                name="description"
-                type="textarea"
-                value={newProject.description}
-                onChange={handleInputChange}
-                required
-              />
-            </FormGroup>
-            <FormGroup>
-              <Label for="status">Status</Label>
-              <Input
-                id="status"
-                name="status"
-                type="select"
-                value={newProject.status}
-                onChange={handleInputChange}
-              >
-                <option value="planning">Planning</option>
-                <option value="active">Active</option>
-                <option value="blocked">Blocked</option>
-                <option value="completed">Completed</option>
-              </Input>
-            </FormGroup>
-          </ModalBody>
-          <ModalFooter>
-            <Button color="secondary" onClick={toggleModal}>Cancel</Button>
-            <Button color="primary" type="submit">Create Project</Button>
-          </ModalFooter>
-        </Form>
-      </Modal>
+      <NewProjectModal toggleModal={() => setIsNewProjectModalOpen(!isNewProjectModalOpen)}
+                       isOpen={isNewProjectModalOpen} />
     </>
   );
 
