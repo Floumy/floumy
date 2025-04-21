@@ -10,18 +10,18 @@ export async function listProjects(orgId) {
   }
 }
 
-export async function createProject(orgId, projectName) {
+export async function createProject(orgId, projectName, projectDescription) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/my-projects`, { name: projectName });
+    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/my-projects`, { name: projectName, description: projectDescription });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateProject(orgId, projectId, projectName) {
+export async function updateProject(orgId, projectId, projectName, projectDescription) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/my-projects/${projectId}`, { name: projectName });
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/my-projects/${projectId}`, { name: projectName, description: projectDescription });
     return response.data;
   } catch (e) {
     throw new Error(e.message);

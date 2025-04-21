@@ -68,6 +68,7 @@ describe('ProjectsService', () => {
     it('should create a project', async () => {
       const createProjectDto = {
         name: 'Test Project',
+        description: 'Test Project Description',
       };
       await service.createProject(user.id, org.id, createProjectDto);
       const projects = await service.listProjects(org.id);
@@ -75,6 +76,21 @@ describe('ProjectsService', () => {
       expect(projects.length).toEqual(2);
       expect(projects[0].id).toBeDefined();
       expect(projects[0].name).toEqual(createProjectDto.name);
+      expect(projects[0].description).toEqual(createProjectDto.description);
+      expect(projects[1].id).toBeDefined();
+      expect(projects[1].name).toEqual(project.name);
+    });
+    it('should create a project without a description', async () => {
+      const createProjectDto = {
+        name: 'Test Project',
+      };
+      await service.createProject(user.id, org.id, createProjectDto);
+      const projects = await service.listProjects(org.id);
+      expect(projects).toBeDefined();
+      expect(projects.length).toEqual(2);
+      expect(projects[0].id).toBeDefined();
+      expect(projects[0].name).toEqual(createProjectDto.name);
+      expect(projects[0].description).toBeNull();
       expect(projects[1].id).toBeDefined();
       expect(projects[1].name).toEqual(project.name);
     });
@@ -165,20 +181,31 @@ describe('ProjectsService', () => {
     it('should update the project', async () => {
       const updateProjectDto = {
         name: 'Updated Project',
+        description: 'Updated Description',
       };
-      await service.updateProject(org.id, project.id, updateProjectDto.name);
+      await service.updateProject(org.id, project.id, updateProjectDto);
       const updatedProject = await service.findOneById(org.id, project.id);
       expect(updatedProject).toBeDefined();
       expect(updatedProject.id).toEqual(project.id);
       expect(updatedProject.name).toEqual(updateProjectDto.name);
+      expect(updatedProject.description).toEqual(updatedProject.description);
+    });
+    it('should update the project without a description', async () => {
+      const updateProjectDto = {
+        name: 'Updated Project',
+      };
+      await service.updateProject(org.id, project.id, updateProjectDto);
+      const updatedProject = await service.findOneById(org.id, project.id);
+      expect(updatedProject).toBeDefined();
+      expect(updatedProject.id).toEqual(project.id);
+      expect(updatedProject.name).toEqual(updateProjectDto.name);
+      expect(updatedProject.description).toBeNull();
     });
     it('should throw an error if the project does not exist', async () => {
       await expect(
-        service.updateProject(
-          org.id,
-          'non-existent-project',
-          'Updated Project',
-        ),
+        service.updateProject(org.id, 'non-existent-project', {
+          name: 'Updated Project',
+        }),
       ).rejects.toThrow();
     });
     it('should throw an error if the project does not belong to the org', async () => {
@@ -187,31 +214,29 @@ describe('ProjectsService', () => {
       project.org = Promise.resolve(new Org());
       await projectsRepository.save(project);
       await expect(
-        service.updateProject(org.id, project.id, 'Updated Project'),
+        service.updateProject(org.id, project.id, { name: 'Updated Project' }),
       ).rejects.toThrow();
     });
     it('should throw an error if the org does not exist', async () => {
       await expect(
-        service.updateProject(
-          'non-existent-org',
-          project.id,
-          'Updated Project',
-        ),
+        service.updateProject('non-existent-org', project.id, {
+          name: 'Updated Project',
+        }),
       ).rejects.toThrow();
     });
     it('should throw an error if the project name is empty', async () => {
       await expect(
-        service.updateProject(org.id, project.id, ''),
+        service.updateProject(org.id, project.id, { name: '' }),
       ).rejects.toThrow();
     });
     it('should throw an error if the project name is too long', async () => {
       await expect(
-        service.updateProject(org.id, project.id, 'a'.repeat(51)),
+        service.updateProject(org.id, project.id, { name: 'a'.repeat(51) }),
       ).rejects.toThrow();
     });
     it('should throw an error if the project name contains invalid characters', async () => {
       await expect(
-        service.updateProject(org.id, project.id, 'a~b'),
+        service.updateProject(org.id, project.id, { name: 'a~b' }),
       ).rejects.toThrow();
     });
     it('should throw an error if the project name is already taken', async () => {
@@ -219,7 +244,7 @@ describe('ProjectsService', () => {
         name: 'Test Project',
       });
       await expect(
-        service.updateProject(org.id, project.id, 'Test Project'),
+        service.updateProject(org.id, project.id, { name: 'Test Project' }),
       ).rejects.toThrow();
     });
   });
