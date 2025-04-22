@@ -92,7 +92,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
               {isFeatureEnabled(FEATURES.ORG_WIDE_APP_SECTION) && <h2 className="py-2">
                 <Link to={`/orgs/${orgId}`} className='p-0'>
                   <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
-                  {currentOrg.name}
+                  <i className="fa fa-arrow-left"></i> Org Dashboard
                 </span>
                 </Link>
               </h2>}
