@@ -1,6 +1,5 @@
 import { Button, FormGroup, Input, InputGroup, Modal } from 'reactstrap';
 import React, { useState } from 'react';
-import { useProjects } from '../../contexts/ProjectsContext';
 import { createProject } from '../../services/projects/projects.service';
 import { useNavigate } from 'react-router-dom';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
@@ -8,9 +7,10 @@ import classnames from 'classnames';
 import InputError from '../Errors/InputError';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
+import { useOrg } from '../../contexts/OrgContext';
 
 export default function NewProjectModal({ isOpen, toggleModal }) {
-  const { orgId, currenProject: currentProject, setCurrentProject, projects } = useProjects();
+  const { orgId, currentOrg } = useOrg();
   const navigate = useNavigate();
   const [focusedProjectName, setFocusedProjectName] = useState(false);
   const [focusedProjectDescription, setFocusedProjectDescription] = useState(false);
@@ -23,7 +23,6 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
     try {
       setIsSubmitting(true);
       const createdProject = await createProject(orgId, projectName, projectDescription);
-      setCurrentProject(createdProject);
       toast.success('Project created');
       toggleModal();
       navigate(`/admin/orgs/${orgId}/projects/${createdProject.id}/dashboard`);
@@ -45,7 +44,7 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
         'unique',
         'Project name already exists',
         function(value) {
-          return !projects.some(project => project.name === value);
+          return !currentOrg?.projects?.some(project => project.name === value);
         }
       ),
   });
@@ -70,7 +69,7 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
       </div>
       <div className="modal-body">
         <Formik
-          initialValues={{ projectName: currentProject?.name, projectDescription: currentProject?.description }}
+          initialValues={{ projectName: '', projectDescription: '' }}
           validationSchema={validationSchema}
           onSubmit={async (values, { setErrors }) => {
             try {
@@ -146,5 +145,5 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
         </Formik>
       </div>
     </Modal>
-);
+  );
 }

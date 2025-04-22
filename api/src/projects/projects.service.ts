@@ -21,6 +21,7 @@ export class ProjectsService {
     const projects = await this.projectsRepository.find({
       where: { org: { id: orgId } },
       order: { createdAt: 'DESC' },
+      relations: ['bipSettings'],
     });
     return await Promise.all(projects.map(ProjectMapper.toDto));
   }
