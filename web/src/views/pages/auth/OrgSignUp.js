@@ -1,9 +1,8 @@
-
-import React from "react";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
+import { useState } from 'react';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
 // nodejs library that concatenates classes
-import classnames from "classnames";
+import classnames from 'classnames';
 // reactstrap components
 import {
   Button,
@@ -17,53 +16,53 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
-} from "reactstrap";
+  Row,
+} from 'reactstrap';
 // core components
-import AuthHeader from "../../../components/Headers/AuthHeader.js";
-import { orgSignUp } from "../../../services/auth/auth.service";
-import { useNavigate } from "react-router-dom";
-import InputError from "../../../components/Errors/InputError";
-import { getInputGroupErrorClass } from "./form-input-utils";
+import AuthHeader from '../../../components/Headers/AuthHeader.js';
+import { orgSignUp } from '../../../services/auth/auth.service';
+import { useNavigate } from 'react-router-dom';
+import InputError from '../../../components/Errors/InputError';
+import { getInputGroupErrorClass } from './form-input-utils';
 
 function OrgSignUp() {
   const search = window.location.search;
   const params = new URLSearchParams(search);
-  const invitationToken = params.get("invitationToken");
+  const invitationToken = params.get('invitationToken');
 
-  const [focusedName, setFocusedName] = React.useState(false);
-  const [focusedEmail, setFocusedEmail] = React.useState(false);
-  const [focusedPassword, setFocusedPassword] = React.useState(false);
-  const [focusedProjectName, setFocusedProjectName] = React.useState(false);
-  const [error, setError] = React.useState(null);
+  const [focusedName, setFocusedName] = useState(false);
+  const [focusedEmail, setFocusedEmail] = useState(false);
+  const [focusedPassword, setFocusedPassword] = useState(false);
+  const [focusedOrgName, setFocusedOrgName] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const validationSpec = {
     name: Yup.string()
-      .min(2, "The name must be at least 2 characters long")
-      .required("The name is required"),
+      .min(2, 'The name must be at least 2 characters long')
+      .required('The name is required'),
     email: Yup.string()
       .matches(
         /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-        "The email address provided is invalid")
-      .required("The email is required"),
+        'The email address provided is invalid')
+      .required('The email is required'),
     password: Yup.string()
-      .min(8, "Password must be at least 8 characters long")
-      .required("The password is required"),
+      .min(8, 'Password must be at least 8 characters long')
+      .required('The password is required'),
     acceptedTerms: Yup.boolean()
-      .required("Required")
-      .oneOf([true], "You must accept the terms and conditions.")
+      .required('Required')
+      .oneOf([true], 'You must accept the terms and conditions.'),
   };
 
   if (!invitationToken) {
-    validationSpec.projectName = Yup.string()
-      .min(2, "The project name must be at least 2 characters long")
-      .required("The project name is required");
+    validationSpec.orgName = Yup.string()
+      .min(2, 'The organization name must be at least 2 characters long')
+      .required('The organization name is required');
   }
 
   const validationSchema = Yup.object(validationSpec);
 
-  const initialValues = { name: "", email: "", password: "", acceptedTerms: false, projectName: "" };
+  const initialValues = { name: '', email: '', password: '', acceptedTerms: false, orgName: '' };
   return (
     <>
       <AuthHeader title="Join Floumy!"
@@ -85,9 +84,9 @@ function OrgSignUp() {
                     try {
                       setError(null);
                       setSubmitting(true);
-                      await orgSignUp(values.name, values.email, values.password, values.projectName, invitationToken);
+                      await orgSignUp(values.name, values.email, values.password, values.orgName, invitationToken);
                       setSubmitting(false);
-                      navigate("/auth/activation-required");
+                      navigate('/auth/activation-required');
                     } catch (e) {
                       setError(e.message);
                     }
@@ -98,10 +97,10 @@ function OrgSignUp() {
                       {error && <div className="text-center text-danger mb-3">{error}</div>}
                       {!invitationToken && <FormGroup
                         className={classnames({
-                          focused: focusedProjectName
+                          focused: focusedOrgName,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.projectName && touched.projectName)}>
+                        <InputGroup className={getInputGroupErrorClass(errors.orgName && touched.orgName)}>
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-app" />
@@ -109,21 +108,21 @@ function OrgSignUp() {
                           </InputGroupAddon>
                           <Field
                             as={Input}
-                            name="projectName"
-                            placeholder="The name of your project"
+                            name="orgName"
+                            placeholder="Your organization or company name"
                             type="text"
-                            onFocus={() => setFocusedProjectName(true)}
-                            onBlur={() => setFocusedProjectName(false)}
-                            invalid={!!(errors.projectName && touched.projectName)}
+                            onFocus={() => setFocusedOrgName(true)}
+                            onBlur={() => setFocusedOrgName(false)}
+                            invalid={!!(errors.orgName && touched.orgName)}
                             className="px-3"
                             autoComplete="off"
                           />
                         </InputGroup>
-                        <ErrorMessage name="projectName" component={InputError} />
+                        <ErrorMessage name="orgName" component={InputError} />
                       </FormGroup>}
                       <FormGroup
                         className={classnames({
-                          focused: focusedName
+                          focused: focusedName,
                         })}
                       >
                         <InputGroup className={getInputGroupErrorClass(errors.name && touched.name)}>
@@ -148,7 +147,7 @@ function OrgSignUp() {
                       </FormGroup>
                       <FormGroup
                         className={classnames({
-                          focused: focusedEmail
+                          focused: focusedEmail,
                         })}
                       >
                         <InputGroup className={getInputGroupErrorClass(errors.email && touched.email)}>
@@ -172,7 +171,7 @@ function OrgSignUp() {
                       </FormGroup>
                       <FormGroup
                         className={classnames({
-                          focused: focusedPassword
+                          focused: focusedPassword,
                         })}
                       >
                         <InputGroup className={getInputGroupErrorClass(errors.password && touched.password)}>
@@ -184,7 +183,7 @@ function OrgSignUp() {
                           <Field
                             as={Input}
                             name="password"
-                            placeholder="Password"
+                            placeholder="Password (min. 8 characters)"
                             type="password"
                             onFocus={() => setFocusedPassword(true)}
                             onBlur={() => setFocusedPassword(false)}
@@ -209,14 +208,14 @@ function OrgSignUp() {
                               htmlFor="customCheckRegister"
                             >
                           <span className="text-muted">
-                            I agree with the{" "}
+                            I agree with the{' '}
                             <a
                               href="https://app.termly.io/policy-viewer/policy.html?policyUUID=fb8deed6-e77a-43cd-aa76-1c655b357e4c"
                               target="_blank" rel="noreferrer"
                             >
                               Privacy Policy
                             </a>
-                            {" "} and {" "}
+                            {' '} and {' '}
                             <a
                               href="https://app.termly.io/policy-viewer/policy.html?policyUUID=b76fc02b-bf3a-4da0-a77b-dcb50b8d37c2"
                               target="_blank" rel="noreferrer"

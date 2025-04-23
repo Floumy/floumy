@@ -18,6 +18,8 @@ function Admin() {
   const [sidenavOpen, setSidenavOpen] = useState(true);
   const { orgId, projectId } = useParams();
 
+  localStorage.setItem('lastVisitedProjectId', projectId);
+
   function isNavigationReplace() {
     let replace = false;
     if (location.pathname.includes('/new')) {

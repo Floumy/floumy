@@ -17,7 +17,7 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(values) {
-    const projectName = values.projectName;
+    const projectName = values.orgName;
     const projectDescription = values.projectDescription;
 
     try {

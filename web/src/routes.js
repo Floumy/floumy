@@ -52,385 +52,392 @@ import Code from './views/pages/code/Code';
 import GitHub from './views/pages/code/GitHub';
 import GitLab from './views/pages/code/GitLab';
 import Projects from './views/pages/orgs/projects/Projects';
+import OrgSettings from './views/pages/settings/OrgSettings';
 
 const routes = [
   {
     redirect: true,
-    path: "/dashboard",
+    path: '/dashboard',
     component: <OKRs />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/feature-requests",
+    path: '/feature-requests',
     component: <FeatureRequests />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/feature-requests/new",
+    path: '/feature-requests/new',
     component: <NewFeatureRequest />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/feature-requests/edit/:featureRequestId",
+    path: '/feature-requests/edit/:featureRequestId',
     component: <EditFeatureRequest />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/issues",
+    path: '/issues',
     component: <Issues />,
-    layout: "/admin"
+    layout: '/admin',
   },
-  { redirect: true, path: "/issues/new", component: <NewIssue />, layout: "/admin" },
+  { redirect: true, path: '/issues/new', component: <NewIssue />, layout: '/admin' },
   {
     redirect: true,
-    path: "/issues/edit/:issueId",
+    path: '/issues/edit/:issueId',
     component: <EditIssue />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     collapse: false,
-    name: "Feed",
-    icon: "fa fa-newspaper",
-    path: "/feed",
+    name: 'Feed',
+    icon: 'fa fa-newspaper',
+    path: '/feed',
     component: <PrivateFeed />,
-    layout: "/admin",
-    shortcut: "1"
+    layout: '/admin',
+    shortcut: '1',
   },
   {
     collapse: false,
-    name: "Objectives",
-    icon: "fa fa-bullseye",
-    path: "/okrs",
+    name: 'Objectives',
+    icon: 'fa fa-bullseye',
+    path: '/okrs',
     component: <OKRs />,
-    layout: "/admin",
-    shortcut: "2"
+    layout: '/admin',
+    shortcut: '2',
   },
   {
     redirect: true,
-    path: "/roadmap",
+    path: '/roadmap',
     component: <InitiativesRoadmap />,
-    layout: "/admin",
-    shortcut: "3"
+    layout: '/admin',
+    shortcut: '3',
   },
   {
     redirect: true,
-    path: "/roadmap/initiatives/new",
+    path: '/roadmap/initiatives/new',
     component: <NewInitiative />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/roadmap/initiatives/detail/:id",
+    path: '/roadmap/initiatives/detail/:id',
     component: <DetailInitiative />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/roadmap/milestones/new",
+    path: '/roadmap/milestones/new',
     component: <NewMilestone />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/roadmap/milestones/edit/:id",
+    path: '/roadmap/milestones/edit/:id',
     component: <EditMilestone />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    name: "New Work Item",
-    path: "/work-item/new",
+    name: 'New Work Item',
+    path: '/work-item/new',
     component: <NewWorkItem />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    name: "Edit Work Item",
-    path: "/work-item/edit/:id",
+    name: 'Edit Work Item',
+    path: '/work-item/edit/:id',
     component: <EditWorkItem />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     collapse: false,
-    name: "Sprints",
-    icon: "fa fa-refresh",
-    path: "/sprints",
+    name: 'Sprints',
+    icon: 'fa fa-refresh',
+    path: '/sprints',
     component: <Sprints />,
-    layout: "/admin",
-    shortcut: "4"
+    layout: '/admin',
+    shortcut: '4',
   },
   {
     redirect: true,
-    path: "/sprints/new",
+    path: '/sprints/new',
     component: <NewSprint />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/sprints/edit/:id",
+    path: '/sprints/edit/:id',
     component: <EditSprint />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     collapse: false,
-    name: "Active Sprint",
-    icon: "fa fa-rocket",
-    path: "/active-sprint",
+    name: 'Active Sprint',
+    icon: 'fa fa-rocket',
+    path: '/active-sprint',
     component: <ActiveSprint />,
-    layout: "/admin",
-    shortcut: "5"
+    layout: '/admin',
+    shortcut: '5',
   },
   {
     collapse: false,
-    name: "All Work Items",
-    icon: "fa fa-tasks",
-    path: "/work-items",
+    name: 'All Work Items',
+    icon: 'fa fa-tasks',
+    path: '/work-items',
     component: <WorkItems />,
-    layout: "/admin",
-    shortcut: "6"
+    layout: '/admin',
+    shortcut: '6',
   },
   {
     collapse: false,
-    name: "All Initiatives",
-    icon: "fa fa-list-alt",
-    path: "/initiatives",
+    name: 'All Initiatives',
+    icon: 'fa fa-list-alt',
+    path: '/initiatives',
     component: <Initiatives />,
-    layout: "/admin",
-    shortcut: "7"
+    layout: '/admin',
+    shortcut: '7',
   },
   {
     redirect: true,
-    path: "/okrs/new",
+    path: '/okrs/new',
     component: <NewOKR />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/okrs/detail/:id",
+    path: '/okrs/detail/:id',
     component: <DetailOKR />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/kr/detail/:keyResultId",
+    path: '/kr/detail/:keyResultId',
     component: <DetailKeyResult />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/build-in-public",
+    path: '/build-in-public',
     component: <BuildInPublic />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/project",
+    path: '/project',
     component: <Project />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/my-profile",
+    path: '/my-profile',
     component: <MyProfile />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/sign-in",
+    path: '/sign-in',
     component: <SignIn />,
-    layout: "/auth"
+    layout: '/auth',
   },
   {
     redirect: true,
-    path: "/sign-up",
+    path: '/sign-up',
     component: <OrgSignUp />,
-    layout: "/auth"
+    layout: '/auth',
   },
   {
     redirect: true,
-    path: "/simple/sign-up",
+    path: '/simple/sign-up',
     component: <SignUp />,
-    layout: "/auth"
+    layout: '/auth',
   },
   {
     redirect: true,
-    path: "/forgot-password",
+    path: '/forgot-password',
     component: <ForgotPassword />,
-    layout: "/auth"
+    layout: '/auth',
   },
   {
     redirect: true,
-    path: "/reset-password",
+    path: '/reset-password',
     component: <ResetPassword />,
-    layout: "/auth"
+    layout: '/auth',
   },
   {
     redirect: true,
-    path: "/reset-email-sent",
+    path: '/reset-email-sent',
     component: <ResetEmailSent />,
-    layout: "/auth"
+    layout: '/auth',
   },
   {
     redirect: true,
-    path: "/password-reset",
+    path: '/password-reset',
     component: <PasswordReset />,
-    layout: "/auth"
+    layout: '/auth',
   },
   {
     redirect: true,
-    path: "/activation",
+    path: '/activation',
     component: <Activation />,
-    layout: "/auth"
+    layout: '/auth',
   },
   {
     redirect: true,
-    path: "/activation-required",
+    path: '/activation-required',
     component: <ActivationRequired />,
-    layout: "/auth"
+    layout: '/auth',
   },
   {
     redirect: true,
-    path: "/members",
+    path: '/members',
     component: <Members />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/code",
+    path: '/code',
     component: <Code />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/code/github",
+    path: '/code/github',
     component: <GitHub />,
-    layout: "/admin"
+    layout: '/admin',
   },
   {
     redirect: true,
-    path: "/code/gitlab",
+    path: '/code/gitlab',
     component: <GitLab />,
-    layout: "/admin"
-  }
+    layout: '/admin',
+  },
 ];
 
 export const publicRoutes = [
   {
     redirect: true,
-    path: "/roadmap",
+    path: '/roadmap',
     component: <PublicRoadmap />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/roadmap/initiatives/detail/:initiativeId",
+    path: '/roadmap/initiatives/detail/:initiativeId',
     component: <PublicDetailInitiative />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/work-item/detail/:workItemId",
+    path: '/work-item/detail/:workItemId',
     component: <PublicDetailWorkItem />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/objectives",
+    path: '/objectives',
     component: <PublicOKRs />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/okrs/detail/:okrId",
+    path: '/okrs/detail/:okrId',
     component: <PublicDetailOKR />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/kr/detail/:keyResultId",
+    path: '/kr/detail/:keyResultId',
     component: <PublicDetailKeyResult />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/sprints",
+    path: '/sprints',
     component: <PublicSprints />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/sprints/detail/:sprintId",
+    path: '/sprints/detail/:sprintId',
     component: <PublicSprint />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/milestones/detail/:milestoneId",
+    path: '/milestones/detail/:milestoneId',
     component: <PublicMilestone />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/active-sprint",
+    path: '/active-sprint',
     component: <PublicActiveSprint />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/feed",
+    path: '/feed',
     component: <PublicFeed />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/feature-requests",
+    path: '/feature-requests',
     component: <FeatureRequests isPublic={true} />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/issues",
+    path: '/issues',
     component: <Issues isPublic={true} />,
-    layout: "/public"
+    layout: '/public',
   },
-  { redirect: true, path: "/issues/new", component: <NewIssue />, layout: "/public" },
+  { redirect: true, path: '/issues/new', component: <NewIssue />, layout: '/public' },
   {
     redirect: true,
-    path: "/feature-requests/new",
+    path: '/feature-requests/new',
     component: <NewFeatureRequest />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/feature-requests/:featureRequestId",
+    path: '/feature-requests/:featureRequestId',
     component: <FeatureRequestDetails />,
-    layout: "/public"
+    layout: '/public',
   },
   {
     redirect: true,
-    path: "/issues/:issueId",
+    path: '/issues/:issueId',
     component: <IssueDetails />,
-    layout: "/public"
-  }
+    layout: '/public',
+  },
 ];
 
 export const orgsRoutes = [
   {
     redirect: true,
-    path: "/projects",
+    path: '/projects',
     component: <Projects />,
-    layout: "/orgs"
+    layout: '/orgs',
   },
   {
     redirect: true,
-    path: "/members",
+    path: '/members',
     component: <Members />,
-    layout: "/orgs"
-  }
-]
+    layout: '/orgs',
+  },
+  {
+    redirect: true,
+    path: '/settings',
+    component: <OrgSettings />,
+    layout: '/orgs',
+  },
+];
 
 export default routes;
