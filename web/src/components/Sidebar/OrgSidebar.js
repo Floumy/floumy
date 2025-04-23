@@ -14,6 +14,8 @@ function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
   const { loading, orgId, currentOrg } = useOrg();
 
+  localStorage.removeItem('lastVisitedProjectId');
+
   // makes the sidenav normal on hover (actually when mouse enters on it)
   const onMouseEnterSidenav = () => {
     if (!document.body.classList.contains('g-sidenav-pinned')) {
@@ -102,6 +104,18 @@ function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
                           >
                             <i className="fa fa-users" />
                             <span className="nav-link-text">Members</span>
+                          </NavLink>
+                        </Col>
+                      </Row>
+                      <Row style={{ maxWidth: '100%', height: '47px' }}>
+                        <Col xs={12}>
+                          <NavLink
+                            to={`/orgs/${orgId}/settings`}
+                            onClick={closeSidenav}
+                            tag={NavLinkRRD}
+                          >
+                            <i className="fa fa-gear" />
+                            <span className="nav-link-text">Org</span>
                           </NavLink>
                         </Col>
                       </Row>

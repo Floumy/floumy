@@ -54,10 +54,19 @@ function SignIn() {
   useEffect(() => {
     const redirectIfLoggedIn = async () => {
       // If the user is already logged in, redirect to the dashboard
+
+      const lastVisitedProjectId = localStorage.getItem("lastVisitedProjectId");
+      if(!localStorage.getItem("currentUser")) {
+        return;
+      }
+
       const currentOrgId = localStorage.getItem("currentUserOrgId");
-      const currentProjectId = localStorage.getItem("currentProjectId");
-      if (localStorage.getItem("currentUser") && currentOrgId && currentProjectId) {
-        navigate(`/admin/orgs/${currentOrgId}/projects/${currentProjectId}/active-sprint`);
+      if (lastVisitedProjectId) {
+        return navigate(`/admin/orgs/${currentOrgId}/projects/${lastVisitedProjectId}/active-sprint`);
+      }
+
+      if (currentOrgId) {
+        return navigate(`/orgs/${currentOrgId}/projects/`);
       }
     };
 
