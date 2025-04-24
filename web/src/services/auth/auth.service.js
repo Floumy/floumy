@@ -4,6 +4,7 @@ import api from '../api/api.service';
 function handleAuthentication(response) {
   const accessToken = response.data.accessToken;
   const refreshToken = response.data.refreshToken;
+
   if (accessToken && refreshToken) {
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
