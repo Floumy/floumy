@@ -70,15 +70,15 @@ function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
         {orgId && currentOrg && (
           <>
             <div className="navbar-inner mb-2">
+              <h2 className="py-2">
+                <Link to={`/orgs/${orgId}`}>
+                      <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
+                        Org Dashboard
+                      </span>
+                </Link>
+              </h2>
               <Collapse navbar isOpen={true}>
                 <div className="mb-3">
-                  <h2 className="py-2">
-                    <Link to={`/orgs/${orgId}`}>
-                      <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
-                        {currentOrg.name}
-                      </span>
-                    </Link>
-                  </h2>
                   <Nav navbar>
                     <NavItem>
                       <Row style={{ maxWidth: '100%', height: '47px' }}>
@@ -88,8 +88,20 @@ function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
                             onClick={closeSidenav}
                             tag={NavLinkRRD}
                           >
-                            <i className="fa fa-project-diagram" />
+                            <i className="fa fa-briefcase" />
                             <span className="nav-link-text">Projects</span>
+                          </NavLink>
+                        </Col>
+                      </Row>
+                      <Row style={{ maxWidth: '100%', height: '47px' }}>
+                        <Col xs={12}>
+                          <NavLink
+                            to={`/orgs/${orgId}/members`}
+                            onClick={closeSidenav}
+                            tag={NavLinkRRD}
+                          >
+                            <i className="fa fa-users" />
+                            <span className="nav-link-text">Members</span>
                           </NavLink>
                         </Col>
                       </Row>

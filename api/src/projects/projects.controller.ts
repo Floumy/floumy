@@ -37,7 +37,7 @@ export class ProjectsController {
   @HttpCode(201)
   async createProject(
     @Request() request,
-    @Body() createProjectDto: { name: string },
+    @Body() createProjectDto: { name: string; description?: string },
     @Param('orgId') orgId: string,
   ) {
     if (orgId !== request.user.org) {
@@ -61,7 +61,7 @@ export class ProjectsController {
     @Request() request,
     @Param('orgId') orgId: string,
     @Param('id') id: string,
-    @Body() updateProjectDto: { name: string },
+    @Body() updateProjectDto: { name: string; description?: string },
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
@@ -71,7 +71,7 @@ export class ProjectsController {
       return await this.projectsService.updateProject(
         orgId,
         id,
-        updateProjectDto.name,
+        updateProjectDto,
       );
     } catch (e) {
       throw new BadRequestException(e.message);

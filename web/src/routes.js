@@ -51,6 +51,7 @@ import IssueDetails from './views/pages/issues/IssueDetails';
 import Code from './views/pages/code/Code';
 import GitHub from './views/pages/code/GitHub';
 import GitLab from './views/pages/code/GitLab';
+import Projects from './views/pages/orgs/projects/Projects';
 
 const routes = [
   {
@@ -416,5 +417,20 @@ export const publicRoutes = [
     layout: "/public"
   }
 ];
+
+export const orgsRoutes = [
+  {
+    redirect: true,
+    path: "/projects",
+    component: <Projects />,
+    layout: "/orgs"
+  },
+  {
+    redirect: true,
+    path: "/members",
+    component: <Members />,
+    layout: "/orgs"
+  }
+]
 
 export default routes;
