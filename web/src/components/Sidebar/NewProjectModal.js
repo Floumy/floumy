@@ -1,6 +1,5 @@
 import { Button, FormGroup, Input, InputGroup, Modal } from 'reactstrap';
 import React, { useState } from 'react';
-import { useProjects } from '../../contexts/ProjectsContext';
 import { createProject } from '../../services/projects/projects.service';
 import { useNavigate } from 'react-router-dom';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
@@ -8,19 +7,22 @@ import classnames from 'classnames';
 import InputError from '../Errors/InputError';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
+import { useOrg } from '../../contexts/OrgContext';
 
 export default function NewProjectModal({ isOpen, toggleModal }) {
-  const { orgId, currenProject, setCurrentProject, projects } = useProjects();
+  const { orgId, currentOrg } = useOrg();
   const navigate = useNavigate();
   const [focusedProjectName, setFocusedProjectName] = useState(false);
+  const [focusedProjectDescription, setFocusedProjectDescription] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(values) {
     const projectName = values.projectName;
+    const projectDescription = values.projectDescription;
+
     try {
       setIsSubmitting(true);
-      const createdProject = await createProject(orgId, projectName);
-      setCurrentProject(createdProject);
+      const createdProject = await createProject(orgId, projectName, projectDescription);
       toast.success('Project created');
       toggleModal();
       navigate(`/admin/orgs/${orgId}/projects/${createdProject.id}/dashboard`);
@@ -42,7 +44,7 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
         'unique',
         'Project name already exists',
         function(value) {
-          return !projects.some(project => project.name === value);
+          return !currentOrg?.projects?.some(project => project.name === value);
         }
       ),
   });
@@ -67,7 +69,7 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
       </div>
       <div className="modal-body">
         <Formik
-          initialValues={{ projectName: currenProject?.name }}
+          initialValues={{ projectName: '', projectDescription: '' }}
           validationSchema={validationSchema}
           onSubmit={async (values, { setErrors }) => {
             try {
@@ -106,6 +108,28 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
                 </InputGroup>
                 <ErrorMessage name="projectName" component={InputError} />
               </FormGroup>
+              <FormGroup
+                className={classnames({
+                  focused: focusedProjectDescription,
+                })}
+              >
+                <InputGroup className="input-group input-group-merge">
+                  <Field
+                    as={Input}
+                    name="projectDescription"
+                    placeholder="Describe your project's goals, scope, and key features (e.g., 'A web application for automated task management with team collaboration features')"
+                    type="textarea"
+                    onFocus={() => setFocusedProjectDescription(true)}
+                    onBlur={() => setFocusedProjectDescription(false)}
+                    value={values.projectDescription}
+                    rows={6}
+                    invalid={!!(errors.projectDescription && touched.projectDescription)}
+                    className="px-3"
+                    autoComplete="off"
+                  />
+                </InputGroup>
+                <ErrorMessage name="projectDescription" component={InputError} />
+              </FormGroup>
               <div>
                 <Button color="primary" type="submit"
                         disabled={isSubmitting}>
@@ -121,5 +145,5 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
         </Formik>
       </div>
     </Modal>
-);
+  );
 }

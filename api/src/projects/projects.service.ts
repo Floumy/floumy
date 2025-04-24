@@ -21,6 +21,7 @@ export class ProjectsService {
     const projects = await this.projectsRepository.find({
       where: { org: { id: orgId } },
       order: { createdAt: 'DESC' },
+      relations: ['bipSettings'],
     });
     return await Promise.all(projects.map(ProjectMapper.toDto));
   }
@@ -28,7 +29,7 @@ export class ProjectsService {
   async createProject(
     userId: string,
     orgId: string,
-    createProjectDto: { name: string },
+    createProjectDto: { name: string; description?: string },
   ) {
     await this.validateProjectName(orgId, createProjectDto.name);
 
@@ -43,6 +44,7 @@ export class ProjectsService {
 
     const project = new Project();
     project.name = createProjectDto.name;
+    project.description = createProjectDto.description;
     project.org = Promise.resolve(org);
     await this.projectsRepository.save(project);
     const userProjects = await user.projects;
@@ -61,14 +63,22 @@ export class ProjectsService {
     return await ProjectMapper.toDto(project);
   }
 
-  async updateProject(orgId: string, projectId: string, projectName: string) {
-    await this.validateProjectName(orgId, projectName);
-
+  async updateProject(
+    orgId: string,
+    projectId: string,
+    updateProjectDto: { name: string; description?: string },
+  ) {
     const project = await this.projectsRepository.findOneByOrFail({
       id: projectId,
       org: { id: orgId },
     });
-    project.name = projectName;
+
+    if (project.name !== updateProjectDto.name) {
+      await this.validateProjectName(orgId, updateProjectDto.name);
+    }
+
+    project.name = updateProjectDto.name;
+    project.description = updateProjectDto?.description;
     await this.projectsRepository.save(project);
     return await ProjectMapper.toDto(project);
   }

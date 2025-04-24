@@ -35,6 +35,8 @@ export class Project {
   id: string;
   @Column()
   name: string;
+  @Column({ type: 'text' })
+  description: string;
   @Column({ nullable: true })
   githubAccessToken: string;
   @Column({ nullable: true })

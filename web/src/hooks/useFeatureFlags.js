@@ -4,7 +4,6 @@ export const FEATURES = {
 
 const DISABLED_FEATURES = {
   production: [
-    FEATURES.ORG_WIDE_APP_SECTION
   ],
   development: [],
 };
