@@ -89,13 +89,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
         {currentOrg && currentProject && (
           <>
             <div className="navbar-inner mb-2">
-              {isFeatureEnabled(FEATURES.ORG_WIDE_APP_SECTION) && <h2 className="py-2">
+              {isFeatureEnabled(FEATURES.ORG_WIDE_APP_SECTION) && <h2 className="mb-4">
                 <Link to={`/orgs/${orgId}`} className='p-0'>
                   <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
                   <i className="fa fa-arrow-left"></i> Org Dashboard
                 </span>
                 </Link>
               </h2>}
+              {currentOrg.name && <h5 className="navbar-project-name text-light text-xl pb-0 mb-0 text-break">
+                {currentOrg.name}
+              </h5>}
               <Collapse navbar isOpen={true}>
                 <ProjectSelector
                   currentProject={currentProject}
