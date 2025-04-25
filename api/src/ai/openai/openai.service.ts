@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import floumySystemPrompt from './prompts';
+import { ResponseFormatJSONSchema } from 'openai/src/resources/shared';
 
 export interface AIResponse<T> {
   data: T;
@@ -25,7 +26,7 @@ export class OpenaiService {
 
   async generateCompletion<T>(
     prompt: string,
-    jsonSchema: any,
+    jsonSchema: ResponseFormatJSONSchema.JSONSchema,
     options: {
       temperature?: number;
       model?: string;
