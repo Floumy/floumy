@@ -52,6 +52,7 @@ import Code from './views/pages/code/Code';
 import GitHub from './views/pages/code/GitHub';
 import GitLab from './views/pages/code/GitLab';
 import Projects from './views/pages/orgs/projects/Projects';
+import {Demo} from "./views/pages/demo/demo";
 
 const routes = [
   {
@@ -317,6 +318,15 @@ const routes = [
     layout: "/admin"
   }
 ];
+
+export const blankRoutes = [
+  {
+    redirect: true,
+    path: "/demo",
+    component: <Demo />,
+    layout: "/blank"
+  },
+    ]
 
 export const publicRoutes = [
   {

@@ -61,4 +61,15 @@ export async function getInitiativeDescription(initiative, keyResultId, mileston
     } catch (e) {
         throw new Error(e.message);
     }
+
 }
+
+export async function generateDemoProjectItems(description) {
+    try {
+        const response = await api.get(`${process.env.REACT_APP_API_URL}/ai/demo-project-items?description=${description}`);
+        return response.data;
+    } catch (e) {
+        throw new Error(e.message);
+    }
+}
+
