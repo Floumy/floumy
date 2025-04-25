@@ -1,7 +1,7 @@
 import { OkrsService } from './okrs.service';
 import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { Objective } from './objective.entity';
+import { Objective, ObjectiveLevel } from './objective.entity';
 import { OrgsService } from '../orgs/orgs.service';
 import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { UsersService } from '../users/users.service';
 import { Timeline } from '../common/timeline.enum';
-import { OKRStatus } from './okrstatus.enum';
+import { ObjectiveStatus } from './okrstatus.enum';
 import { Project } from '../projects/project.entity';
 
 describe('OkrsService', () => {
@@ -68,6 +68,8 @@ describe('OkrsService', () => {
       });
       expect(objective).toBeDefined();
       expect(objective.id).toBeDefined();
+      expect(objective.status).toEqual(ObjectiveStatus.ON_TRACK);
+      expect(objective.level).toEqual(ObjectiveLevel.PROJECT);
       expect(objective.createdAt).toBeDefined();
       expect(objective.updatedAt).toBeDefined();
     });
@@ -168,7 +170,7 @@ describe('OkrsService', () => {
       });
       const okrDto = {
         title: 'Updated Objective',
-        status: OKRStatus.COMPLETED,
+        status: ObjectiveStatus.COMPLETED,
       };
       await service.updateObjective(org.id, project.id, objective.id, okrDto);
       const storedObjective = await service.get(
@@ -179,7 +181,7 @@ describe('OkrsService', () => {
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual('Updated Objective');
       expect(storedObjective.objective.status).toEqual(
-        OKRStatus.COMPLETED.valueOf(),
+        ObjectiveStatus.COMPLETED.valueOf(),
       );
     });
     it('should update objective timeline', async () => {

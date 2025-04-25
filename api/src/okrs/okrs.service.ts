@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Objective } from './objective.entity';
+import { Objective, ObjectiveLevel } from './objective.entity';
 import { IsNull, LessThan, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrgsService } from '../orgs/orgs.service';
 import { KeyResult } from './key-result.entity';
 import { KeyResultMapper, OKRMapper } from './mappers';
-import { OKRStatus } from './okrstatus.enum';
+import { ObjectiveStatus } from './okrstatus.enum';
 import { TimelineService } from '../common/timeline.service';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { User } from '../users/user.entity';
@@ -55,6 +55,7 @@ export class OkrsService {
     newObjective.title = objective.title;
     newObjective.org = Promise.resolve(org);
     newObjective.project = Promise.resolve(project);
+    newObjective.level = ObjectiveLevel.PROJECT;
 
     if (objective.timeline) {
       TimelineService.validateTimeline(objective.timeline);
@@ -126,7 +127,7 @@ export class OkrsService {
     if (!okrDto.title) throw new Error('Objective title is required');
     if (
       !okrDto.status ||
-      !Object.values(OKRStatus).find((status) => status === okrDto.status)
+      !Object.values(ObjectiveStatus).find((status) => status === okrDto.status)
     )
       throw new Error('Objective status is required');
 
@@ -141,7 +142,7 @@ export class OkrsService {
     );
 
     objective.title = okrDto.title;
-    objective.status = Object.values(OKRStatus).find(
+    objective.status = Object.values(ObjectiveStatus).find(
       (status) => status === okrDto.status,
     );
 
@@ -255,7 +256,7 @@ export class OkrsService {
     }
 
     if (updateKeyResultDto.status) {
-      keyResult.status = Object.values(OKRStatus).find(
+      keyResult.status = Object.values(ObjectiveStatus).find(
         (status) => status === updateKeyResultDto.status,
       );
     }
@@ -345,7 +346,7 @@ export class OkrsService {
 
     keyResult.title = updateKeyResultDto.title;
     keyResult.progress = updateKeyResultDto.progress;
-    keyResult.status = Object.values(OKRStatus).find(
+    keyResult.status = Object.values(ObjectiveStatus).find(
       (status) => status === updateKeyResultDto.status,
     );
 
@@ -371,7 +372,7 @@ export class OkrsService {
     const keyResult = new KeyResult();
     keyResult.title = createKeyResultDto.title;
     keyResult.progress = createKeyResultDto.progress;
-    keyResult.status = Object.values(OKRStatus).find(
+    keyResult.status = Object.values(ObjectiveStatus).find(
       (status) => status === createKeyResultDto.status,
     );
     keyResult.objective = Promise.resolve(objective);
@@ -489,7 +490,7 @@ export class OkrsService {
     if (!updateKeyResultDto.status)
       throw new Error('Key Result status is required');
     if (
-      !Object.values(OKRStatus).find(
+      !Object.values(ObjectiveStatus).find(
         (status) => status === updateKeyResultDto.status,
       )
     )
