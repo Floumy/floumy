@@ -109,6 +109,7 @@ export interface OKRDto {
     createdAt: Date;
     updatedAt: Date;
     status: string;
+    level: string;
     timeline: string;
     startDate: Date;
     endDate: Date;

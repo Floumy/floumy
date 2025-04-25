@@ -29,6 +29,7 @@ export class OKRMapper {
         createdAt: objective.createdAt,
         updatedAt: objective.updatedAt,
         status: objective.status,
+        level: objective.level,
         timeline: TimelineService.startAndEndDatesToTimeline(
           objective.startDate,
           objective.endDate,
@@ -70,6 +71,7 @@ export class OKRMapper {
       reference: objective.reference,
       title: objective.title,
       status: objective.status,
+      level: objective.level,
       timeline: TimelineService.startAndEndDatesToTimeline(
         objective.startDate,
         objective.endDate,
