@@ -26,6 +26,7 @@ export class OrgsService {
     const org = new Org();
     org.paymentPlan = PaymentPlan.FREE;
     org.users = Promise.resolve([user]);
+    org.hadDemo = false;
     const savedOrg = await this.orgRepository.save(org);
 
     const project = new Project();
@@ -82,6 +83,7 @@ export class OrgsService {
     org.paymentPlan = PaymentPlan.PREMIUM;
     org.isSubscribed = false;
     org.nextPaymentDate = null;
+    org.hadDemo = false;
     const savedOrg = await this.orgRepository.save(org);
     const project = new Project();
     project.name = projectName;
