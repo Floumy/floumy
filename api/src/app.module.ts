@@ -37,6 +37,7 @@ import { EncryptionModule } from './encryption/encryption.module';
 import { GitlabModule } from './gitlab/gitlab.module';
 import githubConfig from './config/github.config';
 import gitlabConfig from './config/gitlab.config';
+import { DemoModule } from './demo/demo.module';
 
 @Module({
   imports: [
@@ -110,6 +111,7 @@ import gitlabConfig from './config/gitlab.config';
     NotificationModule,
     GithubModule,
     GitlabModule,
+    DemoModule,
   ],
   providers: [
     {
