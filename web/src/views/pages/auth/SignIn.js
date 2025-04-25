@@ -83,9 +83,12 @@ function SignIn() {
           navigate(redirectTo);
           return;
         }
-
-        navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/dashboard`);
-        return;
+        if(currentOrg.hadDemo){
+          navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/dashboard`);
+          return;
+        }
+        navigate(`/blank/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/demo`);
+        return
       }
 
       // TODO: Remove this when we have a proper way to handle it
