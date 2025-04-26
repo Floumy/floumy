@@ -1,4 +1,4 @@
-import api, { logoutUser } from '../api/api.service';
+import api from '../api/api.service';
 
 export async function getOrg() {
   try {
@@ -6,21 +6,6 @@ export async function getOrg() {
     return response.data;
   } catch (e) {
     throw new Error(e.message);
-  }
-}
-
-export async function setCurrentOrg() {
-  try {
-    const currentOrg = await getOrg();
-    localStorage.setItem("currentOrg", JSON.stringify(currentOrg));
-    localStorage.setItem("currentOrgId", currentOrg.id);
-    localStorage.setItem("currentProjectId", currentOrg.projects[0].id);
-    localStorage.setItem("currentOrgName", currentOrg.name);
-    localStorage.setItem("paymentPlan", currentOrg.paymentPlan);
-    localStorage.setItem("isSubscribed", currentOrg.isSubscribed);
-    localStorage.setItem("nextPaymentDate", currentOrg.nextPaymentDate);
-  } catch (e) {
-    logoutUser();
   }
 }
 

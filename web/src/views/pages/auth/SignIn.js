@@ -1,9 +1,8 @@
-
-import React, { useEffect, useState } from "react";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
+import React, { useEffect, useState } from 'react';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
 // nodejs library that concatenates classes
-import classnames from "classnames";
+import classnames from 'classnames';
 // reactstrap components
 import {
   Button,
@@ -17,17 +16,17 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
-} from "reactstrap";
+  Row,
+} from 'reactstrap';
 // core components
-import AuthHeader from "../../../components/Headers/AuthHeader.js";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import InputError from "../../../components/Errors/InputError";
-import { setCurrentUser } from "../../../services/users/users.service";
-import { signIn } from "../../../services/auth/auth.service";
-import { getInputGroupErrorClass } from "./form-input-utils";
-import { getOrg, setCurrentOrg } from "../../../services/org/orgs.service";
-import { logoutUser } from "../../../services/api/api.service";
+import AuthHeader from '../../../components/Headers/AuthHeader.js';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import InputError from '../../../components/Errors/InputError';
+import { setCurrentUser } from '../../../services/users/users.service';
+import { signIn } from '../../../services/auth/auth.service';
+import { getInputGroupErrorClass } from './form-input-utils';
+import { getOrg } from '../../../services/org/orgs.service';
+import { logoutUser } from '../../../services/api/api.service';
 
 function SignIn() {
   const [focusedEmail, setFocusedEmail] = useState(false);
@@ -37,27 +36,36 @@ function SignIn() {
   const navigate = useNavigate();
 
   let redirectTo;
-  if (searchParams.has("redirectTo")) {
-    redirectTo = decodeURI(searchParams.get("redirectTo"));
+  if (searchParams.has('redirectTo')) {
+    redirectTo = decodeURI(searchParams.get('redirectTo'));
   }
 
   const validationSchema = Yup.object({
     email: Yup.string()
       .matches(
         /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-        "The email address provided is invalid")
-      .required("The email is required"),
+        'The email address provided is invalid')
+      .required('The email is required'),
     password: Yup.string()
-      .required("The password is required")
+      .required('The password is required'),
   });
 
   useEffect(() => {
     const redirectIfLoggedIn = async () => {
       // If the user is already logged in, redirect to the dashboard
-      const currentOrgId = localStorage.getItem("currentUserOrgId");
-      const currentProjectId = localStorage.getItem("currentProjectId");
-      if (localStorage.getItem("currentUser") && currentOrgId && currentProjectId) {
-        navigate(`/admin/orgs/${currentOrgId}/projects/${currentProjectId}/active-sprint`);
+
+      const lastVisitedProjectId = localStorage.getItem('lastVisitedProjectId');
+      if (!localStorage.getItem('currentUser')) {
+        return;
+      }
+
+      const currentOrgId = localStorage.getItem('currentUserOrgId');
+      if (lastVisitedProjectId) {
+        return navigate(`/admin/orgs/${currentOrgId}/projects/${lastVisitedProjectId}/active-sprint`);
+      }
+
+      if (currentOrgId) {
+        return navigate(`/orgs/${currentOrgId}/projects/`);
       }
     };
 
@@ -71,8 +79,7 @@ function SignIn() {
 
       await signIn(values.email, values.password);
       await setCurrentUser();
-      // TODO: Remove this when we have a proper way to handle it
-      await setCurrentOrg();
+
       const currentOrg = await getOrg();
 
       if (currentOrg.id) {
@@ -80,17 +87,20 @@ function SignIn() {
         setSubmitting(false);
 
         if (redirectTo) {
-          navigate(redirectTo);
-          return;
+          return navigate(redirectTo);
         }
 
-        navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/dashboard`);
-        return;
+        const lastVisitedProjectId = localStorage.getItem('lastVisitedProjectId');
+        if (lastVisitedProjectId) {
+          return navigate(`/admin/orgs/${currentOrg.id}/projects/${lastVisitedProjectId}/dashboard`);
+        }
+
+        return navigate(`/orgs/${currentOrg.id}/projects/`);
       }
 
       // TODO: Remove this when we have a proper way to handle it
       logoutUser();
-      setError("You are not a member of any organization.");
+      setError('You are not a member of any organization.');
     } catch (e) {
       setError(e.message);
     } finally {
@@ -113,7 +123,7 @@ function SignIn() {
               </CardHeader>
               <CardBody className="px-lg-5 py-lg-5">
                 <Formik
-                  initialValues={{ email: "", password: "" }}
+                  initialValues={{ email: '', password: '' }}
                   validationSchema={validationSchema}
                   onSubmit={onLogin}
                 >
@@ -122,7 +132,7 @@ function SignIn() {
                       {error && <div className="text-center text-danger mb-3">{error}</div>}
                       <FormGroup
                         className={classnames({
-                          focused: focusedEmail
+                          focused: focusedEmail,
                         })}
                       >
                         <InputGroup className={getInputGroupErrorClass(errors.email && touched.email)}>
@@ -146,7 +156,7 @@ function SignIn() {
                       </FormGroup>
                       <FormGroup
                         className={classnames({
-                          focused: focusedPassword
+                          focused: focusedPassword,
                         })}
                       >
                         <InputGroup className={getInputGroupErrorClass(errors.password && touched.password)}>
