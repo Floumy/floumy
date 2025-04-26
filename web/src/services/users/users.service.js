@@ -23,6 +23,7 @@ export async function patchCurrentUser(data) {
 export async function setCurrentUser() {
   try {
     const currentUser = await getCurrentUser();
+
     setCurrentUserToLocalStorage(currentUser);
   } catch (e) {
     await logoutUser();
