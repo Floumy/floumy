@@ -27,6 +27,7 @@ import { signIn } from '../../../services/auth/auth.service';
 import { getInputGroupErrorClass } from './form-input-utils';
 import { getOrg } from '../../../services/org/orgs.service';
 import { logoutUser } from '../../../services/api/api.service';
+import { listOKRs } from '../../../services/okrs/okrs.service';
 
 function SignIn() {
   const [focusedEmail, setFocusedEmail] = useState(false);
@@ -59,19 +60,30 @@ function SignIn() {
       }
 
       const currentOrgId = localStorage.getItem('currentUserOrgId');
+
+      const currentOrg = await getOrg();
+
       const lastVisitedProjectId = localStorage.getItem('lastVisitedProjectId');
-      if (lastVisitedProjectId) {
+      if (lastVisitedProjectId && currentOrg.projects.some(project => project.id === lastVisitedProjectId)) {
         return navigate(`/admin/orgs/${currentOrgId}/projects/${lastVisitedProjectId}/active-sprint`);
       }
 
-      if (currentOrgId) {
-        console.log('this redirect');
-        return navigate(`/orgs/${currentOrgId}/projects/`);
-      }
+      return navigate(`/orgs/${currentOrgId}/projects/`);
     };
 
     redirectIfLoggedIn();
   });
+
+  const redirectToDemoProject = async (currentOrg) => {
+    const okrs = await listOKRs(currentOrg.id, currentOrg.projects[0].id, 'this-quarter');
+    const okrId = okrs?.length > 0 ? okrs[0]?.id : null;
+
+    if(okrId) {
+      return navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/okrs/detail/${okrId}`);
+    }
+
+    return navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/dashboard`);
+  }
 
   const onLogin = async (values, { setSubmitting }) => {
     try {
@@ -91,13 +103,17 @@ function SignIn() {
           return navigate(redirectTo);
         }
 
-        if(currentOrg.hadDemo){
-          return navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/dashboard`);
+        const lastVisitedProjectId = localStorage.getItem('lastVisitedProjectId');
+        if (lastVisitedProjectId && currentOrg.projects.some(project => project.id === lastVisitedProjectId)) {
+          return navigate(`/admin/orgs/${currentOrg.id}/projects/${lastVisitedProjectId}/active-sprint`);
         }
 
-        const lastVisitedProjectId = localStorage.getItem('lastVisitedProjectId');
-        if (lastVisitedProjectId) {
-          return navigate(`/admin/orgs/${currentOrg.id}/projects/${lastVisitedProjectId}/dashboard`);
+        if(currentOrg.id && currentOrg?.projects.length === 0) {
+          return navigate(`/orgs/${currentOrg.id}/projects/`);
+        }
+
+        if(currentOrg.hadDemo){
+          return await redirectToDemoProject(currentOrg);
         }
 
         return navigate(`/blank/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/demo`);

@@ -18,8 +18,6 @@ function Admin() {
   const [sidenavOpen, setSidenavOpen] = useState(true);
   const { orgId, projectId } = useParams();
 
-  localStorage.setItem('lastVisitedProjectId', projectId);
-
   function isNavigationReplace() {
     let replace = false;
     if (location.pathname.includes('/new')) {
@@ -65,6 +63,10 @@ function Admin() {
       setSidenavOpen(false);
     }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('lastVisitedProjectId', projectId);
+  }, [projectId]);
 
   const helpButtonStyle = {
     backgroundColor: 'rgb(0, 0, 0)',
