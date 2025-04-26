@@ -1,13 +1,14 @@
-import {Alert, Badge, Button, Card, Col, Row} from "reactstrap";
-import FormWizard from "react-form-wizard-component";
-import "react-form-wizard-component/dist/style.css";
-import React, {useEffect, useState} from "react";
-import {getOrg} from "../../../services/org/orgs.service";
-import "./demo.css";
-import {generateDemoProjectItems} from "../../../services/ai/ai.service";
-import {completeDemoProject, createDemoProject} from "../../../services/demo/demo.service";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import {Link, useNavigate} from "react-router-dom";
+import { Alert, Badge, Button, Card, Col, Row } from 'reactstrap';
+import FormWizard from 'react-form-wizard-component';
+import 'react-form-wizard-component/dist/style.css';
+import React, { useEffect, useState } from 'react';
+import { getOrg } from '../../../services/org/orgs.service';
+import './demo.css';
+import { generateDemoProjectItems } from '../../../services/ai/ai.service';
+import { completeDemoProject, createDemoProject } from '../../../services/demo/demo.service';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import { useNavigate } from 'react-router-dom';
+import { listOKRs } from '../../../services/okrs/okrs.service';
 
 export function Demo() {
     const [project, setProject] = useState({});
@@ -31,7 +32,7 @@ export function Demo() {
             await createDemoProject(org.id, project.id, generatedItems);
             await complete();
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
 
     };
@@ -54,10 +55,19 @@ export function Demo() {
         try {
             await completeDemoProject(org.id, project.id);
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
-        navigate(`/admin/orgs/${org.id}/projects/${project.id}/dashboard`)
+
+        const okrs = await listOKRs(org.id, project.id, 'this-quarter');
+        const okrId = okrs?.length > 0 ? okrs[0]?.id : null;
+
         setLoading(false);
+
+        if(!okrId) {
+            return navigate(`/orgs/${org.id}/projects`);
+        }
+
+        return navigate(`/admin/orgs/${org.id}/projects/${project.id}/okrs/detail/${okrId}`);
     }
     return (
         <>

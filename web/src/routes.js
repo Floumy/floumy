@@ -327,7 +327,7 @@ export const blankRoutes = [
     component: <Demo />,
     layout: '/blank'
   },
-    ]
+]
 
 export const publicRoutes = [
   {
