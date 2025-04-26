@@ -53,7 +53,7 @@ export class OrgsService {
   }
 
   async getOrCreateOrg(
-    projectName?: string,
+    orgName?: string,
     invitationToken?: string,
   ): Promise<Org> {
     if (invitationToken && invitationToken.trim().length === 0) {
@@ -64,32 +64,28 @@ export class OrgsService {
       return await this.findOneByInvitationToken(invitationToken);
     }
 
-    return await this.createOrg(projectName);
+    return await this.createOrg(orgName);
   }
 
   async patchOrg(orgId: string, name: string) {
     const org = await this.findOneById(orgId);
     org.name = name;
-    const project = new Project();
-    project.name = name;
-    await this.projectRepository.save(project);
-    await this.orgRepository.save(org);
-    return org;
+    return await this.orgRepository.save(org);
   }
 
-  private async createOrg(projectName?: string) {
+  private async createOrg(orgName?: string) {
     const org = new Org();
-    org.name = projectName;
+    org.name = orgName;
     org.paymentPlan = PaymentPlan.PREMIUM;
     org.isSubscribed = false;
     org.nextPaymentDate = null;
     org.hadDemo = false;
     const savedOrg = await this.orgRepository.save(org);
-    const project = new Project();
-    project.name = projectName;
-    project.org = Promise.resolve(savedOrg);
-    await this.projectRepository.save(project);
-    this.eventEmitter.emit('project.created', project);
+    const demoProject = new Project();
+    demoProject.name = `${orgName} Demo`;
+    demoProject.org = Promise.resolve(savedOrg);
+    await this.projectRepository.save(demoProject);
+    this.eventEmitter.emit('project.created', demoProject);
     return savedOrg;
   }
 

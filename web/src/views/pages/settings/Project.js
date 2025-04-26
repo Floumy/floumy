@@ -49,7 +49,7 @@ function Project() {
   });
 
   async function handleSubmit(values, setErrors) {
-    const projectName = values.projectName;
+    const projectName = values.orgName;
     const projectDescription = values.projectDescription;
     try {
       setIsSubmitting(true);

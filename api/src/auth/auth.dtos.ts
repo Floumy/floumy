@@ -7,7 +7,7 @@ export interface OrgSignUpDto {
   name: string;
   email: string;
   password: string;
-  projectName?: string;
+  orgName?: string;
   invitationToken?: string;
 }
 
