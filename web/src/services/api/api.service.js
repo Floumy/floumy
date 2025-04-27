@@ -43,7 +43,6 @@ export function logoutUser() {
   localStorage.removeItem("paymentPlan");
   localStorage.removeItem("isSubscribed");
   localStorage.removeItem("nextPaymentDate");
-  localStorage.removeItem('lastVisitedProjectId');
 }
 
 // Add a response interceptor
