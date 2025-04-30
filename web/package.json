@@ -37,6 +37,7 @@
     "react-detect-offline": "^2.4.5",
     "react-dom": "18.3.1",
     "react-dropzone": "^14.2.3",
+    "react-form-wizard-component": "^0.2.7",
     "react-hotkeys-hook": "^4.4.1",
     "react-infinite-scroll-component": "^6.1.0",
     "react-jvectormap": "0.0.16",

@@ -637,4 +637,155 @@ export class AiService {
     });
     return response.data.description;
   }
+
+  async generateDemoProjectItems(description: string) {
+    const prompt = `Generate 3 objectives, 2 key results for each objective, 2 initiatives for each key result, and 3 work items for each initiative, for the following project description:
+    Project Description: ${description}
+
+  Objectives fields: title
+  Key Results fields: title
+  Initiatives fields: title, description, priority(high/medium/low)
+  Work Items fields: title, type(user-story/task/spike), priority(high/medium/low), description
+  
+  Key Results instructions:
+  Do not include any timelines or deadlines or money amounts.
+  Make the key results specific and measurable.
+  Make sure the key results are clear and concise.
+  Do not include any unnecessary details.
+  Keep the key results short and to the point.
+  
+  Initiatives description instructions:
+  - What is the goal of the initiative?
+  - Why is it important?
+  - What is the expected outcome of the initiative?
+  - Separate the description into sections, each with a heading.
+  - Format the description as an HTML string.
+ 
+  Work Items general instructions:
+  - Prefer to use the following types in this order: user-story, task, spike
+  - As much as possible, slice the work items so that they are not dependent on each other. 
+  - The user story type should be used for work items that are about a job that needs to be done by a user.
+  - The task type should be used for work items that are about a task that is not a user story.
+  - The bug type should be used for work items that are about a something that is broken.
+  - The spike type should be used for work items that are about investigating an idea or a concept.
+  Work Items description instructions:
+  - What is the goal of the work item?
+  - Why is it important?
+  - Implementation details
+  - Acceptance criteria
+  - Separate the description into sections, each with a heading.
+  - Format the description as an HTML string.
+  `;
+
+    type DemoProjectItems = {
+      objectives: {
+        title: string;
+        keyResults: {
+          title: string;
+          initiatives: {
+            title: string;
+            description: string;
+            priority: string;
+            workItems: {
+              title: string;
+              type: string;
+              priority: string;
+              description: string;
+            }[];
+          }[];
+        }[];
+      }[];
+    };
+
+    const response =
+      await this.openaiService.generateCompletion<DemoProjectItems>(prompt, {
+        name: 'demoProjectItems',
+        strict: true,
+        schema: {
+          type: 'object',
+          properties: {
+            objectives: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  title: {
+                    type: 'string',
+                  },
+                  keyResults: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        title: {
+                          type: 'string',
+                        },
+                        initiatives: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              title: {
+                                type: 'string',
+                              },
+                              description: {
+                                type: 'string',
+                              },
+                              priority: {
+                                type: 'string',
+                              },
+                              workItems: {
+                                type: 'array',
+                                items: {
+                                  type: 'object',
+                                  properties: {
+                                    title: {
+                                      type: 'string',
+                                    },
+                                    type: {
+                                      type: 'string',
+                                    },
+                                    priority: {
+                                      type: 'string',
+                                    },
+                                    description: {
+                                      type: 'string',
+                                    },
+                                  },
+                                  required: [
+                                    'title',
+                                    'type',
+                                    'priority',
+                                    'description',
+                                  ],
+                                  additionalProperties: false,
+                                },
+                              },
+                            },
+                            required: [
+                              'title',
+                              'description',
+                              'priority',
+                              'workItems',
+                            ],
+                            additionalProperties: false,
+                          },
+                        },
+                      },
+                      required: ['title', 'initiatives'],
+                      additionalProperties: false,
+                    },
+                  },
+                },
+                required: ['title', 'keyResults'],
+                additionalProperties: false,
+              },
+            },
+          },
+          required: ['objectives'],
+          additionalProperties: false,
+        },
+      });
+    return response.data.objectives;
+  }
 }
