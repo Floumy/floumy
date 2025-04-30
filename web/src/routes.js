@@ -53,7 +53,8 @@ import GitHub from './views/pages/code/GitHub';
 import GitLab from './views/pages/code/GitLab';
 import Projects from './views/pages/orgs/projects/Projects';
 import OrgSettings from './views/pages/settings/OrgSettings';
-import {Demo} from "./views/pages/demo/demo";
+import { Demo } from './views/pages/demo/demo';
+import OrgOKRs from './views/pages/okrs/OrgOKRs';
 
 const routes = [
   {
@@ -448,6 +449,12 @@ export const orgsRoutes = [
     component: <OrgSettings />,
     layout: '/orgs',
   },
+  {
+    redirect: true,
+    path: '/objectives',
+    component: <OrgOKRs />,
+    layout: '/orgs',
+  }
 ];
 
 export default routes;
