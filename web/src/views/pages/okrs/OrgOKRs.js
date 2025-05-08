@@ -290,13 +290,13 @@ function OrgOKRs() {
                           {okr.id !== 0 &&
                             <>
                               <td>
-                                <Link to={`/admin/orgs/${orgId}/okrs/detail/${okr.id}`}
+                                <Link to={`/orgs/${orgId}/okrs/detail/${okr.id}`}
                                       className={'okr-detail'}>
                                   {okr.reference}
                                 </Link>
                               </td>
                               <td className="title-cell">
-                                <Link to={`/admin/orgs/${orgId}/okrs/detail/${okr.id}`}
+                                <Link to={`/orgs/${orgId}/okrs/detail/${okr.id}`}
                                       className={'okr-detail'}>
                                   {okr.title}
                                 </Link>

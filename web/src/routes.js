@@ -55,6 +55,8 @@ import Projects from './views/pages/orgs/projects/Projects';
 import OrgSettings from './views/pages/settings/OrgSettings';
 import { Demo } from './views/pages/demo/demo';
 import OrgOKRs from './views/pages/okrs/OrgOKRs';
+import OrgDetailOKR from './views/pages/okrs/OrgDetailOKR';
+import OrgDetailKeyResult from './views/pages/okrs/OrgDetailKeyResult';
 
 const routes = [
   {
@@ -326,9 +328,9 @@ export const blankRoutes = [
     redirect: true,
     path: '/demo',
     component: <Demo />,
-    layout: '/blank'
+    layout: '/blank',
   },
-]
+];
 
 export const publicRoutes = [
   {
@@ -454,7 +456,19 @@ export const orgsRoutes = [
     path: '/objectives',
     component: <OrgOKRs />,
     layout: '/orgs',
-  }
+  },
+  {
+    redirect: true,
+    path: '/okrs/detail/:objectiveId',
+    component: <OrgDetailOKR />,
+    layout: '/orgs',
+  },
+  {
+    redirect: true,
+    path: '/kr/detail/:keyResultId',
+    component: <OrgDetailKeyResult />,
+    layout: '/public',
+  },
 ];
 
 export default routes;
