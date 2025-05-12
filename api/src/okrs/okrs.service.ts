@@ -38,7 +38,7 @@ export class OkrsService {
 
   async createObjective(
     orgId: string,
-    projectId: string,
+    projectId: string | null,
     objective: ObjectiveDto,
   ) {
     if (!objective.title) throw new Error('Objective title is required');
@@ -46,15 +46,18 @@ export class OkrsService {
     const org = await this.orgsService.findOneById(orgId);
     if (!org) throw new Error('Organization not found');
 
-    const project = await this.projectsRepository.findOneByOrFail({
-      id: projectId,
-      org: { id: orgId },
-    });
-
     const newObjective = new Objective();
     newObjective.title = objective.title;
     newObjective.org = Promise.resolve(org);
-    newObjective.project = Promise.resolve(project);
+
+    if (projectId != null) {
+      const project = await this.projectsRepository.findOneByOrFail({
+        id: projectId,
+        org: { id: orgId },
+      });
+      newObjective.project = Promise.resolve(project);
+    }
+
     newObjective.level = ObjectiveLevel.PROJECT;
 
     if (objective.timeline) {
@@ -81,7 +84,10 @@ export class OkrsService {
     const keyResultEntity = new KeyResult();
     keyResultEntity.title = title;
     keyResultEntity.objective = Promise.resolve(objective);
-    keyResultEntity.org = Promise.resolve(await objective.org);
+    const objectiveOrg = await objective.org;
+    if (objectiveOrg != null) {
+      keyResultEntity.org = Promise.resolve(objectiveOrg);
+    }
     keyResultEntity.project = Promise.resolve(await objective.project);
     return await this.keyResultRepository.save(keyResultEntity);
   }
@@ -209,6 +215,28 @@ export class OkrsService {
       projectId,
       okrDto.objective,
     );
+    if (!okrDto.keyResults || okrDto.keyResults.length === 0) {
+      const savedOkr = await OKRMapper.toDTO(objective, []);
+      this.eventEmitter.emit('okr.created', savedOkr);
+      return savedOkr;
+    }
+
+    const keyResults = await Promise.all(
+      okrDto.keyResults.map((keyResult) =>
+        this.createKeyResultFor(objective, keyResult.title),
+      ),
+    );
+
+    const savedOkr = await OKRMapper.toDTO(objective, keyResults);
+    this.eventEmitter.emit('okr.created', savedOkr);
+    return savedOkr;
+  }
+
+  async createOrgOkr(orgId: string, okrDto: CreateOrUpdateOKRDto) {
+    if (okrDto.objective.timeline) {
+      TimelineService.validateTimeline(okrDto.objective.timeline);
+    }
+    const objective = await this.createObjective(orgId, null, okrDto.objective);
     if (!okrDto.keyResults || okrDto.keyResults.length === 0) {
       const savedOkr = await OKRMapper.toDTO(objective, []);
       this.eventEmitter.emit('okr.created', savedOkr);
