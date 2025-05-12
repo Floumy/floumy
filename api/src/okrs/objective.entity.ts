@@ -78,6 +78,9 @@ export class Objective {
     },
   )
   comments: Promise<ObjectiveComment[]>;
-  @ManyToOne(() => Project, (project) => project.objectives, { lazy: true })
+  @ManyToOne(() => Project, (project) => project.objectives, {
+    lazy: true,
+    nullable: true,
+  })
   project: Promise<Project>;
 }
