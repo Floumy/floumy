@@ -20,9 +20,7 @@ export class OKRMapper {
           id: org.id,
           name: org.name,
         },
-        project: {
-          id: project.id,
-        },
+        project: project ? { id: project.id } : null,
         reference: objective.reference,
         title: objective.title,
         progress: parseFloat(objective.progress?.toFixed(2)),
@@ -169,9 +167,7 @@ export class KeyResultMapper {
         id: org.id,
         name: org.name,
       },
-      project: {
-        id: project.id,
-      },
+      project: project ? { id: project.id } : null,
       progress: keyResult.progress
         ? parseFloat(keyResult.progress?.toFixed(2))
         : 0,

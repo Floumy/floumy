@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDemoDto } from './dtos';
 import { OkrsService } from '../okrs/okrs.service';
-import { OKRStatus } from '../okrs/okrstatus.enum';
+import { ObjectiveStatus } from '../okrs/okrstatus.enum';
 import { InitiativesService } from '../roadmap/initiatives/initiatives.service';
 import { InitiativeStatus } from '../roadmap/initiatives/initiativestatus.enum';
 import { Priority } from '../common/priority.enum';
@@ -44,7 +44,7 @@ export class DemoService {
           createdObjective.objective.id,
           {
             title: keyResult.title,
-            status: OKRStatus.ON_TRACK,
+            status: ObjectiveStatus.ON_TRACK,
             progress: 0,
           },
         );
