@@ -198,12 +198,11 @@ export class OkrsService {
     const okr = await this.get(orgId, projectId, id);
     await this.removeKeyResultsAssociations(orgId, id);
     await this.keyResultRepository.delete({
-      objective: { id, org: { id: orgId }, project: { id: projectId } },
+      objective: { id, org: { id: orgId } },
     });
     await this.objectiveRepository.delete({
       id,
       org: { id: orgId },
-      project: { id: projectId },
     });
     this.eventEmitter.emit('okr.deleted', okr);
   }
