@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Timeline } from '../../common/timeline.enum';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Org } from '../../orgs/org.entity';
 import { Repository } from 'typeorm';
 import { OkrsService } from '../okrs.service';
 import { PublicOkrMapper } from './public.mappers';
@@ -46,7 +45,6 @@ export class PublicService {
 
     const keyResult = await this.okrsService.getKeyResult(
       orgId,
-      projectId,
       objectiveId,
       keyResultId,
     );

@@ -313,16 +313,10 @@ export class OkrsService {
 
   async deleteKeyResult(
     orgId: string,
-    projectId: string | null,
     objectiveId: string,
     keyResultId: string,
   ) {
-    const keyResult = await this.getKeyResult(
-      orgId,
-      projectId,
-      objectiveId,
-      keyResultId,
-    );
+    const keyResult = await this.getKeyResult(orgId, objectiveId, keyResultId);
     const originalKeyResult = await KeyResultMapper.toDTO(keyResult);
 
     await this.removeKeyResultAssociations(keyResultId);
@@ -401,27 +395,20 @@ export class OkrsService {
 
   async getKeyResultDetail(
     orgId: string,
-    projectId: string | null,
     objectiveId: string,
     keyResultId: string,
   ) {
     return await KeyResultMapper.toDtoWithComments(
-      await this.getKeyResult(orgId, projectId, objectiveId, keyResultId),
+      await this.getKeyResult(orgId, objectiveId, keyResultId),
     );
   }
 
-  async getKeyResult(
-    orgId: string,
-    projectId,
-    objectiveId: string,
-    keyResultId: string,
-  ) {
+  async getKeyResult(orgId: string, objectiveId: string, keyResultId: string) {
     return await this.keyResultRepository.findOneByOrFail({
       id: keyResultId,
       objective: {
         id: objectiveId,
         org: { id: orgId },
-        project: { id: projectId },
       },
     });
   }

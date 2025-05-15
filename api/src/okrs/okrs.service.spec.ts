@@ -511,12 +511,7 @@ describe('OkrsService', () => {
         objective,
         'Test Key Result',
       );
-      await service.deleteKeyResult(
-        org.id,
-        project.id,
-        objective.id,
-        keyResult.id,
-      );
+      await service.deleteKeyResult(org.id, objective.id, keyResult.id);
       await expect(service.getKeyResultBy(keyResult.id)).rejects.toThrow();
     });
     it('should update the objective progress', async () => {
@@ -537,12 +532,7 @@ describe('OkrsService', () => {
           progress: 0.5,
         },
       );
-      await service.deleteKeyResult(
-        org.id,
-        project.id,
-        objective.id,
-        keyResult.id,
-      );
+      await service.deleteKeyResult(org.id, objective.id, keyResult.id);
       const updatedObjective = await service.getObjective(objective.id);
       expect(updatedObjective.progress).toEqual(0);
     });
@@ -638,7 +628,6 @@ describe('OkrsService', () => {
       );
       const storedKR = await service.getKeyResultDetail(
         org.id,
-        project.id,
         objective.id,
         keyResult.id,
       );
