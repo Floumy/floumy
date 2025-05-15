@@ -205,12 +205,7 @@ export class OrgOkrsController {
       throw new UnauthorizedException();
     }
 
-    await this.okrsService.deleteKeyResult(
-      orgId,
-      null,
-      objectiveId,
-      keyResultId,
-    );
+    await this.okrsService.deleteKeyResult(orgId, objectiveId, keyResultId);
   }
 
   @Post('okrs/:objectiveId/key-results')
@@ -249,7 +244,6 @@ export class OrgOkrsController {
     try {
       return await this.okrsService.getKeyResultDetail(
         orgId,
-        null,
         objectiveId,
         keyResultId,
       );
