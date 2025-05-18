@@ -322,11 +322,14 @@ export class OkrsService {
     await this.removeKeyResultAssociations(keyResultId);
     await this.keyResultRepository.delete({
       id: keyResultId,
-      objective: { id: objectiveId, org: { id: orgId } },
+      org: { id: orgId },
     });
-    await this.updateObjectiveProgress(
-      await this.objectiveRepository.findOneBy({ id: objectiveId }),
-    );
+
+    if (objectiveId) {
+      await this.updateObjectiveProgress(
+        await this.objectiveRepository.findOneBy({ id: objectiveId }),
+      );
+    }
 
     this.eventEmitter.emit('keyResult.deleted', originalKeyResult);
   }
