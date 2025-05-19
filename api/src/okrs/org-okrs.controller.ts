@@ -15,18 +15,18 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { OkrsService } from './okrs.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CommentsService } from './comments/comments.service';
 import { CreateOrUpdateKeyResultDto, CreateOrUpdateOKRDto, PatchKeyResultDto, UpdateObjectiveDto } from './dtos';
 import { Timeline } from '../common/timeline.enum';
 import { CreateUpdateCommentDto } from '../comments/dtos';
+import { OrgOkrsService } from './org-okrs.service';
 
 @Controller('/orgs/:orgId/')
 @UseGuards(AuthGuard)
 export class OrgOkrsController {
   constructor(
-    private readonly okrsService: OkrsService,
+    private readonly okrsService: OrgOkrsService,
     private readonly commentsService: CommentsService,
   ) {}
 
@@ -44,7 +44,7 @@ export class OrgOkrsController {
     }
 
     try {
-      return await this.okrsService.create(orgId, null, okrDto);
+      return await this.okrsService.create(orgId, okrDto);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -59,7 +59,7 @@ export class OrgOkrsController {
       throw new UnauthorizedException();
     }
 
-    return await this.okrsService.list(orgId, null);
+    return await this.okrsService.list(orgId);
   }
 
   @Get('key-results')
@@ -71,7 +71,7 @@ export class OrgOkrsController {
       throw new UnauthorizedException();
     }
 
-    return await this.okrsService.listKeyResults(orgId, null);
+    return await this.okrsService.listKeyResults(orgId);
   }
 
   @Get('okrs/:id')
@@ -87,7 +87,7 @@ export class OrgOkrsController {
     }
 
     try {
-      return await this.okrsService.get(orgId, null, id);
+      return await this.okrsService.get(orgId, id);
     } catch (e) {
       throw new NotFoundException();
     }
@@ -106,7 +106,7 @@ export class OrgOkrsController {
       throw new UnauthorizedException();
     }
 
-    await this.okrsService.delete(orgId, null, id);
+    await this.okrsService.delete(orgId, id);
   }
 
   @Patch('key-results/:keyResultId')
@@ -127,7 +127,6 @@ export class OrgOkrsController {
     try {
       return await this.okrsService.patchKeyResult(
         orgId,
-        null,
         objectiveId,
         keyResultId,
         updateKeyResultDto,
@@ -154,7 +153,6 @@ export class OrgOkrsController {
     try {
       return await this.okrsService.updateObjective(
         orgId,
-        null,
         objectiveId,
         updateObjectiveDto,
       );
@@ -181,7 +179,6 @@ export class OrgOkrsController {
     try {
       return await this.okrsService.updateKeyResult(
         orgId,
-        null,
         objectiveId,
         keyResultId,
         updateKeyResultDto,
@@ -264,7 +261,7 @@ export class OrgOkrsController {
       throw new UnauthorizedException();
     }
 
-    return await this.okrsService.listForTimeline(orgId, null, timeline);
+    return await this.okrsService.listForTimeline(orgId, timeline);
   }
 
   @Post('/key-results/:keyResultId/comments')
