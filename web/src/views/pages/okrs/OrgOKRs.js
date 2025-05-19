@@ -23,6 +23,7 @@ import {
   okrStatusColorClassName,
   textToColor,
 } from '../../../services/utils/utils';
+import { listOrgOKRs } from '../../../services/okrs/okrs.service';
 
 // Mock data
 const mockStats = {
@@ -81,6 +82,7 @@ function OrgOKRs() {
   const timelineQueryFilter = searchParams.get('timeline') || 'this-quarter';
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [okrs, setOKRs] = useState([]);
 
   useEffect(() => {
     document.title = 'Floumy | OKRs';
@@ -88,9 +90,9 @@ function OrgOKRs() {
     async function fetchData() {
       setIsLoading(true);
       try {
-        // const okrs = await listOKRs(orgId, projectId, timelineQueryFilter);
-        // setOKRs(okrs
-        //   .sort((a, b) => a.createdAt < b.createdAt ? 1 : -1));
+        const okrs = await listOrgOKRs(orgId, timelineQueryFilter);
+        setOKRs(okrs
+          .sort((a, b) => a.createdAt < b.createdAt ? 1 : -1));
       } catch (e) {
         console.error(e.message);
       } finally {
@@ -236,7 +238,7 @@ function OrgOKRs() {
                 </Row>
               </CardHeader>
               {isLoading && <LoadingSpinnerBox />}
-              {!isLoading && mockOKRs.length === 0 &&
+              {!isLoading && okrs.length === 0 &&
                 <div className="p-4">
                   <div>
                     <div style={{ maxWidth: '600px' }} className="mx-auto font-italic">
@@ -252,6 +254,7 @@ function OrgOKRs() {
                         They help you track your success and ensure you're on the right track. Think of them as
                         targets that show how close you are to achieving your goals. .
                         <br />
+                        {/*TODO: Change the URL*/}
                         <Link to={`/admin/orgs/${orgId}/okrs/new`}
                               className="text-blue font-weight-bold">Create an Objective with
                           Key Results</Link></p>
@@ -279,9 +282,8 @@ function OrgOKRs() {
                     </tr>
                     </thead>
                     <tbody className="list">
-                    {mockOKRs.length > 0 ? mockOKRs.map((okr) => (
+                    {okrs.length > 0 ? okrs.map((okr) => (
                         <tr key={okr.id}>
-                          {/*Display empty row with message if is template*/}
                           {okr.id === 0 &&
                             <td colSpan={5} className={'text-center'}>
                               <h3 className="text-center m-0">No objectives found for this timeline.</h3>

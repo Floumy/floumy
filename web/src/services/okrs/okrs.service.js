@@ -1,5 +1,5 @@
-import api from "../api/api.service";
-import axios from "axios";
+import api from '../api/api.service';
+import axios from 'axios';
 
 export async function addOKR(orgId, projectId, okr) {
   try {
@@ -13,6 +13,15 @@ export async function addOKR(orgId, projectId, okr) {
 export async function listOKRs(orgId, projectId, timeline) {
   try {
     const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/timeline/${timeline}`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
+export async function listOrgOKRs(orgId, timeline) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/okrs/timeline/${timeline}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
