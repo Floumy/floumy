@@ -485,4 +485,52 @@ export class OrgOkrsService {
       ],
     });
   }
+
+  async getStats(orgId: string) {
+    const objectives = await this.objectiveRepository.findBy({
+      org: { id: orgId },
+      level: ObjectiveLevel.ORGANIZATION,
+    });
+
+    const keyResults = await this.keyResultRepository.find({
+      where: {
+        org: { id: orgId },
+        objective: { level: ObjectiveLevel.ORGANIZATION },
+      },
+    });
+
+    const completedObjectives = objectives.filter(
+      (obj) => obj.status === ObjectiveStatus.COMPLETED,
+    );
+    const inProgressObjectives = objectives.filter(
+      (obj) => obj.status !== ObjectiveStatus.COMPLETED,
+    );
+
+    const completedKeyResults = keyResults.filter(
+      (kr) => kr.status === ObjectiveStatus.COMPLETED,
+    );
+    const inProgressKeyResults = keyResults.filter(
+      (kr) => kr.status !== ObjectiveStatus.COMPLETED,
+    );
+
+    const currentProgress =
+      objectives.reduce((sum, obj) => sum + (obj.progress || 0), 0) /
+      (objectives.length || 1);
+
+    return {
+      objectives: {
+        total: objectives.length,
+        completed: completedObjectives.length,
+        inProgress: inProgressObjectives.length,
+      },
+      keyResults: {
+        total: keyResults.length,
+        completed: completedKeyResults.length,
+        inProgress: inProgressKeyResults.length,
+      },
+      progress: {
+        current: Math.round(currentProgress),
+      },
+    };
+  }
 }

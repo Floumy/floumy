@@ -1,7 +1,6 @@
 import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective } from './objective.entity';
-import { OkrsService } from './okrs.service';
 import { OrgsService } from '../orgs/orgs.service';
 import { Org } from '../orgs/org.entity';
 import { TokensService } from '../auth/tokens.service';
@@ -14,6 +13,7 @@ import { PaymentPlan } from '../auth/payment.plan';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { OrgOkrsController } from './org-okrs.controller';
+import { OrgOkrsService } from './org-okrs.service';
 
 describe('OrgOkrsController', () => {
   let controller: OrgOkrsController;
@@ -28,7 +28,7 @@ describe('OrgOkrsController', () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [TypeOrmModule.forFeature([Objective, Org, KeyResult, Initiative])],
-      [OkrsService, OrgsService, TokensService, UsersService],
+      [OrgOkrsService, OrgsService, TokensService, UsersService],
       [OrgOkrsController],
     );
     cleanup = dbCleanup;
@@ -956,6 +956,30 @@ describe('OrgOkrsController', () => {
           },
         }),
       ).resolves.not.toThrow();
+    });
+  });
+  describe('when getting the okr stats', () => {
+    it('should return the okr stats', async () => {
+      const stats = await controller.getOkrStats(org.id, {
+        user: {
+          org: org.id,
+        },
+      });
+      expect(stats).toEqual({
+        keyResults: {
+          completed: 0,
+          inProgress: 0,
+          total: 0,
+        },
+        objectives: {
+          completed: 0,
+          inProgress: 0,
+          total: 0,
+        },
+        progress: {
+          current: 0,
+        },
+      });
     });
   });
 });
