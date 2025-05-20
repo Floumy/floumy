@@ -173,3 +173,12 @@ export async function deleteObjectiveComment(orgId, objectiveId, commentId) {
     throw new Error(e.message);
   }
 }
+
+export async function getOkrStats(orgId) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/okrs-stats`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}

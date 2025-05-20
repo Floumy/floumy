@@ -388,7 +388,7 @@ export class OrgOkrsController {
     }
   }
 
-  @Get('okrs/stats')
+  @Get('okrs-stats')
   @HttpCode(HttpStatus.OK)
   async getOkrStats(@Param('orgId') orgId: string, @Request() request) {
     const { org: userOrgId } = request.user;
