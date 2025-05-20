@@ -23,7 +23,7 @@ import {
   okrStatusColorClassName,
   textToColor,
 } from '../../../services/utils/utils';
-import { listOrgOKRs } from '../../../services/okrs/okrs.service';
+import { listOKRs } from '../../../services/okrs/org-okrs.service';
 
 // Mock data
 const mockStats = {
@@ -33,51 +33,9 @@ const mockStats = {
   timeRemaining: { days: 42, progress: 65 },
 };
 
-const mockOKRs = [
-  {
-    id: 'okr-1',
-    reference: 'O-2',
-    title: 'Increase Market Share',
-    description: 'Expand market presence in key regions',
-    team: 'Marketing',
-    progress: 0.75,
-    status: 'In Progress',
-    keyResults: [
-      { id: 'kr-1', title: 'Launch in 3 new markets', progress: 80 },
-      { id: 'kr-2', title: 'Increase customer retention to 85%', progress: 70 },
-    ],
-  },
-  {
-    id: 'okr-2',
-    reference: 'O-1',
-    title: 'Increase Market Share',
-    description: 'Expand market presence in key regions',
-    team: 'Marketing',
-    progress: 0.75,
-    status: 'In Progress',
-    keyResults: [
-      { id: 'kr-1', title: 'Launch in 3 new markets', progress: 80 },
-      { id: 'kr-2', title: 'Increase customer retention to 85%', progress: 70 },
-    ],
-  },
-  {
-    id: 'okr-2',
-    reference: 'O-3',
-    title: 'Increase Market Share',
-    description: 'Expand market presence in key regions',
-    team: 'Marketing',
-    progress: 0.75,
-    status: 'In Progress',
-    keyResults: [
-      { id: 'kr-1', title: 'Launch in 3 new markets', progress: 80 },
-      { id: 'kr-2', title: 'Increase customer retention to 85%', progress: 70 },
-    ],
-  },
-];
-
 function OrgOKRs() {
   let location = useLocation();
-  const { orgId, projectId } = useParams();
+  const { orgId } = useParams();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get('timeline') || 'this-quarter';
   const navigate = useNavigate();
@@ -90,7 +48,7 @@ function OrgOKRs() {
     async function fetchData() {
       setIsLoading(true);
       try {
-        const okrs = await listOrgOKRs(orgId, timelineQueryFilter);
+        const okrs = await listOKRs(orgId, timelineQueryFilter);
         setOKRs(okrs
           .sort((a, b) => a.createdAt < b.createdAt ? 1 : -1));
       } catch (e) {
@@ -101,7 +59,7 @@ function OrgOKRs() {
     }
 
     fetchData();
-  }, [orgId, projectId, timelineQueryFilter]);
+  }, [orgId, timelineQueryFilter]);
 
   return (
     <>
@@ -111,7 +69,8 @@ function OrgOKRs() {
             name: 'New Objective',
             id: 'new-objective',
             shortcut: 'o',
-            action: () => {/* Handle new objective */
+            action: () => {
+              navigate(`/orgs/${orgId}/okrs/new`);
             },
           },
         ]}

@@ -7,7 +7,6 @@ import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import InputError from '../../../components/Errors/InputError';
-import { addInitiative } from '../../../services/roadmap/roadmap.service';
 import {
   addKeyResultComment,
   deleteKeyResult,
@@ -15,22 +14,20 @@ import {
   getKeyResult,
   updateKeyResult,
   updateKeyResultComment,
-} from '../../../services/okrs/okrs.service';
+} from '../../../services/okrs/org-okrs.service';
 import { useNavigate, useParams } from 'react-router-dom';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import NotFoundCard from '../components/NotFoundCard';
 import { toast } from 'react-toastify';
 import Comments from '../../../components/Comments/Comments';
-import AIButton from '../../../components/AI/AIButton';
-import { generateInitiativesForOKR } from '../../../services/ai/ai.service';
 
-function OrgDetailKeyResult() {
+function DetailOrgKeyResult() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [status, setStatus] = React.useState('');
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = React.useState(false);
   const [progress, setProgress] = React.useState('');
-  const {keyResultId, orgId, projectId } = useParams();
+  const {keyResultId, orgId } = useParams();
   const [keyResult, setKeyResult] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
@@ -54,7 +51,7 @@ function OrgDetailKeyResult() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const keyResult = await getKeyResult(orgId, projectId, keyResultId);
+        const keyResult = await getKeyResult(orgId, keyResultId);
         setKeyResult(keyResult);
         setStatus(keyResult.status);
         setProgress(keyResult.progress);
@@ -66,14 +63,13 @@ function OrgDetailKeyResult() {
     }
 
     loadData();
-  }, [orgId, projectId, keyResultId]);
+  }, [orgId, keyResultId]);
 
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
       await updateKeyResult(
         orgId,
-        projectId,
         keyResultId,
         {
           title: values.title,
@@ -92,7 +88,7 @@ function OrgDetailKeyResult() {
   const handleDelete = async () => {
     try {
       setIsSubmitting(true);
-      await deleteKeyResult(orgId, projectId, keyResultId);
+      await deleteKeyResult(orgId, keyResultId);
       navigate(-1);
       setTimeout(() => toast.success('The key result has been deleted'), 100);
     } catch (e) {
@@ -110,7 +106,7 @@ function OrgDetailKeyResult() {
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addKeyResultComment(orgId, projectId, keyResultId, comment);
+      const addedComment = await addKeyResultComment(orgId, keyResultId, comment);
       keyResult.comments.push(addedComment);
       setKeyResult({ ...keyResult });
       toast.success('Comment added successfully');
@@ -121,7 +117,7 @@ function OrgDetailKeyResult() {
 
   async function handleCommentEditSubmit(commentId, comment) {
     try {
-      await updateKeyResultComment(orgId, projectId, keyResultId, commentId, comment);
+      await updateKeyResultComment(orgId, keyResultId, commentId, comment);
       const updatedComment = keyResult.comments.find(c => c.id === commentId);
       updatedComment.content = comment.content;
       updatedComment.mentions = comment.mentions;
@@ -134,35 +130,13 @@ function OrgDetailKeyResult() {
 
   async function handCommentDelete(commentId) {
     try {
-      await deleteKeyResultComment(orgId, projectId, keyResultId, commentId);
+      await deleteKeyResultComment(orgId, keyResultId, commentId);
       const index = keyResult.comments.findIndex(c => c.id === commentId);
       keyResult.comments.splice(index, 1);
       setKeyResult({ ...keyResult });
       toast.success('Comment deleted successfully');
     } catch (e) {
       toast.error('Failed to delete comment');
-    }
-  }
-
-  function isPlaceholderInitiativeOnly() {
-    return keyResult && (!keyResult.initiatives || keyResult.initiatives.length === 1 || !keyResult.initiatives[0]?.title);
-  }
-
-  const addInitiativesWithAi = async () => {
-    try {
-      const initiativesToAdd = (await generateInitiativesForOKR(keyResult.title, keyResult.title))
-        .map(initiative => {
-          return { title: initiative.title, description: initiative.description, priority: initiative.priority, status: 'planned', keyResult: keyResult.id };
-        });
-      const savedInitiatives = [];
-      for (const initiative of initiativesToAdd) {
-        savedInitiatives.push(await addInitiative(orgId, projectId, initiative));
-      }
-      setKeyResult({ ...keyResult, initiatives: savedInitiatives });
-      toast.success('The initiatives have been added');
-    } catch (e) {
-      toast.error('The initiatives could not be saved');
-      console.error(e);
     }
   }
 
@@ -278,23 +252,6 @@ function OrgDetailKeyResult() {
                   </Formik>}
               </CardBody>
             </Card>
-            {!isLoading && keyResult && keyResult.initiatives && <>
-              <Card>
-                <CardHeader className="border-1">
-                  <div className="row">
-                    <div className="col-12">
-                      <h3 className="mb-0">Related Initiatives
-                        {isPlaceholderInitiativeOnly() && <AIButton
-                          disabled={keyResult.title.length === 0}
-                          onClick={addInitiativesWithAi}
-                        />}
-                      </h3>
-
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            </>}
           </Col>
           {!isLoading &&
             <Col lg={4} md={12}>
@@ -312,4 +269,4 @@ function OrgDetailKeyResult() {
   );
 }
 
-export default OrgDetailKeyResult;
+export default DetailOrgKeyResult;
