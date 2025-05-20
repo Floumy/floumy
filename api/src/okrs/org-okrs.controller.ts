@@ -387,4 +387,20 @@ export class OrgOkrsController {
       throw new BadRequestException();
     }
   }
+
+  @Get('okrs/stats')
+  @HttpCode(HttpStatus.OK)
+  async getOkrStats(@Param('orgId') orgId: string, @Request() request) {
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.okrsService.getStats(orgId);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
 }

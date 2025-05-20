@@ -698,4 +698,27 @@ describe('OrgOkrsService', () => {
       expect(okrs[0].title).toEqual('My Other OKR');
     });
   });
+  describe('when getting the okrs stats', () => {
+    it('should return the okrs stats', async () => {
+      await service.create(org.id, {
+        objective: {
+          title: 'My OKR',
+          timeline: 'this-quarter',
+        },
+        keyResults: [
+          { title: 'My KR 1' },
+          { title: 'My KR 2' },
+          { title: 'My KR 3' },
+        ],
+      });
+      const stats = await service.getStats(org.id);
+      expect(stats.objectives.total).toEqual(1);
+      expect(stats.objectives.completed).toEqual(0);
+      expect(stats.objectives.inProgress).toEqual(1);
+      expect(stats.keyResults.total).toEqual(3);
+      expect(stats.keyResults.completed).toEqual(0);
+      expect(stats.keyResults.inProgress).toEqual(3);
+      expect(stats.progress.current).toEqual(0);
+    });
+  });
 });
