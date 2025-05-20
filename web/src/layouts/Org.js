@@ -69,7 +69,7 @@ function OrgLayout() {
           {/*TODO: Redirect to not found page here*/}
           <Route
             path="*"
-            element={<Navigate to={`/orgs/${orgId}/projects`} replace />}
+            element={<Navigate to={`/orgs/${orgId}/objectives`} replace />}
           />
         </Routes>
         <Footer />

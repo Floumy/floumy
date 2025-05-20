@@ -13,7 +13,7 @@ import {
   getOKR,
   updateObjective,
   updateObjectiveComment,
-} from '../../../services/okrs/okrs.service';
+} from '../../../services/okrs/org-okrs.service';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import NotFoundCard from '../components/NotFoundCard';
 import DetailOKRStats from './DetailOKRStats';
@@ -30,13 +30,13 @@ import InputError from '../../../components/Errors/InputError';
 import Select2 from 'react-select2-wrapper';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
-import { getOrg } from '../../../services/org/orgs.service';
 import Comments from '../../../components/Comments/Comments';
 import { generateKeyResults } from '../../../services/ai/ai.service';
 import AIButton from '../../../components/AI/AIButton';
+import { getOrg } from '../../../services/org/orgs.service';
 
-function OrgDetailOKR() {
-  const { orgId, projectId, id } = useParams();
+function DetailOrgOKR() {
+  const { orgId, objectiveId: id } = useParams();
   const [okr, setOKR] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [timeline, setTimeline] = useState('this-quarter');
@@ -65,7 +65,7 @@ function OrgDetailOKR() {
 
     async function fetchAndSetOKR() {
       try {
-        const okr = await getOKR(orgId, projectId, id);
+        const okr = await getOKR(orgId, id);
         setOKR(okr);
         setStatus(okr.objective.status);
         setTimeline(okr.objective.timeline);
@@ -93,7 +93,7 @@ function OrgDetailOKR() {
     }
 
     fetchData();
-  }, [id, orgId, projectId]);
+  }, [id, orgId]);
 
   useMemo(() => {
     const filteredOrgMembers =
@@ -125,7 +125,7 @@ function OrgDetailOKR() {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      const updatedOkr = await updateObjective(orgId, projectId, okr.objective.id, {
+      const updatedOkr = await updateObjective(orgId, okr.objective.id, {
         title: values.title,
         assignedTo,
         status,
@@ -143,7 +143,7 @@ function OrgDetailOKR() {
   const handleDelete = async () => {
     try {
       setIsSubmitting(true);
-      await deleteOKR(orgId, projectId, okr.objective.id);
+      await deleteOKR(orgId, okr.objective.id);
       navigate(-1);
       setTimeout(() => toast.success('The OKR has been deleted'), 100);
     } catch (e) {
@@ -163,7 +163,7 @@ function OrgDetailOKR() {
         status: 'on-track',
         progress: 0,
       };
-      const savedKeyResult = await addKeyResult(orgId, projectId, okr.objective.id, keyResult);
+      const savedKeyResult = await addKeyResult(orgId, okr.objective.id, keyResult);
       okr.keyResults.push(savedKeyResult);
       setOKR({ ...okr });
     } catch (e) {
@@ -181,7 +181,7 @@ function OrgDetailOKR() {
       const savedKeyResults = [];
       for (const keyResult of keyResultsToAdd) {
         savedKeyResults.push(
-          await addKeyResult(orgId, projectId, okr.objective.id, keyResult),
+          await addKeyResult(orgId, okr.objective.id, keyResult),
         );
       }
       okr.keyResults = savedKeyResults;
@@ -204,7 +204,7 @@ function OrgDetailOKR() {
 
   const handleAddComment = async (content) => {
     try {
-      const addedComment = await addObjectiveComment(orgId, projectId, okr.objective.id, content);
+      const addedComment = await addObjectiveComment(orgId, okr.objective.id, content);
       okr.objective.comments.push(addedComment);
       setOKR({ ...okr });
       toast.success('The comment has been added');
@@ -215,7 +215,7 @@ function OrgDetailOKR() {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await deleteObjectiveComment(orgId, projectId, okr.objective.id, commentId);
+      await deleteObjectiveComment(orgId, okr.objective.id, commentId);
       okr.objective.comments = okr.objective.comments.filter(comment => comment.id !== commentId);
       setOKR({ ...okr });
       toast.success('The comment has been deleted');
@@ -226,7 +226,7 @@ function OrgDetailOKR() {
 
   const handleUpdateComment = async (commentId, content) => {
     try {
-      const updatedComment = await updateObjectiveComment(orgId, projectId, okr.objective.id, commentId, content);
+      const updatedComment = await updateObjectiveComment(orgId, okr.objective.id, commentId, content);
       okr.objective.comments = okr.objective.comments.map(comment => {
         if (comment.id === commentId) {
           return updatedComment;
@@ -442,14 +442,14 @@ function OrgDetailOKR() {
                           <tr key={keyResult.id}>
                             <td>
                               <Link
-                                to={`/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`}
+                                to={`/orgs/${orgId}/kr/detail/${keyResult.id}`}
                                 className={'okr-detail'}>
                                 {keyResult.reference}
                               </Link>
                             </td>
                             <td className="title-cell">
                               <Link
-                                to={`/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`}
+                                to={`/orgs/${orgId}/kr/detail/${keyResult.id}`}
                                 className={'okr-detail'}>
                                 {keyResult.title}
                               </Link>
@@ -535,4 +535,4 @@ function OrgDetailOKR() {
   );
 }
 
-export default OrgDetailOKR;
+export default DetailOrgOKR;

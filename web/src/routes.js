@@ -55,8 +55,9 @@ import Projects from './views/pages/orgs/projects/Projects';
 import OrgSettings from './views/pages/settings/OrgSettings';
 import { Demo } from './views/pages/demo/demo';
 import OrgOKRs from './views/pages/okrs/OrgOKRs';
-import OrgDetailOKR from './views/pages/okrs/OrgDetailOKR';
-import OrgDetailKeyResult from './views/pages/okrs/OrgDetailKeyResult';
+import DetailOrgOKR from './views/pages/okrs/DetailOrgOKR';
+import DetailOrgKeyResult from './views/pages/okrs/DetailOrgKeyResult';
+import NewOrgOKR from './views/pages/okrs/NewOrgOKR';
 
 const routes = [
   {
@@ -460,14 +461,20 @@ export const orgsRoutes = [
   {
     redirect: true,
     path: '/okrs/detail/:objectiveId',
-    component: <OrgDetailOKR />,
+    component: <DetailOrgOKR />,
     layout: '/orgs',
   },
   {
     redirect: true,
     path: '/kr/detail/:keyResultId',
-    component: <OrgDetailKeyResult />,
-    layout: '/public',
+    component: <DetailOrgKeyResult />,
+    layout: '/orgs',
+  },
+  {
+    redirect: true,
+    path: '/okrs/new',
+    component: <NewOrgOKR />,
+    layout: '/orgs',
   },
 ];
 
