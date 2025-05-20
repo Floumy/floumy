@@ -23,15 +23,7 @@ import {
   okrStatusColorClassName,
   textToColor,
 } from '../../../services/utils/utils';
-import { listOKRs } from '../../../services/okrs/org-okrs.service';
-
-// Mock data
-const mockStats = {
-  totalObjectives: { count: 12, completed: 4, inProgress: 8 },
-  keyResults: { count: 36, completed: 14, inProgress: 22 },
-  averageProgress: 68,
-  timeRemaining: { days: 42, progress: 65 },
-};
+import { getOkrStats, listOKRs } from '../../../services/okrs/org-okrs.service';
 
 function OrgOKRs() {
   let location = useLocation();
@@ -41,6 +33,9 @@ function OrgOKRs() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [okrs, setOKRs] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsError, setStatsError] = useState(null);
 
   useEffect(() => {
     document.title = 'Floumy | OKRs';
@@ -49,8 +44,7 @@ function OrgOKRs() {
       setIsLoading(true);
       try {
         const okrs = await listOKRs(orgId, timelineQueryFilter);
-        setOKRs(okrs
-          .sort((a, b) => a.createdAt < b.createdAt ? 1 : -1));
+        setOKRs(okrs.sort((a, b) => a.createdAt < b.createdAt ? 1 : -1));
       } catch (e) {
         console.error(e.message);
       } finally {
@@ -58,7 +52,21 @@ function OrgOKRs() {
       }
     }
 
+    async function fetchStats() {
+      setStatsLoading(true);
+      setStatsError(null);
+      try {
+        const statsData = await getOkrStats(orgId);
+        setStats(statsData);
+      } catch (e) {
+        setStatsError('Could not load stats');
+      } finally {
+        setStatsLoading(false);
+      }
+    }
+
     fetchData();
+    fetchStats();
   }, [orgId, timelineQueryFilter]);
 
   return (
@@ -76,42 +84,41 @@ function OrgOKRs() {
         ]}
       />
       <Container className="mt--6" fluid>
-        {/* Statistics Cards */}
+        {!statsLoading && !statsError && stats &&
         <Row className="my-4">
-          <Col lg="3" sm="6">
+          <Col lg="4" sm="12">
             <Card className="card-stats">
               <CardBody>
                 <Row>
                   <Col>
                     <h5 className="card-title text-uppercase text-muted mb-0">Total Objectives</h5>
-                    <span className="h2 font-weight-bold mb-0">{mockStats.totalObjectives.count}</span>
+                    <span className="h2 font-weight-bold mb-0">{stats.objectives.total}</span>
                   </Col>
                 </Row>
                 <p className="mt-3 mb-0 text-sm">
-                  <span className="text-success">{mockStats.totalObjectives.completed} completed</span>
-                  <span className="text-nowrap ml-2">{mockStats.totalObjectives.inProgress} in progress</span>
+                  <span className="text-success">{stats.objectives.completed} completed</span>
+                  <span className="text-nowrap ml-2">{stats.objectives.inProgress} in progress</span>
                 </p>
               </CardBody>
             </Card>
           </Col>
-          <Col lg="3" sm="6">
+          <Col lg="4" sm="12">
             <Card className="card-stats">
               <CardBody>
                 <Row>
                   <Col>
                     <h5 className="card-title text-uppercase text-muted mb-0">Key Results</h5>
-                    <span className="h2 font-weight-bold mb-0">{mockStats.totalObjectives.count}</span>
+                    <span className="h2 font-weight-bold mb-0">{stats.keyResults.total}</span>
                   </Col>
                 </Row>
                 <p className="mt-3 mb-0 text-sm">
-                  <span className="text-success">{mockStats.totalObjectives.completed} completed</span>
-                  <span className="text-nowrap ml-2">{mockStats.totalObjectives.inProgress} in progress</span>
+                  <span className="text-success">{stats.keyResults.completed} completed</span>
+                  <span className="text-nowrap ml-2">{stats.keyResults.inProgress} in progress</span>
                 </p>
               </CardBody>
             </Card>
           </Col>
-          {/* Average Progress Card */}
-          <Col lg="3" sm="6">
+          <Col lg="4" sm="12">
             <Card className="card-stats">
               <CardBody>
                 <Row>
@@ -119,17 +126,12 @@ function OrgOKRs() {
                     <h5 className="card-title text-uppercase text-muted mb-0">
                       Average Progress
                     </h5>
-                    <span className="h2 font-weight-bold mb-0">68%</span>
-                  </Col>
-                  <Col className="col-auto">
-            <span className="text-success h4">
-              +5.2%
-            </span>
+                    <span className="h2 font-weight-bold mb-0">{stats.progress.current}%</span>
                   </Col>
                 </Row>
                 <div className="mt-3">
                   <Progress
-                    value={68}
+                    value={stats.progress.current}
                     color="success"
                     style={{ height: '6px' }}
                   />
@@ -137,34 +139,7 @@ function OrgOKRs() {
               </CardBody>
             </Card>
           </Col>
-
-          <Col lg="3" sm="6">
-            <Card className="card-stats">
-              <CardBody>
-                <Row>
-                  <Col>
-                    <h5 className="card-title text-uppercase text-muted mb-0">
-                      Time Remaining
-                    </h5>
-                    <span className="h2 font-weight-bold mb-0">65%</span>
-                  </Col>
-                  <Col className="col-auto">
-                  <span className="text-warning h4">
-                    42 days
-                  </span>
-                  </Col>
-                </Row>
-                <div className="mt-3">
-                  <Progress
-                    value={65}
-                    color="warning"
-                    style={{ height: '6px' }}
-                  />
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+        </Row>}
 
         <Row>
           <div className="col">

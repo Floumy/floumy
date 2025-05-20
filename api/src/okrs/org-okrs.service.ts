@@ -514,7 +514,7 @@ export class OrgOkrsService {
     );
 
     const currentProgress =
-      objectives.reduce((sum, obj) => sum + (obj.progress || 0), 0) /
+      objectives.reduce((sum, obj) => sum + (obj.progress * 100 || 0), 0) /
       (objectives.length || 1);
 
     return {
