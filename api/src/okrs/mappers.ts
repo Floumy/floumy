@@ -13,6 +13,7 @@ export class OKRMapper {
     const assignedTo = await objective.assignedTo;
     const org = await objective.org;
     const project = await objective.project;
+    const parentObjective = await objective.parentObjective;
     return {
       objective: {
         id: objective.id,
@@ -32,6 +33,13 @@ export class OKRMapper {
           objective.startDate,
           objective.endDate,
         ),
+        parentObjective: parentObjective
+          ? {
+              id: parentObjective.id,
+              reference: parentObjective.reference,
+              title: parentObjective.title,
+            }
+          : undefined,
         startDate: objective.startDate,
         endDate: objective.endDate,
         assignedTo: assignedTo

@@ -2,6 +2,7 @@ export interface ObjectiveDto {
   title: string;
   timeline?: string;
   assignedTo?: string;
+  parentObjective?: string;
 }
 
 export interface CreateOrUpdateKRDto {
@@ -16,6 +17,7 @@ export interface UpdateObjectiveDto {
   status: string;
   timeline?: string;
   assignedTo?: string;
+  parentObjective?: string;
 }
 
 export interface CreateOrUpdateOKRDto {
@@ -102,6 +104,11 @@ export interface OKRDto {
     };
     project: {
       id: string;
+    };
+    parentObjective: {
+      id: string;
+      reference: string;
+      title: string;
     };
     reference: string;
     title: string;

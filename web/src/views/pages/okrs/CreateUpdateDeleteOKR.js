@@ -3,11 +3,11 @@ import { ErrorMessage, Field, FieldArray, Form, Formik } from 'formik';
 import InputError from '../../../components/Errors/InputError';
 import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
-import { deleteOKR } from '../../../services/okrs/okrs.service';
+import { deleteOKR, listOrgObjectives } from '../../../services/okrs/okrs.service';
 import Select2 from 'react-select2-wrapper';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import DeleteWarning from '../components/DeleteWarning';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getOrg } from '../../../services/org/orgs.service';
 import { generateKeyResults } from '../../../services/ai/ai.service';
@@ -22,6 +22,8 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
   const navigate = useNavigate();
   const [members, setMembers] = useState([{ id: '', text: 'None' }]);
   const [assignedTo, setAssignedTo] = useState('');
+  const [orgObjectives, setOrgObjectives] = useState([{ id: '', text: 'None' }]);
+  const [orgObjective, setOrgObjective] = useState('');
 
   const onDeleteOKR = async (id) => {
     setIsLoading(true);
@@ -44,7 +46,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
       // Remove empty key results
       const keyResults = fields
         .filter((field) => field.title);
-      const savedOKR = await onSubmit({ ...values, timeline, assignedTo, keyResults: keyResults });
+      const savedOKR = await onSubmit({ ...values, timeline, assignedTo, keyResults: keyResults, parentObjective: orgObjective });
       navigate(`/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${savedOKR.objective.id}`, {replace: true});
       setTimeout(() => toast.success('The OKR has been saved'), 100);
     } catch (e) {
@@ -137,6 +139,22 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
     fetchData();
   }, [okr?.objective?.assignedTo]);
 
+  useEffect(() => {
+    async function fetchAndSetOrgObjectives() {
+      try {
+        const orgObjectives = await listOrgObjectives(orgId, timeline)
+        const orgObjectiveOptions = orgObjectives.map(objective => {return { id: objective.id, text: `${objective.reference}: ${objective.title}` } });
+        orgObjectiveOptions.push({ id: '', text: 'None' });
+        setOrgObjectives(orgObjectiveOptions);
+        setOrgObjective('');
+      } catch (e) {
+        toast.error('The Org OKRs could not be loaded');
+      }
+    }
+
+    fetchAndSetOrgObjectives()
+  }, [orgId, timeline]);
+
   async function fillKeyResultsWithAi(objective) {
     try {
       const keyResults = (await generateKeyResults(objective))
@@ -226,6 +244,27 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
                       data={members}
                       onChange={(e) => setAssignedTo(e.target.value)}
                     ></Select2>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <div className="form-group mb-3">
+                      <label htmlFor="objective-parent-objective"
+                             className="form-control-label col-form-label">
+                        {orgObjective ? <Link to={`/orgs/${orgId}/okrs/detail/${orgObjective}`}>
+                          Org Objective
+                          <i className="fa fa-link ml-2"/>
+                        </Link> : 'Org Objective'}
+                      </label>
+                      <Select2
+                        className="react-select-container"
+                        defaultValue={orgObjective}
+                        name="parentObjective"
+                        data={orgObjectives}
+                        onChange={(e) => {
+                          setOrgObjective(e.target.value);
+                        }}></Select2>
+                    </div>
                   </Col>
                 </Row>
                 <div className="form-row">

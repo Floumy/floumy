@@ -11,6 +11,7 @@ import {
   deleteObjectiveComment,
   deleteOKR,
   getOKR,
+  listOrgObjectives,
   updateObjective,
   updateObjectiveComment,
 } from '../../../services/okrs/okrs.service';
@@ -52,6 +53,8 @@ function DetailOKR() {
     { id: 'next-quarter', text: 'Next Quarter' },
     { id: 'later', text: 'Later' },
   ]);
+  const [orgObjectives, setOrgObjectives] = useState([{ id: '', text: 'None' }]);
+  const [orgObjective, setOrgObjective] = useState('');
 
   useEffect(() => {
     async function fetchAndSetMembers() {
@@ -69,6 +72,7 @@ function DetailOKR() {
         setOKR(okr);
         setStatus(okr.objective.status);
         setTimeline(okr.objective.timeline);
+        setOrgObjective(okr.objective.parentObjective?.id || '');
         setAssignedTo(okr.objective?.assignedTo?.id || '');
         // We need this to show the past quarter in the timeline options
         if (okr.objective.timeline === 'past') {
@@ -94,6 +98,22 @@ function DetailOKR() {
 
     fetchData();
   }, [id, orgId, projectId]);
+
+  useEffect(() => {
+    async function fetchAndSetOrgObjectives() {
+      try {
+        const orgObjectives = await listOrgObjectives(orgId, timeline)
+        const orgObjectiveOptions = orgObjectives.map(objective => {return { id: objective.id, text: `${objective.reference}: ${objective.title}` } });
+        orgObjectiveOptions.push({ id: '', text: 'None' });
+        setOrgObjectives(orgObjectiveOptions);
+        setOrgObjective('');
+      } catch (e) {
+        toast.error('The Org OKRs could not be loaded');
+      }
+    }
+
+    fetchAndSetOrgObjectives()
+  }, [orgId, timeline]);
 
   useMemo(() => {
     const filteredOrgMembers =
@@ -130,6 +150,7 @@ function DetailOKR() {
         assignedTo,
         status,
         timeline,
+        parentObjective: orgObjective
       });
       setOKR({ ...okr, objective: updatedOkr.objective });
       toast.success('The OKR has been saved');
@@ -344,6 +365,27 @@ function DetailOKR() {
                                   data={timelineOptions}
                                   onChange={(e) => {
                                     setTimeline(e.target.value);
+                                  }}></Select2>
+                              </div>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col>
+                              <div className="form-group mb-3">
+                                <label htmlFor="objective-parent-objective"
+                                       className="form-control-label col-form-label">
+                                  {orgObjective ? <Link to={`/orgs/${orgId}/okrs/detail/${orgObjective}`}>
+                                    Org Objective
+                                    <i className="fa fa-link ml-2"/>
+                                  </Link> : 'Org Objective'}
+                                </label>
+                                <Select2
+                                  className="react-select-container"
+                                  defaultValue={orgObjective}
+                                  name="parentObjective"
+                                  data={orgObjectives}
+                                  onChange={(e) => {
+                                    setOrgObjective(e.target.value);
                                   }}></Select2>
                               </div>
                             </Col>

@@ -1,13 +1,12 @@
-
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 // nodejs library that concatenates classes
 // reactstrap components
-import { Container, Row } from "reactstrap";
+import { Container, Row } from 'reactstrap';
 // core components
-import SimpleHeader from "components/Headers/SimpleHeader.js";
-import { addOKR } from "../../../services/okrs/okrs.service";
-import CreateUpdateDeleteOKR from "./CreateUpdateDeleteOKR";
-import { useParams } from "react-router-dom";
+import SimpleHeader from 'components/Headers/SimpleHeader.js';
+import { addOKR } from '../../../services/okrs/okrs.service';
+import CreateUpdateDeleteOKR from './CreateUpdateDeleteOKR';
+import { useParams } from 'react-router-dom';
 
 function NewOKR() {
   const { orgId, projectId } = useParams();
@@ -28,7 +27,8 @@ function NewOKR() {
                   objective: {
                     title: values.objective,
                     timeline: values.timeline,
-                    assignedTo: values.assignedTo
+                    assignedTo: values.assignedTo,
+                    parentObjective: values.parentObjective
                   },
                   keyResults: values.keyResults
                 });

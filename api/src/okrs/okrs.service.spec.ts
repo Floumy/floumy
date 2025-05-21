@@ -18,6 +18,7 @@ describe('OkrsService', () => {
   let orgsService: OrgsService;
   let featuresRepository: Repository<Initiative>;
   let projectsRepository: Repository<Project>;
+  let objectivesRepository: Repository<Objective>;
   let usersService: UsersService;
   let org: Org;
   let project: Project;
@@ -37,6 +38,9 @@ describe('OkrsService', () => {
     );
     projectsRepository = module.get<Repository<Project>>(
       getRepositoryToken(Project),
+    );
+    objectivesRepository = module.get<Repository<Objective>>(
+      getRepositoryToken(Objective),
     );
     const user = new User('Test User', 'testuser@example.com', 'testtesttest');
     org = await orgsService.createForUser(user);
@@ -360,6 +364,45 @@ describe('OkrsService', () => {
       expect(okr.keyResults[2].updatedAt).toBeDefined();
       expect(okr.keyResults[2].title).toEqual('My KR 3');
     });
+    it('should store the parent objective', async () => {
+      const parentObjective = new Objective();
+      parentObjective.title = 'My Parent Objective';
+      parentObjective.org = Promise.resolve(org);
+      parentObjective.level = ObjectiveLevel.ORGANIZATION;
+      await objectivesRepository.save(parentObjective);
+
+      const okr = await service.create(org.id, project.id, {
+        objective: {
+          title: 'My OKR',
+          parentObjective: parentObjective.id,
+        },
+        keyResults: [
+          { title: 'My KR 1' },
+          { title: 'My KR 2' },
+          { title: 'My KR 3' },
+        ],
+      });
+      const storedObjective = await service.get(
+        org.id,
+        project.id,
+        okr.objective.id,
+      );
+      expect(storedObjective).toBeDefined();
+      expect(storedObjective.objective.title).toEqual(okr.objective.title);
+      expect(storedObjective.objective.parentObjective.id).toEqual(
+        parentObjective.id,
+      );
+      expect(storedObjective.objective.parentObjective.title).toEqual(
+        parentObjective.title,
+      );
+      expect(storedObjective.objective.reference).toBeDefined();
+      expect(storedObjective.objective.createdAt).toEqual(
+        okr.objective.createdAt,
+      );
+      expect(storedObjective.objective.updatedAt).toEqual(
+        okr.objective.updatedAt,
+      );
+    });
   });
   describe('when updating a KR progress', () => {
     it('should update the KR progress', async () => {
@@ -585,6 +628,30 @@ describe('OkrsService', () => {
       );
       const updatedObjective = await service.getObjective(objective.id);
       expect(updatedObjective.progress).toEqual(0.5);
+    });
+    it('should update the parent objective', async () => {
+      const parentObjective = new Objective();
+      parentObjective.title = 'Parent Objective';
+      parentObjective.org = Promise.resolve(org);
+      parentObjective.level = ObjectiveLevel.ORGANIZATION;
+      await objectivesRepository.save(parentObjective);
+
+      const objective = await service.createObjective(org.id, project.id, {
+        title: 'Test Objective',
+        timeline: 'this-quarter',
+      });
+      const updatedObjective = await service.updateObjective(
+        org.id,
+        project.id,
+        objective.id,
+        {
+          parentObjective: parentObjective.id,
+          title: objective.title,
+          status: objective.status,
+        },
+      );
+
+      expect(updatedObjective.objective.parentObjective.id).toEqual(parentObjective.id);
     });
   });
   describe('when creating a key result', () => {
