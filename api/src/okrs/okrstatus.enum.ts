@@ -1,4 +1,4 @@
-export enum OKRStatus {
+export enum ObjectiveStatus {
   ON_TRACK = 'on-track',
   OFF_TRACK = 'off-track',
   AHEAD_OF_SCHEDULE = 'ahead-of-schedule',

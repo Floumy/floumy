@@ -1,4 +1,3 @@
-import { OkrsService } from './okrs.service';
 import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Objective, ObjectiveLevel } from './objective.entity';
@@ -12,9 +11,10 @@ import { UsersService } from '../users/users.service';
 import { Timeline } from '../common/timeline.enum';
 import { ObjectiveStatus } from './okrstatus.enum';
 import { Project } from '../projects/project.entity';
+import { OrgOkrsService } from './org-okrs.service';
 
-describe('OkrsService', () => {
-  let service: OkrsService;
+describe('OrgOkrsService', () => {
+  let service: OrgOkrsService;
   let orgsService: OrgsService;
   let featuresRepository: Repository<Initiative>;
   let projectsRepository: Repository<Project>;
@@ -26,10 +26,10 @@ describe('OkrsService', () => {
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [TypeOrmModule.forFeature([Objective, Org, KeyResult, Initiative, User])],
-      [OkrsService, OrgsService, UsersService],
+      [OrgOkrsService, OrgsService, UsersService],
     );
     cleanup = dbCleanup;
-    service = module.get<OkrsService>(OkrsService);
+    service = module.get<OrgOkrsService>(OrgOkrsService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     featuresRepository = module.get<Repository<Initiative>>(
@@ -63,18 +63,18 @@ describe('OkrsService', () => {
 
   describe('when creating an objective', () => {
     it('should return the objective', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
       });
       expect(objective).toBeDefined();
       expect(objective.id).toBeDefined();
       expect(objective.status).toEqual(ObjectiveStatus.ON_TRACK);
-      expect(objective.level).toEqual(ObjectiveLevel.PROJECT);
+      expect(objective.level).toEqual(ObjectiveLevel.ORGANIZATION);
       expect(objective.createdAt).toBeDefined();
       expect(objective.updatedAt).toBeDefined();
     });
     it('should store the objective', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
       });
       const storedObjective = await service.findObjectiveById(objective.id);
@@ -86,13 +86,13 @@ describe('OkrsService', () => {
 
     it('should validate the objective', async () => {
       await expect(
-        service.createObjective(org.id, project.id, { title: '' }),
+        service.createObjective(org.id, { title: '' }),
       ).rejects.toThrow();
     });
 
     it('should assign the objective to the org', async () => {
-      const { org: testOrg, project } = await createTestOrg();
-      const objective = await service.createObjective(testOrg.id, project.id, {
+      const { org: testOrg } = await createTestOrg();
+      const objective = await service.createObjective(testOrg.id, {
         title: 'Test Objective',
       });
       const storedObjective = await service.findObjectiveById(objective.id);
@@ -103,7 +103,7 @@ describe('OkrsService', () => {
 
     it('should validate the timeline', async () => {
       await expect(
-        service.createObjective(org.id, project.id, {
+        service.createObjective(org.id, {
           title: 'Test Objective',
           timeline: 'invalid',
         }),
@@ -121,7 +121,7 @@ describe('OkrsService', () => {
       project.name = 'Test Project';
       project.org = Promise.resolve(org);
       await projectsRepository.save(project);
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
         assignedTo: user.id,
       });
@@ -133,14 +133,14 @@ describe('OkrsService', () => {
 
   describe('when listing objectives', () => {
     it('should return an empty array', async () => {
-      const objectives = await service.list(org.id, project.id);
+      const objectives = await service.list(org.id);
       expect(objectives).toEqual([]);
     });
     it('should return an array of objectives', async () => {
-      await service.createObjective(org.id, project.id, {
+      await service.createObjective(org.id, {
         title: 'Test Objective',
       });
-      const objectives = await service.list(org.id, project.id);
+      const objectives = await service.list(org.id);
       expect(objectives).toHaveLength(1);
       expect(objectives[0].title).toEqual('Test Objective');
     });
@@ -148,14 +148,10 @@ describe('OkrsService', () => {
 
   describe('when getting an objective', () => {
     it('should return the objective', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
       });
-      const storedObjective = await service.get(
-        org.id,
-        project.id,
-        objective.id,
-      );
+      const storedObjective = await service.get(org.id, objective.id);
       expect(storedObjective).toBeDefined();
       expect(storedObjective.objective.title).toEqual(objective.title);
       expect(storedObjective.objective.createdAt).toEqual(objective.createdAt);
@@ -165,17 +161,17 @@ describe('OkrsService', () => {
 
   describe('when updating an objective', () => {
     it('should update the values in db', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
       });
       const okrDto = {
         title: 'Updated Objective',
         status: ObjectiveStatus.COMPLETED,
       };
-      await service.updateObjective(org.id, project.id, objective.id, okrDto);
+      await service.updateObjective(org.id, objective.id, okrDto);
       const storedObjective = await service.get(
         org.id,
-        project.id,
+
         objective.id,
       );
       expect(storedObjective).toBeDefined();
@@ -185,7 +181,7 @@ describe('OkrsService', () => {
       );
     });
     it('should update objective timeline', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
       });
       const okrDto = {
@@ -193,10 +189,10 @@ describe('OkrsService', () => {
         status: objective.status,
         timeline: 'this-quarter',
       };
-      await service.updateObjective(org.id, project.id, objective.id, okrDto);
+      await service.updateObjective(org.id, objective.id, okrDto);
       const storedObjective = await service.get(
         org.id,
-        project.id,
+
         objective.id,
       );
       expect(storedObjective).toBeDefined();
@@ -215,7 +211,7 @@ describe('OkrsService', () => {
     project.name = 'Test Project';
     project.org = Promise.resolve(org);
     await projectsRepository.save(project);
-    const objective = await service.createObjective(org.id, project.id, {
+    const objective = await service.createObjective(org.id, {
       title: 'Test Objective',
     });
     const okrDto = {
@@ -224,8 +220,8 @@ describe('OkrsService', () => {
       description: 'Updated Objective Description',
       assignedTo: user.id,
     };
-    await service.updateObjective(org.id, project.id, objective.id, okrDto);
-    const storedObjective = await service.get(org.id, project.id, objective.id);
+    await service.updateObjective(org.id, objective.id, okrDto);
+    const storedObjective = await service.get(org.id, objective.id);
     expect(storedObjective).toBeDefined();
     const assignedTo = storedObjective.objective.assignedTo;
     expect(assignedTo).not.toBeNull();
@@ -241,7 +237,7 @@ describe('OkrsService', () => {
     project.name = 'Test Project';
     project.org = Promise.resolve(org);
     await projectsRepository.save(project);
-    const objective = await service.createObjective(org.id, project.id, {
+    const objective = await service.createObjective(org.id, {
       title: 'Test Objective',
     });
     const okrDto = {
@@ -250,8 +246,8 @@ describe('OkrsService', () => {
       description: 'Updated Objective Description',
       assignedTo: null,
     };
-    await service.updateObjective(org.id, project.id, objective.id, okrDto);
-    const storedObjective = await service.get(org.id, project.id, objective.id);
+    await service.updateObjective(org.id, objective.id, okrDto);
+    const storedObjective = await service.get(org.id, objective.id);
     expect(storedObjective).toBeDefined();
     const assignedTo = storedObjective.objective.assignedTo;
     expect(assignedTo).toBeUndefined();
@@ -259,26 +255,22 @@ describe('OkrsService', () => {
 
   describe('when deleting an objective', () => {
     it('should delete the objective', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
       });
-      await service.delete(org.id, project.id, objective.id);
-      await expect(
-        service.get(org.id, project.id, objective.id),
-      ).rejects.toThrow();
+      await service.delete(org.id, objective.id);
+      await expect(service.get(org.id, objective.id)).rejects.toThrow();
     });
     it('should delete the key results', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
       });
       await service.createKeyResultFor(objective, 'Test Key Result');
-      await service.delete(org.id, project.id, objective.id);
-      await expect(
-        service.get(org.id, project.id, objective.id),
-      ).rejects.toThrow();
+      await service.delete(org.id, objective.id);
+      await expect(service.get(org.id, objective.id)).rejects.toThrow();
     });
     it('should remove the key results from the associated feature', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
         timeline: 'this-quarter',
       });
@@ -293,7 +285,7 @@ describe('OkrsService', () => {
       feature.keyResult = Promise.resolve(keyResult);
       feature.project = Promise.resolve(project);
       await featuresRepository.save(feature);
-      await service.delete(org.id, project.id, objective.id);
+      await service.delete(org.id, objective.id);
       const storedFeature = await featuresRepository.findOne({
         where: { id: feature.id },
       });
@@ -304,7 +296,7 @@ describe('OkrsService', () => {
 
   describe('when creating an OKR', () => {
     it('should return the OKR', async () => {
-      const okr = await service.create(org.id, project.id, {
+      const okr = await service.create(org.id, {
         objective: {
           title: 'My OKR',
         },
@@ -323,7 +315,7 @@ describe('OkrsService', () => {
     });
 
     it('should store the OKR', async () => {
-      const okr = await service.create(org.id, project.id, {
+      const okr = await service.create(org.id, {
         objective: {
           title: 'My OKR',
         },
@@ -335,7 +327,7 @@ describe('OkrsService', () => {
       });
       const storedObjective = await service.get(
         org.id,
-        project.id,
+
         okr.objective.id,
       );
       expect(storedObjective).toBeDefined();
@@ -363,7 +355,7 @@ describe('OkrsService', () => {
   });
   describe('when updating a KR progress', () => {
     it('should update the KR progress', async () => {
-      const okr = await service.create(org.id, project.id, {
+      const okr = await service.create(org.id, {
         objective: {
           title: 'My OKR',
         },
@@ -375,7 +367,7 @@ describe('OkrsService', () => {
       });
       await service.patchKeyResult(
         org.id,
-        project.id,
+
         okr.objective.id,
         okr.keyResults[0].id,
         { progress: 0.5 },
@@ -384,7 +376,7 @@ describe('OkrsService', () => {
       expect(updatedKR.progress).toEqual(0.5);
     });
     it('should update the objective progress', async () => {
-      const okr = await service.create(org.id, project.id, {
+      const okr = await service.create(org.id, {
         objective: {
           title: 'My OKR',
         },
@@ -396,21 +388,21 @@ describe('OkrsService', () => {
       });
       await service.patchKeyResult(
         org.id,
-        project.id,
+
         okr.objective.id,
         okr.keyResults[0].id,
         { progress: 0.5 },
       );
       await service.patchKeyResult(
         org.id,
-        project.id,
+
         okr.objective.id,
         okr.keyResults[1].id,
         { progress: 0.5 },
       );
       await service.patchKeyResult(
         org.id,
-        project.id,
+
         okr.objective.id,
         okr.keyResults[2].id,
         { progress: 0.5 },
@@ -421,7 +413,7 @@ describe('OkrsService', () => {
   });
   describe('when updating the key result status', () => {
     it('should update the key result status', async () => {
-      const okr = await service.create(org.id, project.id, {
+      const okr = await service.create(org.id, {
         objective: {
           title: 'My OKR',
         },
@@ -433,7 +425,7 @@ describe('OkrsService', () => {
       });
       await service.patchKeyResult(
         org.id,
-        project.id,
+
         okr.objective.id,
         okr.keyResults[0].id,
         { status: 'off-track' },
@@ -442,7 +434,7 @@ describe('OkrsService', () => {
       expect(updatedKR.status).toEqual('off-track');
     });
     it('should be able to update the key result progress to 0', async () => {
-      const okr = await service.create(org.id, project.id, {
+      const okr = await service.create(org.id, {
         objective: {
           title: 'My OKR',
         },
@@ -454,7 +446,7 @@ describe('OkrsService', () => {
       });
       await service.patchKeyResult(
         org.id,
-        project.id,
+
         okr.objective.id,
         okr.keyResults[0].id,
         { progress: 0 },
@@ -465,7 +457,7 @@ describe('OkrsService', () => {
   });
   describe('when updating a key result title', () => {
     it('should update the key result title', async () => {
-      const okr = await service.create(org.id, project.id, {
+      const okr = await service.create(org.id, {
         objective: {
           title: 'My OKR',
         },
@@ -477,7 +469,7 @@ describe('OkrsService', () => {
       });
       await service.patchKeyResult(
         org.id,
-        project.id,
+
         okr.objective.id,
         okr.keyResults[0].id,
         { title: 'Updated KR 1' },
@@ -488,22 +480,22 @@ describe('OkrsService', () => {
   });
   describe('when listing key results', () => {
     it('should return an empty array', async () => {
-      const keyResults = await service.listKeyResults(org.id, project.id);
+      const keyResults = await service.listKeyResults(org.id);
       expect(keyResults).toEqual([]);
     });
     it('should return an array of key results', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
       });
       await service.createKeyResultFor(objective, 'Test Key Result');
-      const keyResults = await service.listKeyResults(org.id, project.id);
+      const keyResults = await service.listKeyResults(org.id);
       expect(keyResults).toHaveLength(1);
       expect(keyResults[0].title).toEqual('Test Key Result');
     });
   });
   describe('when deleting a key result', () => {
     it('should delete the key result', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
         timeline: 'this-quarter',
       });
@@ -515,7 +507,7 @@ describe('OkrsService', () => {
       await expect(service.getKeyResultBy(keyResult.id)).rejects.toThrow();
     });
     it('should update the objective progress', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
         timeline: 'this-quarter',
       });
@@ -523,15 +515,9 @@ describe('OkrsService', () => {
         objective,
         'Test Key Result',
       );
-      await service.patchKeyResult(
-        org.id,
-        project.id,
-        objective.id,
-        keyResult.id,
-        {
-          progress: 0.5,
-        },
-      );
+      await service.patchKeyResult(org.id, objective.id, keyResult.id, {
+        progress: 0.5,
+      });
       await service.deleteKeyResult(org.id, objective.id, keyResult.id);
       const updatedObjective = await service.getObjective(objective.id);
       expect(updatedObjective.progress).toEqual(0);
@@ -539,7 +525,7 @@ describe('OkrsService', () => {
   });
   describe('when updating a key result', () => {
     it('should update the key result', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
         timeline: 'this-quarter',
       });
@@ -549,7 +535,7 @@ describe('OkrsService', () => {
       );
       await service.updateKeyResult(
         org.id,
-        project.id,
+
         objective.id,
         keyResult.id,
         {
@@ -564,7 +550,7 @@ describe('OkrsService', () => {
       expect(updatedKR.status).toEqual('off-track');
     });
     it('should update the objective progress', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
         timeline: 'this-quarter',
       });
@@ -574,7 +560,7 @@ describe('OkrsService', () => {
       );
       await service.updateKeyResult(
         org.id,
-        project.id,
+
         objective.id,
         keyResult.id,
         {
@@ -589,7 +575,7 @@ describe('OkrsService', () => {
   });
   describe('when creating a key result', () => {
     it('should create the key result', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
         timeline: 'this-quarter',
       });
@@ -604,7 +590,7 @@ describe('OkrsService', () => {
       expect(storedKR.status).toEqual('off-track');
     });
     it('should update the objective progress', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
         timeline: 'this-quarter',
       });
@@ -619,7 +605,7 @@ describe('OkrsService', () => {
   });
   describe('when getting a key result', () => {
     it('should return the key result', async () => {
-      const objective = await service.createObjective(org.id, project.id, {
+      const objective = await service.createObjective(org.id, {
         title: 'Test Objective',
       });
       const keyResult = await service.createKeyResultFor(
@@ -640,13 +626,13 @@ describe('OkrsService', () => {
     it('should return an empty array', async () => {
       const okrs = await service.listForTimeline(
         org.id,
-        project.id,
+
         Timeline.THIS_QUARTER,
       );
       expect(okrs).toEqual([]);
     });
     it('should return an array of okrs', async () => {
-      await service.create(org.id, project.id, {
+      await service.create(org.id, {
         objective: {
           title: 'My OKR',
           timeline: 'this-quarter',
@@ -659,14 +645,14 @@ describe('OkrsService', () => {
       });
       const okrs = await service.listForTimeline(
         org.id,
-        project.id,
+
         Timeline.THIS_QUARTER,
       );
       expect(okrs).toHaveLength(1);
       expect(okrs[0].title).toEqual('My OKR');
     });
     it('should return the okrs for the past', async () => {
-      await service.create(org.id, project.id, {
+      await service.create(org.id, {
         objective: {
           title: 'My OKR',
           timeline: 'this-quarter',
@@ -679,13 +665,13 @@ describe('OkrsService', () => {
       });
       const okrs = await service.listForTimeline(
         org.id,
-        project.id,
+
         Timeline.PAST,
       );
       expect(okrs).toHaveLength(0);
     });
     it('should return the okrs for later', async () => {
-      await service.create(org.id, project.id, {
+      await service.create(org.id, {
         objective: {
           title: 'My OKR',
           timeline: 'this-quarter',
@@ -696,7 +682,7 @@ describe('OkrsService', () => {
           { title: 'My KR 3' },
         ],
       });
-      await service.create(org.id, project.id, {
+      await service.create(org.id, {
         objective: {
           title: 'My Other OKR',
           timeline: 'later',
@@ -705,11 +691,34 @@ describe('OkrsService', () => {
       });
       const okrs = await service.listForTimeline(
         org.id,
-        project.id,
+
         Timeline.LATER,
       );
       expect(okrs).toHaveLength(1);
       expect(okrs[0].title).toEqual('My Other OKR');
+    });
+  });
+  describe('when getting the okrs stats', () => {
+    it('should return the okrs stats', async () => {
+      await service.create(org.id, {
+        objective: {
+          title: 'My OKR',
+          timeline: 'this-quarter',
+        },
+        keyResults: [
+          { title: 'My KR 1' },
+          { title: 'My KR 2' },
+          { title: 'My KR 3' },
+        ],
+      });
+      const stats = await service.getStats(org.id);
+      expect(stats.objectives.total).toEqual(1);
+      expect(stats.objectives.completed).toEqual(0);
+      expect(stats.objectives.inProgress).toEqual(1);
+      expect(stats.keyResults.total).toEqual(3);
+      expect(stats.keyResults.completed).toEqual(0);
+      expect(stats.keyResults.inProgress).toEqual(3);
+      expect(stats.progress.current).toEqual(0);
     });
   });
 });
