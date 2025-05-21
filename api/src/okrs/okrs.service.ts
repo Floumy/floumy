@@ -75,6 +75,15 @@ export class OkrsService {
         }),
       );
     }
+    if (objective.parentObjective) {
+      newObjective.parentObjective = Promise.resolve(
+        await this.objectiveRepository.findOneByOrFail({
+          id: objective.parentObjective,
+          org: { id: orgId },
+          level: ObjectiveLevel.ORGANIZATION,
+        }),
+      );
+    }
     await this.objectiveRepository.save(newObjective);
     return this.objectiveRepository.findOneByOrFail({ id: newObjective.id });
   }
@@ -176,6 +185,14 @@ export class OkrsService {
       objective.assignedTo = Promise.resolve(assignedToUser);
     } else if (assignedTo) {
       objective.assignedTo = Promise.resolve(null);
+    }
+    if (okrDto.parentObjective) {
+      const parentObjective = await this.objectiveRepository.findOneByOrFail({
+        id: okrDto.parentObjective,
+        org: { id: orgId },
+        level: ObjectiveLevel.ORGANIZATION,
+      });
+      objective.parentObjective = Promise.resolve(parentObjective);
     }
 
     const savedObjective = await this.objectiveRepository.save(objective);

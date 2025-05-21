@@ -169,6 +169,7 @@ export class OrgOkrsService {
   async delete(orgId: string, id: string) {
     const okr = await this.get(orgId, id);
     await this.removeKeyResultsAssociations(orgId, id);
+    await this.removeObjectiveAssociations(orgId, id);
     await this.keyResultRepository.delete({
       objective: { id, org: { id: orgId } },
     });
@@ -532,5 +533,12 @@ export class OrgOkrsService {
         current: Math.round(currentProgress),
       },
     };
+  }
+
+  private async removeObjectiveAssociations(orgId: string, id: string) {
+    await this.objectiveRepository.update(
+      { parentObjective: { id }, org: { id: orgId } },
+      { parentObjective: null },
+    );
   }
 }
