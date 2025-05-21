@@ -18,10 +18,9 @@ import {
   PatchKeyResultDto,
   UpdateObjectiveDto,
 } from './dtos';
-import { Project } from '../projects/project.entity';
 
 @Injectable()
-export class OkrsService {
+export class OrgOkrsService {
   constructor(
     @InjectRepository(Objective)
     private objectiveRepository: Repository<Objective>,
@@ -33,14 +32,9 @@ export class OkrsService {
     private usersRepository: Repository<User>,
     private orgsService: OrgsService,
     private eventEmitter: EventEmitter2,
-    @InjectRepository(Project) private projectsRepository: Repository<Project>,
   ) {}
 
-  async createObjective(
-    orgId: string,
-    projectId: string,
-    objective: ObjectiveDto,
-  ) {
+  async createObjective(orgId: string, objective: ObjectiveDto) {
     if (!objective.title) throw new Error('Objective title is required');
 
     const org = await this.orgsService.findOneById(orgId);
@@ -49,16 +43,7 @@ export class OkrsService {
     const newObjective = new Objective();
     newObjective.title = objective.title;
     newObjective.org = Promise.resolve(org);
-
-    if (projectId != null) {
-      const project = await this.projectsRepository.findOneByOrFail({
-        id: projectId,
-        org: { id: orgId },
-      });
-      newObjective.project = Promise.resolve(project);
-    }
-
-    newObjective.level = ObjectiveLevel.PROJECT;
+    newObjective.level = ObjectiveLevel.ORGANIZATION;
 
     if (objective.timeline) {
       TimelineService.validateTimeline(objective.timeline);
@@ -94,40 +79,31 @@ export class OkrsService {
     return await this.objectiveRepository.findOneBy({ id });
   }
 
-  async list(orgId: string, projectId: string) {
+  async list(orgId: string) {
     const objectives = await this.objectiveRepository.findBy({
       org: { id: orgId },
-      project: { id: projectId },
+      level: ObjectiveLevel.ORGANIZATION,
     });
     return await OKRMapper.toListDTO(objectives);
   }
 
-  async get(orgId: any, projectId: string, id: string) {
-    const { objective, keyResults } = await this.getObjectiveDetails(
-      id,
-      orgId,
-      projectId,
-    );
+  async get(orgId: any, id: string) {
+    const { objective, keyResults } = await this.getObjectiveDetails(id, orgId);
     return await OKRMapper.toDTOWithComments(objective, keyResults);
   }
 
-  async getObjectiveDetails(id: string, orgId: string, projectId: string) {
+  async getObjectiveDetails(id: string, orgId: string) {
     const objective = await this.objectiveRepository.findOneByOrFail({
       id,
       org: { id: orgId },
-      project: { id: projectId },
+      level: ObjectiveLevel.ORGANIZATION,
     });
     const keyResults = await objective.keyResults;
     keyResults.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
     return { objective, keyResults };
   }
 
-  async updateObjective(
-    orgId: string,
-    projectId: string,
-    id: string,
-    okrDto: UpdateObjectiveDto,
-  ) {
+  async updateObjective(orgId: string, id: string, okrDto: UpdateObjectiveDto) {
     if (!okrDto.title) throw new Error('Objective title is required');
     if (
       !okrDto.status ||
@@ -138,7 +114,7 @@ export class OkrsService {
     const objective = await this.objectiveRepository.findOneByOrFail({
       id,
       org: { id: orgId },
-      project: { id: projectId },
+      level: ObjectiveLevel.ORGANIZATION,
     });
     const originalObjective = await OKRMapper.toDTO(
       objective,
@@ -190,8 +166,8 @@ export class OkrsService {
     return updatedOkr;
   }
 
-  async delete(orgId: string, projectId: string, id: string) {
-    const okr = await this.get(orgId, projectId, id);
+  async delete(orgId: string, id: string) {
+    const okr = await this.get(orgId, id);
     await this.removeKeyResultsAssociations(orgId, id);
     await this.keyResultRepository.delete({
       objective: { id, org: { id: orgId } },
@@ -203,15 +179,11 @@ export class OkrsService {
     this.eventEmitter.emit('okr.deleted', okr);
   }
 
-  async create(orgId: string, projectId: string, okrDto: CreateOrUpdateOKRDto) {
+  async create(orgId: string, okrDto: CreateOrUpdateOKRDto) {
     if (okrDto.objective.timeline) {
       TimelineService.validateTimeline(okrDto.objective.timeline);
     }
-    const objective = await this.createObjective(
-      orgId,
-      projectId,
-      okrDto.objective,
-    );
+    const objective = await this.createObjective(orgId, okrDto.objective);
     if (!okrDto.keyResults || okrDto.keyResults.length === 0) {
       const savedOkr = await OKRMapper.toDTO(objective, []);
       this.eventEmitter.emit('okr.created', savedOkr);
@@ -231,7 +203,6 @@ export class OkrsService {
 
   async patchKeyResult(
     orgId: any,
-    projectId: string,
     objectiveId: string,
     keyResultId: string,
     updateKeyResultDto: PatchKeyResultDto,
@@ -241,7 +212,7 @@ export class OkrsService {
       objective: {
         id: objectiveId,
         org: { id: orgId },
-        project: { id: projectId },
+        level: ObjectiveLevel.ORGANIZATION,
       },
     });
 
@@ -278,15 +249,10 @@ export class OkrsService {
     return await this.keyResultRepository.findOneByOrFail({ id });
   }
 
-  async getKeyResultByOrgAndProject(
-    orgId: string,
-    projectId: string,
-    id: string,
-  ) {
+  async getKeyResultByOrgAndProject(orgId: string, id: string) {
     return await this.keyResultRepository.findOneByOrFail({
       id,
       org: { id: orgId },
-      project: { id: projectId },
     });
   }
 
@@ -295,9 +261,12 @@ export class OkrsService {
   }
 
   // TODO: Check if other entities should have the projectId as a parameter
-  async listKeyResults(orgId: string, projectId: string) {
+  async listKeyResults(orgId: string) {
     const keyResults = await this.keyResultRepository.find({
-      where: { org: { id: orgId }, project: { id: projectId } },
+      where: {
+        org: { id: orgId },
+        objective: { level: ObjectiveLevel.ORGANIZATION },
+      },
       relations: ['initiatives', 'objective', 'org', 'initiatives.workItems'],
     });
     return await KeyResultMapper.toListDTO(keyResults);
@@ -328,7 +297,6 @@ export class OkrsService {
 
   async updateKeyResult(
     orgId: string,
-    porductId: string,
     objectiveId: string,
     keyResultId: string,
     updateKeyResultDto: CreateOrUpdateKeyResultDto,
@@ -338,7 +306,7 @@ export class OkrsService {
       objective: {
         id: objectiveId,
         org: { id: orgId },
-        project: { id: porductId },
+        level: ObjectiveLevel.ORGANIZATION,
       },
     });
     this.validateCreateOrUpdateKeyResult(updateKeyResultDto);
@@ -377,7 +345,6 @@ export class OkrsService {
     );
     keyResult.objective = Promise.resolve(objective);
     keyResult.org = Promise.resolve(await objective.org);
-    keyResult.project = Promise.resolve(await objective.project);
     await this.keyResultRepository.save(keyResult);
     const savedKeyResult = await this.keyResultRepository.findOneByOrFail({
       id: keyResult.id,
@@ -408,26 +375,21 @@ export class OkrsService {
     });
   }
 
-  async listForTimeline(orgId: string, projectId: string, timeline: Timeline) {
-    const objectives = await this.listObjectivesForTimeline(
-      orgId,
-      projectId,
-      timeline,
-    );
+  async listForTimeline(orgId: string, timeline: Timeline) {
+    const objectives = await this.listObjectivesForTimeline(orgId, timeline);
     return await OKRMapper.toListDTO(objectives);
   }
 
   async listObjectivesForTimeline(
     orgId: string,
-    projectId: string,
     timeline: Timeline,
   ): Promise<Objective[]> {
     if (timeline === Timeline.PAST) {
-      return await this.listPastObjectives(orgId, projectId);
+      return await this.listPastObjectives(orgId);
     }
 
     if (timeline == Timeline.LATER) {
-      return await this.listLaterObjectives(orgId, projectId);
+      return await this.listLaterObjectives(orgId);
     }
 
     const { startDate, endDate } =
@@ -435,7 +397,7 @@ export class OkrsService {
     return await this.objectiveRepository.find({
       where: {
         org: { id: orgId },
-        project: { id: projectId },
+        level: ObjectiveLevel.ORGANIZATION,
         startDate,
         endDate,
       },
@@ -490,20 +452,20 @@ export class OkrsService {
       throw new Error('Key Result status is invalid');
   }
 
-  private async listPastObjectives(orgId: string, projectId: string) {
+  private async listPastObjectives(orgId: string) {
     const { startDate } = TimelineService.calculateQuarterDates(
       TimelineService.getCurrentQuarter(),
     );
     return await this.objectiveRepository.find({
       where: {
         org: { id: orgId },
-        project: { id: projectId },
+        level: ObjectiveLevel.ORGANIZATION,
         endDate: LessThan(startDate),
       },
     });
   }
 
-  private async listLaterObjectives(orgId: string, projectId: string) {
+  private async listLaterObjectives(orgId: string) {
     const { endDate } = TimelineService.calculateQuarterDates(
       TimelineService.getCurrentQuarter() + 1,
     );
@@ -511,16 +473,64 @@ export class OkrsService {
       where: [
         {
           org: { id: orgId },
-          project: { id: projectId },
+          level: ObjectiveLevel.ORGANIZATION,
           startDate: MoreThan(endDate),
         },
         {
           org: { id: orgId },
-          project: { id: projectId },
+          level: ObjectiveLevel.ORGANIZATION,
           startDate: IsNull(),
           endDate: IsNull(),
         },
       ],
     });
+  }
+
+  async getStats(orgId: string) {
+    const objectives = await this.objectiveRepository.findBy({
+      org: { id: orgId },
+      level: ObjectiveLevel.ORGANIZATION,
+    });
+
+    const keyResults = await this.keyResultRepository.find({
+      where: {
+        org: { id: orgId },
+        objective: { level: ObjectiveLevel.ORGANIZATION },
+      },
+    });
+
+    const completedObjectives = objectives.filter(
+      (obj) => obj.status === ObjectiveStatus.COMPLETED,
+    );
+    const inProgressObjectives = objectives.filter(
+      (obj) => obj.status !== ObjectiveStatus.COMPLETED,
+    );
+
+    const completedKeyResults = keyResults.filter(
+      (kr) => kr.status === ObjectiveStatus.COMPLETED,
+    );
+    const inProgressKeyResults = keyResults.filter(
+      (kr) => kr.status !== ObjectiveStatus.COMPLETED,
+    );
+
+    const currentProgress =
+      objectives.reduce((sum, obj) => sum + (obj.progress * 100 || 0), 0) /
+      (objectives.length || 1);
+
+    return {
+      objectives: {
+        total: objectives.length,
+        completed: completedObjectives.length,
+        inProgress: inProgressObjectives.length,
+      },
+      keyResults: {
+        total: keyResults.length,
+        completed: completedKeyResults.length,
+        inProgress: inProgressKeyResults.length,
+      },
+      progress: {
+        current: Math.round(currentProgress),
+      },
+    };
   }
 }

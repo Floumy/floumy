@@ -15,18 +15,18 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { OkrsService } from './okrs.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { Timeline } from '../common/timeline.enum';
-import { CreateOrUpdateKeyResultDto, CreateOrUpdateOKRDto, PatchKeyResultDto, UpdateObjectiveDto } from './dtos';
 import { CommentsService } from './comments/comments.service';
+import { CreateOrUpdateKeyResultDto, CreateOrUpdateOKRDto, PatchKeyResultDto, UpdateObjectiveDto } from './dtos';
+import { Timeline } from '../common/timeline.enum';
 import { CreateUpdateCommentDto } from '../comments/dtos';
+import { OrgOkrsService } from './org-okrs.service';
 
-@Controller('/orgs/:orgId/projects/:projectId')
+@Controller('/orgs/:orgId/')
 @UseGuards(AuthGuard)
-export class OkrsController {
+export class OrgOkrsController {
   constructor(
-    private readonly okrsService: OkrsService,
+    private readonly okrsService: OrgOkrsService,
     private readonly commentsService: CommentsService,
   ) {}
 
@@ -34,7 +34,6 @@ export class OkrsController {
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Request() request,
     @Body() okrDto: CreateOrUpdateOKRDto,
   ) {
@@ -45,7 +44,7 @@ export class OkrsController {
     }
 
     try {
-      return await this.okrsService.create(orgId, projectId, okrDto);
+      return await this.okrsService.create(orgId, okrDto);
     } catch (e) {
       throw new BadRequestException();
     }
@@ -53,41 +52,32 @@ export class OkrsController {
 
   @Get('okrs')
   @HttpCode(HttpStatus.OK)
-  async list(
-    @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
-    @Request() request,
-  ) {
+  async list(@Param('orgId') orgId: string, @Request() request) {
     const { org: userOrgId } = request.user;
 
     if (orgId !== userOrgId) {
       throw new UnauthorizedException();
     }
 
-    return await this.okrsService.list(orgId, projectId);
+    return await this.okrsService.list(orgId);
   }
 
   @Get('key-results')
   @HttpCode(HttpStatus.OK)
-  async listKeyResults(
-    @Request() request,
-    @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
-  ) {
+  async listKeyResults(@Request() request, @Param('orgId') orgId: string) {
     const { org } = request.user;
 
     if (org !== request.user.org) {
       throw new UnauthorizedException();
     }
 
-    return await this.okrsService.listKeyResults(orgId, projectId);
+    return await this.okrsService.listKeyResults(orgId);
   }
 
   @Get('okrs/:id')
   @HttpCode(HttpStatus.OK)
   async get(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('id') id: string,
     @Request() request,
   ) {
@@ -97,7 +87,7 @@ export class OkrsController {
     }
 
     try {
-      return await this.okrsService.get(orgId, projectId, id);
+      return await this.okrsService.get(orgId, id);
     } catch (e) {
       throw new NotFoundException();
     }
@@ -107,7 +97,6 @@ export class OkrsController {
   @HttpCode(HttpStatus.OK)
   async delete(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('id') id: string,
     @Request() request,
   ) {
@@ -117,14 +106,13 @@ export class OkrsController {
       throw new UnauthorizedException();
     }
 
-    await this.okrsService.delete(orgId, projectId, id);
+    await this.okrsService.delete(orgId, id);
   }
 
   @Patch('key-results/:keyResultId')
   @HttpCode(HttpStatus.OK)
   async patchKeyResult(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('objectiveId') objectiveId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
@@ -139,7 +127,6 @@ export class OkrsController {
     try {
       return await this.okrsService.patchKeyResult(
         orgId,
-        projectId,
         objectiveId,
         keyResultId,
         updateKeyResultDto,
@@ -153,7 +140,6 @@ export class OkrsController {
   @HttpCode(HttpStatus.OK)
   async updateObjective(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('objectiveId') objectiveId: string,
     @Request() request,
     @Body() updateObjectiveDto: UpdateObjectiveDto,
@@ -167,7 +153,6 @@ export class OkrsController {
     try {
       return await this.okrsService.updateObjective(
         orgId,
-        projectId,
         objectiveId,
         updateObjectiveDto,
       );
@@ -180,7 +165,6 @@ export class OkrsController {
   @HttpCode(HttpStatus.OK)
   async updateKeyResult(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('objectiveId') objectiveId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
@@ -195,7 +179,6 @@ export class OkrsController {
     try {
       return await this.okrsService.updateKeyResult(
         orgId,
-        projectId,
         objectiveId,
         keyResultId,
         updateKeyResultDto,
@@ -209,7 +192,6 @@ export class OkrsController {
   @HttpCode(HttpStatus.OK)
   async deleteKeyResult(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('objectiveId') objectiveId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
@@ -246,7 +228,6 @@ export class OkrsController {
   @HttpCode(HttpStatus.OK)
   async getKeyResult(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('objectiveId') objectiveId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
@@ -271,7 +252,6 @@ export class OkrsController {
   @Get('okrs/timeline/:timeline')
   async listForTimeline(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Request() request,
     @Param('timeline') timeline: Timeline,
   ) {
@@ -281,14 +261,13 @@ export class OkrsController {
       throw new UnauthorizedException();
     }
 
-    return await this.okrsService.listForTimeline(orgId, projectId, timeline);
+    return await this.okrsService.listForTimeline(orgId, timeline);
   }
 
   @Post('/key-results/:keyResultId/comments')
   @HttpCode(HttpStatus.OK)
   async addCommentToKeyResult(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('keyResultId') keyResultId: string,
     @Request() request,
     @Body() commentDto: CreateUpdateCommentDto,
@@ -296,7 +275,7 @@ export class OkrsController {
     try {
       return await this.commentsService.addCommentToKeyResult(
         orgId,
-        projectId,
+        null,
         keyResultId,
         request.user.sub,
         commentDto.content,
@@ -310,7 +289,6 @@ export class OkrsController {
   @Put('/key-results/:keyResultId/comments/:commentId')
   async updateKeyResultComment(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('commentId') commentId: string,
     @Request() request,
     @Body() commentDto: CreateUpdateCommentDto,
@@ -318,7 +296,7 @@ export class OkrsController {
     try {
       return await this.commentsService.updateKeyResultComment(
         orgId,
-        projectId,
+        null,
         request.user.sub,
         commentId,
         commentDto.content,
@@ -332,14 +310,13 @@ export class OkrsController {
   @Delete('/key-results/:keyResultId/comments/:commentId')
   async deleteKeyResultComment(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('commentId') commentId: string,
     @Request() request,
   ) {
     try {
       return await this.commentsService.deleteKeyResultComment(
         orgId,
-        projectId,
+        null,
         request.user.sub,
         commentId,
       );
@@ -352,7 +329,6 @@ export class OkrsController {
   @HttpCode(HttpStatus.CREATED)
   async addCommentToObjective(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('objectiveId') objectiveId: string,
     @Request() resquest,
     @Body() commentDto: CreateUpdateCommentDto,
@@ -360,7 +336,7 @@ export class OkrsController {
     try {
       return await this.commentsService.addCommentToObjective(
         orgId,
-        projectId,
+        null,
         objectiveId,
         resquest.user.sub,
         commentDto.content,
@@ -375,7 +351,6 @@ export class OkrsController {
   @HttpCode(HttpStatus.OK)
   async updateObjectiveComment(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('commentId') commentId: string,
     @Request() request,
     @Body() commentDto: CreateUpdateCommentDto,
@@ -383,7 +358,7 @@ export class OkrsController {
     try {
       return await this.commentsService.updateObjectiveComment(
         orgId,
-        projectId,
+        null,
         request.user.sub,
         commentId,
         commentDto.content,
@@ -398,17 +373,32 @@ export class OkrsController {
   @HttpCode(HttpStatus.OK)
   async deleteObjectiveComment(
     @Param('orgId') orgId: string,
-    @Param('projectId') projectId: string,
     @Param('commentId') commentId: string,
     @Request() request,
   ) {
     try {
       return await this.commentsService.deleteObjectiveComment(
         orgId,
-        projectId,
+        null,
         request.user.sub,
         commentId,
       );
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
+  @Get('okrs-stats')
+  @HttpCode(HttpStatus.OK)
+  async getOkrStats(@Param('orgId') orgId: string, @Request() request) {
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.okrsService.getStats(orgId);
     } catch (e) {
       throw new BadRequestException();
     }

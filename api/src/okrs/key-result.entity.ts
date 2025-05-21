@@ -11,7 +11,7 @@ import {
 import { Objective } from './objective.entity';
 import { Org } from '../orgs/org.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
-import { OKRStatus } from './okrstatus.enum';
+import { ObjectiveStatus } from './okrstatus.enum';
 import { KeyResultComment } from './key-result-comment.entity';
 import { Project } from '../projects/project.entity';
 
@@ -26,10 +26,10 @@ export class KeyResult {
   progress: number;
   @Column({
     type: 'enum',
-    enum: OKRStatus,
-    default: OKRStatus.ON_TRACK,
+    enum: ObjectiveStatus,
+    default: ObjectiveStatus.ON_TRACK,
   })
-  status: OKRStatus;
+  status: ObjectiveStatus;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

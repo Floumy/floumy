@@ -16,6 +16,8 @@ import { CommentsService } from './comments/comments.service';
 import { KeyResultComment } from './key-result-comment.entity';
 import { ObjectiveComment } from './objective-comment.entity';
 import { Project } from '../projects/project.entity';
+import { OrgOkrsController } from './org-okrs.controller';
+import { OrgOkrsService } from './org-okrs.service';
 
 @Module({
   imports: [
@@ -33,8 +35,8 @@ import { Project } from '../projects/project.entity';
     OrgsModule,
     AuthModule,
   ],
-  providers: [OkrsService, PublicService, CommentsService],
-  controllers: [OkrsController, PublicController],
+  providers: [OkrsService, OrgOkrsService, PublicService, CommentsService],
+  controllers: [OkrsController, PublicController, OrgOkrsController],
   exports: [OkrsService],
 })
 export class OkrsModule {}

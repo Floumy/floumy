@@ -10,10 +10,15 @@ import {
 } from 'typeorm';
 import { Org } from '../orgs/org.entity';
 import { KeyResult } from './key-result.entity';
-import { OKRStatus } from './okrstatus.enum';
+import { ObjectiveStatus } from './okrstatus.enum';
 import { User } from '../users/user.entity';
 import { ObjectiveComment } from './objective-comment.entity';
 import { Project } from '../projects/project.entity';
+
+export enum ObjectiveLevel {
+  ORGANIZATION = 'ORGANIZATION',
+  PROJECT = 'PROJECT',
+}
 
 @Entity()
 @Unique(['reference', 'org'])
@@ -26,10 +31,10 @@ export class Objective {
   progress: number;
   @Column({
     type: 'enum',
-    enum: OKRStatus,
-    default: OKRStatus.ON_TRACK,
+    enum: ObjectiveStatus,
+    default: ObjectiveStatus.ON_TRACK,
   })
-  status: OKRStatus;
+  status: ObjectiveStatus;
   @Column({ nullable: true })
   startDate: Date;
   @Column({ nullable: true })
@@ -42,6 +47,21 @@ export class Objective {
     nullable: false,
   })
   reference: string;
+  @Column({
+    type: 'enum',
+    enum: ObjectiveLevel,
+    default: ObjectiveLevel.PROJECT,
+  })
+  level: ObjectiveLevel;
+  @ManyToOne(() => Objective, (objective) => objective.childObjectives, {
+    nullable: true,
+    lazy: true,
+  })
+  parentObjective: Promise<Objective>;
+  @OneToMany(() => Objective, (objective) => objective.parentObjective, {
+    lazy: true,
+  })
+  childObjectives: Promise<Objective[]>;
   @ManyToOne(() => Org, (org) => org.objectives, { lazy: true })
   org: Promise<Org>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.objective, {
@@ -58,6 +78,9 @@ export class Objective {
     },
   )
   comments: Promise<ObjectiveComment[]>;
-  @ManyToOne(() => Project, (project) => project.objectives, { lazy: true })
+  @ManyToOne(() => Project, (project) => project.objectives, {
+    lazy: true,
+    nullable: true,
+  })
   project: Promise<Project>;
 }

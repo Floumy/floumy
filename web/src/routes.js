@@ -53,7 +53,11 @@ import GitHub from './views/pages/code/GitHub';
 import GitLab from './views/pages/code/GitLab';
 import Projects from './views/pages/orgs/projects/Projects';
 import OrgSettings from './views/pages/settings/OrgSettings';
-import {Demo} from "./views/pages/demo/demo";
+import { Demo } from './views/pages/demo/demo';
+import OrgOKRs from './views/pages/okrs/OrgOKRs';
+import DetailOrgOKR from './views/pages/okrs/DetailOrgOKR';
+import DetailOrgKeyResult from './views/pages/okrs/DetailOrgKeyResult';
+import NewOrgOKR from './views/pages/okrs/NewOrgOKR';
 
 const routes = [
   {
@@ -325,9 +329,9 @@ export const blankRoutes = [
     redirect: true,
     path: '/demo',
     component: <Demo />,
-    layout: '/blank'
+    layout: '/blank',
   },
-]
+];
 
 export const publicRoutes = [
   {
@@ -446,6 +450,30 @@ export const orgsRoutes = [
     redirect: true,
     path: '/settings',
     component: <OrgSettings />,
+    layout: '/orgs',
+  },
+  {
+    redirect: true,
+    path: '/objectives',
+    component: <OrgOKRs />,
+    layout: '/orgs',
+  },
+  {
+    redirect: true,
+    path: '/okrs/detail/:objectiveId',
+    component: <DetailOrgOKR />,
+    layout: '/orgs',
+  },
+  {
+    redirect: true,
+    path: '/kr/detail/:keyResultId',
+    component: <DetailOrgKeyResult />,
+    layout: '/orgs',
+  },
+  {
+    redirect: true,
+    path: '/okrs/new',
+    component: <NewOrgOKR />,
     layout: '/orgs',
   },
 ];

@@ -11,7 +11,7 @@ import { KeyResultComment } from '../key-result-comment.entity';
 import { UsersService } from '../../users/users.service';
 import { OrgsService } from '../../orgs/orgs.service';
 import { PaymentPlan } from '../../auth/payment.plan';
-import { OKRStatus } from '../okrstatus.enum';
+import { ObjectiveStatus } from '../okrstatus.enum';
 import { CommentsService } from './comments.service';
 import { Project } from '../../projects/project.entity';
 
@@ -77,7 +77,7 @@ describe('CommentsService', () => {
         {
           title: 'Test Key Result',
           progress: 0,
-          status: OKRStatus.ON_TRACK,
+          status: ObjectiveStatus.ON_TRACK,
         },
       );
       const comment = await service.addCommentToKeyResult(
@@ -102,7 +102,7 @@ describe('CommentsService', () => {
         {
           title: 'Test Key Result',
           progress: 0,
-          status: OKRStatus.ON_TRACK,
+          status: ObjectiveStatus.ON_TRACK,
         },
       );
       await expect(
@@ -131,7 +131,7 @@ describe('CommentsService', () => {
         {
           title: 'Test Key Result',
           progress: 0,
-          status: OKRStatus.ON_TRACK,
+          status: ObjectiveStatus.ON_TRACK,
         },
       );
       const comment = await service.addCommentToKeyResult(
@@ -165,7 +165,7 @@ describe('CommentsService', () => {
         {
           title: 'Test Key Result',
           progress: 0,
-          status: OKRStatus.ON_TRACK,
+          status: ObjectiveStatus.ON_TRACK,
         },
       );
       const comment = await service.addCommentToKeyResult(
@@ -204,7 +204,7 @@ describe('CommentsService', () => {
         {
           title: 'Test Key Result',
           progress: 0,
-          status: OKRStatus.ON_TRACK,
+          status: ObjectiveStatus.ON_TRACK,
         },
       );
       const comment = await service.addCommentToKeyResult(
@@ -242,7 +242,7 @@ describe('CommentsService', () => {
         {
           title: 'Test Key Result',
           progress: 0,
-          status: OKRStatus.ON_TRACK,
+          status: ObjectiveStatus.ON_TRACK,
         },
       );
       const comment = await service.addCommentToKeyResult(
@@ -280,7 +280,7 @@ describe('CommentsService', () => {
         {
           title: 'Test Key Result',
           progress: 0,
-          status: OKRStatus.ON_TRACK,
+          status: ObjectiveStatus.ON_TRACK,
         },
       );
       const comment = await service.addCommentToKeyResult(

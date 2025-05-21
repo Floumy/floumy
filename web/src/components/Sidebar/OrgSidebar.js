@@ -80,6 +80,19 @@ function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
                       <Row style={{ maxWidth: '100%', height: '47px' }}>
                         <Col xs={12}>
                           <NavLink
+                            to={`/orgs/${orgId}/objectives`}
+                            onClick={closeSidenav}
+                            tag={NavLinkRRD}
+                          >
+
+                            <i className="fa fa-bullseye" />
+                            <span className="nav-link-text">Objectives</span>
+                          </NavLink>
+                        </Col>
+                      </Row>
+                      <Row style={{ maxWidth: '100%', height: '47px' }}>
+                        <Col xs={12}>
+                          <NavLink
                             to={`/orgs/${orgId}/projects`}
                             onClick={closeSidenav}
                             tag={NavLinkRRD}
