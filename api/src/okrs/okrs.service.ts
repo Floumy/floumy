@@ -540,4 +540,58 @@ export class OkrsService {
       ],
     });
   }
+
+  async getStats(orgId: string, projectId: string) {
+    const objectives = await this.objectiveRepository.findBy({
+      org: { id: orgId },
+      project: { id: projectId },
+      level: ObjectiveLevel.PROJECT,
+    });
+
+    const keyResults = await this.keyResultRepository.find({
+      where: {
+        org: { id: orgId },
+        project: { id: projectId },
+        objective: { level: ObjectiveLevel.PROJECT },
+      },
+    });
+
+    const completedObjectives = objectives.filter(
+      (obj) => obj.status === ObjectiveStatus.COMPLETED,
+    );
+    const inProgressObjectives = objectives.filter(
+      (obj) =>
+        obj.status !== ObjectiveStatus.COMPLETED &&
+        obj.status !== ObjectiveStatus.CANCELED,
+    );
+
+    const completedKeyResults = keyResults.filter(
+      (kr) => kr.status === ObjectiveStatus.COMPLETED,
+    );
+    const inProgressKeyResults = keyResults.filter(
+      (kr) =>
+        kr.status !== ObjectiveStatus.COMPLETED &&
+        kr.status !== ObjectiveStatus.CANCELED,
+    );
+
+    const currentProgress =
+      objectives.reduce((sum, obj) => sum + (obj.progress * 100 || 0), 0) /
+      (objectives.length || 1);
+
+    return {
+      objectives: {
+        total: objectives.length,
+        completed: completedObjectives.length,
+        inProgress: inProgressObjectives.length,
+      },
+      keyResults: {
+        total: keyResults.length,
+        completed: completedKeyResults.length,
+        inProgress: inProgressKeyResults.length,
+      },
+      progress: {
+        current: Math.round(currentProgress),
+      },
+    };
+  }
 }

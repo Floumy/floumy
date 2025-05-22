@@ -7,7 +7,7 @@ import { OrgsService } from '../orgs/orgs.service';
 import { Org } from '../orgs/org.entity';
 import { TokensService } from '../auth/tokens.service';
 import { KeyResult } from './key-result.entity';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Timeline } from '../common/timeline.enum';
 import { Repository } from 'typeorm';
@@ -961,6 +961,61 @@ describe('OkrsController', () => {
           },
         }),
       ).resolves.not.toThrow();
+    });
+  });
+
+  describe('when getting OKR stats', () => {
+    it('should return OKR stats for the project', async () => {
+      // Create a test OKR with key results
+      await controller.create(
+        org.id,
+        project.id,
+        {
+          user: { org: org.id },
+        },
+        {
+          objective: {
+            title: 'Test Objective',
+          },
+          keyResults: [
+            {
+              title: 'Test Key Result 1',
+              status: 'completed',
+            },
+            {
+              title: 'Test Key Result 2',
+              status: 'in_progress',
+            },
+          ],
+        },
+      );
+      const stats = await controller.getOkrStats(org.id, project.id, {
+        user: { org: org.id },
+      });
+
+      expect(stats).toEqual({
+        keyResults: {
+          completed: 0,
+          inProgress: 2,
+          total: 2,
+        },
+        objectives: {
+          completed: 0,
+          inProgress: 1,
+          total: 1,
+        },
+        progress: {
+          current: 0,
+        },
+      });
+    });
+
+    it('should return 401 for unauthorized access', async () => {
+      await expect(
+        controller.getOkrStats(org.id, project.id, {
+          user: { org: 'wrong-org-id' },
+        }),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 });
