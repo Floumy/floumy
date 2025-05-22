@@ -34,6 +34,10 @@ export function formatDateWithTime(date) {
   return moment(date).format('D MMM YYYY, h:mm a')
 }
 
+export function displayDateDifferenceFromNow(date) {
+  return moment(date).fromNow();
+}
+
 export function workItemTypeIcon(type) {
   const typeMap = {
     "user-story": <i className="fas fa-user text-green pl-0 mr-2" />,
