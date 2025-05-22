@@ -651,7 +651,9 @@ describe('OkrsService', () => {
         },
       );
 
-      expect(updatedObjective.objective.parentObjective.id).toEqual(parentObjective.id);
+      expect(updatedObjective.objective.parentObjective.id).toEqual(
+        parentObjective.id,
+      );
     });
   });
   describe('when creating a key result', () => {
@@ -777,6 +779,80 @@ describe('OkrsService', () => {
       );
       expect(okrs).toHaveLength(1);
       expect(okrs[0].title).toEqual('My Other OKR');
+    });
+  });
+
+  describe('when getting stats', () => {
+    it('should return stats for objectives and key results', async () => {
+      // Create test objectives with different statuses
+      const objective1 = await service.createObjective(org.id, project.id, {
+        title: 'Completed Objective',
+      });
+      objective1.status = ObjectiveStatus.COMPLETED;
+      objective1.progress = 1;
+      await objectivesRepository.save(objective1);
+
+      const objective2 = await service.createObjective(org.id, project.id, {
+        title: 'In Progress Objective',
+      });
+      objective2.status = ObjectiveStatus.ON_TRACK;
+      objective2.progress = 0.5;
+      await objectivesRepository.save(objective2);
+
+      // Create key results
+      const keyResult1 = new KeyResult();
+      keyResult1.title = 'KR 1';
+      keyResult1.objective = Promise.resolve(objective1);
+      keyResult1.org = Promise.resolve(org);
+      keyResult1.project = Promise.resolve(project);
+      keyResult1.status = ObjectiveStatus.COMPLETED;
+      await service['keyResultRepository'].save(keyResult1);
+
+      const keyResult2 = new KeyResult();
+      keyResult2.title = 'KR 2';
+      keyResult2.objective = Promise.resolve(objective2);
+      keyResult2.org = Promise.resolve(org);
+      keyResult2.project = Promise.resolve(project);
+      keyResult2.status = ObjectiveStatus.ON_TRACK;
+      await service['keyResultRepository'].save(keyResult2);
+
+      const stats = await service.getStats(org.id, project.id);
+
+      expect(stats).toEqual({
+        objectives: {
+          total: 2,
+          completed: 1,
+          inProgress: 1,
+        },
+        keyResults: {
+          total: 2,
+          completed: 1,
+          inProgress: 1,
+        },
+        progress: {
+          current: 75, // (100 + 50) / 2 = 75
+        },
+      });
+    });
+
+    it('should handle empty results', async () => {
+      const stats = await service.getStats(org.id, project.id);
+
+      expect(stats).toEqual({
+        objectives: {
+          total: 0,
+          completed: 0,
+          inProgress: 0,
+        },
+        keyResults: {
+          total: 0,
+          completed: 0,
+          inProgress: 0,
+        },
+        progress: {
+          current: 0,
+        },
+      });
     });
   });
 });

@@ -83,6 +83,26 @@ export class OkrsController {
     return await this.okrsService.listKeyResults(orgId, projectId);
   }
 
+  @Get('okrs-stats')
+  @HttpCode(HttpStatus.OK)
+  async getOkrStats(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+  ) {
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.okrsService.getStats(orgId, projectId);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
+
   @Get('okrs/:id')
   @HttpCode(HttpStatus.OK)
   async get(
