@@ -3,6 +3,7 @@ import InitiativesList from '../initiatives/InitiativesList';
 import { Col, Row } from 'reactstrap';
 import { Link, useParams } from 'react-router-dom';
 import { addInitiative } from '../../../services/roadmap/roadmap.service';
+import { getUser } from '../../../services/okrs/okrs.service';
 
 function Milestone({ milestone, onInitiativeChangeMilestone }) {
   const { orgId, projectId } = useParams();
@@ -69,11 +70,12 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
     setInitiatives(updatedInitiativesPriority);
   }
 
-  function updateInitiativesAssignedTo(updatedInitiatives, assignedTo) {
+  async function updateInitiativesAssignedTo(updatedInitiatives, assignedTo) {
+    const user = await getUser(orgId, assignedTo);
     const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
     const updatedInitiativesAssignedTo = initiatives.map(initiative => {
       if (updatedInitiativesIds.includes(initiative.id)) {
-        initiative.assignedTo = assignedTo;
+        initiative.assignedTo = user;
       }
       return initiative;
     });

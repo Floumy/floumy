@@ -1,10 +1,13 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
+  Param,
   Patch,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { OrgsService } from './orgs.service';
@@ -36,5 +39,26 @@ export class OrgsController {
   async getUsers(@Request() request) {
     const org = request.user.org;
     return await this.orgsService.getUsers(org);
+  }
+
+  @Get(':id/users/:userId')
+  @HttpCode(200)
+  @UseGuards(BasicAuthGuard)
+  async getUser(
+    @Param('id') orgId: string,
+    @Param('userId') userId: string,
+    @Request() request,
+  ) {
+    const org = request.user.org;
+
+    if (org !== orgId) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.orgsService.getUser(orgId, userId);
+    } catch (e) {
+      throw new BadRequestException();
+    }
   }
 }

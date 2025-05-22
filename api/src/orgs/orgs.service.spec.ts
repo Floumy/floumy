@@ -95,4 +95,18 @@ describe('OrgsService', () => {
       expect(storedOrg.name).toBe('New Name');
     });
   });
+
+  describe('when getting the user', () => {
+    it('should return the user of the org', async () => {
+      const savedUser = await usersService.createUserWithOrg(
+        'Test User',
+        'test@example.com',
+        'testtesttest',
+      );
+      const org = await service.getOrg((await savedUser.org).id);
+      const user = await service.getUser(org.id, savedUser.id);
+      expect(user.id).toEqual(savedUser.id);
+      expect(user.name).toEqual(savedUser.name);
+    });
+  });
 });
