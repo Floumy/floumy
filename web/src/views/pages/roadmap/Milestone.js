@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import InitiativesList from "../initiatives/InitiativesList";
-import { Col, Row } from "reactstrap";
-import { Link, useParams } from "react-router-dom";
-import { addInitiative } from "../../../services/roadmap/roadmap.service";
+import React, { useEffect, useState } from 'react';
+import InitiativesList from '../initiatives/InitiativesList';
+import { Col, Row } from 'reactstrap';
+import { Link, useParams } from 'react-router-dom';
+import { addInitiative } from '../../../services/roadmap/roadmap.service';
 
 function Milestone({ milestone, onInitiativeChangeMilestone }) {
   const { orgId, projectId } = useParams();
@@ -69,6 +69,17 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
     setInitiatives(updatedInitiativesPriority);
   }
 
+  function updateInitiativesAssignedTo(updatedInitiatives, assignedTo) {
+    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
+    const updatedInitiativesAssignedTo = initiatives.map(initiative => {
+      if (updatedInitiativesIds.includes(initiative.id)) {
+        initiative.assignedTo = assignedTo;
+      }
+      return initiative;
+    });
+    setInitiatives(updatedInitiativesAssignedTo);
+  }
+
   return (
     <>
       <div className="mb-5">
@@ -88,6 +99,7 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
                 onAddInitiative={async (initiative) => {
                   await handleAddInitiativeWithMilestone(initiative, milestone.id);
                 }}
+                onChangeAssignedTo={updateInitiativesAssignedTo}
                 onChangePriority={updateInitiativesPriority}
                 onChangeStatus={updateInitiativesStatus}
                 onChangeMilestone={onInitiativeChangeMilestone}

@@ -121,6 +121,17 @@ function InitiativesRoadmap() {
     setInitiatives([...sortByPriority(updatedInitiativesList)]);
   }
 
+  function updateBacklogInitiativesAssignedTo(updatedInitiatives, newAssignedTo) {
+    const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
+    const updatedInitiativesList = initiatives.map(initiative => {
+      if (updatedInitiativesIds.includes(initiative.id)) {
+        initiative.assignedTo = newAssignedTo;
+      }
+      return initiative;
+    });
+    setInitiatives([...sortByPriority(updatedInitiativesList)]);
+  }
+
   function onAddInitiative() {
     return async (initiative) => {
       const savedInitiative = await addInitiative(orgId, projectId, initiative);
@@ -224,7 +235,9 @@ function InitiativesRoadmap() {
                                  isLoading={isLoadingInitiatives}
                                  onAddInitiative={onAddInitiative()}
                                  onChangeMilestone={updateBacklogInitiativesMilestone}
-                                 onChangeStatus={updateBacklogInitiativesStatus}/>
+                                 onChangeStatus={updateBacklogInitiativesStatus}
+                                 onChangeAssignedTo={updateBacklogInitiativesAssignedTo}
+            />
           </Col>
         </Row>
       </Container>
