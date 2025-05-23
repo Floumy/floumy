@@ -134,12 +134,10 @@ function InitiativesRoadmap() {
     setInitiatives([...sortByPriority(updatedInitiativesList)]);
   }
 
-  function onAddInitiative() {
-    return async (initiative) => {
-      const savedInitiative = await addInitiative(orgId, projectId, initiative);
-      initiatives.push(savedInitiative);
-      setInitiatives([...initiatives]);
-    };
+  async function onAddInitiative(initiative) {
+    const savedInitiative = await addInitiative(orgId, projectId, initiative);
+    initiatives.push(savedInitiative);
+    setInitiatives([...initiatives]);
   }
 
   return (
@@ -235,7 +233,7 @@ function InitiativesRoadmap() {
             <InitiativesListCard title="Initiatives Backlog"
                                  initiatives={initiatives}
                                  isLoading={isLoadingInitiatives}
-                                 onAddInitiative={onAddInitiative()}
+                                 onAddInitiative={onAddInitiative}
                                  onChangeMilestone={updateBacklogInitiativesMilestone}
                                  onChangeStatus={updateBacklogInitiativesStatus}
                                  onChangeAssignedTo={updateBacklogInitiativesAssignedTo}

@@ -43,7 +43,7 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
 
   async function handleAddInitiativeWithMilestone(initiative, milestoneId) {
     initiative.milestone = milestoneId;
-    const savedInitiative = await addInitiative(initiative, orgId, projectId);
+    const savedInitiative = await addInitiative(orgId, projectId, initiative);
     initiatives.push(savedInitiative);
     setInitiatives([...initiatives]);
   }
