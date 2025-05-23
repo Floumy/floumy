@@ -7,7 +7,7 @@ import {getPRsCycleTime} from "../../../../services/github/github.service";
 import {formatDate} from "../../../../services/utils/utils";
 import LoadingSpinnerBox from "../../components/LoadingSpinnerBox";
 
-export function CycleTime({orgId, projectId}) {
+export function CycleTime({orgId, projectId, getPrData}) {
     if (window.Chart) {
         parseOptions(Chart, chartOptions());
     }
@@ -25,7 +25,7 @@ export function CycleTime({orgId, projectId}) {
     const fetchData = async (timeframe) => {
         setTimeframeInDays(timeframe);
         setIsLoading(true);
-        const data = await getPRsCycleTime(orgId, projectId, timeframe);
+        const data = await getPrData(orgId, projectId, timeframe);
         const labels = data.map(item => formatDate(item.week));
         const prCount = data.map(item => item.prCount);
         const cycleTime = data.map(item => Math.round(item.averageCycleTime / 24));
