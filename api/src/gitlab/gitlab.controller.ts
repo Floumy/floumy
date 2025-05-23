@@ -7,7 +7,7 @@ import {
   Headers,
   Param,
   Post,
-  Put,
+  Put, Query,
   Request,
   UnauthorizedException,
   UseGuards,
@@ -150,6 +150,41 @@ export class GitlabController {
         payload,
         eventType,
       );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+  @Get('/merge-requests/orgs/:orgId/projects/:projectId/mrs/cycle-time')
+  async getPullRequestCycleTime(
+      @Request() request: any,
+      @Param('orgId') orgId: string,
+      @Param('projectId') projectId: string,
+      @Query('timeframeInDays') timeframeInDays: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.gitlabService.getPRsCycleTime(orgId, projectId, parseInt(timeframeInDays));
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get('/merge-requests/orgs/:orgId/projects/:projectId/mrs/merge-time')
+  async getPullRequestMergeTime(
+      @Request() request: any,
+      @Param('orgId') orgId: string,
+      @Param('projectId') projectId: string,
+      @Query('timeframeInDays') timeframeInDays: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.gitlabService.getAverageMergeTime(orgId, projectId, parseInt(timeframeInDays));
     } catch (e) {
       throw new BadRequestException(e.message);
     }

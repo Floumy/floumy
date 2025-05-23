@@ -7,7 +7,7 @@ import {getPRsAverageMergeTime} from "../../../../services/github/github.service
 import {formatDate} from "../../../../services/utils/utils";
 import LoadingSpinnerBox from "../../components/LoadingSpinnerBox";
 
-export function MergeTime({orgId, projectId}) {
+export function MergeTime({orgId, projectId, getPrData}) {
     if (window.Chart) {
         parseOptions(Chart, chartOptions());
     }
@@ -24,7 +24,7 @@ export function MergeTime({orgId, projectId}) {
     const fetchData = async (timeframe) => {
         setTimeframeInDays(timeframe);
         setIsLoading(true);
-        const data = await getPRsAverageMergeTime(orgId, projectId, timeframe);
+        const data = await getPrData(orgId, projectId, timeframe);
         const labels = data.map(item => formatDate(item.week));
         const prCount = data.map(item => item.prCount);
         const mergeTime = data.map(item => Math.round(item.averageMergeTime / 24));

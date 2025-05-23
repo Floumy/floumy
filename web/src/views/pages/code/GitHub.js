@@ -7,7 +7,7 @@ import {
     deleteProjectGithubRepo,
     getGithubRepos,
     getGithubUrl,
-    getIsGithubConnected,
+    getIsGithubConnected, getPRsAverageMergeTime, getPRsCycleTime,
     getPullRequests,
     updateProjectGithubRepo,
 } from '../../../services/github/github.service';
@@ -226,14 +226,14 @@ function GitHub() {
                 <Row>
                     <Col>
                         {!isLoading && currentProject &&
-                        <CycleTime orgId={orgId} projectId={currentProject.id}/>
+                        <CycleTime orgId={orgId} projectId={currentProject.id} getPrData={getPRsCycleTime}/>
                         }
                     </Col>
                 </Row>
                 <Row>
                     <Col>
                         {!isLoading && currentProject &&
-                        <MergeTime orgId={orgId} projectId={currentProject.id}/>
+                        <MergeTime orgId={orgId} projectId={currentProject.id} getPrData={getPRsAverageMergeTime}/>
                         }
                     </Col>
                 </Row>
