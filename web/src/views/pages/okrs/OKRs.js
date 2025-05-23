@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import {
   Badge,
   Card,
+  CardBody,
   CardHeader,
   CardTitle,
   Col,
@@ -16,7 +17,7 @@ import {
 // core components
 import SimpleHeader from "components/Headers/SimpleHeader.js";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { listOKRs } from "../../../services/okrs/okrs.service";
+import { listOKRs, getOkrStats } from "../../../services/okrs/okrs.service";
 import Select2 from "react-select2-wrapper";
 import {
   formatHyphenatedString,
@@ -44,6 +45,9 @@ function OKRs() {
   };
   const [okrs, setOKRs] = useState([okrTemplate]);
   const [isLoading, setIsLoading] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsError, setStatsError] = useState(null);
 
   useEffect(() => {
     document.title = "Floumy | OKRs";
@@ -61,7 +65,21 @@ function OKRs() {
       }
     }
 
+    async function fetchStats() {
+      setStatsLoading(true);
+      setStatsError(null);
+      try {
+        const statsData = await getOkrStats(orgId, projectId);
+        setStats(statsData);
+      } catch (e) {
+        setStatsError('Could not load stats');
+      } finally {
+        setStatsLoading(false);
+      }
+    }
+
     fetchData();
+    fetchStats();
   }, [orgId, projectId, timelineQueryFilter]);
 
   return (
@@ -80,6 +98,62 @@ function OKRs() {
         ]}
       />
       <Container className="mt--6" fluid id="OKRs">
+        {!statsLoading && !statsError && stats &&
+        <Row className="my-4">
+          <Col lg="4" sm="12">
+            <Card className="card-stats">
+              <CardBody>
+                <Row>
+                  <Col>
+                    <h5 className="card-title text-uppercase text-muted mb-0">Total Objectives</h5>
+                    <span className="h2 font-weight-bold mb-0">{stats.objectives.total}</span>
+                  </Col>
+                </Row>
+                <p className="mt-3 mb-0 text-sm">
+                  <span className="text-success">{stats.objectives.completed} completed</span>
+                  <span className="text-nowrap ml-2">{stats.objectives.inProgress} in progress</span>
+                </p>
+              </CardBody>
+            </Card>
+          </Col>
+          <Col lg="4" sm="12">
+            <Card className="card-stats">
+              <CardBody>
+                <Row>
+                  <Col>
+                    <h5 className="card-title text-uppercase text-muted mb-0">Key Results</h5>
+                    <span className="h2 font-weight-bold mb-0">{stats.keyResults.total}</span>
+                  </Col>
+                </Row>
+                <p className="mt-3 mb-0 text-sm">
+                  <span className="text-success">{stats.keyResults.completed} completed</span>
+                  <span className="text-nowrap ml-2">{stats.keyResults.inProgress} in progress</span>
+                </p>
+              </CardBody>
+            </Card>
+          </Col>
+          <Col lg="4" sm="12">
+            <Card className="card-stats">
+              <CardBody>
+                <Row>
+                  <Col>
+                    <h5 className="card-title text-uppercase text-muted mb-0">
+                      Average Progress
+                    </h5>
+                    <span className="h2 font-weight-bold mb-0">{stats.progress.current}%</span>
+                  </Col>
+                </Row>
+                <div className="mt-3">
+                  <Progress
+                    value={stats.progress.current}
+                    color="success"
+                    style={{ height: '6px' }}
+                  />
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>}
         <Row>
           <div className="col">
             <Card>

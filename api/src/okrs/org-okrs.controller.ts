@@ -390,7 +390,7 @@ export class OrgOkrsController {
 
   @Get('okrs-stats')
   @HttpCode(HttpStatus.OK)
-  async getOkrStats(@Param('orgId') orgId: string, @Request() request) {
+  async getOkrStats(@Param('orgId') orgId: string, @Request() request: any) {
     const { org: userOrgId } = request.user;
 
     if (orgId !== userOrgId) {

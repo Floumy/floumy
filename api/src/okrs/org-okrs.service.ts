@@ -504,14 +504,18 @@ export class OrgOkrsService {
       (obj) => obj.status === ObjectiveStatus.COMPLETED,
     );
     const inProgressObjectives = objectives.filter(
-      (obj) => obj.status !== ObjectiveStatus.COMPLETED,
+      (obj) =>
+        obj.status !== ObjectiveStatus.COMPLETED &&
+        obj.status !== ObjectiveStatus.CANCELED,
     );
 
     const completedKeyResults = keyResults.filter(
       (kr) => kr.status === ObjectiveStatus.COMPLETED,
     );
     const inProgressKeyResults = keyResults.filter(
-      (kr) => kr.status !== ObjectiveStatus.COMPLETED,
+      (kr) =>
+        kr.status !== ObjectiveStatus.COMPLETED &&
+        kr.status !== ObjectiveStatus.CANCELED,
     );
 
     const currentProgress =
