@@ -61,7 +61,6 @@ function OrgLayout() {
         toggleSidenav={toggleSidenav}
         logo={{
           outterLink: 'https://floumy.com',
-          // innerLink: "/admin/okrs",
           imgSrc: require('assets/img/brand/logo.png'),
           imgAlt: 'Floumy Logo',
         }}
