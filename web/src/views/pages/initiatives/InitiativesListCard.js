@@ -1,22 +1,23 @@
-import React, { useState } from "react";
-import InitiativesList from "./InitiativesList";
-import { sortByPriority } from "../../../services/utils/utils";
-import PropTypes from "prop-types";
-import BaseInitiativeListCard from "./BaseInitiativeListCard";
+import React, { useState } from 'react';
+import InitiativesList from './InitiativesList';
+import { sortByPriority } from '../../../services/utils/utils';
+import PropTypes from 'prop-types';
+import BaseInitiativeListCard from './BaseInitiativeListCard';
 
 function InitiativesListCard({
-                            title,
-                            initiatives,
-                            isLoading,
-                            enableContextMenu,
-                            onAddInitiative,
-                            onChangeMilestone,
-                            onChangeStatus,
-                            onSearch,
-                            showFilters = true,
-                            showAssignedTo = true,
-                            searchPlaceholder = "Search by title"
-                          }) {
+                               title,
+                               initiatives,
+                               isLoading,
+                               enableContextMenu,
+                               onAddInitiative,
+                               onChangeMilestone,
+                               onChangeStatus,
+                               onChangeAssignedTo,
+                               onSearch,
+                               showFilters = true,
+                               showAssignedTo = true,
+                               searchPlaceholder = 'Search by title',
+                             }) {
   const [filteredInitiatives, setFilteredInitiatives] = useState([]);
 
   function updateInitiativesStatus(updatedInitiatives, status) {
@@ -49,12 +50,13 @@ function InitiativesListCard({
   function renderInitiativeList(filteredInitiatives) {
     return (
       <InitiativesList
-        id={"initiatives-list-card"}
+        id={'initiatives-list-card'}
         initiatives={filteredInitiatives}
         onAddInitiative={onAddInitiative}
         showAssignedTo={showAssignedTo}
         enableContextMenu={enableContextMenu}
         onChangeMilestone={onChangeMilestone}
+        onChangeAssignedTo={onChangeAssignedTo}
         onChangeStatus={updateInitiativesStatus}
         onChangePriority={handleBacklogInitiativeChangePriority}
       />
@@ -87,5 +89,5 @@ InitiativesListCard.propTypes = {
   onAddInitiative: PropTypes.func,
   onChangeMilestone: PropTypes.func,
   onChangeStatus: PropTypes.func,
-  enableContextMenu: PropTypes.bool
+  enableContextMenu: PropTypes.bool,
 };
