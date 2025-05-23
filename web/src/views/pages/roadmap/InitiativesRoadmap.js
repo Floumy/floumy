@@ -15,6 +15,7 @@ import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { sortByPriority } from '../../../services/utils/utils';
 import InitiativesListCard from '../initiatives/InitiativesListCard';
+import { getUser } from '../../../services/okrs/okrs.service';
 
 function InitiativesRoadmap() {
   const { orgId, projectId } = useParams();
@@ -121,6 +122,18 @@ function InitiativesRoadmap() {
     setInitiatives([...sortByPriority(updatedInitiativesList)]);
   }
 
+  async function updateBacklogInitiativesAssignedTo(updatedInitiatives, newAssignedTo) {
+    const user = await getUser(orgId, newAssignedTo);
+    const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
+    const updatedInitiativesList = initiatives.map(initiative => {
+      if (updatedInitiativesIds.includes(initiative.id)) {
+        initiative.assignedTo = user;
+      }
+      return initiative;
+    });
+    setInitiatives([...sortByPriority(updatedInitiativesList)]);
+  }
+
   async function onAddInitiative(initiative) {
     const savedInitiative = await addInitiative(orgId, projectId, initiative);
     initiatives.push(savedInitiative);
@@ -222,7 +235,9 @@ function InitiativesRoadmap() {
                                  isLoading={isLoadingInitiatives}
                                  onAddInitiative={onAddInitiative}
                                  onChangeMilestone={updateBacklogInitiativesMilestone}
-                                 onChangeStatus={updateBacklogInitiativesStatus}/>
+                                 onChangeStatus={updateBacklogInitiativesStatus}
+                                 onChangeAssignedTo={updateBacklogInitiativesAssignedTo}
+            />
           </Col>
         </Row>
       </Container>

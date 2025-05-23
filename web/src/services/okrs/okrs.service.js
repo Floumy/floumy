@@ -182,3 +182,12 @@ export async function deleteObjectiveComment(orgId, projectId, objectiveId, comm
     throw new Error(e.message);
   }
 }
+
+export async function getUser(orgId, userId) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/users/${userId}`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}

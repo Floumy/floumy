@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { Item, Menu, Submenu } from "react-contexify";
-import "react-contexify/dist/ReactContexify.css";
-import { Badge, Spinner } from "reactstrap";
+import React, { useEffect, useState } from 'react';
+import { Item, Menu, Submenu } from 'react-contexify';
+import 'react-contexify/dist/ReactContexify.css';
+import { Badge, Spinner } from 'reactstrap';
 import {
-  initiativeStatusColorClassName,
   formatDate,
   formatHyphenatedString,
-  priorityColor
-} from "../../services/utils/utils";
+  initiativeStatusColorClassName,
+  priorityColor,
+} from '../../services/utils/utils';
 import {
   changeAssignee,
   listMilestones,
   updateInitiativeKeyResult,
   updateInitiativeMilestone,
   updateInitiativePriority,
-  updateInitiativeStatus
-} from "../../services/roadmap/roadmap.service";
-import { toast } from "react-toastify";
-import PropTypes from "prop-types";
-import { listKeyResults } from "../../services/okrs/okrs.service";
-import { useParams } from "react-router-dom";
-import {getOrg} from "../../services/org/orgs.service";
+  updateInitiativeStatus,
+} from '../../services/roadmap/roadmap.service';
+import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
+import { listKeyResults } from '../../services/okrs/okrs.service';
+import { useParams } from 'react-router-dom';
+import { getOrg } from '../../services/org/orgs.service';
 
 function InitiativesContextMenu({
                                menuId,
@@ -28,6 +28,7 @@ function InitiativesContextMenu({
                                onChangeKeyResult,
                                onChangeStatus,
                                onChangePriority,
+                               onChangeAssignTo,
                                onChange
                              }) {
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
@@ -124,6 +125,19 @@ function InitiativesContextMenu({
     }
   }
 
+  function callChangeAssigneeCallbacks(userId, initiatives) {
+    try {
+      if (onChangeAssignTo) {
+        onChangeAssignTo(initiatives, userId);
+      }
+      if (onChange) {
+        onChange(initiatives.map(initiative => initiative.id), { assignee: userId });
+      }
+    } catch (e) {
+      console.error("The callbacks could not be called");
+    }
+  }
+
   const handleChangeKeyResult = async ({ id: keyResultId, event, props }) => {
     try {
       event.preventDefault();
@@ -143,6 +157,7 @@ function InitiativesContextMenu({
       for (const initiative of props.initiatives) {
         await changeAssignee(orgId, projectId, initiative.id, userId);
       }
+      callChangeAssigneeCallbacks(userId, props.initiatives);
       toast.success("The initiatives have been assigned to the user");
     } catch (e) {
       toast.error("The initiatives could not be assigned to the user");
@@ -283,6 +298,7 @@ InitiativesContextMenu.propTypes = {
   menuId: PropTypes.string.isRequired,
   onChangeMilestone: PropTypes.func,
   onChangeKeyResult: PropTypes.func,
+  onChangeAssignTo: PropTypes.func,
   onChangeStatus: PropTypes.func,
   onChangePriority: PropTypes.func,
   onChange: PropTypes.func
