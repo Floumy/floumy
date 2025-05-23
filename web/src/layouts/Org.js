@@ -11,10 +11,17 @@ import { OrgProvider } from '../contexts/OrgContext';
 import OrgSidebar from '../components/Sidebar/OrgSidebar';
 
 function OrgLayout() {
-  const { mainContentRef, getRoutes } = useLayoutHandler('orgs');
+  const { mainContentRef, getRoutes, location } = useLayoutHandler('orgs');
   const [sidenavOpen, setSidenavOpen] = useState(true);
   const { orgId } = useParams();
 
+  function isNavigationReplace() {
+    let replace = false;
+    if (location.pathname.includes('/new')) {
+      replace = true;
+    }
+    return replace;
+  }
 
   const toggleSidenav = () => {
     if (document.body.classList.contains('g-sidenav-pinned')) {
@@ -29,6 +36,7 @@ function OrgLayout() {
 
   useNavigationHotKey('left', -1);
   useNavigationHotKey('right', 1);
+  useNavigationHotKey('o', `/orgs/${orgId}/okrs/new`, isNavigationReplace());
 
   useEffect(() => {
     if (window.innerWidth < 1200) {
