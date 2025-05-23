@@ -28,6 +28,7 @@ describe('OrgsController', () => {
   let controller: OrgsController;
   let cleanup: () => Promise<void>;
   let org: Org;
+  let user: User;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -64,7 +65,7 @@ describe('OrgsController', () => {
     controller = module.get<OrgsController>(OrgsController);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
-    const user = await usersService.createUserWithOrg(
+    user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
       'testtesttest',
@@ -95,6 +96,16 @@ describe('OrgsController', () => {
       );
       expect(result.id).toBe(org.id);
       expect(result.name).toBe('New Name');
+    });
+  });
+
+  describe('when getting the user', () => {
+    it('should return the user of the org', async () => {
+      const result = await controller.getUser(org.id, user.id, {
+        user: { org: org.id },
+      });
+      expect(result.id).toBeDefined();
+      expect(result.name).toBeDefined();
     });
   });
 });

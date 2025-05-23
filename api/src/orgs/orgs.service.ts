@@ -13,6 +13,7 @@ export class OrgsService {
   constructor(
     @InjectRepository(Org) private orgRepository: Repository<Org>,
     @InjectRepository(Project) private projectRepository: Repository<Project>,
+    @InjectRepository(User) private usersRepository: Repository<User>,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -96,5 +97,16 @@ export class OrgsService {
       id: user.id,
       name: user.name,
     }));
+  }
+
+  async getUser(org: string, userId: string) {
+    const user = await this.usersRepository.findOneBy({
+      id: userId,
+      org: { id: org },
+    });
+    return {
+      id: user.id,
+      name: user.name,
+    };
   }
 }
