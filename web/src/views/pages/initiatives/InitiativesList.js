@@ -1,22 +1,22 @@
-import { Link, useParams } from "react-router-dom";
-import { Badge, Button, Col, Input, Progress, Row, UncontrolledTooltip } from "reactstrap";
+import { Link, useParams } from 'react-router-dom';
+import { Badge, Button, Col, Input, Progress, Row, UncontrolledTooltip } from 'reactstrap';
 import {
-  initiativeStatusColorClassName,
   formatHyphenatedString,
   formatProgress,
+  initiativeStatusColorClassName,
   memberNameInitials,
   priorityColor,
   sortByPriority,
-  textToColor
-} from "../../../services/utils/utils";
-import React, { useEffect, useState } from "react";
-import * as Yup from "yup";
-import { Field, Form, Formik } from "formik";
-import Select2 from "react-select2-wrapper";
-import InitiativesContextMenu from "../../../components/ContextMenu/InitiativesContextMenu";
-import { useContextMenu } from "react-contexify";
-import { toast } from "react-toastify";
-import PropTypes from "prop-types";
+  textToColor,
+} from '../../../services/utils/utils';
+import React, { useEffect, useState } from 'react';
+import * as Yup from 'yup';
+import { Field, Form, Formik } from 'formik';
+import Select2 from 'react-select2-wrapper';
+import InitiativesContextMenu from '../../../components/ContextMenu/InitiativesContextMenu';
+import { useContextMenu } from 'react-contexify';
+import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
 
 function InitiativesList({
                         initiatives,
@@ -27,6 +27,7 @@ function InitiativesList({
                         onChangeStatus,
                         onChangeMilestone,
                         onChangeKeyResult,
+                        onChangeAssignedTo,
                         onChange,
                         showAssignedTo = false,
                         enableContextMenu = true
@@ -129,7 +130,7 @@ function InitiativesList({
     <>
       {enableContextMenu && <InitiativesContextMenu menuId={id} onChange={handleChange} onChangePriority={onChangePriority}
                                                     onChangeStatus={onChangeStatus} onChangeMilestone={onChangeMilestone}
-                                                    onChangeKeyResult={onChangeKeyResult} />}
+                                                    onChangeKeyResult={onChangeKeyResult} onChangeAssignTo={onChangeAssignedTo}/>}
       <div className="table-responsive border-bottom">
         <table className="table align-items-center no-select" style={{ minWidth: "700px" }}>
           <thead className={headerClassName}>
@@ -275,6 +276,7 @@ InitiativesList.propTypes = {
   onChangeStatus: PropTypes.func,
   onChangeMilestone: PropTypes.func,
   onChangeKeyResult: PropTypes.func,
+  onChangeAssignedTo: PropTypes.func,
   onChange: PropTypes.func,
   showAssignedTo: PropTypes.bool,
   enableContextMenu: PropTypes.bool,
