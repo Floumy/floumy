@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Objective, ObjectiveLevel } from './objective.entity';
-import { IsNull, LessThan, MoreThan, Repository } from 'typeorm';
+import { In, IsNull, LessThan, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrgsService } from '../orgs/orgs.service';
 import { KeyResult } from './key-result.entity';
@@ -541,18 +541,19 @@ export class OkrsService {
     });
   }
 
-  async getStats(orgId: string, projectId: string) {
-    const objectives = await this.objectiveRepository.findBy({
-      org: { id: orgId },
-      project: { id: projectId },
-      level: ObjectiveLevel.PROJECT,
-    });
-
+  async getStats(orgId: string, projectId: string, timeline: Timeline) {
+    const objectives = await this.listObjectivesForTimeline(
+      orgId,
+      projectId,
+      timeline,
+    );
     const keyResults = await this.keyResultRepository.find({
       where: {
-        org: { id: orgId },
-        project: { id: projectId },
-        objective: { level: ObjectiveLevel.PROJECT },
+        objective: {
+          org: { id: orgId },
+          project: { id: projectId },
+          id: In(objectives.map((obj) => obj.id)),
+        },
       },
     });
 
