@@ -12,6 +12,7 @@ import { UsersService } from '../users/users.service';
 import { Timeline } from '../common/timeline.enum';
 import { ObjectiveStatus } from './okrstatus.enum';
 import { Project } from '../projects/project.entity';
+import { TimelineService } from '../common/timeline.service';
 
 describe('OkrsService', () => {
   let service: OkrsService;
@@ -784,12 +785,17 @@ describe('OkrsService', () => {
 
   describe('when getting stats', () => {
     it('should return stats for objectives and key results', async () => {
+      const { startDate, endDate } = TimelineService.calculateQuarterDates(
+        TimelineService.getCurrentQuarter(),
+      );
       // Create test objectives with different statuses
       const objective1 = await service.createObjective(org.id, project.id, {
         title: 'Completed Objective',
       });
       objective1.status = ObjectiveStatus.COMPLETED;
       objective1.progress = 1;
+      objective1.startDate = startDate;
+      objective1.endDate = endDate;
       await objectivesRepository.save(objective1);
 
       const objective2 = await service.createObjective(org.id, project.id, {
@@ -797,6 +803,8 @@ describe('OkrsService', () => {
       });
       objective2.status = ObjectiveStatus.ON_TRACK;
       objective2.progress = 0.5;
+      objective2.startDate = startDate;
+      objective2.endDate = endDate;
       await objectivesRepository.save(objective2);
 
       // Create key results
