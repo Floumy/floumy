@@ -976,6 +976,7 @@ describe('OkrsController', () => {
         {
           objective: {
             title: 'Test Objective',
+            timeline: Timeline.THIS_QUARTER,
           },
           keyResults: [
             {
