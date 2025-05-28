@@ -174,9 +174,9 @@ export async function deleteObjectiveComment(orgId, objectiveId, commentId) {
   }
 }
 
-export async function getOkrStats(orgId) {
+export async function getOkrStats(orgId, timeline) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/okrs-stats`);
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/okrs-stats/timeline/${timeline}`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
