@@ -816,7 +816,11 @@ describe('OkrsService', () => {
       keyResult2.status = ObjectiveStatus.ON_TRACK;
       await service['keyResultRepository'].save(keyResult2);
 
-      const stats = await service.getStats(org.id, project.id);
+      const stats = await service.getStats(
+        org.id,
+        project.id,
+        Timeline.THIS_QUARTER,
+      );
 
       expect(stats).toEqual({
         objectives: {
@@ -836,7 +840,11 @@ describe('OkrsService', () => {
     });
 
     it('should handle empty results', async () => {
-      const stats = await service.getStats(org.id, project.id);
+      const stats = await service.getStats(
+        org.id,
+        project.id,
+        Timeline.THIS_QUARTER,
+      );
 
       expect(stats).toEqual({
         objectives: {
