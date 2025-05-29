@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { And, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Project } from '../projects/project.entity';
 import crypto from 'crypto';
@@ -179,77 +179,19 @@ export class GithubService {
   }
 
   async listPullRequests(orgId: string, projectId: string) {
-    const openForOneDay = await this.githubPullRequestRepository.find({
+    const allOpenPullRequests = await this.githubPullRequestRepository.find({
       where: {
         org: { id: orgId },
         project: { id: projectId },
-        createdAt: MoreThanOrEqual(
-          new Date(new Date().setDate(new Date().getDate() - 1)),
-        ),
         state: 'open',
       },
       order: {
         createdAt: 'DESC',
       },
     });
-    const openForThreeDays = await this.githubPullRequestRepository.find({
-      where: {
-        org: { id: orgId },
-        project: { id: projectId },
-        createdAt: And(
-          LessThan(new Date(new Date().setDate(new Date().getDate() - 1))),
-          MoreThanOrEqual(
-            new Date(new Date().setDate(new Date().getDate() - 3)),
-          ),
-        ),
-        state: 'open',
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-    });
-
-    // Older than 3 days
-    const openForMoreThanThreeDays =
-      await this.githubPullRequestRepository.find({
-        where: {
-          org: { id: orgId },
-          project: { id: projectId },
-          state: 'open',
-          createdAt: LessThan(
-            new Date(new Date().setDate(new Date().getDate() - 3)),
-          ),
-        },
-        order: {
-          createdAt: 'DESC',
-        },
-      });
-    const closedInThePastSevenDays =
-      await this.githubPullRequestRepository.find({
-        where: {
-          org: { id: orgId },
-          project: { id: projectId },
-          state: 'closed',
-          createdAt: MoreThanOrEqual(
-            new Date(new Date().setDate(new Date().getDate() - 7)),
-          ),
-        },
-        order: {
-          createdAt: 'DESC',
-        },
-      });
     return {
-      openForOneDay: await Promise.all(
-        openForOneDay.map(GithubPullRequestMapper.toDto),
-      ),
-      openForThreeDays: await Promise.all(
-        openForThreeDays.map(GithubPullRequestMapper.toDto),
-      ),
-      openForMoreThanThreeDays: await Promise.all(
-        openForMoreThanThreeDays.map(GithubPullRequestMapper.toDto),
-      ),
-      closedInThePastSevenDays: await Promise.all(
-        closedInThePastSevenDays.map(GithubPullRequestMapper.toDto),
+      list: await Promise.all(
+        allOpenPullRequests.map(GithubPullRequestMapper.toDto),
       ),
     };
   }
@@ -476,24 +418,22 @@ export class GithubService {
     return null;
   }
 
-  private async onNewPullRequest(project: Project, pr: any) {
-    const workItemReference = await this.getPullRequestWorkItemReference(pr);
-
-    if (!workItemReference) {
-      return;
-    }
-
+  private async onNewPullRequest(
+    project: Project,
+    pr: any,
+    approvedAt: Date = null,
+  ) {
+    let workItem = undefined;
     const org = await project.org;
-    const workItem = await this.workItemRepository.findOne({
-      where: {
-        reference: workItemReference.toUpperCase(),
-        org: { id: org.id },
-        project: { id: project.id },
-      },
-    });
-
-    if (!workItem) {
-      return;
+    const workItemReference = await this.getPullRequestWorkItemReference(pr);
+    if (workItemReference) {
+      workItem = await this.workItemRepository.findOne({
+        where: {
+          reference: workItemReference.toUpperCase(),
+          org: { id: org.id },
+          project: { id: project.id },
+        },
+      });
     }
 
     const githubPullRequest = new GithubPullRequest();
@@ -503,9 +443,14 @@ export class GithubService {
     githubPullRequest.state = pr.state;
     githubPullRequest.createdAt = pr.created_at;
     githubPullRequest.updatedAt = pr.updated_at;
+    githubPullRequest.mergedAt = pr.merged_at;
+    githubPullRequest.closedAt = pr.closed_at;
+    githubPullRequest.approvedAt = approvedAt;
     githubPullRequest.org = Promise.resolve(org);
     githubPullRequest.project = Promise.resolve(project);
-    githubPullRequest.workItem = Promise.resolve(workItem);
+    if (workItem) {
+      githubPullRequest.workItem = Promise.resolve(workItem);
+    }
     await this.githubPullRequestRepository.save(githubPullRequest);
   }
 
@@ -703,19 +648,49 @@ export class GithubService {
     const { data: repo } = await octokit.request('GET /repositories/:id', {
       id: project.githubRepositoryId,
     });
-
-    const { data: pullRequests } = await octokit.request(
-      'GET /repos/:owner/:repo/pulls',
-      {
-        owner: repo.owner.login,
-        repo: repo.name,
-        state: 'all',
-      },
-    );
-
-    for (const pullRequest of pullRequests) {
-      await this.onNewPullRequest(project, pullRequest);
+    const allPRs = await this.getPRs(octokit, repo);
+    for (const pullRequest of allPRs) {
+      const { data: prReview } = await octokit.request(
+        'GET /repos/:owner/:repo/pulls/:pull_number/reviews',
+        {
+          owner: repo.owner.login,
+          repo: repo.name,
+          pull_number: pullRequest.number,
+        },
+      );
+      const approvedReview = prReview.find(
+        (review) => review.state === 'APPROVED',
+      );
+      await this.onNewPullRequest(
+        project,
+        pullRequest,
+        approvedReview ? new Date(approvedReview.submitted_at) : null,
+      );
     }
+  }
+
+  private async getPRs(octokit, repo) {
+    let allPRs = [];
+    const perPage = 10;
+    let page = 1;
+    while (true) {
+      const { data: pullRequests } = await octokit.request(
+        'GET /repos/:owner/:repo/pulls',
+        {
+          owner: repo.owner.login,
+          repo: repo.name,
+          state: 'all',
+          per_page: perPage,
+          page,
+        },
+      );
+      allPRs = allPRs.concat(pullRequests);
+      if (pullRequests.length < perPage) {
+        break;
+      }
+      page++;
+    }
+    return allPRs;
   }
 
   async deleteProjectGithubRepo(orgId: string, projectId: string) {
@@ -733,5 +708,42 @@ export class GithubService {
     project.githubRepositoryUrl = null;
     project.githubRepositoryWebhookId = null;
     await this.projectRepository.save(project);
+  }
+
+  async getPRsCycleTime(
+    orgId: string,
+    projectId: string,
+    timeframeInDays: number,
+  ) {
+    return await this.githubPullRequestRepository.query(
+      `SELECT date_trunc('week', "createdAt")                                             AS week,
+              COUNT(*)                                                                    AS "prCount",
+              AVG(EXTRACT(EPOCH FROM (COALESCE("closedAt", NOW()) - "createdAt")) / 3600) AS "averageCycleTime"
+       FROM github_pull_request
+       WHERE "orgId" = $1
+         AND "projectId" = $2
+          AND "createdAt" >= NOW() - $3::INTERVAL
+       GROUP BY week
+       ORDER BY week`,
+      [orgId, projectId, `${timeframeInDays} days`],
+    );
+  }
+  async getAverageMergeTime(
+    orgId: string,
+    projectId: string,
+    timeframeInDays: number,
+  ) {
+    return await this.githubPullRequestRepository.query(
+      `SELECT date_trunc('week', "createdAt")                                             AS week,
+              COUNT(*)                                                                    AS "prCount",
+              AVG(EXTRACT(EPOCH FROM (COALESCE("mergedAt", NOW()) - "createdAt")) / 3600) AS "averageMergeTime"
+       FROM github_pull_request
+       WHERE "orgId" = $1
+         AND "projectId" = $2
+          AND "createdAt" >= NOW() - $3::INTERVAL
+       GROUP BY week
+       ORDER BY week`,
+      [orgId, projectId, `${timeframeInDays} days`],
+    )
   }
 }

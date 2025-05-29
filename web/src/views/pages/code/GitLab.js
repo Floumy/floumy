@@ -5,7 +5,7 @@ import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   disconnectProject,
-  getIsGitLabConnected,
+  getIsGitLabConnected, getMergeRequestsCycleTime, getMergeRequestsMergeTime,
   listMergeRequests,
   listProjects,
   setProject,
@@ -16,6 +16,8 @@ import PRs from '../../../components/Code/PRs';
 import { toast } from 'react-toastify';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import DeleteWarning from '../components/DeleteWarning';
+import {CycleTime} from "./charts/CycleTime";
+import {MergeTime} from "./charts/MergeTime";
 
 function GitLab() {
   const { orgId, projectId } = useParams();
@@ -201,6 +203,20 @@ function GitLab() {
                   <PRs entity="merge requests" prs={mergeRequests} orgId={orgId} projectId={projectId} />}
               </CardBody>
             </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {!isLoading && projectId &&
+                <CycleTime orgId={orgId} projectId={projectId} getPrData={getMergeRequestsCycleTime}/>
+            }
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {!isLoading && projectId &&
+                <MergeTime orgId={orgId} projectId={projectId} getPrData={getMergeRequestsMergeTime}/>
+            }
           </Col>
         </Row>
       </Container>

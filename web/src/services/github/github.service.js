@@ -53,3 +53,29 @@ export async function getPullRequests(orgId, projectId) {
     throw new Error(e.message);
   }
 }
+
+export async function getPRsCycleTime(orgId, projectId, timeframeInDays) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs/cycle-time`, {
+      params: {
+        timeframeInDays
+      }
+    });
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
+export async function getPRsAverageMergeTime(orgId, projectId, timeframeInDays) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs/merge-time`, {
+      params: {
+        timeframeInDays
+      }
+    });
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}

@@ -29,4 +29,10 @@ export class GithubPullRequest {
     lazy: true,
   })
   workItem: Promise<WorkItem>;
+  @Column({ nullable: true })
+  mergedAt: Date;
+  @Column({ nullable: true })
+  closedAt: Date;
+  @Column({ nullable: true })
+  approvedAt: Date;
 }
