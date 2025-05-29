@@ -27,7 +27,7 @@ export function MergeTime({orgId, projectId, getPrData}) {
         const data = await getPrData(orgId, projectId, timeframe);
         const labels = data.map(item => formatDate(item.week));
         const prCount = data.map(item => item.prCount);
-        const mergeTime = data.map(item => Math.round(item.averageMergeTime / 24));
+        const mergeTime = data.map(item => Math.round(item.averageMergeTime));
         const averageMergeTime = (mergeTime.reduce((acc, value) => acc + value) / mergeTime.length).toFixed(1);
         setAverageMergeTime(averageMergeTime);
         setPrCount(prCount)
