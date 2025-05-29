@@ -26,6 +26,10 @@ export function CycleTime({orgId, projectId, getPrData}) {
         setTimeframeInDays(timeframe);
         setIsLoading(true);
         const data = await getPrData(orgId, projectId, timeframe);
+        if (!data || data.length === 0) {
+            setIsLoading(false);
+            return;
+        }
         const labels = data.map(item => formatDate(item.week));
         const prCount = data.map(item => item.prCount);
         const cycleTime = data.map(item => Math.round(item.averageCycleTime / 24));

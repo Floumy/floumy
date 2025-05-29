@@ -225,14 +225,14 @@ function GitHub() {
                 </Row>
                 <Row>
                     <Col>
-                        {!isLoading && currentProject &&
+                        {!isLoading && currentProject && repo &&
                         <CycleTime orgId={orgId} projectId={currentProject.id} getPrData={getPRsCycleTime}/>
                         }
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                        {!isLoading && currentProject &&
+                        {!isLoading && currentProject && repo &&
                         <MergeTime orgId={orgId} projectId={currentProject.id} getPrData={getPRsAverageMergeTime}/>
                         }
                     </Col>
