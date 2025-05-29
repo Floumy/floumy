@@ -66,4 +66,9 @@ export class PublicService {
       throw new Error('Building in public is not enabled');
     }
   }
+
+  async getStats(orgId: string, projectId: string, timeline: Timeline) {
+    await this.validateProjectHasBuildingInPublicEnabled(orgId, projectId);
+    return this.okrsService.getStats(orgId, projectId, timeline);
+  }
 }
