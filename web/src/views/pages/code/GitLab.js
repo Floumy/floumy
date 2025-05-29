@@ -207,14 +207,14 @@ function GitLab() {
         </Row>
         <Row>
           <Col>
-            {!isLoading && projectId &&
+            {!isLoading && projectId && gitlabProject &&
                 <CycleTime orgId={orgId} projectId={projectId} getPrData={getMergeRequestsCycleTime}/>
             }
           </Col>
         </Row>
         <Row>
           <Col>
-            {!isLoading && projectId &&
+            {!isLoading && projectId && gitlabProject &&
                 <MergeTime orgId={orgId} projectId={projectId} getPrData={getMergeRequestsMergeTime}/>
             }
           </Col>
