@@ -265,4 +265,23 @@ describe('PublicService', () => {
       ).rejects.toThrow();
     });
   });
+  describe('when getting the stats', () => {
+    it('should thrown an error if the building in public is not enabled', async () => {
+      const newOrg = new Org();
+      newOrg.name = 'Test Org 2';
+      await orgsRepository.save(newOrg);
+      const newOrgProject = new Project();
+      newOrgProject.name = 'Test Project';
+      newOrgProject.org = Promise.resolve(newOrg);
+      await projectsRepository.save(newOrgProject);
+      const newOrgBipSettings = new BipSettings();
+      newOrgBipSettings.isBuildInPublicEnabled = false;
+      newOrgBipSettings.org = Promise.resolve(newOrg);
+      newOrgBipSettings.project = Promise.resolve(newOrgProject);
+      await bipSettingsRepository.save(newOrgBipSettings);
+      await expect(
+        service.getStats(newOrg.id, newOrgProject.id, Timeline.THIS_QUARTER),
+      ).rejects.toThrow('Building in public is not enabled');
+    });
+  });
 });

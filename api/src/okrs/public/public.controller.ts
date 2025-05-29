@@ -64,4 +64,17 @@ export class PublicController {
       throw new BadRequestException();
     }
   }
+
+  @Get('/okrs-stats/timeline/:timeline')
+  async getStats(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Param('timeline') timeline: Timeline,
+  ) {
+    try {
+      return await this.publicOkrsService.getStats(orgId, projectId, timeline);
+    } catch (e) {
+      throw new BadRequestException();
+    }
+  }
 }
