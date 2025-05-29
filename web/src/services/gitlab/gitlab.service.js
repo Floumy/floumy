@@ -53,3 +53,27 @@ export async function disconnectProject(orgId, projectId) {
     throw new Error(e.message);
   }
 }
+export async function getMergeRequestsCycleTime(orgId, projectId, timeframeInDays) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}/mrs/cycle-time`,{
+      params: {
+        timeframeInDays
+      }
+    });
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+export async function getMergeRequestsMergeTime(orgId, projectId, timeframeInDays) {
+    try {
+        const response = await api.get(`${process.env.REACT_APP_API_URL}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}/mrs/merge-time`,{
+          params: {
+            timeframeInDays
+          }
+        });
+        return response.data;
+    } catch (e) {
+        throw new Error(e.message);
+    }
+}
