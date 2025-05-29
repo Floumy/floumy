@@ -17,7 +17,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CommentsService } from './comments/comments.service';
-import { CreateOrUpdateKeyResultDto, CreateOrUpdateOKRDto, PatchKeyResultDto, UpdateObjectiveDto } from './dtos';
+import {
+  CreateOrUpdateKeyResultDto,
+  CreateOrUpdateOKRDto,
+  PatchKeyResultDto,
+  UpdateObjectiveDto,
+} from './dtos';
 import { Timeline } from '../common/timeline.enum';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 import { OrgOkrsService } from './org-okrs.service';
@@ -388,9 +393,13 @@ export class OrgOkrsController {
     }
   }
 
-  @Get('okrs-stats')
+  @Get('okrs-stats/timeline/:timeline')
   @HttpCode(HttpStatus.OK)
-  async getOkrStats(@Param('orgId') orgId: string, @Request() request: any) {
+  async getOkrStats(
+    @Param('orgId') orgId: string,
+    @Param('timeline') timeline: Timeline,
+    @Request() request: any,
+  ) {
     const { org: userOrgId } = request.user;
 
     if (orgId !== userOrgId) {
@@ -398,7 +407,7 @@ export class OrgOkrsController {
     }
 
     try {
-      return await this.okrsService.getStats(orgId);
+      return await this.okrsService.getStats(orgId, timeline);
     } catch (e) {
       throw new BadRequestException();
     }
