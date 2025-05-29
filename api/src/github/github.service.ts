@@ -716,13 +716,14 @@ export class GithubService {
     timeframeInDays: number,
   ) {
     return await this.githubPullRequestRepository.query(
-      `SELECT date_trunc('week', "createdAt")                                             AS week,
-              COUNT(*)                                                                    AS "prCount",
-              AVG(EXTRACT(EPOCH FROM (COALESCE("closedAt", NOW()) - "createdAt")) / 3600) AS "averageCycleTime"
+      `SELECT date_trunc('week', "createdAt") AS week,
+              COUNT(*)                        AS "prCount",
+              AVG(EXTRACT(EPOCH FROM (COALESCE("mergedAt", "closedAt", NOW()) - "createdAt")) /
+                  3600)                       AS "averageCycleTime"
        FROM github_pull_request
        WHERE "orgId" = $1
          AND "projectId" = $2
-          AND "createdAt" >= NOW() - $3::INTERVAL
+         AND "createdAt" >= NOW() - $3::INTERVAL
        GROUP BY week
        ORDER BY week`,
       [orgId, projectId, `${timeframeInDays} days`],
@@ -734,13 +735,15 @@ export class GithubService {
     timeframeInDays: number,
   ) {
     return await this.githubPullRequestRepository.query(
-      `SELECT date_trunc('week', "createdAt")                                             AS week,
-              COUNT(*)                                                                    AS "prCount",
-              AVG(EXTRACT(EPOCH FROM (COALESCE("mergedAt", NOW()) - "createdAt")) / 3600) AS "averageMergeTime"
+      `SELECT date_trunc('week', "createdAt") AS week,
+              COUNT(*)                        AS "prCount",
+              AVG(EXTRACT(EPOCH FROM (COALESCE("mergedAt", "closedAt", NOW()) - COALESCE("approvedAt", "createdAt"))) /
+                  3600)                       AS "averageMergeTime"
        FROM github_pull_request
        WHERE "orgId" = $1
          AND "projectId" = $2
-          AND "createdAt" >= NOW() - $3::INTERVAL
+         AND "createdAt" >= NOW() - $3::INTERVAL
+         AND "approvedAt" IS NOT NULL
        GROUP BY week
        ORDER BY week`,
       [orgId, projectId, `${timeframeInDays} days`],
