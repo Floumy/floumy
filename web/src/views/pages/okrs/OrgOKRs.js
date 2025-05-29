@@ -56,7 +56,7 @@ function OrgOKRs() {
       setStatsLoading(true);
       setStatsError(null);
       try {
-        const statsData = await getOkrStats(orgId);
+        const statsData = await getOkrStats(orgId, timelineQueryFilter);
         setStats(statsData);
       } catch (e) {
         setStatsError('Could not load stats');

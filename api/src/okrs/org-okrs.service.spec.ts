@@ -711,7 +711,7 @@ describe('OrgOkrsService', () => {
           { title: 'My KR 3' },
         ],
       });
-      const stats = await service.getStats(org.id);
+      const stats = await service.getStats(org.id, Timeline.THIS_QUARTER);
       expect(stats.objectives.total).toEqual(1);
       expect(stats.objectives.completed).toEqual(0);
       expect(stats.objectives.inProgress).toEqual(1);

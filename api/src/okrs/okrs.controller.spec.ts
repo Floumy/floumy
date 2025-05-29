@@ -976,6 +976,7 @@ describe('OkrsController', () => {
         {
           objective: {
             title: 'Test Objective',
+            timeline: Timeline.THIS_QUARTER,
           },
           keyResults: [
             {
@@ -989,9 +990,14 @@ describe('OkrsController', () => {
           ],
         },
       );
-      const stats = await controller.getOkrStats(org.id, project.id, {
-        user: { org: org.id },
-      });
+      const stats = await controller.getOkrStats(
+        org.id,
+        project.id,
+        Timeline.THIS_QUARTER,
+        {
+          user: { org: org.id },
+        },
+      );
 
       expect(stats).toEqual({
         keyResults: {
@@ -1012,7 +1018,7 @@ describe('OkrsController', () => {
 
     it('should return 401 for unauthorized access', async () => {
       await expect(
-        controller.getOkrStats(org.id, project.id, {
+        controller.getOkrStats(org.id, project.id, Timeline.THIS_QUARTER, {
           user: { org: 'wrong-org-id' },
         }),
       ).rejects.toThrow(UnauthorizedException);

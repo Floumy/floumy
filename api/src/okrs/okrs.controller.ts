@@ -83,11 +83,12 @@ export class OkrsController {
     return await this.okrsService.listKeyResults(orgId, projectId);
   }
 
-  @Get('okrs-stats')
+  @Get('okrs-stats/timeline/:timeline')
   @HttpCode(HttpStatus.OK)
   async getOkrStats(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
+    @Param('timeline') timeline: Timeline,
     @Request() request,
   ) {
     const { org: userOrgId } = request.user;
@@ -97,7 +98,7 @@ export class OkrsController {
     }
 
     try {
-      return await this.okrsService.getStats(orgId, projectId);
+      return await this.okrsService.getStats(orgId, projectId, timeline);
     } catch (e) {
       throw new BadRequestException();
     }

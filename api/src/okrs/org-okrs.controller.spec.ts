@@ -960,11 +960,15 @@ describe('OrgOkrsController', () => {
   });
   describe('when getting the okr stats', () => {
     it('should return the okr stats', async () => {
-      const stats = await controller.getOkrStats(org.id, {
-        user: {
-          org: org.id,
+      const stats = await controller.getOkrStats(
+        org.id,
+        Timeline.THIS_QUARTER,
+        {
+          user: {
+            org: org.id,
+          },
         },
-      });
+      );
       expect(stats).toEqual({
         keyResults: {
           completed: 0,
