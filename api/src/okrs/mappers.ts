@@ -14,6 +14,7 @@ export class OKRMapper {
     const org = await objective.org;
     const project = await objective.project;
     const parentObjective = await objective.parentObjective;
+    const childObjectives = await objective.childObjectives;
     return {
       objective: {
         id: objective.id,
@@ -40,6 +41,9 @@ export class OKRMapper {
               title: parentObjective.title,
             }
           : undefined,
+        childObjectives: childObjectives
+          ? await OKRMapper.toChildObjectivesDTO(childObjectives)
+          : [],
         startDate: objective.startDate,
         endDate: objective.endDate,
         assignedTo: assignedTo
@@ -70,6 +74,10 @@ export class OKRMapper {
     return await Promise.all(objectives.map(OKRMapper.toListItemDto));
   }
 
+  static async toChildObjectivesDTO(objectives: Objective[]) {
+    return await Promise.all(objectives.map(OKRMapper.toChildObjectiveItemDto));
+  }
+
   static async toListItemDto(objective: Objective) {
     const assignedTo = await objective.assignedTo;
     return {
@@ -89,6 +97,32 @@ export class OKRMapper {
             name: assignedTo.name,
           }
         : null,
+      createdAt: objective.createdAt,
+      updatedAt: objective.updatedAt,
+    };
+  }
+
+  static async toChildObjectiveItemDto(objective: Objective) {
+    const assignedTo = await objective.assignedTo;
+    const project = await objective.project;
+    return {
+      id: objective.id,
+      reference: objective.reference,
+      title: objective.title,
+      status: objective.status,
+      level: objective.level,
+      timeline: TimelineService.startAndEndDatesToTimeline(
+        objective.startDate,
+        objective.endDate,
+      ),
+      progress: parseFloat(objective.progress?.toFixed(2)),
+      assignedTo: assignedTo
+        ? {
+            id: assignedTo.id,
+            name: assignedTo.name,
+          }
+        : null,
+      project: project ? { id: project.id, name: project.name } : undefined,
       createdAt: objective.createdAt,
       updatedAt: objective.updatedAt,
     };

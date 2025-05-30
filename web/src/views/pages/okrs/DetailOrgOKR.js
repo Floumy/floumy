@@ -394,7 +394,7 @@ function DetailOrgOKR() {
                   </>}
               </CardBody>
             </Card>
-            {!isLoading &&
+            {!isLoading && <>
               <Card>
                 <CardHeader>
                   <h3 className="mb-0">
@@ -518,7 +518,83 @@ function DetailOrgOKR() {
                     </div>
                   </Col>
                 </Row>
-              </Card>}
+              </Card>
+              <Card>
+                <CardHeader>
+                  <h3 className="mb-0">
+                    Related Project Objectives
+                  </h3>
+                </CardHeader>
+                <Row>
+                  <Col>
+                    <div className="table-responsive">
+                      <Table className="table align-items-center no-select" style={{ minWidth: '700px' }}
+                             onContextMenu={(e) => e.preventDefault()}>
+                        <thead className="thead-light">
+                        <tr>
+                          <th className="sort" scope="col" width="5%">
+                            Reference
+                          </th>
+                          <th className="sort" scope="col" width="30%">
+                            Objective
+                          </th>
+                          <th className="sort" scope="col" width="30%">
+                            Project
+                          </th>
+                          <th className="sort" scope="col" width="30%">
+                            Progress
+                          </th>
+                        </tr>
+                        </thead>
+                        <tbody className="list">
+                        {okr && okr.objective.childObjectives && okr.objective.childObjectives.length === 0 &&
+                          <tr>
+                            <td colSpan={4}>
+                              <div className="text-center text-muted">
+                                No project objectives have been added yet
+                              </div>
+                            </td>
+                          </tr>}
+                        {okr && okr.objective.childObjectives && okr.objective.childObjectives.map((projectObjective) => (
+                          <tr key={projectObjective.id}>
+                            <td>
+                              <Link
+                                to={`/admin/orgs/${orgId}/projects/${projectObjective.project.id}/okrs/detail/${projectObjective.id}`}
+                                className={'okr-detail'}>
+                                {projectObjective.reference}
+                              </Link>
+                            </td>
+                            <td className="title-cell">
+                              <Link
+                                to={`/admin/orgs/${orgId}/projects/${projectObjective.project.id}/okrs/detail/${projectObjective.id}`}
+                                className={'okr-detail'}>
+                                {projectObjective.title}
+                              </Link>
+                            </td>
+                            <td className="title-cell">
+                              <Link
+                                to={`/admin/orgs/${orgId}/projects/${projectObjective.project.id}/okrs`}
+                                className={'okr-detail'}>
+                                {projectObjective.project.name}
+                              </Link>
+                            </td>
+                            <td>
+                              <div className="d-flex align-items-center">
+                                <span className="mr-2">{formatOKRsProgress(projectObjective.progress)}%</span>
+                                <div>
+                                  <Progress max="100" value={formatOKRsProgress(projectObjective.progress)}
+                                            color="primary" />
+                                </div>
+                              </div>
+                            </td>
+                          </tr>))}
+                        </tbody>
+                      </Table>
+                    </div>
+                  </Col>
+                </Row>
+              </Card>
+            </>}
           </Col>
           {!isLoading &&
             <Col lg={4} md={12}>
