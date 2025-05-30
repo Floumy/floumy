@@ -189,4 +189,22 @@ export class GitlabController {
       throw new BadRequestException(e.message);
     }
   }
+
+  @Get('/merge-requests/orgs/:orgId/projects/:projectId/mrs/first-review-time')
+  async getPullRequestFirstReviewTime(
+      @Request() request: any,
+      @Param('orgId') orgId: string,
+      @Param('projectId') projectId: string,
+      @Query('timeframeInDays') timeframeInDays: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.gitlabService.getAverageFirstReviewTime(orgId, projectId, parseInt(timeframeInDays));
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }

@@ -7,7 +7,7 @@ import {
     deleteProjectGithubRepo,
     getGithubRepos,
     getGithubUrl,
-    getIsGithubConnected, getPRsAverageMergeTime, getPRsCycleTime,
+    getIsGithubConnected, getPRsFirstReviewTime, getPRsAverageMergeTime, getPRsCycleTime,
     getPullRequests,
     updateProjectGithubRepo,
 } from '../../../services/github/github.service';
@@ -20,6 +20,7 @@ import DeleteWarning from '../components/DeleteWarning';
 import PRs from '../../../components/Code/PRs';
 import {CycleTime} from "./charts/CycleTime";
 import {MergeTime} from "./charts/MergeTime";
+import {FirstReviewTime} from "./charts/FirstReviewTime";
 
 function GitHub() {
     const {orgId, currentProject} = useProjects();
@@ -234,6 +235,13 @@ function GitHub() {
                     <Col>
                         {!isLoading && currentProject && repo &&
                         <MergeTime orgId={orgId} projectId={currentProject.id} getPrData={getPRsAverageMergeTime}/>
+                        }
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        {!isLoading && currentProject && repo &&
+                            <FirstReviewTime orgId={orgId} projectId={currentProject.id} getPrData={getPRsFirstReviewTime}/>
                         }
                     </Col>
                 </Row>
