@@ -271,6 +271,17 @@ export class GitlabService {
             const notes = await gitlab.MergeRequestNotes.all(project.gitlabProjectId, mergeRequest.iid)
 
             const approvedAt = notes.find((note) => note.body.includes('approved this merge request'))?.created_at;
+
+
+            let firstReviewAt = null;
+            if (notes && notes.length > 0) {
+
+                const firstReviewNote = notes
+                    .filter(note => !note.system)
+                    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())[0];
+                firstReviewAt = firstReviewNote ? new Date(firstReviewNote.created_at) : null;
+            }
+
             const mergedAt = mergeRequest.merged_at;
             const closedAt = mergeRequest.closed_at ?? mergedAt;
             const gitlabMergeRequest = new GitlabMergeRequest();
@@ -282,6 +293,7 @@ export class GitlabService {
             gitlabMergeRequest.mergedAt = mergedAt ? new Date(mergedAt) : null;
             gitlabMergeRequest.closedAt = closedAt ? new Date(closedAt) : null;
             gitlabMergeRequest.approvedAt = approvedAt ? new Date(approvedAt) : null;
+            gitlabMergeRequest.firstReviewAt = firstReviewAt;
             gitlabMergeRequest.org = Promise.resolve(project.org);
             gitlabMergeRequest.project = Promise.resolve(project);
             gitlabMergeRequest.workItem = Promise.resolve(workItem);
@@ -527,5 +539,24 @@ export class GitlabService {
              ORDER BY week`,
             [orgId, projectId, `${timeframeInDays} days`],
         )
+    }
+    async getAverageFirstReviewTime(
+        orgId: string,
+        projectId: string,
+        timeframeInDays: number,
+    ) {
+        return await this.gitlabMergeRequestRepository.query(
+            `SELECT date_trunc('week', "createdAt") AS week,
+                    COUNT(*)                        AS "prCount",
+                    AVG(EXTRACT(EPOCH FROM (COALESCE("firstReviewAt", "closedAt", NOW()) - "createdAt")) / 3600) AS "averageFirstReviewTime"
+             FROM gitlab_merge_request
+             WHERE "orgId" = $1
+               AND "projectId" = $2
+               AND "createdAt" >= NOW() - $3::INTERVAL
+               AND "firstReviewAt" IS NOT NULL
+             GROUP BY week
+             ORDER BY week`,
+            [orgId, projectId, `${timeframeInDays} days`],
+        );
     }
 }
