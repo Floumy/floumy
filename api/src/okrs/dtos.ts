@@ -110,6 +110,25 @@ export interface OKRDto {
       reference: string;
       title: string;
     };
+    childObjectives: {
+      id: string;
+      reference: string;
+      title: string;
+      status: string;
+      level: string;
+      timeline: string;
+      progress: number;
+      project: {
+        id: string;
+        name: string;
+      },
+      assignedTo: {
+        id: string;
+        name: string;
+      };
+      createdAt: Date;
+      updatedAt: Date;
+    }[];
     reference: string;
     title: string;
     progress: number;
