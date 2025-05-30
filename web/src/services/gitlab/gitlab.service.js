@@ -77,3 +77,16 @@ export async function getMergeRequestsMergeTime(orgId, projectId, timeframeInDay
         throw new Error(e.message);
     }
 }
+
+export async function getMergeRequestsFirstReviewTime(orgId, projectId, timeframeInDays) {
+  try {
+    const response = await api.get(`${process.env.REACT_APP_API_URL}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}/mrs/first-review-time`, {
+      params: {
+        timeframeInDays
+      }
+    });
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}

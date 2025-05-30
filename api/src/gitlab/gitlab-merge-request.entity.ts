@@ -33,4 +33,6 @@ export class GitlabMergeRequest {
   closedAt: Date;
   @Column({ nullable: true })
   approvedAt: Date;
+  @Column({ nullable: true })
+  firstReviewAt: Date;
 }
