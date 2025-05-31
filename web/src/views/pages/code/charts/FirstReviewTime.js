@@ -1,12 +1,12 @@
-import React, {useEffect} from "react";
-import {Line} from "react-chartjs-2";
-import {Button, ButtonGroup, Card, CardBody, CardHeader, Col, Row} from "reactstrap";
-import {averageMergeTimeChartOptions, chartOptions, parseOptions} from "../../../../variables/charts";
+import React, { useEffect } from "react";
+import { Line } from "react-chartjs-2";
+import { Button, ButtonGroup, Card, CardBody, CardHeader, Col, Row } from "reactstrap";
+import { chartOptions, averageMergeTimeChartOptions, parseOptions } from "../../../../variables/charts";
 import Chart from "chart.js";
-import {formatDate} from "../../../../services/utils/utils";
+import { formatDate } from "../../../../services/utils/utils";
 import LoadingSpinnerBox from "../../components/LoadingSpinnerBox";
 
-export function MergeTime({orgId, projectId, getPrData}) {
+export function FirstReviewTime({ orgId, projectId, getPrData }) {
     if (window.Chart) {
         parseOptions(Chart, chartOptions());
     }
@@ -14,8 +14,9 @@ export function MergeTime({orgId, projectId, getPrData}) {
     const [prCount, setPrCount] = React.useState([]);
     const [labels, setLabels] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(false);
-    const [averageMergeTime, setAverageMergeTime] = React.useState(0);
+    const [averageFirstReviewTime, setAverageFirstReviewTime] = React.useState(0);
     const [timeframeInDays, setTimeframeInDays] = React.useState(30);
+
     useEffect(() => {
         fetchData(365).catch(console.error);
     }, []);
@@ -30,19 +31,20 @@ export function MergeTime({orgId, projectId, getPrData}) {
         }
         const labels = data.map(item => formatDate(item.week));
         const prCount = data.map(item => item.prCount);
-        const mergeTime = data.map(item => Math.round(item.averageMergeTime));
-        const averageMergeTime = (mergeTime.reduce((acc, value) => acc + value) / mergeTime.length).toFixed(1);
-        setAverageMergeTime(averageMergeTime);
-        setPrCount(prCount)
+        const reviewTime = data.map(item => Math.round(item.averageFirstReviewTime));
+        const averageFirstReviewTime = (reviewTime.reduce((acc, value) => acc + value) / reviewTime.length).toFixed(1);
+        setAverageFirstReviewTime(averageFirstReviewTime);
+        setPrCount(prCount);
         setLabels(labels);
-        setData(mergeTime);
+        setData(reviewTime);
         setIsLoading(false);
-    }
+    };
+
     return (
         <>
             {isLoading ? <Row>
                     <Col className="text-center">
-                        <LoadingSpinnerBox/>
+                        <LoadingSpinnerBox />
                     </Col>
                 </Row>
                 :
@@ -50,12 +52,12 @@ export function MergeTime({orgId, projectId, getPrData}) {
                     <CardHeader>
                         <Row>
                             <Col>
-                                <h1 className="h3 mb-0">Merge time</h1>
+                                <h1 className="h3 mb-0">First Review Time</h1>
                                 <p className="text-sm mb-0">
-                                    <span className="text-nowrap">Average merge time</span>
-                                    <br/>
-                                    <strong>{averageMergeTime} hours per PR </strong>
-                                    <br/>
+                                    <span className="text-nowrap">Average time to first review</span>
+                                    <br />
+                                    <strong>{averageFirstReviewTime} hours per PR </strong>
+                                    <br />
                                 </p>
                             </Col>
                             <Col className='text-right'>
@@ -98,7 +100,7 @@ export function MergeTime({orgId, projectId, getPrData}) {
                                     labels,
                                     datasets: [
                                         {
-                                            label: "Merge time",
+                                            label: "First review time",
                                             data,
                                             tension: 0.4,
                                             order: 1
@@ -124,4 +126,3 @@ export function MergeTime({orgId, projectId, getPrData}) {
         </>
     );
 }
-
