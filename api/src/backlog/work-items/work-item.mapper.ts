@@ -95,6 +95,7 @@ export default class WorkItemMapper {
     const gitlabBranches = await workItem.gitlabBranches;
     const branches = project.gitlabProjectId ? gitlabBranches : githubBranches;
     const codeConnectionType = project.gitlabProjectId ? 'gitlab' : 'github';
+    console.log(codeConnectionType)
     return {
       id: workItem.id,
       org: org ? { id: org.id } : undefined,
@@ -232,6 +233,7 @@ class BranchMapper {
         state: branch.state,
         createdAt: branch.createdAt,
         updatedAt: branch.updatedAt,
+        deletedAt: branch.deletedAt,
       };
     });
   }
