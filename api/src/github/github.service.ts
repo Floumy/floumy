@@ -422,6 +422,7 @@ export class GithubService {
     project: Project,
     pr: any,
     approvedAt: Date = null,
+    firstReviewAt: Date = null,
   ) {
     let workItem = undefined;
     const org = await project.org;
@@ -446,6 +447,7 @@ export class GithubService {
     githubPullRequest.mergedAt = pr.merged_at;
     githubPullRequest.closedAt = pr.closed_at;
     githubPullRequest.approvedAt = approvedAt;
+    githubPullRequest.firstReviewAt = firstReviewAt;
     githubPullRequest.org = Promise.resolve(org);
     githubPullRequest.project = Promise.resolve(project);
     if (workItem) {
@@ -662,10 +664,22 @@ export class GithubService {
       const approvedReview = prReview.find(
         (review) => review.state === 'APPROVED',
       );
+
+      let firstReviewAt: Date = null;
+      if (prReview.length > 0) {
+        const firstReview = prReview.reduce((earliest, review) => {
+          if (!earliest || new Date(review.submitted_at) < new Date(earliest.submitted_at)) {
+            return review;
+          }
+          return earliest;
+        }, null);
+        firstReviewAt = firstReview ? new Date(firstReview.submitted_at) : null;
+      }
       await this.onNewPullRequest(
         project,
         pullRequest,
         approvedReview ? new Date(approvedReview.submitted_at) : null,
+        firstReviewAt,
       );
     }
   }
@@ -749,5 +763,24 @@ export class GithubService {
        ORDER BY week`,
       [orgId, projectId, `${timeframeInDays} days`],
     )
+  }
+
+  async getAverageFirstReviewTime(
+    orgId: string,
+    projectId: string,
+    timeframeInDays: number,
+  ) {
+    return await this.githubPullRequestRepository.query(
+      `SELECT date_trunc('week', "createdAt") AS week,
+              COUNT(*)                        AS "prCount",
+              AVG(EXTRACT(EPOCH FROM (COALESCE("firstReviewAt", "closedAt", NOW()) - "createdAt")) / 3600) AS "averageFirstReviewTime"
+       FROM github_pull_request
+       WHERE "orgId" = $1
+         AND "projectId" = $2
+         AND "createdAt" >= NOW() - $3::INTERVAL
+       GROUP BY week
+       ORDER BY week`,
+      [orgId, projectId, `${timeframeInDays} days`],
+    );
   }
 }
