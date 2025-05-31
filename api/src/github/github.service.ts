@@ -554,6 +554,7 @@ export class GithubService {
 
     githubBranch.state = 'closed';
     githubBranch.updatedAt = new Date();
+    githubBranch.deletedAt = new Date();
     await this.githubBranchRepository.save(githubBranch);
   }
 
