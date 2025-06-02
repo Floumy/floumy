@@ -598,7 +598,6 @@ export class GitlabService {
       project: { id: projectId },
     });
 
-    // Delete project branches
     await this.gitlabBranchRepository.delete({
       project: { id: projectId },
     });
