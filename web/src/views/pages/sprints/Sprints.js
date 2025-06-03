@@ -278,6 +278,20 @@ function Sprints() {
     setBacklogWorkItems([...updatedWorkItems]);
   }
 
+  function deleteWorkItemsFromSprint(deletedWorkItems, sprintId) {
+    const sprint = sprints.find(sprint => sprint.id === sprintId);
+    if (!sprint) return;
+    
+    const deletedIds = deletedWorkItems.map(wi => wi.id);
+    sprint.workItems = sprint.workItems.filter(wi => !deletedIds.includes(wi.id));
+    setSprints([...sprints]);
+  }
+
+  function deleteWorkItemsFromBacklog(deletedWorkItems) {
+    const deletedIds = deletedWorkItems.map(wi => wi.id);
+    setBacklogWorkItems(backlogWorkItems.filter(wi => !deletedIds.includes(wi.id)));
+  }
+
   return (
     <>
       {isLoadingSprints && <InfiniteLoadingBar />}
@@ -414,6 +428,9 @@ function Sprints() {
                           onChangeAssignee={(workItems, assignee) => {
                             updateWorkItemAssigneeInSprint(workItems, assignee, sprint.id);
                           }}
+                          onDelete={(deletedWorkItems) => {
+                            deleteWorkItemsFromSprint(deletedWorkItems, sprint.id);
+                          }}
                         />
                         <CardBody className="pt-2 pb-2 font-italic"><Row><Col className="text-sm">Unfinished Work
                           Items</Col></Row></CardBody>
@@ -431,6 +448,9 @@ function Sprints() {
                           }}
                           onChangeAssignee={(workItems, assignee) => {
                             updateWorkItemAssigneeInSprint(workItems, assignee, sprint.id);
+                          }}
+                          onDelete={(deletedWorkItems) => {
+                            deleteWorkItemsFromSprint(deletedWorkItems, sprint.id);
                           }}
                         />
                       </div>
@@ -455,7 +475,9 @@ function Sprints() {
                           onChangeAssignee={(workItems, assignee) => {
                             updateWorkItemAssigneeInSprint(workItems, assignee, sprint.id);
                           }}
-
+                          onDelete={(deletedWorkItems) => {
+                            deleteWorkItemsFromSprint(deletedWorkItems, sprint.id);
+                          }}
                         />
                       </div>
                     }
@@ -479,6 +501,7 @@ function Sprints() {
                 updateWorkItemsPriorityInBacklog(workItems, priority);
               }}
               onChangeAssignee={(workItems, assignee) => {updateWorkItemAssigneeInBacklog(workItems, assignee);}}
+              onDelete={deleteWorkItemsFromBacklog}
             />
           </Col>
         </Row>

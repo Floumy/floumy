@@ -80,6 +80,12 @@ export function DetailInitiative() {
     setInitiative({ ...initiative });
   }
 
+  function handleDeleteWorkItem(deletedWorkItems) {
+    const deletedIds = deletedWorkItems.map(wi => wi.id);
+    initiative.workItems = initiative.workItems.filter(wi => !deletedIds.includes(wi.id));
+    setInitiative({ ...initiative });
+  }
+
   function isPlaceholderWorkItemOnly() {
     return initiative && (!initiative.workItems || initiative.workItems.length === 1 || !initiative.workItems[0]?.title);
   }
@@ -136,6 +142,7 @@ export function DetailInitiative() {
                     onAddNewWorkItem={handleAddWorkItem}
                     onChangeStatus={updateWorkItemsChangeStatus}
                     onChangePriority={updateWorkItemsPriority}
+                    onDelete={handleDeleteWorkItem}
                   />
                 </>
               }
