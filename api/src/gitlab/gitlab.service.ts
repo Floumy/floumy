@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { And, In, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { EncryptionService } from '../encryption/encryption.service';
 import { Gitlab } from '@gitbeaker/node';
 import { Project } from '../projects/project.entity';
@@ -482,6 +482,8 @@ export class GitlabService {
       );
     }
 
+    await this.cleanupGitlabRepoAssociations(projectId);
+
     project.gitlabProjectId = null;
     project.gitlabProjectWebhookId = null;
     project.gitlabAccessToken = null;
@@ -589,5 +591,15 @@ export class GitlabService {
              ORDER BY week`,
       [orgId, projectId, `${timeframeInDays} days`],
     );
+  }
+
+  private async cleanupGitlabRepoAssociations(projectId: string) {
+    await this.gitlabMergeRequestRepository.delete({
+      project: { id: projectId },
+    });
+
+    await this.gitlabBranchRepository.delete({
+      project: { id: projectId },
+    });
   }
 }
