@@ -29,7 +29,12 @@ export default function PRs({prs, orgId, projectId, entity = 'pull requests'}) {
               </tr>}
               {prs.list.map((pr, index) => (
                 <tr key={index}>
-                  <td>{pr.title}</td>
+                  <td>
+                    <a href={pr.url} target="_blank" rel="noopener noreferrer" className="text-primary">
+                      {pr.title}
+                      <i className="fa fa-external-link-alt ml-2" style={{fontSize: '0.75rem'}}/>
+                    </a>
+                  </td>
                   <td>
                     {pr.workItem ?
                     <Link
