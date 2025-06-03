@@ -25,7 +25,7 @@ export default function PRs({prs, orgId, projectId, entity = 'pull requests'}) {
               </thead>
               <tbody className="list">
               {prs.list.length === 0 && <tr>
-                <td colSpan={3} className="text-center">No {entity}</td>
+                <td colSpan={4} className="text-center">No {entity}</td>
               </tr>}
               {prs.list.map((pr, index) => (
                 <tr key={index}>
