@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,6 +14,7 @@ import { GithubEvents } from './events';
 
 @Injectable()
 export class GithubService {
+  private readonly logger = new Logger(GithubService.name);
   constructor(
     @Inject('GITHUB_CLIENT') private readonly octokit: any,
     private readonly configService: ConfigService,
@@ -149,7 +150,7 @@ export class GithubService {
       projectId,
     });
 
-    return `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=repo,user&state=${state}`;
+    return `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=repo,user&state=${state}&prompt=consent`;
   }
 
   async handleOAuthCallback(code: string, state: string) {
@@ -556,6 +557,7 @@ export class GithubService {
 
     githubBranch.state = 'closed';
     githubBranch.updatedAt = new Date();
+    githubBranch.deletedAt = new Date();
     await this.githubBranchRepository.save(githubBranch);
   }
 
@@ -599,11 +601,15 @@ export class GithubService {
       id: project.githubRepositoryId,
     });
 
-    await octokit.request('DELETE /repos/:owner/:repo/hooks/:hook_id', {
-      owner: repo.owner.login,
-      repo: repo.name,
-      hook_id: project.githubRepositoryWebhookId,
-    });
+    try {
+      await octokit.request('DELETE /repos/:owner/:repo/hooks/:hook_id', {
+        owner: repo.owner.login,
+        repo: repo.name,
+        hook_id: project.githubRepositoryWebhookId,
+      });
+    } catch (e) {
+      this.logger.error('Error deleting webhook', e);
+    }
   }
 
   private async cleanupGithubRepoAssociation(project: Project) {
@@ -667,7 +673,10 @@ export class GithubService {
       let firstReviewAt: Date = null;
       if (prReview.length > 0) {
         const firstReview = prReview.reduce((earliest, review) => {
-          if (!earliest || new Date(review.submitted_at) < new Date(earliest.submitted_at)) {
+          if (
+            !earliest ||
+            new Date(review.submitted_at) < new Date(earliest.submitted_at)
+          ) {
             return review;
           }
           return earliest;
@@ -761,7 +770,7 @@ export class GithubService {
        GROUP BY week
        ORDER BY week`,
       [orgId, projectId, `${timeframeInDays} days`],
-    )
+    );
   }
 
   async getAverageFirstReviewTime(

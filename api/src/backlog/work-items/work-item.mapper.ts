@@ -232,6 +232,7 @@ class BranchMapper {
         state: branch.state,
         createdAt: branch.createdAt,
         updatedAt: branch.updatedAt,
+        deletedAt: branch.deletedAt,
       };
     });
   }

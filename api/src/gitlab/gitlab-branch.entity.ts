@@ -24,6 +24,8 @@ export class GitlabBranch {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
+  @Column({ nullable: true })
+  deletedAt: Date;
   @ManyToOne(() => Project, (project) => project.gitlabBranches, { lazy: true })
   project: Promise<Project>;
   @ManyToOne(() => Org, (org) => org.gitlabBranches, { lazy: true })
