@@ -89,7 +89,10 @@ export class GithubService {
       orgId,
       project,
     });
-
+    this.eventEmitter.emit(GithubEvents.ProcessBranches, {
+      orgId,
+      project,
+    });
     return {
       id: repo.id,
       name: repo.full_name,
@@ -645,6 +648,15 @@ export class GithubService {
     }
   }
 
+  @OnEvent(GithubEvents.ProcessBranches)
+  async handleProcessBranches(payload: { orgId: string; project: Project }) {
+    try {
+      await this.processGithubBranches(payload.project);
+    } catch (error) {
+      console.error('Error processing branches:', error);
+    }
+  }
+
   private async processGithubPullRequests(project: Project) {
     const token = await this.getToken(project.id);
 
@@ -690,6 +702,36 @@ export class GithubService {
         firstReviewAt,
       );
     }
+  }
+
+  private async processGithubBranches(project: Project) {
+    const allBranches = await this.getBranches(project);
+    for (const branch of allBranches) {
+      await this.onBranchCreated(project, branch.name);
+    }
+  }
+
+  private async getBranches(project: Project) {
+    const token = await this.getToken(project.id);
+
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const octokit = await this.getAuthenticatedOctokit(token);
+    const { data: repo } = await octokit.request('GET /repositories/:id', {
+      id: project.githubRepositoryId,
+    });
+    // Get all open branches
+    const { data: branches } = await octokit.request(
+      'GET /repos/:owner/:repo/branches',
+      {
+        owner: repo.owner.login,
+        repo: repo.name,
+        state: 'open',
+      },
+    );
+    return branches;
   }
 
   private async getPRs(octokit, repo) {
