@@ -13,6 +13,7 @@ function InitiativesListCard({
                                onChangeMilestone,
                                onChangeStatus,
                                onChangeAssignedTo,
+                               onDelete,
                                onSearch,
                                showFilters = true,
                                showAssignedTo = true,
@@ -47,6 +48,15 @@ function InitiativesListCard({
     }
   }
 
+  function handleDelete(deletedInitiatives) {
+    const deletedIds = deletedInitiatives.map(initiative => initiative.id);
+    const remainingInitiatives = filteredInitiatives.filter(initiative => !deletedIds.includes(initiative.id));
+    setFilteredInitiatives(remainingInitiatives);
+    if (onDelete) {
+      onDelete(deletedInitiatives);
+    }
+  }
+
   function renderInitiativeList(filteredInitiatives) {
     return (
       <InitiativesList
@@ -59,6 +69,7 @@ function InitiativesListCard({
         onChangeAssignedTo={onChangeAssignedTo}
         onChangeStatus={updateInitiativesStatus}
         onChangePriority={handleBacklogInitiativeChangePriority}
+        onDelete={handleDelete}
       />
     );
   }
@@ -89,5 +100,7 @@ InitiativesListCard.propTypes = {
   onAddInitiative: PropTypes.func,
   onChangeMilestone: PropTypes.func,
   onChangeStatus: PropTypes.func,
+  onChangeAssignedTo: PropTypes.func,
+  onDelete: PropTypes.func,
   enableContextMenu: PropTypes.bool,
 };

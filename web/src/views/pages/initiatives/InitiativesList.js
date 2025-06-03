@@ -29,6 +29,7 @@ function InitiativesList({
                         onChangeKeyResult,
                         onChangeAssignedTo,
                         onChange,
+                        onDelete,
                         showAssignedTo = false,
                         enableContextMenu = true
                       }) {
@@ -126,11 +127,20 @@ function InitiativesList({
     }
   }
 
+  function handleDelete(deletedInitiatives) {
+    setSelectedInitiatives([]);
+    setLastSelectedInitiative(null);
+    if (onDelete) {
+      onDelete(deletedInitiatives);
+    }
+  }
+
   return (
     <>
       {enableContextMenu && <InitiativesContextMenu menuId={id} onChange={handleChange} onChangePriority={onChangePriority}
                                                     onChangeStatus={onChangeStatus} onChangeMilestone={onChangeMilestone}
-                                                    onChangeKeyResult={onChangeKeyResult} onChangeAssignTo={onChangeAssignedTo}/>}
+                                                    onChangeKeyResult={onChangeKeyResult} onChangeAssignTo={onChangeAssignedTo}
+                                                    onDelete={handleDelete}/>}
       <div className="table-responsive border-bottom">
         <table className="table align-items-center no-select" style={{ minWidth: "700px" }}>
           <thead className={headerClassName}>
