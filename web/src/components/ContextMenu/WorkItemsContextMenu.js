@@ -7,19 +7,24 @@ import {
   changeWorkItemAssignee,
   updateWorkItemSprint,
   updateWorkItemPriority,
-  updateWorkItemStatus
+  updateWorkItemStatus,
+  deleteWorkItem
 } from "../../services/backlog/backlog.service";
 import {formatHyphenatedString, priorityColor, workItemStatusColorClassName} from "../../services/utils/utils";
 import {toast} from "react-toastify";
 import PropTypes from "prop-types";
 import {useParams} from "react-router-dom";
 import {getOrg} from "../../services/org/orgs.service";
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 
-function WorkItemsContextMenu({ menuId, onChangeSprint, onChangeStatus, onChangePriority, onChange, onChangeAssignee }) {
+function WorkItemsContextMenu({ menuId, onChangeSprint, onChangeStatus, onChangePriority, onChange, onChangeAssignee, onDelete }) {
   const [isLoadingSprints, setIsLoadingSprints] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [users, setUsers] = useState([]);
   const [sprints, setSprints] = useState([]);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [itemsToDelete, setItemsToDelete] = useState([]);
   const { orgId, projectId } = useParams();
 
   useEffect(() => {
@@ -160,6 +165,44 @@ function WorkItemsContextMenu({ menuId, onChangeSprint, onChangeStatus, onChange
     }
   };
 
+  const handleDeleteClick = ({ event, props }) => {
+    event.preventDefault();
+    setItemsToDelete(props.workItems);
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      setIsDeleting(true);
+      for (const workItem of itemsToDelete) {
+        await deleteWorkItem(orgId, projectId, workItem.id);
+      }
+      callDeleteCallbacks(itemsToDelete);
+      toast.success(`Successfully deleted ${itemsToDelete.length} work item${itemsToDelete.length > 1 ? 's' : ''}`);
+      setShowDeleteConfirmation(false);
+    } catch (e) {
+      toast.error("Failed to delete work items");
+    } finally {
+      setIsDeleting(false);
+      setItemsToDelete([]);
+    }
+  };
+
+  const callDeleteCallbacks = (workItems) => {
+    try {
+      if (onDelete) {
+        onDelete(workItems);
+      }
+    } catch (e) {
+      console.error("The delete callbacks could not be called");
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false);
+    setItemsToDelete([]);
+  };
+
   const workItemStatuses = [
     "planned",
     "ready-to-start",
@@ -181,17 +224,18 @@ function WorkItemsContextMenu({ menuId, onChangeSprint, onChangeStatus, onChange
   ];
 
   return (
-    <Menu id={menuId} theme="dark">
-      <Submenu label={"Change status"} style={{ maxHeight: "200px", overflowY: "scroll" }}>
-        {workItemStatuses.map(status => (
-          <Item key={status} id={status} onClick={handleChangeStatus}>
-            <Badge color="" className="badge-dot mr-4">
-              <i className={workItemStatusColorClassName(status)} />
-              <span className="status">{formatHyphenatedString(status)}</span>
-            </Badge>
-          </Item>
-        ))}
-      </Submenu>
+    <>
+      <Menu id={menuId} theme="dark">
+        <Submenu label={"Change status"} style={{ maxHeight: "200px", overflowY: "scroll" }}>
+          {workItemStatuses.map(status => (
+            <Item key={status} id={status} onClick={handleChangeStatus}>
+              <Badge color="" className="badge-dot mr-4">
+                <i className={workItemStatusColorClassName(status)} />
+                <span className="status">{formatHyphenatedString(status)}</span>
+              </Badge>
+            </Item>
+          ))}
+        </Submenu>
       {isLoadingUsers && <Item disabled className="text-center"><Spinner className="m-auto" color="primary"/></Item>}
       {!isLoadingUsers && users.length === 0 && <Item disabled>Assign to</Item>}
       {!isLoadingUsers && users.length > 0 &&
@@ -228,8 +272,20 @@ function WorkItemsContextMenu({ menuId, onChangeSprint, onChangeStatus, onChange
           ))}
           <Item key={"null"} id={null} onClick={handleChangeSprint}>None</Item>
         </Submenu>}
-
-    </Menu>
+        <Item onClick={handleDeleteClick} className="text-danger">
+          Delete
+        </Item>
+      </Menu>
+      
+      <DeleteConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        itemCount={itemsToDelete.length}
+        itemType="work items"
+      />
+    </>
   );
 }
 
@@ -238,7 +294,9 @@ WorkItemsContextMenu.propTypes = {
   onChangeSprint: PropTypes.func,
   onChangePriority: PropTypes.func,
   onChangeStatus: PropTypes.func,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  onChangeAssignee: PropTypes.func,
+  onDelete: PropTypes.func
 };
 
 export default WorkItemsContextMenu;
