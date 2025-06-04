@@ -28,6 +28,7 @@ function WorkItemsList({
                          onChangePriority,
                          onChangeAssignee,
                          onChange,
+                         onDelete,
                          enableContextMenu = true,
                          id = 'work-items-context-menu',
                        }) {
@@ -125,6 +126,13 @@ function WorkItemsList({
     }
   }
 
+  function handleDelete(deletedWorkItems) {
+    setSelectedWorkItems([]);
+    if (onDelete) {
+      onDelete(deletedWorkItems);
+    }
+  }
+
   useEffect(() => {
     setSelectedWorkItems([]);
   }, [workItems]);
@@ -136,7 +144,8 @@ function WorkItemsList({
       onChangeStatus={onChangeStatus}
       onChangePriority={onChangePriority}
       onChangeAssignee={onChangeAssignee}
-      onChange={handleChange} />}
+      onChange={handleChange}
+      onDelete={handleDelete} />}
     <div className="table-responsive">
       <Table className="align-items-center table-flush border-bottom no-select" style={{ minWidth: '700px' }}>
         <thead className={headerClassName}>

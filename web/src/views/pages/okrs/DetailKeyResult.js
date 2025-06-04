@@ -113,6 +113,14 @@ function DetailKeyResult() {
     setKeyResult({ ...keyResult });
   }
 
+  async function handleDeleteInitiative(deletedInitiatives) {
+    const deletedIds = deletedInitiatives.map(i => i.id);
+    setKeyResult({
+      ...keyResult,
+      initiatives: keyResult.initiatives.filter(i => !deletedIds.includes(i.id))
+    });
+  }
+
   const validationSchema = Yup.object({
     title: Yup.string()
       .required('The key result title is required'),
@@ -340,6 +348,7 @@ function DetailKeyResult() {
                   onChangeStatus={updateInitiativesStatus}
                   onChangePriority={updateInitiativesPriority}
                   onChangeKeyResult={updateInitiativesKeyResult}
+                  onDelete={handleDeleteInitiative}
                 />
               </Card>
             </>}
