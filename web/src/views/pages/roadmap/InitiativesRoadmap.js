@@ -140,6 +140,11 @@ function InitiativesRoadmap() {
     setInitiatives([...initiatives]);
   }
 
+  async function onDeleteInitiative(deletedInitiatives) {
+    const deletedIds = deletedInitiatives.map(i => i.id);
+    setInitiatives(initiatives.filter(i => !deletedIds.includes(i.id)));
+  }
+
   return (
     <>
       {isLoadingMilestones && <InfiniteLoadingBar />}
@@ -237,6 +242,7 @@ function InitiativesRoadmap() {
                                  onChangeMilestone={updateBacklogInitiativesMilestone}
                                  onChangeStatus={updateBacklogInitiativesStatus}
                                  onChangeAssignedTo={updateBacklogInitiativesAssignedTo}
+                                 onDelete={onDeleteInitiative}
             />
           </Col>
         </Row>

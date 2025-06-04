@@ -15,12 +15,14 @@ import {
   updateInitiativeMilestone,
   updateInitiativePriority,
   updateInitiativeStatus,
+  deleteInitiative,
 } from '../../services/roadmap/roadmap.service';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { listKeyResults } from '../../services/okrs/okrs.service';
 import { useParams } from 'react-router-dom';
 import { getOrg } from '../../services/org/orgs.service';
+import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 
 function InitiativesContextMenu({
                                menuId,
@@ -29,7 +31,8 @@ function InitiativesContextMenu({
                                onChangeStatus,
                                onChangePriority,
                                onChangeAssignTo,
-                               onChange
+                               onChange,
+                               onDelete
                              }) {
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
   const [isLoadingKeyResults, setIsLoadingKeyResults] = useState(false);
@@ -37,6 +40,9 @@ function InitiativesContextMenu({
   const [users, setUsers] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [keyResults, setKeyResults] = useState([]);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [itemsToDelete, setItemsToDelete] = useState([]);
   const { projectId, orgId } = useParams();
 
   useEffect(() => {
@@ -216,6 +222,44 @@ function InitiativesContextMenu({
     }
   };
 
+  const handleDeleteClick = ({ event, props }) => {
+    event.preventDefault();
+    setItemsToDelete(props.initiatives);
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      setIsDeleting(true);
+      for (const initiative of itemsToDelete) {
+        await deleteInitiative(orgId, projectId, initiative.id);
+      }
+      callDeleteCallbacks(itemsToDelete);
+      toast.success(`Successfully deleted ${itemsToDelete.length} initiative${itemsToDelete.length > 1 ? 's' : ''}`);
+      setShowDeleteConfirmation(false);
+    } catch (e) {
+      toast.error("Failed to delete initiatives");
+    } finally {
+      setIsDeleting(false);
+      setItemsToDelete([]);
+    }
+  };
+
+  const callDeleteCallbacks = (initiatives) => {
+    try {
+      if (onDelete) {
+        onDelete(initiatives);
+      }
+    } catch (e) {
+      console.error("The delete callbacks could not be called");
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false);
+    setItemsToDelete([]);
+  };
+
   const initiativeStatuses = [
     "planned",
     "ready-to-start",
@@ -231,7 +275,8 @@ function InitiativesContextMenu({
   ];
 
   return (
-    <Menu id={menuId} theme="dark">
+    <>
+      <Menu id={menuId} theme="dark">
       <Submenu label={"Change status"} style={{ maxHeight: "200px", overflowY: "scroll" }}>
         {initiativeStatuses.map(status => (
           <Item key={status} id={status} onClick={handleChangeStatus}>
@@ -290,7 +335,20 @@ function InitiativesContextMenu({
           ))}
           <Item key={"null"} id={null} onClick={handleChangeKeyResult}>None</Item>
         </Submenu>}
-    </Menu>
+        <Item onClick={handleDeleteClick} className="text-danger">
+          Delete
+        </Item>
+      </Menu>
+      
+      <DeleteConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        itemCount={itemsToDelete.length}
+        itemType="initiatives"
+      />
+    </>
   );
 }
 
@@ -301,7 +359,8 @@ InitiativesContextMenu.propTypes = {
   onChangeAssignTo: PropTypes.func,
   onChangeStatus: PropTypes.func,
   onChangePriority: PropTypes.func,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  onDelete: PropTypes.func
 };
 
 export default InitiativesContextMenu;

@@ -16,6 +16,7 @@ function WorkItemsListCard({
                              onChangeStatus,
                              onChangePriority,
                              onChangeAssignee,
+                             onDelete,
                              onSearch,
                              enableContextMenu = true,
                              showFilters = true,
@@ -41,6 +42,15 @@ function WorkItemsListCard({
         })
     );
   }, [onSearch, filterByType, filterByPriority, filterByStatus, workItems, searchText]);
+
+  function handleDelete(deletedWorkItems) {
+    const deletedIds = deletedWorkItems.map(workItem => workItem.id);
+    const remainingWorkItems = filteredWorkItems.filter(workItem => !deletedIds.includes(workItem.id));
+    setFilteredWorkItems(remainingWorkItems);
+    if (onDelete) {
+      onDelete(deletedWorkItems);
+    }
+  }
 
 
   return (
@@ -87,6 +97,7 @@ function WorkItemsListCard({
             onChangeStatus={onChangeStatus}
             onChangePriority={onChangePriority}
             onChangeAssignee={onChangeAssignee}
+            onDelete={handleDelete}
           />}
         {isLoading && <LoadingSpinnerBox />}
       </Card>
