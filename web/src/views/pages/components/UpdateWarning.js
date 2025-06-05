@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button, Modal } from "reactstrap";
+import React, { useEffect, useState } from 'react';
+import { Button, Modal } from 'reactstrap';
 
 function UpdateWarning({ isOpen, warningMessage, entity, toggle, onUpdate }) {
   const [modal, setModal] = useState(isOpen);

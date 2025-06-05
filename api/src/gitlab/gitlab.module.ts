@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { GitlabMergeRequest } from './gitlab-merge-request.entity';
 import { GitlabBranch } from './gitlab-branch.entity';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   providers: [GitlabService],
@@ -19,6 +20,7 @@ import { GitlabBranch } from './gitlab-branch.entity';
     ConfigModule,
     EncryptionModule,
     AuthModule,
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forFeature([
       User,
       User,
