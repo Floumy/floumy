@@ -122,16 +122,24 @@ function InitiativesRoadmap() {
     setInitiatives([...sortByPriority(updatedInitiativesList)]);
   }
 
-  async function updateBacklogInitiativesAssignedTo(updatedInitiatives, newAssignedTo) {
-    const user = await getUser(orgId, newAssignedTo);
+  function updateInitiativesUser(updatedInitiatives, newAssignedTo) {
     const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
     const updatedInitiativesList = initiatives.map(initiative => {
       if (updatedInitiativesIds.includes(initiative.id)) {
-        initiative.assignedTo = user;
+        initiative.assignedTo = newAssignedTo;
       }
       return initiative;
     });
     setInitiatives([...sortByPriority(updatedInitiativesList)]);
+  }
+
+  async function updateBacklogInitiativesAssignedTo(updatedInitiatives, newAssignedTo) {
+    if (!newAssignedTo) {
+      updateInitiativesUser(updatedInitiatives, newAssignedTo);
+      return;
+    }
+    const user = await getUser(orgId, newAssignedTo);
+    updateInitiativesUser(updatedInitiatives, user);
   }
 
   async function onAddInitiative(initiative) {
