@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import {QueryRunner, Repository} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -31,6 +31,7 @@ export class UsersService {
     email: string,
     password: string,
     org: Org = null,
+    queryRunner?: QueryRunner
   ) {
     await this.validateUser(name, email, password);
     const hashedPassword = await this.encryptPassword(password);
@@ -42,7 +43,10 @@ export class UsersService {
       user.projects = Promise.resolve(projects);
     }
 
-    return await this.usersRepository.save(user);
+    if (!queryRunner) {
+      return await this.usersRepository.save(user);
+    }
+    return await queryRunner.manager.save(user);
   }
 
   /**
