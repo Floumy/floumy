@@ -4,6 +4,7 @@ import { Col, Row } from 'reactstrap';
 import { Link, useParams } from 'react-router-dom';
 import { addInitiative } from '../../../services/roadmap/roadmap.service';
 import { getUser } from '../../../services/okrs/okrs.service';
+import { sortByPriority } from '../../../services/utils/utils';
 
 function Milestone({ milestone, onInitiativeChangeMilestone }) {
   const { orgId, projectId } = useParams();
@@ -70,16 +71,24 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
     setInitiatives(updatedInitiativesPriority);
   }
 
-  async function updateInitiativesAssignedTo(updatedInitiatives, assignedTo) {
-    const user = await getUser(orgId, assignedTo);
-    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
-    const updatedInitiativesAssignedTo = initiatives.map(initiative => {
+  function updateInitiativesUser(updatedInitiatives, newAssignedTo) {
+    const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
+    const updatedInitiativesList = initiatives.map(initiative => {
       if (updatedInitiativesIds.includes(initiative.id)) {
-        initiative.assignedTo = user;
+        initiative.assignedTo = newAssignedTo;
       }
       return initiative;
     });
-    setInitiatives(updatedInitiativesAssignedTo);
+    setInitiatives([...sortByPriority(updatedInitiativesList)]);
+  }
+
+  async function updateInitiativesAssignedTo(updatedInitiatives, newAssignedTo) {
+    if (!newAssignedTo) {
+      updateInitiativesUser(updatedInitiatives, newAssignedTo);
+      return;
+    }
+    const user = await getUser(orgId, newAssignedTo);
+    updateInitiativesUser(updatedInitiatives, user);
   }
 
   return (
