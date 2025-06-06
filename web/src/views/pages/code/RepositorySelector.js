@@ -48,8 +48,8 @@ function RepositorySelector() {
                       color="light"
                       className="p-4 d-flex flex-column align-items-center m-0 mb-4 mr-md-4"
                       style={{
-                        minWidth: '300px',
-                        border: '2px solid #dee2e6',
+                        minWidth: '150px',
+                        border: '0',
                         borderRadius: '12px',
                         transition: 'all 0.2s',
                         backgroundColor: '#f8f9fa',
@@ -67,8 +67,8 @@ function RepositorySelector() {
                       color="light"
                       className="p-4 d-flex flex-column align-items-center m-0 mb-4"
                       style={{
-                        minWidth: '300px',
-                        border: '2px solid #dee2e6',
+                        minWidth: '150px',
+                        border: '0',
                         borderRadius: '12px',
                         transition: 'all 0.2s',
                         backgroundColor: '#f8f9fa',

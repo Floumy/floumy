@@ -1,26 +1,29 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import {Card, CardBody, CardHeader, CardTitle, Col, Container, Row, UncontrolledTooltip} from 'reactstrap';
+import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row, UncontrolledTooltip } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import {
     deleteProjectGithubRepo,
     getGithubRepos,
     getGithubUrl,
-    getIsGithubConnected, getPRsFirstReviewTime, getPRsAverageMergeTime, getPRsCycleTime,
+    getIsGithubConnected,
+    getPRsAverageMergeTime,
+    getPRsCycleTime,
+    getPRsFirstReviewTime,
     getPullRequests,
     updateProjectGithubRepo,
 } from '../../../services/github/github.service';
-import {useProjects} from '../../../contexts/ProjectsContext';
+import { useProjects } from '../../../contexts/ProjectsContext';
 import Select2 from 'react-select2-wrapper';
-import {toast} from 'react-toastify';
-import {useNavigate} from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 import UpdateWarning from '../components/UpdateWarning';
 import DeleteWarning from '../components/DeleteWarning';
 import PRs from '../../../components/Code/PRs';
-import {CycleTime} from "./charts/CycleTime";
-import {MergeTime} from "./charts/MergeTime";
-import {FirstReviewTime} from "./charts/FirstReviewTime";
+import { CycleTime } from './charts/CycleTime';
+import { MergeTime } from './charts/MergeTime';
+import { FirstReviewTime } from './charts/FirstReviewTime';
 
 function GitHub() {
     const {orgId, currentProject} = useProjects();
@@ -86,11 +89,6 @@ function GitHub() {
 
     const handleRepoUpdate = async () => {
         try {
-            if (isEditing) {
-                setUpdateWarning(true);
-                return;
-            }
-
             const projectRepo = await updateProjectGithubRepo(orgId, currentProject.id, selectedRepo);
             setRepo(projectRepo);
             setUpdateWarning(false);
@@ -212,7 +210,7 @@ function GitHub() {
                                                 }}
                                             ></Select2>
                                             <button className="btn btn-primary my-3" type="button"
-                                                    onClick={handleRepoUpdate} disabled={!selectedRepo}>Save
+                                                    onClick={() => setUpdateWarning(true)} disabled={!selectedRepo}>Save
                                             </button>
                                             {isEditing && <button className="btn btn-white my-3" type="button"
                                                                   onClick={() => setIsEditing(false)}>Cancel</button>}

@@ -10,6 +10,8 @@ import { GitlabBranch } from './gitlab-branch.entity';
 import { GitlabMergeRequest } from './gitlab-merge-request.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { GitlabMergeRequestMapper } from './mappers';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { GitlabEvents } from './events';
 
 @Injectable()
 export class GitlabService {
@@ -26,6 +28,7 @@ export class GitlabService {
     @InjectRepository(WorkItem)
     private readonly workItemRepository: Repository<WorkItem>,
     private readonly configService: ConfigService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async setToken(projectId: string, token: string) {
@@ -66,6 +69,15 @@ export class GitlabService {
       id: projectId,
       org: { id: orgId },
     });
+
+    if (project.gitlabProjectId === gitlabProjectId) {
+      return {
+        id: gitlabProjectId,
+        name: project.gitlabProjectName,
+        url: project.gitlabProjectUrl,
+      };
+    }
+
     const token = this.encryptionService.decrypt(project.gitlabAccessToken);
     const gitlab = new Gitlab({
       token,
@@ -95,8 +107,8 @@ export class GitlabService {
     project.gitlabProjectName = projectName;
     await this.projectRepository.save(project);
 
-    await this.processBranches(project);
-    await this.processMergeRequests(project);
+    this.eventEmitter.emit(GitlabEvents.ProcessBranches, { project });
+    this.eventEmitter.emit(GitlabEvents.ProcessMergeRequests, { project });
 
     return {
       id: gitlabProjectId,
@@ -231,15 +243,24 @@ export class GitlabService {
     return workItemReference[0];
   }
 
-  private async processBranches(project: Project) {
-    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
-    const gitlab = new Gitlab({
-      token,
-    });
-    const branches = await gitlab.Branches.all(project.gitlabProjectId);
+  @OnEvent(GitlabEvents.ProcessBranches)
+  private async processBranches(payload: { project: Project }) {
+    try {
+      const token = this.encryptionService.decrypt(
+        payload.project.gitlabAccessToken,
+      );
+      const gitlab = new Gitlab({
+        token,
+      });
+      const branches = await gitlab.Branches.all(
+        payload.project.gitlabProjectId,
+      );
 
-    for (const branch of branches) {
-      await this.handleNewBranch(project, branch.name);
+      for (const branch of branches) {
+        await this.handleNewBranch(payload.project, branch.name);
+      }
+    } catch (error) {
+      console.error('Error processing branches:', error);
     }
   }
 
@@ -262,59 +283,68 @@ export class GitlabService {
     });
   }
 
-  private async processMergeRequests(project: Project) {
-    const token = this.encryptionService.decrypt(project.gitlabAccessToken);
-    const gitlab = new Gitlab({
-      token,
-    });
-    const mergeRequests = await gitlab.MergeRequests.all({
-      projectId: project.gitlabProjectId,
-    });
-    for (const mergeRequest of mergeRequests) {
-      const workItem = await this.getMergeRequestWorkItem(
-        project,
-        mergeRequest,
+  @OnEvent(GitlabEvents.ProcessMergeRequests)
+  private async processMergeRequests(payload: { project: Project }) {
+    try {
+      const token = this.encryptionService.decrypt(
+        payload.project.gitlabAccessToken,
       );
+      const gitlab = new Gitlab({
+        token,
+      });
+      const mergeRequests = await gitlab.MergeRequests.all({
+        projectId: payload.project.gitlabProjectId,
+      });
+      for (const mergeRequest of mergeRequests) {
+        const workItem = await this.getMergeRequestWorkItem(
+          payload.project,
+          mergeRequest,
+        );
 
-      const notes = await gitlab.MergeRequestNotes.all(
-        project.gitlabProjectId,
-        mergeRequest.iid,
-      );
+        const notes = await gitlab.MergeRequestNotes.all(
+          payload.project.gitlabProjectId,
+          mergeRequest.iid,
+        );
 
-      const approvedAt = notes.find((note) =>
-        note.body.includes('approved this merge request'),
-      )?.created_at;
+        const approvedAt = notes.find((note) =>
+          note.body.includes('approved this merge request'),
+        )?.created_at;
 
-      let firstReviewAt = null;
-      if (notes && notes.length > 0) {
-        const firstReviewNote = notes
-          .filter((note) => !note.system)
-          .sort(
-            (a, b) =>
-              new Date(a.created_at).getTime() -
-              new Date(b.created_at).getTime(),
-          )[0];
-        firstReviewAt = firstReviewNote
-          ? new Date(firstReviewNote.created_at)
+        let firstReviewAt = null;
+        if (notes && notes.length > 0) {
+          const firstReviewNote = notes
+            .filter((note) => !note.system)
+            .sort(
+              (a, b) =>
+                new Date(a.created_at).getTime() -
+                new Date(b.created_at).getTime(),
+            )[0];
+          firstReviewAt = firstReviewNote
+            ? new Date(firstReviewNote.created_at)
+            : null;
+        }
+
+        const mergedAt = mergeRequest.merged_at;
+        const closedAt = mergeRequest.closed_at ?? mergedAt;
+        const gitlabMergeRequest = new GitlabMergeRequest();
+        gitlabMergeRequest.title = mergeRequest.title;
+        gitlabMergeRequest.url = mergeRequest.web_url;
+        gitlabMergeRequest.state = mergeRequest.state;
+        gitlabMergeRequest.createdAt = new Date(mergeRequest.created_at);
+        gitlabMergeRequest.updatedAt = new Date(mergeRequest.updated_at);
+        gitlabMergeRequest.mergedAt = mergedAt ? new Date(mergedAt) : null;
+        gitlabMergeRequest.closedAt = closedAt ? new Date(closedAt) : null;
+        gitlabMergeRequest.approvedAt = approvedAt
+          ? new Date(approvedAt)
           : null;
+        gitlabMergeRequest.firstReviewAt = firstReviewAt;
+        gitlabMergeRequest.org = Promise.resolve(payload.project.org);
+        gitlabMergeRequest.project = Promise.resolve(payload.project);
+        gitlabMergeRequest.workItem = Promise.resolve(workItem);
+        await this.gitlabMergeRequestRepository.save(gitlabMergeRequest);
       }
-
-      const mergedAt = mergeRequest.merged_at;
-      const closedAt = mergeRequest.closed_at ?? mergedAt;
-      const gitlabMergeRequest = new GitlabMergeRequest();
-      gitlabMergeRequest.title = mergeRequest.title;
-      gitlabMergeRequest.url = mergeRequest.web_url;
-      gitlabMergeRequest.state = mergeRequest.state;
-      gitlabMergeRequest.createdAt = new Date(mergeRequest.created_at);
-      gitlabMergeRequest.updatedAt = new Date(mergeRequest.updated_at);
-      gitlabMergeRequest.mergedAt = mergedAt ? new Date(mergedAt) : null;
-      gitlabMergeRequest.closedAt = closedAt ? new Date(closedAt) : null;
-      gitlabMergeRequest.approvedAt = approvedAt ? new Date(approvedAt) : null;
-      gitlabMergeRequest.firstReviewAt = firstReviewAt;
-      gitlabMergeRequest.org = Promise.resolve(project.org);
-      gitlabMergeRequest.project = Promise.resolve(project);
-      gitlabMergeRequest.workItem = Promise.resolve(workItem);
-      await this.gitlabMergeRequestRepository.save(gitlabMergeRequest);
+    } catch (error) {
+      console.error('Error processing merge requests:', error);
     }
   }
 
@@ -534,6 +564,7 @@ export class GitlabService {
 
     return await this.handleNewMergeRequest(project, mrEvent);
   }
+
   async getPRsCycleTime(
     orgId: string,
     projectId: string,
@@ -541,18 +572,19 @@ export class GitlabService {
   ) {
     return await this.gitlabMergeRequestRepository.query(
       `SELECT date_trunc('week', "createdAt") AS week,
-                    COUNT(*)                        AS "prCount",
-                    AVG(EXTRACT(EPOCH FROM (COALESCE("mergedAt", "closedAt", NOW()) - "createdAt")) /
-                        3600)                       AS "averageCycleTime"
-             FROM gitlab_merge_request
-             WHERE "orgId" = $1
-               AND "projectId" = $2
-               AND "createdAt" >= NOW() - $3::INTERVAL
-             GROUP BY week
-             ORDER BY week`,
+              COUNT(*)                        AS "prCount",
+              AVG(EXTRACT(EPOCH FROM (COALESCE("mergedAt", "closedAt", NOW()) - "createdAt")) /
+                  3600)                       AS "averageCycleTime"
+       FROM gitlab_merge_request
+       WHERE "orgId" = $1
+         AND "projectId" = $2
+         AND "createdAt" >= NOW() - $3::INTERVAL
+       GROUP BY week
+       ORDER BY week`,
       [orgId, projectId, `${timeframeInDays} days`],
     );
   }
+
   async getAverageMergeTime(
     orgId: string,
     projectId: string,
@@ -560,19 +592,20 @@ export class GitlabService {
   ) {
     return await this.gitlabMergeRequestRepository.query(
       `SELECT date_trunc('week', "createdAt") AS week,
-                    COUNT(*)                        AS "prCount",
-                    AVG(EXTRACT(EPOCH FROM (COALESCE("mergedAt", "closedAt", NOW()) - "approvedAt")) /
-                        3600)                       AS "averageMergeTime"
-             FROM gitlab_merge_request
-             WHERE "orgId" = $1
-               AND "projectId" = $2
-               AND "createdAt" >= NOW() - $3::INTERVAL
-               AND "approvedAt" IS NOT NULL
-             GROUP BY week
-             ORDER BY week`,
+              COUNT(*)                        AS "prCount",
+              AVG(EXTRACT(EPOCH FROM (COALESCE("mergedAt", "closedAt", NOW()) - "approvedAt")) /
+                  3600)                       AS "averageMergeTime"
+       FROM gitlab_merge_request
+       WHERE "orgId" = $1
+         AND "projectId" = $2
+         AND "createdAt" >= NOW() - $3::INTERVAL
+         AND "approvedAt" IS NOT NULL
+       GROUP BY week
+       ORDER BY week`,
       [orgId, projectId, `${timeframeInDays} days`],
     );
   }
+
   async getAverageFirstReviewTime(
     orgId: string,
     projectId: string,
@@ -580,15 +613,16 @@ export class GitlabService {
   ) {
     return await this.gitlabMergeRequestRepository.query(
       `SELECT date_trunc('week', "createdAt") AS week,
-                    COUNT(*)                        AS "prCount",
-                    AVG(EXTRACT(EPOCH FROM (COALESCE("firstReviewAt", "closedAt", NOW()) - "createdAt")) / 3600) AS "averageFirstReviewTime"
-             FROM gitlab_merge_request
-             WHERE "orgId" = $1
-               AND "projectId" = $2
-               AND "createdAt" >= NOW() - $3::INTERVAL
-               AND "firstReviewAt" IS NOT NULL
-             GROUP BY week
-             ORDER BY week`,
+              COUNT(*)                        AS "prCount",
+              AVG(EXTRACT(EPOCH FROM (COALESCE("firstReviewAt", "closedAt", NOW()) - "createdAt")) /
+                  3600)                       AS "averageFirstReviewTime"
+       FROM gitlab_merge_request
+       WHERE "orgId" = $1
+         AND "projectId" = $2
+         AND "createdAt" >= NOW() - $3::INTERVAL
+         AND "firstReviewAt" IS NOT NULL
+       GROUP BY week
+       ORDER BY week`,
       [orgId, projectId, `${timeframeInDays} days`],
     );
   }
