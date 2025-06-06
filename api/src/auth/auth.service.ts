@@ -3,7 +3,7 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { RefreshToken } from './refresh-token.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {DataSource, Repository} from 'typeorm';
 import { TokensService } from './tokens.service';
 import { OrgSignUpDto } from './auth.dtos';
 import { v4 as uuid } from 'uuid';
@@ -30,6 +30,7 @@ export class AuthService {
     private notificationsService: MailNotificationsService,
     private orgsService: OrgsService,
     private eventEmitter: EventEmitter2,
+    private dataSource: DataSource,
   ) {}
 
   async signIn(email: string, password: string): Promise<AuthDto> {
@@ -180,21 +181,28 @@ export class AuthService {
     password: string,
     org?: Org,
   ) {
-    const user = await this.usersService.createUser(name, email, password, org);
 
-    try {
-      const activationToken = await this.generateActivationToken();
-      await this.notificationsService.sendActivationEmail(
-        user.name,
-        user.email,
-        activationToken,
-      );
-      user.activationToken = activationToken;
-      await this.usersService.save(user);
-    } catch (e) {
-      this.logger.error(e.message);
-      throw new Error('The activation email could not be sent');
-    }
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+          const user = await this.usersService.createUser(name, email, password, org, queryRunner);
+          const activationToken = await this.generateActivationToken();
+          await this.notificationsService.sendActivationEmail(
+              user.name,
+              user.email,
+              activationToken,
+          );
+          user.activationToken = activationToken;
+          await queryRunner.manager.save(user);
+          await queryRunner.commitTransaction();
+      } catch (e) {
+          await queryRunner.rollbackTransaction();
+          this.logger.error(e.message);
+          throw new Error('The activation email could not be sent');
+      }finally {
+          await queryRunner.release();
+      }
   }
 
   private async getOrCreateRefreshToken(user: User) {
