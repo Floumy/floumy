@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 // Create an Axios instance
 const api = axios.create();
@@ -33,11 +33,9 @@ function updateTokens(newAccessToken, newRefreshToken) {
 export function logoutUser() {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
-  localStorage.removeItem("currentUser");
   localStorage.removeItem("currentUserName");
   localStorage.removeItem("currentUserId");
   localStorage.removeItem("currentUserOrgId");
-  localStorage.removeItem("lastSignedIn");
   localStorage.removeItem("currentOrg");
   localStorage.removeItem("currentOrgName");
   localStorage.removeItem("paymentPlan");

@@ -8,14 +8,12 @@ function handleAuthentication(response) {
   if (accessToken && refreshToken) {
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
-    localStorage.setItem('lastSignedIn', response.data.lastSignedIn);
     api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     return true;
   }
 
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
-  localStorage.removeItem('lastSignedIn');
   api.defaults.headers.common['Authorization'] = null;
   return false;
 }
