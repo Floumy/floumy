@@ -1,4 +1,4 @@
-import api, { logoutUser } from "../api/api.service";
+import api, { logoutUser } from '../api/api.service';
 
 export async function getCurrentUser() {
   try {
@@ -31,7 +31,6 @@ export async function setCurrentUser() {
 }
 
 export function setCurrentUserToLocalStorage(currentUser) {
-  localStorage.setItem("currentUser", JSON.stringify(currentUser));
   localStorage.setItem("currentUserName", currentUser.name);
   localStorage.setItem("currentUserId", currentUser.id);
   if (currentUser.orgId !== null && currentUser.orgId !== undefined) {

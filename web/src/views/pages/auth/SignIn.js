@@ -55,7 +55,7 @@ function SignIn() {
     const redirectIfLoggedIn = async () => {
       // If the user is already logged in, redirect to the dashboard
 
-      if (!localStorage.getItem('currentUser')) {
+      if (!localStorage.getItem('currentUserId')) {
         return;
       }
 
