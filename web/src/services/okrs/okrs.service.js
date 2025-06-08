@@ -192,6 +192,15 @@ export async function getOkrStats(orgId, projectId, timeline) {
   }
 }
 
+export async function getPublicOkrStats(orgId, projectId, timeline) {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/okrs-stats/timeline/${timeline}`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
 export async function getUser(orgId, userId) {
   try {
     const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/users/${userId}`);
