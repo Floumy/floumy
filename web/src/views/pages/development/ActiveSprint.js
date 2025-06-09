@@ -1,20 +1,20 @@
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Badge, Button, Card, CardBody, CardHeader, Col, Container, Row } from "reactstrap";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import React, { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Badge, Button, Card, CardBody, CardHeader, Col, Container, Row } from 'reactstrap';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   formatDate,
   formatHyphenatedString,
   getSprintEndDate,
   getSprintStartDate,
-  workItemStatusColorClassName
-} from "../../../services/utils/utils";
-import { completeSprint, getActiveSprint } from "../../../services/sprints/sprints.service";
-import DevelopmentStats from "./DevelopmentStats";
-import WorkItemsList from "../backlog/WorkItemsList";
-import { getWorkItemsGroupedByStatus } from "../../../services/utils/workItemUtils";
+  workItemStatusColorClassName,
+} from '../../../services/utils/utils';
+import { completeSprint, getActiveSprint } from '../../../services/sprints/sprints.service';
+import DevelopmentStats from './DevelopmentStats';
+import WorkItemsList from '../backlog/WorkItemsList';
+import { getWorkItemsGroupedByStatus } from '../../../services/utils/workItemUtils';
 
 function ActiveSprint() {
   const { orgId, projectId } = useParams();
@@ -199,6 +199,7 @@ function ActiveSprint() {
                                      onChangeStatus={updateWorkItemsStatus}
                                      onChangePriority={updateWorkItemsPriority}
                                      onChangeAssignee={updateWorkItemAssignee}
+                                     onDelete={removeWorkItemsFromActiveSprint}
                                      headerClassName={"thead"} />
                     </div>
                   ))}
