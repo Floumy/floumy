@@ -1,12 +1,13 @@
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Badge, Card, CardHeader, CardTitle, Col, Container, Row, Table, UncontrolledTooltip } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import { getOrg } from "../../../services/org/orgs.service";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { formatDateWithTime, memberNameInitials, textToColor } from "../../../services/utils/utils";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { deactivateUser } from "../../../services/users/users.service";
-import { toast } from "react-toastify";
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Badge, Card, CardHeader, CardTitle, Col, Container, Row, Table, UncontrolledTooltip } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { getOrg } from '../../../services/org/orgs.service';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import { formatDateWithTime, memberNameInitials, textToColor } from '../../../services/utils/utils';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { deactivateUser } from '../../../services/users/users.service';
+import { toast } from 'react-toastify';
+import Select2 from 'react-select2-wrapper';
 
 function Members() {
 
@@ -55,6 +56,26 @@ function Members() {
     }
   }
 
+  const handleRoleChange = async (memberId, newRole) => {
+    setIsLoading(true);
+    try {
+      // You'll need to implement this API service
+      // await updateUserRole(memberId, newRole);
+      setMembers(members.map((member) => {
+        if (member.id === memberId) {
+          return { ...member, role: newRole };
+        }
+        return member;
+      }));
+      toast.success("Role updated successfully");
+    } catch (e) {
+      toast.error("Failed to update role");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   return (
     <>
       <SimpleHeader />
@@ -98,23 +119,25 @@ function Members() {
                 >
                   <thead className="thead-light">
                   <tr>
-                    <th scope="col" width={"40%"}>Name</th>
-                    <th scope="col" width={"20%"}>Email</th>
-                    <th scope="col" width={"10%"}>Status</th>
-                    <th scope="col" width={"20%"}>Created at</th>
-                    <th scope="col" width={"10%"}></th>
+                    <th scope="col" width="30%">Name</th>
+                    <th scope="col" width="20%">Email</th>
+                    <th scope="col" width="20%">Role</th>
+                    <th scope="col" width="10%">Status</th>
+                    <th scope="col" width="10%">Created at</th>
+                    <th scope="col" width="10%"></th>
                   </tr>
                   </thead>
                   <tbody className="list">
-                  {members.length === 0 &&
+                  {members.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="text-center">
+                      <td colSpan={6} className="text-center">
                         No members found.
                       </td>
-                    </tr>}
+                    </tr>
+                  )}
                   {members.length > 0 && members.map((member) => (
                     <tr key={member.id}>
-                      <td>
+                    <td>
                         <span
                           style={{ backgroundColor: textToColor(member.name) }}
                           className="avatar avatar-xs rounded-circle mr-2">
@@ -124,6 +147,23 @@ function Members() {
                       </td>
                       <td>
                         {member.email}
+                      </td>
+                      <td>
+                        <div className="d-flex flex-column">
+                          <Select2
+                            className="form-control"
+                            value={member.role || 'contributor'}
+                            onChange={(e) => handleRoleChange(member.id, e.target.value)}
+                            disabled={!member.isActive}
+                            data={[
+                              { id: "admin", text: "Admin" },
+                              { id: "contributor", text: "Contributor" }
+                            ]}
+                            options={{
+                              placeholder: "Select role"
+                            }}
+                          />
+                        </div>
                       </td>
                       <td>
                         {member.isActive &&
