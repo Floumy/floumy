@@ -1,16 +1,16 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from 'react';
 // javascript plugin that creates a sortable object from a dom object
 // reactstrap components
-import {Badge, Card, CardBody, CardHeader, Col, Container, Progress, Row, Table} from "reactstrap";
+import { Badge, Card, CardBody, CardHeader, Col, Container, Progress, Row, Table } from 'reactstrap';
 // core components
-import SimpleHeader from "components/Headers/SimpleHeader.js";
-import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
-import {getOkrStats, listPublicObjectives} from "../../../services/okrs/okrs.service";
-import Select2 from "react-select2-wrapper";
-import {formatHyphenatedString, formatOKRsProgress, okrStatusColorClassName} from "../../../services/utils/utils";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
+import SimpleHeader from 'components/Headers/SimpleHeader.js';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { getPublicOkrStats, listPublicObjectives } from '../../../services/okrs/okrs.service';
+import Select2 from 'react-select2-wrapper';
+import { formatHyphenatedString, formatOKRsProgress, okrStatusColorClassName } from '../../../services/utils/utils';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 
 function PublicOKRs() {
     const {orgId, projectId} = useParams();
@@ -52,7 +52,7 @@ function PublicOKRs() {
             setStatsLoading(true);
             setStatsError(null);
             try {
-                const statsData = await getOkrStats(orgId, projectId, timelineQueryFilter);
+                const statsData = await getPublicOkrStats(orgId, projectId, timelineQueryFilter);
                 setStats(statsData);
             } catch (e) {
                 setStatsError('Could not load stats');
