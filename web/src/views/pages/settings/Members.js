@@ -121,7 +121,19 @@ function Members() {
                   <tr>
                     <th scope="col" width="30%">Name</th>
                     <th scope="col" width="20%">Email</th>
-                    <th scope="col" width="20%">Role</th>
+                    <th scope="col" width="20%">
+                      Role
+                      <i id="tooltip-role" className="fa fa-info-circle ml-2"/>
+                      <UncontrolledTooltip
+                        trigger="hover focus"
+                        target="tooltip-role"
+                      >
+                        <span>
+                          <strong>Contributor:</strong> can view and edit the project content.<br/>
+                          <strong>Admin:</strong> can manage projects and members.<br/>
+                        </span>
+                      </UncontrolledTooltip>
+                    </th>
                     <th scope="col" width="10%">Status</th>
                     <th scope="col" width="10%">Created at</th>
                     <th scope="col" width="10%"></th>
@@ -150,19 +162,23 @@ function Members() {
                       </td>
                       <td>
                         <div className="d-flex flex-column">
-                          <Select2
-                            className="form-control"
-                            value={member.role || 'contributor'}
-                            onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                            disabled={!member.isActive}
-                            data={[
-                              { id: "admin", text: "Admin" },
-                              { id: "contributor", text: "Contributor" }
-                            ]}
-                            options={{
-                              placeholder: "Select role"
-                            }}
-                          />
+                          {member.id === localStorage.getItem("currentUserId") || !member.isActive ? <>
+                            <span className="text-muted">{member.role || 'Contributor'}</span>
+                          </> : <>
+                            <Select2
+                              className="react-select-container"
+                              value={member.role || 'contributor'}
+                              onChange={(e) => handleRoleChange(member.id, e.target.value)}
+                              disabled={!member.isActive || member.id === localStorage.getItem("currentUserId")}
+                              data={[
+                                { id: "admin", text: "Admin" },
+                                { id: "contributor", text: "Contributor" }
+                              ]}
+                              options={{
+                                placeholder: "Select role"
+                              }}
+                            />
+                          </>}
                         </div>
                       </td>
                       <td>
