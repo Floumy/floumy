@@ -1,13 +1,12 @@
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { getBuildInPublicSettings, updateBuildInPublicSettings } from "../../../services/bip/build-in-public.service";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { Link, useParams } from "react-router-dom";
-import { clearCache } from "../../../services/cache/cache.service";
-import { useBuildInPublic } from "../../../contexts/BuidInPublicContext";
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { getBuildInPublicSettings, updateBuildInPublicSettings } from '../../../services/bip/build-in-public.service';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import { Link, useParams } from 'react-router-dom';
+import { useBuildInPublic } from '../../../contexts/BuidInPublicContext';
 
 function BuildInPublic() {
   const { orgId, projectId } = useParams();
@@ -70,7 +69,6 @@ function BuildInPublic() {
           ...newSettings,
           isBuildInPublicEnabled: isBuildInPublicEnabledBasedOnSettings(newSettings)
         });
-        clearCache(`${orgId}-settings`);
       } catch (error) {
         toast.error("Failed to update settings");
       }
@@ -117,7 +115,6 @@ function BuildInPublic() {
         ...settings,
         isBuildInPublicEnabled: !isBuildInPublicEnabled
       });
-      clearCache(`${orgId}-settings`);
       toast.success("Settings updated successfully");
     } catch (e) {
       toast.error("Failed to update settings");
