@@ -12,10 +12,12 @@ import { User } from '../users/user.entity';
 import { OrgsService } from '../orgs/orgs.service';
 import { Org } from '../orgs/org.entity';
 
+
 describe('AuthController', () => {
   let controller: AuthController;
   let usersService: UsersService;
   let cleanup: () => Promise<void>;
+  let response: any;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -33,6 +35,10 @@ describe('AuthController', () => {
 
     controller = module.get<AuthController>(AuthController);
     usersService = module.get<UsersService>(UsersService);
+    response = {
+      cookies: jest.fn(),
+      cookie: jest.fn(),
+    }
   });
 
   afterEach(async () => {
@@ -51,14 +57,15 @@ describe('AuthController', () => {
         email: 'john@example.com',
         password: 'testtesttest',
       });
+
       const user = await usersService.findOneByEmail('john@example.com');
       user.isActive = true;
       await usersService.save(user);
-      const { accessToken } = await controller.signIn({
+      const { lastSignedIn } = await controller.signIn({
         email: 'john@example.com',
         password: 'testtesttest',
-      });
-      expect(accessToken).toBeDefined();
+      }, response);
+      expect(lastSignedIn).toBeDefined();
     });
   });
 
@@ -68,7 +75,7 @@ describe('AuthController', () => {
         controller.signIn({
           email: 'john',
           password: 'wrongpassword',
-        }),
+        }, response),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -86,21 +93,22 @@ describe('AuthController', () => {
       user.isActive = true;
       await usersService.save(user);
 
-      const { accessToken, refreshToken } = await controller.signIn({
+      await controller.signIn({
         email: 'test@example.com',
         password: 'testtesttest',
-      });
-
+      }, response);
+      const request = {
+        cookies: {
+          refreshToken: response.cookie.mock.calls[1][1],
+        },
+      }
       // Wait for 1 second to make sure the refresh token is regenerated
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-        await controller.refreshToken({
-          refreshToken,
-        });
-      expect(newAccessToken).toBeDefined();
-      expect(newRefreshToken).toBeDefined();
-      expect(newAccessToken).not.toEqual(accessToken);
-      expect(newRefreshToken).not.toEqual(refreshToken);
+      await controller.refreshToken(request, response)
+      expect(response.cookie.mock.calls[2][1]).toBeDefined()
+      expect(response.cookie.mock.calls[3][1]).toBeDefined()
+      expect(response.cookie.mock.calls[2][1]).not.toEqual(response.cookie.mock.calls[0][1]);
+      expect(response.cookie.mock.calls[3][1]).not.toEqual(response.cookie.mock.calls[1][1]);
     });
   });
 
