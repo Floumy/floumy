@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 // react library for routing
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
 
 // plugins styles from node_modules
 import 'react-notification-alert/dist/animate.css';
@@ -20,8 +20,7 @@ import '@mdxeditor/editor/style.css';
 
 import AdminLayout from 'layouts/Admin.js';
 import AuthLayout from 'layouts/Auth.js';
-import AuthGuard from './guards/AuthGuard';
-import { ToastContainer } from 'react-toastify';
+import {ToastContainer} from 'react-toastify';
 import PublicLayout from './layouts/Public';
 import {BlankLayout} from "./layouts/Blank";
 import OrgLayout from './layouts/Org';
@@ -34,19 +33,13 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/admin/orgs/:orgId/projects/:projectId/*" element={
-          <AuthGuard>
             <AdminLayout />
-          </AuthGuard>
         } />
           <Route path="/blank/orgs/:orgId/projects/:projectId/*" element={
-          <AuthGuard>
             <BlankLayout />
-          </AuthGuard>
         } />
         <Route path="/orgs/:orgId/*" element={
-          <AuthGuard>
             <OrgLayout />
-          </AuthGuard>
         } />
         <Route path="/public/orgs/:orgId/projects/:projectId/*" element={
           <PublicLayout />
