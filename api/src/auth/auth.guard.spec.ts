@@ -185,9 +185,9 @@ describe('AuthGuard', () => {
         return {
           getRequest: () => {
             return {
-              headers: {
-                authorization: `Bearer ${accessToken}`,
-              },
+              cookies: {
+                accessToken: accessToken,
+              }
             };
           },
         };
