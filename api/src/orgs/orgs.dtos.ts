@@ -1,6 +1,7 @@
 export interface MemberDto {
   id: string;
   name: string;
+  role: string;
   email: string;
   isActive: boolean;
   createdAt: Date;
