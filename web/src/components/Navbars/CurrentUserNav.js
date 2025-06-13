@@ -55,9 +55,9 @@ export default function CurrentUserNav() {
           <div className="dropdown-divider"></div>
           <DropdownItem
             href="#pablo"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault();
-              logoutUser();
+              await logoutUser();
               window.location.href = "/auth/sign-in";
             }}
           >

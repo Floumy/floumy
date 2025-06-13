@@ -55,7 +55,7 @@ function SignIn() {
     const redirectIfLoggedIn = async () => {
       // If the user is already logged in, redirect to the dashboard
 
-      if (!localStorage.getItem('currentUser')) {
+      if (!localStorage.getItem('currentUserId')) {
         return;
       }
 
@@ -120,7 +120,7 @@ function SignIn() {
       }
 
       // TODO: Remove this when we have a proper way to handle it
-      logoutUser();
+      await logoutUser();
       setError('You are not a member of any organization.');
     } catch (e) {
       setError(e.message);

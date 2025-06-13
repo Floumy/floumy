@@ -46,15 +46,6 @@ function OrgLayout() {
     }
   }, []);
 
-  const helpButtonStyle = {
-    backgroundColor: 'rgb(0, 0, 0)',
-    color: 'rgb(255, 255, 255)',
-    display: 'flex',
-    alignItems: 'center',
-    transform: 'rotate(-90deg) translateX(calc(124px))',
-    visibility: 'visible',
-  };
-
   return (
     <OrgProvider orgId={orgId}>
       <OrgSidebar
@@ -84,11 +75,6 @@ function OrgLayout() {
       {sidenavOpen ? (
         <div className="backdrop d-xl-none" onClick={toggleSidenav} onKeyDown={toggleSidenav} role="button" />
       ) : null}
-      <button id="userHelpButton" className="userHelpButtonMiddleRight" data-drawer-trigger="true"
-              aria-controls="drawer-name" aria-expanded="false"
-              style={helpButtonStyle}>Report
-        a problem
-      </button>
     </OrgProvider>
   );
 }
