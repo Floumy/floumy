@@ -163,7 +163,7 @@ function Members() {
                       <td>
                         <div className="d-flex flex-column">
                           {member.id === localStorage.getItem("currentUserId") || !member.isActive ? <>
-                            <span className="text-muted">{member.role || 'Contributor'}</span>
+                            <span className="text-muted text-capitalize">{member.role}</span>
                           </> : <>
                             <Select2
                               className="react-select-container"
@@ -174,9 +174,6 @@ function Members() {
                                 { id: "admin", text: "Admin" },
                                 { id: "contributor", text: "Contributor" }
                               ]}
-                              options={{
-                                placeholder: "Select role"
-                              }}
                             />
                           </>}
                         </div>
