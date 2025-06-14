@@ -9,12 +9,15 @@ import {ValidationPipe} from '@nestjs/common';
 import * as process from "node:process";
 import winston from "winston";
 import {utilities as nestWinstonModuleUtilities, WinstonModule} from "nest-winston";
+import 'winston-daily-rotate-file';
 
 let transports = [];
-if(process.env.NODE_ENV === 'production') {
-    transports.push(new winston.transports.File({
-        filename: '/usr/src/log/error.log',
+if(process.env.NODE_ENV !== 'production') {
+    transports.push(new winston.transports.DailyRotateFile({
+        filename: '/usr/src/log/%DATE%-error.log'  ,
         level: 'error',
+        datePattern: 'YYYY-MM-DD',
+        maxFiles: '30d',
         format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.ms(),
