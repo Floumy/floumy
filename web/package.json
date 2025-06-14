@@ -19,6 +19,7 @@
     "dompurify": "^3.0.6",
     "dropzone": "5.9.3",
     "formik": "^2.4.5",
+    "framer-motion": "^12.18.1",
     "list.js": "2.3.1",
     "moment": "2.29.4",
     "nouislider": "15.4.0",
