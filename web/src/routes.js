@@ -58,6 +58,7 @@ import OrgOKRs from './views/pages/okrs/OrgOKRs';
 import DetailOrgOKR from './views/pages/okrs/DetailOrgOKR';
 import DetailOrgKeyResult from './views/pages/okrs/DetailOrgKeyResult';
 import NewOrgOKR from './views/pages/okrs/NewOrgOKR';
+import PermissionDenied from './views/pages/errors/PermissionDenied';
 
 const routes = [
   {
@@ -322,6 +323,12 @@ const routes = [
     component: <GitLab />,
     layout: '/admin',
   },
+  {
+    redirect: true,
+    path: '/permission-denied',
+    component: <PermissionDenied />,
+    layout: '/admin',
+  }
 ];
 
 export const blankRoutes = [
@@ -476,6 +483,12 @@ export const orgsRoutes = [
     component: <NewOrgOKR />,
     layout: '/orgs',
   },
+  {
+    redirect: true,
+    path: '/permission-denied',
+    component: <PermissionDenied />,
+    layout: '/orgs',
+  }
 ];
 
 export default routes;
