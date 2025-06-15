@@ -7,6 +7,7 @@ export class UserMapper {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
       orgId: org ? org.id : null,
       isActive: user.isActive,
       createdAt: user.createdAt,
