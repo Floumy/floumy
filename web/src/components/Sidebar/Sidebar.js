@@ -90,7 +90,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
           <>
             <div className="navbar-inner mb-2">
               {isFeatureEnabled(FEATURES.ORG_WIDE_APP_SECTION) && <h2 className="mb-4">
-                <Link to={`/orgs/${orgId}`} className='p-0'>
+                <Link to={`/orgs/${orgId}/objectives`} className='p-0'>
                   <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
                   <i className="fa fa-arrow-left"></i> Org Dashboard
                 </span>

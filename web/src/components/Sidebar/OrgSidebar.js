@@ -9,10 +9,12 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Col, Collapse, Nav, Navbar, NavbarBrand, NavItem, NavLink, Row } from 'reactstrap';
 import NewProjectModal from './NewProjectModal';
 import { useOrg } from '../../contexts/OrgContext';
+import { useCurrentUser } from '../../contexts/CurrentUserContext';
 
 function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
   const { loading, orgId, currentOrg } = useOrg();
+  const { currentUser } = useCurrentUser();
 
   // makes the sidenav normal on hover (actually when mouse enters on it)
   const onMouseEnterSidenav = () => {
@@ -114,18 +116,20 @@ function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
                           </NavLink>
                         </Col>
                       </Row>
-                      <Row style={{ maxWidth: '100%', height: '47px' }}>
-                        <Col xs={12}>
-                          <NavLink
-                            to={`/orgs/${orgId}/settings`}
-                            onClick={closeSidenav}
-                            tag={NavLinkRRD}
-                          >
-                            <i className="fa fa-gear" />
-                            <span className="nav-link-text">Org</span>
-                          </NavLink>
-                        </Col>
-                      </Row>
+                      {currentUser?.role === 'admin' &&
+                        <Row style={{ maxWidth: '100%', height: '47px' }}>
+                          <Col xs={12}>
+                            <NavLink
+                              to={`/orgs/${orgId}/settings`}
+                              onClick={closeSidenav}
+                              tag={NavLinkRRD}
+                            >
+                              <i className="fa fa-gear" />
+                              <span className="nav-link-text">Org</span>
+                            </NavLink>
+                          </Col>
+                        </Row>
+                      }
                     </NavItem>
                   </Nav>
                 </div>

@@ -10,11 +10,8 @@ import Footer from '../components/Footers/Footer';
 import { OrgProvider } from '../contexts/OrgContext';
 import OrgSidebar from '../components/Sidebar/OrgSidebar';
 import NotFound from '../views/pages/errors/NotFound';
-import { useCurrentUser } from '../contexts/CurrentUserContext';
-import PermissionDenied from '../views/pages/errors/PermissionDenied';
 
 function OrgLayout() {
-  const { currentUser } = useCurrentUser();
   const { mainContentRef, getRoutes, location } = useLayoutHandler('orgs');
   const [sidenavOpen, setSidenavOpen] = useState(true);
   const { orgId } = useParams();
@@ -49,10 +46,6 @@ function OrgLayout() {
       setSidenavOpen(false);
     }
   }, []);
-
-  if (currentUser?.role !== 'admin') {
-    return <PermissionDenied />;
-  }
 
   return (
     <OrgProvider orgId={orgId}>

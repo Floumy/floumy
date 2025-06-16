@@ -30,18 +30,18 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <>
-    <CurrentUserProvider>
+
       <ToastContainer theme="dark" hideProgressBar={true} />
       <BrowserRouter>
         <Routes>
           <Route path="/admin/orgs/:orgId/projects/:projectId/*" element={
-            <AdminLayout />
+            <CurrentUserProvider><AdminLayout /></CurrentUserProvider>
           } />
           <Route path="/blank/orgs/:orgId/projects/:projectId/*" element={
-            <BlankLayout />
+            <CurrentUserProvider><BlankLayout /></CurrentUserProvider>
           } />
           <Route path="/orgs/:orgId/*" element={
-            <OrgLayout />
+            <CurrentUserProvider><OrgLayout /></CurrentUserProvider>
           } />
           <Route path="/public/orgs/:orgId/projects/:projectId/*" element={
             <PublicLayout />
@@ -50,6 +50,5 @@ root.render(
           <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
         </Routes>
       </BrowserRouter>
-    </CurrentUserProvider>
   </>,
 );
