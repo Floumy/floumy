@@ -8,17 +8,19 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { deactivateUser } from '../../../services/users/users.service';
 import { toast } from 'react-toastify';
 import Select2 from 'react-select2-wrapper';
+import { useCurrentUser } from '../../../contexts/CurrentUserContext';
 
 function Members() {
 
   const [isLoading, setIsLoading] = useState(false);
 
   const [members, setMembers] = useState([]);
-  const [invitationLink, setInvitationLink] = useState("");
-  const [copiedText, setCopiedText] = useState("");
+  const [invitationLink, setInvitationLink] = useState('');
+  const [copiedText, setCopiedText] = useState('');
+  const { currentUser } = useCurrentUser();
 
   useEffect(() => {
-    document.title = "Floumy | Members";
+    document.title = 'Floumy | Members';
 
     async function fetchOrg() {
       setIsLoading(true);
@@ -48,9 +50,9 @@ function Members() {
         }
         return member;
       }));
-      toast.success("The member has been deactivated");
+      toast.success('The member has been deactivated');
     } catch (e) {
-      toast.error("The member could not be deactivated");
+      toast.error('The member could not be deactivated');
     } finally {
       setIsLoading(false);
     }
@@ -67,9 +69,9 @@ function Members() {
         }
         return member;
       }));
-      toast.success("Role updated successfully");
+      toast.success('Role updated successfully');
     } catch (e) {
-      toast.error("Failed to update role");
+      toast.error('Failed to update role');
     } finally {
       setIsLoading(false);
     }
@@ -89,32 +91,33 @@ function Members() {
                     <CardTitle tag="h2" className="mb-3">Members</CardTitle>
                   </Col>
                   <Col xs={12} md={4}>
-                    <div className="text-xs-left text-sm-right">
-                      <CopyToClipboard
-                        text={invitationLink}
-                        onCopy={() => setCopiedText(invitationLink)}
-                      >
-                        <button id="copy-invite-link" className="btn btn-primary" type="button">
-                          Invite with link <i className="fas fa-link ml-2" />
-                        </button>
-                      </CopyToClipboard>
-                      <UncontrolledTooltip
-                        delay={0}
-                        trigger="hover focus"
-                        target="copy-invite-link"
-                      >
-                        {copiedText === invitationLink
-                          ? "Link copied to clipboard"
-                          : "Copy invite link to clipboard"}
-                      </UncontrolledTooltip>
-                    </div>
+                    {currentUser?.role === 'admin' &&
+                      <div className="text-xs-left text-sm-right">
+                        <CopyToClipboard
+                          text={invitationLink}
+                          onCopy={() => setCopiedText(invitationLink)}
+                        >
+                          <button id="copy-invite-link" className="btn btn-primary" type="button">
+                            Invite with link <i className="fas fa-link ml-2" />
+                          </button>
+                        </CopyToClipboard>
+                        <UncontrolledTooltip
+                          delay={0}
+                          trigger="hover focus"
+                          target="copy-invite-link"
+                        >
+                          {copiedText === invitationLink
+                            ? 'Link copied to clipboard'
+                            : 'Copy invite link to clipboard'}
+                        </UncontrolledTooltip>
+                      </div>}
                   </Col>
                 </Row>
               </CardHeader>
               {isLoading && <LoadingSpinnerBox />}
               <div className="table-responsive">
                 {!isLoading && <Table className="align-items-center table-flush border-bottom no-select"
-                                      style={{ minWidth: "700px" }}
+                                      style={{ minWidth: '700px' }}
                                       onContextMenu={(e) => e.preventDefault()}
                 >
                   <thead className="thead-light">
@@ -123,20 +126,20 @@ function Members() {
                     <th scope="col" width="20%">Email</th>
                     <th scope="col" width="20%">
                       Role
-                      <i id="tooltip-role" className="fa fa-info-circle ml-2"/>
+                      <i id="tooltip-role" className="fa fa-info-circle ml-2" />
                       <UncontrolledTooltip
                         trigger="hover focus"
                         target="tooltip-role"
                       >
                         <span>
-                          <strong>Contributor:</strong> can view and edit the project content.<br/>
-                          <strong>Admin:</strong> can manage projects and members.<br/>
+                          <strong>Contributor:</strong> can view and edit the project content.<br />
+                          <strong>Admin:</strong> can manage projects and members.<br />
                         </span>
                       </UncontrolledTooltip>
                     </th>
                     <th scope="col" width="10%">Status</th>
                     <th scope="col" width="10%">Created at</th>
-                    <th scope="col" width="10%"></th>
+                    {currentUser?.role === 'admin' && <th scope="col" width="10%"></th>}
                   </tr>
                   </thead>
                   <tbody className="list">
@@ -149,7 +152,7 @@ function Members() {
                   )}
                   {members.length > 0 && members.map((member) => (
                     <tr key={member.id}>
-                    <td>
+                      <td>
                         <span
                           style={{ backgroundColor: textToColor(member.name) }}
                           className="avatar avatar-xs rounded-circle mr-2">
@@ -162,17 +165,17 @@ function Members() {
                       </td>
                       <td>
                         <div className="d-flex flex-column">
-                          {member.id === localStorage.getItem("currentUserId") || !member.isActive ? <>
+                          {currentUser?.role !== 'admin' || member.id === currentUser?.id|| !member.isActive ? <>
                             <span className="text-muted text-capitalize">{member.role}</span>
                           </> : <>
                             <Select2
                               className="react-select-container"
                               value={member.role || 'contributor'}
                               onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                              disabled={!member.isActive || member.id === localStorage.getItem("currentUserId")}
+                              disabled={!member.isActive || member.id === localStorage.getItem('currentUserId')}
                               data={[
-                                { id: "admin", text: "Admin" },
-                                { id: "contributor", text: "Contributor" }
+                                { id: 'admin', text: 'Admin' },
+                                { id: 'contributor', text: 'Contributor' },
                               ]}
                             />
                           </>}
@@ -191,15 +194,17 @@ function Members() {
                       <td>
                         {formatDateWithTime(member.createdAt)}
                       </td>
-                      <td>
-                        <div className="d-flex justify-content-end">
-                          <button className="btn btn-sm btn-danger" type="button"
-                                  onClick={() => deactivate(member.id)}
-                                  disabled={member.id === localStorage.getItem("currentUserId") || !member.isActive}>
-                            Deactivate
-                          </button>
-                        </div>
-                      </td>
+                      {currentUser?.role === 'admin' &&
+                        <td>
+                          <div className="d-flex justify-content-end">
+                            <button className="btn btn-sm btn-danger" type="button"
+                                    onClick={() => deactivate(member.id)}
+                                    disabled={member.id === localStorage.getItem('currentUserId') || !member.isActive}>
+                              Deactivate
+                            </button>
+                          </div>
+                        </td>
+                      }
                     </tr>
                   ))}
                   </tbody>
