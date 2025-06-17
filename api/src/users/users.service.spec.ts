@@ -174,4 +174,28 @@ describe('UsersService', () => {
       expect(foundUser.name).toEqual(newName);
     });
   });
+  describe("when updating the user's role", () => {
+    it('should update the user role', async () => {
+      const user = await service.createUserWithOrg(
+        'Test User',
+        'test@example.com',
+        'testtesttest',
+      );
+      const newRole = 'ADMIN';
+      await service.changeRole(user.id, user.org.id, user.id, newRole);
+      const foundUser = await service.findOne(user.id);
+      expect(foundUser.role).toEqual(newRole);
+    });
+    it('should throw an error if the user tries to change their own role', async () => {
+      const user = await service.createUserWithOrg(
+        'Test User',
+        'test@example.com',
+        'testtesttest',
+      );
+      const org = await user.org;
+      await expect(
+        service.changeRole(user.id, org.id, user.id, 'admin'),
+      ).rejects.toThrow();
+    });
+  });
 });

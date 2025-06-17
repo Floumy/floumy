@@ -46,6 +46,26 @@ export class UsersController {
     }
   }
 
+  @Post(':id/change-role')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @UseGuards(AuthGuard)
+  async changeRole(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() requestBody: { role: string },
+  ) {
+    try {
+      await this.usersService.changeRole(
+        req.user.sub,
+        req.user.org,
+        id,
+        requestBody.role,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.NOT_ACCEPTABLE);
+    }
+  }
+
   @Post(':id/deactivate')
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AuthGuard)
