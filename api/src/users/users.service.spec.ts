@@ -181,9 +181,15 @@ describe('UsersService', () => {
         'test@example.com',
         'testtesttest',
       );
-      const newRole = 'ADMIN';
       const org = await user.org;
-      await service.changeRole(user.id, org.id, user.id, newRole);
+      const secondUser = await service.createUser(
+        'Second User',
+        'test2@example.com',
+        'testtesttest',
+        org,
+      );
+      const newRole = 'admin';
+      await service.changeRole(user.id, org.id, secondUser.id, newRole);
       const foundUser = await service.findOne(user.id);
       expect(foundUser.role).toEqual(newRole);
     });

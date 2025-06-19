@@ -57,16 +57,19 @@ export class UsersService {
    * @param email
    * @param password
    * @param invitationToken
+   * @param userRole
    */
   async createUserWithOrg(
     name: string,
     email: string,
     password: string,
     invitationToken?: string,
+    userRole = UserRole.ADMIN,
   ) {
     await this.validateUser(name, email, password);
     const hashedPassword = await this.encryptPassword(password);
     const user = new User(name, email, hashedPassword);
+    user.role = userRole;
     if (invitationToken) {
       const org =
         await this.orgsService.findOneByInvitationToken(invitationToken);
