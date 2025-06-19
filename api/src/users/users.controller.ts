@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -46,7 +47,7 @@ export class UsersController {
     }
   }
 
-  @Post(':id/change-role')
+  @Put(':id/role')
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AuthGuard)
   async changeRole(

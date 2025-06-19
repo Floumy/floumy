@@ -4,6 +4,7 @@ import { User } from './user.entity';
 import { setupTestingModule } from '../../test/test.utils';
 import { OrgsModule } from '../orgs/orgs.module';
 import { RefreshToken } from '../auth/refresh-token.entity';
+import { UserRole } from './enums';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -191,7 +192,7 @@ describe('UsersService', () => {
       const newRole = 'admin';
       await service.changeRole(user.id, org.id, secondUser.id, newRole);
       const foundUser = await service.findOne(user.id);
-      expect(foundUser.role).toEqual(newRole);
+      expect(foundUser.role).toEqual(UserRole.ADMIN);
     });
     it('should throw an error if the user tries to change their own role', async () => {
       const user = await service.createUserWithOrg(

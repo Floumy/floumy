@@ -54,3 +54,12 @@ export async function getUsersByOrgId(orgId) {
     throw new Error(e.response.data.message);
   }
 }
+
+export async function updateUserRole(userId, role) {
+  try {
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/users/${userId}/role`, { role });
+    return response.data;
+  } catch (e) {
+    throw new Error(e.response.data.message);
+  }
+}
