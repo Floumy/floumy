@@ -5,7 +5,7 @@ import { getOrg } from '../../../services/org/orgs.service';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { formatDateWithTime, memberNameInitials, textToColor } from '../../../services/utils/utils';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { deactivateUser } from '../../../services/users/users.service';
+import { deactivateUser, updateUserRole } from '../../../services/users/users.service';
 import { toast } from 'react-toastify';
 import Select2 from 'react-select2-wrapper';
 import { useCurrentUser } from '../../../contexts/CurrentUserContext';
@@ -59,10 +59,16 @@ function Members() {
   }
 
   const handleRoleChange = async (memberId, newRole) => {
+    if(newRole.trim() === '') {
+      return;
+    }
+    if(memberId === currentUser?.id) {
+      toast.error('You cannot change your own role');
+      return;
+    }
     setIsLoading(true);
     try {
-      // You'll need to implement this API service
-      // await updateUserRole(memberId, newRole);
+      await updateUserRole(memberId, newRole);
       setMembers(members.map((member) => {
         if (member.id === memberId) {
           return { ...member, role: newRole };
@@ -174,8 +180,8 @@ function Members() {
                               onChange={(e) => handleRoleChange(member.id, e.target.value)}
                               disabled={!member.isActive || member.id === localStorage.getItem('currentUserId')}
                               data={[
-                                { id: 'admin', text: 'Admin' },
-                                { id: 'contributor', text: 'Contributor' },
+                                { id: 'ADMIN', text: 'Admin' },
+                                { id: 'CONTRIBUTOR', text: 'Contributor' },
                               ]}
                             />
                           </>}
