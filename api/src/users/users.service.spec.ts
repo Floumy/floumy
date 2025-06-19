@@ -178,7 +178,7 @@ describe('UsersService', () => {
     it('should update the user role', async () => {
       const user = await service.createUserWithOrg(
         'Test User',
-        'test@example.com',
+        'test1@example.com',
         'testtesttest',
       );
       const org = await user.org;
