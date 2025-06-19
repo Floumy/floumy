@@ -67,9 +67,15 @@ describe('UsersController', () => {
         'testtesttest',
       );
       const org = await user.org;
+      const secondUser = await usersService.createUser(
+        'Second User',
+        'test2@example.com',
+        'testtesttest',
+        org,
+      );
       await controller.changeRole(
         { user: { sub: user.id, org: org.id } },
-        user.id,
+        secondUser.id,
         { role: 'admin' },
       );
       const foundUser = await usersService.findOne(user.id);
