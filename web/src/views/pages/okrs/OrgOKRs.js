@@ -24,7 +24,6 @@ import {
   textToColor,
 } from '../../../services/utils/utils';
 import { getOkrStats, listOKRs } from '../../../services/okrs/org-okrs.service';
-import { useCurrentUser } from '../../../contexts/CurrentUserContext';
 
 function OrgOKRs() {
   let location = useLocation();
@@ -37,7 +36,6 @@ function OrgOKRs() {
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState(null);
-  const {currentUser} = useCurrentUser();
 
   useEffect(() => {
     document.title = 'Floumy | OKRs';
@@ -75,7 +73,7 @@ function OrgOKRs() {
     <>
       <SimpleHeader
         headerButtons={
-        currentUser?.role === 'admin' && [
+        [
           {
             name: 'New Objective',
             id: 'new-objective',

@@ -19,7 +19,7 @@ export class BasicAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    if (await this.isPublic(context)) {
+    if (this.isPublic(context)) {
       return true;
     }
 
@@ -38,10 +38,23 @@ export class BasicAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
+    const requiredRoles = this.getRequiredRoles(context);
+    if (requiredRoles && !requiredRoles.includes(this.userDetails.role)) {
+      this.logger.error('User does not have required role');
+      throw new UnauthorizedException();
+    }
+
     return true;
   }
 
-  protected async isPublic(context: ExecutionContext): Promise<boolean> {
+  protected getRequiredRoles(context: ExecutionContext): string[] | undefined {
+    return this.reflector.getAllAndOverride<string[]>('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+  }
+
+  protected isPublic(context: ExecutionContext): boolean {
     return this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
