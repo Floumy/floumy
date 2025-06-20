@@ -61,7 +61,7 @@ export class NotificationService {
         },
       },
     });
-    return await Promise.all(
+    const filteredNotifications = await Promise.all(
       notifications.map(async (notification) => {
         let entityName: string;
         let entityUrl: string;
@@ -81,6 +81,7 @@ export class NotificationService {
             }catch (e){
                 this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
                 await this.notificationsRepository.delete(notification.id);
+                return undefined;
             }
             break;
           case EntityType.INITIATIVE_DESCRIPTION:
@@ -94,6 +95,7 @@ export class NotificationService {
                 // Cleanup the notification if the entity is not found
                 this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
                 await this.notificationsRepository.delete(notification.id);
+                return undefined;
             }
             break;
           case EntityType.WORK_ITEM_COMMENT:
@@ -109,7 +111,7 @@ export class NotificationService {
                     // Cleanup the notification if the entity is not found
                     this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
                     await this.notificationsRepository.delete(notification.id);
-
+                    return undefined;
                 }
             break;
           case EntityType.WORK_ITEM_DESCRIPTION:
@@ -123,6 +125,7 @@ export class NotificationService {
                 // Cleanup the notification if the entity is not found
                 this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
                 await this.notificationsRepository.delete(notification.id);
+                return undefined;
             }
             break;
           case EntityType.FEATURE_REQUEST_COMMENT:
@@ -139,6 +142,7 @@ export class NotificationService {
                 // Cleanup the notification if the entity is not found
                 this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
                 await this.notificationsRepository.delete(notification.id);
+                return undefined;
             }
             break;
           case EntityType.ISSUE_COMMENT:
@@ -155,6 +159,7 @@ export class NotificationService {
                 // Cleanup the notification if the entity is not found
                 this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
                 await this.notificationsRepository.delete(notification.id);
+                return undefined;
             }
             break;
           case EntityType.KEY_RESULT_COMMENT:
@@ -171,6 +176,7 @@ export class NotificationService {
                 // Cleanup the notification if the entity is not found
                 this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
                 await this.notificationsRepository.delete(notification.id);
+                return undefined;
             }
             break;
           case EntityType.OBJECTIVE_COMMENT:
@@ -187,10 +193,11 @@ export class NotificationService {
                 // Cleanup the notification if the entity is not found
                 this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
                 await this.notificationsRepository.delete(notification.id);
+                return undefined;
             }
             break;
           default:
-            entityName = 'Unknown';
+            return undefined;
         }
         return {
           id: notification.id,
@@ -203,7 +210,10 @@ export class NotificationService {
           createdAt: notification.createdAt,
           createdBy: await notification.createdBy,
         };
-      }),
+      })
+    );
+    return filteredNotifications.filter(
+      (notification) => notification !== undefined
     );
   }
 
