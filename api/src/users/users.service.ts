@@ -199,6 +199,10 @@ export class UsersService {
       id: userId,
       org: { id: orgId },
     });
+    role = role.toUpperCase();
+    if (role !== 'ADMIN' && role !== 'CONTRIBUTOR') {
+      throw new Error('Invalid role');
+    }
     user.role = UserRole[role];
     await this.usersRepository.save(user);
   }

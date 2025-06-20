@@ -12,6 +12,8 @@ import {
 } from '@nestjs/common';
 import { OrgsService } from './orgs.service';
 import { BasicAuthGuard } from '../auth/basic-auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
+import { Roles } from '../auth/roles.guard';
 
 @Controller('orgs')
 export class OrgsController {
@@ -27,7 +29,8 @@ export class OrgsController {
 
   @Patch('current')
   @HttpCode(200)
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(AuthGuard)
+  @Roles('admin')
   async patchOrg(@Request() request, @Body() requestBody: { name: string }) {
     const org = request.user.org;
     return await this.orgsService.patchOrg(org, requestBody.name);
