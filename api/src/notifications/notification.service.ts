@@ -1,5 +1,5 @@
 import { In, Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import {Injectable, Logger} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityType, Notification, StatusType } from './notification.entity';
 import { ViewNotificationDto } from './dtos';
@@ -14,6 +14,7 @@ import { ObjectiveComment } from '../okrs/objective-comment.entity';
 
 @Injectable()
 export class NotificationService {
+    private readonly logger = new Logger(NotificationService.name);
   constructor(
     @InjectRepository(Notification)
     private notificationsRepository: Repository<Notification>,
@@ -68,78 +69,125 @@ export class NotificationService {
         const project = await notification.project;
         switch (notification.entity) {
           case EntityType.INITIATIVE_COMMENT:
-            const featureComment =
-              await this.featureCommentsRepository.findOneOrFail({
-                where: { id: notification.entityId },
-                relations: ['initiative'],
-              });
-            const feature = await featureComment.initiative;
-            entityName = feature.reference + ': ' + feature.title;
-            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/roadmap/features/detail/${feature.id}`;
+            try{
+              const featureComment =
+                  await this.featureCommentsRepository.findOneOrFail({
+                    where: { id: notification.entityId },
+                    relations: ['initiative'],
+                  });
+              const feature = await featureComment.initiative;
+              entityName = feature.reference + ': ' + feature.title;
+              entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/roadmap/features/detail/${feature.id}`;
+            }catch (e){
+                this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
+                await this.notificationsRepository.delete(notification.id);
+            }
             break;
           case EntityType.INITIATIVE_DESCRIPTION:
-            const f = await this.featuresRepository.findOneOrFail({
-              where: { id: notification.entityId },
-            });
-            entityName = f.reference + ': ' + f.title;
-            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/roadmap/features/detail/${f.id}`;
+            try {
+                const f = await this.featuresRepository.findOneOrFail({
+                    where: { id: notification.entityId },
+                });
+                entityName = f.reference + ': ' + f.title;
+                entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/roadmap/features/detail/${f.id}`;
+            }catch (e){
+                // Cleanup the notification if the entity is not found
+                this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
+                await this.notificationsRepository.delete(notification.id);
+            }
             break;
           case EntityType.WORK_ITEM_COMMENT:
-            const workItemComment =
-              await this.workItemCommentsRepository.findOneOrFail({
-                where: { id: notification.entityId },
-                relations: ['workItem'],
-              });
-            const workItem = await workItemComment.workItem;
-            entityName = workItem.reference + ': ' + workItem.title;
-            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/work-item/edit/${workItem.id}`;
+                try{
+                    const workItemComment = await this.workItemCommentsRepository.findOneOrFail({
+                        where: { id: notification.entityId },
+                        relations: ['workItem'],
+                    });
+                    const workItem = await workItemComment.workItem;
+                    entityName = workItem.reference + ': ' + workItem.title;
+                    entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/work-item/edit/${workItem.id}`;
+                }catch (e){
+                    // Cleanup the notification if the entity is not found
+                    this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
+                    await this.notificationsRepository.delete(notification.id);
+
+                }
             break;
           case EntityType.WORK_ITEM_DESCRIPTION:
-            const wi = await this.workItemsRepository.findOneOrFail({
-              where: { id: notification.entityId },
-            });
-            entityName = wi.reference + ': ' + wi.title;
-            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/work-item/edit/${wi.id}`;
+            try{
+                const wi = await this.workItemsRepository.findOneOrFail({
+                    where: { id: notification.entityId },
+                });
+                entityName = wi.reference + ': ' + wi.title;
+                entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/work-item/edit/${wi.id}`;
+            }catch (e){
+                // Cleanup the notification if the entity is not found
+                this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
+                await this.notificationsRepository.delete(notification.id);
+            }
             break;
           case EntityType.FEATURE_REQUEST_COMMENT:
-            const featureRequestComment =
-              await this.featureRequestCommentsRepository.findOneOrFail({
-                where: { id: notification.entityId },
-                relations: ['featureRequest'],
-              });
-            const featureRequest = await featureRequestComment.featureRequest;
-            entityName = featureRequest.title;
-            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/feature-requests/edit/${featureRequest.id}`;
+            try{
+                const featureRequestComment =
+                    await this.featureRequestCommentsRepository.findOneOrFail({
+                        where: { id: notification.entityId },
+                        relations: ['featureRequest'],
+                    });
+                const featureRequest = await featureRequestComment.featureRequest;
+                entityName = featureRequest.title;
+                entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/feature-requests/edit/${featureRequest.id}`;
+            }catch (e){
+                // Cleanup the notification if the entity is not found
+                this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
+                await this.notificationsRepository.delete(notification.id);
+            }
             break;
           case EntityType.ISSUE_COMMENT:
-            const issueComment =
-              await this.issueCommentsRepository.findOneOrFail({
-                where: { id: notification.entityId },
-                relations: ['issue'],
-              });
-            const issue = await issueComment.issue;
-            entityName = issue.title;
-            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/issues/edit/${issue.id}`;
+            try{
+                const issueComment =
+                    await this.issueCommentsRepository.findOneOrFail({
+                        where: { id: notification.entityId },
+                        relations: ['issue'],
+                    });
+                const issue = await issueComment.issue;
+                entityName = issue.title;
+                entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/issues/edit/${issue.id}`;
+            }catch (e){
+                // Cleanup the notification if the entity is not found
+                this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
+                await this.notificationsRepository.delete(notification.id);
+            }
             break;
           case EntityType.KEY_RESULT_COMMENT:
-            const keyResultComment =
-              await this.keyResultCommentsRepository.findOneOrFail({
-                where: { id: notification.entityId },
-                relations: ['keyResult'],
-              });
-            const keyResult = await keyResultComment.keyResult;
-            entityName = keyResult.reference + ': ' + keyResult.title;
-            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/kr/detail/${keyResult.id}`;
+            try{
+                const keyResultComment =
+                    await this.keyResultCommentsRepository.findOneOrFail({
+                        where: { id: notification.entityId },
+                        relations: ['keyResult'],
+                    });
+                const keyResult = await keyResultComment.keyResult;
+                entityName = keyResult.reference + ': ' + keyResult.title;
+                entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/kr/detail/${keyResult.id}`;
+            }catch (e){
+                // Cleanup the notification if the entity is not found
+                this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
+                await this.notificationsRepository.delete(notification.id);
+            }
             break;
           case EntityType.OBJECTIVE_COMMENT:
-            const objectiveComment =
-              await this.objectiveCommentsRepository.findOneOrFail({
-                where: { id: notification.entityId },
-                relations: ['objective'],
-              });
-            const objective = await objectiveComment.objective;
-            entityName = objective.reference + ': ' + objective.title;
-            entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/okrs/detail/${objective.id}`;
+            try{
+                const objectiveComment =
+                    await this.objectiveCommentsRepository.findOneOrFail({
+                        where: { id: notification.entityId },
+                        relations: ['objective'],
+                    });
+                const objective = await objectiveComment.objective;
+                entityName = objective.reference + ': ' + objective.title;
+                entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/okrs/detail/${objective.id}`;
+            }catch (e){
+                // Cleanup the notification if the entity is not found
+                this.logger.error(`Notification with ID ${notification.id} has an invalid entity: ${e.message}`);
+                await this.notificationsRepository.delete(notification.id);
+            }
             break;
           default:
             entityName = 'Unknown';
