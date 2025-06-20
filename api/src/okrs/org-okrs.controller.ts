@@ -17,18 +17,15 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CommentsService } from './comments/comments.service';
-import {
-  CreateOrUpdateKeyResultDto,
-  CreateOrUpdateOKRDto,
-  PatchKeyResultDto,
-  UpdateObjectiveDto,
-} from './dtos';
+import { CreateOrUpdateKeyResultDto, CreateOrUpdateOKRDto, PatchKeyResultDto, UpdateObjectiveDto } from './dtos';
 import { Timeline } from '../common/timeline.enum';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 import { OrgOkrsService } from './org-okrs.service';
+import { Roles } from '../auth/roles.guard';
 
 @Controller('/orgs/:orgId/')
 @UseGuards(AuthGuard)
+@Roles('admin')
 export class OrgOkrsController {
   constructor(
     private readonly okrsService: OrgOkrsService,

@@ -1,10 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { TokensService } from './tokens.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -37,6 +31,16 @@ export class AuthGuard extends BasicAuthGuard implements CanActivate {
     const org = this.userDetails.org;
     if (!org) {
       this.logger.error('No org found for user');
+      throw new UnauthorizedException();
+    }
+
+    const requiredRoles = this.reflector.get<string[]>(
+      'roles',
+      context.getHandler(),
+    );
+
+    if (requiredRoles && !requiredRoles.includes(this.userDetails.role)) {
+      this.logger.error('User does not have required role');
       throw new UnauthorizedException();
     }
 

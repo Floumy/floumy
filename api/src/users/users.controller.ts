@@ -16,6 +16,7 @@ import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { BasicAuthGuard } from '../auth/basic-auth.guard';
 import { PatchUserDto } from './dtos';
+import { Roles } from '../auth/roles.guard';
 
 @Controller('users')
 export class UsersController {
@@ -50,6 +51,7 @@ export class UsersController {
   @Put(':id/role')
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AuthGuard)
+  @Roles('admin')
   async changeRole(
     @Request() req: any,
     @Param('id') id: string,
@@ -70,6 +72,7 @@ export class UsersController {
   @Post(':id/deactivate')
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AuthGuard)
+  @Roles('admin')
   async deactivateUser(@Request() req: any, @Param('id') id: string) {
     try {
       await this.usersService.deactivate(req.user.org, id);
