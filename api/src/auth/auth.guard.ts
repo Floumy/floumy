@@ -34,16 +34,6 @@ export class AuthGuard extends BasicAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const requiredRoles = this.reflector.get<string[]>(
-      'roles',
-      context.getHandler(),
-    );
-
-    if (requiredRoles && !requiredRoles.includes(this.userDetails.role)) {
-      this.logger.error('User does not have required role');
-      throw new UnauthorizedException();
-    }
-
     return true;
   }
 }

@@ -21,11 +21,9 @@ import { CreateOrUpdateKeyResultDto, CreateOrUpdateOKRDto, PatchKeyResultDto, Up
 import { Timeline } from '../common/timeline.enum';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 import { OrgOkrsService } from './org-okrs.service';
-import { Roles } from '../auth/roles.guard';
 
 @Controller('/orgs/:orgId/')
 @UseGuards(AuthGuard)
-@Roles('admin')
 export class OrgOkrsController {
   constructor(
     private readonly okrsService: OrgOkrsService,
