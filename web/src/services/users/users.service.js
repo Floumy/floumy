@@ -33,6 +33,7 @@ export async function setCurrentUser() {
 export function setCurrentUserToLocalStorage(currentUser) {
   localStorage.setItem("currentUserName", currentUser.name);
   localStorage.setItem("currentUserId", currentUser.id);
+  localStorage.setItem("currentUserRole", currentUser.role);
   if (currentUser.orgId !== null && currentUser.orgId !== undefined) {
     localStorage.setItem("currentUserOrgId", currentUser.orgId);
   }

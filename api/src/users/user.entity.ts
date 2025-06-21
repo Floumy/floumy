@@ -46,7 +46,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserRole,
-    default: UserRole.CONTRIBUTOR,
+    default: UserRole.ADMIN,
   })
   role: UserRole;
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
