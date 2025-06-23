@@ -35,16 +35,10 @@ RUN npm install --production
 # Copy the built application from the builder stage
 COPY --from=builder /usr/src/app/dist ./dist
 
-# Create log directory and set permissions
-RUN mkdir -p /usr/src/log && chown -R node:node /usr/src/log
-
 ENV NODE_ENV=production
 
 # Expose the port the app runs on
 EXPOSE 8080
-
-# Switch to non-root user
-USER node
 
 # Command to run the application
 CMD ["node", "dist/main"]
