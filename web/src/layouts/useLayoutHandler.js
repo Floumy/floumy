@@ -1,10 +1,13 @@
-import { Route, useLocation } from "react-router-dom";
-import React from "react";
+import { Route, useLocation } from 'react-router-dom';
+import React from 'react';
 
 export default function useLayoutHandler(slug) {
   const location = useLocation();
   const mainContentRef = React.useRef(null);
   React.useEffect(() => {
+    if (!mainContentRef.current) {
+      return;
+    }
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     mainContentRef.current.scrollTop = 0;

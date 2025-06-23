@@ -19,6 +19,7 @@ import { FeatureRequestVote } from '../feature-requests/feature-request-vote.ent
 import { Issue } from '../issues/issue.entity';
 import { Project } from '../projects/project.entity';
 import { Notification } from '../notifications/notification.entity';
+import { UserRole } from './enums';
 
 @Entity()
 export class User {
@@ -42,6 +43,12 @@ export class User {
   passwordResetToken: string;
   @Column({ nullable: true })
   lastSignedIn: Date;
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.ADMIN,
+  })
+  role: UserRole;
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
     cascade: true,
     lazy: true,

@@ -27,7 +27,7 @@ import { getOkrStats, listOKRs } from '../../../services/okrs/org-okrs.service';
 
 function OrgOKRs() {
   let location = useLocation();
-  const { orgId } = useParams();
+  const { orgId, projectId } = useParams();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get('timeline') || 'this-quarter';
   const navigate = useNavigate();
@@ -72,7 +72,8 @@ function OrgOKRs() {
   return (
     <>
       <SimpleHeader
-        headerButtons={[
+        headerButtons={
+        [
           {
             name: 'New Objective',
             id: 'new-objective',
@@ -188,8 +189,7 @@ function OrgOKRs() {
                         They help you track your success and ensure you're on the right track. Think of them as
                         targets that show how close you are to achieving your goals. .
                         <br />
-                        {/*TODO: Change the URL*/}
-                        <Link to={`/admin/orgs/${orgId}/okrs/new`}
+                        <Link to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/new`}
                               className="text-blue font-weight-bold">Create an Objective with
                           Key Results</Link></p>
                     </div>

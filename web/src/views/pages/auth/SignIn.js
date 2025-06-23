@@ -109,7 +109,7 @@ function SignIn() {
         }
 
         if(currentOrg.id && currentOrg?.projects.length === 0) {
-          return navigate(`/orgs/${currentOrg.id}/projects/`);
+          return navigate(`/orgs/${currentOrg.id}/objectives/`);
         }
 
         if(currentOrg.hadDemo){

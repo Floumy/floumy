@@ -7,9 +7,11 @@ import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { AuthGuard } from '../auth/auth.guard';
 import { TokensService } from '../auth/tokens.service';
+import { UserRole } from './enums';
 
 describe('UsersController', () => {
   let controller: UsersController;
+  let usersService: UsersService;
   let cleanup: () => Promise<void>;
   let user: User;
 
@@ -21,7 +23,7 @@ describe('UsersController', () => {
     );
     cleanup = dbCleanup;
     controller = module.get<UsersController>(UsersController);
-    const usersService = module.get<UsersService>(UsersService);
+    usersService = module.get<UsersService>(UsersService);
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -54,6 +56,30 @@ describe('UsersController', () => {
       );
       expect(currentUser).toBeDefined();
       expect(currentUser.name).toEqual('New Name');
+    });
+  });
+
+  describe("when updating the user's role", () => {
+    it('should update the user role', async () => {
+      const user = await usersService.createUserWithOrg(
+        'Test User',
+        'test1@example.com',
+        'testtesttest',
+      );
+      const org = await user.org;
+      const secondUser = await usersService.createUser(
+        'Second User',
+        'test2@example.com',
+        'testtesttest',
+        org,
+      );
+      await controller.changeRole(
+        { user: { sub: user.id, org: org.id } },
+        secondUser.id,
+        { role: 'admin' },
+      );
+      const foundUser = await usersService.findOne(user.id);
+      expect(foundUser.role).toEqual(UserRole.ADMIN);
     });
   });
 });

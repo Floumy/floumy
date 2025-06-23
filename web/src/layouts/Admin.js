@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // react library for routing
-import { Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useParams } from 'react-router-dom';
 // core components
 import Sidebar from 'components/Sidebar/Sidebar.js';
 
@@ -12,6 +12,7 @@ import Footer from '../components/Footers/Footer';
 import { BuildInPublicProvider } from '../contexts/BuidInPublicContext';
 import { ProjectsProvider } from '../contexts/ProjectsContext';
 import { OrgProvider } from '../contexts/OrgContext';
+import NotFound from '../views/pages/errors/NotFound';
 
 function Admin() {
   const { location, mainContentRef, getRoutes } = useLayoutHandler('admin');
@@ -90,10 +91,9 @@ function Admin() {
               />
               <Routes>
                 {getRoutes(routes)}
-                {/*TODO: Redirect to not found page here*/}
                 <Route
                   path="*"
-                  element={<Navigate to={`/admin/orgs/${orgId}/projects/${projectId}/active-sprint`} replace />}
+                  element={<NotFound />}
                 />
               </Routes>
               <Footer />

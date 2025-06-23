@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 // react library for routing
-import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 // plugins styles from node_modules
 import 'react-notification-alert/dist/animate.css';
@@ -20,33 +20,35 @@ import '@mdxeditor/editor/style.css';
 
 import AdminLayout from 'layouts/Admin.js';
 import AuthLayout from 'layouts/Auth.js';
-import {ToastContainer} from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import PublicLayout from './layouts/Public';
-import {BlankLayout} from "./layouts/Blank";
+import { BlankLayout } from './layouts/Blank';
 import OrgLayout from './layouts/Org';
+import { CurrentUserProvider } from './contexts/CurrentUserContext';
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <>
-    <ToastContainer theme="dark" hideProgressBar={true} />
-    <BrowserRouter>
-      <Routes>
-        <Route path="/admin/orgs/:orgId/projects/:projectId/*" element={
-            <AdminLayout />
-        } />
+
+      <ToastContainer theme="dark" hideProgressBar={true} />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/admin/orgs/:orgId/projects/:projectId/*" element={
+            <CurrentUserProvider><AdminLayout /></CurrentUserProvider>
+          } />
           <Route path="/blank/orgs/:orgId/projects/:projectId/*" element={
-            <BlankLayout />
-        } />
-        <Route path="/orgs/:orgId/*" element={
-            <OrgLayout />
-        } />
-        <Route path="/public/orgs/:orgId/projects/:projectId/*" element={
-          <PublicLayout />
-        } />
-        <Route path="/auth/*" element={<AuthLayout />} />
-        <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
-      </Routes>
-    </BrowserRouter>
-  </>
+            <CurrentUserProvider><BlankLayout /></CurrentUserProvider>
+          } />
+          <Route path="/orgs/:orgId/*" element={
+            <CurrentUserProvider><OrgLayout /></CurrentUserProvider>
+          } />
+          <Route path="/public/orgs/:orgId/projects/:projectId/*" element={
+            <PublicLayout />
+          } />
+          <Route path="/auth/*" element={<AuthLayout />} />
+          <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
+        </Routes>
+      </BrowserRouter>
+  </>,
 );

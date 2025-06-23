@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -15,6 +16,8 @@ import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { BasicAuthGuard } from '../auth/basic-auth.guard';
 import { PatchUserDto } from './dtos';
+import { Roles } from '../auth/roles.guard';
+import { UserRole } from './enums';
 
 @Controller('users')
 export class UsersController {
@@ -46,9 +49,31 @@ export class UsersController {
     }
   }
 
+  @Put(':id/role')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
+  async changeRole(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() requestBody: { role: string },
+  ) {
+    try {
+      await this.usersService.changeRole(
+        req.user.sub,
+        req.user.org,
+        id,
+        requestBody.role,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.NOT_ACCEPTABLE);
+    }
+  }
+
   @Post(':id/deactivate')
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
   async deactivateUser(@Request() req: any, @Param('id') id: string) {
     try {
       await this.usersService.deactivate(req.user.org, id);
