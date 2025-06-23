@@ -33,6 +33,7 @@ export async function setCurrentUser() {
 export function setCurrentUserToLocalStorage(currentUser) {
   localStorage.setItem("currentUserName", currentUser.name);
   localStorage.setItem("currentUserId", currentUser.id);
+  localStorage.setItem("currentUserRole", currentUser.role);
   if (currentUser.orgId !== null && currentUser.orgId !== undefined) {
     localStorage.setItem("currentUserOrgId", currentUser.orgId);
   }
@@ -49,6 +50,15 @@ export async function deactivateUser(userId) {
 export async function getUsersByOrgId(orgId) {
   try {
     const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/users`);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.response.data.message);
+  }
+}
+
+export async function updateUserRole(userId, role) {
+  try {
+    const response = await api.put(`${process.env.REACT_APP_API_URL}/users/${userId}/role`, { role });
     return response.data;
   } catch (e) {
     throw new Error(e.response.data.message);

@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Col, Container, Row } from "reactstrap";
-import React from "react";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import ChangeName from "./components/ChangeName";
+import { Card, CardBody, CardHeader, Col, Container, Row } from 'reactstrap';
+import React from 'react';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import ChangeName from './components/ChangeName';
 
 export default function MyProfile() {
 
@@ -19,6 +19,10 @@ export default function MyProfile() {
                 <Row>
                   <Col>
                     <ChangeName />
+                  </Col>
+                  <Col>
+                    <h3>Role</h3>
+                    <p className="text-capitalize">{localStorage.getItem("currentUserRole") || 'Contributor'}</p>
                   </Col>
                 </Row>
               </CardBody>

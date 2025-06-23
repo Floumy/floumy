@@ -4,6 +4,7 @@ import { User } from './user.entity';
 import { setupTestingModule } from '../../test/test.utils';
 import { OrgsModule } from '../orgs/orgs.module';
 import { RefreshToken } from '../auth/refresh-token.entity';
+import { UserRole } from './enums';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -172,6 +173,37 @@ describe('UsersService', () => {
       await service.patch(user.id, { name: newName });
       const foundUser = await service.findOne(user.id);
       expect(foundUser.name).toEqual(newName);
+    });
+  });
+  describe("when updating the user's role", () => {
+    it('should update the user role', async () => {
+      const user = await service.createUserWithOrg(
+        'Test User',
+        'test1@example.com',
+        'testtesttest',
+      );
+      const org = await user.org;
+      const secondUser = await service.createUser(
+        'Second User',
+        'test2@example.com',
+        'testtesttest',
+        org,
+      );
+      const newRole = 'admin';
+      await service.changeRole(user.id, org.id, secondUser.id, newRole);
+      const foundUser = await service.findOne(user.id);
+      expect(foundUser.role).toEqual(UserRole.ADMIN);
+    });
+    it('should throw an error if the user tries to change their own role', async () => {
+      const user = await service.createUserWithOrg(
+        'Test User',
+        'test@example.com',
+        'testtesttest',
+      );
+      const org = await user.org;
+      await expect(
+        service.changeRole(user.id, org.id, user.id, 'admin'),
+      ).rejects.toThrow();
     });
   });
 });

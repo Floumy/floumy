@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './user.entity';
-import {QueryRunner, Repository} from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -10,6 +10,7 @@ import { RefreshToken } from '../auth/refresh-token.entity';
 import { Org } from '../orgs/org.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PatchUserDto } from './dtos';
+import { UserRole } from './enums';
 
 @Injectable()
 export class UsersService {
@@ -31,7 +32,7 @@ export class UsersService {
     email: string,
     password: string,
     org: Org = null,
-    queryRunner?: QueryRunner
+    queryRunner?: QueryRunner,
   ) {
     await this.validateUser(name, email, password);
     const hashedPassword = await this.encryptPassword(password);
@@ -56,16 +57,19 @@ export class UsersService {
    * @param email
    * @param password
    * @param invitationToken
+   * @param userRole
    */
   async createUserWithOrg(
     name: string,
     email: string,
     password: string,
     invitationToken?: string,
+    userRole = UserRole.ADMIN,
   ) {
     await this.validateUser(name, email, password);
     const hashedPassword = await this.encryptPassword(password);
     const user = new User(name, email, hashedPassword);
+    user.role = userRole;
     if (invitationToken) {
       const org =
         await this.orgsService.findOneByInvitationToken(invitationToken);
@@ -174,5 +178,32 @@ export class UsersService {
     await Promise.all(
       refreshTokens.map((token) => this.refreshTokensRepository.remove(token)),
     );
+  }
+
+  async changeRole(
+    adminUserId: string,
+    orgId: string,
+    userId: string,
+    role: string,
+  ) {
+    if (adminUserId === userId) {
+      throw new Error('Cannot change your own role');
+    }
+
+    await this.usersRepository.findOneByOrFail({
+      id: adminUserId,
+      org: { id: orgId },
+      role: UserRole.ADMIN,
+    });
+    const user = await this.usersRepository.findOneByOrFail({
+      id: userId,
+      org: { id: orgId },
+    });
+    role = role.toUpperCase();
+    if (role !== 'ADMIN' && role !== 'CONTRIBUTOR') {
+      throw new Error('Invalid role');
+    }
+    user.role = UserRole[role];
+    await this.usersRepository.save(user);
   }
 }

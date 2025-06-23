@@ -1,13 +1,14 @@
-import React from "react";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
-import { Button, Input, InputGroup } from "reactstrap";
-import InputError from "../../../../components/Errors/InputError";
-import { patchCurrentUser } from "../../../../services/users/users.service";
-import { toast } from "react-toastify";
+import React from 'react';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+import { Button, Input, InputGroup } from 'reactstrap';
+import InputError from '../../../../components/Errors/InputError';
+import { patchCurrentUser } from '../../../../services/users/users.service';
+import { toast } from 'react-toastify';
 
 export default function ChangeName() {
   const currentUserName = localStorage.getItem("currentUserName");
+  const currentUserRole = localStorage.getItem("currentUserRole");
 
   const validationSchema = Yup.object({
     name: Yup.string()

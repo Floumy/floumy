@@ -12,6 +12,7 @@ export class MembersMapper {
     return {
       id: member.id,
       name: member.name,
+      role: member.role,
       email: member.email,
       isActive: member.isActive,
       createdAt: member.createdAt,

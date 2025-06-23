@@ -1,10 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { TokensService } from './tokens.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,7 +19,7 @@ export class AuthGuard extends BasicAuthGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    if (await this.isPublic(context)) {
+    if (this.isPublic(context)) {
       return true;
     }
 

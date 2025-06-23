@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 // react library for routing
-import { Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useParams } from 'react-router-dom';
 // core components
 import { orgsRoutes } from 'routes.js';
 import AdminNavbar from '../components/Navbars/AdminNavbar';
@@ -9,6 +9,7 @@ import useNavigationHotKey from './useNavigationHotKey';
 import Footer from '../components/Footers/Footer';
 import { OrgProvider } from '../contexts/OrgContext';
 import OrgSidebar from '../components/Sidebar/OrgSidebar';
+import NotFound from '../views/pages/errors/NotFound';
 
 function OrgLayout() {
   const { mainContentRef, getRoutes, location } = useLayoutHandler('orgs');
@@ -64,10 +65,9 @@ function OrgLayout() {
         />
         <Routes>
           {getRoutes(orgsRoutes)}
-          {/*TODO: Redirect to not found page here*/}
           <Route
             path="*"
-            element={<Navigate to={`/orgs/${orgId}/objectives`} replace />}
+            element={<NotFound />}
           />
         </Routes>
         <Footer />
