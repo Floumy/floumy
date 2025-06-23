@@ -6,11 +6,16 @@ import { TokensService } from './tokens.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import { Repository } from 'typeorm';
+import { UserRole } from '../users/enums';
 
 @Injectable()
 export class BasicAuthGuard implements CanActivate {
   protected readonly logger = new Logger(BasicAuthGuard.name);
-  protected userDetails: any;
+  protected userDetails: {
+    sub: string;
+    org: string;
+    role: UserRole;
+  };
 
   constructor(
     protected tokenService: TokensService,
@@ -47,8 +52,10 @@ export class BasicAuthGuard implements CanActivate {
     return true;
   }
 
-  protected getRequiredRoles(context: ExecutionContext): string[] | undefined {
-    return this.reflector.getAllAndOverride<string[]>('roles', [
+  protected getRequiredRoles(
+    context: ExecutionContext,
+  ): UserRole[] | undefined {
+    return this.reflector.getAllAndOverride<UserRole[]>('roles', [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -63,15 +70,24 @@ export class BasicAuthGuard implements CanActivate {
 
   protected async verifyAccessToken(request: Request, token: string) {
     try {
-      this.userDetails = await this.tokenService.verifyAccessToken(token);
-      await this.usersRepository.findOneByOrFail({
-        id: this.userDetails.sub,
+      const tokenDetails = await this.tokenService.verifyAccessToken(token);
+      const user = await this.usersRepository.findOneByOrFail({
+        id: tokenDetails.sub,
         org: {
-          id: this.userDetails.org,
+          id: tokenDetails.org,
         },
         isActive: true,
       });
-      request['user'] = this.userDetails;
+      this.userDetails = {
+        sub: tokenDetails.sub,
+        org: tokenDetails.org,
+        role: user.role,
+      };
+      request['user'] = {
+        sub: tokenDetails.sub,
+        org: tokenDetails.org,
+        role: user.role,
+      };
     } catch (error) {
       this.logger.error(`Failed to verify access token: ${token}`);
       this.logger.error(error);

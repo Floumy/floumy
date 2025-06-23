@@ -17,6 +17,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { BasicAuthGuard } from '../auth/basic-auth.guard';
 import { PatchUserDto } from './dtos';
 import { Roles } from '../auth/roles.guard';
+import { UserRole } from './enums';
 
 @Controller('users')
 export class UsersController {
@@ -51,7 +52,7 @@ export class UsersController {
   @Put(':id/role')
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AuthGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   async changeRole(
     @Request() req: any,
     @Param('id') id: string,
@@ -72,7 +73,7 @@ export class UsersController {
   @Post(':id/deactivate')
   @HttpCode(HttpStatus.ACCEPTED)
   @UseGuards(AuthGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   async deactivateUser(@Request() req: any, @Param('id') id: string) {
     try {
       await this.usersService.deactivate(req.user.org, id);
