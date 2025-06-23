@@ -11,37 +11,21 @@ import winston from 'winston';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import 'winston-daily-rotate-file';
 
-const transports = [];
-if (process.env.NODE_ENV === 'production') {
-  transports.push(
-    new winston.transports.DailyRotateFile({
-      filename: '/usr/src/log/%DATE%-error.log',
-      level: 'error',
-      datePattern: 'YYYY-MM-DD',
-      maxFiles: '30d',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.ms(),
-        winston.format.json(),
-      ),
-    }),
-  );
-} else {
-  transports.push(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.ms(),
-        nestWinstonModuleUtilities.format.nestLike('Floumy', {
-          colors: true,
-          prettyPrint: true,
-          processId: true,
-          appName: true,
-        }),
-      ),
-    }),
-  );
-}
+const transports = [
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.ms(),
+      nestWinstonModuleUtilities.format.nestLike('Floumy', {
+        colors: true,
+        prettyPrint: true,
+        processId: true,
+        appName: true,
+      }),
+    ),
+  }),
+];
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: WinstonModule.createLogger({
