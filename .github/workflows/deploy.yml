@@ -45,6 +45,7 @@ jobs:
             docker run --network host \
               -d --restart=always \
               --name api \
+              -v /var/log/floumy:/usr/src/log/ \
               -e FRONTEND_URL=https://app.floumy.com \
               -e DB_HOST=${{ secrets.DB_HOST }} \
               -e DB_PORT=${{ secrets.DB_PORT }} \
@@ -78,7 +79,6 @@ jobs:
               -e GITLAB_WEBHOOK_URL_BASE=${{ secrets.GITLAB_WEBHOOK_URL_BASE }} \
               -e GITLAB_WEBHOOK_SECRET=${{ secrets.GITLAB_WEBHOOK_SECRET }} \
               -p 4000:8080 registry.digitalocean.com/floumy-registry/api:latest \
-            /
             docker image prune -f
 
   build-and-deploy-web:
