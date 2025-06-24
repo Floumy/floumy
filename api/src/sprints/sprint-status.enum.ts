@@ -1,5 +1,5 @@
 export enum SprintStatus {
-  PLANNED = "planned",
-  ACTIVE = "active",
-  COMPLETED = "completed"
+  PLANNED = 'planned',
+  ACTIVE = 'active',
+  COMPLETED = 'completed',
 }

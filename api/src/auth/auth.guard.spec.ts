@@ -187,7 +187,7 @@ describe('AuthGuard', () => {
             return {
               cookies: {
                 accessToken: accessToken,
-              }
+              },
             };
           },
         };

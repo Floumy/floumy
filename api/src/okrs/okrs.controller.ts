@@ -18,7 +18,12 @@ import {
 import { OkrsService } from './okrs.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Timeline } from '../common/timeline.enum';
-import { CreateOrUpdateKeyResultDto, CreateOrUpdateOKRDto, PatchKeyResultDto, UpdateObjectiveDto } from './dtos';
+import {
+  CreateOrUpdateKeyResultDto,
+  CreateOrUpdateOKRDto,
+  PatchKeyResultDto,
+  UpdateObjectiveDto,
+} from './dtos';
 import { CommentsService } from './comments/comments.service';
 import { CreateUpdateCommentDto } from '../comments/dtos';
 

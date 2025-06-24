@@ -31,7 +31,8 @@ export class WorkItemsService {
   constructor(
     @InjectRepository(WorkItem)
     private workItemsRepository: Repository<WorkItem>,
-    @InjectRepository(Initiative) private initiativeRepository: Repository<Initiative>,
+    @InjectRepository(Initiative)
+    private initiativeRepository: Repository<Initiative>,
     @InjectRepository(Sprint)
     private sprintRepository: Repository<Sprint>,
     @InjectRepository(User) private usersRepository: Repository<User>,
@@ -231,12 +232,7 @@ export class WorkItemsService {
     const previous = await WorkItemMapper.toDto(workItem);
     const currentSprint = await workItem.sprint;
 
-    await this.updateSprint(
-      workItem,
-      workItemPatchDto,
-      orgId,
-      currentSprint,
-    );
+    await this.updateSprint(workItem, workItemPatchDto, orgId, currentSprint);
     this.updateStatusAndCompletionDate(workItem, workItemPatchDto);
     this.updatePriority(workItem, workItemPatchDto);
 
@@ -518,7 +514,8 @@ export class WorkItemsService {
           workItem.status === WorkItemStatus.DONE ||
           workItem.status === WorkItemStatus.CLOSED,
       );
-      initiative.progress = (completedWorkItems.length / workItems.length) * 100;
+      initiative.progress =
+        (completedWorkItems.length / workItems.length) * 100;
       await this.initiativeRepository.save(initiative);
     }
   }
@@ -535,10 +532,7 @@ export class WorkItemsService {
         org: { id: orgId },
       });
       workItem.sprint = Promise.resolve(sprint);
-    } else if (
-      currentSprint != null &&
-      workItemPatchDto.sprint === null
-    ) {
+    } else if (currentSprint != null && workItemPatchDto.sprint === null) {
       workItem.sprint = Promise.resolve(null);
     }
   }

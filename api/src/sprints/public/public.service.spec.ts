@@ -141,11 +141,7 @@ describe('PublicService', () => {
         startDate: new Date().toString(),
         duration: 1,
       });
-      const result = await service.getSprintById(
-        org.id,
-        project.id,
-        sprint.id,
-      );
+      const result = await service.getSprintById(org.id, project.id, sprint.id);
       expect(result).toBeDefined();
     });
     it('should throw an error if the org does not have build in public enabled', async () => {
@@ -178,12 +174,11 @@ describe('PublicService', () => {
   });
   describe('when getting the active sprint', () => {
     it('should return the active sprint', async () => {
-      const orgWithActiveSprints = await orgsService.getOrCreateOrg('Test Project');
+      const orgWithActiveSprints =
+        await orgsService.getOrCreateOrg('Test Project');
       const projectWithActiveSprints = new Project();
       projectWithActiveSprints.name = 'Test Project';
-      projectWithActiveSprints.org = Promise.resolve(
-        orgWithActiveSprints,
-      );
+      projectWithActiveSprints.org = Promise.resolve(orgWithActiveSprints);
       await projectsRepository.save(projectWithActiveSprints);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
@@ -214,12 +209,11 @@ describe('PublicService', () => {
       expect(result.goal).toEqual('Test Goal');
     });
     it('should return null if there is no active sprint', async () => {
-      const orgWithActiveSprints = await orgsService.getOrCreateOrg('Test Project');
+      const orgWithActiveSprints =
+        await orgsService.getOrCreateOrg('Test Project');
       const projectWithActiveSprints = new Project();
       projectWithActiveSprints.name = 'Test Project';
-      projectWithActiveSprints.org = Promise.resolve(
-        orgWithActiveSprints,
-      );
+      projectWithActiveSprints.org = Promise.resolve(orgWithActiveSprints);
       await projectsRepository.save(projectWithActiveSprints);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;

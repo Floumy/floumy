@@ -19,7 +19,10 @@ import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { InitiativeComment } from './initiative-comment.entity';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { Project } from '../../projects/project.entity';
-import { InitiativeQueryBuilder, FilterOptions } from './initiative.query-builder';
+import {
+  InitiativeQueryBuilder,
+  FilterOptions,
+} from './initiative.query-builder';
 import { InitiativeStatus } from './initiativestatus.enum';
 import {
   ActionType,
@@ -31,7 +34,8 @@ import { CreateNotificationDto } from '../../notifications/dtos';
 @Injectable()
 export class InitiativesService {
   constructor(
-    @InjectRepository(Initiative) private initiativeRepository: Repository<Initiative>,
+    @InjectRepository(Initiative)
+    private initiativeRepository: Repository<Initiative>,
     @InjectRepository(User) private userRepository: Repository<User>,
     private okrsService: OkrsService,
     private milestonesService: MilestonesService,
@@ -87,7 +91,12 @@ export class InitiativesService {
     }
 
     await this.setInitiativeAssignedTo(initiativeDto, org, initiative);
-    await this.setInitiativeKeyResult(initiativeDto, org, projectId, initiative);
+    await this.setInitiativeKeyResult(
+      initiativeDto,
+      org,
+      projectId,
+      initiative,
+    );
 
     if (initiativeDto.milestone) {
       const milestone = await this.milestonesService.findOneById(
@@ -518,7 +527,9 @@ export class InitiativesService {
     const files = await this.filesRepository.findBy({
       id: In(initiativeDto.files.map((file) => file.id)),
     });
-    await this.initiativeFileRepository.delete({ initiative: { id: initiative.id } });
+    await this.initiativeFileRepository.delete({
+      initiative: { id: initiative.id },
+    });
     const initiativeFiles = files.map((file) => {
       const initiativeFile = new InitiativeFile();
       initiativeFile.initiative = Promise.resolve(initiative);
@@ -531,7 +542,8 @@ export class InitiativesService {
 
   private validateInitiative(initiativeDto: CreateUpdateInitiativeDto) {
     if (!initiativeDto.title) throw new Error('Initiative title is required');
-    if (!initiativeDto.priority) throw new Error('Initiative priority is required');
+    if (!initiativeDto.priority)
+      throw new Error('Initiative priority is required');
     if (!initiativeDto.status) throw new Error('Initiative status is required');
     if (!Object.values(Priority).includes(initiativeDto.priority))
       throw new Error('Invalid priority');

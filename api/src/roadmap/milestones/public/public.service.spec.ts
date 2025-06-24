@@ -95,7 +95,10 @@ describe('PublicService', () => {
     await cleanup();
   });
 
-  async function createMilestone(title: string, initiatives: Initiative[] = []) {
+  async function createMilestone(
+    title: string,
+    initiatives: Initiative[] = [],
+  ) {
     const milestone = new Milestone();
     milestone.org = Promise.resolve(org);
     milestone.project = Promise.resolve(project);

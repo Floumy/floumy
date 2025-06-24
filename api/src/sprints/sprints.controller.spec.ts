@@ -123,13 +123,9 @@ describe('SprintsController', () => {
           duration: 1,
         },
       );
-      const sprints = await controller.listWithWorkItems(
-        org.id,
-        project.id,
-        {
-          user: { org: org.id },
-        },
-      );
+      const sprints = await controller.listWithWorkItems(org.id, project.id, {
+        user: { org: org.id },
+      });
       expect(sprints.length).toEqual(1);
       expect(sprints[0].goal).toEqual('Goal 1');
       expect(sprints[0].startDate).toEqual('2020-01-01');
@@ -249,13 +245,9 @@ describe('SprintsController', () => {
         },
         sprint.id,
       );
-      const sprints = await controller.listWithWorkItems(
-        org.id,
-        project.id,
-        {
-          user: { org: org.id },
-        },
-      );
+      const sprints = await controller.listWithWorkItems(org.id, project.id, {
+        user: { org: org.id },
+      });
       expect(sprints.length).toEqual(0);
     });
   });
