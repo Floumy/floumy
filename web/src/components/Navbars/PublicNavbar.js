@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import { Collapse, Container, Nav, Navbar, NavItem } from 'reactstrap';
 import CurrentUserNav from './CurrentUserNav';
 
-function PublicNavbar({ theme, sidenavOpen, toggleSidenav }) {
+function PublicNavbar({ sidenavOpen, toggleSidenav }) {
   return (
     <>
       <Navbar

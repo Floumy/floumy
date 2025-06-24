@@ -15,7 +15,6 @@ import {
   parseOptions,
 } from '../../../../variables/charts';
 import Chart from 'chart.js';
-import { getPRsCycleTime } from '../../../../services/github/github.service';
 import { formatDate } from '../../../../services/utils/utils';
 import LoadingSpinnerBox from '../../components/LoadingSpinnerBox';
 

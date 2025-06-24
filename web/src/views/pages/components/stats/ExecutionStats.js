@@ -19,14 +19,13 @@ import {
   parseOptions,
 } from '../../../../variables/charts';
 import {
-  formatDate,
   formatWorkItemStatusName,
   formatWorkItemTypeName,
   workItemsColorVariable,
   workItemsTypeColorVariable,
 } from '../../../../services/utils/utils';
 
-function ExecutionStats({ workItems, dueDate }) {
+function ExecutionStats({ workItems }) {
   const [estimationsDistribution, setEstimationsDistribution] = useState([]);
   const [estimationsDistributionLabels, setEstimationsDistributionLabels] =
     useState([]);

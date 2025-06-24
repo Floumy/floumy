@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef } from 'react';
+import React, { useMemo } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'quill-mention';
 import 'quill-mention/dist/quill.mention.css';

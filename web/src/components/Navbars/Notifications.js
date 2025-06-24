@@ -181,7 +181,10 @@ export default function Notifications() {
 
         <ListGroup flush style={{ maxHeight: '500px', overflowY: 'auto' }}>
           {notifications.map((notification) => (
-            <ListGroupItem className="list-group-item-action">
+            <ListGroupItem
+              className="list-group-item-action"
+              key={notification.id}
+            >
               <Link to={notification.entityUrl} tag={Link}>
                 <Row className="align-items-center">
                   <Col className="col-auto">
