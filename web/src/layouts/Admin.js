@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 // core components
 import Sidebar from 'components/Sidebar/Sidebar.js';
+import { motion } from 'framer-motion';
 
 import routes from 'routes.js';
 import AdminNavbar from '../components/Navbars/AdminNavbar';
@@ -13,11 +14,31 @@ import { BuildInPublicProvider } from '../contexts/BuidInPublicContext';
 import { ProjectsProvider } from '../contexts/ProjectsContext';
 import { OrgProvider } from '../contexts/OrgContext';
 import NotFound from '../views/pages/errors/NotFound';
+import AiChatSlideIn from '../components/SlideIn/AiChatSlideIn';
 
 function Admin() {
   const { location, mainContentRef, getRoutes } = useLayoutHandler('admin');
   const [sidenavOpen, setSidenavOpen] = useState(true);
+  const [aiChatOpen, setAiChatOpen] = useState(true);
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1200);
   const { orgId, projectId } = useParams();
+
+  // Keep chat always open on larger screens and track screen size
+  useEffect(() => {
+    const handleResize = () => {
+      const largeScreen = window.innerWidth >= 1200;
+      setIsLargeScreen(largeScreen);
+
+      if (largeScreen) {
+        setAiChatOpen(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial check
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   function isNavigationReplace() {
     let replace = false;
@@ -125,18 +146,31 @@ function Admin() {
                 imgAlt: 'Floumy Logo',
               }}
             />
-            <div className="main-content" ref={mainContentRef}>
+            <motion.div
+              className="main-content"
+              ref={mainContentRef}
+              animate={isLargeScreen ? {
+                marginRight: aiChatOpen ? '600px' : '0px',
+              } : {}}
+              transition={{ type: 'keyframes', damping: 20, stiffness: 300 }}
+            >
               <AdminNavbar
                 theme={'dark'}
                 sidenavOpen={sidenavOpen}
                 toggleSidenav={toggleSidenav}
+                aiChatOpen={aiChatOpen}
+                toggleAiChat={() => setAiChatOpen(!aiChatOpen)}
               />
               <Routes>
                 {getRoutes(routes)}
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Footer />
-            </div>
+            </motion.div>
+            <AiChatSlideIn
+              isOpen={aiChatOpen}
+              toggle={() => setAiChatOpen(!aiChatOpen)}
+            />
             {sidenavOpen ? (
               <div
                 className="backdrop d-xl-none"
