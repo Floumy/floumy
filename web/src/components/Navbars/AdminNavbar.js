@@ -3,10 +3,10 @@ import React from 'react';
 import classnames from 'classnames';
 // nodejs library to set properties for components
 // reactstrap components
-import { Collapse, Container, Nav, Navbar, NavItem } from 'reactstrap';
+import { Button, Collapse, Container, Nav, Navbar, NavItem } from 'reactstrap';
 import CurrentUserNav from './CurrentUserNav';
 
-function AdminNavbar({ sidenavOpen, toggleSidenav }) {
+function AdminNavbar({ sidenavOpen, toggleSidenav, aiChatOpen, toggleAiChat }) {
   return (
     <>
       <Navbar
@@ -32,6 +32,18 @@ function AdminNavbar({ sidenavOpen, toggleSidenav }) {
                     <i className="sidenav-toggler-line" />
                   </div>
                 </div>
+              </NavItem>
+              <NavItem>
+                <Button
+                  className={classnames('btn-icon-only rounded-circle', {
+                    'btn-primary': aiChatOpen,
+                    'btn-outline-primary': !aiChatOpen,
+                  })}
+                  onClick={toggleAiChat}
+                  title="AI Assistant"
+                >
+                  <i className="ni ni-atom" />
+                </Button>
               </NavItem>
             </Nav>
             <CurrentUserNav />
