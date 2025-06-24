@@ -8,7 +8,6 @@ import { toast } from 'react-toastify';
 
 export default function ChangeName() {
   const currentUserName = localStorage.getItem('currentUserName');
-  const currentUserRole = localStorage.getItem('currentUserRole');
 
   const validationSchema = Yup.object({
     name: Yup.string()

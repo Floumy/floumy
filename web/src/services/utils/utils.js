@@ -27,10 +27,6 @@ export function priorityColor(priority) {
   return priorityMap[priority];
 }
 
-function padNumber(number) {
-  return number < 10 ? '0' + number : number;
-}
-
 export function formatDate(date) {
   return moment(date).format('D MMM YYYY');
 }
@@ -305,8 +301,4 @@ export function formatTimeline(timeline) {
 export function dateToQuarterAndYear(date) {
   const quarter = Math.floor((date.getMonth() + 3) / 3);
   return 'Q' + quarter + ' ' + date.getFullYear();
-}
-
-export function humanReadableRelativeDate(date) {
-  const momentDate = moment(date);
 }
