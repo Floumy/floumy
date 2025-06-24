@@ -6,7 +6,16 @@ import { Link, NavLink as NavLinkRRD } from 'react-router-dom';
 // react library that creates nice scrollbar on windows devices
 import PerfectScrollbar from 'react-perfect-scrollbar';
 // reactstrap components
-import { Col, Collapse, Nav, Navbar, NavbarBrand, NavItem, NavLink, Row } from 'reactstrap';
+import {
+  Col,
+  Collapse,
+  Nav,
+  Navbar,
+  NavbarBrand,
+  NavItem,
+  NavLink,
+  Row,
+} from 'reactstrap';
 import NewProjectModal from './NewProjectModal';
 import { useOrg } from '../../contexts/OrgContext';
 import { useCurrentUser } from '../../contexts/CurrentUserContext';
@@ -55,95 +64,99 @@ function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
   };
 
   const scrollBarInner = (
-      <div className="scrollbar-inner">
-        <div className="sidenav-header d-flex align-items-center text-white">
-          {!loading && logo ? (
-            <NavbarBrand {...navbarBrandProps}>
-              <img
-                alt={logo.imgAlt}
-                className="navbar-brand-img"
-                src={logo.imgSrc}
-                style={{ borderRadius: '5px' }}
-              />
-              <span style={{ marginLeft: '15px' }} className="text-white text-sm">Floumy</span>
-            </NavbarBrand>
-          ) : null}
-        </div>
-        {orgId && currentOrg && (
-          <>
-            <div className="navbar-inner mb-2">
-              <Collapse navbar isOpen={true}>
-                {currentOrg.name && <h5 className="navbar-project-name text-light text-xl pb-3 text-break">
-                  {currentOrg.name}
-                </h5>}
-                <div className="mb-3">
-                  <Nav navbar>
-                    <NavItem>
-                      <Row style={{ maxWidth: '100%', height: '47px' }}>
-                        <Col xs={12}>
-                          <NavLink
-                            to={`/orgs/${orgId}/objectives`}
-                            onClick={closeSidenav}
-                            tag={NavLinkRRD}
-                          >
-
-                            <i className="fa fa-bullseye" />
-                            <span className="nav-link-text">Objectives</span>
-                          </NavLink>
-                        </Col>
-                      </Row>
-                      <Row style={{ maxWidth: '100%', height: '47px' }}>
-                        <Col xs={12}>
-                          <NavLink
-                            to={`/orgs/${orgId}/projects`}
-                            onClick={closeSidenav}
-                            tag={NavLinkRRD}
-                          >
-                            <i className="fa fa-briefcase" />
-                            <span className="nav-link-text">Projects</span>
-                          </NavLink>
-                        </Col>
-                      </Row>
-                      <Row style={{ maxWidth: '100%', height: '47px' }}>
-                        <Col xs={12}>
-                          <NavLink
-                            to={`/orgs/${orgId}/members`}
-                            onClick={closeSidenav}
-                            tag={NavLinkRRD}
-                          >
-                            <i className="fa fa-users" />
-                            <span className="nav-link-text">Members</span>
-                          </NavLink>
-                        </Col>
-                      </Row>
-                      {currentUser?.role === 'admin' &&
-                        <Row style={{ maxWidth: '100%', height: '47px' }}>
-                          <Col xs={12}>
-                            <NavLink
-                              to={`/orgs/${orgId}/settings`}
-                              onClick={closeSidenav}
-                              tag={NavLinkRRD}
-                            >
-                              <i className="fa fa-gear" />
-                              <span className="nav-link-text">Org</span>
-                            </NavLink>
-                          </Col>
-                        </Row>
-                      }
-                    </NavItem>
-                  </Nav>
-                </div>
-              </Collapse>
-            </div>
-          </>
-        )}
+    <div className="scrollbar-inner">
+      <div className="sidenav-header d-flex align-items-center text-white">
+        {!loading && logo ? (
+          <NavbarBrand {...navbarBrandProps}>
+            <img
+              alt={logo.imgAlt}
+              className="navbar-brand-img"
+              src={logo.imgSrc}
+              style={{ borderRadius: '5px' }}
+            />
+            <span style={{ marginLeft: '15px' }} className="text-white text-sm">
+              Floumy
+            </span>
+          </NavbarBrand>
+        ) : null}
       </div>
-    )
-  ;
-
+      {orgId && currentOrg && (
+        <>
+          <div className="navbar-inner mb-2">
+            <Collapse navbar isOpen={true}>
+              {currentOrg.name && (
+                <h5 className="navbar-project-name text-light text-xl pb-3 text-break">
+                  {currentOrg.name}
+                </h5>
+              )}
+              <div className="mb-3">
+                <Nav navbar>
+                  <NavItem>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={12}>
+                        <NavLink
+                          to={`/orgs/${orgId}/objectives`}
+                          onClick={closeSidenav}
+                          tag={NavLinkRRD}
+                        >
+                          <i className="fa fa-bullseye" />
+                          <span className="nav-link-text">Objectives</span>
+                        </NavLink>
+                      </Col>
+                    </Row>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={12}>
+                        <NavLink
+                          to={`/orgs/${orgId}/projects`}
+                          onClick={closeSidenav}
+                          tag={NavLinkRRD}
+                        >
+                          <i className="fa fa-briefcase" />
+                          <span className="nav-link-text">Projects</span>
+                        </NavLink>
+                      </Col>
+                    </Row>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={12}>
+                        <NavLink
+                          to={`/orgs/${orgId}/members`}
+                          onClick={closeSidenav}
+                          tag={NavLinkRRD}
+                        >
+                          <i className="fa fa-users" />
+                          <span className="nav-link-text">Members</span>
+                        </NavLink>
+                      </Col>
+                    </Row>
+                    {currentUser?.role === 'admin' && (
+                      <Row style={{ maxWidth: '100%', height: '47px' }}>
+                        <Col xs={12}>
+                          <NavLink
+                            to={`/orgs/${orgId}/settings`}
+                            onClick={closeSidenav}
+                            tag={NavLinkRRD}
+                          >
+                            <i className="fa fa-gear" />
+                            <span className="nav-link-text">Org</span>
+                          </NavLink>
+                        </Col>
+                      </Row>
+                    )}
+                  </NavItem>
+                </Nav>
+              </div>
+            </Collapse>
+          </div>
+        </>
+      )}
+    </div>
+  );
   return (
     <>
-      <NewProjectModal isOpen={newProjectModal} toggleModal={toggleNewProjectModal} />
+      <NewProjectModal
+        isOpen={newProjectModal}
+        toggleModal={toggleNewProjectModal}
+      />
       <Navbar
         className={
           'sidenav navbar-vertical navbar-expand-xs navbar-dark bg-dark ' +

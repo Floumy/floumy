@@ -1,7 +1,19 @@
-import { Card, CardBody, CardHeader, Col, Container, Input, Progress, Row } from 'reactstrap';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Container,
+  Input,
+  Progress,
+  Row,
+} from 'reactstrap';
 import React, { useEffect } from 'react';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
-import { formatProgress, keyResultStatusName } from '../../../services/utils/utils';
+import {
+  formatProgress,
+  keyResultStatusName,
+} from '../../../services/utils/utils';
 import { useParams } from 'react-router-dom';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
@@ -28,7 +40,11 @@ function PublicDetailKeyResult() {
     async function loadData() {
       try {
         setIsLoading(true);
-        const keyResult = await getPublicKeyResult(orgId, projectId, keyResultId);
+        const keyResult = await getPublicKeyResult(
+          orgId,
+          projectId,
+          keyResultId,
+        );
         setKeyResult(keyResult);
       } catch (e) {
         toast.error('The key result could not be loaded');
@@ -42,7 +58,12 @@ function PublicDetailKeyResult() {
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addKeyResultComment(orgId, projectId, keyResultId, comment);
+      const addedComment = await addKeyResultComment(
+        orgId,
+        projectId,
+        keyResultId,
+        comment,
+      );
       keyResult.comments.push(addedComment);
       setKeyResult({ ...keyResult });
       toast.success('Comment added successfully');
@@ -53,10 +74,17 @@ function PublicDetailKeyResult() {
 
   async function handleCommentEditSubmit(commentId, content) {
     try {
-      const updatedComment = await updateKeyResultComment(orgId, projectId, keyResultId, commentId, content);
+      const updatedComment = await updateKeyResultComment(
+        orgId,
+        projectId,
+        keyResultId,
+        commentId,
+        content,
+      );
 
       setKeyResult({
-        ...keyResult, comments: keyResult.comments.map(comment => {
+        ...keyResult,
+        comments: keyResult.comments.map((comment) => {
           if (comment.id === commentId) {
             return updatedComment;
           }
@@ -72,7 +100,7 @@ function PublicDetailKeyResult() {
   async function handCommentDelete(commentId) {
     try {
       await deleteKeyResultComment(orgId, projectId, keyResultId, commentId);
-      const index = keyResult.comments.findIndex(c => c.id === commentId);
+      const index = keyResult.comments.findIndex((c) => c.id === commentId);
       keyResult.comments.splice(index, 1);
       setKeyResult({ ...keyResult });
       toast.success('Comment deleted successfully');
@@ -84,84 +112,94 @@ function PublicDetailKeyResult() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        breadcrumbs={keyResult?.breadcrumbs}
-        isPublic={true}
-      />
+      <SimpleHeader breadcrumbs={keyResult?.breadcrumbs} isPublic={true} />
       <Container className="mt--6" fluid id="OKRs">
         <Row>
           <Col md={12} lg={8}>
-            {!isLoading && !keyResult && <NotFoundCard message="Key result not be found" />}
+            {!isLoading && !keyResult && (
+              <NotFoundCard message="Key result not be found" />
+            )}
             <Card>
               <CardHeader className="border-1">
                 <div className="row">
                   <div className="col-12">
-                    <h3 className="mb-0">Key Result {keyResult && keyResult.reference}</h3>
-                    {keyResult && <div className="py-2"><PublicShareButtons title={keyResult.title} /></div>}
+                    <h3 className="mb-0">
+                      Key Result {keyResult && keyResult.reference}
+                    </h3>
+                    {keyResult && (
+                      <div className="py-2">
+                        <PublicShareButtons title={keyResult.title} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardHeader>
               <CardBody>
                 {isLoading && <LoadingSpinnerBox />}
-                {!isLoading && keyResult && <>
-                  <Row className="mb-3">
-                    <Col xs={12} sm={8}>
-                      <label className="form-control-label">
-                        Title
-                      </label>
-                      <Input
-                        disabled={true}
-                        className="bg-white"
-                        id="objective-title"
-                        name="title"
-                        type="text"
-                        value={keyResult.title}
-                      />
-                    </Col>
-                    <Col xs={12} sm={4} className="mb-3">
-                      <label className="form-control-label">
-                        Status
-                      </label>
-                      <Input
-                        disabled={true}
-                        className="bg-white"
-                        id="objective-status"
-                        name="status"
-                        type="text"
-                        value={keyResultStatusName(keyResult.status)} />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col xs={12} sm={12}>
-                      <label className="form-control-label col-form-label">
-                        Progress {formatProgress(keyResult.progress * 100)}%
-                      </label>
-                      <div className="my-1">
-                        <Progress max="100" value={keyResult.progress * 100} color="primary" />
-                      </div>
-                    </Col>
-                  </Row>
-                </>}
+                {!isLoading && keyResult && (
+                  <>
+                    <Row className="mb-3">
+                      <Col xs={12} sm={8}>
+                        <label className="form-control-label">Title</label>
+                        <Input
+                          disabled={true}
+                          className="bg-white"
+                          id="objective-title"
+                          name="title"
+                          type="text"
+                          value={keyResult.title}
+                        />
+                      </Col>
+                      <Col xs={12} sm={4} className="mb-3">
+                        <label className="form-control-label">Status</label>
+                        <Input
+                          disabled={true}
+                          className="bg-white"
+                          id="objective-status"
+                          name="status"
+                          type="text"
+                          value={keyResultStatusName(keyResult.status)}
+                        />
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col xs={12} sm={12}>
+                        <label className="form-control-label col-form-label">
+                          Progress {formatProgress(keyResult.progress * 100)}%
+                        </label>
+                        <div className="my-1">
+                          <Progress
+                            max="100"
+                            value={keyResult.progress * 100}
+                            color="primary"
+                          />
+                        </div>
+                      </Col>
+                    </Row>
+                  </>
+                )}
               </CardBody>
             </Card>
-            {!isLoading && keyResult && keyResult.initiatives && <>
-              <Card>
-                <CardHeader className="border-1">
-                  <div className="row">
-                    <div className="col-12">
-                      <h3 className="mb-0">Related Initiatives</h3>
+            {!isLoading && keyResult && keyResult.initiatives && (
+              <>
+                <Card>
+                  <CardHeader className="border-1">
+                    <div className="row">
+                      <div className="col-12">
+                        <h3 className="mb-0">Related Initiatives</h3>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <PublicInitiativesList
-                  orgId={orgId}
-                  projectId={projectId}
-                  initiatives={keyResult.initiatives}
-                />
-              </Card>
-            </>}
+                  </CardHeader>
+                  <PublicInitiativesList
+                    orgId={orgId}
+                    projectId={projectId}
+                    initiatives={keyResult.initiatives}
+                  />
+                </Card>
+              </>
+            )}
           </Col>
-          {!isLoading &&
+          {!isLoading && (
             <Col md={12} lg={4}>
               <Comments
                 comments={keyResult?.comments || []}
@@ -170,7 +208,7 @@ function PublicDetailKeyResult() {
                 onCommentDelete={handCommentDelete}
               />
             </Col>
-          }
+          )}
         </Row>
       </Container>
     </>

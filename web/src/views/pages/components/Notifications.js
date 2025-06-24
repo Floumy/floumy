@@ -1,11 +1,10 @@
-
-import React from "react";
+import React from 'react';
 // nodejs library that concatenates classes
-import classnames from "classnames";
+import classnames from 'classnames';
 // react plugin for creating notifications over the dashboard
-import NotificationAlert from "react-notification-alert";
+import NotificationAlert from 'react-notification-alert';
 // react component used to create sweet alerts
-import ReactBSAlert from "react-bootstrap-sweetalert";
+import ReactBSAlert from 'react-bootstrap-sweetalert';
 // reactstrap components
 import {
   UncontrolledAlert,
@@ -23,9 +22,9 @@ import {
   Container,
   Row,
   Col,
-} from "reactstrap";
+} from 'reactstrap';
 // core components
-import SimpleHeader from "components/Headers/SimpleHeader.js";
+import SimpleHeader from 'components/Headers/SimpleHeader.js';
 
 function Notifications() {
   const [focusedEmail, setFocusedEmail] = React.useState(false);
@@ -37,11 +36,11 @@ function Notifications() {
   const notificationAlertRef = React.useRef(null);
   const notify = (type) => {
     let options = {
-      place: "tc",
+      place: 'tc',
       message: (
         <div className="alert-text">
           <span className="alert-title" data-notify="title">
-            {" "}
+            {' '}
             Bootstrap Notify
           </span>
           <span data-notify="message">
@@ -50,7 +49,7 @@ function Notifications() {
         </div>
       ),
       type: type,
-      icon: "ni ni-bell-55",
+      icon: 'ni ni-bell-55',
       autoDismiss: 7,
     };
     notificationAlertRef.current.notificationAlert(options);
@@ -58,7 +57,7 @@ function Notifications() {
   const basicAlert = () => {
     setalert(
       <ReactBSAlert
-        style={{ display: "block", marginTop: "-100px" }}
+        style={{ display: 'block', marginTop: '-100px' }}
         title="Here's a message!"
         onConfirm={() => setalert(null)}
         onCancel={() => setalert(null)}
@@ -66,14 +65,14 @@ function Notifications() {
         text="A few words about this sweet alert ..."
       >
         A few words about this sweet alert ...
-      </ReactBSAlert>
+      </ReactBSAlert>,
     );
   };
   const infoAlert = () => {
     setalert(
       <ReactBSAlert
         info
-        style={{ display: "block", marginTop: "-100px" }}
+        style={{ display: 'block', marginTop: '-100px' }}
         title="Info"
         onConfirm={() => setalert(null)}
         onCancel={() => setalert(null)}
@@ -82,14 +81,14 @@ function Notifications() {
         btnSize=""
       >
         A few words about this sweet alert ...
-      </ReactBSAlert>
+      </ReactBSAlert>,
     );
   };
   const successAlert = () => {
     setalert(
       <ReactBSAlert
         success
-        style={{ display: "block", marginTop: "-100px" }}
+        style={{ display: 'block', marginTop: '-100px' }}
         title="Success"
         onConfirm={() => setalert(null)}
         onCancel={() => setalert(null)}
@@ -98,14 +97,14 @@ function Notifications() {
         btnSize=""
       >
         A few words about this sweet alert ...
-      </ReactBSAlert>
+      </ReactBSAlert>,
     );
   };
   const warningAlert = () => {
     setalert(
       <ReactBSAlert
         warning
-        style={{ display: "block", marginTop: "-100px" }}
+        style={{ display: 'block', marginTop: '-100px' }}
         title="Warning"
         onConfirm={() => setalert(null)}
         onCancel={() => setalert(null)}
@@ -114,19 +113,19 @@ function Notifications() {
         btnSize=""
       >
         A few words about this sweet alert ...
-      </ReactBSAlert>
+      </ReactBSAlert>,
     );
   };
   const questionAlert = () => {
     setalert(
       <ReactBSAlert
         custom
-        style={{ display: "block", marginTop: "-100px" }}
+        style={{ display: 'block', marginTop: '-100px' }}
         title="Question"
         customIcon={
           <div
             className="swal2-icon swal2-question swal2-animate-question-icon"
-            style={{ display: "flex" }}
+            style={{ display: 'flex' }}
           >
             <span className="swal2-icon-text">?</span>
           </div>
@@ -138,7 +137,7 @@ function Notifications() {
         btnSize=""
       >
         A few words about this sweet alert ...
-      </ReactBSAlert>
+      </ReactBSAlert>,
     );
   };
 
@@ -382,7 +381,7 @@ function Notifications() {
                                   <img
                                     alt="..."
                                     src={
-                                      require("assets/img/icons/common/github.svg")
+                                      require('assets/img/icons/common/github.svg')
                                         .default
                                     }
                                   />
@@ -399,7 +398,7 @@ function Notifications() {
                                   <img
                                     alt="..."
                                     src={
-                                      require("assets/img/icons/common/google.svg")
+                                      require('assets/img/icons/common/google.svg')
                                         .default
                                     }
                                   />
@@ -414,7 +413,7 @@ function Notifications() {
                             </div>
                             <Form role="form">
                               <FormGroup
-                                className={classnames("mb-3", {
+                                className={classnames('mb-3', {
                                   focused: focusedEmail,
                                 })}
                               >
@@ -490,19 +489,19 @@ function Notifications() {
                 <h3 className="mb-0">Notifications</h3>
               </CardHeader>
               <CardBody>
-                <Button color="default" onClick={() => notify("default")}>
+                <Button color="default" onClick={() => notify('default')}>
                   Default
                 </Button>
-                <Button color="info" onClick={() => notify("info")}>
+                <Button color="info" onClick={() => notify('info')}>
                   Info
                 </Button>
-                <Button color="success" onClick={() => notify("success")}>
+                <Button color="success" onClick={() => notify('success')}>
                   Success
                 </Button>
-                <Button color="warning" onClick={() => notify("warning")}>
+                <Button color="warning" onClick={() => notify('warning')}>
                   Warning
                 </Button>
-                <Button color="danger" onClick={() => notify("danger")}>
+                <Button color="danger" onClick={() => notify('danger')}>
                   Danger
                 </Button>
               </CardBody>

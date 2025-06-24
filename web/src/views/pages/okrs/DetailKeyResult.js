@@ -1,4 +1,13 @@
-import { Button, Card, CardBody, CardHeader, Col, Container, Input, Row } from 'reactstrap';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Container,
+  Input,
+  Row,
+} from 'reactstrap';
 import FloumySlider from '../../../components/Sliders/FloumySlider';
 import Select2 from 'react-select2-wrapper';
 import InitiativesList from '../initiatives/InitiativesList';
@@ -32,7 +41,7 @@ function DetailKeyResult() {
   const [status, setStatus] = React.useState('');
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = React.useState(false);
   const [progress, setProgress] = React.useState('');
-  const {keyResultId, orgId, projectId } = useParams();
+  const { keyResultId, orgId, projectId } = useParams();
   const [keyResult, setKeyResult] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
@@ -73,15 +82,11 @@ function DetailKeyResult() {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      await updateKeyResult(
-        orgId,
-        projectId,
-        keyResultId,
-        {
-          title: values.title,
-          status,
-          progress,
-        });
+      await updateKeyResult(orgId, projectId, keyResultId, {
+        title: values.title,
+        status,
+        progress,
+      });
 
       toast.success('The key result has been saved');
     } catch (e) {
@@ -114,50 +119,70 @@ function DetailKeyResult() {
   }
 
   async function handleDeleteInitiative(deletedInitiatives) {
-    const deletedIds = deletedInitiatives.map(i => i.id);
+    const deletedIds = deletedInitiatives.map((i) => i.id);
     setKeyResult({
       ...keyResult,
-      initiatives: keyResult.initiatives.filter(i => !deletedIds.includes(i.id))
+      initiatives: keyResult.initiatives.filter(
+        (i) => !deletedIds.includes(i.id),
+      ),
     });
   }
 
   const validationSchema = Yup.object({
-    title: Yup.string()
-      .required('The key result title is required'),
+    title: Yup.string().required('The key result title is required'),
   });
 
   function updateInitiativesKeyResult(updatedInitiatives, keyResultId) {
     if (keyResultId === null || keyResultId !== keyResult.id) {
-      const newInitiatives = keyResult.initiatives.filter(initiative => !updatedInitiatives.some(f => f.id === initiative.id));
+      const newInitiatives = keyResult.initiatives.filter(
+        (initiative) => !updatedInitiatives.some((f) => f.id === initiative.id),
+      );
       setKeyResult({ ...keyResult, initiatives: newInitiatives });
     }
   }
 
   function updateInitiativesPriority(updatedInitiatives, priority) {
-    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
-    const updatedInitiativesPriority = keyResult.initiatives.map(initiative => {
-      if (updatedInitiativesIds.includes(initiative.id)) {
-        initiative.priority = priority;
-      }
-      return initiative;
+    const updatedInitiativesIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    const updatedInitiativesPriority = keyResult.initiatives.map(
+      (initiative) => {
+        if (updatedInitiativesIds.includes(initiative.id)) {
+          initiative.priority = priority;
+        }
+        return initiative;
+      },
+    );
+    setKeyResult({
+      ...keyResult,
+      initiatives: sortByPriority(updatedInitiativesPriority),
     });
-    setKeyResult({ ...keyResult, initiatives: sortByPriority(updatedInitiativesPriority) });
   }
 
   function updateInitiativesStatus(updatedInitiatives, status) {
-    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
-    const updatedInitiativesStatus = keyResult.initiatives.map(initiative => {
+    const updatedInitiativesIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    const updatedInitiativesStatus = keyResult.initiatives.map((initiative) => {
       if (updatedInitiativesIds.includes(initiative.id)) {
         initiative.status = status;
       }
       return initiative;
     });
-    setKeyResult({ ...keyResult, initiatives: sortByPriority(updatedInitiativesStatus) });
+    setKeyResult({
+      ...keyResult,
+      initiatives: sortByPriority(updatedInitiativesStatus),
+    });
   }
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addKeyResultComment(orgId, projectId, keyResultId, comment);
+      const addedComment = await addKeyResultComment(
+        orgId,
+        projectId,
+        keyResultId,
+        comment,
+      );
       keyResult.comments.push(addedComment);
       setKeyResult({ ...keyResult });
       toast.success('Comment added successfully');
@@ -168,8 +193,14 @@ function DetailKeyResult() {
 
   async function handleCommentEditSubmit(commentId, comment) {
     try {
-      await updateKeyResultComment(orgId, projectId, keyResultId, commentId, comment);
-      const updatedComment = keyResult.comments.find(c => c.id === commentId);
+      await updateKeyResultComment(
+        orgId,
+        projectId,
+        keyResultId,
+        commentId,
+        comment,
+      );
+      const updatedComment = keyResult.comments.find((c) => c.id === commentId);
       updatedComment.content = comment.content;
       updatedComment.mentions = comment.mentions;
       setKeyResult({ ...keyResult });
@@ -182,7 +213,7 @@ function DetailKeyResult() {
   async function handCommentDelete(commentId) {
     try {
       await deleteKeyResultComment(orgId, projectId, keyResultId, commentId);
-      const index = keyResult.comments.findIndex(c => c.id === commentId);
+      const index = keyResult.comments.findIndex((c) => c.id === commentId);
       keyResult.comments.splice(index, 1);
       setKeyResult({ ...keyResult });
       toast.success('Comment deleted successfully');
@@ -192,18 +223,32 @@ function DetailKeyResult() {
   }
 
   function isPlaceholderInitiativeOnly() {
-    return keyResult && (!keyResult.initiatives || keyResult.initiatives.length === 1 || !keyResult.initiatives[0]?.title);
+    return (
+      keyResult &&
+      (!keyResult.initiatives ||
+        keyResult.initiatives.length === 1 ||
+        !keyResult.initiatives[0]?.title)
+    );
   }
 
   const addInitiativesWithAi = async () => {
     try {
-      const initiativesToAdd = (await generateInitiativesForOKR(keyResult.title, keyResult.title))
-        .map(initiative => {
-          return { title: initiative.title, description: initiative.description, priority: initiative.priority, status: 'planned', keyResult: keyResult.id };
-        });
+      const initiativesToAdd = (
+        await generateInitiativesForOKR(keyResult.title, keyResult.title)
+      ).map((initiative) => {
+        return {
+          title: initiative.title,
+          description: initiative.description,
+          priority: initiative.priority,
+          status: 'planned',
+          keyResult: keyResult.id,
+        };
+      });
       const savedInitiatives = [];
       for (const initiative of initiativesToAdd) {
-        savedInitiatives.push(await addInitiative(orgId, projectId, initiative));
+        savedInitiatives.push(
+          await addInitiative(orgId, projectId, initiative),
+        );
       }
       setKeyResult({ ...keyResult, initiatives: savedInitiatives });
       toast.success('The initiatives have been added');
@@ -211,18 +256,18 @@ function DetailKeyResult() {
       toast.error('The initiatives could not be saved');
       console.error(e);
     }
-  }
+  };
 
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        breadcrumbs={keyResult?.breadcrumbs}
-      />
+      <SimpleHeader breadcrumbs={keyResult?.breadcrumbs} />
       <Container className="mt--6" fluid id="OKRs">
         <Row>
           <Col lg={8} md={12}>
-            {!isLoading && !keyResult && <NotFoundCard message="Key result not be found" />}
+            {!isLoading && !keyResult && (
+              <NotFoundCard message="Key result not be found" />
+            )}
             <DeleteWarning
               isOpen={isDeleteWarningOpen}
               entity={'Key Result'}
@@ -233,27 +278,25 @@ function DetailKeyResult() {
               <CardHeader className="border-1">
                 <div className="row">
                   <div className="col-12">
-                    <h3 className="mb-0">Edit Key Result {keyResult && keyResult.reference}</h3>
+                    <h3 className="mb-0">
+                      Edit Key Result {keyResult && keyResult.reference}
+                    </h3>
                   </div>
                 </div>
               </CardHeader>
               <CardBody>
                 {isLoading && <LoadingSpinnerBox />}
-                {!isLoading && keyResult &&
+                {!isLoading && keyResult && (
                   <Formik
                     initialValues={{ title: keyResult.title || '' }}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                   >
                     {({ values, handleChange, errors, touched }) => (
-                      <Form
-                        className="needs-validation"
-                        noValidate>
+                      <Form className="needs-validation" noValidate>
                         <Row className="mb-3">
                           <Col>
-                            <label className="form-control-label">
-                              Title
-                            </label>
+                            <label className="form-control-label">Title</label>
                             <Field
                               as={Input}
                               id="objective-title"
@@ -265,7 +308,10 @@ function DetailKeyResult() {
                               invalid={!!(errors.title && touched.title)}
                               autoComplete="off"
                             />
-                            <ErrorMessage name={'objective'} component={InputError} />
+                            <ErrorMessage
+                              name={'objective'}
+                              component={InputError}
+                            />
                           </Col>
                         </Row>
                         <Row className="mb-3">
@@ -283,7 +329,8 @@ function DetailKeyResult() {
                               data={statuses}
                               onChange={async (e) => {
                                 await setStatus(e.target.value);
-                              }} />
+                              }}
+                            />
                           </Col>
                           <Col xs={12} sm={6} className="mb-3">
                             <label className="form-control-label col-form-label">
@@ -293,7 +340,8 @@ function DetailKeyResult() {
                               initialValue={keyResult.progress * 100}
                               onSliderValueChange={(sliderValue) => {
                                 setProgress(parseFloat(sliderValue) / 100);
-                              }} />
+                              }}
+                            />
                           </Col>
                         </Row>
                         <Row>
@@ -321,39 +369,45 @@ function DetailKeyResult() {
                             </Button>
                           </Col>
                         </Row>
-                      </Form>)}
-                  </Formik>}
+                      </Form>
+                    )}
+                  </Formik>
+                )}
               </CardBody>
             </Card>
-            {!isLoading && keyResult && keyResult.initiatives && <>
-              <Card>
-                <CardHeader className="border-1">
-                  <div className="row">
-                    <div className="col-12">
-                      <h3 className="mb-0">Related Initiatives
-                        {isPlaceholderInitiativeOnly() && <AIButton
-                          disabled={keyResult.title.length === 0}
-                          onClick={addInitiativesWithAi}
-                        />}
-                      </h3>
-
+            {!isLoading && keyResult && keyResult.initiatives && (
+              <>
+                <Card>
+                  <CardHeader className="border-1">
+                    <div className="row">
+                      <div className="col-12">
+                        <h3 className="mb-0">
+                          Related Initiatives
+                          {isPlaceholderInitiativeOnly() && (
+                            <AIButton
+                              disabled={keyResult.title.length === 0}
+                              onClick={addInitiativesWithAi}
+                            />
+                          )}
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <InitiativesList
-                  initiatives={keyResult.initiatives}
-                  onAddInitiative={async (initiative) => {
-                    await handleAddInitiative(keyResult.id, initiative);
-                  }}
-                  onChangeStatus={updateInitiativesStatus}
-                  onChangePriority={updateInitiativesPriority}
-                  onChangeKeyResult={updateInitiativesKeyResult}
-                  onDelete={handleDeleteInitiative}
-                />
-              </Card>
-            </>}
+                  </CardHeader>
+                  <InitiativesList
+                    initiatives={keyResult.initiatives}
+                    onAddInitiative={async (initiative) => {
+                      await handleAddInitiative(keyResult.id, initiative);
+                    }}
+                    onChangeStatus={updateInitiativesStatus}
+                    onChangePriority={updateInitiativesPriority}
+                    onChangeKeyResult={updateInitiativesKeyResult}
+                    onDelete={handleDeleteInitiative}
+                  />
+                </Card>
+              </>
+            )}
           </Col>
-          {!isLoading &&
+          {!isLoading && (
             <Col lg={4} md={12}>
               <Comments
                 comments={keyResult?.comments || []}
@@ -362,7 +416,7 @@ function DetailKeyResult() {
                 onCommentDelete={handCommentDelete}
               />
             </Col>
-          }
+          )}
         </Row>
       </Container>
     </>

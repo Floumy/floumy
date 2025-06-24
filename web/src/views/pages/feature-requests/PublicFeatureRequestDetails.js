@@ -1,7 +1,16 @@
-import React from "react";
-import { Card, CardBody, CardHeader, Col, Form, FormGroup, Input, Row } from "reactstrap";
-import CardHeaderDetails from "../components/CardHeaderDetails";
-import { formatHyphenatedString } from "../../../services/utils/utils";
+import React from 'react';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Form,
+  FormGroup,
+  Input,
+  Row,
+} from 'reactstrap';
+import CardHeaderDetails from '../components/CardHeaderDetails';
+import { formatHyphenatedString } from '../../../services/utils/utils';
 
 export default function PublicFeatureRequestDetails({ featureRequest }) {
   return (
@@ -9,20 +18,17 @@ export default function PublicFeatureRequestDetails({ featureRequest }) {
       <Card>
         <CardHeader>
           <h3 className="mb-0">Feature Request</h3>
-          <CardHeaderDetails createdAt={featureRequest.createdAt} updatedAt={featureRequest.updatedAt} />
+          <CardHeaderDetails
+            createdAt={featureRequest.createdAt}
+            updatedAt={featureRequest.updatedAt}
+          />
         </CardHeader>
         <CardBody>
-          <Form
-            className="needs-validation"
-            noValidate>
+          <Form className="needs-validation" noValidate>
             <Row>
               <Col>
                 <FormGroup>
-                  <label
-                    className="form-control-label"
-                  >
-                    Title
-                  </label>
+                  <label className="form-control-label">Title</label>
                   <Input
                     id="title"
                     name="title"
@@ -38,11 +44,7 @@ export default function PublicFeatureRequestDetails({ featureRequest }) {
             <Row>
               <Col>
                 <FormGroup>
-                  <label
-                    className="form-control-label"
-                  >
-                    Status
-                  </label>
+                  <label className="form-control-label">Status</label>
                   <Input
                     id="status"
                     name="status"
@@ -56,11 +58,7 @@ export default function PublicFeatureRequestDetails({ featureRequest }) {
               </Col>
               <Col>
                 <FormGroup>
-                  <label
-                    className="form-control-label"
-                  >
-                    Estimation
-                  </label>
+                  <label className="form-control-label">Estimation</label>
                   <Input
                     id="estimation"
                     name="estimation"
@@ -76,11 +74,7 @@ export default function PublicFeatureRequestDetails({ featureRequest }) {
             <Row>
               <Col>
                 <FormGroup>
-                  <label
-                    className="form-control-label"
-                  >
-                    Description
-                  </label>
+                  <label className="form-control-label">Description</label>
                   <Input
                     id="description"
                     name="description"

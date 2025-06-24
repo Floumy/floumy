@@ -44,7 +44,8 @@ function OrgSignUp() {
     email: Yup.string()
       .matches(
         /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-        'The email address provided is invalid')
+        'The email address provided is invalid',
+      )
       .required('The email is required'),
     password: Yup.string()
       .min(8, 'Password must be at least 8 characters long')
@@ -62,11 +63,16 @@ function OrgSignUp() {
 
   const validationSchema = Yup.object(validationSpec);
 
-  const initialValues = { name: '', email: '', password: '', acceptedTerms: false, orgName: '' };
+  const initialValues = {
+    name: '',
+    email: '',
+    password: '',
+    acceptedTerms: false,
+    orgName: '',
+  };
   return (
     <>
-      <AuthHeader title="Join Floumy!"
-                  lead="Stop dreaming, start doing." />
+      <AuthHeader title="Join Floumy!" lead="Stop dreaming, start doing." />
       <Container className="mt--8 pb-5">
         <Row className="justify-content-center">
           <Col lg="6" md="8">
@@ -84,7 +90,13 @@ function OrgSignUp() {
                     try {
                       setError(null);
                       setSubmitting(true);
-                      await orgSignUp(values.name, values.email, values.password, values.orgName, invitationToken);
+                      await orgSignUp(
+                        values.name,
+                        values.email,
+                        values.password,
+                        values.orgName,
+                        invitationToken,
+                      );
                       setSubmitting(false);
                       navigate('/auth/activation-required');
                     } catch (e) {
@@ -94,38 +106,52 @@ function OrgSignUp() {
                 >
                   {({ isSubmitting, errors, touched }) => (
                     <Form>
-                      {error && <div className="text-center text-danger mb-3">{error}</div>}
-                      {!invitationToken && <FormGroup
-                        className={classnames({
-                          focused: focusedOrgName,
-                        })}
-                      >
-                        <InputGroup className={getInputGroupErrorClass(errors.orgName && touched.orgName)}>
-                          <InputGroupAddon addonType="prepend">
-                            <InputGroupText>
-                              <i className="ni ni-app" />
-                            </InputGroupText>
-                          </InputGroupAddon>
-                          <Field
-                            as={Input}
-                            name="orgName"
-                            placeholder="Your organization or company name"
-                            type="text"
-                            onFocus={() => setFocusedOrgName(true)}
-                            onBlur={() => setFocusedOrgName(false)}
-                            invalid={!!(errors.orgName && touched.orgName)}
-                            className="px-3"
-                            autoComplete="off"
-                          />
-                        </InputGroup>
-                        <ErrorMessage name="orgName" component={InputError} />
-                      </FormGroup>}
+                      {error && (
+                        <div className="text-center text-danger mb-3">
+                          {error}
+                        </div>
+                      )}
+                      {!invitationToken && (
+                        <FormGroup
+                          className={classnames({
+                            focused: focusedOrgName,
+                          })}
+                        >
+                          <InputGroup
+                            className={getInputGroupErrorClass(
+                              errors.orgName && touched.orgName,
+                            )}
+                          >
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText>
+                                <i className="ni ni-app" />
+                              </InputGroupText>
+                            </InputGroupAddon>
+                            <Field
+                              as={Input}
+                              name="orgName"
+                              placeholder="Your organization or company name"
+                              type="text"
+                              onFocus={() => setFocusedOrgName(true)}
+                              onBlur={() => setFocusedOrgName(false)}
+                              invalid={!!(errors.orgName && touched.orgName)}
+                              className="px-3"
+                              autoComplete="off"
+                            />
+                          </InputGroup>
+                          <ErrorMessage name="orgName" component={InputError} />
+                        </FormGroup>
+                      )}
                       <FormGroup
                         className={classnames({
                           focused: focusedName,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.name && touched.name)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.name && touched.name,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-hat-3" />
@@ -150,7 +176,11 @@ function OrgSignUp() {
                           focused: focusedEmail,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.email && touched.email)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.email && touched.email,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-email-83" />
@@ -174,7 +204,11 @@ function OrgSignUp() {
                           focused: focusedPassword,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.password && touched.password)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.password && touched.password,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-lock-circle-open" />
@@ -207,30 +241,40 @@ function OrgSignUp() {
                               className="custom-control-label"
                               htmlFor="customCheckRegister"
                             >
-                          <span className="text-muted">
-                            I agree with the{' '}
-                            <a
-                              href="https://app.termly.io/policy-viewer/policy.html?policyUUID=fb8deed6-e77a-43cd-aa76-1c655b357e4c"
-                              target="_blank" rel="noreferrer"
-                            >
-                              Privacy Policy
-                            </a>
-                            {' '} and {' '}
-                            <a
-                              href="https://app.termly.io/policy-viewer/policy.html?policyUUID=b76fc02b-bf3a-4da0-a77b-dcb50b8d37c2"
-                              target="_blank" rel="noreferrer"
-                            >
-                              Terms of Service
-                            </a>
-                          </span>
+                              <span className="text-muted">
+                                I agree with the{' '}
+                                <a
+                                  href="https://app.termly.io/policy-viewer/policy.html?policyUUID=fb8deed6-e77a-43cd-aa76-1c655b357e4c"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Privacy Policy
+                                </a>{' '}
+                                and{' '}
+                                <a
+                                  href="https://app.termly.io/policy-viewer/policy.html?policyUUID=b76fc02b-bf3a-4da0-a77b-dcb50b8d37c2"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Terms of Service
+                                </a>
+                              </span>
                             </label>
                           </div>
-                          <ErrorMessage name="acceptedTerms" component={InputError} />
+                          <ErrorMessage
+                            name="acceptedTerms"
+                            component={InputError}
+                          />
                         </Col>
                       </Row>
                       <div className="text-center">
-                        <Button id="create-account-submit" className="mt-4" color="info" type="submit"
-                                disabled={isSubmitting}>
+                        <Button
+                          id="create-account-submit"
+                          className="mt-4"
+                          color="info"
+                          type="submit"
+                          disabled={isSubmitting}
+                        >
                           Create account
                         </Button>
                       </div>

@@ -1,30 +1,40 @@
-import React, { useEffect, useState } from "react";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row } from "reactstrap";
-import { Field, Form, Formik } from "formik";
-import InputError from "../../../components/Errors/InputError";
-import ReactDatetime from "react-datetime";
-import Select2 from "react-select2-wrapper";
-import { deleteSprint, startSprint } from "../../../services/sprints/sprints.service";
-import DeleteWarning from "../components/DeleteWarning";
+import React, { useEffect, useState } from 'react';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  FormGroup,
+  Input,
+  Row,
+} from 'reactstrap';
+import { Field, Form, Formik } from 'formik';
+import InputError from '../../../components/Errors/InputError';
+import ReactDatetime from 'react-datetime';
+import Select2 from 'react-select2-wrapper';
+import {
+  deleteSprint,
+  startSprint,
+} from '../../../services/sprints/sprints.service';
+import DeleteWarning from '../components/DeleteWarning';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from "react-toastify";
-import WorkItemsListCard from "../backlog/WorkItemsListCard";
-import { addWorkItem } from "../../../services/backlog/backlog.service";
-import { sortByPriority } from "../../../services/utils/utils";
-import ExecutionStats from "../components/stats/ExecutionStats";
+import { toast } from 'react-toastify';
+import WorkItemsListCard from '../backlog/WorkItemsListCard';
+import { addWorkItem } from '../../../services/backlog/backlog.service';
+import { sortByPriority } from '../../../services/utils/utils';
+import ExecutionStats from '../components/stats/ExecutionStats';
 
-function CreateUpdateDeleteSprint(
-  {
-    onSubmit,
-    sprint = {
-      id: "",
-      goal: "",
-      startDate: "",
-      duration: 2
-    }
-  }
-) {
+function CreateUpdateDeleteSprint({
+  onSubmit,
+  sprint = {
+    id: '',
+    goal: '',
+    startDate: '',
+    duration: 2,
+  },
+}) {
   const { orgId, projectId } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [startDate, setStartDate] = useState(sprint?.startDate);
@@ -41,7 +51,7 @@ function CreateUpdateDeleteSprint(
   const handleSubmit = async (values) => {
     try {
       setIsLoading(true);
-      if (startDate === "") {
+      if (startDate === '') {
         setIsStartDateTouched(true);
         return;
       }
@@ -50,16 +60,19 @@ function CreateUpdateDeleteSprint(
       const savedSprint = await onSubmit({
         goal: values.goal,
         startDate,
-        duration
+        duration,
       });
 
-      setTimeout(() => toast.success("The sprint has been saved"), 100);
+      setTimeout(() => toast.success('The sprint has been saved'), 100);
 
-      if(!sprint.id) {
-        navigate(`/admin/orgs/${orgId}/projects/${projectId}/sprints/edit/${savedSprint.id}`, {replace: true});
+      if (!sprint.id) {
+        navigate(
+          `/admin/orgs/${orgId}/projects/${projectId}/sprints/edit/${savedSprint.id}`,
+          { replace: true },
+        );
       }
     } catch (e) {
-      toast.error("The sprint could not be saved");
+      toast.error('The sprint could not be saved');
     } finally {
       setIsSubmitting(false);
       setIsLoading(false);
@@ -67,7 +80,7 @@ function CreateUpdateDeleteSprint(
   };
 
   useEffect(() => {
-    document.title = "Floumy | Sprint";
+    document.title = 'Floumy | Sprint';
 
     if (sprint.id) {
       setIsUpdate(true);
@@ -76,35 +89,35 @@ function CreateUpdateDeleteSprint(
   }, [sprint]);
 
   function getDueDateClassName() {
-    if (isStartDateTouched && startDate === "") {
-      return "form-control is-invalid";
+    if (isStartDateTouched && startDate === '') {
+      return 'form-control is-invalid';
     }
-    return "form-control ";
+    return 'form-control ';
   }
 
   const onDelete = async (id) => {
     try {
       await deleteSprint(orgId, projectId, id);
       navigate(-1);
-      setTimeout(() => toast.success("The sprint has been deleted"), 100);
+      setTimeout(() => toast.success('The sprint has been deleted'), 100);
     } catch (e) {
       setIsDeleteWarningOpen(false);
-      toast.error("The sprint could not be deleted");
+      toast.error('The sprint could not be deleted');
     }
   };
 
   function isDate(value) {
-    return value && typeof value.format === "function";
+    return value && typeof value.format === 'function';
   }
 
   function onChangeStartDate(value) {
     if (isDate(value)) {
-      setStartDate(value.format("YYYY-MM-DD"));
+      setStartDate(value.format('YYYY-MM-DD'));
       setIsStartDateTouched(true);
       return;
     }
 
-    setStartDate("");
+    setStartDate('');
     setIsStartDateTouched(true);
   }
 
@@ -121,8 +134,8 @@ function CreateUpdateDeleteSprint(
 
   function removeWorkItemFromSprint(workItems) {
     const newWorkItems = [];
-    workItems.forEach(workItem => {
-      if (!workItems.some(w => w.id === workItem.id)) {
+    workItems.forEach((workItem) => {
+      if (!workItems.some((w) => w.id === workItem.id)) {
         newWorkItems.push(workItem);
       }
     });
@@ -130,11 +143,11 @@ function CreateUpdateDeleteSprint(
   }
 
   function updateWorkItemsStatusAndCompletedAt(updatedWorkItems, status) {
-    const newWorkItems = workItems.map(workItem => {
-      if (updatedWorkItems.some(w => w.id === workItem.id)) {
+    const newWorkItems = workItems.map((workItem) => {
+      if (updatedWorkItems.some((w) => w.id === workItem.id)) {
         workItem.status = status;
         workItem.completedAt = null;
-        if (status === "done" || status === "closed") {
+        if (status === 'done' || status === 'closed') {
           workItem.completedAt = new Date().toISOString();
         }
       }
@@ -146,7 +159,7 @@ function CreateUpdateDeleteSprint(
   function updateWorkItemsPriority(updatedWorkItems, priority) {
     const workItemsToUpdate = [];
     for (const workItem of workItems) {
-      if (updatedWorkItems.some(w => w.id === workItem.id)) {
+      if (updatedWorkItems.some((w) => w.id === workItem.id)) {
         workItem.priority = priority;
       }
       workItemsToUpdate.push(workItem);
@@ -157,10 +170,10 @@ function CreateUpdateDeleteSprint(
   async function start(sprintId) {
     try {
       await startSprint(sprintId);
-      setSprintStatus("active");
-      toast.success("The sprint has been started");
+      setSprintStatus('active');
+      toast.success('The sprint has been started');
     } catch (e) {
-      toast.error("The sprint could not be started");
+      toast.error('The sprint could not be started');
     }
   }
 
@@ -168,23 +181,37 @@ function CreateUpdateDeleteSprint(
     <>
       <DeleteWarning
         isOpen={isDeleteWarningOpen}
-        entity={"sprint"}
+        entity={'sprint'}
         toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
         onDelete={() => onDelete(sprint.id)}
       />
       {isLoading && <InfiniteLoadingBar />}
-      {workItems && workItems.length > 0 && <ExecutionStats workItems={workItems} dueDate={sprint?.endDate} />}
+      {workItems && workItems.length > 0 && (
+        <ExecutionStats workItems={workItems} dueDate={sprint?.endDate} />
+      )}
       <Card>
         <CardHeader>
-          {isUpdate && <h3 className="mb-0"><span className="mr-2">Edit {sprint.title}</span>
-            {sprintStatus === "active" && <span className="badge badge-info">Active</span>}
-            {sprintStatus === "completed" && <span className="badge badge-success">Completed</span>}
-            {sprintStatus === "planned" &&
-              <button onClick={async () => {
-                await start(orgId, projectId, sprint.id);
-              }} className="btn btn-sm btn-outline-primary mr-0">Start Sprint
-              </button>}
-          </h3>}
+          {isUpdate && (
+            <h3 className="mb-0">
+              <span className="mr-2">Edit {sprint.title}</span>
+              {sprintStatus === 'active' && (
+                <span className="badge badge-info">Active</span>
+              )}
+              {sprintStatus === 'completed' && (
+                <span className="badge badge-success">Completed</span>
+              )}
+              {sprintStatus === 'planned' && (
+                <button
+                  onClick={async () => {
+                    await start(orgId, projectId, sprint.id);
+                  }}
+                  className="btn btn-sm btn-outline-primary mr-0"
+                >
+                  Start Sprint
+                </button>
+              )}
+            </h3>
+          )}
 
           {!isUpdate && <h3 className="mb-0">New Sprint</h3>}
         </CardHeader>
@@ -194,15 +221,10 @@ function CreateUpdateDeleteSprint(
             onSubmit={handleSubmit}
           >
             {({ values, handleChange }) => (
-              <Form
-                className="needs-validation"
-                noValidate>
+              <Form className="needs-validation" noValidate>
                 <Row>
                   <Col className="mb-3" md="12">
-                    <label
-                      className="form-control-label">
-                      Goal
-                    </label>
+                    <label className="form-control-label">Goal</label>
                     <Field
                       as={Input}
                       id="goal"
@@ -218,47 +240,37 @@ function CreateUpdateDeleteSprint(
                 <Row>
                   <Col>
                     <FormGroup>
-                      <label
-                        className="form-control-label"
-                      >
-                        Start Date
-                      </label>
+                      <label className="form-control-label">Start Date</label>
                       <ReactDatetime
                         inputProps={{
-                          placeholder: "When does this sprint start?",
-                          className: getDueDateClassName()
+                          placeholder: 'When does this sprint start?',
+                          className: getDueDateClassName(),
                         }}
                         closeOnSelect={true}
                         timeFormat={false}
-                        dateFormat={"YYYY-MM-DD"}
+                        dateFormat={'YYYY-MM-DD'}
                         value={startDate}
                         onChange={(value) => onChangeStartDate(value)}
                       />
-                      {isStartDateTouched && startDate === "" &&
-                        <InputError>
-                          The start date is required
-                        </InputError>
-                      }
+                      {isStartDateTouched && startDate === '' && (
+                        <InputError>The start date is required</InputError>
+                      )}
                     </FormGroup>
                   </Col>
                   <Col>
                     <FormGroup>
-                      <label
-                        className="form-control-label"
-                      >
-                        Duration
-                      </label>
+                      <label className="form-control-label">Duration</label>
                       <Select2
                         className="form-control"
-                        defaultValue={"2"}
+                        defaultValue={'2'}
                         data={[
-                          { id: "1", text: "One week" },
-                          { id: "2", text: "Two weeks" },
-                          { id: "3", text: "Three weeks" },
-                          { id: "4", text: "Four weeks" }
+                          { id: '1', text: 'One week' },
+                          { id: '2', text: 'Two weeks' },
+                          { id: '3', text: 'Three weeks' },
+                          { id: '4', text: 'Four weeks' },
                         ]}
                         options={{
-                          placeholder: "How long is this sprint?"
+                          placeholder: 'How long is this sprint?',
                         }}
                         value={duration}
                         onSelect={(e) => setDuration(e.target.value)}
@@ -267,7 +279,7 @@ function CreateUpdateDeleteSprint(
                   </Col>
                 </Row>
                 <Button
-                  id={"save-sprint"}
+                  id={'save-sprint'}
                   color="primary"
                   type="submit"
                   className="mt-3"
@@ -275,29 +287,33 @@ function CreateUpdateDeleteSprint(
                 >
                   Save Sprint
                 </Button>
-                {isUpdate && <Button
-                  id={"delete-sprint"}
-                  color="secondary"
-                  type="button"
-                  className="mt-3"
-                  onClick={() => setIsDeleteWarningOpen(true)}
-                  disabled={isSubmitting}
-                >
-                  Delete Sprint
-                </Button>}
+                {isUpdate && (
+                  <Button
+                    id={'delete-sprint'}
+                    color="secondary"
+                    type="button"
+                    className="mt-3"
+                    onClick={() => setIsDeleteWarningOpen(true)}
+                    disabled={isSubmitting}
+                  >
+                    Delete Sprint
+                  </Button>
+                )}
               </Form>
             )}
           </Formik>
         </CardBody>
       </Card>
-      {isUpdate && sprint && workItems && <WorkItemsListCard
-        title={"Work Items"}
-        workItems={workItems}
-        onAddWorkItem={handleAddWorkItem}
-        onChangeSprint={handleChangeSprint}
-        onChangeStatus={updateWorkItemsStatusAndCompletedAt}
-        onChangePriority={updateWorkItemsPriority}
-      />}
+      {isUpdate && sprint && workItems && (
+        <WorkItemsListCard
+          title={'Work Items'}
+          workItems={workItems}
+          onAddWorkItem={handleAddWorkItem}
+          onChangeSprint={handleChangeSprint}
+          onChangeStatus={updateWorkItemsStatusAndCompletedAt}
+          onChangePriority={updateWorkItemsPriority}
+        />
+      )}
     </>
   );
 }

@@ -1,9 +1,8 @@
-
-import React from "react";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
+import React from 'react';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
 // nodejs library that concatenates classes
-import classnames from "classnames";
+import classnames from 'classnames';
 // reactstrap components
 import {
   Button,
@@ -17,14 +16,14 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
-} from "reactstrap";
+  Row,
+} from 'reactstrap';
 
-import AuthHeader from "../../../components/Headers/AuthHeader.js";
-import { signUp } from "../../../services/auth/auth.service";
-import { useNavigate } from "react-router-dom";
-import InputError from "../../../components/Errors/InputError";
-import { getInputGroupErrorClass } from "./form-input-utils";
+import AuthHeader from '../../../components/Headers/AuthHeader.js';
+import { signUp } from '../../../services/auth/auth.service';
+import { useNavigate } from 'react-router-dom';
+import InputError from '../../../components/Errors/InputError';
+import { getInputGroupErrorClass } from './form-input-utils';
 
 function SignUp() {
   const [focusedName, setFocusedName] = React.useState(false);
@@ -35,28 +34,34 @@ function SignUp() {
 
   const validationSpec = {
     name: Yup.string()
-      .min(2, "The name must be at least 2 characters long")
-      .required("The name is required"),
+      .min(2, 'The name must be at least 2 characters long')
+      .required('The name is required'),
     email: Yup.string()
       .matches(
         /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-        "The email address provided is invalid")
-      .required("The email is required"),
+        'The email address provided is invalid',
+      )
+      .required('The email is required'),
     password: Yup.string()
-      .min(8, "Password must be at least 8 characters long")
-      .required("The password is required"),
+      .min(8, 'Password must be at least 8 characters long')
+      .required('The password is required'),
     acceptedTerms: Yup.boolean()
-      .required("Required")
-      .oneOf([true], "You must accept the terms and conditions.")
+      .required('Required')
+      .oneOf([true], 'You must accept the terms and conditions.'),
   };
 
   const validationSchema = Yup.object(validationSpec);
 
-  const initialValues = { name: "", email: "", password: "", acceptedTerms: false, projectName: "" };
+  const initialValues = {
+    name: '',
+    email: '',
+    password: '',
+    acceptedTerms: false,
+    projectName: '',
+  };
   return (
     <>
-      <AuthHeader title="Join Floumy!"
-                  lead="Stop dreaming, start doing." />
+      <AuthHeader title="Join Floumy!" lead="Stop dreaming, start doing." />
       <Container className="mt--8 pb-5">
         <Row className="justify-content-center">
           <Col lg="6" md="8">
@@ -76,7 +81,7 @@ function SignUp() {
                       setSubmitting(true);
                       await signUp(values.name, values.email, values.password);
                       setSubmitting(false);
-                      navigate("/auth/activation-required");
+                      navigate('/auth/activation-required');
                     } catch (e) {
                       setError(e.message);
                     }
@@ -84,13 +89,21 @@ function SignUp() {
                 >
                   {({ isSubmitting, errors, touched }) => (
                     <Form>
-                      {error && <div className="text-center text-danger mb-3">{error}</div>}
+                      {error && (
+                        <div className="text-center text-danger mb-3">
+                          {error}
+                        </div>
+                      )}
                       <FormGroup
                         className={classnames({
-                          focused: focusedName
+                          focused: focusedName,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.name && touched.name)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.name && touched.name,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-hat-3" />
@@ -112,10 +125,14 @@ function SignUp() {
                       </FormGroup>
                       <FormGroup
                         className={classnames({
-                          focused: focusedEmail
+                          focused: focusedEmail,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.email && touched.email)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.email && touched.email,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-email-83" />
@@ -136,10 +153,14 @@ function SignUp() {
                       </FormGroup>
                       <FormGroup
                         className={classnames({
-                          focused: focusedPassword
+                          focused: focusedPassword,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.password && touched.password)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.password && touched.password,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-lock-circle-open" />
@@ -172,30 +193,40 @@ function SignUp() {
                               className="custom-control-label"
                               htmlFor="customCheckRegister"
                             >
-                          <span className="text-muted">
-                            I agree with the{" "}
-                            <a
-                              href="https://app.termly.io/policy-viewer/policy.html?policyUUID=fb8deed6-e77a-43cd-aa76-1c655b357e4c"
-                              target="_blank" rel="noreferrer"
-                            >
-                              Privacy Policy
-                            </a>
-                            {" "} and {" "}
-                            <a
-                              href="https://app.termly.io/policy-viewer/policy.html?policyUUID=b76fc02b-bf3a-4da0-a77b-dcb50b8d37c2"
-                              target="_blank" rel="noreferrer"
-                            >
-                              Terms of Service
-                            </a>
-                          </span>
+                              <span className="text-muted">
+                                I agree with the{' '}
+                                <a
+                                  href="https://app.termly.io/policy-viewer/policy.html?policyUUID=fb8deed6-e77a-43cd-aa76-1c655b357e4c"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Privacy Policy
+                                </a>{' '}
+                                and{' '}
+                                <a
+                                  href="https://app.termly.io/policy-viewer/policy.html?policyUUID=b76fc02b-bf3a-4da0-a77b-dcb50b8d37c2"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Terms of Service
+                                </a>
+                              </span>
                             </label>
                           </div>
-                          <ErrorMessage name="acceptedTerms" component={InputError} />
+                          <ErrorMessage
+                            name="acceptedTerms"
+                            component={InputError}
+                          />
                         </Col>
                       </Row>
                       <div className="text-center">
-                        <Button id="create-account-submit" className="mt-4" color="info" type="submit"
-                                disabled={isSubmitting}>
+                        <Button
+                          id="create-account-submit"
+                          className="mt-4"
+                          color="info"
+                          type="submit"
+                          disabled={isSubmitting}
+                        >
                           Create account
                         </Button>
                       </div>

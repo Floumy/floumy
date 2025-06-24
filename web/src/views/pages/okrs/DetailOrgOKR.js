@@ -1,7 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
 // javascript plugin that creates a sortable object from a dom object
 // reactstrap components
-import { Badge, Button, Card, CardBody, CardHeader, Col, Container, Input, Progress, Row, Table } from 'reactstrap';
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Container,
+  Input,
+  Progress,
+  Row,
+  Table,
+} from 'reactstrap';
 // core components
 import SimpleHeader from 'components/Headers/SimpleHeader.js';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -79,7 +91,8 @@ function DetailOrgOKR() {
             {
               id: okr.objective.timeline,
               text: dateToQuarterAndYear(new Date(okr.objective.startDate)),
-            }]);
+            },
+          ]);
         }
       } catch (e) {
         toast.error('The OKR could not be loaded');
@@ -96,15 +109,14 @@ function DetailOrgOKR() {
   }, [id, orgId]);
 
   useMemo(() => {
-    const filteredOrgMembers =
-      members
-        .filter(member =>
-          member.isActive ||
-          member.id === assignedTo ||
-          member.id === '')
-        .map(user => {
-          return { id: user.id, text: user.name };
-        });
+    const filteredOrgMembers = members
+      .filter(
+        (member) =>
+          member.isActive || member.id === assignedTo || member.id === '',
+      )
+      .map((user) => {
+        return { id: user.id, text: user.name };
+      });
     filteredOrgMembers.push({ id: '', text: 'None' });
     setFilteredMembers(filteredOrgMembers);
   }, [members, assignedTo]);
@@ -163,7 +175,11 @@ function DetailOrgOKR() {
         status: 'on-track',
         progress: 0,
       };
-      const savedKeyResult = await addKeyResult(orgId, okr.objective.id, keyResult);
+      const savedKeyResult = await addKeyResult(
+        orgId,
+        okr.objective.id,
+        keyResult,
+      );
       okr.keyResults.push(savedKeyResult);
       setOKR({ ...okr });
     } catch (e) {
@@ -175,7 +191,7 @@ function DetailOrgOKR() {
   const handleAddKeyResultsWithAi = async (keyResults) => {
     try {
       toast.success('The key results have been added');
-      const keyResultsToAdd = keyResults.map(keyResult => {
+      const keyResultsToAdd = keyResults.map((keyResult) => {
         return { title: keyResult.title, status: 'on-track', progress: 0 };
       });
       const savedKeyResults = [];
@@ -193,18 +209,20 @@ function DetailOrgOKR() {
   };
 
   const validationSchema = Yup.object({
-    title: Yup.string()
-      .required('The objective title is required'),
+    title: Yup.string().required('The objective title is required'),
   });
 
   const krValidationSchema = Yup.object({
-    title: Yup.string()
-      .required('The key result title is required'),
+    title: Yup.string().required('The key result title is required'),
   });
 
   const handleAddComment = async (content) => {
     try {
-      const addedComment = await addObjectiveComment(orgId, okr.objective.id, content);
+      const addedComment = await addObjectiveComment(
+        orgId,
+        okr.objective.id,
+        content,
+      );
       okr.objective.comments.push(addedComment);
       setOKR({ ...okr });
       toast.success('The comment has been added');
@@ -216,7 +234,9 @@ function DetailOrgOKR() {
   const handleDeleteComment = async (commentId) => {
     try {
       await deleteObjectiveComment(orgId, okr.objective.id, commentId);
-      okr.objective.comments = okr.objective.comments.filter(comment => comment.id !== commentId);
+      okr.objective.comments = okr.objective.comments.filter(
+        (comment) => comment.id !== commentId,
+      );
       setOKR({ ...okr });
       toast.success('The comment has been deleted');
     } catch (e) {
@@ -226,8 +246,13 @@ function DetailOrgOKR() {
 
   const handleUpdateComment = async (commentId, content) => {
     try {
-      const updatedComment = await updateObjectiveComment(orgId, okr.objective.id, commentId, content);
-      okr.objective.comments = okr.objective.comments.map(comment => {
+      const updatedComment = await updateObjectiveComment(
+        orgId,
+        okr.objective.id,
+        commentId,
+        content,
+      );
+      okr.objective.comments = okr.objective.comments.map((comment) => {
         if (comment.id === commentId) {
           return updatedComment;
         }
@@ -241,18 +266,20 @@ function DetailOrgOKR() {
   };
 
   if (!isLoading && !okr) {
-    return <>
-      <SimpleHeader />
-      <Container className="mt--6" fluid id="OKRs">
-        <Row>
-          <Col>
-            <div className="card-wrapper">
-              <NotFoundCard message="Objective not be found" />
-            </div>
-          </Col>
-        </Row>
-      </Container>
-    </>;
+    return (
+      <>
+        <SimpleHeader />
+        <Container className="mt--6" fluid id="OKRs">
+          <Row>
+            <Col>
+              <div className="card-wrapper">
+                <NotFoundCard message="Objective not be found" />
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </>
+    );
   }
 
   return (
@@ -260,7 +287,9 @@ function DetailOrgOKR() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
-        {okr && okr.keyResults && okr.keyResults.length > 0 && <DetailOKRStats okr={okr} />}
+        {okr && okr.keyResults && okr.keyResults.length > 0 && (
+          <DetailOKRStats okr={okr} />
+        )}
 
         <Row>
           <Col lg={8} md={12}>
@@ -278,22 +307,28 @@ function DetailOrgOKR() {
               </CardHeader>
               <CardBody className="border-bottom">
                 {isLoading && <LoadingSpinnerBox />}
-                {!isLoading && okr &&
+                {!isLoading && okr && (
                   <>
                     <Formik
                       initialValues={{ title: okr.objective.title || '' }}
                       validationSchema={validationSchema}
                       onSubmit={handleSubmit}
                     >
-                      {({ values, handleChange, isSubmitting, errors, touched }) => (
-                        <Form
-                          className="needs-validation"
-                          noValidate>
+                      {({
+                        values,
+                        handleChange,
+                        isSubmitting,
+                        errors,
+                        touched,
+                      }) => (
+                        <Form className="needs-validation" noValidate>
                           <Row>
                             <Col s={12} md={12}>
                               <div className="form-group mb-3">
-                                <label htmlFor="objective-status"
-                                       className="form-control-label col-form-label">
+                                <label
+                                  htmlFor="objective-status"
+                                  className="form-control-label col-form-label"
+                                >
                                   Title
                                 </label>
                                 <Field
@@ -307,13 +342,18 @@ function DetailOrgOKR() {
                                   invalid={!!(errors.title && touched.title)}
                                   autoComplete="off"
                                 />
-                                <ErrorMessage name={'objective'} component={InputError} />
+                                <ErrorMessage
+                                  name={'objective'}
+                                  component={InputError}
+                                />
                               </div>
                             </Col>
                             <Col s={12} md={6}>
                               <div className="form-group mb-3">
-                                <label htmlFor="objective-status"
-                                       className="form-control-label col-form-label">
+                                <label
+                                  htmlFor="objective-status"
+                                  className="form-control-label col-form-label"
+                                >
                                   Status
                                 </label>
                                 <Select2
@@ -328,13 +368,16 @@ function DetailOrgOKR() {
                                   }}
                                   onClick={() => {
                                     setIsDeleteWarningOpen(true);
-                                  }} />
+                                  }}
+                                />
                               </div>
                             </Col>
                             <Col s={12} md={6}>
                               <div className="form-group mb-3">
-                                <label htmlFor="objective-status"
-                                       className="form-control-label col-form-label">
+                                <label
+                                  htmlFor="objective-status"
+                                  className="form-control-label col-form-label"
+                                >
                                   Timeline
                                 </label>
                                 <Select2
@@ -344,7 +387,8 @@ function DetailOrgOKR() {
                                   data={timelineOptions}
                                   onChange={(e) => {
                                     setTimeline(e.target.value);
-                                  }}></Select2>
+                                  }}
+                                ></Select2>
                               </div>
                             </Col>
                           </Row>
@@ -389,222 +433,294 @@ function DetailOrgOKR() {
                               </Button>
                             </Col>
                           </Row>
-                        </Form>)}
+                        </Form>
+                      )}
                     </Formik>
-                  </>}
+                  </>
+                )}
               </CardBody>
             </Card>
-            {!isLoading && <>
-              <Card>
-                <CardHeader>
-                  <h3 className="mb-0">
-                    Related Key Results {okr?.keyResults?.length === 0 && <AIButton
-                    text="Add with AI"
-                    disabled={!okr.objective.id}
-                    onClick={async () => {
-                      const keyResults = await generateKeyResults(okr.objective.title);
-                      await handleAddKeyResultsWithAi(keyResults);
-                    }}
-                  />}
-                  </h3>
-                </CardHeader>
-                <Row>
-                  <Col>
-                    <div className="table-responsive">
-                      <Table className="table align-items-center no-select" style={{ minWidth: '700px' }}
-                             onContextMenu={(e) => e.preventDefault()}>
-                        <thead className="thead-light">
-                        <tr>
-                          <th className="sort" scope="col" width="5%">
-                            Reference
-                          </th>
-                          <th className="sort" scope="col" width="50%">
-                            Key Result
-                          </th>
-                          <th className="sort" scope="col" width="30%">
-                            Progress
-                          </th>
-                          <th className="sort" scope="col" width="10%">
-                            Status
-                          </th>
-                        </tr>
-                        </thead>
-                        <tbody className="list">
-                        {okr && okr.keyResults && okr.keyResults.length === 0 &&
-                          <tr>
-                            <td colSpan={4}>
-                              <div className="text-center text-muted">
-                                No key results have been added yet
-                              </div>
-                            </td>
-                          </tr>}
-                        {okr && okr.keyResults && okr.keyResults.map((keyResult) => (
-                          <tr key={keyResult.id}>
-                            <td>
-                              <Link
-                                to={`/orgs/${orgId}/kr/detail/${keyResult.id}`}
-                                className={'okr-detail'}>
-                                {keyResult.reference}
-                              </Link>
-                            </td>
-                            <td className="title-cell">
-                              <Link
-                                to={`/orgs/${orgId}/kr/detail/${keyResult.id}`}
-                                className={'okr-detail'}>
-                                {keyResult.title}
-                              </Link>
-                            </td>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <span className="mr-2">{formatOKRsProgress(keyResult.progress)}%</span>
-                                <div>
-                                  <Progress max="100" value={formatOKRsProgress(keyResult.progress)}
-                                            color="primary" />
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <Badge color="" className="badge-dot mr-4">
-                                <i className={okrStatusColorClassName(keyResult.status)} />
-                                <span className="status">{formatHyphenatedString(keyResult.status)}</span>
-                              </Badge>
-                            </td>
-                          </tr>))}
-                        <tr>
-                          <td colSpan={5}>
-                            {<Formik
-                              initialValues={{ title: '' }}
-                              validationSchema={krValidationSchema}
-                              onSubmit={async (values, { resetForm }) => {
-                                await handleAddKeyResult(values);
-                                resetForm();
-                              }}
-                            >
-                              {({ values, handleChange, errors, touched }) => (
-                                <Form
-                                  className="needs-validation"
-                                  noValidate>
-                                  <Row>
-                                    <Col xs={10}>
-                                      <Field
-                                        as={Input}
-                                        id="title"
-                                        name="title"
-                                        placeholder="How will you measure your progress?"
-                                        type="text"
-                                        value={values.title}
-                                        onChange={handleChange}
-                                        invalid={!!(errors.title && touched.title)}
-                                        autoComplete="off"
+            {!isLoading && (
+              <>
+                <Card>
+                  <CardHeader>
+                    <h3 className="mb-0">
+                      Related Key Results{' '}
+                      {okr?.keyResults?.length === 0 && (
+                        <AIButton
+                          text="Add with AI"
+                          disabled={!okr.objective.id}
+                          onClick={async () => {
+                            const keyResults = await generateKeyResults(
+                              okr.objective.title,
+                            );
+                            await handleAddKeyResultsWithAi(keyResults);
+                          }}
+                        />
+                      )}
+                    </h3>
+                  </CardHeader>
+                  <Row>
+                    <Col>
+                      <div className="table-responsive">
+                        <Table
+                          className="table align-items-center no-select"
+                          style={{ minWidth: '700px' }}
+                          onContextMenu={(e) => e.preventDefault()}
+                        >
+                          <thead className="thead-light">
+                            <tr>
+                              <th className="sort" scope="col" width="5%">
+                                Reference
+                              </th>
+                              <th className="sort" scope="col" width="50%">
+                                Key Result
+                              </th>
+                              <th className="sort" scope="col" width="30%">
+                                Progress
+                              </th>
+                              <th className="sort" scope="col" width="10%">
+                                Status
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="list">
+                            {okr &&
+                              okr.keyResults &&
+                              okr.keyResults.length === 0 && (
+                                <tr>
+                                  <td colSpan={4}>
+                                    <div className="text-center text-muted">
+                                      No key results have been added yet
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            {okr &&
+                              okr.keyResults &&
+                              okr.keyResults.map((keyResult) => (
+                                <tr key={keyResult.id}>
+                                  <td>
+                                    <Link
+                                      to={`/orgs/${orgId}/kr/detail/${keyResult.id}`}
+                                      className={'okr-detail'}
+                                    >
+                                      {keyResult.reference}
+                                    </Link>
+                                  </td>
+                                  <td className="title-cell">
+                                    <Link
+                                      to={`/orgs/${orgId}/kr/detail/${keyResult.id}`}
+                                      className={'okr-detail'}
+                                    >
+                                      {keyResult.title}
+                                    </Link>
+                                  </td>
+                                  <td>
+                                    <div className="d-flex align-items-center">
+                                      <span className="mr-2">
+                                        {formatOKRsProgress(keyResult.progress)}
+                                        %
+                                      </span>
+                                      <div>
+                                        <Progress
+                                          max="100"
+                                          value={formatOKRsProgress(
+                                            keyResult.progress,
+                                          )}
+                                          color="primary"
+                                        />
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <Badge color="" className="badge-dot mr-4">
+                                      <i
+                                        className={okrStatusColorClassName(
+                                          keyResult.status,
+                                        )}
                                       />
-                                    </Col>
-                                    <Col xs={2} className="text-right">
-                                      <Button
-                                        id={'save-key-result'}
-                                        color="primary"
-                                        type="submit"
-                                        disabled={isSubmitting}
+                                      <span className="status">
+                                        {formatHyphenatedString(
+                                          keyResult.status,
+                                        )}
+                                      </span>
+                                    </Badge>
+                                  </td>
+                                </tr>
+                              ))}
+                            <tr>
+                              <td colSpan={5}>
+                                {
+                                  <Formik
+                                    initialValues={{ title: '' }}
+                                    validationSchema={krValidationSchema}
+                                    onSubmit={async (values, { resetForm }) => {
+                                      await handleAddKeyResult(values);
+                                      resetForm();
+                                    }}
+                                  >
+                                    {({
+                                      values,
+                                      handleChange,
+                                      errors,
+                                      touched,
+                                    }) => (
+                                      <Form
+                                        className="needs-validation"
+                                        noValidate
                                       >
-                                        Add
-                                      </Button>
-                                    </Col>
-                                  </Row>
-                                </Form>)}
-                            </Formik>}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </Table>
-                    </div>
-                  </Col>
-                </Row>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <h3 className="mb-0">
-                    Related Project Objectives
-                  </h3>
-                </CardHeader>
-                <Row>
-                  <Col>
-                    <div className="table-responsive">
-                      <Table className="table align-items-center no-select" style={{ minWidth: '700px' }}
-                             onContextMenu={(e) => e.preventDefault()}>
-                        <thead className="thead-light">
-                        <tr>
-                          <th className="sort" scope="col" width="5%">
-                            Reference
-                          </th>
-                          <th className="sort" scope="col" width="30%">
-                            Objective
-                          </th>
-                          <th className="sort" scope="col" width="30%">
-                            Project
-                          </th>
-                          <th className="sort" scope="col" width="30%">
-                            Progress
-                          </th>
-                        </tr>
-                        </thead>
-                        <tbody className="list">
-                        {okr && okr.objective.childObjectives && okr.objective.childObjectives.length === 0 &&
-                          <tr>
-                            <td colSpan={4}>
-                              <div className="text-center text-muted">
-                                No project objectives have been added yet
-                              </div>
-                            </td>
-                          </tr>}
-                        {okr && okr.objective.childObjectives && okr.objective.childObjectives.map((projectObjective) => (
-                          <tr key={projectObjective.id}>
-                            <td>
-                              <Link
-                                to={`/admin/orgs/${orgId}/projects/${projectObjective.project.id}/okrs/detail/${projectObjective.id}`}
-                                className={'okr-detail'}>
-                                {projectObjective.reference}
-                              </Link>
-                            </td>
-                            <td className="title-cell">
-                              <Link
-                                to={`/admin/orgs/${orgId}/projects/${projectObjective.project.id}/okrs/detail/${projectObjective.id}`}
-                                className={'okr-detail'}>
-                                {projectObjective.title}
-                              </Link>
-                            </td>
-                            <td className="title-cell">
-                              <Link
-                                to={`/admin/orgs/${orgId}/projects/${projectObjective.project.id}/okrs`}
-                                className={'okr-detail'}>
-                                {projectObjective.project.name}
-                              </Link>
-                            </td>
-                            <td>
-                              <div className="d-flex align-items-center">
-                                <span className="mr-2">{formatOKRsProgress(projectObjective.progress)}%</span>
-                                <div>
-                                  <Progress max="100" value={formatOKRsProgress(projectObjective.progress)}
-                                            color="primary" />
-                                </div>
-                              </div>
-                            </td>
-                          </tr>))}
-                        </tbody>
-                      </Table>
-                    </div>
-                  </Col>
-                </Row>
-              </Card>
-            </>}
+                                        <Row>
+                                          <Col xs={10}>
+                                            <Field
+                                              as={Input}
+                                              id="title"
+                                              name="title"
+                                              placeholder="How will you measure your progress?"
+                                              type="text"
+                                              value={values.title}
+                                              onChange={handleChange}
+                                              invalid={
+                                                !!(
+                                                  errors.title && touched.title
+                                                )
+                                              }
+                                              autoComplete="off"
+                                            />
+                                          </Col>
+                                          <Col xs={2} className="text-right">
+                                            <Button
+                                              id={'save-key-result'}
+                                              color="primary"
+                                              type="submit"
+                                              disabled={isSubmitting}
+                                            >
+                                              Add
+                                            </Button>
+                                          </Col>
+                                        </Row>
+                                      </Form>
+                                    )}
+                                  </Formik>
+                                }
+                              </td>
+                            </tr>
+                          </tbody>
+                        </Table>
+                      </div>
+                    </Col>
+                  </Row>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <h3 className="mb-0">Related Project Objectives</h3>
+                  </CardHeader>
+                  <Row>
+                    <Col>
+                      <div className="table-responsive">
+                        <Table
+                          className="table align-items-center no-select"
+                          style={{ minWidth: '700px' }}
+                          onContextMenu={(e) => e.preventDefault()}
+                        >
+                          <thead className="thead-light">
+                            <tr>
+                              <th className="sort" scope="col" width="5%">
+                                Reference
+                              </th>
+                              <th className="sort" scope="col" width="30%">
+                                Objective
+                              </th>
+                              <th className="sort" scope="col" width="30%">
+                                Project
+                              </th>
+                              <th className="sort" scope="col" width="30%">
+                                Progress
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="list">
+                            {okr &&
+                              okr.objective.childObjectives &&
+                              okr.objective.childObjectives.length === 0 && (
+                                <tr>
+                                  <td colSpan={4}>
+                                    <div className="text-center text-muted">
+                                      No project objectives have been added yet
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            {okr &&
+                              okr.objective.childObjectives &&
+                              okr.objective.childObjectives.map(
+                                (projectObjective) => (
+                                  <tr key={projectObjective.id}>
+                                    <td>
+                                      <Link
+                                        to={`/admin/orgs/${orgId}/projects/${projectObjective.project.id}/okrs/detail/${projectObjective.id}`}
+                                        className={'okr-detail'}
+                                      >
+                                        {projectObjective.reference}
+                                      </Link>
+                                    </td>
+                                    <td className="title-cell">
+                                      <Link
+                                        to={`/admin/orgs/${orgId}/projects/${projectObjective.project.id}/okrs/detail/${projectObjective.id}`}
+                                        className={'okr-detail'}
+                                      >
+                                        {projectObjective.title}
+                                      </Link>
+                                    </td>
+                                    <td className="title-cell">
+                                      <Link
+                                        to={`/admin/orgs/${orgId}/projects/${projectObjective.project.id}/okrs`}
+                                        className={'okr-detail'}
+                                      >
+                                        {projectObjective.project.name}
+                                      </Link>
+                                    </td>
+                                    <td>
+                                      <div className="d-flex align-items-center">
+                                        <span className="mr-2">
+                                          {formatOKRsProgress(
+                                            projectObjective.progress,
+                                          )}
+                                          %
+                                        </span>
+                                        <div>
+                                          <Progress
+                                            max="100"
+                                            value={formatOKRsProgress(
+                                              projectObjective.progress,
+                                            )}
+                                            color="primary"
+                                          />
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ),
+                              )}
+                          </tbody>
+                        </Table>
+                      </div>
+                    </Col>
+                  </Row>
+                </Card>
+              </>
+            )}
           </Col>
-          {!isLoading &&
+          {!isLoading && (
             <Col lg={4} md={12}>
-              <Comments comments={okr?.objective?.comments}
-                        onCommentAdd={handleAddComment}
-                        onCommentDelete={handleDeleteComment}
-                        onCommentEdit={handleUpdateComment}
+              <Comments
+                comments={okr?.objective?.comments}
+                onCommentAdd={handleAddComment}
+                onCommentDelete={handleDeleteComment}
+                onCommentEdit={handleUpdateComment}
               />
             </Col>
-          }
+          )}
         </Row>
       </Container>
     </>

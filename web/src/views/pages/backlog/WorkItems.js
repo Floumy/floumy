@@ -65,7 +65,9 @@ function WorkItems() {
             shortcut: 'w',
             id: 'new-work-item',
             action: () => {
-              navigate(`/admin/orgs/${orgId}/projects/${projectId}/work-item/new`);
+              navigate(
+                `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`,
+              );
             },
           },
         ]}

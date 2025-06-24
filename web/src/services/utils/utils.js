@@ -1,37 +1,42 @@
-import React from "react";
-import { colors } from "../../variables/charts";
+import React from 'react';
+import { colors } from '../../variables/charts';
 import moment from 'moment';
 
 export function formatHyphenatedString(str) {
-  if (!str) return "";
-  return str.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+  if (!str) return '';
+  return str
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 export function trimText(text, maxLength = 50) {
-  if (!text) return "";
+  if (!text) return '';
 
-  return text && text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+  return text && text.length > maxLength
+    ? text.substring(0, maxLength) + '...'
+    : text;
 }
 
 export function priorityColor(priority) {
   const priorityMap = {
-    "high": "danger",
-    "medium": "warning",
-    "low": "success"
+    high: 'danger',
+    medium: 'warning',
+    low: 'success',
   };
   return priorityMap[priority];
 }
 
 function padNumber(number) {
-  return number < 10 ? "0" + number : number;
+  return number < 10 ? '0' + number : number;
 }
 
 export function formatDate(date) {
-  return moment(date).format('D MMM YYYY')
+  return moment(date).format('D MMM YYYY');
 }
 
 export function formatDateWithTime(date) {
-  return moment(date).format('D MMM YYYY, h:mm a')
+  return moment(date).format('D MMM YYYY, h:mm a');
 }
 
 export function displayDateDifferenceFromNow(date) {
@@ -40,122 +45,122 @@ export function displayDateDifferenceFromNow(date) {
 
 export function workItemTypeIcon(type) {
   const typeMap = {
-    "user-story": <i className="fas fa-user text-green pl-0 mr-2" />,
-    "bug": <i className="fas fa-bug text-red pl-0 mr-2" />,
-    "task": <i className="fas fa-tasks text-blue pl-0 mr-2" />,
-    "technical-debt": <i className="fas fa-code text-warning pl-0 mr-2" />,
-    "spike": <i className="fas fa-bolt text-info pl-0 mr-2" />
+    'user-story': <i className="fas fa-user text-green pl-0 mr-2" />,
+    bug: <i className="fas fa-bug text-red pl-0 mr-2" />,
+    task: <i className="fas fa-tasks text-blue pl-0 mr-2" />,
+    'technical-debt': <i className="fas fa-code text-warning pl-0 mr-2" />,
+    spike: <i className="fas fa-bolt text-info pl-0 mr-2" />,
   };
   return typeMap[type];
 }
 
 export function workItemStatusColorClassName(status) {
   const statusMap = {
-    "planned": "bg-warning",
-    "ready-to-start": "bg-info",
-    "in-progress": "bg-primary",
-    "blocked": "bg-danger",
-    "code-review": "bg-purple",
-    "testing": "bg-purple",
-    "revisions": "bg-purple",
-    "ready-for-deployment": "bg-purple",
-    "deployed": "bg-purple",
-    "done": "bg-success",
-    "closed": "bg-gray"
+    planned: 'bg-warning',
+    'ready-to-start': 'bg-info',
+    'in-progress': 'bg-primary',
+    blocked: 'bg-danger',
+    'code-review': 'bg-purple',
+    testing: 'bg-purple',
+    revisions: 'bg-purple',
+    'ready-for-deployment': 'bg-purple',
+    deployed: 'bg-purple',
+    done: 'bg-success',
+    closed: 'bg-gray',
   };
   return statusMap[status];
 }
 
 export function workItemsColorVariable(status) {
   const statusMap = {
-    "planned": colors.theme.warning,
-    "ready-to-start": colors.theme.info,
-    "in-progress": colors.theme.primary,
-    "blocked": colors.theme.danger,
-    "code-review": colors.purple["900"],
-    "testing": colors.purple["900"],
-    "revisions": colors.purple["900"],
-    "ready-for-deployment": colors.purple["900"],
-    "deployed": colors.purple["900"],
-    "done": colors.theme.success,
-    "closed": colors.gray["600"]
+    planned: colors.theme.warning,
+    'ready-to-start': colors.theme.info,
+    'in-progress': colors.theme.primary,
+    blocked: colors.theme.danger,
+    'code-review': colors.purple['900'],
+    testing: colors.purple['900'],
+    revisions: colors.purple['900'],
+    'ready-for-deployment': colors.purple['900'],
+    deployed: colors.purple['900'],
+    done: colors.theme.success,
+    closed: colors.gray['600'],
   };
   return statusMap[status];
 }
 
 export function workItemsTypeColorVariable(type) {
   const typeMap = {
-    "user-story": colors.theme.success,
-    "bug": colors.theme.danger,
-    "task": colors.theme.info,
-    "technical-debt": colors.theme.warning,
-    "spike": colors.theme.primary
+    'user-story': colors.theme.success,
+    bug: colors.theme.danger,
+    task: colors.theme.info,
+    'technical-debt': colors.theme.warning,
+    spike: colors.theme.primary,
   };
   return typeMap[type];
 }
 
 export function formatWorkItemTypeName(type) {
   const typeMap = {
-    "user-story": "User Story",
-    "bug": "Bug",
-    "task": "Task",
-    "technical-debt": "Technical Debt",
-    "spike": "Spike"
+    'user-story': 'User Story',
+    bug: 'Bug',
+    task: 'Task',
+    'technical-debt': 'Technical Debt',
+    spike: 'Spike',
   };
   return typeMap[type];
 }
 
 export function formatWorkItemStatusName(status) {
   const statusMap = {
-    "planned": "Planned",
-    "ready-to-start": "Ready to Start",
-    "in-progress": "In Progress",
-    "blocked": "Blocked",
-    "code-review": "Code Review",
-    "testing": "Testing",
-    "revisions": "Revisions",
-    "ready-for-deployment": "Ready for Deployment",
-    "deployed": "Deployed",
-    "done": "Done",
-    "closed": "Closed"
+    planned: 'Planned',
+    'ready-to-start': 'Ready to Start',
+    'in-progress': 'In Progress',
+    blocked: 'Blocked',
+    'code-review': 'Code Review',
+    testing: 'Testing',
+    revisions: 'Revisions',
+    'ready-for-deployment': 'Ready for Deployment',
+    deployed: 'Deployed',
+    done: 'Done',
+    closed: 'Closed',
   };
   return statusMap[status];
 }
 
 export function initiativeStatusColorClassName(status) {
   const statusMap = {
-    "pending": "bg-warning",
-    "approved": "bg-info",
-    "planned": "bg-info",
-    "ready-to-start": "bg-info",
-    "in-progress": "bg-primary",
-    "completed": "bg-success",
-    "closed": "bg-gray"
+    pending: 'bg-warning',
+    approved: 'bg-info',
+    planned: 'bg-info',
+    'ready-to-start': 'bg-info',
+    'in-progress': 'bg-primary',
+    completed: 'bg-success',
+    closed: 'bg-gray',
   };
   return statusMap[status];
 }
 
 export function okrStatusColorClassName(status) {
   const statusMap = {
-    "on-track": "bg-success",
-    "off-track": "bg-danger",
-    "at-risk": "bg-warning",
-    "ahead-of-schedule": "bg-info",
-    "completed": "bg-success",
-    "stalled": "bg-warning",
-    "deferred": "bg-info",
-    "canceled": "bg-danger",
-    "under-review": "bg-info",
-    "needs-attention": "bg-warning"
+    'on-track': 'bg-success',
+    'off-track': 'bg-danger',
+    'at-risk': 'bg-warning',
+    'ahead-of-schedule': 'bg-info',
+    completed: 'bg-success',
+    stalled: 'bg-warning',
+    deferred: 'bg-info',
+    canceled: 'bg-danger',
+    'under-review': 'bg-info',
+    'needs-attention': 'bg-warning',
   };
   return statusMap[status];
 }
 
 export function sortByPriority(arr) {
   const priorityMap = {
-    "high": 1,
-    "medium": 2,
-    "low": 3
+    high: 1,
+    medium: 2,
+    low: 3,
   };
   return arr.sort((a, b) => {
     return priorityMap[a.priority] < priorityMap[b.priority] ? -1 : 1;
@@ -171,7 +176,10 @@ export function formatProgress(progress) {
 }
 
 export function memberNameInitials(name) {
-  return name.split(" ").map(word => word.charAt(0)).join("");
+  return name
+    .split(' ')
+    .map((word) => word.charAt(0))
+    .join('');
 }
 
 export function textToColor(inputText) {
@@ -182,10 +190,10 @@ export function textToColor(inputText) {
   }
 
   // Convert hash into a color
-  let color = "#";
+  let color = '#';
   for (let i = 0; i < 3; i++) {
-    let value = (hash >> (i * 8)) & 0xFF;
-    color += ("00" + value.toString(16)).substr(-2);
+    let value = (hash >> (i * 8)) & 0xff;
+    color += ('00' + value.toString(16)).substr(-2);
   }
 
   return color;
@@ -215,88 +223,88 @@ export function getSprintEndDate(sprint) {
 }
 
 export function workItemTypeName(type) {
-  if (!type) return "";
+  if (!type) return '';
   const typeMap = {
-    "user-story": "User Story",
-    "bug": "Bug",
-    "task": "Task",
-    "technical-debt": "Technical Debt",
-    "spike": "Spike"
+    'user-story': 'User Story',
+    bug: 'Bug',
+    task: 'Task',
+    'technical-debt': 'Technical Debt',
+    spike: 'Spike',
   };
   return typeMap[type];
 }
 
 export function priorityName(priority) {
-  if (!priority) return "";
+  if (!priority) return '';
   const priorityMap = {
-    "high": "High",
-    "medium": "Medium",
-    "low": "Low"
+    high: 'High',
+    medium: 'Medium',
+    low: 'Low',
   };
   return priorityMap[priority];
 }
 
 export function workItemStatusName(status) {
-  if (!status) return "";
+  if (!status) return '';
   const statusMap = {
-    "planned": "Planned",
-    "ready-to-start": "Ready to Start",
-    "in-progress": "In Progress",
-    "blocked": "Blocked",
-    "code-review": "Code Review",
-    "testing": "Testing",
-    "revisions": "Revisions",
-    "ready-for-deployment": "Ready for Deployment",
-    "deployed": "Deployed",
-    "done": "Done",
-    "closed": "Closed"
+    planned: 'Planned',
+    'ready-to-start': 'Ready to Start',
+    'in-progress': 'In Progress',
+    blocked: 'Blocked',
+    'code-review': 'Code Review',
+    testing: 'Testing',
+    revisions: 'Revisions',
+    'ready-for-deployment': 'Ready for Deployment',
+    deployed: 'Deployed',
+    done: 'Done',
+    closed: 'Closed',
   };
   return statusMap[status];
 }
 
 export function initiativeStatusName(status) {
-  if (!status) return "";
+  if (!status) return '';
   const statusMap = {
-    "planned": "Planned",
-    "ready-to-start": "Ready to Start",
-    "in-progress": "In Progress",
-    "completed": "Completed",
-    "closed": "Closed"
+    planned: 'Planned',
+    'ready-to-start': 'Ready to Start',
+    'in-progress': 'In Progress',
+    completed: 'Completed',
+    closed: 'Closed',
   };
   return statusMap[status];
 }
 
 export function keyResultStatusName(status) {
-  if (!status) return "";
+  if (!status) return '';
   const statusMap = {
-    "on-track": "On Track",
-    "off-track": "Off Track",
-    "at-risk": "At Risk",
-    "ahead-of-schedule": "Ahead of Schedule",
-    "completed": "Completed",
-    "stalled": "Stalled",
-    "deferred": "Deferred",
-    "canceled": "Canceled",
-    "under-review": "Under Review",
-    "needs-attention": "Needs Attention"
+    'on-track': 'On Track',
+    'off-track': 'Off Track',
+    'at-risk': 'At Risk',
+    'ahead-of-schedule': 'Ahead of Schedule',
+    completed: 'Completed',
+    stalled: 'Stalled',
+    deferred: 'Deferred',
+    canceled: 'Canceled',
+    'under-review': 'Under Review',
+    'needs-attention': 'Needs Attention',
   };
   return statusMap[status];
 }
 
 export function formatTimeline(timeline) {
-  if (!timeline) return "";
+  if (!timeline) return '';
   const timelineMap = {
-    "past": "Past",
-    "this-quarter": "This Quarter",
-    "next-quarter": "Next Quarter",
-    "later": "Later"
+    past: 'Past',
+    'this-quarter': 'This Quarter',
+    'next-quarter': 'Next Quarter',
+    later: 'Later',
   };
   return timelineMap[timeline];
 }
 
 export function dateToQuarterAndYear(date) {
   const quarter = Math.floor((date.getMonth() + 3) / 3);
-  return "Q" + quarter + " " + date.getFullYear();
+  return 'Q' + quarter + ' ' + date.getFullYear();
 }
 
 export function humanReadableRelativeDate(date) {

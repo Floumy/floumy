@@ -35,8 +35,16 @@ function PublicLayout() {
     return replace;
   }
 
-  useNavigationHotKey('r', `/public/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace());
-  useNavigationHotKey('f', `/public/orgs/${orgId}/projects/${projectId}/feature-requests`, false);
+  useNavigationHotKey(
+    'r',
+    `/public/orgs/${orgId}/projects/${projectId}/feature-requests/new`,
+    isNavigationReplace(),
+  );
+  useNavigationHotKey(
+    'f',
+    `/public/orgs/${orgId}/projects/${projectId}/feature-requests`,
+    false,
+  );
   useNavigationHotKey('left', -1);
   useNavigationHotKey('right', 1);
 
@@ -109,15 +117,17 @@ function PublicLayout() {
         />
         <Routes>
           {getRoutes(publicRoutes)}
-          <Route
-            path="*"
-            element={<Navigate to="/auth/sign-in" replace />}
-          />
+          <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
         </Routes>
         <Footer />
       </div>
       {sidenavOpen ? (
-        <div className="backdrop d-xl-none" onClick={toggleSidenav} onKeyDown={toggleSidenav} role="button" />
+        <div
+          className="backdrop d-xl-none"
+          onClick={toggleSidenav}
+          onKeyDown={toggleSidenav}
+          role="button"
+        />
       ) : null}
     </>
   );

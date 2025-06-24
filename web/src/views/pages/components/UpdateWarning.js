@@ -47,17 +47,21 @@ function UpdateWarning({ isOpen, warningMessage, entity, toggle, onUpdate }) {
         <div className="modal-body">
           <div className="py-3 text-center">
             <i className="ni ni-check-bold ni-3x" />
-            <h4 className="heading mt-4">Are you sure you want to update this {entity}?</h4>
-            <p>
-              {warningMessage}
-            </p>
+            <h4 className="heading mt-4">
+              Are you sure you want to update this {entity}?
+            </h4>
+            <p>{warningMessage}</p>
           </div>
         </div>
         <div className="modal-footer">
-          <Button className="btn-white" color="default" type="button" onClick={handleUpdate} disabled={isUpdating}>
-            {isUpdating ? <>
-              Updating...
-            </> : "Update"}
+          <Button
+            className="btn-white"
+            color="default"
+            type="button"
+            onClick={handleUpdate}
+            disabled={isUpdating}
+          >
+            {isUpdating ? <>Updating...</> : 'Update'}
           </Button>
           <Button
             className="text-white ml-auto"

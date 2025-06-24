@@ -11,7 +11,7 @@ const PermissionDenied = () => {
       <div className="container my-auto py-5">
         <div className="row justify-content-center">
           <div className="col-12 col-md-8 col-lg-6 text-center">
-            <motion.h1 
+            <motion.h1
               className="display-3 fw-bold text-danger mb-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -20,17 +20,17 @@ const PermissionDenied = () => {
               <i className="fas fa-lock me-2 mr-2"></i>
               Access Denied
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               className="lead mb-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              You don't have permission to access this page.
-              Please contact your administrator if you believe this is a mistake.
+              You don't have permission to access this page. Please contact your
+              administrator if you believe this is a mistake.
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

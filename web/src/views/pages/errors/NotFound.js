@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import { motion } from 'framer-motion';
 
-
 const NotFound = () => {
   const navigate = useNavigate();
 
@@ -12,7 +11,7 @@ const NotFound = () => {
       <div className="container my-auto py-5">
         <div className="row justify-content-center">
           <div className="col-12 col-md-8 col-lg-6 text-center">
-            <motion.h1 
+            <motion.h1
               className="display-3 fw-bold text-primary mb-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -20,17 +19,17 @@ const NotFound = () => {
             >
               Oops! Page Not Found
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               className="lead mb-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              The page you're looking for doesn't exist or has been moved.
-              Let's get you back on track.
+              The page you're looking for doesn't exist or has been moved. Let's
+              get you back on track.
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

@@ -1,5 +1,4 @@
-
-import React from "react";
+import React from 'react';
 
 // reactstrap components
 import {
@@ -11,9 +10,9 @@ import {
   Container,
   Row,
   Col,
-} from "reactstrap";
+} from 'reactstrap';
 // core components
-import SimpleHeader from "components/Headers/SimpleHeader.js";
+import SimpleHeader from 'components/Headers/SimpleHeader.js';
 
 function Buttons() {
   return (

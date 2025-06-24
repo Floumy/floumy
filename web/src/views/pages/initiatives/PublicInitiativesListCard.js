@@ -1,21 +1,21 @@
-import React from "react";
-import PublicInitiativesList from "./PublicInitiativesList";
-import BaseInitiativeListCard from "./BaseInitiativeListCard";
+import React from 'react';
+import PublicInitiativesList from './PublicInitiativesList';
+import BaseInitiativeListCard from './BaseInitiativeListCard';
 
 function PublicInitiativesListCard({
-                                  orgId,
-                                  projectId,
-                                  title,
-                                  initiatives,
-                                  isLoading,
-                                  showFilters = true
-                                }) {
+  orgId,
+  projectId,
+  title,
+  initiatives,
+  isLoading,
+  showFilters = true,
+}) {
   function renderInitiativeList(filteredInitiatives) {
     return (
       <PublicInitiativesList
         orgId={orgId}
         projectId={projectId}
-        id={"initiatives-list-card"}
+        id={'initiatives-list-card'}
         initiatives={filteredInitiatives}
       />
     );

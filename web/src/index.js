@@ -30,25 +30,40 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <>
-
-      <ToastContainer theme="dark" hideProgressBar={true} />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/admin/orgs/:orgId/projects/:projectId/*" element={
-            <CurrentUserProvider><AdminLayout /></CurrentUserProvider>
-          } />
-          <Route path="/blank/orgs/:orgId/projects/:projectId/*" element={
-            <CurrentUserProvider><BlankLayout /></CurrentUserProvider>
-          } />
-          <Route path="/orgs/:orgId/*" element={
-            <CurrentUserProvider><OrgLayout /></CurrentUserProvider>
-          } />
-          <Route path="/public/orgs/:orgId/projects/:projectId/*" element={
-            <PublicLayout />
-          } />
-          <Route path="/auth/*" element={<AuthLayout />} />
-          <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
-        </Routes>
-      </BrowserRouter>
+    <ToastContainer theme="dark" hideProgressBar={true} />
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/admin/orgs/:orgId/projects/:projectId/*"
+          element={
+            <CurrentUserProvider>
+              <AdminLayout />
+            </CurrentUserProvider>
+          }
+        />
+        <Route
+          path="/blank/orgs/:orgId/projects/:projectId/*"
+          element={
+            <CurrentUserProvider>
+              <BlankLayout />
+            </CurrentUserProvider>
+          }
+        />
+        <Route
+          path="/orgs/:orgId/*"
+          element={
+            <CurrentUserProvider>
+              <OrgLayout />
+            </CurrentUserProvider>
+          }
+        />
+        <Route
+          path="/public/orgs/:orgId/projects/:projectId/*"
+          element={<PublicLayout />}
+        />
+        <Route path="/auth/*" element={<AuthLayout />} />
+        <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
+      </Routes>
+    </BrowserRouter>
   </>,
 );
