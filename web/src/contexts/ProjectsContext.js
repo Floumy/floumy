@@ -15,7 +15,7 @@ export function ProjectsProvider({ children, orgId, projectId }) {
         const projects = await listProjects(orgId);
         if (projects) {
           setProjects(projects);
-          setCurrentProject(projects.find(p => p.id === projectId) || null);
+          setCurrentProject(projects.find((p) => p.id === projectId) || null);
         }
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -36,7 +36,7 @@ export function ProjectsProvider({ children, orgId, projectId }) {
     projects,
     loading,
     setCurrentProject,
-    setProjects
+    setProjects,
   };
 
   return (

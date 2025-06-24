@@ -54,7 +54,7 @@ describe('FeatureQueryBuilder', () => {
         MilestonesService,
         WorkItemsService,
         FilesService,
-        FilesStorageRepository
+        FilesStorageRepository,
       ],
     );
     cleanup = dbCleanup;

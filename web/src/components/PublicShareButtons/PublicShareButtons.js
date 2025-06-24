@@ -6,12 +6,11 @@ import {
   RedditIcon,
   RedditShareButton,
   TwitterShareButton,
-  XIcon
-} from "react-share";
-import React from "react";
+  XIcon,
+} from 'react-share';
+import React from 'react';
 
 export default function PublicShareButtons({ title }) {
-
   const currentUrl = window.location.href;
 
   return (
@@ -31,5 +30,6 @@ export default function PublicShareButtons({ title }) {
       <FacebookShareButton url={currentUrl} quote={title}>
         <FacebookIcon size={24} round />
       </FacebookShareButton>
-    </div>);
+    </div>
+  );
 }

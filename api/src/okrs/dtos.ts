@@ -121,7 +121,7 @@ export interface OKRDto {
       project: {
         id: string;
         name: string;
-      },
+      };
       assignedTo: {
         id: string;
         name: string;

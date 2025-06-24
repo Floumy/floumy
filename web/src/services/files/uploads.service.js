@@ -1,18 +1,25 @@
-import api from "../api/api.service";
+import api from '../api/api.service';
 
 export async function uploadFile(orgId, projectId, file, onUploadProgress) {
   try {
     if (!file) return;
     const formData = new FormData();
-    formData.append("file", file);
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/files/`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data"
+    formData.append('file', file);
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/files/`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: function (progressEvent) {
+          if (onUploadProgress)
+            onUploadProgress(
+              Math.round((progressEvent.loaded * 100) / progressEvent.total),
+            );
+        },
       },
-      onUploadProgress: function(progressEvent) {
-        if (onUploadProgress) onUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
-      }
-    });
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -21,22 +28,26 @@ export async function uploadFile(orgId, projectId, file, onUploadProgress) {
 
 export async function downloadFile(orgId, projectId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/files/${id}`, {
-      responseType: "blob"
-    });
-    const file = new Blob(
-      [response.data],
-      { type: response.headers["content-type"] }
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/files/${id}`,
+      {
+        responseType: 'blob',
+      },
     );
+    const file = new Blob([response.data], {
+      type: response.headers['content-type'],
+    });
 
     // Create a URL for the file
     const fileURL = URL.createObjectURL(file);
 
     // Create a temporary anchor element and trigger the download
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = fileURL;
-    const fileName = response.headers["content-disposition"].split("filename=")[1].replace(/"/g, "");
-    link.setAttribute("download", fileName);
+    const fileName = response.headers['content-disposition']
+      .split('filename=')[1]
+      .replace(/"/g, '');
+    link.setAttribute('download', fileName);
     document.body.appendChild(link);
     link.click();
 
@@ -50,7 +61,9 @@ export async function downloadFile(orgId, projectId, id) {
 
 export async function deleteFile(orgId, projectId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/files/${id}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/files/${id}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }

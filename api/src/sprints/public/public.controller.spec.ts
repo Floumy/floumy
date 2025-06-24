@@ -137,9 +137,7 @@ describe('PublicController', () => {
   describe('When getting the active sprint', () => {
     it('should return an sprint', async () => {
       const orgWithActiveSprint = await orgsService.createForUser(user);
-      const projectWithActiveSprint = (
-        await orgWithActiveSprint.projects
-      )[0];
+      const projectWithActiveSprint = (await orgWithActiveSprint.projects)[0];
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveSprintsPagePublic = true;

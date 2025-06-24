@@ -1,10 +1,9 @@
 export const FEATURES = {
-  ORG_WIDE_APP_SECTION: Symbol('ORG_WIDE_APP_SECTION')
-}
+  ORG_WIDE_APP_SECTION: Symbol('ORG_WIDE_APP_SECTION'),
+};
 
 const DISABLED_FEATURES = {
-  production: [
-  ],
+  production: [],
   development: [],
 };
 

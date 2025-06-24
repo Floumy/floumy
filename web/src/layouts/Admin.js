@@ -40,19 +40,61 @@ function Admin() {
 
   useNavigationHotKey('1', `/admin/orgs/${orgId}/projects/${projectId}/feed`);
   useNavigationHotKey('2', `/admin/orgs/${orgId}/projects/${projectId}/okrs`);
-  useNavigationHotKey('3', `/admin/orgs/${orgId}/projects/${projectId}/roadmap`);
-  useNavigationHotKey('4', `/admin/orgs/${orgId}/projects/${projectId}/sprints`);
-  useNavigationHotKey('5', `/admin/orgs/${orgId}/projects/${projectId}/active-sprint`);
-  useNavigationHotKey('6', `/admin/orgs/${orgId}/projects/${projectId}/work-items`);
-  useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/initiatives`);
+  useNavigationHotKey(
+    '3',
+    `/admin/orgs/${orgId}/projects/${projectId}/roadmap`,
+  );
+  useNavigationHotKey(
+    '4',
+    `/admin/orgs/${orgId}/projects/${projectId}/sprints`,
+  );
+  useNavigationHotKey(
+    '5',
+    `/admin/orgs/${orgId}/projects/${projectId}/active-sprint`,
+  );
+  useNavigationHotKey(
+    '6',
+    `/admin/orgs/${orgId}/projects/${projectId}/work-items`,
+  );
+  useNavigationHotKey(
+    '7',
+    `/admin/orgs/${orgId}/projects/${projectId}/initiatives`,
+  );
   useNavigationHotKey('8', `/admin/orgs/${orgId}/projects/${projectId}/code`);
-  useNavigationHotKey('w', `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`);
-  useNavigationHotKey('i', `/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`, isNavigationReplace());
-  useNavigationHotKey('m', `/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`, isNavigationReplace());
-  useNavigationHotKey('s', `/admin/orgs/${orgId}/projects/${projectId}/sprints/new`, isNavigationReplace());
-  useNavigationHotKey('o', `/admin/orgs/${orgId}/projects/${projectId}/okrs/new`, isNavigationReplace());
-  useNavigationHotKey('r', `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/new`, isNavigationReplace());
-  useNavigationHotKey('n', `/admin/orgs/${orgId}/projects/${projectId}/issues/new`, false);
+  useNavigationHotKey(
+    'w',
+    `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`,
+  );
+  useNavigationHotKey(
+    'i',
+    `/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`,
+    isNavigationReplace(),
+  );
+  useNavigationHotKey(
+    'm',
+    `/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`,
+    isNavigationReplace(),
+  );
+  useNavigationHotKey(
+    's',
+    `/admin/orgs/${orgId}/projects/${projectId}/sprints/new`,
+    isNavigationReplace(),
+  );
+  useNavigationHotKey(
+    'o',
+    `/admin/orgs/${orgId}/projects/${projectId}/okrs/new`,
+    isNavigationReplace(),
+  );
+  useNavigationHotKey(
+    'r',
+    `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/new`,
+    isNavigationReplace(),
+  );
+  useNavigationHotKey(
+    'n',
+    `/admin/orgs/${orgId}/projects/${projectId}/issues/new`,
+    false,
+  );
 
   useNavigationHotKey('left', -1);
   useNavigationHotKey('right', 1);
@@ -91,15 +133,17 @@ function Admin() {
               />
               <Routes>
                 {getRoutes(routes)}
-                <Route
-                  path="*"
-                  element={<NotFound />}
-                />
+                <Route path="*" element={<NotFound />} />
               </Routes>
               <Footer />
             </div>
             {sidenavOpen ? (
-              <div className="backdrop d-xl-none" onClick={toggleSidenav} onKeyDown={toggleSidenav} role="button" />
+              <div
+                className="backdrop d-xl-none"
+                onClick={toggleSidenav}
+                onKeyDown={toggleSidenav}
+                role="button"
+              />
             ) : null}
           </ProjectsProvider>
         </OrgProvider>

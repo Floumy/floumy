@@ -5,25 +5,27 @@ import PropTypes from 'prop-types';
 import BaseInitiativeListCard from './BaseInitiativeListCard';
 
 function InitiativesListCard({
-                               title,
-                               initiatives,
-                               isLoading,
-                               enableContextMenu,
-                               onAddInitiative,
-                               onChangeMilestone,
-                               onChangeStatus,
-                               onChangeAssignedTo,
-                               onDelete,
-                               onSearch,
-                               showFilters = true,
-                               showAssignedTo = true,
-                               searchPlaceholder = 'Search by title',
-                             }) {
+  title,
+  initiatives,
+  isLoading,
+  enableContextMenu,
+  onAddInitiative,
+  onChangeMilestone,
+  onChangeStatus,
+  onChangeAssignedTo,
+  onDelete,
+  onSearch,
+  showFilters = true,
+  showAssignedTo = true,
+  searchPlaceholder = 'Search by title',
+}) {
   const [filteredInitiatives, setFilteredInitiatives] = useState([]);
 
   function updateInitiativesStatus(updatedInitiatives, status) {
-    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
-    const updatedInitiativesStatus = filteredInitiatives.map(initiative => {
+    const updatedInitiativesIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    const updatedInitiativesStatus = filteredInitiatives.map((initiative) => {
       if (updatedInitiativesIds.includes(initiative.id)) {
         initiative.status = status;
       }
@@ -36,7 +38,7 @@ function InitiativesListCard({
   }
 
   function handleBacklogInitiativeChangePriority(initiatives, priority) {
-    const updatedInitiatives = initiatives.map(initiative => {
+    const updatedInitiatives = initiatives.map((initiative) => {
       if (initiative.priority !== priority) {
         initiative.priority = priority;
       }
@@ -49,8 +51,10 @@ function InitiativesListCard({
   }
 
   function handleDelete(deletedInitiatives) {
-    const deletedIds = deletedInitiatives.map(initiative => initiative.id);
-    const remainingInitiatives = filteredInitiatives.filter(initiative => !deletedIds.includes(initiative.id));
+    const deletedIds = deletedInitiatives.map((initiative) => initiative.id);
+    const remainingInitiatives = filteredInitiatives.filter(
+      (initiative) => !deletedIds.includes(initiative.id),
+    );
     setFilteredInitiatives(remainingInitiatives);
     if (onDelete) {
       onDelete(deletedInitiatives);

@@ -1,12 +1,11 @@
-
-import React from "react";
+import React from 'react';
 // react library for routing
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 // core components
-import routes from "routes.js";
-import useLayoutHandler from "./useLayoutHandler";
-import Footer from "../components/Footers/Footer";
+import routes from 'routes.js';
+import useLayoutHandler from './useLayoutHandler';
+import Footer from '../components/Footers/Footer';
 
 function Auth() {
   const { mainContentRef, getRoutes } = useLayoutHandler('auth');
@@ -20,7 +19,7 @@ function Auth() {
       document.body.classList.remove('bg-default');
     };
   });
-  
+
   return (
     <>
       <div className="main-content" ref={mainContentRef}>

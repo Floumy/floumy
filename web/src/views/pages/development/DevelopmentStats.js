@@ -1,10 +1,14 @@
-import { Card, CardBody, CardHeader, CardTitle, Col, Row } from "reactstrap";
-import { Line } from "react-chartjs-2";
-import { burndownChartOptions, chartOptions, parseOptions } from "../../../variables/charts";
-import React, { useEffect, useState } from "react";
-import Chart from "chart.js";
-import PropTypes from "prop-types";
-import { getSprintEndDate } from "../../../services/utils/utils";
+import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'reactstrap';
+import { Line } from 'react-chartjs-2';
+import {
+  burndownChartOptions,
+  chartOptions,
+  parseOptions,
+} from '../../../variables/charts';
+import React, { useEffect, useState } from 'react';
+import Chart from 'chart.js';
+import PropTypes from 'prop-types';
+import { getSprintEndDate } from '../../../services/utils/utils';
 
 function DevelopmentStats({ sprint }) {
   if (window.Chart) {
@@ -19,11 +23,16 @@ function DevelopmentStats({ sprint }) {
   const [totalEstimation, setTotalEstimation] = useState(0);
 
   function isDoneBefore(workItem, currentDate) {
-    return workItem.status === "done" && new Date(workItem.completedAt) < currentDate;
+    return (
+      workItem.status === 'done' && new Date(workItem.completedAt) < currentDate
+    );
   }
 
   function isClosedBefore(workItem, currentDate) {
-    return workItem.status === "closed" && new Date(workItem.completedAt) < currentDate;
+    return (
+      workItem.status === 'closed' &&
+      new Date(workItem.completedAt) < currentDate
+    );
   }
 
   function getTotalEstimation(workItems) {
@@ -35,7 +44,9 @@ function DevelopmentStats({ sprint }) {
   function calculateDaysLeft(sprint) {
     const currentDate = new Date();
     currentDate.setHours(23, 59, 59, 999);
-    return Math.ceil((getSprintEndDate(sprint) - currentDate) / (24 * 60 * 60 * 1000));
+    return Math.ceil(
+      (getSprintEndDate(sprint) - currentDate) / (24 * 60 * 60 * 1000),
+    );
   }
 
   useEffect(() => {
@@ -46,19 +57,29 @@ function DevelopmentStats({ sprint }) {
 
     function calculateOverallCompletion(workItems) {
       const totalNumberOfWorkItems = workItems.length;
-      const totalNumberOfCompletedWorkItems = workItems.filter(workItem => workItem.status === "done" || workItem.status === "closed").length;
-      setOverallCompletion(Math.round(totalNumberOfCompletedWorkItems / totalNumberOfWorkItems * 100));
+      const totalNumberOfCompletedWorkItems = workItems.filter(
+        (workItem) =>
+          workItem.status === 'done' || workItem.status === 'closed',
+      ).length;
+      setOverallCompletion(
+        Math.round(
+          (totalNumberOfCompletedWorkItems / totalNumberOfWorkItems) * 100,
+        ),
+      );
     }
 
     function calculateEstimatedEffortLeft(workItems) {
       let totalCompletedEstimation = 0;
-      workItems.forEach(workItem => {
-        if (workItem.status === "done" || workItem.status === "closed") {
+      workItems.forEach((workItem) => {
+        if (workItem.status === 'done' || workItem.status === 'closed') {
           totalCompletedEstimation += workItem.estimation;
         }
       });
-      const completedEstimationPercentage = totalCompletedEstimation / getTotalEstimation(workItems);
-      setEstimatedEffortLeft(Math.round((1 - completedEstimationPercentage) * 100));
+      const completedEstimationPercentage =
+        totalCompletedEstimation / getTotalEstimation(workItems);
+      setEstimatedEffortLeft(
+        Math.round((1 - completedEstimationPercentage) * 100),
+      );
     }
 
     function setBurndownLabels() {
@@ -72,7 +93,7 @@ function DevelopmentStats({ sprint }) {
       for (let i = 0; i < numberOfDays; i++) {
         const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
         // Format date as ex: Fri 1 Jan
-        const formattedDate = `${date.toLocaleDateString("en-US", { weekday: "short" })} ${date.getDate()} ${date.toLocaleDateString("en-US", { month: "short" })}`;
+        const formattedDate = `${date.toLocaleDateString('en-US', { weekday: 'short' })} ${date.getDate()} ${date.toLocaleDateString('en-US', { month: 'short' })}`;
         labels.push(formattedDate);
       }
       setLabels(labels);
@@ -99,16 +120,24 @@ function DevelopmentStats({ sprint }) {
     function calculateBurndown(workItems) {
       const data = [];
       const startDate = new Date(sprint.actualStartDate);
-      let numberOfDays = Math.ceil((new Date() - startDate) / (24 * 60 * 60 * 1000));
+      let numberOfDays = Math.ceil(
+        (new Date() - startDate) / (24 * 60 * 60 * 1000),
+      );
       const daysLeft = calculateDaysLeft(sprint);
       if (daysLeft < 0) {
         numberOfDays += Math.abs(daysLeft);
       }
       for (let i = 0; i < numberOfDays; i++) {
-        const currentDate = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+        const currentDate = new Date(
+          startDate.getTime() + i * 24 * 60 * 60 * 1000,
+        );
         currentDate.setHours(23, 59, 59, 999);
         const totalCompletedEstimation = workItems
-          .filter(workItem => isDoneBefore(workItem, currentDate) || isClosedBefore(workItem, currentDate))
+          .filter(
+            (workItem) =>
+              isDoneBefore(workItem, currentDate) ||
+              isClosedBefore(workItem, currentDate),
+          )
           .reduce((acc, workItem) => {
             return acc + workItem.estimation;
           }, 0);
@@ -137,7 +166,9 @@ function DevelopmentStats({ sprint }) {
         <Col className="d-none d-sm-block">
           <Card>
             <CardHeader>
-              <h5 className="h3 mb-0">Effort Burndown based on Work Items Estimation</h5>
+              <h5 className="h3 mb-0">
+                Effort Burndown based on Work Items Estimation
+              </h5>
             </CardHeader>
             <CardBody>
               <div className="chart">
@@ -146,16 +177,16 @@ function DevelopmentStats({ sprint }) {
                     labels,
                     datasets: [
                       {
-                        label: "Effort Left",
-                        data
+                        label: 'Effort Left',
+                        data,
                       },
                       {
-                        label: "Ideal Burndown",
+                        label: 'Ideal Burndown',
                         data: idealBurndown,
-                        borderColor: "rgb(225, 237, 245)",
-                        backgroundColor: "rgba(225, 237, 245)"
-                      }
-                    ]
+                        borderColor: 'rgb(225, 237, 245)',
+                        backgroundColor: 'rgba(225, 237, 245)',
+                      },
+                    ],
                   }}
                   options={burndownChartOptions}
                   className="chart-canvas"
@@ -175,8 +206,8 @@ function DevelopmentStats({ sprint }) {
                     Completed Items
                   </CardTitle>
                   <span className="h2 font-weight-bold mb-0 ">
-                      {overallCompletion}%
-                    </span>
+                    {overallCompletion}%
+                  </span>
                 </Col>
                 <Col className="text-right col-auto">
                   <div className="icon icon-shape bg-white text-primary rounded-circle bg-lighter">
@@ -196,8 +227,8 @@ function DevelopmentStats({ sprint }) {
                     Effort Left
                   </CardTitle>
                   <span className="h2 font-weight-bold mb-0 ">
-                      {estimatedEffortLeft}%
-                    </span>
+                    {estimatedEffortLeft}%
+                  </span>
                 </Col>
                 <Col className="text-right col-auto">
                   <div className="icon icon-shape bg-white text-primary rounded-circle bg-lighter">
@@ -214,7 +245,7 @@ function DevelopmentStats({ sprint }) {
 }
 
 DevelopmentStats.propTypes = {
-  sprint: PropTypes.object.isRequired
+  sprint: PropTypes.object.isRequired,
 };
 
 export default DevelopmentStats;

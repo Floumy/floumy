@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button, Modal } from "reactstrap";
+import React, { useEffect, useState } from 'react';
+import { Button, Modal } from 'reactstrap';
 
 function DeleteWarning({ isOpen, entity, toggle, onDelete }) {
   const [modal, setModal] = useState(isOpen);
@@ -47,17 +47,24 @@ function DeleteWarning({ isOpen, entity, toggle, onDelete }) {
         <div className="modal-body">
           <div className="py-3 text-center">
             <i className="ni ni-check-bold ni-3x" />
-            <h4 className="heading mt-4">Are you sure you want to delete this {entity}?</h4>
+            <h4 className="heading mt-4">
+              Are you sure you want to delete this {entity}?
+            </h4>
             <p>
-              This action is irreversible and will permanently remove the {entity}. Please confirm your decision.
+              This action is irreversible and will permanently remove the{' '}
+              {entity}. Please confirm your decision.
             </p>
           </div>
         </div>
         <div className="modal-footer">
-          <Button className="btn-white" color="default" type="button" onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? <>
-              Deleting...
-            </> : "Delete"}
+          <Button
+            className="btn-white"
+            color="default"
+            type="button"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
+            {isDeleting ? <>Deleting...</> : 'Delete'}
           </Button>
           <Button
             className="text-white ml-auto"

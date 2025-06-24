@@ -1,37 +1,49 @@
-import { Card, CardHeader, FormGroup, Input, InputGroup, InputGroupAddon, InputGroupText } from "reactstrap";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import React, { useEffect, useState } from "react";
-import PublicWorkItemsList from "./PublicWorkItemsList";
-import { filterWorkItems } from "../../../services/utils/workItemUtils";
-import WorkItemsListCardHeader from "./WorkItemsListCardHeader";
+import {
+  Card,
+  CardHeader,
+  FormGroup,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+} from 'reactstrap';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import React, { useEffect, useState } from 'react';
+import PublicWorkItemsList from './PublicWorkItemsList';
+import { filterWorkItems } from '../../../services/utils/workItemUtils';
+import WorkItemsListCardHeader from './WorkItemsListCardHeader';
 
 function PublicWorkItemsListCard({
-                                   id = "work-items-list-card",
-                                   orgId,
-                                   title,
-                                   workItems,
-                                   isLoading,
-                                   showFilters = true,
-                                   showAssignedTo = true,
-                                   showInitiative = true,
-                                   searchPlaceholder = "Search by title"
-                                 }) {
-  const [filterByPriority, setFilterByPriority] = useState("all");
-  const [filterByType, setFilterByType] = useState("all");
-  const [filterByStatus, setFilterByStatus] = useState("all");
-  const [searchText, setSearchText] = useState("");
+  id = 'work-items-list-card',
+  orgId,
+  title,
+  workItems,
+  isLoading,
+  showFilters = true,
+  showAssignedTo = true,
+  showInitiative = true,
+  searchPlaceholder = 'Search by title',
+}) {
+  const [filterByPriority, setFilterByPriority] = useState('all');
+  const [filterByType, setFilterByType] = useState('all');
+  const [filterByStatus, setFilterByStatus] = useState('all');
+  const [searchText, setSearchText] = useState('');
   const [filteredWorkItems, setFilteredWorkItems] = useState([]);
 
   useEffect(() => {
     setFilteredWorkItems(
-      filterWorkItems(workItems, filterByPriority, filterByType, filterByStatus)
-        .filter(workItem => {
-          if (searchText === "") {
-            return true;
-          }
+      filterWorkItems(
+        workItems,
+        filterByPriority,
+        filterByType,
+        filterByStatus,
+      ).filter((workItem) => {
+        if (searchText === '') {
+          return true;
+        }
 
-          return workItem.title.toLowerCase().includes(searchText.toLowerCase());
-        })
+        return workItem.title.toLowerCase().includes(searchText.toLowerCase());
+      }),
     );
   }, [filterByType, filterByPriority, filterByStatus, workItems, searchText]);
 
@@ -72,14 +84,15 @@ function PublicWorkItemsListCard({
             </InputGroup>
           </FormGroup>
         </CardHeader>
-        {(!isLoading || filteredWorkItems.length > 0) &&
+        {(!isLoading || filteredWorkItems.length > 0) && (
           <PublicWorkItemsList
             id={id}
             showAssignedTo={showAssignedTo}
             showInitiative={showInitiative}
             workItems={filteredWorkItems}
             orgId={orgId}
-          />}
+          />
+        )}
         {isLoading && <LoadingSpinnerBox />}
       </Card>
     </>

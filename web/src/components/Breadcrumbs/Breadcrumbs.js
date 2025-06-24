@@ -1,14 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-} from "reactstrap";
+import { Breadcrumb, BreadcrumbItem } from 'reactstrap';
 import { Link, useParams } from 'react-router-dom';
 
 export default function Breadcrumbs({ breadcrumbs, isPublic }) {
-
-  const {orgId, projectId} = useParams();
+  const { orgId, projectId } = useParams();
 
   const getAdminBreadcrumbUrl = (breadcrumb) => {
     if (breadcrumb.type === 'work-item') {
@@ -23,7 +19,7 @@ export default function Breadcrumbs({ breadcrumbs, isPublic }) {
     if (breadcrumb.type === 'objective') {
       return `/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${breadcrumb.id}`;
     }
-  }
+  };
 
   const getPublicBreadcrumbUrl = (breadcrumb) => {
     if (breadcrumb.type === 'work-item') {
@@ -38,7 +34,7 @@ export default function Breadcrumbs({ breadcrumbs, isPublic }) {
     if (breadcrumb.type === 'objective') {
       return `/public/orgs/${orgId}/projects/${projectId}/okrs/detail/${breadcrumb.id}`;
     }
-  }
+  };
 
   const getBreadcrumbUrl = (breadcrumb) => {
     if (isPublic) {
@@ -46,7 +42,7 @@ export default function Breadcrumbs({ breadcrumbs, isPublic }) {
     }
 
     return getAdminBreadcrumbUrl(breadcrumb);
-  }
+  };
 
   return (
     <Breadcrumb listClassName="breadcrumb-links breadcrumb-dark">

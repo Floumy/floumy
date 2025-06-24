@@ -62,9 +62,7 @@ describe('PublicController', () => {
       expect(projectResult.bipSettings.isObjectivesPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isRoadmapPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isSprintsPagePublic).toBeDefined();
-      expect(
-        projectResult.bipSettings.isActiveSprintsPagePublic,
-      ).toBeDefined();
+      expect(projectResult.bipSettings.isActiveSprintsPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isFeedPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isIssuesPagePublic).toBeDefined();
       expect(

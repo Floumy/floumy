@@ -1,5 +1,5 @@
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import {
   Badge,
   Card,
@@ -12,28 +12,36 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
-} from "reactstrap";
-import { useNavigate, useParams } from "react-router-dom";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { listIssues, searchIssues } from "../../../services/issues/issues.service";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { formatHyphenatedString, priorityColor } from "../../../services/utils/utils";
-import { toast } from "react-toastify";
-import IssueStats from "./IssueStats";
+  Row,
+} from 'reactstrap';
+import { useNavigate, useParams } from 'react-router-dom';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  listIssues,
+  searchIssues,
+} from '../../../services/issues/issues.service';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import {
+  formatHyphenatedString,
+  priorityColor,
+} from '../../../services/utils/utils';
+import { toast } from 'react-toastify';
+import IssueStats from './IssueStats';
 
 export default function Issues({ isPublic = false }) {
   const { orgId, projectId } = useParams();
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const navigate = useNavigate();
-  const context = window.location.pathname.includes("public") ? "public" : "admin";
+  const context = window.location.pathname.includes('public')
+    ? 'public'
+    : 'admin';
   const [issues, setIssues] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [search, setSearch] = useState("");
-  const [searchText, setSearchText] = useState("");
+  const [search, setSearch] = useState('');
+  const [searchText, setSearchText] = useState('');
   const typingTimeoutRef = useRef(null);
 
   function debounce(func, delay) {
@@ -41,33 +49,44 @@ export default function Issues({ isPublic = false }) {
     typingTimeoutRef.current = setTimeout(func, delay);
   }
 
-  const fetchIssues = useCallback(async (pageNum, isInitial = false, searchTerm = "") => {
-    if (isInitial) {
-      setIsInitialLoading(true);
-    } else {
-      setIsLoadingMore(true);
-    }
-
-    try {
-      let newIssues;
-      if (searchTerm) {
-        newIssues = await searchIssues(orgId, projectId, searchTerm, pageNum, 50);
-      } else {
-        newIssues = await listIssues(orgId, projectId, pageNum, 50);
-      }
-      setIssues(prevIssues => isInitial ? newIssues : [...prevIssues, ...newIssues]);
-      setHasMore(newIssues.length > 0);
-    } catch (e) {
-      console.error(e.message);
-      toast.error("Failed to fetch issues");
-    } finally {
+  const fetchIssues = useCallback(
+    async (pageNum, isInitial = false, searchTerm = '') => {
       if (isInitial) {
-        setIsInitialLoading(false);
+        setIsInitialLoading(true);
       } else {
-        setIsLoadingMore(false);
+        setIsLoadingMore(true);
       }
-    }
-  }, [orgId, projectId]);
+
+      try {
+        let newIssues;
+        if (searchTerm) {
+          newIssues = await searchIssues(
+            orgId,
+            projectId,
+            searchTerm,
+            pageNum,
+            50,
+          );
+        } else {
+          newIssues = await listIssues(orgId, projectId, pageNum, 50);
+        }
+        setIssues((prevIssues) =>
+          isInitial ? newIssues : [...prevIssues, ...newIssues],
+        );
+        setHasMore(newIssues.length > 0);
+      } catch (e) {
+        console.error(e.message);
+        toast.error('Failed to fetch issues');
+      } finally {
+        if (isInitial) {
+          setIsInitialLoading(false);
+        } else {
+          setIsLoadingMore(false);
+        }
+      }
+    },
+    [orgId, projectId],
+  );
 
   function doSearch(event) {
     const searchText = event.target.value;
@@ -84,24 +103,28 @@ export default function Issues({ isPublic = false }) {
   }
 
   useEffect(() => {
-    document.title = "Floumy | Issues";
+    document.title = 'Floumy | Issues';
     fetchIssues(1, true);
   }, [fetchIssues]);
 
   const loadNextPage = () => {
     if (!isLoadingMore && hasMore) {
-      setPage(prevPage => prevPage + 1);
+      setPage((prevPage) => prevPage + 1);
       fetchIssues(page + 1, false, search);
     }
   };
 
   function navigateToDetailPage(issue) {
     if (isPublic) {
-      navigate(`/${context}/orgs/${orgId}/projects/${projectId}/issues/${issue.id}`);
+      navigate(
+        `/${context}/orgs/${orgId}/projects/${projectId}/issues/${issue.id}`,
+      );
       return;
     }
 
-    navigate(`/${context}/orgs/${orgId}/projects/${projectId}/issues/edit/${issue.id}`);
+    navigate(
+      `/${context}/orgs/${orgId}/projects/${projectId}/issues/edit/${issue.id}`,
+    );
   }
 
   return (
@@ -110,13 +133,15 @@ export default function Issues({ isPublic = false }) {
       <SimpleHeader
         headerButtons={[
           {
-            name: "New Issue",
-            shortcut: "n",
-            id: "new-issue",
+            name: 'New Issue',
+            shortcut: 'n',
+            id: 'new-issue',
             action: () => {
-              navigate(`/${context}/orgs/${orgId}/projects/${projectId}/issues/new`);
-            }
-          }
+              navigate(
+                `/${context}/orgs/${orgId}/projects/${projectId}/issues/new`,
+              );
+            },
+          },
         ]}
       />
       <Container className="mt--6" fluid>
@@ -159,39 +184,59 @@ export default function Issues({ isPublic = false }) {
                   dataLength={issues.length}
                 >
                   <div className="table-responsive border-bottom">
-                    <table className="table align-items-center no-select" style={{ minWidth: "700px" }}>
+                    <table
+                      className="table align-items-center no-select"
+                      style={{ minWidth: '700px' }}
+                    >
                       <thead className="thead-light">
-                      <tr>
-                        <th scope="col" width="60%">Title</th>
-                        <th scope="col" width="20%">Status</th>
-                        <th scope="col" width="20%">Priority</th>
-                      </tr>
+                        <tr>
+                          <th scope="col" width="60%">
+                            Title
+                          </th>
+                          <th scope="col" width="20%">
+                            Status
+                          </th>
+                          <th scope="col" width="20%">
+                            Priority
+                          </th>
+                        </tr>
                       </thead>
                       <tbody className="list">
-                      {issues.length === 0 ? (
-                        <tr>
-                          <td colSpan="3" className="text-center">No issues found.</td>
-                        </tr>
-                      ) : (
-                        issues.map(issue => (
-                          <tr key={issue.id}
-                              onClick={() => navigateToDetailPage(issue)}
-                              style={{ cursor: "pointer" }}>
-                            <td>{issue.title}</td>
-                            <td>
-                              <Badge color="" className="badge-dot mr-4">
-                                <i className={`bg-${getStatusColor(issue.status)}`} />
-                                <span className="status">{formatHyphenatedString(issue.status)}</span>
-                              </Badge>
-                            </td>
-                            <td>
-                              <Badge color={priorityColor(issue.priority)} pill={true}>
-                                {issue.priority}
-                              </Badge>
+                        {issues.length === 0 ? (
+                          <tr>
+                            <td colSpan="3" className="text-center">
+                              No issues found.
                             </td>
                           </tr>
-                        ))
-                      )}
+                        ) : (
+                          issues.map((issue) => (
+                            <tr
+                              key={issue.id}
+                              onClick={() => navigateToDetailPage(issue)}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              <td>{issue.title}</td>
+                              <td>
+                                <Badge color="" className="badge-dot mr-4">
+                                  <i
+                                    className={`bg-${getStatusColor(issue.status)}`}
+                                  />
+                                  <span className="status">
+                                    {formatHyphenatedString(issue.status)}
+                                  </span>
+                                </Badge>
+                              </td>
+                              <td>
+                                <Badge
+                                  color={priorityColor(issue.priority)}
+                                  pill={true}
+                                >
+                                  {issue.priority}
+                                </Badge>
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -207,19 +252,19 @@ export default function Issues({ isPublic = false }) {
 
 function getStatusColor(status) {
   switch (status) {
-    case "submitted":
-    case "acknowledged":
-      return "info";
-    case "under-review":
-    case "in-progress":
-      return "primary";
-    case "awaiting-customer-response":
-      return "warning";
-    case "resolved":
-      return "success";
-    case "closed":
-      return "secondary";
+    case 'submitted':
+    case 'acknowledged':
+      return 'info';
+    case 'under-review':
+    case 'in-progress':
+      return 'primary';
+    case 'awaiting-customer-response':
+      return 'warning';
+    case 'resolved':
+      return 'success';
+    case 'closed':
+      return 'secondary';
     default:
-      return "light";
+      return 'light';
   }
 }

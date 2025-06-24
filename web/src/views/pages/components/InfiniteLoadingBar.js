@@ -1,5 +1,5 @@
-import React from "react";
-import "./InfiniteLoadingBar.css";
+import React from 'react';
+import './InfiniteLoadingBar.css';
 
 const InfiniteLoadingBar = () => {
   return (
@@ -11,14 +11,14 @@ const InfiniteLoadingBar = () => {
 
 const styles = {
   loadingBarContainer: {
-    width: "100%",
-    position: "fixed",
+    width: '100%',
+    position: 'fixed',
     top: 0,
     left: 0,
     zIndex: 9999,
-    height: "4px",
-    backgroundColor: "#f0f0f0" // Light gray background
-  }
+    height: '4px',
+    backgroundColor: '#f0f0f0', // Light gray background
+  },
 };
 
 export default InfiniteLoadingBar;

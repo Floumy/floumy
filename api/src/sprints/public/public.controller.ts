@@ -39,10 +39,7 @@ export class PublicController {
     @Param('projectId') projectId: string,
   ) {
     try {
-      return await this.publicSprintsService.getActiveSprint(
-        orgId,
-        projectId,
-      );
+      return await this.publicSprintsService.getActiveSprint(orgId, projectId);
     } catch (e) {
       throw new BadRequestException();
     }

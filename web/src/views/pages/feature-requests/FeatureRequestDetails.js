@@ -26,7 +26,11 @@ export default function FeatureRequestDetails() {
     async function fetchFeatureRequest(orgId, projectId, featureRequestId) {
       try {
         setIsLoading(true);
-        const featureRequest = await getFeatureRequest(orgId, projectId, featureRequestId);
+        const featureRequest = await getFeatureRequest(
+          orgId,
+          projectId,
+          featureRequestId,
+        );
         setFeatureRequest(featureRequest);
       } catch (e) {
         console.error(e);
@@ -40,7 +44,12 @@ export default function FeatureRequestDetails() {
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addFeatureRequestComment(orgId, projectId, featureRequest.id, comment);
+      const addedComment = await addFeatureRequestComment(
+        orgId,
+        projectId,
+        featureRequest.id,
+        comment,
+      );
       featureRequest.comments.push(addedComment);
       setFeatureRequest({ ...featureRequest });
       toast.success('Comment added successfully');
@@ -51,8 +60,16 @@ export default function FeatureRequestDetails() {
 
   async function handleCommentUpdate(commentId, content) {
     try {
-      const updatedComment = await updateFeatureRequestComment(orgId, projectId, featureRequest.id, commentId, content);
-      const index = featureRequest.comments.findIndex((c) => c.id === updatedComment.id);
+      const updatedComment = await updateFeatureRequestComment(
+        orgId,
+        projectId,
+        featureRequest.id,
+        commentId,
+        content,
+      );
+      const index = featureRequest.comments.findIndex(
+        (c) => c.id === updatedComment.id,
+      );
       featureRequest.comments[index] = updatedComment;
       setFeatureRequest({ ...featureRequest });
       toast.success('Comment updated successfully');
@@ -63,8 +80,15 @@ export default function FeatureRequestDetails() {
 
   async function handleCommentDelete(commentId) {
     try {
-      await deleteFeatureRequestComment(orgId, projectId, featureRequest.id, commentId);
-      const index = featureRequest.comments.findIndex((c) => c.id === commentId);
+      await deleteFeatureRequestComment(
+        orgId,
+        projectId,
+        featureRequest.id,
+        commentId,
+      );
+      const index = featureRequest.comments.findIndex(
+        (c) => c.id === commentId,
+      );
       featureRequest.comments.splice(index, 1);
       setFeatureRequest({ ...featureRequest });
       toast.success('Comment deleted successfully');
@@ -73,45 +97,61 @@ export default function FeatureRequestDetails() {
     }
   }
 
-  return (<>
-    {isLoading && <InfiniteLoadingBar />}
-    <SimpleHeader />
-    <Container className="mt--6" fluid>
-      <Row>
-        <Col lg={8} md={12}>
-          <Row>
-            <Col>
-              <div className="card-wrapper">
-                {isLoading && <Card><CardHeader><h2>Feature Request</h2></CardHeader><LoadingSpinnerBox /></Card>}
-                {!isLoading && featureRequest && <PublicFeatureRequestDetails featureRequest={featureRequest} />}
-              </div>
-            </Col>
-          </Row>
-          {featureRequest?.initiatives && <Row>
-            <Col>
-              <Card>
-                <CardHeader>
-                  <h3 className="mb-0">Related Initiatives</h3>
-                </CardHeader>
-                <PublicInitiativesList
-                  showAssignedTo={false}
-                  orgId={orgId}
-                  projectId={projectId}
-                  initiatives={featureRequest?.initiatives}
-                  headerClassName={'thead'}
-                />
-              </Card>
-            </Col>
-          </Row>}
-        </Col>
-        <Col lg={4} md={12}>
-          <Comments comments={featureRequest?.comments}
-                    onCommentAdd={handleCommentAdd}
-                    onCommentEdit={handleCommentUpdate}
-                    onCommentDelete={handleCommentDelete} />
-        </Col>
-      </Row>
-
-    </Container>
-  </>);
+  return (
+    <>
+      {isLoading && <InfiniteLoadingBar />}
+      <SimpleHeader />
+      <Container className="mt--6" fluid>
+        <Row>
+          <Col lg={8} md={12}>
+            <Row>
+              <Col>
+                <div className="card-wrapper">
+                  {isLoading && (
+                    <Card>
+                      <CardHeader>
+                        <h2>Feature Request</h2>
+                      </CardHeader>
+                      <LoadingSpinnerBox />
+                    </Card>
+                  )}
+                  {!isLoading && featureRequest && (
+                    <PublicFeatureRequestDetails
+                      featureRequest={featureRequest}
+                    />
+                  )}
+                </div>
+              </Col>
+            </Row>
+            {featureRequest?.initiatives && (
+              <Row>
+                <Col>
+                  <Card>
+                    <CardHeader>
+                      <h3 className="mb-0">Related Initiatives</h3>
+                    </CardHeader>
+                    <PublicInitiativesList
+                      showAssignedTo={false}
+                      orgId={orgId}
+                      projectId={projectId}
+                      initiatives={featureRequest?.initiatives}
+                      headerClassName={'thead'}
+                    />
+                  </Card>
+                </Col>
+              </Row>
+            )}
+          </Col>
+          <Col lg={4} md={12}>
+            <Comments
+              comments={featureRequest?.comments}
+              onCommentAdd={handleCommentAdd}
+              onCommentEdit={handleCommentUpdate}
+              onCommentDelete={handleCommentDelete}
+            />
+          </Col>
+        </Row>
+      </Container>
+    </>
+  );
 }

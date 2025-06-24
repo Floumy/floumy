@@ -34,11 +34,7 @@ export class PublicService {
     );
   }
 
-  async getSprintById(
-    orgId: string,
-    projectId: string,
-    sprintId: string,
-  ) {
+  async getSprintById(orgId: string, projectId: string, sprintId: string) {
     await this.validateProjectHasBuildInPublicEnabled(orgId, projectId);
 
     const sprint = await this.sprintsService.findSprint(
@@ -64,10 +60,7 @@ export class PublicService {
       throw new Error('Building in public is not enabled');
     }
 
-    const sprint = await this.sprintsService.findActiveSprint(
-      orgId,
-      projectId,
-    );
+    const sprint = await this.sprintsService.findActiveSprint(orgId, projectId);
     return sprint ? await SprintMapper.toDto(sprint) : null;
   }
 

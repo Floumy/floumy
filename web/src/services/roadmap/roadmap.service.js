@@ -3,7 +3,10 @@ import axios from 'axios';
 
 export async function addInitiative(orgId, projectId, initiative) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives`, initiative);
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives`,
+      initiative,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -12,14 +15,22 @@ export async function addInitiative(orgId, projectId, initiative) {
 
 export async function listAllInitiatives(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function searchInitiativesWithOptions(orgId, projectId, searchOptions, page = 1, limit = 50) {
+export async function searchInitiativesWithOptions(
+  orgId,
+  projectId,
+  searchOptions,
+  page = 1,
+  limit = 50,
+) {
   try {
     const params = new URLSearchParams();
 
@@ -38,17 +49,23 @@ export async function searchInitiativesWithOptions(orgId, projectId, searchOptio
 
     // Build filters object
     const filters = {
-      status: searchOptions.status !== 'all' ? [searchOptions.status] : undefined,
-      assigneeIds: searchOptions.assignee !== 'all' ? [searchOptions.assignee] : undefined,
-      priority: searchOptions.priority !== 'all' ? [searchOptions.priority] : undefined,
-      completedAt: (searchOptions.completedAt?.start || searchOptions.completedAt?.end) ? {
-        start: searchOptions.completedAt.start || undefined,
-        end: searchOptions.completedAt.end || undefined
-      } : undefined
+      status:
+        searchOptions.status !== 'all' ? [searchOptions.status] : undefined,
+      assigneeIds:
+        searchOptions.assignee !== 'all' ? [searchOptions.assignee] : undefined,
+      priority:
+        searchOptions.priority !== 'all' ? [searchOptions.priority] : undefined,
+      completedAt:
+        searchOptions.completedAt?.start || searchOptions.completedAt?.end
+          ? {
+              start: searchOptions.completedAt.start || undefined,
+              end: searchOptions.completedAt.end || undefined,
+            }
+          : undefined,
     };
 
     // Only add filters if there are any active ones
-    if (Object.values(filters).some(v => v !== undefined)) {
+    if (Object.values(filters).some((v) => v !== undefined)) {
       params.append('f', JSON.stringify(filters));
     }
 
@@ -63,7 +80,9 @@ export async function searchInitiativesWithOptions(orgId, projectId, searchOptio
 
 export async function getInitiative(orgId, projectId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${id}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${id}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -72,7 +91,9 @@ export async function getInitiative(orgId, projectId, id) {
 
 export async function getPublicInitiative(orgId, projectId, id) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/initiatives/${id}`);
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/initiatives/${id}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -81,7 +102,10 @@ export async function getPublicInitiative(orgId, projectId, id) {
 
 export async function updateInitiative(orgId, projectId, id, initiative) {
   try {
-    await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${id}`, initiative);
+    await api.put(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${id}`,
+      initiative,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -89,7 +113,9 @@ export async function updateInitiative(orgId, projectId, id, initiative) {
 
 export async function deleteInitiative(orgId, projectId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${id}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${id}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -97,7 +123,10 @@ export async function deleteInitiative(orgId, projectId, id) {
 
 export async function addMilestone(orgId, projectId, milestone) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones`, milestone);
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones`,
+      milestone,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -106,25 +135,39 @@ export async function addMilestone(orgId, projectId, milestone) {
 
 export async function listMilestones(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/list`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/list`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listMilestonesWithInitiatives(orgId, projectId, timeline) {
+export async function listMilestonesWithInitiatives(
+  orgId,
+  projectId,
+  timeline,
+) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/timeline/${timeline}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/timeline/${timeline}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function listPublicMilestonesWithInitiatives(orgId, projectId, timeline) {
+export async function listPublicMilestonesWithInitiatives(
+  orgId,
+  projectId,
+  timeline,
+) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/milestones/timeline/${timeline}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/milestones/timeline/${timeline}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -133,7 +176,9 @@ export async function listPublicMilestonesWithInitiatives(orgId, projectId, time
 
 export async function listInitiativesWithoutMilestone(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/without-milestone`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/without-milestone`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -142,7 +187,9 @@ export async function listInitiativesWithoutMilestone(orgId, projectId) {
 
 export async function getMilestone(orgId, projectId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -151,7 +198,9 @@ export async function getMilestone(orgId, projectId, id) {
 
 export async function getPublicMilestone(orgId, projectId, milestoneId) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/milestones/${milestoneId}`);
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/milestones/${milestoneId}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -160,7 +209,10 @@ export async function getPublicMilestone(orgId, projectId, milestoneId) {
 
 export async function updateMilestone(orgId, projectId, id, milestone) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`, milestone);
+    const response = await api.put(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`,
+      milestone,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -169,79 +221,145 @@ export async function updateMilestone(orgId, projectId, id, milestone) {
 
 export async function deleteMilestone(orgId, projectId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/milestones/${id}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateInitiativeMilestone(orgId, projectId, initiativeId, milestoneId) {
+export async function updateInitiativeMilestone(
+  orgId,
+  projectId,
+  initiativeId,
+  milestoneId,
+) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}`, { milestone: milestoneId });
+    await api.patch(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}`,
+      { milestone: milestoneId },
+    );
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateInitiativeKeyResult(orgId, projectId, initiativeId, keyResultId) {
+export async function updateInitiativeKeyResult(
+  orgId,
+  projectId,
+  initiativeId,
+  keyResultId,
+) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}`, { keyResult: keyResultId });
+    await api.patch(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}`,
+      { keyResult: keyResultId },
+    );
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateInitiativeStatus(orgId, projectId, initiativeId, status) {
+export async function updateInitiativeStatus(
+  orgId,
+  projectId,
+  initiativeId,
+  status,
+) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}`, { status });
+    await api.patch(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}`,
+      { status },
+    );
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateInitiativePriority(orgId, projectId, initiativeId, priority) {
+export async function updateInitiativePriority(
+  orgId,
+  projectId,
+  initiativeId,
+  priority,
+) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}`, { priority });
+    await api.patch(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}`,
+      { priority },
+    );
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function addInitiativeComment(orgId, projectId, initiativeId, comment) {
+export async function addInitiativeComment(
+  orgId,
+  projectId,
+  initiativeId,
+  comment,
+) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}/comments`, {
-      content: comment.content,
-      mentions: comment.mentions
-    });
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}/comments`,
+      {
+        content: comment.content,
+        mentions: comment.mentions,
+      },
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function deleteInitiativeComment(orgId, projectId, initiativeId, commentId) {
+export async function deleteInitiativeComment(
+  orgId,
+  projectId,
+  initiativeId,
+  commentId,
+) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}/comments/${commentId}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}/comments/${commentId}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateInitiativeComment(orgId, projectId, initiativeId, commentId, comment) {
+export async function updateInitiativeComment(
+  orgId,
+  projectId,
+  initiativeId,
+  commentId,
+  comment,
+) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}/comments/${commentId}`, {
-      content: comment.content,
-      mentions: comment.mentions
-    });
+    const response = await api.put(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}/comments/${commentId}`,
+      {
+        content: comment.content,
+        mentions: comment.mentions,
+      },
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function changeAssignee(orgId, projectId, initiativeId, assigneeId) {
+export async function changeAssignee(
+  orgId,
+  projectId,
+  initiativeId,
+  assigneeId,
+) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}/assignee`, { assignee: assigneeId });
+    await api.patch(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/initiatives/${initiativeId}/assignee`,
+      { assignee: assigneeId },
+    );
   } catch (e) {
     throw new Error(e.message);
   }

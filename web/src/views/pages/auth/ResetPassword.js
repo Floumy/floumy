@@ -1,9 +1,8 @@
-
-import React from "react";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
+import React from 'react';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
 // nodejs library that concatenates classes
-import classnames from "classnames";
+import classnames from 'classnames';
 // reactstrap components
 import {
   Button,
@@ -17,14 +16,14 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
-} from "reactstrap";
+  Row,
+} from 'reactstrap';
 // core components
-import AuthHeader from "../../../components/Headers/AuthHeader.js";
-import { useNavigate } from "react-router-dom";
-import InputError from "../../../components/Errors/InputError";
-import { resetPassword } from "../../../services/auth/auth.service";
-import { getInputGroupErrorClass } from "./form-input-utils";
+import AuthHeader from '../../../components/Headers/AuthHeader.js';
+import { useNavigate } from 'react-router-dom';
+import InputError from '../../../components/Errors/InputError';
+import { resetPassword } from '../../../services/auth/auth.service';
+import { getInputGroupErrorClass } from './form-input-utils';
 
 function ResetPassword() {
   const [focusedPassword, setFocusedPassword] = React.useState(false);
@@ -32,17 +31,18 @@ function ResetPassword() {
   const navigate = useNavigate();
   const search = window.location.search;
   const params = new URLSearchParams(search);
-  const resetToken = params.get("token");
+  const resetToken = params.get('token');
 
   const validationSchema = Yup.object({
-    password: Yup.string()
-      .required("The password is required")
+    password: Yup.string().required('The password is required'),
   });
 
   return (
     <>
-      <AuthHeader title="Reset Your Password, Reset Your Journey"
-                  lead="Time for a fresh start! Enter your new password below. Make it strong, make it memorable, and most importantly, make it yours. Ready to unlock your next adventure?" />
+      <AuthHeader
+        title="Reset Your Password, Reset Your Journey"
+        lead="Time for a fresh start! Enter your new password below. Make it strong, make it memorable, and most importantly, make it yours. Ready to unlock your next adventure?"
+      />
       <Container className="mt--8 pb-5">
         <Row className="justify-content-center">
           <Col lg="6" md="8">
@@ -54,7 +54,7 @@ function ResetPassword() {
               </CardHeader>
               <CardBody className="px-lg-5 py-lg-5">
                 <Formik
-                  initialValues={{ password: "" }}
+                  initialValues={{ password: '' }}
                   validationSchema={validationSchema}
                   onSubmit={async (values, { setSubmitting }) => {
                     try {
@@ -65,7 +65,7 @@ function ResetPassword() {
 
                       setSubmitting(false);
 
-                      navigate("/auth/password-reset");
+                      navigate('/auth/password-reset');
                     } catch (e) {
                       setError(e.message);
                     }
@@ -73,13 +73,21 @@ function ResetPassword() {
                 >
                   {({ isSubmitting, errors, touched }) => (
                     <Form>
-                      {error && <div className="text-center text-danger mb-3">{error}</div>}
+                      {error && (
+                        <div className="text-center text-danger mb-3">
+                          {error}
+                        </div>
+                      )}
                       <FormGroup
                         className={classnames({
-                          focused: focusedPassword
+                          focused: focusedPassword,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.password && touched.password)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.password && touched.password,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-lock-circle-open" />
@@ -99,8 +107,13 @@ function ResetPassword() {
                         <ErrorMessage name="password" component={InputError} />
                       </FormGroup>
                       <div className="text-center">
-                        <Button id="login-submit" className="mt-4" color="info" type="submit"
-                                disabled={isSubmitting}>
+                        <Button
+                          id="login-submit"
+                          className="mt-4"
+                          color="info"
+                          type="submit"
+                          disabled={isSubmitting}
+                        >
                           Secure My Account
                         </Button>
                       </div>

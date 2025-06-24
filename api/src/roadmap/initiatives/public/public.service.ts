@@ -10,7 +10,8 @@ import { Project } from '../../../projects/project.entity';
 export class PublicService {
   constructor(
     @InjectRepository(Org) private orgRepository: Repository<Org>,
-    @InjectRepository(Initiative) private initiativesRepository: Repository<Initiative>,
+    @InjectRepository(Initiative)
+    private initiativesRepository: Repository<Initiative>,
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
   ) {}

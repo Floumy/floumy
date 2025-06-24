@@ -1,5 +1,5 @@
-import { Button, Modal } from "reactstrap";
-import React, { useState } from "react";
+import { Button, Modal } from 'reactstrap';
+import React, { useState } from 'react';
 
 export default function TrialExpiredWarning() {
   const [isOpen, setIsOpen] = useState(true);
@@ -38,7 +38,8 @@ export default function TrialExpiredWarning() {
             <i className="ni ni-calendar-grid-58 ni-3x" />
             <h4 className="heading mt-4">Your Trial Has Ended</h4>
             <p>
-              Your 7-day free trial has expired. To continue enjoying our awesome service, please upgrade your plan.
+              Your 7-day free trial has expired. To continue enjoying our
+              awesome service, please upgrade your plan.
             </p>
           </div>
         </div>

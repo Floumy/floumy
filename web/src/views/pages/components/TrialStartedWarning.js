@@ -1,5 +1,5 @@
-import { Button, Modal } from "reactstrap";
-import React, { useState } from "react";
+import { Button, Modal } from 'reactstrap';
+import React, { useState } from 'react';
 
 export default function TrialStartedWarning() {
   const [isOpen, setIsOpen] = useState(true);
@@ -38,8 +38,8 @@ export default function TrialStartedWarning() {
             <i className="ni ni-satisfied ni-3x" />
             <h4 className="heading mt-4">Enjoy Your 7-Day Free Trial</h4>
             <p>
-              You’ve got 7 days to explore all the features. After that, upgrade to keep enjoying our awesome service.
-              Have fun!
+              You’ve got 7 days to explore all the features. After that, upgrade
+              to keep enjoying our awesome service. Have fun!
             </p>
           </div>
         </div>
@@ -48,7 +48,8 @@ export default function TrialStartedWarning() {
             className="ml-auto mr-auto"
             data-dismiss="modal"
             type="button"
-            onClick={() => toggleModal()}>
+            onClick={() => toggleModal()}
+          >
             Got it!
           </Button>
         </div>

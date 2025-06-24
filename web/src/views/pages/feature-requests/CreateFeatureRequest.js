@@ -1,11 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from "react-toastify";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row } from "reactstrap";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
-import InputError from "../../../components/Errors/InputError";
+import { toast } from 'react-toastify';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  FormGroup,
+  Input,
+  Row,
+} from 'reactstrap';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+import InputError from '../../../components/Errors/InputError';
 
 export default function CreateFeatureRequest({ onSubmit }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,10 +35,13 @@ export default function CreateFeatureRequest({ onSubmit }) {
     try {
       setIsLoading(true);
       const savedFeatureRequest = await onSubmit(values);
-      setTimeout(() => toast.success("The feature request has been saved"), 100);
-      navigate(getDetailUrl(savedFeatureRequest.id), {replace: true});
+      setTimeout(
+        () => toast.success('The feature request has been saved'),
+        100,
+      );
+      navigate(getDetailUrl(savedFeatureRequest.id), { replace: true });
     } catch (e) {
-      toast.error("The feature request could not be saved");
+      toast.error('The feature request could not be saved');
     } finally {
       setIsSubmitting(false);
       setIsLoading(false);
@@ -37,14 +49,12 @@ export default function CreateFeatureRequest({ onSubmit }) {
   };
 
   useEffect(() => {
-    document.title = "Floumy | Feature Request";
+    document.title = 'Floumy | Feature Request';
   }, []);
 
   const validationSchema = Yup.object({
-    title: Yup.string()
-      .required("The title is required"),
-    description: Yup.string()
-      .required("The description is required")
+    title: Yup.string().required('The title is required'),
+    description: Yup.string().required('The description is required'),
   });
 
   return (
@@ -56,22 +66,16 @@ export default function CreateFeatureRequest({ onSubmit }) {
         </CardHeader>
         <CardBody>
           <Formik
-            initialValues={{ title: "", description: "" }}
+            initialValues={{ title: '', description: '' }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
             {({ values, handleChange, errors, touched }) => (
-              <Form
-                className="needs-validation"
-                noValidate>
+              <Form className="needs-validation" noValidate>
                 <Row>
                   <Col>
                     <FormGroup>
-                      <label
-                        className="form-control-label"
-                      >
-                        Title
-                      </label>
+                      <label className="form-control-label">Title</label>
                       <Field
                         as={Input}
                         id="title"
@@ -83,18 +87,14 @@ export default function CreateFeatureRequest({ onSubmit }) {
                         invalid={!!(errors.title && touched.title)}
                         autoComplete="off"
                       />
-                      <ErrorMessage name={"title"} component={InputError} />
+                      <ErrorMessage name={'title'} component={InputError} />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Row>
                   <Col>
                     <FormGroup>
-                      <label
-                        className="form-control-label"
-                      >
-                        Description
-                      </label>
+                      <label className="form-control-label">Description</label>
                       <Field
                         as={Input}
                         id="description"
@@ -107,12 +107,15 @@ export default function CreateFeatureRequest({ onSubmit }) {
                         invalid={!!(errors.description && touched.description)}
                         autoComplete="off"
                       />
-                      <ErrorMessage name={"description"} component={InputError} />
+                      <ErrorMessage
+                        name={'description'}
+                        component={InputError}
+                      />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Button
-                  id={"save-feature-request"}
+                  id={'save-feature-request'}
                   color="primary"
                   type="submit"
                   className="mt-3"

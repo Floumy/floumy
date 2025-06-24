@@ -1,15 +1,19 @@
-import axios from "axios";
-import {logout} from "../auth/auth.service";
+import axios from 'axios';
+import { logout } from '../auth/auth.service';
 
 // Create an Axios instance
 const api = axios.create({
-  withCredentials: true
+  withCredentials: true,
 });
 
 async function refreshTokens() {
-  await axios.post(`${process.env.REACT_APP_API_URL}/auth/refresh-token`, {}, {
-    withCredentials: true
-  });
+  await axios.post(
+    `${process.env.REACT_APP_API_URL}/auth/refresh-token`,
+    {},
+    {
+      withCredentials: true,
+    },
+  );
 }
 
 function retryOriginalRequestWithTheNewAccessToken(error) {
@@ -18,19 +22,19 @@ function retryOriginalRequestWithTheNewAccessToken(error) {
 }
 
 export async function logoutUser() {
-  localStorage.removeItem("currentUserName");
-  localStorage.removeItem("currentUserId");
-  localStorage.removeItem("currentUserOrgId");
-  localStorage.removeItem("currentOrg");
-  localStorage.removeItem("currentOrgName");
-  localStorage.removeItem("paymentPlan");
-  localStorage.removeItem("isSubscribed");
-  localStorage.removeItem("nextPaymentDate");
-  await logout()
+  localStorage.removeItem('currentUserName');
+  localStorage.removeItem('currentUserId');
+  localStorage.removeItem('currentUserOrgId');
+  localStorage.removeItem('currentOrg');
+  localStorage.removeItem('currentOrgName');
+  localStorage.removeItem('paymentPlan');
+  localStorage.removeItem('isSubscribed');
+  localStorage.removeItem('nextPaymentDate');
+  await logout();
 }
 
 // Add a response interceptor
-api.interceptors.response.use(null, async error => {
+api.interceptors.response.use(null, async (error) => {
   const originalRequest = error.config;
   if (error.response.status === 401) {
     if (!originalRequest._retryCount) {
@@ -39,7 +43,7 @@ api.interceptors.response.use(null, async error => {
 
     if (originalRequest._retryCount >= 3) {
       await logoutUser();
-      window.location.href = "/auth/sign-in";
+      window.location.href = '/auth/sign-in';
       return Promise.reject(error);
     }
 
@@ -50,12 +54,12 @@ api.interceptors.response.use(null, async error => {
       return retryOriginalRequestWithTheNewAccessToken(error);
     } catch (refreshError) {
       await logoutUser();
-      window.location.href = "/auth/sign-in";
+      window.location.href = '/auth/sign-in';
     }
   }
 
   if (error.response.status === 402) {
-    window.location.href = "/admin/billing?expired=true";
+    window.location.href = '/admin/billing?expired=true';
   }
 
   // If the error is due to other reasons, we'll just pass it along

@@ -7,7 +7,8 @@ import {
   Headers,
   Param,
   Post,
-  Put, Query,
+  Put,
+  Query,
   Request,
   UnauthorizedException,
   UseGuards,
@@ -156,17 +157,21 @@ export class GitlabController {
   }
   @Get('/merge-requests/orgs/:orgId/projects/:projectId/mrs/cycle-time')
   async getPullRequestCycleTime(
-      @Request() request: any,
-      @Param('orgId') orgId: string,
-      @Param('projectId') projectId: string,
-      @Query('timeframeInDays') timeframeInDays: string,
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Query('timeframeInDays') timeframeInDays: string,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.gitlabService.getPRsCycleTime(orgId, projectId, parseInt(timeframeInDays));
+      return await this.gitlabService.getPRsCycleTime(
+        orgId,
+        projectId,
+        parseInt(timeframeInDays),
+      );
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -174,17 +179,21 @@ export class GitlabController {
 
   @Get('/merge-requests/orgs/:orgId/projects/:projectId/mrs/merge-time')
   async getPullRequestMergeTime(
-      @Request() request: any,
-      @Param('orgId') orgId: string,
-      @Param('projectId') projectId: string,
-      @Query('timeframeInDays') timeframeInDays: string,
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Query('timeframeInDays') timeframeInDays: string,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.gitlabService.getAverageMergeTime(orgId, projectId, parseInt(timeframeInDays));
+      return await this.gitlabService.getAverageMergeTime(
+        orgId,
+        projectId,
+        parseInt(timeframeInDays),
+      );
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -192,17 +201,21 @@ export class GitlabController {
 
   @Get('/merge-requests/orgs/:orgId/projects/:projectId/mrs/first-review-time')
   async getPullRequestFirstReviewTime(
-      @Request() request: any,
-      @Param('orgId') orgId: string,
-      @Param('projectId') projectId: string,
-      @Query('timeframeInDays') timeframeInDays: string,
+    @Request() request: any,
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Query('timeframeInDays') timeframeInDays: string,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
     try {
-      return await this.gitlabService.getAverageFirstReviewTime(orgId, projectId, parseInt(timeframeInDays));
+      return await this.gitlabService.getAverageFirstReviewTime(
+        orgId,
+        projectId,
+        parseInt(timeframeInDays),
+      );
     } catch (e) {
       throw new BadRequestException(e.message);
     }

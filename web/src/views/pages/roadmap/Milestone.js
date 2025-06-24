@@ -11,7 +11,7 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
   const [initiatives, setInitiatives] = useState([]);
   const [showInitiatives, setShowInitiatives] = useState(true);
   useEffect(() => {
-    const priority = ["high", "medium", "low"];
+    const priority = ['high', 'medium', 'low'];
     const initiatives = milestone.initiatives.sort((a, b) => {
       return priority.indexOf(a.priority) - priority.indexOf(b.priority);
     });
@@ -19,27 +19,36 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
   }, [milestone?.initiatives]);
 
   function getMilestoneHeader() {
-    return <>
-      <h3 className="pt-2 pr-4">
-        <button onClick={(e) => {
-          e.preventDefault();
-          setShowInitiatives(!showInitiatives);
-        }}
-                className="btn btn-sm btn-outline-light shadow-none shadow-none--hover pt-1 pb-0 pr-2">
-          {!showInitiatives && <i className="ni ni-bold-right" />}
-          {showInitiatives && <i className="ni ni-bold-down" />}
-        </button>
-        <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/edit/${milestone.id}`}>
-          <span className="text-gray">{milestone.dueDate}</span> | {milestone.title} <span
-          className="text-muted text-sm"></span>
-        </Link>
-      </h3>
-      <div className={"text-muted text-sm"}>Initiatives Count: {milestone.initiatives.length}</div>
-      {milestone.description &&
-        <div className="text-sm text-muted">
-          Description: {milestone.description}
-        </div>}
-    </>;
+    return (
+      <>
+        <h3 className="pt-2 pr-4">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setShowInitiatives(!showInitiatives);
+            }}
+            className="btn btn-sm btn-outline-light shadow-none shadow-none--hover pt-1 pb-0 pr-2"
+          >
+            {!showInitiatives && <i className="ni ni-bold-right" />}
+            {showInitiatives && <i className="ni ni-bold-down" />}
+          </button>
+          <Link
+            to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/edit/${milestone.id}`}
+          >
+            <span className="text-gray">{milestone.dueDate}</span> |{' '}
+            {milestone.title} <span className="text-muted text-sm"></span>
+          </Link>
+        </h3>
+        <div className={'text-muted text-sm'}>
+          Initiatives Count: {milestone.initiatives.length}
+        </div>
+        {milestone.description && (
+          <div className="text-sm text-muted">
+            Description: {milestone.description}
+          </div>
+        )}
+      </>
+    );
   }
 
   async function handleAddInitiativeWithMilestone(initiative, milestoneId) {
@@ -50,8 +59,10 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
   }
 
   function updateInitiativesStatus(updatedInitiatives, status) {
-    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
-    const updatedInitiativesStatus = initiatives.map(initiative => {
+    const updatedInitiativesIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    const updatedInitiativesStatus = initiatives.map((initiative) => {
       if (updatedInitiativesIds.includes(initiative.id)) {
         initiative.status = status;
       }
@@ -61,8 +72,10 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
   }
 
   function updateInitiativesPriority(updatedInitiatives, priority) {
-    const updatedInitiativesIds = updatedInitiatives.map(initiative => initiative.id);
-    const updatedInitiativesPriority = initiatives.map(initiative => {
+    const updatedInitiativesIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    const updatedInitiativesPriority = initiatives.map((initiative) => {
       if (updatedInitiativesIds.includes(initiative.id)) {
         initiative.priority = priority;
       }
@@ -72,8 +85,8 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
   }
 
   function updateInitiativesUser(updatedInitiatives, newAssignedTo) {
-    const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
-    const updatedInitiativesList = initiatives.map(initiative => {
+    const updatedInitiativesIds = updatedInitiatives.map((f) => f.id);
+    const updatedInitiativesList = initiatives.map((initiative) => {
       if (updatedInitiativesIds.includes(initiative.id)) {
         initiative.assignedTo = newAssignedTo;
       }
@@ -82,7 +95,10 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
     setInitiatives([...sortByPriority(updatedInitiativesList)]);
   }
 
-  async function updateInitiativesAssignedTo(updatedInitiatives, newAssignedTo) {
+  async function updateInitiativesAssignedTo(
+    updatedInitiatives,
+    newAssignedTo,
+  ) {
     if (!newAssignedTo) {
       updateInitiativesUser(updatedInitiatives, newAssignedTo);
       return;
@@ -95,9 +111,7 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
     <>
       <div className="mb-5">
         <Row className="pl-4 pr-4 pb-2">
-          <Col sm={12}>
-            {getMilestoneHeader()}
-          </Col>
+          <Col sm={12}>{getMilestoneHeader()}</Col>
         </Row>
         <Row>
           <Col>
@@ -106,9 +120,12 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
                 id={`milestone-${milestone.id}-initiatives-context-menu`}
                 initiatives={initiatives}
                 showAssignedTo={true}
-                headerClassName={"thead"}
+                headerClassName={'thead'}
                 onAddInitiative={async (initiative) => {
-                  await handleAddInitiativeWithMilestone(initiative, milestone.id);
+                  await handleAddInitiativeWithMilestone(
+                    initiative,
+                    milestone.id,
+                  );
                 }}
                 onChangeAssignedTo={updateInitiativesAssignedTo}
                 onChangePriority={updateInitiativesPriority}

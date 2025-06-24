@@ -126,7 +126,9 @@ describe('InitiativesController', () => {
         },
       );
       expect(initiativeResponse.title).toEqual('my initiative');
-      expect(initiativeResponse.description).toEqual('my initiative description');
+      expect(initiativeResponse.description).toEqual(
+        'my initiative description',
+      );
       expect(initiativeResponse.priority).toEqual(Priority.HIGH);
       expect(initiativeResponse.status).toEqual(InitiativeStatus.CLOSED);
       expect(initiativeResponse.createdAt).toBeDefined();

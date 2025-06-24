@@ -21,5 +21,7 @@ export class AddFeedItem1720466098756 implements MigrationInterface {
     `);
   }
 
+  /* eslint-disable */
   public async down(queryRunner: QueryRunner): Promise<void> {}
+    /* eslint-enable */
 }

@@ -11,7 +11,6 @@ import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
 import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
-import {OrgsModule} from "../orgs/orgs.module";
 
 @Module({
   imports: [

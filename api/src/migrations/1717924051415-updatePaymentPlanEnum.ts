@@ -7,5 +7,7 @@ ALTER TYPE org_payment_plan_enum ADD VALUE 'trial' AFTER 'build-in-public';
 ALTER TYPE org_payment_plan_enum ADD VALUE 'free' AFTER 'trial';`);
   }
 
+  /* eslint-disable */
   public async down(queryRunner: QueryRunner): Promise<void> {}
+    /* eslint-enable */
 }

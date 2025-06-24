@@ -19,7 +19,12 @@ export default function useLayoutHandler(slug) {
       }
       if (prop.layout === `/${slug}`) {
         return (
-          <Route path={prop.path} element={prop.component} key={prop.path} exact />
+          <Route
+            path={prop.path}
+            element={prop.component}
+            key={prop.path}
+            exact
+          />
         );
       } else {
         return null;

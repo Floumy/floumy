@@ -27,7 +27,9 @@ export class Milestone {
   updatedAt: Date;
   @ManyToOne(() => Org, (org) => org.milestones, { lazy: true })
   org: Promise<Org>;
-  @OneToMany(() => Initiative, (initiative) => initiative.milestone, { lazy: true })
+  @OneToMany(() => Initiative, (initiative) => initiative.milestone, {
+    lazy: true,
+  })
   initiatives: Promise<Initiative[]>;
   @ManyToOne(() => Project, (project) => project.milestones, { lazy: true })
   project: Promise<Project>;

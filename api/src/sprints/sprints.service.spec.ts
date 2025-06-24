@@ -156,11 +156,7 @@ describe('SprintsService', () => {
         startDate: '2020-01-01',
         duration: 1,
       });
-      const foundSprint = await service.get(
-        org.id,
-        project.id,
-        sprint.id,
-      );
+      const foundSprint = await service.get(org.id, project.id, sprint.id);
       expect(foundSprint.id).toBeDefined();
       expect(foundSprint.title).toEqual('Sprint CW1-CW2 2020');
       expect(foundSprint.goal).toEqual('Test Sprint');
@@ -277,11 +273,7 @@ describe('SprintsService', () => {
         project.id,
         sprint2.id,
       );
-      const completedSprint = await service.get(
-        org.id,
-        project.id,
-        sprint1.id,
-      );
+      const completedSprint = await service.get(org.id, project.id, sprint1.id);
       expect(completedSprint.status).toEqual('completed');
       expect(completedSprint.actualEndDate).toBeDefined();
       expect(completedSprint.actualStartDate).toBeDefined();
@@ -320,19 +312,13 @@ describe('SprintsService', () => {
         project.id,
         sprint.id,
       );
-      const activeSprint = await service.getActiveSprint(
-        org.id,
-        project.id,
-      );
+      const activeSprint = await service.getActiveSprint(org.id, project.id);
       expect(activeSprint.id).toEqual(startedSprint.id);
       expect(activeSprint.workItems.length).toEqual(1);
       expect(activeSprint.workItems[0].id).toEqual(workItem.id);
     });
     it('should return null if there is no active sprint', async () => {
-      const activeSprint = await service.getActiveSprint(
-        org.id,
-        project.id,
-      );
+      const activeSprint = await service.getActiveSprint(org.id, project.id);
       expect(activeSprint).toBeNull();
     });
   });

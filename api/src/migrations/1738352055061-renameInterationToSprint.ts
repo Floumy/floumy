@@ -33,5 +33,7 @@ export class RenameIterationToSprint1738352055061
         `);
   }
 
+  /* eslint-disable */
   public async down(queryRunner: QueryRunner): Promise<void> {}
+    /* eslint-enable */
 }

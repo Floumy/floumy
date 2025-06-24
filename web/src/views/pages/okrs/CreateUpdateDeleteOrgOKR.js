@@ -1,4 +1,12 @@
-import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Input,
+  Row,
+} from 'reactstrap';
 import { ErrorMessage, Field, FieldArray, Form, Formik } from 'formik';
 import InputError from '../../../components/Errors/InputError';
 import React, { useEffect, useState } from 'react';
@@ -42,10 +50,16 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
     try {
       setSubmitting(true);
       // Remove empty key results
-      const keyResults = fields
-        .filter((field) => field.title);
-      const savedOKR = await onSubmit({ ...values, timeline, assignedTo, keyResults: keyResults });
-      navigate(`/orgs/${orgId}/okrs/detail/${savedOKR.objective.id}`, {replace: true});
+      const keyResults = fields.filter((field) => field.title);
+      const savedOKR = await onSubmit({
+        ...values,
+        timeline,
+        assignedTo,
+        keyResults: keyResults,
+      });
+      navigate(`/orgs/${orgId}/okrs/detail/${savedOKR.objective.id}`, {
+        replace: true,
+      });
       setTimeout(() => toast.success('The OKR has been saved'), 100);
     } catch (e) {
       toast.error('The OKR could not be saved');
@@ -66,7 +80,7 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
 
     if (okr.keyResults.length > 0) {
       const keyResults = okr.keyResults
-        .sort((a, b) => a.createdAt < b.createdAt ? -1 : 1)
+        .sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1))
         .map((keyResult) => {
           return {
             id: keyResult.id,
@@ -78,8 +92,7 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
   }, [okr]);
 
   const validationSchema = Yup.object({
-    objective: Yup.string()
-      .required('The objective is required'),
+    objective: Yup.string().required('The objective is required'),
   });
 
   const handleFieldChange = (e, keyResultId, index) => {
@@ -102,7 +115,11 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
   };
 
   const handleFieldKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && fields[index].title === '' && fields.length > 1) {
+    if (
+      e.key === 'Backspace' &&
+      fields[index].title === '' &&
+      fields.length > 1
+    ) {
       // This is important to prevent React to propagate the event further and call handleFieldChange
       e.preventDefault();
       setFields(fields.filter((_, idx) => idx !== index));
@@ -113,8 +130,10 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
     async function fetchAndSetMembers() {
       const org = await getOrg();
       const mappedUsers = org.members
-        .filter(user => user.isActive || user.id === okr?.objective?.assignedTo)
-        .map(user => {
+        .filter(
+          (user) => user.isActive || user.id === okr?.objective?.assignedTo,
+        )
+        .map((user) => {
           return { id: user.id, text: user.name };
         });
       mappedUsers.push({ id: '', text: 'None' });
@@ -124,9 +143,7 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
     async function fetchData() {
       setIsLoading(true);
       try {
-        await Promise.all([
-          fetchAndSetMembers(),
-        ]);
+        await Promise.all([fetchAndSetMembers()]);
       } catch (e) {
         toast.error('The members could not be loaded.');
       } finally {
@@ -139,8 +156,10 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
 
   async function fillKeyResultsWithAi(objective) {
     try {
-      const keyResults = (await generateKeyResults(objective))
-        .map((kr) => ({ id: kr.title, title: kr.title }));
+      const keyResults = (await generateKeyResults(objective)).map((kr) => ({
+        id: kr.title,
+        title: kr.title,
+      }));
       setFields([...keyResults, ...fields]);
     } catch (e) {
       toast.error('The key results could not be filled with AI');
@@ -166,14 +185,15 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
         </CardHeader>
         <CardBody>
           <Formik
-            initialValues={{ objective: okr?.objective.title || '', keyResults: fields }}
+            initialValues={{
+              objective: okr?.objective.title || '',
+              keyResults: fields,
+            }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
             {({ values, handleChange, isSubmitting, errors, touched }) => (
-              <Form
-                className="needs-validation"
-                noValidate>
+              <Form className="needs-validation" noValidate>
                 <Row>
                   <Col className="mb-3" md={12} lg={12}>
                     <label
@@ -211,7 +231,8 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
                         { id: 'next-quarter', text: 'Next Quarter' },
                         { id: 'later', text: 'Later' },
                       ]}
-                      onChange={handleTimelineChange}></Select2>
+                      onChange={handleTimelineChange}
+                    ></Select2>
                   </Col>
                   <Col className="mb-3" md={12} lg={6}>
                     <label
@@ -235,14 +256,19 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
                       htmlFor="validationCustom01"
                     >
                       Key Results
-                      {isPlaceholderKeyResultOnly() && <AIButton
-                        disabled={values.objective.length === 0}
-                        onClick={async () => await fillKeyResultsWithAi(values.objective)}
-                      />}
+                      {isPlaceholderKeyResultOnly() && (
+                        <AIButton
+                          disabled={values.objective.length === 0}
+                          onClick={async () =>
+                            await fillKeyResultsWithAi(values.objective)
+                          }
+                        />
+                      )}
                     </label>
                     <FieldArray name="keyResults">
                       <div>
-                        {fields && fields.length > 0 &&
+                        {fields &&
+                          fields.length > 0 &&
                           fields.map((field, index) => (
                             <Field
                               id={`key-result-${index}`}
@@ -259,7 +285,9 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
                               }}
                               onKeyDown={(e) => handleFieldKeyDown(e, index)}
                               autoComplete={'off'}
-                              invalid={!!(errors.keyResults && touched.keyResults)}
+                              invalid={
+                                !!(errors.keyResults && touched.keyResults)
+                              }
                             />
                           ))}
                       </div>
@@ -276,18 +304,20 @@ function CreateUpdateDeleteOrgOKR({ onSubmit, okr }) {
                   >
                     Save Objective
                   </Button>
-                  {okr && <Button
-                    id={'delete-objective'}
-                    color="secondary"
-                    type="button"
-                    className="ml-0 mb-3"
-                    onClick={() => {
-                      setIsDeleteWarningOpen(true);
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    Delete Objective
-                  </Button>}
+                  {okr && (
+                    <Button
+                      id={'delete-objective'}
+                      color="secondary"
+                      type="button"
+                      className="ml-0 mb-3"
+                      onClick={() => {
+                        setIsDeleteWarningOpen(true);
+                      }}
+                      disabled={isSubmitting}
+                    >
+                      Delete Objective
+                    </Button>
+                  )}
                 </div>
               </Form>
             )}

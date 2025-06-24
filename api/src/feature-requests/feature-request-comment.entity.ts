@@ -1,7 +1,7 @@
-import {Entity, JoinTable, ManyToMany, ManyToOne} from 'typeorm';
+import { Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { FeatureRequest } from './feature-request.entity';
 import { Comment } from '../comments/comment-entity';
-import {User} from "../users/user.entity";
+import { User } from '../users/user.entity';
 
 @Entity()
 export class FeatureRequestComment extends Comment {

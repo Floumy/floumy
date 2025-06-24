@@ -1,12 +1,12 @@
-import { useParams } from "react-router-dom";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Card, Container, Row } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import { getPublicWorkItem } from "../../../services/backlog/backlog.service";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import NotFoundCard from "../components/NotFoundCard";
-import PublicWorkItem from "./PublicWorkItem";
+import { useParams } from 'react-router-dom';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Card, Container, Row } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { getPublicWorkItem } from '../../../services/backlog/backlog.service';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import NotFoundCard from '../components/NotFoundCard';
+import PublicWorkItem from './PublicWorkItem';
 
 function PublicDetailWorkItem() {
   const [loading, setLoading] = useState(true);
@@ -31,17 +31,20 @@ function PublicDetailWorkItem() {
   return (
     <>
       {loading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        breadcrumbs={workItem?.breadcrumbs}
-        isPublic={true}
-      />
+      <SimpleHeader breadcrumbs={workItem?.breadcrumbs} isPublic={true} />
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">
             <div className="card-wrapper">
-              {loading && <Card><LoadingSpinnerBox /></Card>}
+              {loading && (
+                <Card>
+                  <LoadingSpinnerBox />
+                </Card>
+              )}
               {workItem && <PublicWorkItem workItem={workItem} />}
-              {!workItem && !loading && <NotFoundCard message={"Work item not found"} />}
+              {!workItem && !loading && (
+                <NotFoundCard message={'Work item not found'} />
+              )}
             </div>
           </div>
         </Row>

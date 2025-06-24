@@ -12,9 +12,13 @@ import { IssueComment } from './issue-comment.entity';
 import { CommentMapper } from '../comments/mappers';
 import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import {CreateNotificationDto} from "../notifications/dtos";
-import {ActionType, EntityType, StatusType} from "../notifications/notification.entity";
-import {EventEmitter2} from "@nestjs/event-emitter";
+import { CreateNotificationDto } from '../notifications/dtos';
+import {
+  ActionType,
+  EntityType,
+  StatusType,
+} from '../notifications/notification.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class IssuesService {
