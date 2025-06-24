@@ -22,9 +22,7 @@ class WorkItemMapper {
       type: workItem.type,
       status: workItem.status,
       estimation: workItem.estimation,
-      sprint: sprint
-        ? { id: sprint.id, title: sprint.title }
-        : null,
+      sprint: sprint ? { id: sprint.id, title: sprint.title } : null,
       initiative: initiative ? InitiativeMapper.toDto(initiative) : null,
       assignedTo: assignedTo
         ? { id: assignedTo.id, name: assignedTo.name }

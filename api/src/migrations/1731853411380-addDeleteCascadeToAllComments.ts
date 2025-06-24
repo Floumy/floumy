@@ -57,5 +57,7 @@ export class AddDeleteCascadeToAllComments1731853411380
     `);
   }
 
+  /* eslint-disable */
   public async down(queryRunner: QueryRunner): Promise<void> {}
+    /* eslint-enable */
 }

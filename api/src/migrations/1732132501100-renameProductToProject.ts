@@ -59,8 +59,9 @@ export class RenameProjectToProject1732132501100 implements MigrationInterface {
     `);
   }
 
+  /* eslint-disable */
   public async down(queryRunner: QueryRunner): Promise<void> {
     throw new Error('This migration cannot be reversed');
   }
-
+    /* eslint-enable */
 }

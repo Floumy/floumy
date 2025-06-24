@@ -24,7 +24,7 @@ import {
   EntityType,
   StatusType,
 } from '../notifications/notification.entity';
-import {EventEmitter2} from "@nestjs/event-emitter";
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class FeatureRequestsService {

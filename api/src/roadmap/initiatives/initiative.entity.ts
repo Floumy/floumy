@@ -75,7 +75,10 @@ export class Initiative {
   milestone: Promise<Milestone>;
   @OneToMany(() => WorkItem, (workItem) => workItem.initiative, { lazy: true })
   workItems: Promise<WorkItem[]>;
-  @OneToMany(() => InitiativeFile, (initiativeFile) => initiativeFile.initiative)
+  @OneToMany(
+    () => InitiativeFile,
+    (initiativeFile) => initiativeFile.initiative,
+  )
   initiativeFiles: Promise<InitiativeFile[]>;
   @OneToMany(
     () => InitiativeComment,

@@ -12,7 +12,6 @@ import { User } from '../users/user.entity';
 import { OrgsService } from '../orgs/orgs.service';
 import { Org } from '../orgs/org.entity';
 
-
 describe('AuthController', () => {
   let controller: AuthController;
   let usersService: UsersService;
@@ -38,7 +37,7 @@ describe('AuthController', () => {
     response = {
       cookies: jest.fn(),
       cookie: jest.fn(),
-    }
+    };
   });
 
   afterEach(async () => {
@@ -61,10 +60,13 @@ describe('AuthController', () => {
       const user = await usersService.findOneByEmail('john@example.com');
       user.isActive = true;
       await usersService.save(user);
-      const { lastSignedIn } = await controller.signIn({
-        email: 'john@example.com',
-        password: 'testtesttest',
-      }, response);
+      const { lastSignedIn } = await controller.signIn(
+        {
+          email: 'john@example.com',
+          password: 'testtesttest',
+        },
+        response,
+      );
       expect(lastSignedIn).toBeDefined();
     });
   });
@@ -72,10 +74,13 @@ describe('AuthController', () => {
   describe('when signing in with invalid credentials', () => {
     it('should throw an error', async () => {
       await expect(
-        controller.signIn({
-          email: 'john',
-          password: 'wrongpassword',
-        }, response),
+        controller.signIn(
+          {
+            email: 'john',
+            password: 'wrongpassword',
+          },
+          response,
+        ),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
@@ -93,22 +98,29 @@ describe('AuthController', () => {
       user.isActive = true;
       await usersService.save(user);
 
-      await controller.signIn({
-        email: 'test@example.com',
-        password: 'testtesttest',
-      }, response);
+      await controller.signIn(
+        {
+          email: 'test@example.com',
+          password: 'testtesttest',
+        },
+        response,
+      );
       const request = {
         cookies: {
           refreshToken: response.cookie.mock.calls[1][1],
         },
-      }
+      };
       // Wait for 1 second to make sure the refresh token is regenerated
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      await controller.refreshToken(request, response)
-      expect(response.cookie.mock.calls[2][1]).toBeDefined()
-      expect(response.cookie.mock.calls[3][1]).toBeDefined()
-      expect(response.cookie.mock.calls[2][1]).not.toEqual(response.cookie.mock.calls[0][1]);
-      expect(response.cookie.mock.calls[3][1]).not.toEqual(response.cookie.mock.calls[1][1]);
+      await controller.refreshToken(request, response);
+      expect(response.cookie.mock.calls[2][1]).toBeDefined();
+      expect(response.cookie.mock.calls[3][1]).toBeDefined();
+      expect(response.cookie.mock.calls[2][1]).not.toEqual(
+        response.cookie.mock.calls[0][1],
+      );
+      expect(response.cookie.mock.calls[3][1]).not.toEqual(
+        response.cookie.mock.calls[1][1],
+      );
     });
   });
 

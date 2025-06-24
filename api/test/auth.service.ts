@@ -1,12 +1,16 @@
-import * as request from "supertest";
-import { HttpStatus, INestApplication } from "@nestjs/common";
+import * as request from 'supertest';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 
-export async function signIn(app: INestApplication, email: string, password: string): Promise<request.Test> {
+export async function signIn(
+  app: INestApplication,
+  email: string,
+  password: string,
+): Promise<request.Test> {
   return request(app.getHttpServer())
-    .post("/auth/sign-in")
+    .post('/auth/sign-in')
     .send({
       email,
-      password
+      password,
     })
     .expect(HttpStatus.OK)
     .expect(({ body }) => {
@@ -14,18 +18,28 @@ export async function signIn(app: INestApplication, email: string, password: str
     });
 }
 
-export async function signUp(app: INestApplication, name: string, email: string, password: string): Promise<request.Test> {
+export async function signUp(
+  app: INestApplication,
+  name: string,
+  email: string,
+  password: string,
+): Promise<request.Test> {
   return request(app.getHttpServer())
-    .post("/auth/sign-up")
+    .post('/auth/sign-up')
     .send({
       name,
       email,
-      password
+      password,
     })
     .expect(HttpStatus.CREATED);
 }
 
-export async function signUpAndSignIn(app: INestApplication, name: string, email: string, password: string): Promise<request.Test> {
+export async function signUpAndSignIn(
+  app: INestApplication,
+  name: string,
+  email: string,
+  password: string,
+): Promise<request.Test> {
   await signUp(app, name, email, password);
   return signIn(app, email, password);
 }
