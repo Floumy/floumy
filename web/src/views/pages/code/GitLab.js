@@ -1,11 +1,24 @@
 import React, { useEffect } from 'react';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Alert, Card, CardBody, CardHeader, CardTitle, Col, Container, Row, UncontrolledTooltip } from 'reactstrap';
+import {
+  Alert,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Container,
+  Row,
+  UncontrolledTooltip,
+} from 'reactstrap';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   disconnectProject,
-  getIsGitLabConnected, getMergeRequestsCycleTime, getMergeRequestsFirstReviewTime, getMergeRequestsMergeTime,
+  getIsGitLabConnected,
+  getMergeRequestsCycleTime,
+  getMergeRequestsFirstReviewTime,
+  getMergeRequestsMergeTime,
   listMergeRequests,
   listProjects,
   setProject,
@@ -16,9 +29,9 @@ import PRs from '../../../components/Code/PRs';
 import { toast } from 'react-toastify';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import DeleteWarning from '../components/DeleteWarning';
-import {CycleTime} from "./charts/CycleTime";
-import {MergeTime} from "./charts/MergeTime";
-import {FirstReviewTime} from "./charts/FirstReviewTime";
+import { CycleTime } from './charts/CycleTime';
+import { MergeTime } from './charts/MergeTime';
+import { FirstReviewTime } from './charts/FirstReviewTime';
 
 function GitLab() {
   const { orgId, projectId } = useParams();
@@ -59,7 +72,8 @@ function GitLab() {
       const mergeRequests = await listMergeRequests(orgId, projectId);
       setMergeRequests(mergeRequests);
 
-      const { connected: isConnected, gitlabProject } = await getIsGitLabConnected(orgId, projectId);
+      const { connected: isConnected, gitlabProject } =
+        await getIsGitLabConnected(orgId, projectId);
       setIsGitLabConnected(isConnected);
       setGitlabProject(gitlabProject);
 
@@ -75,7 +89,8 @@ function GitLab() {
     async function fetchIsConnected() {
       setIsLoading(true);
       try {
-        const { connected: isConnected, gitlabProject } = await getIsGitLabConnected(orgId, projectId);
+        const { connected: isConnected, gitlabProject } =
+          await getIsGitLabConnected(orgId, projectId);
         setIsGitLabConnected(isConnected);
         setGitlabProject(gitlabProject);
 
@@ -88,7 +103,6 @@ function GitLab() {
           const projects = await listProjects(orgId, projectId);
           setProjects(projects);
         }
-
       } catch (e) {
         console.error(e);
       } finally {
@@ -138,52 +152,89 @@ function GitLab() {
           toggle={() => setDisconnectWarning(!disconnectWarning)}
           warningMessage={'Are you sure you want to disconnect from GitLab?'}
           entity={'connection to GitLab'}
-          onDelete={async () => await handleGitlabProjectDisconnect()} />
+          onDelete={async () => await handleGitlabProjectDisconnect()}
+        />
         <Row>
           <Col>
             <Card className="mb-5">
               <CardHeader>
                 <Row>
                   <Col md={12}>
-                    <CardTitle tag="h2" className="mb-3"> {mergeRequests && gitlabProject ? <>
-                      Merge Requests {' '}
-                      <a className="btn-link text-blue mr-2" href={gitlabProject.url} target="_blank" rel="noreferrer">
-                        | {gitlabProject.name}
-                      </a>
-                      <i className="fa fa-edit mr-2" style={{ cursor: 'pointer' }} onClick={editGitlabProject} />
-                      <UncontrolledTooltip target="disconnect-from-github" placement="top">
-                        Disconnect from GitLab
-                      </UncontrolledTooltip>
-                      <i className="fa fa-xmark mr-2" style={{ cursor: 'pointer' }} id="disconnect-from-github"
-                         onClick={() => setDisconnectWarning(true)} />
-                    </> : <span className="mr-2">GitLab Integration</span>}
+                    <CardTitle tag="h2" className="mb-3">
+                      {' '}
+                      {mergeRequests && gitlabProject ? (
+                        <>
+                          Merge Requests{' '}
+                          <a
+                            className="btn-link text-blue mr-2"
+                            href={gitlabProject.url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            | {gitlabProject.name}
+                          </a>
+                          <i
+                            className="fa fa-edit mr-2"
+                            style={{ cursor: 'pointer' }}
+                            onClick={editGitlabProject}
+                          />
+                          <UncontrolledTooltip
+                            target="disconnect-from-github"
+                            placement="top"
+                          >
+                            Disconnect from GitLab
+                          </UncontrolledTooltip>
+                          <i
+                            className="fa fa-xmark mr-2"
+                            style={{ cursor: 'pointer' }}
+                            id="disconnect-from-github"
+                            onClick={() => setDisconnectWarning(true)}
+                          />
+                        </>
+                      ) : (
+                        <span className="mr-2">GitLab Integration</span>
+                      )}
                     </CardTitle>
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
                 {isLoading && <LoadingSpinnerBox />}
-                {!isLoading && !isGitLabConnected &&
+                {!isLoading && !isGitLabConnected && (
                   <form onSubmit={saveToken}>
                     <div className="form-group">
                       <Alert variant="warning" color="warning" className="mb-3">
                         <i className="fa fa-exclamation-triangle mr-2" />
-                        <span>The access token must have the <b>API</b> scope and <b>Maintainer</b> role.</span>
+                        <span>
+                          The access token must have the <b>API</b> scope and{' '}
+                          <b>Maintainer</b> role.
+                        </span>
                       </Alert>
                       <label htmlFor="access-token">Access Token</label>
-                      <input className="form-control" id="access-token" type="password" value={accessToken}
-                             onChange={(e) => setAccessToken(e.target.value)} />
+                      <input
+                        className="form-control"
+                        id="access-token"
+                        type="password"
+                        value={accessToken}
+                        onChange={(e) => setAccessToken(e.target.value)}
+                      />
                     </div>
-                    <button type="submit" className="btn btn-primary">Save</button>
+                    <button type="submit" className="btn btn-primary">
+                      Save
+                    </button>
                   </form>
-                }
-                {((!isLoading && isGitLabConnected && projects.length > 0) || isEditing) && (
+                )}
+                {((!isLoading && isGitLabConnected && projects.length > 0) ||
+                  isEditing) && (
                   <div className="mt-3">
                     <form onSubmit={saveGitlabProject}>
                       <div className="form-group">
                         <Select2
                           className="form-control"
-                          data={projects.map(project => ({ id: project.id, text: project.name }))}
+                          data={projects.map((project) => ({
+                            id: project.id,
+                            text: project.name,
+                          }))}
                           options={{
                             placeholder: 'Select a project',
                           }}
@@ -193,38 +244,65 @@ function GitLab() {
                           }}
                         ></Select2>
                       </div>
-                      <button type="submit" className="btn btn-primary">Save</button>
-                      <button type="button" className="btn btn-secondary" onClick={cancelEditGitlabProject}>
+                      <button type="submit" className="btn btn-primary">
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={cancelEditGitlabProject}
+                      >
                         Cancel
                       </button>
                     </form>
                   </div>
                 )}
-                {!isLoading && isGitLabConnected && mergeRequests && !isEditing &&
-                  <PRs entity="merge requests" prs={mergeRequests} orgId={orgId} projectId={projectId} />}
+                {!isLoading &&
+                  isGitLabConnected &&
+                  mergeRequests &&
+                  !isEditing && (
+                    <PRs
+                      entity="merge requests"
+                      prs={mergeRequests}
+                      orgId={orgId}
+                      projectId={projectId}
+                    />
+                  )}
               </CardBody>
             </Card>
           </Col>
         </Row>
         <Row>
           <Col>
-            {!isLoading && projectId && gitlabProject &&
-                <CycleTime orgId={orgId} projectId={projectId} getPrData={getMergeRequestsCycleTime}/>
-            }
+            {!isLoading && projectId && gitlabProject && (
+              <CycleTime
+                orgId={orgId}
+                projectId={projectId}
+                getPrData={getMergeRequestsCycleTime}
+              />
+            )}
           </Col>
         </Row>
         <Row>
           <Col>
-            {!isLoading && projectId && gitlabProject &&
-                <MergeTime orgId={orgId} projectId={projectId} getPrData={getMergeRequestsMergeTime}/>
-            }
+            {!isLoading && projectId && gitlabProject && (
+              <MergeTime
+                orgId={orgId}
+                projectId={projectId}
+                getPrData={getMergeRequestsMergeTime}
+              />
+            )}
           </Col>
         </Row>
         <Row>
           <Col>
-            {!isLoading && projectId && gitlabProject &&
-                <FirstReviewTime orgId={orgId} projectId={projectId} getPrData={getMergeRequestsFirstReviewTime}/>
-            }
+            {!isLoading && projectId && gitlabProject && (
+              <FirstReviewTime
+                orgId={orgId}
+                projectId={projectId}
+                getPrData={getMergeRequestsFirstReviewTime}
+              />
+            )}
           </Col>
         </Row>
       </Container>

@@ -1,20 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import DeleteWarning from "../components/DeleteWarning";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row } from "reactstrap";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
-import InputError from "../../../components/Errors/InputError";
-import Select2 from "react-select2-wrapper";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import DeleteWarning from '../components/DeleteWarning';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  FormGroup,
+  Input,
+  Row,
+} from 'reactstrap';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+import InputError from '../../../components/Errors/InputError';
+import Select2 from 'react-select2-wrapper';
 
 export default function UpdateIssue({ issue, onUpdate, onDelete }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
-  const [status, setStatus] = useState(issue?.status || "submitted");
-  const [priority, setPriority] = useState(issue?.priority || "medium");
+  const [status, setStatus] = useState(issue?.status || 'submitted');
+  const [priority, setPriority] = useState(issue?.priority || 'medium');
 
   const navigate = useNavigate();
 
@@ -25,12 +34,12 @@ export default function UpdateIssue({ issue, onUpdate, onDelete }) {
         title: values.title,
         description: values.description,
         status: status,
-        priority: priority
+        priority: priority,
       };
       await onUpdate(updatedIssue);
       toast.success('The issue has been saved');
     } catch (e) {
-      toast.error("The issue could not be saved");
+      toast.error('The issue could not be saved');
     } finally {
       setIsSubmitting(false);
       setIsLoading(false);
@@ -38,53 +47,51 @@ export default function UpdateIssue({ issue, onUpdate, onDelete }) {
   };
 
   useEffect(() => {
-    document.title = "Floumy | Issue";
+    document.title = 'Floumy | Issue';
   }, []);
 
   const handleDelete = async (id) => {
     try {
       await onDelete(id);
       navigate(-1);
-      setTimeout(() => toast.success("The issue has been deleted"), 100);
+      setTimeout(() => toast.success('The issue has been deleted'), 100);
     } catch (e) {
       setIsDeleteWarningOpen(false);
-      toast.error("The issue could not be deleted");
+      toast.error('The issue could not be deleted');
     }
   };
 
   const validationSchema = Yup.object({
-    title: Yup.string()
-      .required("The title is required"),
-    description: Yup.string()
-      .required("The description is required")
+    title: Yup.string().required('The title is required'),
+    description: Yup.string().required('The description is required'),
   });
 
   return (
     <>
       <DeleteWarning
         isOpen={isDeleteWarningOpen}
-        entity={"issue"}
+        entity={'issue'}
         toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
         onDelete={() => handleDelete(issue.id)}
       />
       {isLoading && <InfiniteLoadingBar />}
       <Card>
         <CardHeader>
-          <h3 className="mb-0"><span className="mr-2">Edit Issue</span></h3>
+          <h3 className="mb-0">
+            <span className="mr-2">Edit Issue</span>
+          </h3>
         </CardHeader>
         <CardBody>
           <Formik
             initialValues={{
-              title: issue?.title || "",
-              description: issue?.description || ""
+              title: issue?.title || '',
+              description: issue?.description || '',
             }}
             validationSchema={validationSchema}
             onSubmit={handleUpdate}
           >
             {({ values, handleChange, errors, touched }) => (
-              <Form
-                className="needs-validation"
-                noValidate>
+              <Form className="needs-validation" noValidate>
                 <Row>
                   <Col>
                     <FormGroup>
@@ -100,7 +107,7 @@ export default function UpdateIssue({ issue, onUpdate, onDelete }) {
                         invalid={!!(errors.title && touched.title)}
                         autoComplete="off"
                       />
-                      <ErrorMessage name={"title"} component={InputError} />
+                      <ErrorMessage name={'title'} component={InputError} />
                     </FormGroup>
                   </Col>
                 </Row>
@@ -112,13 +119,16 @@ export default function UpdateIssue({ issue, onUpdate, onDelete }) {
                       defaultValue={status}
                       name="status"
                       data={[
-                        { id: "submitted", text: "Submitted" },
-                        { id: "acknowledged", text: "Acknowledged" },
-                        { id: "under-review", text: "Under Review" },
-                        { id: "in-progress", text: "In Progress" },
-                        { id: "awaiting-customer-response", text: "Awaiting Customer Response" },
-                        { id: "resolved", text: "Resolved" },
-                        { id: "closed", text: "Closed" }
+                        { id: 'submitted', text: 'Submitted' },
+                        { id: 'acknowledged', text: 'Acknowledged' },
+                        { id: 'under-review', text: 'Under Review' },
+                        { id: 'in-progress', text: 'In Progress' },
+                        {
+                          id: 'awaiting-customer-response',
+                          text: 'Awaiting Customer Response',
+                        },
+                        { id: 'resolved', text: 'Resolved' },
+                        { id: 'closed', text: 'Closed' },
                       ]}
                       onChange={(e) => setStatus(e.target.value)}
                     />
@@ -130,9 +140,9 @@ export default function UpdateIssue({ issue, onUpdate, onDelete }) {
                       defaultValue={priority}
                       name="priority"
                       data={[
-                        { id: "low", text: "Low" },
-                        { id: "medium", text: "Medium" },
-                        { id: "high", text: "High" }
+                        { id: 'low', text: 'Low' },
+                        { id: 'medium', text: 'Medium' },
+                        { id: 'high', text: 'High' },
                       ]}
                       onChange={(e) => setPriority(e.target.value)}
                     />
@@ -154,12 +164,15 @@ export default function UpdateIssue({ issue, onUpdate, onDelete }) {
                         invalid={!!(errors.description && touched.description)}
                         autoComplete="off"
                       />
-                      <ErrorMessage name={"description"} component={InputError} />
+                      <ErrorMessage
+                        name={'description'}
+                        component={InputError}
+                      />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Button
-                  id={"save-issue"}
+                  id={'save-issue'}
                   color="primary"
                   type="submit"
                   className="mt-3"
@@ -168,7 +181,7 @@ export default function UpdateIssue({ issue, onUpdate, onDelete }) {
                   Save Issue
                 </Button>
                 <Button
-                  id={"delete-issue"}
+                  id={'delete-issue'}
                   color="secondary"
                   type="button"
                   className="mt-3 ml-2"

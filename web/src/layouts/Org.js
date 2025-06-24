@@ -65,15 +65,17 @@ function OrgLayout() {
         />
         <Routes>
           {getRoutes(orgsRoutes)}
-          <Route
-            path="*"
-            element={<NotFound />}
-          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </div>
       {sidenavOpen ? (
-        <div className="backdrop d-xl-none" onClick={toggleSidenav} onKeyDown={toggleSidenav} role="button" />
+        <div
+          className="backdrop d-xl-none"
+          onClick={toggleSidenav}
+          onKeyDown={toggleSidenav}
+          role="button"
+        />
       ) : null}
     </OrgProvider>
   );

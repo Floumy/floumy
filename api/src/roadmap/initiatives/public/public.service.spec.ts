@@ -112,7 +112,11 @@ describe('PublicService', () => {
       initiative.org = Promise.resolve(org);
       initiative.project = Promise.resolve(project);
       await initiativesRepository.save(initiative);
-      const actual = await service.getInitiative(org.id, project.id, initiative.id);
+      const actual = await service.getInitiative(
+        org.id,
+        project.id,
+        initiative.id,
+      );
       expect(actual).toBeDefined();
     });
     it('should throw an error if the org is not public', async () => {

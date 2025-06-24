@@ -8,8 +8,6 @@ export class AddProjectDescription1745261284203 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE "project" DROP COLUMN "description"`,
-    );
+    await queryRunner.query(`ALTER TABLE "project" DROP COLUMN "description"`);
   }
 }

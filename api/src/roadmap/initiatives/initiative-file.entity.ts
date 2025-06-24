@@ -13,7 +13,9 @@ export class InitiativeFile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Initiative, (initiative) => initiative.initiativeFiles, { lazy: true })
+  @ManyToOne(() => Initiative, (initiative) => initiative.initiativeFiles, {
+    lazy: true,
+  })
   initiative: Promise<Initiative>;
 
   @OneToOne(() => File, { lazy: true })

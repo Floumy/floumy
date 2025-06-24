@@ -1,10 +1,9 @@
-
-import React from "react";
+import React from 'react';
 
 // reactstrap components
-import { Card, CardHeader, CardBody, Container, Row, Col } from "reactstrap";
+import { Card, CardHeader, CardBody, Container, Row, Col } from 'reactstrap';
 // core components
-import SimpleHeader from "components/Headers/SimpleHeader.js";
+import SimpleHeader from 'components/Headers/SimpleHeader.js';
 
 function Typography() {
   return (
@@ -234,7 +233,7 @@ function Typography() {
                         Integer posuere erat a ante.
                       </p>
                       <footer className="blockquote-footer">
-                        Someone famous in{" "}
+                        Someone famous in{' '}
                         <cite title="Source Title">Source Title</cite>
                       </footer>
                     </blockquote>

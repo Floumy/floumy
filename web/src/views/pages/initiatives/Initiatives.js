@@ -26,7 +26,12 @@ function Initiatives() {
   async function searchInitiatives(searchOptions, page, initiatives = []) {
     setIsLoading(true);
     try {
-      const response = await searchInitiativesWithOptions(orgId, projectId, searchOptions, page);
+      const response = await searchInitiativesWithOptions(
+        orgId,
+        projectId,
+        searchOptions,
+        page,
+      );
       if (response.length === 0) {
         setHasMoreInitiatives(false);
       } else {
@@ -54,33 +59,40 @@ function Initiatives() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader headerButtons={[
-        {
-          name: 'New Initiative',
-          shortcut: 'i',
-          id: 'new-initiative',
-          action: () => {
-            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`);
+      <SimpleHeader
+        headerButtons={[
+          {
+            name: 'New Initiative',
+            shortcut: 'i',
+            id: 'new-initiative',
+            action: () => {
+              navigate(
+                `/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`,
+              );
+            },
           },
-        },
-      ]} />
+        ]}
+      />
       <Container className="mt--6" fluid>
         <Row>
           <Col>
-            <InfiniteScroll next={loadNextPage}
-                            hasMore={hasMoreInitiatives}
-                            loader={<></>}
-                            dataLength={initiatives.length}
-                            style={{ minHeight: '500px', overflow: 'visible' }}>
-              <SearchInitiativesListCard title="All Initiatives"
-                                         initiatives={initiatives}
-                                         isLoading={isLoading}
-                                         onSearch={handleSearch}
-                                         searchPlaceholder={'Search by title, description, or reference'}
-                                         filterByPriority={filterByPriority}
-                                         setFilterByPriority={setFilterByPriority}
-                                         filterByStatus={filterByStatus}
-                                         setFilterByStatus={setFilterByStatus}
+            <InfiniteScroll
+              next={loadNextPage}
+              hasMore={hasMoreInitiatives}
+              loader={<></>}
+              dataLength={initiatives.length}
+              style={{ minHeight: '500px', overflow: 'visible' }}
+            >
+              <SearchInitiativesListCard
+                title="All Initiatives"
+                initiatives={initiatives}
+                isLoading={isLoading}
+                onSearch={handleSearch}
+                searchPlaceholder={'Search by title, description, or reference'}
+                filterByPriority={filterByPriority}
+                setFilterByPriority={setFilterByPriority}
+                filterByStatus={filterByStatus}
+                setFilterByStatus={setFilterByStatus}
               />
             </InfiniteScroll>
           </Col>

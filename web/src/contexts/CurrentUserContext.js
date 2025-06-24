@@ -16,7 +16,7 @@ export function CurrentUserProvider({ children }) {
         setCurrentUser(userData);
         setError(null);
       } catch (err) {
-        console.error("Failed to fetch current user", err);
+        console.error('Failed to fetch current user', err);
         setError(err);
       } finally {
         setIsLoading(false);
@@ -33,7 +33,7 @@ export function CurrentUserProvider({ children }) {
       isLoading,
       error,
     }),
-    [currentUser, isLoading, error]
+    [currentUser, isLoading, error],
   );
 
   return (

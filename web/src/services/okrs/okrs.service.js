@@ -3,7 +3,10 @@ import axios from 'axios';
 
 export async function addOKR(orgId, projectId, okr) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs`, okr);
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs`,
+      okr,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -12,7 +15,9 @@ export async function addOKR(orgId, projectId, okr) {
 
 export async function listOKRs(orgId, projectId, timeline) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/timeline/${timeline}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/timeline/${timeline}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -21,7 +26,9 @@ export async function listOKRs(orgId, projectId, timeline) {
 
 export async function listPublicObjectives(orgId, projectId, timeline) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/okrs/timeline/${timeline}`);
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/okrs/timeline/${timeline}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -30,7 +37,9 @@ export async function listPublicObjectives(orgId, projectId, timeline) {
 
 export async function listKeyResults(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -39,7 +48,9 @@ export async function listKeyResults(orgId, projectId) {
 
 export async function getOKR(orgId, projectId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${id}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${id}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -48,7 +59,9 @@ export async function getOKR(orgId, projectId, id) {
 
 export async function listOrgObjectives(orgId, timeline) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/okrs/timeline/${timeline}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/okrs/timeline/${timeline}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -57,7 +70,9 @@ export async function listOrgObjectives(orgId, timeline) {
 
 export async function getPublicOKR(orgId, projectId, okrId) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/okrs/${okrId}`);
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/okrs/${okrId}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -66,7 +81,9 @@ export async function getPublicOKR(orgId, projectId, okrId) {
 
 export async function deleteOKR(orgId, projectId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${id}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${id}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -74,16 +91,27 @@ export async function deleteOKR(orgId, projectId, id) {
 
 export async function updateObjective(orgId, projectId, id, objectiveData) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/objective/${id}`, objectiveData);
+    const response = await api.put(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/objective/${id}`,
+      objectiveData,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateKeyResult(orgId, projectId, keyResultId, keyResultData) {
+export async function updateKeyResult(
+  orgId,
+  projectId,
+  keyResultId,
+  keyResultData,
+) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}`, keyResultData);
+    const response = await api.put(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}`,
+      keyResultData,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -92,7 +120,9 @@ export async function updateKeyResult(orgId, projectId, keyResultId, keyResultDa
 
 export async function deleteKeyResult(orgId, projectId, keyResultId) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -100,7 +130,10 @@ export async function deleteKeyResult(orgId, projectId, keyResultId) {
 
 export async function addKeyResult(orgId, projectId, objectiveId, keyResult) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/key-results`, keyResult);
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/key-results`,
+      keyResult,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -109,7 +142,9 @@ export async function addKeyResult(orgId, projectId, objectiveId, keyResult) {
 
 export async function getKeyResult(orgId, projectId, keyResultId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -118,66 +153,116 @@ export async function getKeyResult(orgId, projectId, keyResultId) {
 
 export async function getPublicKeyResult(orgId, projectId, keyResultId) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}`);
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function addKeyResultComment(orgId, projectId, keyResultId, comment) {
+export async function addKeyResultComment(
+  orgId,
+  projectId,
+  keyResultId,
+  comment,
+) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}/comments`, {
-      content: comment.content,
-      mentions: comment.mentions,
-    });
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}/comments`,
+      {
+        content: comment.content,
+        mentions: comment.mentions,
+      },
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateKeyResultComment(orgId, projectId, keyResultId, commentId, comment) {
+export async function updateKeyResultComment(
+  orgId,
+  projectId,
+  keyResultId,
+  commentId,
+  comment,
+) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}/comments/${commentId}`, {
-      content: comment.content,
-      mentions: comment.mentions,
-    });
+    const response = await api.put(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}/comments/${commentId}`,
+      {
+        content: comment.content,
+        mentions: comment.mentions,
+      },
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function deleteKeyResultComment(orgId, projectId, keyResultId, commentId) {
+export async function deleteKeyResultComment(
+  orgId,
+  projectId,
+  keyResultId,
+  commentId,
+) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}/comments/${commentId}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/key-results/${keyResultId}/comments/${commentId}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function addObjectiveComment(orgId, projectId, objectiveId, comment) {
+export async function addObjectiveComment(
+  orgId,
+  projectId,
+  objectiveId,
+  comment,
+) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments`, {content: comment.content, mentions: comment.mentions});
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments`,
+      { content: comment.content, mentions: comment.mentions },
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateObjectiveComment(orgId, projectId, objectiveId, commentId, comment) {
+export async function updateObjectiveComment(
+  orgId,
+  projectId,
+  objectiveId,
+  commentId,
+  comment,
+) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments/${commentId}`, { content: comment.content, mentions: comment.mentions });
+    const response = await api.put(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments/${commentId}`,
+      { content: comment.content, mentions: comment.mentions },
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function deleteObjectiveComment(orgId, projectId, objectiveId, commentId) {
+export async function deleteObjectiveComment(
+  orgId,
+  projectId,
+  objectiveId,
+  commentId,
+) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments/${commentId}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs/${objectiveId}/comments/${commentId}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -185,7 +270,9 @@ export async function deleteObjectiveComment(orgId, projectId, objectiveId, comm
 
 export async function getOkrStats(orgId, projectId, timeline) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs-stats/timeline/${timeline}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/okrs-stats/timeline/${timeline}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -194,7 +281,9 @@ export async function getOkrStats(orgId, projectId, timeline) {
 
 export async function getPublicOkrStats(orgId, projectId, timeline) {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/okrs-stats/timeline/${timeline}`);
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/okrs-stats/timeline/${timeline}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -203,7 +292,9 @@ export async function getPublicOkrStats(orgId, projectId, timeline) {
 
 export async function getUser(orgId, userId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/users/${userId}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/users/${userId}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);

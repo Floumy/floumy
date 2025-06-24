@@ -1,9 +1,13 @@
-import { Card, CardBody, CardHeader, CardTitle, Col, Row } from "reactstrap";
-import { Line } from "react-chartjs-2";
-import { burndownChartOptions, chartOptions, parseOptions } from "../../../variables/charts";
-import React, { useEffect, useState } from "react";
-import Chart from "chart.js";
-import PropTypes from "prop-types";
+import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'reactstrap';
+import { Line } from 'react-chartjs-2';
+import {
+  burndownChartOptions,
+  chartOptions,
+  parseOptions,
+} from '../../../variables/charts';
+import React, { useEffect, useState } from 'react';
+import Chart from 'chart.js';
+import PropTypes from 'prop-types';
 
 function DetailOKRStats({ okr }) {
   useEffect(() => {
@@ -23,18 +27,28 @@ function DetailOKRStats({ okr }) {
   useEffect(() => {
     function calculateOverallCompletion(workItems) {
       const totalNumberOfWorkItems = workItems.length;
-      const totalNumberOfCompletedWorkItems = workItems.filter(workItem => workItem.status === "done" || workItem.status === "closed").length;
-      return Math.round(totalNumberOfCompletedWorkItems / totalNumberOfWorkItems * 100);
+      const totalNumberOfCompletedWorkItems = workItems.filter(
+        (workItem) =>
+          workItem.status === 'done' || workItem.status === 'closed',
+      ).length;
+      return Math.round(
+        (totalNumberOfCompletedWorkItems / totalNumberOfWorkItems) * 100,
+      );
     }
 
     function calculateEstimatedEffortLeft(workItems, totalEstimation) {
       let totalCompletedEstimation = 0;
       workItems
-        .filter(workItem => (workItem.status === "done" || workItem.status === "closed") && workItem.completedAt !== null)
-        .forEach(workItem => {
+        .filter(
+          (workItem) =>
+            (workItem.status === 'done' || workItem.status === 'closed') &&
+            workItem.completedAt !== null,
+        )
+        .forEach((workItem) => {
           totalCompletedEstimation += workItem.estimation;
         });
-      const completedEstimationPercentage = totalCompletedEstimation / totalEstimation;
+      const completedEstimationPercentage =
+        totalCompletedEstimation / totalEstimation;
       return Math.round((1 - completedEstimationPercentage) * 100);
     }
 
@@ -51,7 +65,11 @@ function DetailOKRStats({ okr }) {
       return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
     }
 
-    function calculateBurndownAggregatedByWeek(quarterStartDate, workItems, totalEstimation) {
+    function calculateBurndownAggregatedByWeek(
+      quarterStartDate,
+      workItems,
+      totalEstimation,
+    ) {
       const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
       const DAYS_PER_WEEK = 7;
 
@@ -66,11 +84,17 @@ function DetailOKRStats({ okr }) {
       const completedEstimationsPerWeek = new Array(weeks).fill(0);
 
       // Filter and process work items
-      workItems.forEach(workItem => {
-        if ((workItem.status === "done" || workItem.status === "closed") && workItem.completedAt) {
-          const workItemWeekIndex = dateDiffInWeeks(new Date(workItem.completedAt), quarterStartDate) - 1;
+      workItems.forEach((workItem) => {
+        if (
+          (workItem.status === 'done' || workItem.status === 'closed') &&
+          workItem.completedAt
+        ) {
+          const workItemWeekIndex =
+            dateDiffInWeeks(new Date(workItem.completedAt), quarterStartDate) -
+            1;
           if (workItemWeekIndex >= 0) {
-            completedEstimationsPerWeek[workItemWeekIndex] += workItem.estimation;
+            completedEstimationsPerWeek[workItemWeekIndex] +=
+              workItem.estimation;
           }
         }
       });
@@ -81,7 +105,9 @@ function DetailOKRStats({ okr }) {
       }
 
       // Prepare and set data
-      return completedEstimationsPerWeek.map(value => Math.round((totalEstimation - value) / totalEstimation * 100));
+      return completedEstimationsPerWeek.map((value) =>
+        Math.round(((totalEstimation - value) / totalEstimation) * 100),
+      );
     }
 
     function calculateIdealBurndownAggregatedByWeek(startDate, endDate) {
@@ -107,7 +133,9 @@ function DetailOKRStats({ okr }) {
       const weeks = Math.round(days / 7);
       const labels = [];
       for (let i = 0; i < weeks; i++) {
-        const date = new Date(startDate.getTime() + i * (1000 * 60 * 60 * 24 * 7));
+        const date = new Date(
+          startDate.getTime() + i * (1000 * 60 * 60 * 24 * 7),
+        );
         const formattedDate = `CW${getWeekNumber(date)} ${date.getFullYear()}`;
         labels.push(formattedDate);
       }
@@ -124,9 +152,9 @@ function DetailOKRStats({ okr }) {
 
       if (okr.keyResults) {
         const workItems = okr.keyResults
-          .filter(keyResult => keyResult.initiatives)
-          .flatMap(keyResult => keyResult.initiatives)
-          .flatMap(initiative => initiative.workItems);
+          .filter((keyResult) => keyResult.initiatives)
+          .flatMap((keyResult) => keyResult.initiatives)
+          .flatMap((initiative) => initiative.workItems);
         setWorkItems(workItems);
 
         const totalEstimation = getTotalEstimation(workItems);
@@ -134,11 +162,24 @@ function DetailOKRStats({ okr }) {
 
         if (workItems.length > 0 && totalEstimation > 0) {
           setOverallCompletion(calculateOverallCompletion(workItems));
-          setEstimatedEffortLeft(calculateEstimatedEffortLeft(workItems, totalEstimation));
-          const labels = calculateBurndownAggregatedByWeekLabels(startDate, endDate);
+          setEstimatedEffortLeft(
+            calculateEstimatedEffortLeft(workItems, totalEstimation),
+          );
+          const labels = calculateBurndownAggregatedByWeekLabels(
+            startDate,
+            endDate,
+          );
           setLabels(labels);
-          setData(calculateBurndownAggregatedByWeek(startDate, workItems, totalEstimation));
-          setIdealBurndown(calculateIdealBurndownAggregatedByWeek(startDate, endDate));
+          setData(
+            calculateBurndownAggregatedByWeek(
+              startDate,
+              workItems,
+              totalEstimation,
+            ),
+          );
+          setIdealBurndown(
+            calculateIdealBurndownAggregatedByWeek(startDate, endDate),
+          );
         }
       }
     }
@@ -154,7 +195,9 @@ function DetailOKRStats({ okr }) {
         <Col className="d-none d-sm-block">
           <Card>
             <CardHeader>
-              <h5 className="h3 mb-0">Effort Burndown based on Work Items Estimation</h5>
+              <h5 className="h3 mb-0">
+                Effort Burndown based on Work Items Estimation
+              </h5>
             </CardHeader>
             <CardBody>
               <div className="chart">
@@ -192,8 +235,8 @@ function DetailOKRStats({ okr }) {
                     Completed Items
                   </CardTitle>
                   <span className="h2 font-weight-bold mb-0 ">
-                      {overallCompletion}%
-                    </span>
+                    {overallCompletion}%
+                  </span>
                 </Col>
                 <Col className="text-right col-auto">
                   <div className="icon icon-shape bg-white text-primary rounded-circle bg-lighter">
@@ -213,8 +256,8 @@ function DetailOKRStats({ okr }) {
                     Effort Left
                   </CardTitle>
                   <span className="h2 font-weight-bold mb-0 ">
-                      {estimatedEffortLeft}%
-                    </span>
+                    {estimatedEffortLeft}%
+                  </span>
                 </Col>
                 <Col className="text-right col-auto">
                   <div className="icon icon-shape bg-white text-primary rounded-circle bg-lighter">

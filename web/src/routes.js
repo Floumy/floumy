@@ -91,7 +91,12 @@ const routes = [
     component: <Issues />,
     layout: '/admin',
   },
-  { redirect: true, path: '/issues/new', component: <NewIssue />, layout: '/admin' },
+  {
+    redirect: true,
+    path: '/issues/new',
+    component: <NewIssue />,
+    layout: '/admin',
+  },
   {
     redirect: true,
     path: '/issues/edit/:issueId',
@@ -328,7 +333,7 @@ const routes = [
     path: '/permission-denied',
     component: <PermissionDenied />,
     layout: '/admin',
-  }
+  },
 ];
 
 export const blankRoutes = [
@@ -419,7 +424,12 @@ export const publicRoutes = [
     component: <Issues isPublic={true} />,
     layout: '/public',
   },
-  { redirect: true, path: '/issues/new', component: <NewIssue />, layout: '/public' },
+  {
+    redirect: true,
+    path: '/issues/new',
+    component: <NewIssue />,
+    layout: '/public',
+  },
   {
     redirect: true,
     path: '/feature-requests/new',
@@ -488,7 +498,7 @@ export const orgsRoutes = [
     path: '/permission-denied',
     component: <PermissionDenied />,
     layout: '/orgs',
-  }
+  },
 ];
 
 export default routes;

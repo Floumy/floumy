@@ -1,7 +1,7 @@
-import {Entity, JoinTable, ManyToMany, ManyToOne} from 'typeorm';
-import {WorkItem} from './work-item.entity';
-import {Comment} from '../../comments/comment-entity';
-import {User} from '../../users/user.entity';
+import { Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { WorkItem } from './work-item.entity';
+import { Comment } from '../../comments/comment-entity';
+import { User } from '../../users/user.entity';
 
 @Entity()
 export class WorkItemComment extends Comment {

@@ -1,7 +1,6 @@
-
-import React from "react";
+import React from 'react';
 // react library for routing
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 // reactstrap components
 import {
   UncontrolledCollapse,
@@ -15,7 +14,7 @@ import {
   Col,
   UncontrolledTooltip,
   Button,
-} from "reactstrap";
+} from 'reactstrap';
 
 function AdminNavbar() {
   return (
@@ -29,7 +28,7 @@ function AdminNavbar() {
           <NavbarBrand to="/" tag={Link}>
             <img
               alt="..."
-              src={require("assets/img/brand/argon-react-white.png")}
+              src={require('assets/img/brand/argon-react-white.png')}
             />
           </NavbarBrand>
           <button
@@ -53,7 +52,7 @@ function AdminNavbar() {
               <Row>
                 <Col className="collapse-brand" xs="6">
                   <Link to="/admin/dashboard">
-                    <img alt="..." src={require("assets/img/brand/blue.png")} />
+                    <img alt="..." src={require('assets/img/brand/blue.png')} />
                   </Link>
                 </Col>
                 <Col className="collapse-close" xs="6">

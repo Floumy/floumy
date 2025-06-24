@@ -12,14 +12,19 @@ export const githubClientMock = {
             url: 'https://api.github.com/users/thelexned',
             html_url: 'https://github.com/thelexned',
             followers_url: 'https://api.github.com/users/thelexned/followers',
-            following_url: 'https://api.github.com/users/thelexned/following{/other_user}',
+            following_url:
+              'https://api.github.com/users/thelexned/following{/other_user}',
             gists_url: 'https://api.github.com/users/thelexned/gists{/gist_id}',
-            starred_url: 'https://api.github.com/users/thelexned/starred{/owner}{/repo}',
-            subscriptions_url: 'https://api.github.com/users/thelexned/subscriptions',
+            starred_url:
+              'https://api.github.com/users/thelexned/starred{/owner}{/repo}',
+            subscriptions_url:
+              'https://api.github.com/users/thelexned/subscriptions',
             organizations_url: 'https://api.github.com/users/thelexned/orgs',
             repos_url: 'https://api.github.com/users/thelexned/repos',
-            events_url: 'https://api.github.com/users/thelexned/events{/privacy}',
-            received_events_url: 'https://api.github.com/users/thelexned/received_events',
+            events_url:
+              'https://api.github.com/users/thelexned/events{/privacy}',
+            received_events_url:
+              'https://api.github.com/users/thelexned/received_events',
             type: 'User',
             site_admin: false,
             name: 'Alexandru Nedelcu',
@@ -54,11 +59,13 @@ export const githubClientMock = {
                 login: 'thelexned',
                 id: 66918833,
                 node_id: 'MDQ6VXNlcjY2OTE4ODMz',
-                avatar_url: 'https://avatars.githubusercontent.com/u/66918833?v=4',
+                avatar_url:
+                  'https://avatars.githubusercontent.com/u/66918833?v=4',
                 gravatar_id: '',
                 url: 'https://api.github.com/users/thelexned',
                 html_url: 'https://github.com/thelexned',
-                followers_url: 'https://api.github.com/users/thelexned/followers',
+                followers_url:
+                  'https://api.github.com/users/thelexned/followers',
               },
             },
           ],
@@ -69,8 +76,10 @@ export const githubClientMock = {
           data: {
             id: 1,
             url: 'https://api.github.com/repos/thelexned/floumy/hooks/1',
-            test_url: 'https://api.github.com/repos/thelexned/floumy/hooks/1/test',
-            ping_url: 'https://api.github.com/repos/thelexned/floumy/hooks/1/pings',
+            test_url:
+              'https://api.github.com/repos/thelexned/floumy/hooks/1/test',
+            ping_url:
+              'https://api.github.com/repos/thelexned/floumy/hooks/1/pings',
             name: 'web',
             events: ['push', 'pull_request'],
             active: true,
@@ -119,9 +128,9 @@ export const githubClientMock = {
             created_at: '2023-01-01T00:00:00Z',
             updated_at: '2023-01-01T00:00:00Z',
             head: {
-              ref: 'feature/WI-123-test-branch'
-            }
-          }
+              ref: 'feature/WI-123-test-branch',
+            },
+          },
         ],
       };
     }

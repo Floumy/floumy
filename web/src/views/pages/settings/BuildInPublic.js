@@ -1,20 +1,35 @@
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Container,
+  Row,
+} from 'reactstrap';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { getBuildInPublicSettings, updateBuildInPublicSettings } from '../../../services/bip/build-in-public.service';
+import {
+  getBuildInPublicSettings,
+  updateBuildInPublicSettings,
+} from '../../../services/bip/build-in-public.service';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { Link, useParams } from 'react-router-dom';
 import { useBuildInPublic } from '../../../contexts/BuidInPublicContext';
 
 function BuildInPublic() {
   const { orgId, projectId } = useParams();
-  const [isLoadingBuildInPublicSettings, setIsLoadingBuildInPublicSettings] = useState(false);
+  const [isLoadingBuildInPublicSettings, setIsLoadingBuildInPublicSettings] =
+    useState(false);
   const [isBuildInPublicEnabled, setIsBuildInPublicEnabled] = useState(false);
 
-  const [publicLink, setPublicLink] = useState("");
-  const { settings: buildInPublicSettings, setSettings: setBuildInPublicSettings } = useBuildInPublic();
+  const [publicLink, setPublicLink] = useState('');
+  const {
+    settings: buildInPublicSettings,
+    setSettings: setBuildInPublicSettings,
+  } = useBuildInPublic();
 
   function createUrl(path) {
     const protocol = window.location.protocol;
@@ -22,26 +37,31 @@ function BuildInPublic() {
     return `${protocol}//${host}${path}`;
   }
 
-  const paymentPlan = localStorage.getItem("paymentPlan");
+  const paymentPlan = localStorage.getItem('paymentPlan');
 
   useEffect(() => {
     async function fetchData() {
       setIsLoadingBuildInPublicSettings(true);
       try {
-        const buildInPublicSettings = await getBuildInPublicSettings(orgId, projectId);
+        const buildInPublicSettings = await getBuildInPublicSettings(
+          orgId,
+          projectId,
+        );
         setBuildInPublicSettings({
           isObjectivesPagePublic: buildInPublicSettings.isObjectivesPagePublic,
           isRoadmapPagePublic: buildInPublicSettings.isRoadmapPagePublic,
           isSprintsPagePublic: buildInPublicSettings.isSprintsPagePublic,
-          isActiveSprintsPagePublic: buildInPublicSettings.isActiveSprintsPagePublic,
+          isActiveSprintsPagePublic:
+            buildInPublicSettings.isActiveSprintsPagePublic,
           isFeedPagePublic: buildInPublicSettings.isFeedPagePublic,
           isIssuesPagePublic: buildInPublicSettings.isIssuesPagePublic,
-          isFeatureRequestsPagePublic: buildInPublicSettings.isFeatureRequestsPagePublic,
-          isBuildInPublicEnabled: buildInPublicSettings.isBuildInPublicEnabled
+          isFeatureRequestsPagePublic:
+            buildInPublicSettings.isFeatureRequestsPagePublic,
+          isBuildInPublicEnabled: buildInPublicSettings.isBuildInPublicEnabled,
         });
         setIsBuildInPublicEnabled(buildInPublicSettings.isBuildInPublicEnabled);
       } catch (error) {
-        toast.error("Failed to fetch build in public settings");
+        toast.error('Failed to fetch build in public settings');
       } finally {
         setIsLoadingBuildInPublicSettings(false);
       }
@@ -59,39 +79,59 @@ function BuildInPublic() {
       try {
         const newSettings = {
           ...buildInPublicSettings,
-          [page]: e.target.checked
+          [page]: e.target.checked,
         };
         setBuildInPublicSettings({
           ...newSettings,
-          isBuildInPublicEnabled: isBuildInPublicEnabledBasedOnSettings(newSettings)
+          isBuildInPublicEnabled:
+            isBuildInPublicEnabledBasedOnSettings(newSettings),
         });
         await updateBuildInPublicSettings(orgId, projectId, {
           ...newSettings,
-          isBuildInPublicEnabled: isBuildInPublicEnabledBasedOnSettings(newSettings)
+          isBuildInPublicEnabled:
+            isBuildInPublicEnabledBasedOnSettings(newSettings),
         });
       } catch (error) {
-        toast.error("Failed to update settings");
+        toast.error('Failed to update settings');
       }
     };
   }
 
   useEffect(() => {
-    setIsBuildInPublicEnabled(isBuildInPublicEnabledBasedOnSettings(buildInPublicSettings));
+    setIsBuildInPublicEnabled(
+      isBuildInPublicEnabledBasedOnSettings(buildInPublicSettings),
+    );
 
     if (buildInPublicSettings.isFeedPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/feed`));
+      setPublicLink(
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/feed`),
+      );
     } else if (buildInPublicSettings.isObjectivesPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/okrs`));
+      setPublicLink(
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/okrs`),
+      );
     } else if (buildInPublicSettings.isRoadmapPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/roadmap`));
+      setPublicLink(
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/roadmap`),
+      );
     } else if (buildInPublicSettings.isSprintsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/sprints`));
+      setPublicLink(
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/sprints`),
+      );
     } else if (buildInPublicSettings.isActiveSprintsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-sprint`));
+      setPublicLink(
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-sprint`),
+      );
     } else if (buildInPublicSettings.isIssuesPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/issues`));
+      setPublicLink(
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/issues`),
+      );
     } else if (buildInPublicSettings.isFeatureRequestsPagePublic) {
-      setPublicLink(createUrl(`/public/orgs/${orgId}/projects/${projectId}/feature-requests`));
+      setPublicLink(
+        createUrl(
+          `/public/orgs/${orgId}/projects/${projectId}/feature-requests`,
+        ),
+      );
     }
   }, [buildInPublicSettings, orgId]);
 
@@ -104,20 +144,20 @@ function BuildInPublic() {
         isActiveSprintsPagePublic: !isBuildInPublicEnabled,
         isFeedPagePublic: !isBuildInPublicEnabled,
         isIssuesPagePublic: !isBuildInPublicEnabled,
-        isFeatureRequestsPagePublic: !isBuildInPublicEnabled
+        isFeatureRequestsPagePublic: !isBuildInPublicEnabled,
       };
       await updateBuildInPublicSettings(orgId, projectId, {
         ...settings,
-        isBuildInPublicEnabled: !isBuildInPublicEnabled
+        isBuildInPublicEnabled: !isBuildInPublicEnabled,
       });
       setIsBuildInPublicEnabled(!isBuildInPublicEnabled);
       setBuildInPublicSettings({
         ...settings,
-        isBuildInPublicEnabled: !isBuildInPublicEnabled
+        isBuildInPublicEnabled: !isBuildInPublicEnabled,
       });
-      toast.success("Settings updated successfully");
+      toast.success('Settings updated successfully');
     } catch (e) {
-      toast.error("Failed to update settings");
+      toast.error('Failed to update settings');
     }
   }
 
@@ -132,28 +172,39 @@ function BuildInPublic() {
               <CardHeader>
                 <Row>
                   <Col xs={12} md={8}>
-                    <CardTitle tag="h2" className="mb-3">Build In Public</CardTitle>
+                    <CardTitle tag="h2" className="mb-3">
+                      Build In Public
+                    </CardTitle>
                   </Col>
                   <Col xs={12} md={4}>
-                    {!isLoadingBuildInPublicSettings && isBuildInPublicEnabled &&
-                      <div className="text-xs-left text-sm-right">
-                        <Link className="btn btn-icon btn-primary" color="primary" id="tooltipCopyLink" type="button"
-                              to={publicLink} target="_blank">
-                          Open the public project page <i className="fas fa-external-link ml-2" />
-                        </Link>
-
-                      </div>}
+                    {!isLoadingBuildInPublicSettings &&
+                      isBuildInPublicEnabled && (
+                        <div className="text-xs-left text-sm-right">
+                          <Link
+                            className="btn btn-icon btn-primary"
+                            color="primary"
+                            id="tooltipCopyLink"
+                            type="button"
+                            to={publicLink}
+                            target="_blank"
+                          >
+                            Open the public project page{' '}
+                            <i className="fas fa-external-link ml-2" />
+                          </Link>
+                        </div>
+                      )}
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
-                {isLoadingBuildInPublicSettings &&
+                {isLoadingBuildInPublicSettings && (
                   <Row>
                     <Col className="text-center">
                       <LoadingSpinnerBox />
                     </Col>
-                  </Row>}
-                {!isLoadingBuildInPublicSettings &&
+                  </Row>
+                )}
+                {!isLoadingBuildInPublicSettings && (
                   <>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
@@ -161,7 +212,11 @@ function BuildInPublic() {
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle mr-1">
-                          <input checked={isBuildInPublicEnabled} onChange={toggleBuildInPublic} type="checkbox" />
+                          <input
+                            checked={isBuildInPublicEnabled}
+                            onChange={toggleBuildInPublic}
+                            type="checkbox"
+                          />
                           <span
                             className="custom-toggle-slider"
                             data-label-off="No"
@@ -170,14 +225,17 @@ function BuildInPublic() {
                         </label>
                       </Col>
                     </Row>
-                    <Row className="mb-3" hidden={paymentPlan !== "premium"}>
+                    <Row className="mb-3" hidden={paymentPlan !== 'premium'}>
                       <Col xs={6} sm={3} md={2}>
                         Issues
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle">
-                          <input checked={buildInPublicSettings.isIssuesPagePublic}
-                                 onChange={togglePublicPage("isIssuesPagePublic")} type="checkbox" />
+                          <input
+                            checked={buildInPublicSettings.isIssuesPagePublic}
+                            onChange={togglePublicPage('isIssuesPagePublic')}
+                            type="checkbox"
+                          />
                           <span
                             className="custom-toggle-slider"
                             data-label-off="No"
@@ -186,14 +244,21 @@ function BuildInPublic() {
                         </label>
                       </Col>
                     </Row>
-                    <Row className="mb-3" hidden={paymentPlan !== "premium"}>
+                    <Row className="mb-3" hidden={paymentPlan !== 'premium'}>
                       <Col xs={6} sm={3} md={2}>
                         Feature Requests
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle">
-                          <input checked={buildInPublicSettings.isFeatureRequestsPagePublic}
-                                 onChange={togglePublicPage("isFeatureRequestsPagePublic")} type="checkbox" />
+                          <input
+                            checked={
+                              buildInPublicSettings.isFeatureRequestsPagePublic
+                            }
+                            onChange={togglePublicPage(
+                              'isFeatureRequestsPagePublic',
+                            )}
+                            type="checkbox"
+                          />
                           <span
                             className="custom-toggle-slider"
                             data-label-off="No"
@@ -208,8 +273,11 @@ function BuildInPublic() {
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle">
-                          <input checked={buildInPublicSettings.isFeedPagePublic}
-                                 onChange={togglePublicPage("isFeedPagePublic")} type="checkbox" />
+                          <input
+                            checked={buildInPublicSettings.isFeedPagePublic}
+                            onChange={togglePublicPage('isFeedPagePublic')}
+                            type="checkbox"
+                          />
                           <span
                             className="custom-toggle-slider"
                             data-label-off="No"
@@ -224,9 +292,15 @@ function BuildInPublic() {
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle mr-1">
-                          <input checked={buildInPublicSettings.isObjectivesPagePublic}
-                                 onChange={togglePublicPage("isObjectivesPagePublic")}
-                                 type="checkbox" />
+                          <input
+                            checked={
+                              buildInPublicSettings.isObjectivesPagePublic
+                            }
+                            onChange={togglePublicPage(
+                              'isObjectivesPagePublic',
+                            )}
+                            type="checkbox"
+                          />
                           <span
                             className="custom-toggle-slider"
                             data-label-off="No"
@@ -241,9 +315,11 @@ function BuildInPublic() {
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle  mr-1">
-                          <input checked={buildInPublicSettings.isRoadmapPagePublic}
-                                 onChange={togglePublicPage("isRoadmapPagePublic")}
-                                 type="checkbox" />
+                          <input
+                            checked={buildInPublicSettings.isRoadmapPagePublic}
+                            onChange={togglePublicPage('isRoadmapPagePublic')}
+                            type="checkbox"
+                          />
                           <span
                             className="custom-toggle-slider"
                             data-label-off="No"
@@ -258,9 +334,11 @@ function BuildInPublic() {
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle mr-1">
-                          <input checked={buildInPublicSettings.isSprintsPagePublic}
-                                 onChange={togglePublicPage("isSprintsPagePublic")}
-                                 type="checkbox" />
+                          <input
+                            checked={buildInPublicSettings.isSprintsPagePublic}
+                            onChange={togglePublicPage('isSprintsPagePublic')}
+                            type="checkbox"
+                          />
                           <span
                             className="custom-toggle-slider"
                             data-label-off="No"
@@ -275,8 +353,15 @@ function BuildInPublic() {
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle">
-                          <input checked={buildInPublicSettings.isActiveSprintsPagePublic}
-                                 onChange={togglePublicPage("isActiveSprintsPagePublic")} type="checkbox" />
+                          <input
+                            checked={
+                              buildInPublicSettings.isActiveSprintsPagePublic
+                            }
+                            onChange={togglePublicPage(
+                              'isActiveSprintsPagePublic',
+                            )}
+                            type="checkbox"
+                          />
                           <span
                             className="custom-toggle-slider"
                             data-label-off="No"
@@ -285,8 +370,8 @@ function BuildInPublic() {
                         </label>
                       </Col>
                     </Row>
-                  </>}
-
+                  </>
+                )}
               </CardBody>
             </Card>
           </Col>

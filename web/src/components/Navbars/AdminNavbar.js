@@ -1,29 +1,27 @@
-
-import React from "react";
+import React from 'react';
 // nodejs library that concatenates classes
-import classnames from "classnames";
+import classnames from 'classnames';
 // nodejs library to set properties for components
 // reactstrap components
-import { Collapse, Container, Nav, Navbar, NavItem } from "reactstrap";
-import CurrentUserNav from "./CurrentUserNav";
+import { Collapse, Container, Nav, Navbar, NavItem } from 'reactstrap';
+import CurrentUserNav from './CurrentUserNav';
 
 function AdminNavbar({ sidenavOpen, toggleSidenav }) {
   return (
     <>
       <Navbar
         className={classnames(
-          "navbar-top navbar-expand border-bottom navbar-light")}
+          'navbar-top navbar-expand border-bottom navbar-light',
+        )}
       >
         <Container fluid>
           <Collapse navbar isOpen={true}>
-
             <Nav className="align-items-center ml-md-auto" navbar>
               <NavItem className="d-xl-none">
                 <div
-                  className={classnames(
-                    "pr-3 sidenav-toggler",
-                    { active: sidenavOpen },
-                  )}
+                  className={classnames('pr-3 sidenav-toggler', {
+                    active: sidenavOpen,
+                  })}
                   onClick={toggleSidenav}
                   role="button"
                   onKeyDown={toggleSidenav}
@@ -43,6 +41,5 @@ function AdminNavbar({ sidenavOpen, toggleSidenav }) {
     </>
   );
 }
-
 
 export default AdminNavbar;

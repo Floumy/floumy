@@ -1,9 +1,8 @@
-
-import React from "react";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
+import React from 'react';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
 // nodejs library that concatenates classes
-import classnames from "classnames";
+import classnames from 'classnames';
 // reactstrap components
 import {
   Button,
@@ -17,14 +16,14 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
-} from "reactstrap";
+  Row,
+} from 'reactstrap';
 // core components
-import AuthHeader from "../../../components/Headers/AuthHeader.js";
-import { useNavigate } from "react-router-dom";
-import InputError from "../../../components/Errors/InputError";
-import { sendResetPasswordLink } from "../../../services/auth/auth.service";
-import { getInputGroupErrorClass } from "./form-input-utils";
+import AuthHeader from '../../../components/Headers/AuthHeader.js';
+import { useNavigate } from 'react-router-dom';
+import InputError from '../../../components/Errors/InputError';
+import { sendResetPasswordLink } from '../../../services/auth/auth.service';
+import { getInputGroupErrorClass } from './form-input-utils';
 
 function ForgotPassword() {
   const [focusedEmail, setFocusedEmail] = React.useState(false);
@@ -35,14 +34,17 @@ function ForgotPassword() {
     email: Yup.string()
       .matches(
         /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-        "The email address provided is invalid")
-      .required("The email field is required")
+        'The email address provided is invalid',
+      )
+      .required('The email field is required'),
   });
 
   return (
     <>
-      <AuthHeader title="Lost Your Password?"
-                  lead="No Big Deal. It happens. Drop your email below, and we’ll shoot you a reset link. Let’s get you back in the game!" />
+      <AuthHeader
+        title="Lost Your Password?"
+        lead="No Big Deal. It happens. Drop your email below, and we’ll shoot you a reset link. Let’s get you back in the game!"
+      />
       <Container className="mt--8 pb-5">
         <Row className="justify-content-center">
           <Col lg="6" md="8">
@@ -54,7 +56,7 @@ function ForgotPassword() {
               </CardHeader>
               <CardBody className="px-lg-5 py-lg-5">
                 <Formik
-                  initialValues={{ email: "" }}
+                  initialValues={{ email: '' }}
                   validationSchema={validationSchema}
                   onSubmit={async (values, { setSubmitting }) => {
                     try {
@@ -65,7 +67,7 @@ function ForgotPassword() {
 
                       setSubmitting(false);
 
-                      navigate("/auth/reset-email-sent");
+                      navigate('/auth/reset-email-sent');
                     } catch (e) {
                       setError(e.message);
                     }
@@ -73,13 +75,21 @@ function ForgotPassword() {
                 >
                   {({ isSubmitting, errors, touched }) => (
                     <Form>
-                      {error && <div className="text-center text-danger mb-3">{error}</div>}
+                      {error && (
+                        <div className="text-center text-danger mb-3">
+                          {error}
+                        </div>
+                      )}
                       <FormGroup
                         className={classnames({
-                          focused: focusedEmail
+                          focused: focusedEmail,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.email && touched.email)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.email && touched.email,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-email-83" />
@@ -99,8 +109,13 @@ function ForgotPassword() {
                         <ErrorMessage name="email" component={InputError} />
                       </FormGroup>
                       <div className="text-center">
-                        <Button id="login-submit" className="mt-4" color="info" type="submit"
-                                disabled={isSubmitting}>
+                        <Button
+                          id="login-submit"
+                          className="mt-4"
+                          color="info"
+                          type="submit"
+                          disabled={isSubmitting}
+                        >
                           Reset and Roll!
                         </Button>
                       </div>

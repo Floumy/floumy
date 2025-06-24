@@ -117,11 +117,7 @@ export class SprintsController {
     }
 
     try {
-      return await this.sprintsService.completeSprint(
-        orgId,
-        projectId,
-        id,
-      );
+      return await this.sprintsService.completeSprint(orgId, projectId, id);
     } catch (e) {
       throw new NotFoundException(e.message);
     }

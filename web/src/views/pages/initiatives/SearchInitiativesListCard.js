@@ -1,11 +1,15 @@
 import { Link, useParams } from 'react-router-dom';
 import {
-  Badge, Card,
+  Badge,
+  Card,
   CardHeader,
   CardTitle,
   Col,
-  FormGroup, Input,
-  InputGroup, InputGroupAddon, InputGroupText,
+  FormGroup,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Progress,
   Row,
   UncontrolledTooltip,
@@ -25,12 +29,11 @@ import ReactDatetime from 'react-datetime';
 import { getOrg } from '../../../services/org/orgs.service';
 
 function SearchInitiativesListCard({
-                                  initiatives,
-                                  title,
-                                  onSearch,
-                                  searchPlaceholder = 'Search by title',
-                                }) {
-
+  initiatives,
+  title,
+  onSearch,
+  searchPlaceholder = 'Search by title',
+}) {
   const { orgId, projectId } = useParams();
   const [searchText, handleSearch] = useDebounceSearch((text) => {
     onSearch({
@@ -74,7 +77,7 @@ function SearchInitiativesListCard({
         const org = await getOrg();
         const usersOptions = [
           { id: 'all', text: 'All Assignees' },
-          ...org.members.map(user => ({ id: user.id, text: user.name })),
+          ...org.members.map((user) => ({ id: user.id, text: user.name })),
         ];
         setUsers(usersOptions);
       } catch (e) {
@@ -204,78 +207,120 @@ function SearchInitiativesListCard({
         </FormGroup>
       </CardHeader>
       <div className="table-responsive border-bottom">
-        <table className="table align-items-center no-select" style={{ minWidth: '700px' }}>
+        <table
+          className="table align-items-center no-select"
+          style={{ minWidth: '700px' }}
+        >
           <thead className="thead-light">
-          <tr>
-            <th scope="col" width="5%">Reference</th>
-            <th scope="col" width="40%">Initiative</th>
-            <th scope="col" width="20%">Progress</th>
-            <th scope="col" width="5%">W.I. Count</th>
-            <th scope="col" width="10%">Status</th>
-            <th scope="col" width={'10%'}>Assigned To</th>
-            <th scope="col" width="10%">Priority</th>
-          </tr>
+            <tr>
+              <th scope="col" width="5%">
+                Reference
+              </th>
+              <th scope="col" width="40%">
+                Initiative
+              </th>
+              <th scope="col" width="20%">
+                Progress
+              </th>
+              <th scope="col" width="5%">
+                W.I. Count
+              </th>
+              <th scope="col" width="10%">
+                Status
+              </th>
+              <th scope="col" width={'10%'}>
+                Assigned To
+              </th>
+              <th scope="col" width="10%">
+                Priority
+              </th>
+            </tr>
           </thead>
           <tbody className="list">
-          {initiatives.length === 0 &&
-            <tr>
-              <td colSpan={7} className={'text-center'}>
-                No initiatives found.
-              </td>
-            </tr>
-          }
-          {initiatives.map((initiative) => (
-            <tr key={initiative.id}>
-              <td>
-                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
-                      className={'initiative-detail'}>
-                  {initiative.reference}
-                </Link>
-              </td>
-              <td className="title-cell">
-                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
-                      className={'initiative-detail'}>
-                  {initiative.title}
-                </Link>
-              </td>
-              <td>
-                <div className="d-flex align-items-center">
-                  <span className="mr-2">{formatProgress(initiative.progress)}%</span>
-                  <div>
-                    <Progress style={{ maxWidth: '80px' }} max="100" value={initiative.progress} color="primary" />
+            {initiatives.length === 0 && (
+              <tr>
+                <td colSpan={7} className={'text-center'}>
+                  No initiatives found.
+                </td>
+              </tr>
+            )}
+            {initiatives.map((initiative) => (
+              <tr key={initiative.id}>
+                <td>
+                  <Link
+                    to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
+                    className={'initiative-detail'}
+                  >
+                    {initiative.reference}
+                  </Link>
+                </td>
+                <td className="title-cell">
+                  <Link
+                    to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${initiative.id}`}
+                    className={'initiative-detail'}
+                  >
+                    {initiative.title}
+                  </Link>
+                </td>
+                <td>
+                  <div className="d-flex align-items-center">
+                    <span className="mr-2">
+                      {formatProgress(initiative.progress)}%
+                    </span>
+                    <div>
+                      <Progress
+                        style={{ maxWidth: '80px' }}
+                        max="100"
+                        value={initiative.progress}
+                        color="primary"
+                      />
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td>
-                {initiative.workItemsCount}
-              </td>
-              <td>
-                <Badge color="" className="badge-dot mr-4">
-                  <i className={initiativeStatusColorClassName(initiative.status)} />
-                  <span className="status">{formatHyphenatedString(initiative.status)}</span>
-                </Badge>
-              </td>
-              <td>
-                {initiative.assignedTo && initiative.assignedTo.name &&
-                  <>
-                    <UncontrolledTooltip target={'assigned-to-' + initiative.id} placement="top">
-                      {initiative.assignedTo.name}
-                    </UncontrolledTooltip>
-                    <span
-                      className="avatar avatar-xs rounded-circle"
-                      style={{ backgroundColor: textToColor(initiative.assignedTo.name) }}
-                      id={'assigned-to-' + initiative.id}>{memberNameInitials(initiative.assignedTo.name)}
-                </span>
-                  </>}
-                {!initiative.assignedTo && '-'}
-              </td>
-              <td>
-                <Badge color={priorityColor(initiative.priority)} pill={true}>
-                  {initiative.priority}
-                </Badge>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td>{initiative.workItemsCount}</td>
+                <td>
+                  <Badge color="" className="badge-dot mr-4">
+                    <i
+                      className={initiativeStatusColorClassName(
+                        initiative.status,
+                      )}
+                    />
+                    <span className="status">
+                      {formatHyphenatedString(initiative.status)}
+                    </span>
+                  </Badge>
+                </td>
+                <td>
+                  {initiative.assignedTo && initiative.assignedTo.name && (
+                    <>
+                      <UncontrolledTooltip
+                        target={'assigned-to-' + initiative.id}
+                        placement="top"
+                      >
+                        {initiative.assignedTo.name}
+                      </UncontrolledTooltip>
+                      <span
+                        className="avatar avatar-xs rounded-circle"
+                        style={{
+                          backgroundColor: textToColor(
+                            initiative.assignedTo.name,
+                          ),
+                        }}
+                        id={'assigned-to-' + initiative.id}
+                      >
+                        {memberNameInitials(initiative.assignedTo.name)}
+                      </span>
+                    </>
+                  )}
+                  {!initiative.assignedTo && '-'}
+                </td>
+                <td>
+                  <Badge color={priorityColor(initiative.priority)} pill={true}>
+                    {initiative.priority}
+                  </Badge>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

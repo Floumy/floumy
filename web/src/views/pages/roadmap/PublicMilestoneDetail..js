@@ -1,14 +1,16 @@
-import React, { useEffect } from "react";
-import { Card, CardBody, CardHeader, Col, Input, Row } from "reactstrap";
-import PublicInitiativesListCard from "../initiatives/PublicInitiativesListCard";
-import { useParams } from "react-router-dom";
-import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
+import React, { useEffect } from 'react';
+import { Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import PublicInitiativesListCard from '../initiatives/PublicInitiativesListCard';
+import { useParams } from 'react-router-dom';
+import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 
-function PublicMilestoneDetail({ milestone = { id: "", title: "", description: "", dueDate: "" } }) {
+function PublicMilestoneDetail({
+  milestone = { id: '', title: '', description: '', dueDate: '' },
+}) {
   const { orgId, projectId } = useParams();
 
   useEffect(() => {
-    document.title = "Floumy | Milestone";
+    document.title = 'Floumy | Milestone';
   }, []);
 
   return (
@@ -16,7 +18,11 @@ function PublicMilestoneDetail({ milestone = { id: "", title: "", description: "
       <Card>
         <CardHeader>
           <h3 className="mb-0">Milestone</h3>
-          {milestone && <div className="py-2"><PublicShareButtons title={milestone.title} /></div>}
+          {milestone && (
+            <div className="py-2">
+              <PublicShareButtons title={milestone.title} />
+            </div>
+          )}
         </CardHeader>
         <CardBody>
           <Row>
@@ -37,11 +43,7 @@ function PublicMilestoneDetail({ milestone = { id: "", title: "", description: "
               />
             </Col>
             <Col>
-              <label
-                className="form-control-label"
-              >
-                Due Date
-              </label>
+              <label className="form-control-label">Due Date</label>
               <Input
                 type="text"
                 name="dueDate"
@@ -72,13 +74,15 @@ function PublicMilestoneDetail({ milestone = { id: "", title: "", description: "
           </Row>
         </CardBody>
       </Card>
-      {milestone?.initiatives && <PublicInitiativesListCard
-        orgId={orgId}
-        projectId={projectId}
-        title="Initiatives"
-        initiatives={milestone.initiatives}
-        showAssignedTo={false}
-      />}
+      {milestone?.initiatives && (
+        <PublicInitiativesListCard
+          orgId={orgId}
+          projectId={projectId}
+          title="Initiatives"
+          initiatives={milestone.initiatives}
+          showAssignedTo={false}
+        />
+      )}
     </>
   );
 }

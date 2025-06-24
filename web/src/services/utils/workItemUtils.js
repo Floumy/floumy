@@ -1,26 +1,22 @@
 const statusOrder = [
-  "planned",
-  "ready-to-start",
-  "in-progress",
-  "blocked",
-  "code-review",
-  "testing",
-  "revisions",
-  "ready-for-deployment",
-  "deployed",
-  "done",
-  "closed"
+  'planned',
+  'ready-to-start',
+  'in-progress',
+  'blocked',
+  'code-review',
+  'testing',
+  'revisions',
+  'ready-for-deployment',
+  'deployed',
+  'done',
+  'closed',
 ];
 
-const priorityOrder = [
-  "high",
-  "medium",
-  "low"
-];
+const priorityOrder = ['high', 'medium', 'low'];
 
 export function sortWorkItemsByStatusOrder(workItemsByStatusAcc) {
   const sortedWorkItemsByStatusAcc = {};
-  statusOrder.forEach(status => {
+  statusOrder.forEach((status) => {
     if (workItemsByStatusAcc[status]) {
       sortedWorkItemsByStatusAcc[status] = workItemsByStatusAcc[status];
     }
@@ -29,12 +25,16 @@ export function sortWorkItemsByStatusOrder(workItemsByStatusAcc) {
 }
 
 export function sortWorkItemsByPriority(workItemsByStatusAcc) {
-  Object.keys(workItemsByStatusAcc).forEach(status => {
+  Object.keys(workItemsByStatusAcc).forEach((status) => {
     workItemsByStatusAcc[status].sort((a, b) => {
-      if (priorityOrder.indexOf(a.priority) < priorityOrder.indexOf(b.priority)) {
+      if (
+        priorityOrder.indexOf(a.priority) < priorityOrder.indexOf(b.priority)
+      ) {
         return -1;
       }
-      if (priorityOrder.indexOf(a.priority) > priorityOrder.indexOf(b.priority)) {
+      if (
+        priorityOrder.indexOf(a.priority) > priorityOrder.indexOf(b.priority)
+      ) {
         return 1;
       }
       return 0;
@@ -66,9 +66,22 @@ export function getWorkItemsGroupedByStatus(workItems) {
   return sortWorkItemsByStatusOrder(workItemsByStatus);
 }
 
-export function filterWorkItems(workItems, filterByPriority, filterByType, filterByStatus) {
+export function filterWorkItems(
+  workItems,
+  filterByPriority,
+  filterByType,
+  filterByStatus,
+) {
   return workItems
-    .filter(workItem => filterByPriority === "all" || workItem.priority === filterByPriority)
-    .filter(workItem => filterByType === "all" || workItem.type === filterByType)
-    .filter(workItem => filterByStatus === "all" || workItem.status === filterByStatus);
+    .filter(
+      (workItem) =>
+        filterByPriority === 'all' || workItem.priority === filterByPriority,
+    )
+    .filter(
+      (workItem) => filterByType === 'all' || workItem.type === filterByType,
+    )
+    .filter(
+      (workItem) =>
+        filterByStatus === 'all' || workItem.status === filterByStatus,
+    );
 }

@@ -52,8 +52,8 @@ export default function EditIssue() {
 
   function updateWorkItemsStatus(workItems, status) {
     const updatedWorkItems = [];
-    issue.workItems.forEach(workItem => {
-      if (workItems.some(w => w.id === workItem.id)) {
+    issue.workItems.forEach((workItem) => {
+      if (workItems.some((w) => w.id === workItem.id)) {
         workItem.status = status;
       }
       updatedWorkItems.push(workItem);
@@ -63,13 +63,16 @@ export default function EditIssue() {
 
   function sortWorkItems(a, b) {
     const priorityMap = ['high', 'medium', 'low'];
-    return priorityMap.indexOf(a.priority) - priorityMap.indexOf(b.priority) || a.createdAt - b.createdAt;
+    return (
+      priorityMap.indexOf(a.priority) - priorityMap.indexOf(b.priority) ||
+      a.createdAt - b.createdAt
+    );
   }
 
   function updateWorkItemsPriority(workItems, priority) {
     const updatedWorkItems = [];
-    issue.workItems.forEach(workItem => {
-      if (workItems.some(w => w.id === workItem.id)) {
+    issue.workItems.forEach((workItem) => {
+      if (workItems.some((w) => w.id === workItem.id)) {
         workItem.priority = priority;
       }
       updatedWorkItems.push(workItem);
@@ -80,8 +83,8 @@ export default function EditIssue() {
 
   function updateWorkItemsSprint(workItems, sprintId) {
     const updatedWorkItems = [];
-    issue.workItems.forEach(workItem => {
-      if (workItems.some(w => w.id === workItem.id)) {
+    issue.workItems.forEach((workItem) => {
+      if (workItems.some((w) => w.id === workItem.id)) {
         workItem.sprint = sprintId;
       }
       updatedWorkItems.push(workItem);
@@ -92,7 +95,7 @@ export default function EditIssue() {
   function updateWorkItemsAssignee(workItems, assignee) {
     const updatedWorkItems = [];
     for (const workItem of issue.workItems) {
-      if (workItems.some((wi) => (wi.id === workItem.id))) {
+      if (workItems.some((wi) => wi.id === workItem.id)) {
         workItem.assignedTo = assignee.id === null ? undefined : assignee;
       }
       updatedWorkItems.push(workItem);
@@ -102,7 +105,12 @@ export default function EditIssue() {
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addIssueComment(orgId, projectId, issueId, comment);
+      const addedComment = await addIssueComment(
+        orgId,
+        projectId,
+        issueId,
+        comment,
+      );
       issue.comments.push(addedComment);
       setIssue({ ...issue });
       toast.success('Comment added successfully');
@@ -113,7 +121,13 @@ export default function EditIssue() {
 
   async function handleCommentUpdate(commentId, content) {
     try {
-      const updatedComment = await updateIssueComment(orgId, projectId, issueId, commentId, content);
+      const updatedComment = await updateIssueComment(
+        orgId,
+        projectId,
+        issueId,
+        commentId,
+        content,
+      );
       const index = issue.comments.findIndex((c) => c.id === updatedComment.id);
       issue.comments[index] = updatedComment;
       setIssue({ ...issue });
@@ -144,20 +158,26 @@ export default function EditIssue() {
   };
 
   function isPlaceholderWorkItemOnly() {
-    return issue && (!issue.workItems || issue.workItems.length === 1 || !issue.workItems[0]?.title);
+    return (
+      issue &&
+      (!issue.workItems ||
+        issue.workItems.length === 1 ||
+        !issue.workItems[0]?.title)
+    );
   }
 
   const addWorkItemsWithAi = async () => {
     try {
-      const workItemsToAdd = (await generateWorkItemsForIssue(issue.title, issue.description))
-        .map(workItem => {
-          return {
-            title: workItem.title,
-            type: workItem.type,
-            priority: workItem.priority,
-            description: workItem.description,
-          };
-        });
+      const workItemsToAdd = (
+        await generateWorkItemsForIssue(issue.title, issue.description)
+      ).map((workItem) => {
+        return {
+          title: workItem.title,
+          type: workItem.type,
+          priority: workItem.priority,
+          description: workItem.description,
+        };
+      });
       const savedWorkItems = [];
       for (const workItem of workItemsToAdd) {
         workItem.issue = issue.id;
@@ -173,7 +193,7 @@ export default function EditIssue() {
 
   return (
     <>
-      <SimpleHeader/>
+      <SimpleHeader />
       <Container className="mt--6" fluid>
         <Row>
           <Col lg={8} md={12}>
@@ -198,35 +218,46 @@ export default function EditIssue() {
                 </div>
               </Col>
             </Row>
-            {issue && issue.workItems && <Row>
-              <Col>
-                <Card>
-                  <CardHeader>
-                    <h3 className="mb-0">Related Work Items {isPlaceholderWorkItemOnly() && <AIButton
-                      disabled={issue?.title?.length === 0 || issue?.description?.length === 0}
-                      onClick={addWorkItemsWithAi}
-                    />}
-                    </h3>
-                  </CardHeader>
-                  <WorkItemsList
-                    workItems={issue?.workItems}
-                    showAssignedTo={false}
-                    showInitiative={false}
-                    onAddNewWorkItem={handleAddWorkItem}
-                    onChangeStatus={updateWorkItemsStatus}
-                    onChangePriority={updateWorkItemsPriority}
-                    onChangeSprint={updateWorkItemsSprint}
-                    onChangeAssignee={updateWorkItemsAssignee}
-                  />
-                </Card>
-              </Col>
-            </Row>}
+            {issue && issue.workItems && (
+              <Row>
+                <Col>
+                  <Card>
+                    <CardHeader>
+                      <h3 className="mb-0">
+                        Related Work Items{' '}
+                        {isPlaceholderWorkItemOnly() && (
+                          <AIButton
+                            disabled={
+                              issue?.title?.length === 0 ||
+                              issue?.description?.length === 0
+                            }
+                            onClick={addWorkItemsWithAi}
+                          />
+                        )}
+                      </h3>
+                    </CardHeader>
+                    <WorkItemsList
+                      workItems={issue?.workItems}
+                      showAssignedTo={false}
+                      showInitiative={false}
+                      onAddNewWorkItem={handleAddWorkItem}
+                      onChangeStatus={updateWorkItemsStatus}
+                      onChangePriority={updateWorkItemsPriority}
+                      onChangeSprint={updateWorkItemsSprint}
+                      onChangeAssignee={updateWorkItemsAssignee}
+                    />
+                  </Card>
+                </Col>
+              </Row>
+            )}
           </Col>
           <Col lg={4} md={12}>
-            <Comments comments={issue?.comments}
-                      onCommentAdd={handleCommentAdd}
-                      onCommentEdit={handleCommentUpdate}
-                      onCommentDelete={handleCommentDelete} />
+            <Comments
+              comments={issue?.comments}
+              onCommentAdd={handleCommentAdd}
+              onCommentEdit={handleCommentUpdate}
+              onCommentDelete={handleCommentDelete}
+            />
           </Col>
         </Row>
       </Container>

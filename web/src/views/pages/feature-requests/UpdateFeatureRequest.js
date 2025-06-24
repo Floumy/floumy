@@ -1,19 +1,32 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import DeleteWarning from "../components/DeleteWarning";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row } from "reactstrap";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
-import InputError from "../../../components/Errors/InputError";
-import Select2 from "react-select2-wrapper";
-import InitiativesList from "../initiatives/InitiativesList";
-import { addInitiative } from "../../../services/roadmap/roadmap.service";
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import DeleteWarning from '../components/DeleteWarning';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  FormGroup,
+  Input,
+  Row,
+} from 'reactstrap';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+import InputError from '../../../components/Errors/InputError';
+import Select2 from 'react-select2-wrapper';
+import InitiativesList from '../initiatives/InitiativesList';
+import { addInitiative } from '../../../services/roadmap/roadmap.service';
 import AIButton from '../../../components/AI/AIButton';
 import { generateInitiativesForFeatureRequest } from '../../../services/ai/ai.service';
 
-export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelete }) {
+export default function UpdateFeatureRequest({
+  featureRequest,
+  onUpdate,
+  onDelete,
+}) {
   const { orgId, projectId } = useParams();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,12 +44,12 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
         title: values.title,
         description: values.description,
         status: status,
-        estimation: values.estimation || null
+        estimation: values.estimation || null,
       };
       await onUpdate(updatedFeatureRequest);
       toast.success('The feature request has been saved');
     } catch (e) {
-      toast.error("The feature request could not be saved");
+      toast.error('The feature request could not be saved');
     } finally {
       setIsSubmitting(false);
       setIsLoading(false);
@@ -44,31 +57,31 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
   };
 
   useEffect(() => {
-    document.title = "Floumy | Feature Request";
+    document.title = 'Floumy | Feature Request';
   });
 
   const handleDelete = async (id) => {
     try {
       await onDelete(id);
       navigate(-1);
-      setTimeout(() => toast.success("The feature request has been deleted"), 100);
+      setTimeout(
+        () => toast.success('The feature request has been deleted'),
+        100,
+      );
     } catch (e) {
       setIsDeleteWarningOpen(false);
-      toast.error("The feature request could not be deleted");
+      toast.error('The feature request could not be deleted');
     }
   };
 
   const validationSchema = Yup.object({
-    title: Yup.string()
-      .required("The title is required"),
-    description: Yup.string()
-      .required("The description is required"),
-    status: Yup.string()
-      .required("The status is required"),
+    title: Yup.string().required('The title is required'),
+    description: Yup.string().required('The description is required'),
+    status: Yup.string().required('The status is required'),
     estimation: Yup.number()
       .nullable()
-      .positive("The estimation must be a positive number")
-      .typeError("The estimation must be a number")
+      .positive('The estimation must be a positive number')
+      .typeError('The estimation must be a number'),
   });
 
   async function handleAddFeature(featureRequestId, initiative) {
@@ -80,8 +93,10 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
   }
 
   function updateFeaturesStatus(updatedFeatures, status) {
-    const updatedFeaturesIds = updatedFeatures.map(initiative => initiative.id);
-    const featureRequestFeatures = initiatives.map(initiative => {
+    const updatedFeaturesIds = updatedFeatures.map(
+      (initiative) => initiative.id,
+    );
+    const featureRequestFeatures = initiatives.map((initiative) => {
       if (updatedFeaturesIds.includes(initiative.id)) {
         initiative.status = status;
       }
@@ -91,35 +106,53 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
   }
 
   function sortFeatures(a, b) {
-    const priorityMap = ["high", "medium", "low"];
+    const priorityMap = ['high', 'medium', 'low'];
     return priorityMap.indexOf(a.priority) - priorityMap.indexOf(b.priority);
   }
 
   function updateFeaturesPriority(updatedFeatures, priority) {
-    const updatedFeaturesIds = updatedFeatures.map(initiative => initiative.id);
-    const featureRequestFeatures = initiatives.map(initiative => {
-      if (updatedFeaturesIds.includes(initiative.id)) {
-        initiative.priority = priority;
-      }
-      return initiative;
-    }).sort(sortFeatures);
+    const updatedFeaturesIds = updatedFeatures.map(
+      (initiative) => initiative.id,
+    );
+    const featureRequestFeatures = initiatives
+      .map((initiative) => {
+        if (updatedFeaturesIds.includes(initiative.id)) {
+          initiative.priority = priority;
+        }
+        return initiative;
+      })
+      .sort(sortFeatures);
     setInitiatives([...featureRequestFeatures]);
   }
 
   function isPlaceholderInitiativeOnly() {
-    return featureRequest && (!initiatives || initiatives.length === 1 || !initiatives[0]?.title);
+    return (
+      featureRequest &&
+      (!initiatives || initiatives.length === 1 || !initiatives[0]?.title)
+    );
   }
 
   const addInitiativesWithAi = async () => {
     try {
-      const initiativesToAdd = (await generateInitiativesForFeatureRequest(featureRequest.title, featureRequest.description))
-        .map(initiative => {
-          return { title: initiative.title, description: initiative.description, priority: initiative.priority, status: 'planned' };
-        });
+      const initiativesToAdd = (
+        await generateInitiativesForFeatureRequest(
+          featureRequest.title,
+          featureRequest.description,
+        )
+      ).map((initiative) => {
+        return {
+          title: initiative.title,
+          description: initiative.description,
+          priority: initiative.priority,
+          status: 'planned',
+        };
+      });
       const savedInitiatives = [];
       for (const initiative of initiativesToAdd) {
         initiative.featureRequest = featureRequest.id;
-        savedInitiatives.push(await addInitiative(orgId, projectId, initiative));
+        savedInitiatives.push(
+          await addInitiative(orgId, projectId, initiative),
+        );
       }
       setInitiatives([...savedInitiatives]);
       toast.success('The initiatives have been added');
@@ -127,43 +160,39 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
       toast.error('The initiatives could not be saved');
       console.error(e);
     }
-  }
+  };
   return (
     <>
       <DeleteWarning
         isOpen={isDeleteWarningOpen}
-        entity={"feature request"}
+        entity={'feature request'}
         toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
         onDelete={() => handleDelete(featureRequest.id)}
       />
       {isLoading && <InfiniteLoadingBar />}
       <Card>
         <CardHeader>
-          <h3 className="mb-0"><span className="mr-2">Edit Feature Request</span></h3>
+          <h3 className="mb-0">
+            <span className="mr-2">Edit Feature Request</span>
+          </h3>
         </CardHeader>
         <CardBody>
           <Formik
             initialValues={{
-              title: featureRequest?.title || "",
-              description: featureRequest?.description || "",
-              status: featureRequest?.status || "",
-              estimation: featureRequest?.estimation || ""
+              title: featureRequest?.title || '',
+              description: featureRequest?.description || '',
+              status: featureRequest?.status || '',
+              estimation: featureRequest?.estimation || '',
             }}
             validationSchema={validationSchema}
             onSubmit={handleUpdate}
           >
             {({ values, handleChange, errors, touched }) => (
-              <Form
-                className="needs-validation"
-                noValidate>
+              <Form className="needs-validation" noValidate>
                 <Row>
                   <Col>
                     <FormGroup>
-                      <label
-                        className="form-control-label"
-                      >
-                        Title
-                      </label>
+                      <label className="form-control-label">Title</label>
                       <Field
                         as={Input}
                         id="title"
@@ -175,43 +204,35 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
                         invalid={!!(errors.title && touched.title)}
                         autoComplete="off"
                       />
-                      <ErrorMessage name={"title"} component={InputError} />
+                      <ErrorMessage name={'title'} component={InputError} />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Row>
                   <Col>
                     <FormGroup>
-                      <label
-                        className="form-control-label"
-                      >
-                        Status
-                      </label>
+                      <label className="form-control-label">Status</label>
                       <Select2
                         className="react-select-container"
                         defaultValue={status}
                         name="status"
                         data={[
-                          { text: "Pending", id: "pending" },
-                          { text: "Approved", id: "approved" },
-                          { text: "Planned", id: "planned" },
-                          { text: "Ready to Start", id: "ready-to-start" },
-                          { text: "In Progress", id: "in-progress" },
-                          { text: "Completed", id: "completed" },
-                          { text: "Closed", id: "closed" }
+                          { text: 'Pending', id: 'pending' },
+                          { text: 'Approved', id: 'approved' },
+                          { text: 'Planned', id: 'planned' },
+                          { text: 'Ready to Start', id: 'ready-to-start' },
+                          { text: 'In Progress', id: 'in-progress' },
+                          { text: 'Completed', id: 'completed' },
+                          { text: 'Closed', id: 'closed' },
                         ]}
-                        onChange={(e) => setStatus(e.target.value)}>
-                      </Select2>
-                      <ErrorMessage name={"status"} component={InputError} />
+                        onChange={(e) => setStatus(e.target.value)}
+                      ></Select2>
+                      <ErrorMessage name={'status'} component={InputError} />
                     </FormGroup>
                   </Col>
                   <Col>
                     <FormGroup>
-                      <label
-                        className="form-control-label"
-                      >
-                        Estimation
-                      </label>
+                      <label className="form-control-label">Estimation</label>
                       <Field
                         as={Input}
                         id="estimation"
@@ -220,20 +241,19 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
                         className="bg-white"
                         onChange={handleChange}
                         value={values.estimation}
-                        autoComplete={"off"}
+                        autoComplete={'off'}
                       />
-                      <ErrorMessage name={"estimation"} component={InputError} />
+                      <ErrorMessage
+                        name={'estimation'}
+                        component={InputError}
+                      />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Row>
                   <Col>
                     <FormGroup>
-                      <label
-                        className="form-control-label"
-                      >
-                        Description
-                      </label>
+                      <label className="form-control-label">Description</label>
                       <Field
                         as={Input}
                         id="description"
@@ -246,12 +266,15 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
                         invalid={!!(errors.description && touched.description)}
                         autoComplete="off"
                       />
-                      <ErrorMessage name={"description"} component={InputError} />
+                      <ErrorMessage
+                        name={'description'}
+                        component={InputError}
+                      />
                     </FormGroup>
                   </Col>
                 </Row>
                 <Button
-                  id={"save-feature-request"}
+                  id={'save-feature-request'}
                   color="primary"
                   type="submit"
                   className="mt-3"
@@ -260,7 +283,7 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
                   Save Request
                 </Button>
                 <Button
-                  id={"delete-feature-request"}
+                  id={'delete-feature-request'}
                   color="secondary"
                   type="button"
                   className="mt-3"
@@ -274,29 +297,38 @@ export default function UpdateFeatureRequest({ featureRequest, onUpdate, onDelet
           </Formik>
         </CardBody>
       </Card>
-      {!isLoading && featureRequest && initiatives && <>
-        <Card>
-          <CardHeader className="border-1">
-            <div className="row">
-              <div className="col-12">
-                <h3 className="mb-0">Related Initiatives {isPlaceholderInitiativeOnly() && <AIButton
-                  disabled={featureRequest?.title?.length === 0 || featureRequest?.description?.length === 0}
-                  onClick={addInitiativesWithAi}
-                />}
-                </h3>
+      {!isLoading && featureRequest && initiatives && (
+        <>
+          <Card>
+            <CardHeader className="border-1">
+              <div className="row">
+                <div className="col-12">
+                  <h3 className="mb-0">
+                    Related Initiatives{' '}
+                    {isPlaceholderInitiativeOnly() && (
+                      <AIButton
+                        disabled={
+                          featureRequest?.title?.length === 0 ||
+                          featureRequest?.description?.length === 0
+                        }
+                        onClick={addInitiativesWithAi}
+                      />
+                    )}
+                  </h3>
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <InitiativesList
-            initiatives={initiatives}
-            onAddInitiative={async (initiative) => {
-              await handleAddFeature(featureRequest.id, initiative);
-            }}
-            onChangeStatus={updateFeaturesStatus}
-            onChangePriority={updateFeaturesPriority}
-          />
-        </Card>
-      </>}
+            </CardHeader>
+            <InitiativesList
+              initiatives={initiatives}
+              onAddInitiative={async (initiative) => {
+                await handleAddFeature(featureRequest.id, initiative);
+              }}
+              onChangeStatus={updateFeaturesStatus}
+              onChangePriority={updateFeaturesPriority}
+            />
+          </Card>
+        </>
+      )}
     </>
   );
 }
