@@ -1,5 +1,15 @@
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Button, Card, CardHeader, Col, Container, FormGroup, Input, InputGroup, Row } from 'reactstrap';
+import {
+  Button,
+  Card,
+  CardHeader,
+  Col,
+  Container,
+  FormGroup,
+  Input,
+  InputGroup,
+  Row,
+} from 'reactstrap';
 import React, { useEffect, useState } from 'react';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
@@ -35,7 +45,8 @@ function OrgSettings() {
   }, [orgId]);
 
   const validationSchema = Yup.object().shape({
-    orgName: Yup.string().trim()
+    orgName: Yup.string()
+      .trim()
       .required('Org name is required')
       .min(3, 'Org name must be at least 3 characters')
       .max(50, 'Org name cannot be longer than 50 characters')
@@ -54,7 +65,10 @@ function OrgSettings() {
       toast.success('Org name saved');
     } catch (e) {
       toast.error('Failed to save org name');
-      setErrors({ orgName: 'Please verify that the org name: is unique within your organization, is between 3-50 characters long, contains only letters, numbers, underscores, hyphens and spaces, and is not empty.' });
+      setErrors({
+        orgName:
+          'Please verify that the org name: is unique within your organization, is between 3-50 characters long, contains only letters, numbers, underscores, hyphens and spaces, and is not empty.',
+      });
     }
   }
 
@@ -67,59 +81,62 @@ function OrgSettings() {
             <h3 className="mb-0">Org</h3>
           </CardHeader>
           {loadingOrg && <LoadingSpinnerBox />}
-          {!loadingOrg && org && <Row className="p-4">
-            <Col>
-              <Formik
-                initialValues={{ orgName: org.name }}
-                validationSchema={validationSchema}
-                onSubmit={async (values, { setErrors }) => {
-                  try {
-                    setIsSubmitting(true);
-                    await handleSubmit(values, setErrors);
-                  } catch (e) {
-                    setErrors({ orgName: e.message });
-                  } finally {
-                    setIsSubmitting(false);
-                  }
-                }}
-              >
-                {({ values, errors, touched }) => (
-                  <Form
-                    className="needs-validation"
-                    noValidate>
-                    <h4>Org Name</h4>
-                    <FormGroup
-                      className={classnames({
-                        focused: focusedOrgName,
-                      })}
-                    >
-                      <InputGroup className="input-group input-group-merge">
-                        <Field
-                          as={Input}
-                          name="orgName"
-                          placeholder="The name of your org"
-                          type="text"
-                          onFocus={() => setFocusedOrgName(true)}
-                          onBlur={() => setFocusedOrgName(false)}
-                          value={values.orgName}
-                          invalid={!!(errors.orgName && touched.orgName)}
-                          className="px-3"
-                          autoComplete="off"
-                        />
-                      </InputGroup>
-                      <ErrorMessage name="orgName" component={InputError} />
-                    </FormGroup>
-                    <div>
-                      <Button color="primary" type="submit"
-                              disabled={isSubmitting}>
-                        Save
-                      </Button>
-                    </div>
-                  </Form>
-                )}
-              </Formik>
-            </Col>
-          </Row>}
+          {!loadingOrg && org && (
+            <Row className="p-4">
+              <Col>
+                <Formik
+                  initialValues={{ orgName: org.name }}
+                  validationSchema={validationSchema}
+                  onSubmit={async (values, { setErrors }) => {
+                    try {
+                      setIsSubmitting(true);
+                      await handleSubmit(values, setErrors);
+                    } catch (e) {
+                      setErrors({ orgName: e.message });
+                    } finally {
+                      setIsSubmitting(false);
+                    }
+                  }}
+                >
+                  {({ values, errors, touched }) => (
+                    <Form className="needs-validation" noValidate>
+                      <h4>Org Name</h4>
+                      <FormGroup
+                        className={classnames({
+                          focused: focusedOrgName,
+                        })}
+                      >
+                        <InputGroup className="input-group input-group-merge">
+                          <Field
+                            as={Input}
+                            name="orgName"
+                            placeholder="The name of your org"
+                            type="text"
+                            onFocus={() => setFocusedOrgName(true)}
+                            onBlur={() => setFocusedOrgName(false)}
+                            value={values.orgName}
+                            invalid={!!(errors.orgName && touched.orgName)}
+                            className="px-3"
+                            autoComplete="off"
+                          />
+                        </InputGroup>
+                        <ErrorMessage name="orgName" component={InputError} />
+                      </FormGroup>
+                      <div>
+                        <Button
+                          color="primary"
+                          type="submit"
+                          disabled={isSubmitting}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </Form>
+                  )}
+                </Formik>
+              </Col>
+            </Row>
+          )}
         </Card>
       </Container>
     </>

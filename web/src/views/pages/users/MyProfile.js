@@ -4,7 +4,6 @@ import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import ChangeName from './components/ChangeName';
 
 export default function MyProfile() {
-
   return (
     <>
       <SimpleHeader />
@@ -22,7 +21,9 @@ export default function MyProfile() {
                   </Col>
                   <Col>
                     <h3>Role</h3>
-                    <p className="text-capitalize">{localStorage.getItem("currentUserRole") || 'Contributor'}</p>
+                    <p className="text-capitalize">
+                      {localStorage.getItem('currentUserRole') || 'Contributor'}
+                    </p>
                   </Col>
                 </Row>
               </CardBody>

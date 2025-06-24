@@ -1,8 +1,11 @@
-import api from "../api/api.service";
+import api from '../api/api.service';
 
 export async function addWorkItem(orgId, projectId, workItem) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items`, workItem);
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items`,
+      workItem,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -11,14 +14,22 @@ export async function addWorkItem(orgId, projectId, workItem) {
 
 export async function listWorkItems(orgId, projectId, page = 1, limit = 50) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items?page=${page}&limit=${limit}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items?page=${page}&limit=${limit}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function searchWorkItemsWithOptions(orgId, projectId, searchOptions, page = 1, limit = 50) {
+export async function searchWorkItemsWithOptions(
+  orgId,
+  projectId,
+  searchOptions,
+  page = 1,
+  limit = 50,
+) {
   try {
     const params = new URLSearchParams();
 
@@ -37,18 +48,24 @@ export async function searchWorkItemsWithOptions(orgId, projectId, searchOptions
 
     // Build filters object
     const filters = {
-      status: searchOptions.status !== 'all' ? [searchOptions.status] : undefined,
-      assigneeIds: searchOptions.assignee !== 'all' ? [searchOptions.assignee] : undefined,
-      priority: searchOptions.priority !== 'all' ? [searchOptions.priority] : undefined,
+      status:
+        searchOptions.status !== 'all' ? [searchOptions.status] : undefined,
+      assigneeIds:
+        searchOptions.assignee !== 'all' ? [searchOptions.assignee] : undefined,
+      priority:
+        searchOptions.priority !== 'all' ? [searchOptions.priority] : undefined,
       type: searchOptions.type !== 'all' ? [searchOptions.type] : undefined,
-      completedAt: (searchOptions.completedAt?.start || searchOptions.completedAt?.end) ? {
-        start: searchOptions.completedAt.start || undefined,
-        end: searchOptions.completedAt.end || undefined
-      } : undefined
+      completedAt:
+        searchOptions.completedAt?.start || searchOptions.completedAt?.end
+          ? {
+              start: searchOptions.completedAt.start || undefined,
+              end: searchOptions.completedAt.end || undefined,
+            }
+          : undefined,
     };
 
     // Only add filters if there are any active ones
-    if (Object.values(filters).some(v => v !== undefined)) {
+    if (Object.values(filters).some((v) => v !== undefined)) {
       params.append('f', JSON.stringify(filters));
     }
 
@@ -63,7 +80,9 @@ export async function searchWorkItemsWithOptions(orgId, projectId, searchOptions
 
 export async function listOpenWorkItems(orgId, projectId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/open`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/open`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -72,7 +91,9 @@ export async function listOpenWorkItems(orgId, projectId) {
 
 export async function getWorkItem(orgId, projectId, id) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -81,7 +102,9 @@ export async function getWorkItem(orgId, projectId, id) {
 
 export async function getPublicWorkItem(orgId, projectId, workItemId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -90,7 +113,10 @@ export async function getPublicWorkItem(orgId, projectId, workItemId) {
 
 export async function updateWorkItem(orgId, projectId, id, workItem) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`, workItem);
+    const response = await api.put(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      workItem,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -99,7 +125,9 @@ export async function updateWorkItem(orgId, projectId, id, workItem) {
 
 export async function deleteWorkItem(orgId, projectId, id) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -107,7 +135,10 @@ export async function deleteWorkItem(orgId, projectId, id) {
 
 export async function updateWorkItemSprint(orgId, projectId, id, sprintId) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`, { sprint: sprintId });
+    await api.patch(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      { sprint: sprintId },
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -115,7 +146,10 @@ export async function updateWorkItemSprint(orgId, projectId, id, sprintId) {
 
 export async function updateWorkItemStatus(orgId, projectId, id, status) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`, { status: status });
+    await api.patch(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      { status: status },
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -123,7 +157,10 @@ export async function updateWorkItemStatus(orgId, projectId, id, status) {
 
 export async function updateWorkItemPriority(orgId, projectId, id, priority) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`, { priority: priority });
+    await api.patch(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      { priority: priority },
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -131,16 +168,28 @@ export async function updateWorkItemPriority(orgId, projectId, id, priority) {
 
 export async function addComment(orgId, projectId, workItemId, comment) {
   try {
-    const response = await api.post(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`, { content: comment.content, mentions: comment.mentions });
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`,
+      { content: comment.content, mentions: comment.mentions },
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function updateComment(orgId, projectId, workItemId, commentId, comment) {
+export async function updateComment(
+  orgId,
+  projectId,
+  workItemId,
+  commentId,
+  comment,
+) {
   try {
-    const response = await api.put(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`, { content: comment.content, mentions: comment.mentions });
+    const response = await api.put(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`,
+      { content: comment.content, mentions: comment.mentions },
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -149,7 +198,9 @@ export async function updateComment(orgId, projectId, workItemId, commentId, com
 
 export async function deleteComment(orgId, projectId, workItemId, commentId) {
   try {
-    await api.delete(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`);
+    await api.delete(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`,
+    );
   } catch (e) {
     throw new Error(e.message);
   }
@@ -157,16 +208,26 @@ export async function deleteComment(orgId, projectId, workItemId, commentId) {
 
 export async function listComments(orgId, projectId, workItemId) {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);
   }
 }
 
-export async function changeWorkItemAssignee(orgId, projectId, workItemId, userId) {
+export async function changeWorkItemAssignee(
+  orgId,
+  projectId,
+  workItemId,
+  userId,
+) {
   try {
-    await api.patch(`${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/assignee`, { assignee: userId });
+    await api.patch(
+      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/assignee`,
+      { assignee: userId },
+    );
   } catch (e) {
     throw new Error(e.message);
   }

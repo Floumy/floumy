@@ -1,9 +1,9 @@
-import CreateUpdateDeleteMilestone from "./CreateUpdateDeleteMilestone";
-import { addMilestone } from "../../../services/roadmap/roadmap.service";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import React from "react";
-import { Col, Container, Row } from "reactstrap";
-import { useParams } from "react-router-dom";
+import CreateUpdateDeleteMilestone from './CreateUpdateDeleteMilestone';
+import { addMilestone } from '../../../services/roadmap/roadmap.service';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import React from 'react';
+import { Col, Container, Row } from 'reactstrap';
+import { useParams } from 'react-router-dom';
 
 function NewMilestone() {
   const { orgId, projectId } = useParams();
@@ -14,7 +14,7 @@ function NewMilestone() {
 
   return (
     <>
-      <SimpleHeader/>
+      <SimpleHeader />
       <Container className="mt--6" fluid>
         <Row>
           <Col>

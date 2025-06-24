@@ -1,5 +1,4 @@
-
-import React from "react";
+import React from 'react';
 
 // reactstrap components
 import {
@@ -9,7 +8,7 @@ import {
   Container,
   Row,
   Col,
-} from "reactstrap";
+} from 'reactstrap';
 
 function AlternativeHeader() {
   return (
@@ -19,7 +18,7 @@ function AlternativeHeader() {
           <div className="header-body">
             <Row className="align-items-center py-4">
               <Col lg="6" xs="7">
-                <h6 className="h2 d-inline-block mb-0">Alternative</h6>{" "}
+                <h6 className="h2 d-inline-block mb-0">Alternative</h6>{' '}
                 <Breadcrumb
                   className="d-none d-md-inline-block ml-md-4"
                   listClassName="breadcrumb-links"

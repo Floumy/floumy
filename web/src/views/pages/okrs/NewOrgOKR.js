@@ -12,26 +12,28 @@ function NewOrgOkr() {
   const { orgId } = useParams();
 
   useEffect(() => {
-    document.title = "Floumy | OKR";
+    document.title = 'Floumy | OKR';
   }, []);
 
   return (
     <>
-      <SimpleHeader/>
+      <SimpleHeader />
       <Container className="mt--6" fluid>
         <Row>
           <div className="col">
             <div className="card-wrapper">
-              <CreateUpdateDeleteOrgOKR onSubmit={async (values) => {
-                return await addOKR(orgId, {
-                  objective: {
-                    title: values.objective,
-                    timeline: values.timeline,
-                    assignedTo: values.assignedTo
-                  },
-                  keyResults: values.keyResults
-                });
-              }} />
+              <CreateUpdateDeleteOrgOKR
+                onSubmit={async (values) => {
+                  return await addOKR(orgId, {
+                    objective: {
+                      title: values.objective,
+                      timeline: values.timeline,
+                      assignedTo: values.assignedTo,
+                    },
+                    keyResults: values.keyResults,
+                  });
+                }}
+              />
             </div>
           </div>
         </Row>

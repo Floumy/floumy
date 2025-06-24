@@ -18,7 +18,8 @@ import {
   memberNameInitials,
   priorityColor,
   textToColor,
-  workItemStatusColorClassName, workItemTypeIcon,
+  workItemStatusColorClassName,
+  workItemTypeIcon,
 } from '../../../services/utils/utils';
 import React, { useEffect, useState } from 'react';
 import Select2 from 'react-select2-wrapper';
@@ -27,11 +28,11 @@ import ReactDatetime from 'react-datetime';
 import { getOrg } from '../../../services/org/orgs.service';
 
 function SearchWorkItemsListCard({
-                                   workItems,
-                                   title,
-                                   onSearch,
-                                   searchPlaceholder = 'Search by title',
-                                 }) {
+  workItems,
+  title,
+  onSearch,
+  searchPlaceholder = 'Search by title',
+}) {
   const { orgId, projectId } = useParams();
   const [searchText, handleSearch] = useDebounceSearch((text) => {
     onSearch({
@@ -71,7 +72,14 @@ function SearchWorkItemsListCard({
     };
 
     handleFilterChange();
-  }, [filterByAssignee, filterByPriority, filterByStatus, startDate, endDate, filterByType]);
+  }, [
+    filterByAssignee,
+    filterByPriority,
+    filterByStatus,
+    startDate,
+    endDate,
+    filterByType,
+  ]);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -79,7 +87,7 @@ function SearchWorkItemsListCard({
         const org = await getOrg();
         const usersOptions = [
           { id: 'all', text: 'All Assignees' },
-          ...org.members.map(user => ({ id: user.id, text: user.name })),
+          ...org.members.map((user) => ({ id: user.id, text: user.name })),
         ];
         setUsers(usersOptions);
       } catch (e) {
@@ -235,65 +243,97 @@ function SearchWorkItemsListCard({
         </FormGroup>
       </CardHeader>
       <div className="table-responsive border-bottom">
-        <table className="table align-items-center no-select" style={{ minWidth: '700px' }}>
+        <table
+          className="table align-items-center no-select"
+          style={{ minWidth: '700px' }}
+        >
           <thead className="thead-light">
-          <tr>
-            <th scope="col" width="5%">Reference</th>
-            <th scope="col" width="40%">Title</th>
-            <th scope="col" width="10%">Assigned To</th>
-            <th scope="col" width="10%">Status</th>
-            <th scope="col" width="10%">Priority</th>
-          </tr>
+            <tr>
+              <th scope="col" width="5%">
+                Reference
+              </th>
+              <th scope="col" width="40%">
+                Title
+              </th>
+              <th scope="col" width="10%">
+                Assigned To
+              </th>
+              <th scope="col" width="10%">
+                Status
+              </th>
+              <th scope="col" width="10%">
+                Priority
+              </th>
+            </tr>
           </thead>
           <tbody className="list">
-          {workItems.length === 0 &&
-            <tr>
-              <td colSpan={7} className={'text-center'}>
-                No work items found.
-              </td>
-            </tr>
-          }
-          {workItems.map((workItem) => (
-            <tr key={workItem.id}>
-              <td>
-                <Link to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`}>
-                  {workItem.reference}
-                </Link>
-              </td>
-              <td className="title-cell">
-                {workItemTypeIcon(workItem.type)}
-                <Link className={"edit-work-item"} color={"muted"}
-                      to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`}>
-                  {workItem.title}
-                </Link>
-              </td>
-              <td>
-                {workItem.assignedTo && workItem.assignedTo.name &&
-                  <>
-                    <UncontrolledTooltip target={'assigned-to-' + workItem.id} placement="top">
-                      {workItem.assignedTo.name}
-                    </UncontrolledTooltip>
-                    <span
-                      className="avatar avatar-xs rounded-circle"
-                      style={{ backgroundColor: textToColor(workItem.assignedTo.name) }}
-                      id={'assigned-to-' + workItem.id}>{memberNameInitials(workItem.assignedTo.name)}
+            {workItems.length === 0 && (
+              <tr>
+                <td colSpan={7} className={'text-center'}>
+                  No work items found.
+                </td>
+              </tr>
+            )}
+            {workItems.map((workItem) => (
+              <tr key={workItem.id}>
+                <td>
+                  <Link
+                    to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`}
+                  >
+                    {workItem.reference}
+                  </Link>
+                </td>
+                <td className="title-cell">
+                  {workItemTypeIcon(workItem.type)}
+                  <Link
+                    className={'edit-work-item'}
+                    color={'muted'}
+                    to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/edit/${workItem.id}`}
+                  >
+                    {workItem.title}
+                  </Link>
+                </td>
+                <td>
+                  {workItem.assignedTo && workItem.assignedTo.name && (
+                    <>
+                      <UncontrolledTooltip
+                        target={'assigned-to-' + workItem.id}
+                        placement="top"
+                      >
+                        {workItem.assignedTo.name}
+                      </UncontrolledTooltip>
+                      <span
+                        className="avatar avatar-xs rounded-circle"
+                        style={{
+                          backgroundColor: textToColor(
+                            workItem.assignedTo.name,
+                          ),
+                        }}
+                        id={'assigned-to-' + workItem.id}
+                      >
+                        {memberNameInitials(workItem.assignedTo.name)}
+                      </span>
+                    </>
+                  )}
+                  {!workItem.assignedTo && '-'}
+                </td>
+                <td>
+                  <Badge color="" className="badge-dot mr-4">
+                    <i
+                      className={workItemStatusColorClassName(workItem.status)}
+                    />
+                    <span className="status">
+                      {formatHyphenatedString(workItem.status)}
                     </span>
-                  </>}
-                {!workItem.assignedTo && '-'}
-              </td>
-              <td>
-                <Badge color="" className="badge-dot mr-4">
-                  <i className={workItemStatusColorClassName(workItem.status)} />
-                  <span className="status">{formatHyphenatedString(workItem.status)}</span>
-                </Badge>
-              </td>
-              <td>
-                <Badge color={priorityColor(workItem.priority)} pill={true}>
-                  {workItem.priority}
-                </Badge>
-              </td>
-            </tr>
-          ))}
+                  </Badge>
+                </td>
+                <td>
+                  <Badge color={priorityColor(workItem.priority)} pill={true}>
+                    {workItem.priority}
+                  </Badge>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

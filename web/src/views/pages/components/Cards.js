@@ -1,5 +1,4 @@
-
-import React from "react";
+import React from 'react';
 
 // reactstrap components
 import {
@@ -17,9 +16,9 @@ import {
   Container,
   Row,
   Col,
-} from "reactstrap";
+} from 'reactstrap';
 // core components
-import CardsHeader from "components/Headers/CardsHeader.js";
+import CardsHeader from 'components/Headers/CardsHeader.js';
 
 function Cards() {
   return (
@@ -31,7 +30,7 @@ function Cards() {
             <Card>
               <CardImg
                 alt="..."
-                src={require("assets/img/theme/img-1-1000x600.jpg")}
+                src={require('assets/img/theme/img-1-1000x600.jpg')}
                 top
               />
 
@@ -85,7 +84,7 @@ function Cards() {
             <Card className="card-profile">
               <CardImg
                 alt="..."
-                src={require("assets/img/theme/img-1-1000x600.jpg")}
+                src={require('assets/img/theme/img-1-1000x600.jpg')}
                 top
               />
               <Row className="justify-content-center">
@@ -95,7 +94,7 @@ function Cards() {
                       <img
                         alt="..."
                         className="rounded-circle"
-                        src={require("assets/img/theme/team-4.jpg")}
+                        src={require('assets/img/theme/team-4.jpg')}
                       />
                     </a>
                   </div>
@@ -189,7 +188,7 @@ function Cards() {
                     >
                       <img
                         alt="..."
-                        src={require("assets/img/theme/team-2.jpg")}
+                        src={require('assets/img/theme/team-2.jpg')}
                       />
                     </a>
                   </Col>
@@ -218,8 +217,8 @@ function Cards() {
                   <img
                     alt="..."
                     className="rounded-circle img-center img-fluid shadow shadow-lg--hover"
-                    src={require("assets/img/theme/team-1.jpg")}
-                    style={{ width: "140px" }}
+                    src={require('assets/img/theme/team-1.jpg')}
+                    style={{ width: '140px' }}
                   />
                 </a>
                 <div className="pt-4 text-center">
@@ -262,7 +261,7 @@ function Cards() {
             <Card>
               <CardImg
                 alt="..."
-                src={require("assets/img/theme/img-1-1000x900.jpg")}
+                src={require('assets/img/theme/img-1-1000x900.jpg')}
                 top
               />
 
@@ -299,7 +298,7 @@ function Cards() {
                     Integer posuere erat a ante.
                   </p>
                   <footer className="blockquote-footer text-danger">
-                    Someone famous in{" "}
+                    Someone famous in{' '}
                     <cite title="Source Title">Source Title</cite>
                   </footer>
                 </blockquote>
@@ -415,7 +414,7 @@ function Cards() {
             <Card className="bg-dark text-white border-0">
               <CardImg
                 alt="..."
-                src={require("assets/img/theme/img-1-1000x600.jpg")}
+                src={require('assets/img/theme/img-1-1000x600.jpg')}
               />
               <CardImgOverlay className="d-flex align-items-center">
                 <div>

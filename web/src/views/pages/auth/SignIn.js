@@ -45,10 +45,10 @@ function SignIn() {
     email: Yup.string()
       .matches(
         /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-        'The email address provided is invalid')
+        'The email address provided is invalid',
+      )
       .required('The email is required'),
-    password: Yup.string()
-      .required('The password is required'),
+    password: Yup.string().required('The password is required'),
   });
 
   useEffect(() => {
@@ -64,8 +64,15 @@ function SignIn() {
       const currentOrg = await getOrg();
 
       const lastVisitedProjectId = localStorage.getItem('lastVisitedProjectId');
-      if (lastVisitedProjectId && currentOrg.projects.some(project => project.id === lastVisitedProjectId)) {
-        return navigate(`/admin/orgs/${currentOrgId}/projects/${lastVisitedProjectId}/active-sprint`);
+      if (
+        lastVisitedProjectId &&
+        currentOrg.projects.some(
+          (project) => project.id === lastVisitedProjectId,
+        )
+      ) {
+        return navigate(
+          `/admin/orgs/${currentOrgId}/projects/${lastVisitedProjectId}/active-sprint`,
+        );
       }
 
       return navigate(`/orgs/${currentOrgId}/projects/`);
@@ -75,15 +82,23 @@ function SignIn() {
   });
 
   const redirectToDemoProject = async (currentOrg) => {
-    const okrs = await listOKRs(currentOrg.id, currentOrg.projects[0].id, 'this-quarter');
+    const okrs = await listOKRs(
+      currentOrg.id,
+      currentOrg.projects[0].id,
+      'this-quarter',
+    );
     const okrId = okrs?.length > 0 ? okrs[0]?.id : null;
 
-    if(okrId) {
-      return navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/okrs/detail/${okrId}`);
+    if (okrId) {
+      return navigate(
+        `/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/okrs/detail/${okrId}`,
+      );
     }
 
-    return navigate(`/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/dashboard`);
-  }
+    return navigate(
+      `/admin/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/dashboard`,
+    );
+  };
 
   const onLogin = async (values, { setSubmitting }) => {
     try {
@@ -96,27 +111,37 @@ function SignIn() {
       const currentOrg = await getOrg();
 
       if (currentOrg.id) {
-
         setSubmitting(false);
 
         if (redirectTo) {
           return navigate(redirectTo);
         }
 
-        const lastVisitedProjectId = localStorage.getItem('lastVisitedProjectId');
-        if (lastVisitedProjectId && currentOrg.projects.some(project => project.id === lastVisitedProjectId)) {
-          return navigate(`/admin/orgs/${currentOrg.id}/projects/${lastVisitedProjectId}/active-sprint`);
+        const lastVisitedProjectId = localStorage.getItem(
+          'lastVisitedProjectId',
+        );
+        if (
+          lastVisitedProjectId &&
+          currentOrg.projects.some(
+            (project) => project.id === lastVisitedProjectId,
+          )
+        ) {
+          return navigate(
+            `/admin/orgs/${currentOrg.id}/projects/${lastVisitedProjectId}/active-sprint`,
+          );
         }
 
-        if(currentOrg.id && currentOrg?.projects.length === 0) {
+        if (currentOrg.id && currentOrg?.projects.length === 0) {
           return navigate(`/orgs/${currentOrg.id}/objectives/`);
         }
 
-        if(currentOrg.hadDemo){
+        if (currentOrg.hadDemo) {
           return await redirectToDemoProject(currentOrg);
         }
 
-        return navigate(`/blank/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/demo`);
+        return navigate(
+          `/blank/orgs/${currentOrg.id}/projects/${currentOrg.projects[0].id}/demo`,
+        );
       }
 
       // TODO: Remove this when we have a proper way to handle it
@@ -131,8 +156,10 @@ function SignIn() {
 
   return (
     <>
-      <AuthHeader title="Welcome Back to Floumy!"
-                  lead="Stop wasting time. Let’s turn your ideas into wins. Get to it!" />
+      <AuthHeader
+        title="Welcome Back to Floumy!"
+        lead="Stop wasting time. Let’s turn your ideas into wins. Get to it!"
+      />
       <Container className="mt--8 pb-5">
         <Row className="justify-content-center">
           <Col lg="6" md="8">
@@ -150,13 +177,21 @@ function SignIn() {
                 >
                   {({ isSubmitting, errors, touched }) => (
                     <Form>
-                      {error && <div className="text-center text-danger mb-3">{error}</div>}
+                      {error && (
+                        <div className="text-center text-danger mb-3">
+                          {error}
+                        </div>
+                      )}
                       <FormGroup
                         className={classnames({
                           focused: focusedEmail,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.email && touched.email)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.email && touched.email,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-email-83" />
@@ -180,7 +215,11 @@ function SignIn() {
                           focused: focusedPassword,
                         })}
                       >
-                        <InputGroup className={getInputGroupErrorClass(errors.password && touched.password)}>
+                        <InputGroup
+                          className={getInputGroupErrorClass(
+                            errors.password && touched.password,
+                          )}
+                        >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
                               <i className="ni ni-lock-circle-open" />
@@ -200,8 +239,13 @@ function SignIn() {
                         <ErrorMessage name="password" component={InputError} />
                       </FormGroup>
                       <div className="text-center">
-                        <Button id="login-submit" className="mt-4" color="info" type="submit"
-                                disabled={isSubmitting}>
+                        <Button
+                          id="login-submit"
+                          className="mt-4"
+                          color="info"
+                          type="submit"
+                          disabled={isSubmitting}
+                        >
                           Sign in
                         </Button>
                       </div>
@@ -212,8 +256,10 @@ function SignIn() {
                   Or sign up <a href="/auth/sign-up">here</a>
                 </div>
                 <div className="text-center text-muted mt-4">
-                  <small>Forgot your password?<a href="/auth/forgot-password"> Reset it here</a></small>
-
+                  <small>
+                    Forgot your password?
+                    <a href="/auth/forgot-password"> Reset it here</a>
+                  </small>
                 </div>
               </CardBody>
             </Card>

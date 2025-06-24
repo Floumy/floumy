@@ -1,5 +1,5 @@
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import {
   Badge,
   Card,
@@ -12,22 +12,25 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
-} from "reactstrap";
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { initiativeStatusColorClassName, formatHyphenatedString } from "../../../services/utils/utils";
+  Row,
+} from 'reactstrap';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import {
+  initiativeStatusColorClassName,
+  formatHyphenatedString,
+} from '../../../services/utils/utils';
 import {
   downvoteFeatureRequest,
   listCurrentUserFeatureRequestVotes,
   listFeatureRequests,
   searchFeatureRequests,
-  upvoteFeatureRequest
-} from "../../../services/feature-requests/feature-requests.service";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { isAuthenticated } from "../../../services/auth/auth.service";
-import { toast } from "react-toastify";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
+  upvoteFeatureRequest,
+} from '../../../services/feature-requests/feature-requests.service';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { isAuthenticated } from '../../../services/auth/auth.service';
+import { toast } from 'react-toastify';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 
 export default function FeatureRequests({ isPublic = false }) {
   const { orgId, projectId } = useParams();
@@ -36,10 +39,10 @@ export default function FeatureRequests({ isPublic = false }) {
   const [hasMoreFeatureRequests, setHasMoreFeatureRequests] = useState(true);
   const [featureRequestVotesMap, setFeatureRequestVotesMap] = useState({});
   const navigate = useNavigate();
-  const context = isPublic ? "public" : "admin";
+  const context = isPublic ? 'public' : 'admin';
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [searchText, setSearchText] = useState("");
+  const [search, setSearch] = useState('');
+  const [searchText, setSearchText] = useState('');
 
   const typingTimeoutRef = useRef(null);
 
@@ -54,22 +57,36 @@ export default function FeatureRequests({ isPublic = false }) {
     debounce(async () => await handleSearch(searchText), 500);
   }
 
-  async function fetchFeatureRequests(page = 1, searchTerm = "") {
+  async function fetchFeatureRequests(page = 1, searchTerm = '') {
     setIsLoading(true);
     try {
       let featureRequestsData;
       if (searchTerm) {
-        featureRequestsData = await searchFeatureRequests(orgId, projectId, searchTerm, page, 50);
+        featureRequestsData = await searchFeatureRequests(
+          orgId,
+          projectId,
+          searchTerm,
+          page,
+          50,
+        );
       } else {
-        featureRequestsData = await listFeatureRequests(orgId, projectId, page, 50);
+        featureRequestsData = await listFeatureRequests(
+          orgId,
+          projectId,
+          page,
+          50,
+        );
       }
       if (featureRequestsData.length === 0) {
         setHasMoreFeatureRequests(false);
       } else {
-        setFeatureRequests(prevRequests => [...prevRequests, ...featureRequestsData]);
+        setFeatureRequests((prevRequests) => [
+          ...prevRequests,
+          ...featureRequestsData,
+        ]);
       }
     } catch (e) {
-      toast.error("Failed to fetch feature requests");
+      toast.error('Failed to fetch feature requests');
     } finally {
       setIsLoading(false);
     }
@@ -85,17 +102,21 @@ export default function FeatureRequests({ isPublic = false }) {
 
   async function fetchCurrentUserFeatureRequestVotes() {
     if (await isAuthenticated()) {
-      const featureRequestVotes = await listCurrentUserFeatureRequestVotes(orgId, projectId);
+      const featureRequestVotes = await listCurrentUserFeatureRequestVotes(
+        orgId,
+        projectId,
+      );
       let featureRequestVotesMap = {};
-      featureRequestVotes.forEach(featureRequestVote => {
-        featureRequestVotesMap[featureRequestVote.featureRequest.id] = featureRequestVote.vote;
+      featureRequestVotes.forEach((featureRequestVote) => {
+        featureRequestVotesMap[featureRequestVote.featureRequest.id] =
+          featureRequestVote.vote;
       });
       setFeatureRequestVotesMap(featureRequestVotesMap);
     }
   }
 
   useEffect(() => {
-    document.title = "Floumy | Feature Requests";
+    document.title = 'Floumy | Feature Requests';
     fetchFeatureRequests(1);
     fetchCurrentUserFeatureRequestVotes();
   }, []);
@@ -106,7 +127,7 @@ export default function FeatureRequests({ isPublic = false }) {
   }
 
   function getDetailPage(context, orgId, projectId, featureRequestId) {
-    if (context === "admin") {
+    if (context === 'admin') {
       return `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequestId}/`;
     }
 
@@ -121,13 +142,13 @@ export default function FeatureRequests({ isPublic = false }) {
       await upvoteFeatureRequest(orgId, projectId, featureRequest.id);
       featureRequestVotesMap[featureRequest.id] = 1;
       setFeatureRequestVotesMap({ ...featureRequestVotesMap });
-      featureRequests.forEach(fr => {
+      featureRequests.forEach((fr) => {
         if (fr.id === featureRequest.id) {
           fr.votesCount++;
         }
       });
       setFeatureRequests([...featureRequests]);
-      toast.success("You voted up the feature request");
+      toast.success('You voted up the feature request');
     };
   }
 
@@ -139,13 +160,13 @@ export default function FeatureRequests({ isPublic = false }) {
       await downvoteFeatureRequest(orgId, projectId, featureRequest.id);
       featureRequestVotesMap[featureRequest.id] = -1;
       setFeatureRequestVotesMap({ ...featureRequestVotesMap });
-      featureRequests.forEach(fr => {
+      featureRequests.forEach((fr) => {
         if (fr.id === featureRequest.id) {
           fr.votesCount--;
         }
       });
       setFeatureRequests([...featureRequests]);
-      toast.success("You voted down the feature request");
+      toast.success('You voted down the feature request');
     };
   }
 
@@ -155,13 +176,15 @@ export default function FeatureRequests({ isPublic = false }) {
       <SimpleHeader
         headerButtons={[
           {
-            name: "New Request",
-            shortcut: "r",
-            id: "new-feature-request",
+            name: 'New Request',
+            shortcut: 'r',
+            id: 'new-feature-request',
             action: () => {
-              navigate(`/${context}/orgs/${orgId}/projects/${projectId}/feature-requests/new`);
-            }
-          }
+              navigate(
+                `/${context}/orgs/${orgId}/projects/${projectId}/feature-requests/new`,
+              );
+            },
+          },
         ]}
       />
       <Container className="mt--6" fluid>
@@ -180,7 +203,7 @@ export default function FeatureRequests({ isPublic = false }) {
                       </InputGroupText>
                     </InputGroupAddon>
                     <Input
-                      placeholder={"Search by title or description"}
+                      placeholder={'Search by title or description'}
                       type="search"
                       value={searchText}
                       onChange={doSearch}
@@ -188,73 +211,134 @@ export default function FeatureRequests({ isPublic = false }) {
                   </InputGroup>
                 </FormGroup>
               </CardHeader>
-              <InfiniteScroll next={loadNextPage}
-                              hasMore={hasMoreFeatureRequests}
-                              loader={<></>}
-                              dataLength={featureRequests.length}
-                              key={search}>
-
-                {(!isLoading || featureRequests?.length > 0) && <div className="table-responsive border-bottom">
-                  <table className="table align-items-center no-select" style={{ minWidth: "700px" }}>
-                    <thead className="thead-light">
-                    <tr>
-                      <th scope="col" width="10%">Votes</th>
-                      <th scope="col" width="55%">Feature</th>
-                      <th scope="col" width="10%">Est.</th>
-                      <th scope="col" width="25%">Status</th>
-                    </tr>
-                    </thead>
-                    <tbody className="list">
-                    {featureRequests.length === 0 && (<tr>
-                      <td colSpan={4} className="text-center">No feature requests found.</td>
-                    </tr>)}
-                    {featureRequests && featureRequests.map((featureRequest) => (
-                      <tr key={featureRequest.id}>
-                        <td>
-                          <div className="vote badge badge-lg badge-secondary p-2 text-dark"
-                               style={{ fontSize: "small", border: "1px solid #cecece" }}>
-                            <i className="fa fa-arrow-up" style={{
-                              cursor: "pointer",
-                              color: featureRequestVotesMap[featureRequest.id] === 1 ? "#81b8fc" : "#cecece"
-                            }}
-                               role="button"
-                               tabIndex="0"
-                               aria-pressed="false"
-                               aria-expanded="false"
-                               onClick={upVote(featureRequest)}
-                            />
-                            <span className="px-3">{featureRequest.votesCount}</span>
-                            <i className="fa fa-arrow-down" style={{
-                              cursor: "pointer",
-                              color: featureRequestVotesMap[featureRequest.id] === -1 ? "#81b8fc" : "#cecece"
-                            }}
-                               role="button"
-                               tabIndex="0"
-                               aria-pressed="false"
-                               aria-expanded="false"
-                               onClick={downVote(featureRequest)}
-                            />
-                          </div>
-                        </td>
-                        <td className="title-cell" style={{ maxWidth: "300px" }}>
-                          <Link to={getDetailPage(context, orgId, projectId, featureRequest.id)}>
-                            {featureRequest.title}
-                          </Link>
-                        </td>
-                        <td>
-                          {featureRequest.estimation && featureRequest.estimation > 0 ? featureRequest.estimation : "-"}
-                        </td>
-                        <td>
-                          <Badge color="" className="badge-dot mr-4">
-                            <i className={initiativeStatusColorClassName(featureRequest.status)} />
-                            <span className="status">{formatHyphenatedString(featureRequest.status)}</span>
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                    </tbody>
-                  </table>
-                </div>}
+              <InfiniteScroll
+                next={loadNextPage}
+                hasMore={hasMoreFeatureRequests}
+                loader={<></>}
+                dataLength={featureRequests.length}
+                key={search}
+              >
+                {(!isLoading || featureRequests?.length > 0) && (
+                  <div className="table-responsive border-bottom">
+                    <table
+                      className="table align-items-center no-select"
+                      style={{ minWidth: '700px' }}
+                    >
+                      <thead className="thead-light">
+                        <tr>
+                          <th scope="col" width="10%">
+                            Votes
+                          </th>
+                          <th scope="col" width="55%">
+                            Feature
+                          </th>
+                          <th scope="col" width="10%">
+                            Est.
+                          </th>
+                          <th scope="col" width="25%">
+                            Status
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="list">
+                        {featureRequests.length === 0 && (
+                          <tr>
+                            <td colSpan={4} className="text-center">
+                              No feature requests found.
+                            </td>
+                          </tr>
+                        )}
+                        {featureRequests &&
+                          featureRequests.map((featureRequest) => (
+                            <tr key={featureRequest.id}>
+                              <td>
+                                <div
+                                  className="vote badge badge-lg badge-secondary p-2 text-dark"
+                                  style={{
+                                    fontSize: 'small',
+                                    border: '1px solid #cecece',
+                                  }}
+                                >
+                                  <i
+                                    className="fa fa-arrow-up"
+                                    style={{
+                                      cursor: 'pointer',
+                                      color:
+                                        featureRequestVotesMap[
+                                          featureRequest.id
+                                        ] === 1
+                                          ? '#81b8fc'
+                                          : '#cecece',
+                                    }}
+                                    role="button"
+                                    tabIndex="0"
+                                    aria-pressed="false"
+                                    aria-expanded="false"
+                                    onClick={upVote(featureRequest)}
+                                  />
+                                  <span className="px-3">
+                                    {featureRequest.votesCount}
+                                  </span>
+                                  <i
+                                    className="fa fa-arrow-down"
+                                    style={{
+                                      cursor: 'pointer',
+                                      color:
+                                        featureRequestVotesMap[
+                                          featureRequest.id
+                                        ] === -1
+                                          ? '#81b8fc'
+                                          : '#cecece',
+                                    }}
+                                    role="button"
+                                    tabIndex="0"
+                                    aria-pressed="false"
+                                    aria-expanded="false"
+                                    onClick={downVote(featureRequest)}
+                                  />
+                                </div>
+                              </td>
+                              <td
+                                className="title-cell"
+                                style={{ maxWidth: '300px' }}
+                              >
+                                <Link
+                                  to={getDetailPage(
+                                    context,
+                                    orgId,
+                                    projectId,
+                                    featureRequest.id,
+                                  )}
+                                >
+                                  {featureRequest.title}
+                                </Link>
+                              </td>
+                              <td>
+                                {featureRequest.estimation &&
+                                featureRequest.estimation > 0
+                                  ? featureRequest.estimation
+                                  : '-'}
+                              </td>
+                              <td>
+                                <Badge color="" className="badge-dot mr-4">
+                                  <i
+                                    className={initiativeStatusColorClassName(
+                                      featureRequest.status,
+                                    )}
+                                  />
+                                  <span className="status">
+                                    {formatHyphenatedString(
+                                      featureRequest.status,
+                                    )}
+                                  </span>
+                                </Badge>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
                 {isLoading && <LoadingSpinnerBox />}
               </InfiniteScroll>
             </Card>

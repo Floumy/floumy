@@ -1,9 +1,9 @@
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Col, Container, Row } from "reactstrap";
-import React from "react";
-import CreateUpdateDeleteSprint from "./CreateUpdateDeleteSprint";
-import { addSprint } from "../../../services/sprints/sprints.service";
-import { useParams } from "react-router-dom";
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Col, Container, Row } from 'reactstrap';
+import React from 'react';
+import CreateUpdateDeleteSprint from './CreateUpdateDeleteSprint';
+import { addSprint } from '../../../services/sprints/sprints.service';
+import { useParams } from 'react-router-dom';
 
 function NewSprint() {
   const { orgId, projectId } = useParams();
@@ -14,7 +14,7 @@ function NewSprint() {
 
   return (
     <>
-      <SimpleHeader/>
+      <SimpleHeader />
       <Container className="mt--6" fluid>
         <Row>
           <Col>

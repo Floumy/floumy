@@ -13,7 +13,8 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
   const { orgId, currentOrg } = useOrg();
   const navigate = useNavigate();
   const [focusedProjectName, setFocusedProjectName] = useState(false);
-  const [focusedProjectDescription, setFocusedProjectDescription] = useState(false);
+  const [focusedProjectDescription, setFocusedProjectDescription] =
+    useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(values) {
@@ -22,7 +23,11 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
 
     try {
       setIsSubmitting(true);
-      const createdProject = await createProject(orgId, projectName, projectDescription);
+      const createdProject = await createProject(
+        orgId,
+        projectName,
+        projectDescription,
+      );
       toast.success('Project created');
       toggleModal();
       navigate(`/admin/orgs/${orgId}/projects/${createdProject.id}/dashboard`);
@@ -32,21 +37,18 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
   }
 
   const validationSchema = Yup.object().shape({
-    projectName: Yup.string().trim()
+    projectName: Yup.string()
+      .trim()
       .required('Project name is required')
       .min(3, 'Project name must be at least 3 characters')
       .max(50, 'Project name cannot be longer than 50 characters')
       .matches(
         /^[a-zA-Z0-9_\- ]+$/,
-        'Project name can only contain letters, numbers, underscores, hyphens and spaces'
+        'Project name can only contain letters, numbers, underscores, hyphens and spaces',
       )
-      .test(
-        'unique',
-        'Project name already exists',
-        function(value) {
-          return !currentOrg?.projects?.some(project => project.name === value);
-        }
-      ),
+      .test('unique', 'Project name already exists', function (value) {
+        return !currentOrg?.projects?.some((project) => project.name === value);
+      }),
   });
 
   return (
@@ -83,9 +85,7 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
           }}
         >
           {({ values, errors, touched }) => (
-            <Form
-              className="needs-validation"
-              noValidate>
+            <Form className="needs-validation" noValidate>
               <h4>Project Name</h4>
               <FormGroup
                 className={classnames({
@@ -123,20 +123,25 @@ export default function NewProjectModal({ isOpen, toggleModal }) {
                     onBlur={() => setFocusedProjectDescription(false)}
                     value={values.projectDescription}
                     rows={6}
-                    invalid={!!(errors.projectDescription && touched.projectDescription)}
+                    invalid={
+                      !!(
+                        errors.projectDescription && touched.projectDescription
+                      )
+                    }
                     className="px-3"
                     autoComplete="off"
                   />
                 </InputGroup>
-                <ErrorMessage name="projectDescription" component={InputError} />
+                <ErrorMessage
+                  name="projectDescription"
+                  component={InputError}
+                />
               </FormGroup>
               <div>
-                <Button color="primary" type="submit"
-                        disabled={isSubmitting}>
+                <Button color="primary" type="submit" disabled={isSubmitting}>
                   Create Project
                 </Button>
-                <Button color="secondary" type="button"
-                        onClick={toggleModal}>
+                <Button color="secondary" type="button" onClick={toggleModal}>
                   Close
                 </Button>
               </div>

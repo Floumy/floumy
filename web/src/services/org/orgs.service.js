@@ -2,7 +2,9 @@ import api from '../api/api.service';
 
 export async function getOrg() {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/orgs/current`);
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/orgs/current`,
+    );
     return response.data;
   } catch (e) {
     throw new Error(e.message);

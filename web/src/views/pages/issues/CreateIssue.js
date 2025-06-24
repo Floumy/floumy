@@ -2,7 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
-import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row } from 'reactstrap';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  FormGroup,
+  Input,
+  Row,
+} from 'reactstrap';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import InputError from '../../../components/Errors/InputError';
@@ -12,7 +21,6 @@ export default function CreateIssue({ onSubmit }) {
   const [isLoading, setIsLoading] = useState(false);
   const { orgId, projectId } = useParams();
   const navigate = useNavigate();
-
 
   const getDetailUrl = (issueId) => {
     const currentContextUrlSlug = window.location.pathname.split('/')[1];
@@ -29,7 +37,7 @@ export default function CreateIssue({ onSubmit }) {
       const savedIssue = await onSubmit(values);
       setTimeout(() => toast.success('The issue has been saved'), 100);
 
-      navigate(getDetailUrl(savedIssue.id), {replace: true});
+      navigate(getDetailUrl(savedIssue.id), { replace: true });
     } catch (e) {
       toast.error('The issue could not be saved');
     } finally {
@@ -104,7 +112,10 @@ export default function CreateIssue({ onSubmit }) {
                         invalid={!!(errors.description && touched.description)}
                         autoComplete="off"
                       />
-                      <ErrorMessage name={'description'} component={InputError} />
+                      <ErrorMessage
+                        name={'description'}
+                        component={InputError}
+                      />
                     </FormGroup>
                   </Col>
                 </Row>

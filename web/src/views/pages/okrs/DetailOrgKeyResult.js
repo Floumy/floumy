@@ -1,4 +1,13 @@
-import { Button, Card, CardBody, CardHeader, Col, Container, Input, Row } from 'reactstrap';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Container,
+  Input,
+  Row,
+} from 'reactstrap';
 import FloumySlider from '../../../components/Sliders/FloumySlider';
 import Select2 from 'react-select2-wrapper';
 import React, { useEffect } from 'react';
@@ -27,7 +36,7 @@ function DetailOrgKeyResult() {
   const [status, setStatus] = React.useState('');
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = React.useState(false);
   const [progress, setProgress] = React.useState('');
-  const {keyResultId, orgId } = useParams();
+  const { keyResultId, orgId } = useParams();
   const [keyResult, setKeyResult] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
@@ -68,14 +77,11 @@ function DetailOrgKeyResult() {
   const handleSubmit = async (values) => {
     try {
       setIsSubmitting(true);
-      await updateKeyResult(
-        orgId,
-        keyResultId,
-        {
-          title: values.title,
-          status,
-          progress,
-        });
+      await updateKeyResult(orgId, keyResultId, {
+        title: values.title,
+        status,
+        progress,
+      });
 
       toast.success('The key result has been saved');
     } catch (e) {
@@ -100,13 +106,16 @@ function DetailOrgKeyResult() {
   };
 
   const validationSchema = Yup.object({
-    title: Yup.string()
-      .required('The key result title is required'),
+    title: Yup.string().required('The key result title is required'),
   });
 
   async function handleCommentAdd(comment) {
     try {
-      const addedComment = await addKeyResultComment(orgId, keyResultId, comment);
+      const addedComment = await addKeyResultComment(
+        orgId,
+        keyResultId,
+        comment,
+      );
       keyResult.comments.push(addedComment);
       setKeyResult({ ...keyResult });
       toast.success('Comment added successfully');
@@ -118,7 +127,7 @@ function DetailOrgKeyResult() {
   async function handleCommentEditSubmit(commentId, comment) {
     try {
       await updateKeyResultComment(orgId, keyResultId, commentId, comment);
-      const updatedComment = keyResult.comments.find(c => c.id === commentId);
+      const updatedComment = keyResult.comments.find((c) => c.id === commentId);
       updatedComment.content = comment.content;
       updatedComment.mentions = comment.mentions;
       setKeyResult({ ...keyResult });
@@ -131,7 +140,7 @@ function DetailOrgKeyResult() {
   async function handCommentDelete(commentId) {
     try {
       await deleteKeyResultComment(orgId, keyResultId, commentId);
-      const index = keyResult.comments.findIndex(c => c.id === commentId);
+      const index = keyResult.comments.findIndex((c) => c.id === commentId);
       keyResult.comments.splice(index, 1);
       setKeyResult({ ...keyResult });
       toast.success('Comment deleted successfully');
@@ -143,13 +152,13 @@ function DetailOrgKeyResult() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader
-        breadcrumbs={keyResult?.breadcrumbs}
-      />
+      <SimpleHeader breadcrumbs={keyResult?.breadcrumbs} />
       <Container className="mt--6" fluid id="OKRs">
         <Row>
           <Col lg={8} md={12}>
-            {!isLoading && !keyResult && <NotFoundCard message="Key result not be found" />}
+            {!isLoading && !keyResult && (
+              <NotFoundCard message="Key result not be found" />
+            )}
             <DeleteWarning
               isOpen={isDeleteWarningOpen}
               entity={'Key Result'}
@@ -160,27 +169,25 @@ function DetailOrgKeyResult() {
               <CardHeader className="border-1">
                 <div className="row">
                   <div className="col-12">
-                    <h3 className="mb-0">Edit Key Result {keyResult && keyResult.reference}</h3>
+                    <h3 className="mb-0">
+                      Edit Key Result {keyResult && keyResult.reference}
+                    </h3>
                   </div>
                 </div>
               </CardHeader>
               <CardBody>
                 {isLoading && <LoadingSpinnerBox />}
-                {!isLoading && keyResult &&
+                {!isLoading && keyResult && (
                   <Formik
                     initialValues={{ title: keyResult.title || '' }}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                   >
                     {({ values, handleChange, errors, touched }) => (
-                      <Form
-                        className="needs-validation"
-                        noValidate>
+                      <Form className="needs-validation" noValidate>
                         <Row className="mb-3">
                           <Col>
-                            <label className="form-control-label">
-                              Title
-                            </label>
+                            <label className="form-control-label">Title</label>
                             <Field
                               as={Input}
                               id="objective-title"
@@ -192,7 +199,10 @@ function DetailOrgKeyResult() {
                               invalid={!!(errors.title && touched.title)}
                               autoComplete="off"
                             />
-                            <ErrorMessage name={'objective'} component={InputError} />
+                            <ErrorMessage
+                              name={'objective'}
+                              component={InputError}
+                            />
                           </Col>
                         </Row>
                         <Row className="mb-3">
@@ -210,7 +220,8 @@ function DetailOrgKeyResult() {
                               data={statuses}
                               onChange={async (e) => {
                                 await setStatus(e.target.value);
-                              }} />
+                              }}
+                            />
                           </Col>
                           <Col xs={12} sm={6} className="mb-3">
                             <label className="form-control-label col-form-label">
@@ -220,7 +231,8 @@ function DetailOrgKeyResult() {
                               initialValue={keyResult.progress * 100}
                               onSliderValueChange={(sliderValue) => {
                                 setProgress(parseFloat(sliderValue) / 100);
-                              }} />
+                              }}
+                            />
                           </Col>
                         </Row>
                         <Row>
@@ -248,12 +260,14 @@ function DetailOrgKeyResult() {
                             </Button>
                           </Col>
                         </Row>
-                      </Form>)}
-                  </Formik>}
+                      </Form>
+                    )}
+                  </Formik>
+                )}
               </CardBody>
             </Card>
           </Col>
-          {!isLoading &&
+          {!isLoading && (
             <Col lg={4} md={12}>
               <Comments
                 comments={keyResult?.comments || []}
@@ -262,7 +276,7 @@ function DetailOrgKeyResult() {
                 onCommentDelete={handCommentDelete}
               />
             </Col>
-          }
+          )}
         </Row>
       </Container>
     </>

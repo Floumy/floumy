@@ -1,8 +1,7 @@
-
-import React from "react";
+import React from 'react';
 
 // reactstrap components
-import { Button, Container, Row, Col } from "reactstrap";
+import { Button, Container, Row, Col } from 'reactstrap';
 
 function ProfileHeader() {
   return (
@@ -10,11 +9,11 @@ function ProfileHeader() {
       <div
         className="header pb-6 d-flex align-items-center"
         style={{
-          minHeight: "500px",
+          minHeight: '500px',
           backgroundImage:
-            'url("' + require("assets/img/theme/profile-cover.jpg") + '")',
-          backgroundSize: "cover",
-          backgroundPosition: "center top",
+            'url("' + require('assets/img/theme/profile-cover.jpg') + '")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
         }}
       >
         <span className="mask bg-gradient-info opacity-8" />

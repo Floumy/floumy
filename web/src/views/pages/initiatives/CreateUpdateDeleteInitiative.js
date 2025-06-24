@@ -1,9 +1,20 @@
-import { Button, Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Input,
+  Row,
+} from 'reactstrap';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import InputError from '../../../components/Errors/InputError';
 import Select2 from 'react-select2-wrapper';
 import React, { useCallback, useEffect, useState } from 'react';
-import { deleteInitiative, listMilestones } from '../../../services/roadmap/roadmap.service';
+import {
+  deleteInitiative,
+  listMilestones,
+} from '../../../services/roadmap/roadmap.service';
 import { listKeyResults } from '../../../services/okrs/okrs.service';
 import * as Yup from 'yup';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
@@ -67,8 +78,8 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
   const fetchAndSetMembers = useCallback(async () => {
     const org = await getOrg();
     const mappedUsers = org.members
-      .filter(user => user.isActive || user.id === initiative?.assignedTo?.id)
-      .map(user => {
+      .filter((user) => user.isActive || user.id === initiative?.assignedTo?.id)
+      .map((user) => {
         return { id: user.id, text: user.name };
       });
     mappedUsers.push({ id: '', text: 'None' });
@@ -104,7 +115,12 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
     }
 
     fetchData();
-  }, [fetchAndSetKeyResults, fetchAndSetMilestones, fetchAndSetMembers, fetchAndSetFeatureRequests]);
+  }, [
+    fetchAndSetKeyResults,
+    fetchAndSetMilestones,
+    fetchAndSetMembers,
+    fetchAndSetFeatureRequests,
+  ]);
 
   useEffect(() => {
     if (initiative?.id) {
@@ -137,8 +153,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
   }, [initiative?.keyResult?.id, keyResults]);
 
   const validationSchema = Yup.object({
-    title: Yup.string()
-      .required('The title is required'),
+    title: Yup.string().required('The title is required'),
   });
 
   function getMilestoneSelectItemText(milestone) {
@@ -155,7 +170,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
       const initiativeToBeSaved = {
         title: values.title,
         description: descriptionText,
-        mentions: mentions.map(mention => mention.id),
+        mentions: mentions.map((mention) => mention.id),
         priority: priority,
         status: status,
         files: files,
@@ -173,8 +188,11 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
       setIsSubmitting(false);
 
       setTimeout(() => toast.success('The initiative has been saved'), 100);
-      if(!initiative || !initiative.id) {
-        navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${savedInitiative.id}`, {replace: true});
+      if (!initiative || !initiative.id) {
+        navigate(
+          `/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/detail/${savedInitiative.id}`,
+          { replace: true },
+        );
       }
     } catch (e) {
       console.error(e);
@@ -210,10 +228,16 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
       <Card>
         <CardHeader>
           {!isUpdate && <h3 className="mb-0">New Initiative</h3>}
-          {isUpdate && <h3 className="mb-0">Edit Initiative {initiative.reference}</h3>}
-          {isUpdate && <CardHeaderDetails createdAt={initiative.createdAt}
-                                          updatedAt={initiative.updatedAt}
-                                          createdBy={initiative.createdBy} />}
+          {isUpdate && (
+            <h3 className="mb-0">Edit Initiative {initiative.reference}</h3>
+          )}
+          {isUpdate && (
+            <CardHeaderDetails
+              createdAt={initiative.createdAt}
+              updatedAt={initiative.updatedAt}
+              createdBy={initiative.createdBy}
+            />
+          )}
         </CardHeader>
         <CardBody>
           <Formik
@@ -222,9 +246,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
             onSubmit={handleSubmit}
           >
             {({ values, handleChange, errors, touched }) => (
-              <Form
-                className="needs-validation"
-                noValidate>
+              <Form className="needs-validation" noValidate>
                 <Row>
                   <Col className="mb-3">
                     <label
@@ -264,7 +286,8 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                         { id: 'medium', text: 'Medium' },
                         { id: 'low', text: 'Low' },
                       ]}
-                      onChange={(e) => setPriority(e.target.value)}></Select2>
+                      onChange={(e) => setPriority(e.target.value)}
+                    ></Select2>
                   </Col>
                   <Col xs={12} sm={6} className="mb-3">
                     <label
@@ -284,7 +307,8 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                         { id: 'completed', text: 'Completed' },
                         { id: 'closed', text: 'Closed' },
                       ]}
-                      onChange={(e) => setStatus(e.target.value)}></Select2>
+                      onChange={(e) => setStatus(e.target.value)}
+                    ></Select2>
                   </Col>
                 </Row>
                 <Row className="mb-3">
@@ -293,10 +317,16 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                       className="form-control-label"
                       htmlFor="validationCustom01"
                     >
-                      {keyResult ? <Link to={`/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult}`}>
-                        Key Result
-                        <i className="fa fa-link ml-2"/>
-                      </Link> : 'Key Result'}
+                      {keyResult ? (
+                        <Link
+                          to={`/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult}`}
+                        >
+                          Key Result
+                          <i className="fa fa-link ml-2" />
+                        </Link>
+                      ) : (
+                        'Key Result'
+                      )}
                     </label>
                     <Select2
                       className="react-select-container"
@@ -307,7 +337,10 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                           return { id: '', text: 'None' };
                         }
 
-                        return { id: keyResult.id, text: `${keyResult.reference}: ${keyResult.title}` };
+                        return {
+                          id: keyResult.id,
+                          text: `${keyResult.reference}: ${keyResult.title}`,
+                        };
                       })}
                       onChange={(e) => setKeyResult(e.target.value)}
                     ></Select2>
@@ -319,44 +352,64 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                       className="form-control-label"
                       htmlFor="validationCustom01"
                     >
-                      {milestone ? <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/edit/${milestone}`}>
-                        Milestone
-                        <i className="fa fa-link ml-2"/>
-                      </Link> : 'Milestone'}
+                      {milestone ? (
+                        <Link
+                          to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/edit/${milestone}`}
+                        >
+                          Milestone
+                          <i className="fa fa-link ml-2" />
+                        </Link>
+                      ) : (
+                        'Milestone'
+                      )}
                     </label>
                     <Select2
                       className="react-select-container"
                       defaultValue={milestone}
                       placeholder="Select a milestone"
                       data={milestones.map((milestone) => {
-                        return { id: milestone.id, text: getMilestoneSelectItemText(milestone) };
+                        return {
+                          id: milestone.id,
+                          text: getMilestoneSelectItemText(milestone),
+                        };
                       })}
                       onChange={(e) => setMilestone(e.target.value)}
                     ></Select2>
                   </Col>
                 </Row>
-                {paymentPlan === 'premium' && <Row className="mb-3">
-                  <Col>
-                    <label
-                      className="form-control-label"
-                      htmlFor="validationCustom01"
-                    >
-                      {featureRequest ? <Link to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequest}`}>
-                        Feature Request
-                        <i className="fa fa-link ml-2"/>
-                      </Link> : 'Feature Request'}
-                    </label>
-                    <Select2
-                      className="react-select-container"
-                      defaultValue={featureRequest}
-                      placeholder="Select a feature request"
-                      data={featureRequests.map((featureRequest) => {
-                        return { id: featureRequest.id, text: featureRequest.title };
-                      })}
-                      onChange={(e) => setFeatureRequest(e.target.value)}
-                    ></Select2>
-                  </Col>
-                </Row>}
+                {paymentPlan === 'premium' && (
+                  <Row className="mb-3">
+                    <Col>
+                      <label
+                        className="form-control-label"
+                        htmlFor="validationCustom01"
+                      >
+                        {featureRequest ? (
+                          <Link
+                            to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequest}`}
+                          >
+                            Feature Request
+                            <i className="fa fa-link ml-2" />
+                          </Link>
+                        ) : (
+                          'Feature Request'
+                        )}
+                      </label>
+                      <Select2
+                        className="react-select-container"
+                        defaultValue={featureRequest}
+                        placeholder="Select a feature request"
+                        data={featureRequests.map((featureRequest) => {
+                          return {
+                            id: featureRequest.id,
+                            text: featureRequest.title,
+                          };
+                        })}
+                        onChange={(e) => setFeatureRequest(e.target.value)}
+                      ></Select2>
+                    </Col>
+                  </Row>
+                )}
                 <Row className="mb-3">
                   <Col>
                     <label
@@ -365,29 +418,41 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                     >
                       Description
                     </label>
-                    {!initiative?.description && <AIButton
-                      text="Fill with AI"
-                      disabled={values.title.length === 0}
-                      onClick={async () => {
-                        const response = await getInitiativeDescription(values.title, keyResult, milestone, featureRequest);
-                        setDescriptionText(response);
+                    {!initiative?.description && (
+                      <AIButton
+                        text="Fill with AI"
+                        disabled={values.title.length === 0}
+                        onClick={async () => {
+                          const response = await getInitiativeDescription(
+                            values.title,
+                            keyResult,
+                            milestone,
+                            featureRequest,
+                          );
+                          setDescriptionText(response);
+                        }}
+                      />
+                    )}
+                    <RichTextEditor
+                      value={descriptionText}
+                      onChange={(text, mentions) => {
+                        setDescriptionText(text);
+                        setMentions(mentions);
                       }}
-                    />}
-                    <RichTextEditor value={descriptionText} onChange={(text, mentions) => {
-                      setDescriptionText(text);
-                      setMentions(mentions);
-                    }} toolbar={[
-                      ['bold', 'italic'],
-                      ['link', 'blockquote', 'code', 'image', 'video'],
-                      [
-                        {
-                          list: 'ordered',
-                        },
-                        {
-                          list: 'bullet',
-                        },
-                      ],
-                    ]} placeholder="Describe your initiative and its impact ..." />
+                      toolbar={[
+                        ['bold', 'italic'],
+                        ['link', 'blockquote', 'code', 'image', 'video'],
+                        [
+                          {
+                            list: 'ordered',
+                          },
+                          {
+                            list: 'bullet',
+                          },
+                        ],
+                      ]}
+                      placeholder="Describe your initiative and its impact ..."
+                    />
                   </Col>
                 </Row>
                 <Row>
@@ -398,7 +463,10 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                     >
                       Attachments
                     </label>
-                    <FloumyDropZone onFilesChanged={handleFilesChanged} initialFiles={uploadedFiles} />
+                    <FloumyDropZone
+                      onFilesChanged={handleFilesChanged}
+                      initialFiles={uploadedFiles}
+                    />
                   </Col>
                 </Row>
                 <Row className="mb-5">
@@ -426,16 +494,18 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                 >
                   Save Initiative
                 </Button>
-                {isUpdate && <Button
-                  id={'delete-initiative'}
-                  color="secondary"
-                  type="button"
-                  className="mt-3"
-                  onClick={() => setIsDeleteWarningOpen(true)}
-                  disabled={isSubmitting}
-                >
-                  Delete Initiative
-                </Button>}
+                {isUpdate && (
+                  <Button
+                    id={'delete-initiative'}
+                    color="secondary"
+                    type="button"
+                    className="mt-3"
+                    onClick={() => setIsDeleteWarningOpen(true)}
+                    disabled={isSubmitting}
+                  >
+                    Delete Initiative
+                  </Button>
+                )}
               </Form>
             )}
           </Formik>

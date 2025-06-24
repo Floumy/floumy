@@ -1,12 +1,12 @@
-import SimpleHeader from "../../../components/Headers/SimpleHeader";
-import { Card, Col, Container, Row } from "reactstrap";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import InfiniteLoadingBar from "../components/InfiniteLoadingBar";
-import LoadingSpinnerBox from "../components/LoadingSpinnerBox";
-import { getPublicSprint } from "../../../services/sprints/sprints.service";
-import NotFoundCard from "../components/NotFoundCard";
-import PublicSprintDetail from "./PublicSprintDetail";
+import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { Card, Col, Container, Row } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
+import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import { getPublicSprint } from '../../../services/sprints/sprints.service';
+import NotFoundCard from '../components/NotFoundCard';
+import PublicSprintDetail from './PublicSprintDetail';
 
 function PublicSprint() {
   const { orgId, projectId, sprintId } = useParams();
@@ -32,16 +32,20 @@ function PublicSprint() {
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
-      <SimpleHeader/>
+      <SimpleHeader />
       <Container className="mt--6" fluid>
         <Row>
           <Col>
             <div className="card-wrapper">
-              {isLoading && <Card><LoadingSpinnerBox /></Card>}
-              {sprint && <PublicSprintDetail
-                orgId={orgId}
-                sprint={sprint} />}
-              {!sprint && !isLoading && <NotFoundCard message={"Sprint not found"} />}
+              {isLoading && (
+                <Card>
+                  <LoadingSpinnerBox />
+                </Card>
+              )}
+              {sprint && <PublicSprintDetail orgId={orgId} sprint={sprint} />}
+              {!sprint && !isLoading && (
+                <NotFoundCard message={'Sprint not found'} />
+              )}
             </div>
           </Col>
         </Row>

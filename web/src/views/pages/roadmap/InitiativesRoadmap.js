@@ -23,7 +23,9 @@ function InitiativesRoadmap() {
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get('timeline');
   const navigate = useNavigate();
-  const [timelineFilterValue, setTimelineFilterValue] = useState(timelineQueryFilter || 'this-quarter');
+  const [timelineFilterValue, setTimelineFilterValue] = useState(
+    timelineQueryFilter || 'this-quarter',
+  );
   const [initiatives, setInitiatives] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [isLoadingMilestones, setIsLoadingMilestones] = useState(false);
@@ -38,7 +40,10 @@ function InitiativesRoadmap() {
     async function fetchInitiatives() {
       setIsLoadingInitiatives(true);
       try {
-        const initiatives = await listInitiativesWithoutMilestone(orgId, projectId);
+        const initiatives = await listInitiativesWithoutMilestone(
+          orgId,
+          projectId,
+        );
         const sortedInitiatives = sortByPriority(initiatives);
         setInitiatives(sortedInitiatives);
       } catch (e) {
@@ -46,7 +51,6 @@ function InitiativesRoadmap() {
       } finally {
         setIsLoadingInitiatives(false);
       }
-
     }
 
     fetchInitiatives();
@@ -56,7 +60,11 @@ function InitiativesRoadmap() {
     async function fetchMilestones() {
       setIsLoadingMilestones(true);
       try {
-        const milestones = await listMilestonesWithInitiatives(orgId, projectId, timelineFilterValue);
+        const milestones = await listMilestonesWithInitiatives(
+          orgId,
+          projectId,
+          timelineFilterValue,
+        );
         setMilestones(milestones);
       } catch (e) {
         console.error(e.message);
@@ -69,12 +77,18 @@ function InitiativesRoadmap() {
   }, [orgId, projectId, timelineFilterValue]);
 
   function updateInitiativesMilestone(updatedInitiatives, newMilestoneId) {
-    const previousMilestone = milestones.find(milestone => milestone.initiatives.find(initiative => initiative.id === updatedInitiatives[0].id));
+    const previousMilestone = milestones.find((milestone) =>
+      milestone.initiatives.find(
+        (initiative) => initiative.id === updatedInitiatives[0].id,
+      ),
+    );
     if (previousMilestone.id === newMilestoneId) {
       return;
     }
 
-    const newMilestone = milestones.find(milestone => milestone.id === newMilestoneId);
+    const newMilestone = milestones.find(
+      (milestone) => milestone.id === newMilestoneId,
+    );
     if (newMilestone) {
       for (const initiative of updatedInitiatives) {
         newMilestone.initiatives.push(initiative);
@@ -87,44 +101,58 @@ function InitiativesRoadmap() {
       setInitiatives([...sortByPriority(initiatives)]);
     }
 
-    previousMilestone.initiatives = previousMilestone.initiatives.filter(initiative => !updatedInitiatives.some(f => f.id === initiative.id));
+    previousMilestone.initiatives = previousMilestone.initiatives.filter(
+      (initiative) => !updatedInitiatives.some((f) => f.id === initiative.id),
+    );
 
     setMilestones([...milestones]);
   }
 
-  function updateBacklogInitiativesMilestone(updatedInitiatives, newMilestoneId) {
+  function updateBacklogInitiativesMilestone(
+    updatedInitiatives,
+    newMilestoneId,
+  ) {
     // Remove initiative from initiatives list and add it to the new milestone
-    const newMilestone = milestones.find(milestone => milestone.id === newMilestoneId);
+    const newMilestone = milestones.find(
+      (milestone) => milestone.id === newMilestoneId,
+    );
     for (const initiative of updatedInitiatives) {
       newMilestone.initiatives.push(initiative);
     }
     newMilestone.initiatives = sortByPriority(newMilestone.initiatives);
 
-    const filteredInitiatives = initiatives.filter(initiative => !updatedInitiatives.some(f => f.id === initiative.id));
+    const filteredInitiatives = initiatives.filter(
+      (initiative) => !updatedInitiatives.some((f) => f.id === initiative.id),
+    );
     setInitiatives(filteredInitiatives);
 
     setMilestones([...milestones]);
   }
 
   function updateBacklogInitiativesStatus(updatedInitiatives, newStatus) {
-    const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
-    const updatedInitiativesList = initiatives.map(initiative => {
-      // If the initiative is closed or completed, we remove it from the backlog
-      if (initiative.status === 'closed' || initiative.status === 'completed') {
-        return null;
-      }
-      if (updatedInitiativesIds.includes(initiative.id)) {
-        initiative.status = newStatus;
-      }
-      return initiative;
-    }).filter(initiative => initiative !== null);
+    const updatedInitiativesIds = updatedInitiatives.map((f) => f.id);
+    const updatedInitiativesList = initiatives
+      .map((initiative) => {
+        // If the initiative is closed or completed, we remove it from the backlog
+        if (
+          initiative.status === 'closed' ||
+          initiative.status === 'completed'
+        ) {
+          return null;
+        }
+        if (updatedInitiativesIds.includes(initiative.id)) {
+          initiative.status = newStatus;
+        }
+        return initiative;
+      })
+      .filter((initiative) => initiative !== null);
 
     setInitiatives([...sortByPriority(updatedInitiativesList)]);
   }
 
   function updateInitiativesUser(updatedInitiatives, newAssignedTo) {
-    const updatedInitiativesIds = updatedInitiatives.map(f => f.id);
-    const updatedInitiativesList = initiatives.map(initiative => {
+    const updatedInitiativesIds = updatedInitiatives.map((f) => f.id);
+    const updatedInitiativesList = initiatives.map((initiative) => {
       if (updatedInitiativesIds.includes(initiative.id)) {
         initiative.assignedTo = newAssignedTo;
       }
@@ -133,7 +161,10 @@ function InitiativesRoadmap() {
     setInitiatives([...sortByPriority(updatedInitiativesList)]);
   }
 
-  async function updateBacklogInitiativesAssignedTo(updatedInitiatives, newAssignedTo) {
+  async function updateBacklogInitiativesAssignedTo(
+    updatedInitiatives,
+    newAssignedTo,
+  ) {
     if (!newAssignedTo) {
       updateInitiativesUser(updatedInitiatives, newAssignedTo);
       return;
@@ -149,31 +180,37 @@ function InitiativesRoadmap() {
   }
 
   async function onDeleteInitiative(deletedInitiatives) {
-    const deletedIds = deletedInitiatives.map(i => i.id);
-    setInitiatives(initiatives.filter(i => !deletedIds.includes(i.id)));
+    const deletedIds = deletedInitiatives.map((i) => i.id);
+    setInitiatives(initiatives.filter((i) => !deletedIds.includes(i.id)));
   }
 
   return (
     <>
       {isLoadingMilestones && <InfiniteLoadingBar />}
-      <SimpleHeader headerButtons={[
-        {
-          name: 'New Milestone',
-          shortcut: 'm',
-          id: 'new-milestone',
-          action: () => {
-            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`);
+      <SimpleHeader
+        headerButtons={[
+          {
+            name: 'New Milestone',
+            shortcut: 'm',
+            id: 'new-milestone',
+            action: () => {
+              navigate(
+                `/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`,
+              );
+            },
           },
-        },
-        {
-          name: 'New Initiative',
-          shortcut: 'i',
-          id: 'new-initiative',
-          action: () => {
-            navigate(`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`);
+          {
+            name: 'New Initiative',
+            shortcut: 'i',
+            id: 'new-initiative',
+            action: () => {
+              navigate(
+                `/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`,
+              );
+            },
           },
-        },
-      ]} />
+        ]}
+      />
       <Container className="mt--6" fluid>
         <Row>
           <Col>
@@ -181,9 +218,7 @@ function InitiativesRoadmap() {
               <CardHeader className="rounded-lg">
                 <Row>
                   <Col xs={12} sm={8}>
-                    <CardTitle tag="h2">
-                      Initiatives Roadmap
-                    </CardTitle>
+                    <CardTitle tag="h2">Initiatives Roadmap</CardTitle>
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2
@@ -203,54 +238,80 @@ function InitiativesRoadmap() {
                         setTimelineFilterValue(e.target.value);
                         navigate(`?timeline=${e.target.value}`);
                       }}
-                    >
-                    </Select2>
+                    ></Select2>
                   </Col>
                 </Row>
               </CardHeader>
               <div className="p-4">
                 {isLoadingMilestones && <LoadingSpinnerBox />}
                 {!isLoadingMilestones && milestones.length === 0 && (
-                  <div style={{ maxWidth: '600px' }} className="mx-auto font-italic">
+                  <div
+                    style={{ maxWidth: '600px' }}
+                    className="mx-auto font-italic"
+                  >
                     <h3>Roadmap</h3>
-                    <p>The Roadmap is your project's strategic plan that outlines the vision, direction, and
-                      progress over time. It helps you communicate your plans and priorities to stakeholders. Start
-                      by creating a roadmap to visualize your project's journey and keep everyone informed.</p>
+                    <p>
+                      The Roadmap is your project's strategic plan that outlines
+                      the vision, direction, and progress over time. It helps
+                      you communicate your plans and priorities to stakeholders.
+                      Start by creating a roadmap to visualize your project's
+                      journey and keep everyone informed.
+                    </p>
                     <h3>Milestones</h3>
-                    <p>Milestones are significant points or achievements in your project timeline. They help you
-                      track major progress and ensure you're meeting key deadlines. Set milestones to celebrate your
-                      accomplishments and keep your project on schedule.
+                    <p>
+                      Milestones are significant points or achievements in your
+                      project timeline. They help you track major progress and
+                      ensure you're meeting key deadlines. Set milestones to
+                      celebrate your accomplishments and keep your project on
+                      schedule.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`}
-                            className="text-blue font-weight-bold">Set a
-                        Milestone</Link>
+                      <Link
+                        to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`}
+                        className="text-blue font-weight-bold"
+                      >
+                        Set a Milestone
+                      </Link>
                     </p>
                     <h3>Initiatives</h3>
-                    <p>Initiatives are high-level efforts that encompass multiple projects or tasks aimed at achieving
-                      a strategic goal. They provide a broader context for your work, aligning various activities
-                      towards a common objective. Define initiatives to prioritize efforts, allocate resources
-                      effectively, and ensure your team is working towards the same strategic vision.
+                    <p>
+                      Initiatives are high-level efforts that encompass multiple
+                      projects or tasks aimed at achieving a strategic goal.
+                      They provide a broader context for your work, aligning
+                      various activities towards a common objective. Define
+                      initiatives to prioritize efforts, allocate resources
+                      effectively, and ensure your team is working towards the
+                      same strategic vision.
                       <br />
-                      <Link to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`}
-                            className="text-blue font-weight-bold">Add an
-                        Initiative</Link>
+                      <Link
+                        to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`}
+                        className="text-blue font-weight-bold"
+                      >
+                        Add an Initiative
+                      </Link>
                     </p>
                   </div>
                 )}
-                {!isLoadingMilestones && milestones.length > 0 && milestones.map((milestone) => (
-                  <Milestone key={milestone.id} milestone={milestone}
-                             onInitiativeChangeMilestone={updateInitiativesMilestone} />))}
+                {!isLoadingMilestones &&
+                  milestones.length > 0 &&
+                  milestones.map((milestone) => (
+                    <Milestone
+                      key={milestone.id}
+                      milestone={milestone}
+                      onInitiativeChangeMilestone={updateInitiativesMilestone}
+                    />
+                  ))}
               </div>
             </Card>
             <div id={'initiatives-backlog'} />
-            <InitiativesListCard title="Initiatives Backlog"
-                                 initiatives={initiatives}
-                                 isLoading={isLoadingInitiatives}
-                                 onAddInitiative={onAddInitiative}
-                                 onChangeMilestone={updateBacklogInitiativesMilestone}
-                                 onChangeStatus={updateBacklogInitiativesStatus}
-                                 onChangeAssignedTo={updateBacklogInitiativesAssignedTo}
-                                 onDelete={onDeleteInitiative}
+            <InitiativesListCard
+              title="Initiatives Backlog"
+              initiatives={initiatives}
+              isLoading={isLoadingInitiatives}
+              onAddInitiative={onAddInitiative}
+              onChangeMilestone={updateBacklogInitiativesMilestone}
+              onChangeStatus={updateBacklogInitiativesStatus}
+              onChangeAssignedTo={updateBacklogInitiativesAssignedTo}
+              onDelete={onDeleteInitiative}
             />
           </Col>
         </Row>

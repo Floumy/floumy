@@ -33,11 +33,7 @@ export function OrgProvider({ children, orgId }) {
     loading,
   };
 
-  return (
-    <OrgContext.Provider value={value}>
-      {children}
-    </OrgContext.Provider>
-  );
+  return <OrgContext.Provider value={value}>{children}</OrgContext.Provider>;
 }
 
 export function useOrg() {

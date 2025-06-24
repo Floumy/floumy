@@ -1,9 +1,12 @@
-import { Card, CardBody, CardHeader, Col, Form, Input, Row } from "reactstrap";
-import ReactQuill from "react-quill";
-import React from "react";
-import CardHeaderDetails from "../components/CardHeaderDetails";
-import { initiativeStatusName, priorityName } from "../../../services/utils/utils";
-import PublicShareButtons from "../../../components/PublicShareButtons/PublicShareButtons";
+import { Card, CardBody, CardHeader, Col, Form, Input, Row } from 'reactstrap';
+import ReactQuill from 'react-quill';
+import React from 'react';
+import CardHeaderDetails from '../components/CardHeaderDetails';
+import {
+  initiativeStatusName,
+  priorityName,
+} from '../../../services/utils/utils';
+import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 import { Link, useParams } from 'react-router-dom';
 
 function PublicInitiative({ initiative }) {
@@ -14,14 +17,18 @@ function PublicInitiative({ initiative }) {
       <Card>
         <CardHeader>
           <h3 className="mb-0">Initiative {initiative.reference}</h3>
-          <CardHeaderDetails createdAt={initiative.createdAt}
-                             updatedAt={initiative.updatedAt} />
-          {initiative && <div className="py-2"><PublicShareButtons title={initiative.title} /></div>}
+          <CardHeaderDetails
+            createdAt={initiative.createdAt}
+            updatedAt={initiative.updatedAt}
+          />
+          {initiative && (
+            <div className="py-2">
+              <PublicShareButtons title={initiative.title} />
+            </div>
+          )}
         </CardHeader>
         <CardBody>
-          <Form
-            className="needs-validation"
-            noValidate>
+          <Form className="needs-validation" noValidate>
             <Row>
               <Col className="mb-3">
                 <label
@@ -54,7 +61,8 @@ function PublicInitiative({ initiative }) {
                   disabled={true}
                   className="bg-white"
                   defaultValue={priorityName(initiative?.priority)}
-                  name="priority"></Input>
+                  name="priority"
+                ></Input>
               </Col>
               <Col xs={12} sm={6} className="mb-3">
                 <label
@@ -78,17 +86,24 @@ function PublicInitiative({ initiative }) {
                   className="form-control-label"
                   htmlFor="validationCustom01"
                 >
-                  {initiative && initiative.keyResult && initiative.keyResult.id ?
-                    <Link to={`/public/orgs/${orgId}/projects/${projectId}/kr/detail/${initiative.keyResult.id}`}>
-                    Key Result
-                    <i className="fa fa-link ml-2"/>
-                  </Link> : 'Key Result'}
+                  {initiative &&
+                  initiative.keyResult &&
+                  initiative.keyResult.id ? (
+                    <Link
+                      to={`/public/orgs/${orgId}/projects/${projectId}/kr/detail/${initiative.keyResult.id}`}
+                    >
+                      Key Result
+                      <i className="fa fa-link ml-2" />
+                    </Link>
+                  ) : (
+                    'Key Result'
+                  )}
                 </label>
                 <Input
                   type="text"
                   disabled={true}
                   className="bg-white"
-                  defaultValue={initiative.keyResult?.title || "None"}
+                  defaultValue={initiative.keyResult?.title || 'None'}
                 ></Input>
               </Col>
             </Row>
@@ -98,40 +113,56 @@ function PublicInitiative({ initiative }) {
                   className="form-control-label"
                   htmlFor="validationCustom01"
                 >
-                  {initiative && initiative.milestone && initiative.milestone.id ?
-                    <Link to={`/public/orgs/${orgId}/projects/${projectId}/milestones/detail/${initiative.milestone.id}`}>
+                  {initiative &&
+                  initiative.milestone &&
+                  initiative.milestone.id ? (
+                    <Link
+                      to={`/public/orgs/${orgId}/projects/${projectId}/milestones/detail/${initiative.milestone.id}`}
+                    >
                       Milestone
-                      <i className="fa fa-link ml-2"/>
-                    </Link> : 'Milestone'}
+                      <i className="fa fa-link ml-2" />
+                    </Link>
+                  ) : (
+                    'Milestone'
+                  )}
                 </label>
                 <Input
                   type="text"
                   disabled={true}
                   className="bg-white"
-                  defaultValue={initiative.milestone?.title || "None"}
+                  defaultValue={initiative.milestone?.title || 'None'}
                 ></Input>
               </Col>
             </Row>
-            {initiative.featureRequest !== undefined && <Row className="mb-3">
-              <Col>
-                <label
-                  className="form-control-label"
-                  htmlFor="validationCustom01"
-                >
-                  {initiative && initiative.featureRequest && initiative.featureRequest.id ?
-                    <Link to={`/public/orgs/${orgId}/projects/${projectId}/feature-requests/${initiative.featureRequest.id}`}>
-                      Feature Request
-                      <i className="fa fa-link ml-2"/>
-                    </Link> : 'Feature Request'}
-                </label>
-                <Input
-                  type="text"
-                  disabled={true}
-                  className="bg-white"
-                  defaultValue={initiative.featureRequest?.title || "None"}
-                ></Input>
-              </Col>
-            </Row>}
+            {initiative.featureRequest !== undefined && (
+              <Row className="mb-3">
+                <Col>
+                  <label
+                    className="form-control-label"
+                    htmlFor="validationCustom01"
+                  >
+                    {initiative &&
+                    initiative.featureRequest &&
+                    initiative.featureRequest.id ? (
+                      <Link
+                        to={`/public/orgs/${orgId}/projects/${projectId}/feature-requests/${initiative.featureRequest.id}`}
+                      >
+                        Feature Request
+                        <i className="fa fa-link ml-2" />
+                      </Link>
+                    ) : (
+                      'Feature Request'
+                    )}
+                  </label>
+                  <Input
+                    type="text"
+                    disabled={true}
+                    className="bg-white"
+                    defaultValue={initiative.featureRequest?.title || 'None'}
+                  ></Input>
+                </Col>
+              </Row>
+            )}
             <Row className="mb-3">
               <Col>
                 <label
@@ -145,7 +176,7 @@ function PublicInitiative({ initiative }) {
                   readOnly={true}
                   theme="snow"
                   modules={{
-                    toolbar: false
+                    toolbar: false,
                   }}
                 />
               </Col>
