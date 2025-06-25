@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 // core components
 import Sidebar from 'components/Sidebar/Sidebar.js';
-import { motion } from 'framer-motion';
 
 import routes from 'routes.js';
 import AdminNavbar from '../components/Navbars/AdminNavbar';
@@ -20,13 +19,13 @@ function Admin() {
   const { location, mainContentRef, getRoutes } = useLayoutHandler('admin');
   const [sidenavOpen, setSidenavOpen] = useState(true);
   const [aiChatOpen, setAiChatOpen] = useState(true);
-  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1200);
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 2000);
   const { orgId, projectId } = useParams();
 
   // Keep chat always open on larger screens and track screen size
   useEffect(() => {
     const handleResize = () => {
-      const largeScreen = window.innerWidth >= 1200;
+      const largeScreen = window.innerWidth >= 2000;
       setIsLargeScreen(largeScreen);
 
       if (largeScreen) {
@@ -146,13 +145,10 @@ function Admin() {
                 imgAlt: 'Floumy Logo',
               }}
             />
-            <motion.div
+            <div
               className="main-content"
               ref={mainContentRef}
-              animate={isLargeScreen ? {
-                marginRight: aiChatOpen ? '600px' : '0px',
-              } : {}}
-              transition={{ type: 'keyframes', damping: 20, stiffness: 300 }}
+              style={{ marginRight: isLargeScreen ? '600px' : '0' }}
             >
               <AdminNavbar
                 theme={'dark'}
@@ -166,7 +162,7 @@ function Admin() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Footer />
-            </motion.div>
+            </div>
             <AiChatSlideIn
               isOpen={aiChatOpen}
               toggle={() => setAiChatOpen(!aiChatOpen)}
