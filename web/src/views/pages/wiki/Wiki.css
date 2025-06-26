@@ -1,7 +1,282 @@
+/* Notion-like styling for Wiki */
+
+/* Sidebar styling */
+.wiki-list-group {
+  margin-bottom: 0;
+  padding: 0.25rem;
+}
+
+.wiki-list-group-item {
+  border: none !important;
+  border-radius: 6px !important;
+  margin-bottom: 3px;
+  padding: 7px 10px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.wiki-list-group-item:hover {
+  background-color: rgba(55, 53, 47, 0.06);
+  transform: translateX(2px);
+}
+
+.wiki-list-group-item.selected {
+  background-color: rgba(55, 53, 47, 0.08);
+  font-weight: 500;
+}
+
+.wiki-list-group-item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background-color: rgba(94, 114, 228, 0.1);
+  transition: width 0.2s ease;
+}
+
+.wiki-list-group-item.selected::after {
+  width: 3px;
+}
+
+.wiki-list-group-item .node-title {
+  font-size: 14px;
+  color: #37352f;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wiki-list-group-item .folder-icon {
+  color: #37352f;
+  width: 16px;
+  font-size: 12px;
+}
+
+.wiki-list-group-item .file-icon {
+  color: #37352f;
+  opacity: 0.6;
+  width: 16px;
+  font-size: 12px;
+}
+
+.folder-children {
+  margin-left: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hover controls */
 .wiki-list-group-item .hover-controls {
   display: none;
+  align-items: center;
+  position: absolute;
+  right: 8px;
 }
+
+.wiki-list-group-item {
+  position: relative;
+}
+
 .wiki-list-group-item:hover .hover-controls {
   display: flex;
 }
 
+.wiki-control-btn {
+  color: #6b7280 !important;
+  padding: 2px 6px !important;
+  margin-left: 2px;
+  border-radius: 3px;
+  box-shadow: none !important;
+}
+
+.wiki-control-btn:hover {
+  background-color: rgba(55, 53, 47, 0.08) !important;
+  color: #37352f !important;
+}
+
+.wiki-dropdown-menu {
+  border-radius: 8px;
+  padding: 8px 0;
+  min-width: 200px;
+  box-shadow: 0 0 0 1px rgba(15, 15, 15, 0.05), 0 3px 6px rgba(15, 15, 15, 0.1), 0 9px 24px rgba(15, 15, 15, 0.2);
+  border: none;
+  margin-top: 5px;
+  animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wiki-dropdown-menu .dropdown-item {
+  padding: 0;
+}
+
+.wiki-dropdown-menu .dropdown-btn-item {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #37352f;
+  transition: all 0.15s ease;
+  border-radius: 0;
+}
+
+.wiki-dropdown-menu .dropdown-btn-item:hover {
+  background-color: rgba(55, 53, 47, 0.06);
+  color: #5e72e4;
+}
+
+/* Search bar */
+.wiki-search {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.wiki-search input {
+  border-radius: 8px;
+  border: 1px solid rgba(55, 53, 47, 0.16);
+  padding: 10px 12px 10px 36px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: rgba(55, 53, 47, 0.02);
+  width: 100%;
+}
+
+.wiki-search input:focus {
+  border-color: #5e72e4;
+  box-shadow: 0 0 0 2px rgba(94, 114, 228, 0.15);
+  background-color: #fff;
+}
+
+.wiki-search input::placeholder {
+  color: #9ca3af;
+  transition: color 0.2s ease;
+}
+
+.wiki-search input:focus::placeholder {
+  color: #d1d5db;
+}
+
+.wiki-search i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.wiki-search input:focus + i,
+.wiki-search:hover i {
+  color: #5e72e4;
+}
+
+/* Editor area styling */
+.wiki-editor-container {
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: calc(100vh - 180px); /* Adjust for header, footer, and padding */
+  height: calc(100vh - 180px); /* Set a fixed height to fill the available space */
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 5px 0;
+  position: relative;
+}
+
+.wiki-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #37352f;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  border: none;
+  width: 100%;
+  background: transparent;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid transparent;
+  letter-spacing: -0.01em;
+}
+
+.wiki-title:focus {
+  outline: none;
+  box-shadow: none;
+  border-radius: 0;
+  border-bottom-color: rgba(55, 53, 47, 0.08);
+}
+
+.wiki-title::placeholder {
+  color: rgba(55, 53, 47, 0.4);
+  font-weight: 500;
+}
+
+/* Sidebar header */
+.wiki-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(55, 53, 47, 0.06);
+}
+
+.wiki-sidebar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #37352f;
+  margin: 0;
+  letter-spacing: 0.01em;
+  position: relative;
+  padding-left: 2px;
+}
+
+.wiki-sidebar-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 20px;
+  height: 2px;
+  background-color: #5e72e4;
+  border-radius: 2px;
+}
+
+.wiki-add-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.wiki-add-btn {
+  color: #6b7280 !important;
+  padding: 6px 10px !important;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.wiki-add-btn:hover {
+  background-color: rgba(94, 114, 228, 0.08) !important;
+  color: #5e72e4 !important;
+  transform: translateY(-1px);
+}
+
+.wiki-add-btn:active {
+  transform: translateY(0);
+}
+
+/* Add this for the folder icon rotation */
+.fa-rotate-90 {
+  transform: rotate(90deg);
+}
