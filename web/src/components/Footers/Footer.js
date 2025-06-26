@@ -1,17 +1,15 @@
 /*eslint-disable*/
-import React from "react";
+import React from 'react';
 
 // reactstrap components
-import { Col, Container, Nav, NavItem, NavLink, Row } from "reactstrap";
+import { Col, Container, Nav, NavItem, NavLink, Row } from 'reactstrap';
 
-function Footer({ justifyContent = "left" }) {
+function Footer({ justifyContent = 'left' }) {
   return (
-
     <Container fluid>
       <footer className="footer bg-transparent ">
         <Row className="align-items-center justify-content-lg-between">
           <Col lg="12">
-
             <Nav className={`nav-footer justify-content-${justifyContent}`}>
               <NavItem>
                 <NavLink
@@ -19,10 +17,8 @@ function Footer({ justifyContent = "left" }) {
                   target="_blank"
                   className="copyright"
                 >
-                  © {new Date().getFullYear()}{" "}
-                  <span className="font-weight-bold ml-1">
-                    Tyntar
-                  </span>
+                  © {new Date().getFullYear()}{' '}
+                  <span className="font-weight-bold ml-1">Tyntar</span>
                 </NavLink>
               </NavItem>
               <NavItem>

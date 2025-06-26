@@ -6,3 +6,151 @@
 .ql-mention-list-container-top {
   color: rgb(82, 95, 127);
 }
+
+.tiptap-bubble-menu {
+  display: flex;
+  gap: 0.5rem;
+  background: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08), 0 1.5px 4px rgba(44, 62, 80, 0.06);
+  padding: 0.25rem 0.5rem;
+  align-items: center;
+  border: 1px solid #e9ecef;
+  z-index: 10;
+}
+.tiptap-bubble-menu button {
+  background: none;
+  border: none;
+  color: #525f7f;
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  outline: none;
+}
+.tiptap-bubble-menu button.is-active,
+.tiptap-bubble-menu button:hover {
+  background: #f6f9fc;
+  color: #5e72e4;
+}
+.tiptap a {
+  color: #5e72e4;
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+.tiptap a:hover {
+  color: #233dd2;
+  text-decoration: underline;
+}
+.tiptap-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fafbfc;
+  margin-bottom: 8px;
+  padding-left: 10px;
+}
+.tiptap-toolbar button {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+  font-size: 16px;
+  color: #444;
+}
+.tiptap-toolbar button.is-active,
+.tiptap-toolbar button:hover {
+  background: #e0e7ef;
+  color: #1976d2;
+}
+.tiptap-toolbar i {
+  pointer-events: none;
+}
+.tiptap{
+  padding: 12px;
+}
+.tiptap-editor-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+
+  min-height: 120px;
+  background: #fff;
+  transition: border 0.2s;
+}
+.tiptap:focus-within {
+  border-color: #1976d2;
+}
+.suggestions {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08), 0 1.5px 4px rgba(44, 62, 80, 0.06);
+  padding: 4px 0;
+  z-index: 100;
+}
+.suggestions button {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 8px 16px;
+  font-size: 15px;
+  color: #444;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.suggestions button.is-selected,
+.suggestions button:hover {
+  background: #e0e7ef;
+  color: #1976d2;
+}
+.suggestions .item {
+  padding: 8px 16px;
+  color: #888;
+  font-size: 15px;
+}
+.tiptap-editor-container table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.tiptap-editor-container th,
+.tiptap-editor-container td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: left;
+  background: #fafbfc;
+}
+.tiptap-editor-container th {
+  background: #f5f6fa;
+  font-weight: 600;
+}
+.tiptap-editor-container tr:nth-child(even) td {
+  background: #f9f9f9;
+}
+.tiptap-editor-container tr:hover td {
+  background: #f1f7ff;
+}
+.dropdown-menu{
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08), 0 1.5px 4px rgba(44, 62, 80, 0.06);
+}
+.dropdown-menu .dropdown-item{
+  padding: 0;
+}
+.tippy-box {
+  max-width: none !important;
+}
+
