@@ -2,7 +2,6 @@ import {
   Card,
   CardBody,
   CardHeader,
-  FormText,
   ListGroup,
   ListGroupItem,
   UncontrolledTooltip,
@@ -216,15 +215,13 @@ export default function Comments({
             />
           </div>
         </div>
-        <FormText className="text-sm mb-0">
-          <RichTextEditor
-            value={editingCommentContent}
-            onChange={(text, mentions) => {
-              setEditingCommentContent(text);
-              setEditingCommentMentions(mentions);
-            }}
-          />
-        </FormText>
+        <RichTextEditor
+          value={editingCommentContent}
+          onChange={(text, mentions) => {
+            setEditingCommentContent(text);
+            setEditingCommentMentions(mentions);
+          }}
+        />
       </ListGroupItem>
     );
   }
@@ -267,22 +264,20 @@ export default function Comments({
                   <small>now</small>
                 </div>
               )}
-              <FormText className="text-sm mb-0">
-                {!currentUserName && (
-                  <UncontrolledTooltip delay={0} target="add-comment">
-                    Sign in to comment
-                  </UncontrolledTooltip>
-                )}
-                <RichTextEditor
-                  id="add-comment"
-                  value={comment}
-                  onChange={(text, mentions) => {
-                    setComment(text);
-                    setMentions(mentions);
-                  }}
-                  placeholder="Write a comment..."
-                />
-              </FormText>
+              {!currentUserName && (
+                <UncontrolledTooltip delay={0} target="add-comment">
+                  Sign in to comment
+                </UncontrolledTooltip>
+              )}
+              <RichTextEditor
+                id="add-comment"
+                enabled={!!currentUserName}
+                value={comment}
+                onChange={(text, mentions) => {
+                  setComment(text);
+                  setMentions(mentions);
+                }}
+              />
               <button
                 className="btn btn-sm btn-primary mt-2"
                 onClick={submitComment}

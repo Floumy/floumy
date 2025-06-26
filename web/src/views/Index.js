@@ -1,12 +1,21 @@
 /*eslint-disable*/
-import React from "react";
+import React from 'react';
 // react library for routing
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 // reactstrap components
-import { Badge, Button, Card, CardBody, Col, Container, Row, UncontrolledTooltip } from "reactstrap";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  Col,
+  Container,
+  Row,
+  UncontrolledTooltip,
+} from 'reactstrap';
 // core components
-import IndexNavbar from "components/Navbars/IndexNavbar.js";
-import IndexHeader from "components/Headers/IndexHeader.js";
+import IndexNavbar from 'components/Navbars/IndexNavbar.js';
+import IndexHeader from 'components/Headers/IndexHeader.js';
 
 function Index() {
   return (
@@ -132,7 +141,7 @@ function Index() {
                 <img
                   alt="..."
                   className="img-fluid"
-                  src={require("assets/img/theme/landing-1.png")}
+                  src={require('assets/img/theme/landing-1.png')}
                 />
               </Col>
               <Col className="order-md-1" md="6">
@@ -193,7 +202,7 @@ function Index() {
                 <img
                   alt="..."
                   className="img-fluid"
-                  src={require("assets/img/theme/landing-2.png")}
+                  src={require('assets/img/theme/landing-2.png')}
                 />
               </Col>
               <Col md="6">
@@ -222,7 +231,7 @@ function Index() {
                 <img
                   alt="..."
                   className="img-fluid"
-                  src={require("assets/img/theme/landing-3.png")}
+                  src={require('assets/img/theme/landing-3.png')}
                 />
               </Col>
               <Col className="order-md-1" md="6">
@@ -312,7 +321,7 @@ function Index() {
             <Row className="row-grid justify-content-center">
               <Col className="text-center" lg="8">
                 <h2 className="display-3">
-                  Do you love this awesome{" "}
+                  Do you love this awesome{' '}
                   <span className="text-success">
                     Dashboard for Bootstrap 4, React and Reactstrap?
                   </span>
@@ -416,7 +425,7 @@ function Index() {
                           alt="..."
                           className="img-fluid rounded-circle"
                           src="https://raw.githubusercontent.com/creativetimofficial/public-assets/master/logos/laravel_logo.png"
-                          style={{ backgroundColor: "white" }}
+                          style={{ backgroundColor: 'white' }}
                         />
                       </a>
                       <UncontrolledTooltip delay={0} target="tooltip374813717">

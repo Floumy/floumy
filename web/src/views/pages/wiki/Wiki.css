@@ -1,0 +1,7 @@
+.wiki-list-group-item .hover-controls {
+  display: none;
+}
+.wiki-list-group-item:hover .hover-controls {
+  display: flex;
+}
+
