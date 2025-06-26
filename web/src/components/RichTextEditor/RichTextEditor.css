@@ -9,35 +9,35 @@
 
 .tiptap-bubble-menu {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   background: #fff;
-  border-radius: 0.5rem;
+  border-radius: 0.4rem;
   box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08), 0 1.5px 4px rgba(44, 62, 80, 0.06);
   padding: 0.25rem 0.5rem;
   align-items: center;
-  border: 1px solid #e9ecef;
   z-index: 10;
 }
 .tiptap-bubble-menu button {
   background: none;
   border: none;
-  color: #525f7f;
-  font-size: 1rem;
+  color: #37352f;
+  font-size: 0.9rem;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  transition: background 0.15s, color 0.15s;
   cursor: pointer;
   outline: none;
 }
-.tiptap-bubble-menu button.is-active,
+.tiptap-bubble-menu button.is-active {
+  background: rgba(55, 53, 47, 0.08);
+  color: #37352f;
+}
 .tiptap-bubble-menu button:hover {
-  background: #f6f9fc;
-  color: #5e72e4;
+  background: rgba(55, 53, 47, 0.06);
+  color: #37352f;
 }
 .tiptap a {
   color: #5e72e4;
   text-decoration: underline;
-  transition: color 0.15s;
 }
 .tiptap a:hover {
   color: #233dd2;
@@ -46,11 +46,11 @@
 .tiptap-toolbar {
   display: flex;
   gap: 8px;
-  padding: 8px 0;
-  border-bottom: 1px solid #e0e0e0;
-  background: #fafbfc;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+  background: #ffffff;
   margin-bottom: 8px;
-  padding-left: 10px;
+  border-radius: 5px 5px 0 0;
 }
 .tiptap-toolbar button {
   background: none;
@@ -58,28 +58,62 @@
   padding: 6px 8px;
   cursor: pointer;
   border-radius: 4px;
-  transition: background 0.2s;
-  font-size: 16px;
-  color: #444;
+  font-size: 15px;
+  color: #37352f;
 }
-.tiptap-toolbar button.is-active,
+.tiptap-toolbar button.is-active {
+  background: rgba(55, 53, 47, 0.08);
+  color: #37352f;
+}
 .tiptap-toolbar button:hover {
-  background: #e0e7ef;
-  color: #1976d2;
+  background: rgba(55, 53, 47, 0.06);
+  color: #37352f;
 }
 .tiptap-toolbar i {
   pointer-events: none;
 }
 .tiptap{
-  padding: 12px;
+  padding: 12px 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 16px;
+  line-height: 1.5;
+  color: #37352f;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.tiptap p {
+  margin-bottom: 0.5em;
+}
+
+.tiptap h1 {
+  font-size: 1.875em;
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.tiptap h2 {
+  font-size: 1.5em;
+  margin-top: 1.3em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.tiptap h3 {
+  font-size: 1.25em;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
 }
 .tiptap-editor-container {
-  border: 1px solid #e0e0e0;
+  border: none;
   border-radius: 6px;
-
   min-height: 120px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   background: #fff;
-  transition: border 0.2s;
 }
 .tiptap:focus-within {
   border-color: #1976d2;
@@ -92,7 +126,6 @@
   background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08), 0 1.5px 4px rgba(44, 62, 80, 0.06);
   padding: 4px 0;
   z-index: 100;
 }
@@ -106,7 +139,6 @@
   color: #444;
   cursor: pointer;
   border-radius: 0;
-  transition: background 0.15s, color 0.15s;
 }
 .suggestions button.is-selected,
 .suggestions button:hover {
@@ -125,7 +157,6 @@
   background: #fff;
   border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .tiptap-editor-container th,
 .tiptap-editor-container td {
@@ -145,7 +176,6 @@
   background: #f1f7ff;
 }
 .dropdown-menu{
-  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08), 0 1.5px 4px rgba(44, 62, 80, 0.06);
 }
 .dropdown-menu .dropdown-item{
   padding: 0;
@@ -153,4 +183,3 @@
 .tippy-box {
   max-width: none !important;
 }
-
