@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import {
   Button,
@@ -21,49 +22,201 @@ import './Wiki.css';
 
 const mockTree = [
   {
-    id: 'folder-1',
-    type: 'folder',
-    title: 'General',
+    id: 'page-1',
+    title: 'Introduction',
+    content: '<p>Welcome to the project wiki!</p>',
     children: [
       {
-        id: 'page-1',
-        type: 'page',
-        title: 'Introduction',
-        content: '<p>Welcome to the project wiki!</p>',
-      },
-      {
         id: 'page-2',
-        type: 'page',
         title: 'Getting Started',
         content: '<p>How to get started...</p>',
+        children: [
+          {
+            id: 'page-21',
+            title: 'Installation',
+            content: '<p>Installation steps...</p>',
+            children: [],
+          },
+          {
+            id: 'page-22',
+            title: 'Configuration',
+            content: '<p>Configuration guide...</p>',
+            children: [],
+          },
+        ],
+      },
+      {
+        id: 'page-23',
+        title: 'Advanced Usage',
+        content: '<p>Advanced usage tips...</p>',
+        children: [
+          {
+            id: 'page-231',
+            title: 'Performance Tuning',
+            content: '<p>How to tune performance...</p>',
+            children: [],
+          },
+        ],
       },
     ],
   },
   {
-    id: 'folder-2',
-    type: 'folder',
-    title: 'Help',
+    id: 'page-3',
+    title: 'FAQ',
+    content: '<p>Frequently Asked Questions</p>',
     children: [
       {
-        id: 'page-3',
-        type: 'page',
-        title: 'FAQ',
-        content: '<p>Frequently Asked Questions</p>',
+        id: 'page-31',
+        title: 'General Questions',
+        content: '<p>General questions answered...</p>',
+        children: [],
+      },
+      {
+        id: 'page-32',
+        title: 'Troubleshooting',
+        content: '<p>Troubleshooting common issues...</p>',
+        children: [
+          {
+            id: 'page-321',
+            title: 'Login Issues',
+            content: '<p>How to resolve login issues...</p>',
+            children: [],
+          },
+          {
+            id: 'page-322',
+            title: 'Network Problems',
+            content: '<p>Network troubleshooting...</p>',
+            children: [],
+          },
+        ],
       },
     ],
   },
   {
     id: 'page-4',
-    type: 'page',
     title: 'Changelog',
     content: '<p>Changelog content</p>',
+    children: [
+      {
+        id: 'page-41',
+        title: 'v1.0.0',
+        content: '<p>Initial release notes...</p>',
+        children: [],
+      },
+      {
+        id: 'page-42',
+        title: 'v1.1.0',
+        content: '<p>New features in v1.1.0...</p>',
+        children: [],
+      },
+      {
+        id: 'page-43',
+        title: 'v2.0.0',
+        content: '<p>Major update in v2.0.0...</p>',
+        children: [],
+      },
+    ],
+  },
+  {
+    id: 'page-5',
+    title: 'User Guide',
+    content: '<p>User guide content...</p>',
+    children: [
+      {
+        id: 'page-51',
+        title: 'Account Management',
+        content: '<p>Managing your account...</p>',
+        children: [],
+      },
+      {
+        id: 'page-52',
+        title: 'Security',
+        content: '<p>Security best practices...</p>',
+        children: [],
+      },
+      {
+        id: 'page-53',
+        title: 'Integrations',
+        content: '<p>Integration options...</p>',
+        children: [
+          {
+            id: 'page-531',
+            title: 'Slack',
+            content: '<p>Slack integration guide...</p>',
+            children: [],
+          },
+          {
+            id: 'page-532',
+            title: 'GitHub',
+            content: '<p>GitHub integration guide...</p>',
+            children: [],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'page-6',
+    title: 'API Reference',
+    content: '<p>API reference documentation...</p>',
+    children: [
+      {
+        id: 'page-61',
+        title: 'Authentication API',
+        content: '<p>Auth API details...</p>',
+        children: [],
+      },
+      {
+        id: 'page-62',
+        title: 'Data API',
+        content: '<p>Data API details...</p>',
+        children: [],
+      },
+    ],
+  },
+  {
+    id: 'page-7',
+    title: 'Contributing',
+    content: '<p>How to contribute...</p>',
+    children: [
+      {
+        id: 'page-71',
+        title: 'Code Style',
+        content: '<p>Code style guide...</p>',
+        children: [],
+      },
+      {
+        id: 'page-72',
+        title: 'Pull Requests',
+        content: '<p>Pull request process...</p>',
+        children: [],
+      },
+    ],
+  },
+  {
+    id: 'page-8',
+    title: 'Release Process',
+    content: '<p>Release process documentation...</p>',
+    children: [],
+  },
+  {
+    id: 'page-9',
+    title: 'Roadmap',
+    content: '<p>Project roadmap...</p>',
+    children: [],
+  },
+  {
+    id: 'page-10',
+    title: 'Contact',
+    content: '<p>Contact information...</p>',
+    children: [],
   },
 ];
 
 function findPageById(tree, id) {
   for (const node of tree) {
-    if (node.type === 'page' && node.id === id) return node;
-    if (node.type === 'folder' && node.children) {
+    if (node.id === id) return node;
+    if (node.children && node.children.length) {
       const found = findPageById(node.children, id);
       if (found) return found;
     }
@@ -71,13 +224,13 @@ function findPageById(tree, id) {
   return null;
 }
 
-const FolderTree = ({ tree, selectedId, onSelect, onAddPage, onAddFolder }) => {
-  const [openFolders, setOpenFolders] = useState({});
+const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
+  const [openPages, setOpenPages] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState({});
   const [hovered, setHovered] = useState(null);
 
-  const toggleFolder = (id) => {
-    setOpenFolders((prev) => ({ ...prev, [id]: !prev[id] }));
+  const togglePage = (id) => {
+    setOpenPages((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const toggleDropdown = (id) => {
@@ -86,8 +239,6 @@ const FolderTree = ({ tree, selectedId, onSelect, onAddPage, onAddFolder }) => {
 
   const handleOption = (action, node) => {
     // Placeholder for option actions: rename, move, delete
-    // action: 'rename' | 'move' | 'delete'
-    // node: the folder or page node
   };
 
   const renderTree = (nodes) => {
@@ -95,7 +246,7 @@ const FolderTree = ({ tree, selectedId, onSelect, onAddPage, onAddFolder }) => {
     return (
       <ListGroup flush className="wiki-list-group">
         {nodes.map((node) => {
-          const isOpen = openFolders[node.id] === true;
+          const isOpen = openPages[node.id] === true;
           const isHovered = hovered === node.id;
           const isSelected = selectedId === node.id;
 
@@ -108,36 +259,42 @@ const FolderTree = ({ tree, selectedId, onSelect, onAddPage, onAddFolder }) => {
             >
               <ListGroupItem
                 className={`wiki-list-group-item d-flex align-items-center py-2 ${isSelected ? 'selected' : ''}`}
-                onClick={
-                  node.type === 'folder'
-                    ? () => toggleFolder(node.id)
-                    : () => onSelect(node.id)
-                }
+                onClick={() => {
+                  if (node.children && node.children.length > 0) {
+                    togglePage(node.id);
+                  } else {
+                    onSelect(node.id);
+                  }
+                }}
                 onMouseEnter={() => setHovered(node.id)}
                 onMouseLeave={() => {
                   setHovered(null);
                   setDropdownOpen({});
                 }}
               >
-                {node.type === 'folder' ? (
-                  <>
-                    <motion.i
-                      animate={{ rotate: isOpen ? 90 : 0 }}
-                      className={`fa fa-chevron-right mr-2 folder-icon`}
-                    />
-                    <span className="node-title">{node.title}</span>
-                  </>
-                ) : (
-                  <>
-                    <i className="fa fa-file-lines mr-2 file-icon" />
-                    <span className="node-title">{node.title}</span>
-                  </>
-                )}
-                <div className="hover-controls ml-auto">
+                <i className="fa fa-file-lines mr-2 file-icon" />
+                <span
+                  className="node-title"
+                  style={
+                    isHovered
+                      ? { marginRight: '90px', transition: 'margin-right 0.2s' }
+                      : { transition: 'margin-right 0.2s' }
+                  }
+                >
+                  {node.title}
+                </span>
+                <div
+                  className="hover-controls ml-auto"
+                  style={
+                    isHovered
+                      ? { position: 'absolute', right: 16, display: 'flex' }
+                      : { display: 'none' }
+                  }
+                >
                   <Button
                     color="link"
                     className="wiki-control-btn focus:box-shadow-none"
-                    title="Add Page"
+                    title="Add Child Page"
                     onClick={(e) => {
                       e.stopPropagation();
                       onAddPage(node.id);
@@ -202,7 +359,7 @@ const FolderTree = ({ tree, selectedId, onSelect, onAddPage, onAddFolder }) => {
                 </div>
               </ListGroupItem>
               <AnimatePresence>
-                {node.type === 'folder' && isOpen && (
+                {isOpen && node.children && node.children.length > 0 && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
@@ -267,10 +424,10 @@ export const Wiki = () => {
                       <Button
                         color="link"
                         className="wiki-add-btn"
-                        title="Add Folder"
-                        onClick={handleAddFolder}
+                        title="Add Page"
+                        onClick={() => handleAddPage(null)}
                       >
-                        <i className="fa fa-folder-plus" />
+                        <i className="fa fa-plus" />
                       </Button>
                     </div>
                   </div>
@@ -286,12 +443,11 @@ export const Wiki = () => {
                     />
                   </div>
 
-                  <FolderTree
+                  <PageTree
                     tree={tree}
                     selectedId={selectedId}
                     onSelect={setSelectedId}
                     onAddPage={handleAddPage}
-                    onAddFolder={handleAddFolder}
                   />
                 </Col>
 
@@ -314,6 +470,7 @@ export const Wiki = () => {
                     <RichTextEditor
                       value={selectedPage?.content}
                       toolbar={true}
+                      bordered={false}
                     />
                   </motion.div>
                 </Col>

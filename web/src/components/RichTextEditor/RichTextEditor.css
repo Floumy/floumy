@@ -107,13 +107,15 @@
   font-weight: 600;
 }
 .tiptap-editor-container {
-  border: none;
-  border-radius: 6px;
   min-height: 120px;
   height: 100%;
   display: flex;
   flex-direction: column;
   background: #fff;
+}
+.tiptap-editor-container-border{
+  border: 1px solid #d1d5db; /* light gray border */
+  border-radius: 6px;
 }
 .tiptap:focus-within {
   border-color: #1976d2;
