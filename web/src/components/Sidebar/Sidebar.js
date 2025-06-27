@@ -520,23 +520,25 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     </Col>
                   </Row>
                 </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={10}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/wiki`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-file" />
-                        <span className="nav-link-text">Wiki</span>
-                      </NavLink>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={9} />
-                    </Col>
-                  </Row>
-                </NavItem>
+                {isFeatureEnabled('WIKI') && (
+                  <NavItem>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={10}>
+                        <NavLink
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/wiki`}
+                          onClick={closeSidenav}
+                          tag={NavLinkRRD}
+                        >
+                          <i className="fa fa-file" />
+                          <span className="nav-link-text">Wiki</span>
+                        </NavLink>
+                      </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <ShortcutIcon shortcutKey={9} />
+                      </Col>
+                    </Row>
+                  </NavItem>
+                )}
               </Nav>
             </Collapse>
           </div>
