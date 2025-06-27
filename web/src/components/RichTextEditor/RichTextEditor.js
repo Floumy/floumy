@@ -5,7 +5,6 @@ import './RichTextEditor.css';
 import { useParams } from 'react-router-dom';
 import { getUsersByOrgId } from '../../services/users/users.service';
 import {
-  BubbleMenu,
   EditorContent,
   FloatingMenu,
   ReactRenderer,
@@ -21,7 +20,6 @@ import Table from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
-import { BubbleMenuControls } from './BubbleMenuControls';
 import { ToolbarControls } from './ToolbarControls';
 import 'highlight.js/styles/github.css';
 
@@ -199,6 +197,7 @@ const Tiptap = ({ content, orgId, onChange, toolbar, enabled }) => {
   const editor = useEditor({
     extensions,
     content,
+    autofocus: true,
     editable: enabled !== false,
     onUpdate: ({ editor }) => {
       if (onChange) {
@@ -225,9 +224,6 @@ const Tiptap = ({ content, orgId, onChange, toolbar, enabled }) => {
       )}
       <EditorContent editor={editor} />
       <FloatingMenu editor={editor}>Write or @mention</FloatingMenu>
-      <BubbleMenu editor={editor} className="tiptap-bubble-menu">
-        <BubbleMenuControls editor={editor} />
-      </BubbleMenu>
     </div>
   );
 };

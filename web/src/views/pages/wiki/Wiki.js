@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import {
+  Button,
   Card,
-  CardHeader,
   CardBody,
-  Container,
-  Row,
   Col,
+  Container,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Input,
   ListGroup,
   ListGroupItem,
-  Button,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
+  Row,
 } from 'reactstrap';
 import RichTextEditor from 'components/RichTextEditor/RichTextEditor';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { AnimatePresence, motion } from 'framer-motion';
 import './Wiki.css';
 
 const mockTree = [
@@ -92,16 +93,21 @@ const FolderTree = ({ tree, selectedId, onSelect, onAddPage, onAddFolder }) => {
   const renderTree = (nodes) => {
     if (!Array.isArray(nodes)) return null;
     return (
-      <ListGroup flush>
+      <ListGroup flush className="wiki-list-group">
         {nodes.map((node) => {
           const isOpen = openFolders[node.id] === true;
           const isHovered = hovered === node.id;
+          const isSelected = selectedId === node.id;
 
           return (
-            <div key={node.id}>
+            <motion.div
+              key={node.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            >
               <ListGroupItem
-                className={`d-flex align-items-center py-2`}
-                style={{ cursor: 'pointer', border: 'none' }}
+                className={`wiki-list-group-item d-flex align-items-center py-2 ${isSelected ? 'selected' : ''}`}
                 onClick={
                   node.type === 'folder'
                     ? () => toggleFolder(node.id)
@@ -115,111 +121,100 @@ const FolderTree = ({ tree, selectedId, onSelect, onAddPage, onAddFolder }) => {
               >
                 {node.type === 'folder' ? (
                   <>
-                    <i
-                      className={`fa ${isOpen ? 'fa-folder-open' : 'fa-folder'} mr-2`}
+                    <motion.i
+                      animate={{ rotate: isOpen ? 90 : 0 }}
+                      className={`fa fa-chevron-right mr-2 folder-icon`}
                     />
-                    <span>{node.title}</span>
+                    <span className="node-title">{node.title}</span>
                   </>
                 ) : (
                   <>
-                    <i className="fa fa-file mr-2" />
-                    <span style={{ flex: 1 }}>{node.title}</span>
+                    <i className="fa fa-file-lines mr-2 file-icon" />
+                    <span className="node-title">{node.title}</span>
                   </>
                 )}
-                {isHovered && (
-                  <>
-                    <Button
+                <div className="hover-controls ml-auto">
+                  <Button
+                    color="link"
+                    className="wiki-control-btn focus:box-shadow-none"
+                    title="Add Page"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddPage(node.id);
+                    }}
+                  >
+                    <i className="fa fa-plus" />
+                  </Button>
+                  <Dropdown
+                    isOpen={dropdownOpen[node.id] || false}
+                    toggle={(e) => {
+                      e.stopPropagation();
+                      toggleDropdown(node.id);
+                    }}
+                    direction="left"
+                  >
+                    <DropdownToggle
                       color="link"
-                      className="ml-auto p-0"
-                      title="Add Page"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAddPage(node.id);
-                      }}
+                      className="wiki-control-btn"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <i className="fa fa-file-circle-plus" />
-                    </Button>
-                    <Dropdown
-                      isOpen={dropdownOpen[node.id] || false}
-                      toggle={(e) => {
-                        e.stopPropagation();
-                        toggleDropdown(node.id);
-                      }}
-                      direction="left"
-                    >
-                      <DropdownToggle
-                        color="link"
-                        className="pt-0 pb-0 ml-2"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <i className="fa fa-ellipsis-v" />
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        <DropdownItem>
-                          <Button
-                            className="dropdown-btn-item"
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              width: '100%',
-                              textAlign: 'left',
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOption('rename', node);
-                            }}
-                          >
-                            <i className="fa fa-edit mr-2" />
-                            Rename
-                          </Button>
-                        </DropdownItem>
-                        <DropdownItem>
-                          <Button
-                            className="dropdown-btn-item"
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              width: '100%',
-                              textAlign: 'left',
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOption('move', node);
-                            }}
-                          >
-                            <i className="fa fa-arrows-alt mr-2" />
-                            Move
-                          </Button>
-                        </DropdownItem>
-                        <DropdownItem>
-                          <Button
-                            className="dropdown-btn-item"
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              width: '100%',
-                              textAlign: 'left',
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOption('delete', node);
-                            }}
-                          >
-                            <i className="fa fa-trash mr-2" />
-                            Delete
-                          </Button>
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </Dropdown>
-                  </>
-                )}
-              </ListGroupItem>
-              {node.type === 'folder' && isOpen && (
-                <div style={{ marginLeft: 18 }}>
-                  {renderTree(node.children)}
+                      <i className="fa fa-ellipsis" />
+                    </DropdownToggle>
+                    <DropdownMenu className="wiki-dropdown-menu">
+                      <DropdownItem>
+                        <Button
+                          className="dropdown-btn-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOption('rename', node);
+                          }}
+                        >
+                          <i className="fa fa-edit mr-2" />
+                          Rename
+                        </Button>
+                      </DropdownItem>
+                      <DropdownItem>
+                        <Button
+                          className="dropdown-btn-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOption('move', node);
+                          }}
+                        >
+                          <i className="fa fa-arrows-alt mr-2" />
+                          Move
+                        </Button>
+                      </DropdownItem>
+                      <DropdownItem>
+                        <Button
+                          className="dropdown-btn-item"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOption('delete', node);
+                          }}
+                        >
+                          <i className="fa fa-trash mr-2" />
+                          Delete
+                        </Button>
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
                 </div>
-              )}
-            </div>
+              </ListGroupItem>
+              <AnimatePresence>
+                {node.type === 'folder' && isOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="folder-children"
+                  >
+                    {renderTree(node.children)}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           );
         })}
       </ListGroup>
@@ -232,75 +227,100 @@ const FolderTree = ({ tree, selectedId, onSelect, onAddPage, onAddFolder }) => {
 export const Wiki = () => {
   const [tree, setTree] = useState(mockTree);
   const [selectedId, setSelectedId] = useState('page-1');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [title, setTitle] = useState('');
   const selectedPage = findPageById(tree, selectedId) || tree[0];
+
+  // Update title when selected page changes
+  React.useEffect(() => {
+    if (selectedPage) {
+      setTitle(selectedPage.title);
+    }
+  }, [selectedPage]);
 
   // Placeholder handlers
   const handleAddFolder = () => {};
   const handleAddPage = (folderId) => {};
 
+  // Handle title change
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+    // In a real app, you would update the page title in the database
+  };
+
   return (
     <>
       <SimpleHeader />
-      <Container className="mt--6 px-0" fluid>
-        <Row className="justify-content-center">
-          <Col>
-            <Card>
-              <CardHeader>
-                <h3 className="mb-0">Wiki</h3>
-              </CardHeader>
-              <CardBody>
-                <Row>
-                  <Col md="4" className="border-right">
-                    <Row>
-                      <Col>
-                        <h4>Pages</h4>
-                      </Col>
-                      <Col>
-                        <div className="d-flex align-items-center mb-3">
-                          <Button
-                            color="link"
-                            size="lg"
-                            className="p-0 mr-2"
-                            title="Add Folder"
-                            onClick={handleAddFolder}
-                          >
-                            <i className="fa fa-folder-plus" />
-                          </Button>
-                          <Button
-                            color="link"
-                            className="p-0"
-                            title="Add Page"
-                            onClick={() => handleAddPage(null)}
-                          >
-                            <i className="fa fa-file-circle-plus" />
-                          </Button>
-                        </div>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col>
-                        <FolderTree
-                          tree={tree}
-                          selectedId={selectedId}
-                          onSelect={setSelectedId}
-                          onAddPage={handleAddPage}
-                          onAddFolder={handleAddFolder}
-                        />
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col md="8">
-                    <h5>{selectedPage?.title}</h5>
+      <Container className="mt--6" fluid>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Card className="shadow-sm border-0">
+            <CardBody className="p-4">
+              <Row>
+                <Col md="3" className="pr-md-0">
+                  <div className="wiki-sidebar-header">
+                    <h6 className="wiki-sidebar-title">Pages</h6>
+                    <div className="wiki-add-buttons">
+                      <Button
+                        color="link"
+                        className="wiki-add-btn"
+                        title="Add Folder"
+                        onClick={handleAddFolder}
+                      >
+                        <i className="fa fa-folder-plus" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="wiki-search">
+                    <i className="fa fa-search"></i>
+                    <Input
+                      type="text"
+                      class="focus:shadow-none"
+                      placeholder="Search pages..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+
+                  <FolderTree
+                    tree={tree}
+                    selectedId={selectedId}
+                    onSelect={setSelectedId}
+                    onAddPage={handleAddPage}
+                    onAddFolder={handleAddFolder}
+                  />
+                </Col>
+
+                <Col md="9" className="pl-md-5">
+                  <motion.div
+                    key={selectedId}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                    className="wiki-editor-container"
+                  >
+                    <Input
+                      type="text"
+                      className="wiki-title"
+                      value={title}
+                      onChange={handleTitleChange}
+                      placeholder="Untitled"
+                    />
+
                     <RichTextEditor
                       value={selectedPage?.content}
                       toolbar={true}
                     />
-                  </Col>
-                </Row>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+                  </motion.div>
+                </Col>
+              </Row>
+            </CardBody>
+          </Card>
+        </motion.div>
       </Container>
     </>
   );
