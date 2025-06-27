@@ -87,7 +87,15 @@ export const MentionsList = React.forwardRef(function MentionsList(props, ref) {
     </div>
   );
 });
-const Tiptap = ({ content, orgId, onChange, toolbar, enabled }) => {
+const Tiptap = ({
+  id,
+  content,
+  orgId,
+  onChange,
+  toolbar,
+  enabled,
+  bordered,
+}) => {
   const getMentionsFromDoc = (doc) => {
     const mentions = [];
     doc.descendants((node) => {
@@ -215,8 +223,18 @@ const Tiptap = ({ content, orgId, onChange, toolbar, enabled }) => {
     }
   }, [content, editor]);
 
+  const focusEditor = () => {
+    if (editor) {
+      editor.chain().focus().run();
+    }
+  };
+
   return (
-    <div className="tiptap-editor-container">
+    <div
+      id={id}
+      className={`tiptap-editor-container ${bordered ? 'tiptap-editor-container-border' : ''}`}
+      onClick={focusEditor}
+    >
       {toolbar && (
         <div className="tiptap-toolbar">
           <ToolbarControls editor={editor} />
@@ -227,18 +245,25 @@ const Tiptap = ({ content, orgId, onChange, toolbar, enabled }) => {
     </div>
   );
 };
-const RichTextEditor = ({ onChange, value, toolbar = false, id, enabled }) => {
+const RichTextEditor = ({
+  onChange,
+  value,
+  toolbar = false,
+  id,
+  enabled,
+  bordered = true,
+}) => {
   const { orgId } = useParams();
   return (
-    <div id={id}>
-      <Tiptap
-        content={value}
-        orgId={orgId}
-        onChange={onChange}
-        toolbar={toolbar}
-        enabled={enabled}
-      />
-    </div>
+    <Tiptap
+      id={id}
+      content={value}
+      orgId={orgId}
+      onChange={onChange}
+      toolbar={toolbar}
+      enabled={enabled}
+      bordered={bordered}
+    />
   );
 };
 
