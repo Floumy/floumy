@@ -18,6 +18,8 @@ import { Issue } from '../issues/issue.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Objective } from '../okrs/objective.entity';
+import { ChatController } from './chat/chat.controller';
+import { ChatService } from './chat/chat.service';
 
 @Module({
   imports: [
@@ -40,7 +42,7 @@ import { Objective } from '../okrs/objective.entity';
       Objective,
     ]),
   ],
-  controllers: [AiController],
-  providers: [AiService, OpenaiService],
+  controllers: [AiController, ChatController],
+  providers: [AiService, OpenaiService, ChatService],
 })
 export class AiModule {}
