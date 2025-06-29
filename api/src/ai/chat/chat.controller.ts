@@ -12,8 +12,8 @@ export class ChatController {
   @Sse('stream')
   streamChat(@Query('message') message: string): Observable<{
     id: string;
-    type: 'human' | 'ai' | 'error';
-    data: string;
+    type: 'message';
+    data: any;
   }> {
     const messageId = uuid();
     return this.chatService.sendMessageStream(messageId, message).pipe(
@@ -21,13 +21,17 @@ export class ChatController {
         this.logger.error(error);
         return new Observable<{
           id: string;
-          type: 'human' | 'ai' | 'error';
-          data: string;
+          type: 'message';
+          data: any;
         }>((subscriber) => {
           subscriber.next({
-            data: 'An error occurred during streaming',
-            type: 'error',
-            id: messageId,
+            data: {
+              id: messageId,
+              error: 'An error occurred during streaming',
+              isUser: false,
+            },
+            type: 'message',
+            id: new Date().toISOString(),
           });
           subscriber.complete();
         });

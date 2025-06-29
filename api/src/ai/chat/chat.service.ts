@@ -16,8 +16,8 @@ export class ChatService {
     message: string,
   ): Observable<{
     id: string;
-    type: 'human' | 'ai' | 'error';
-    data: string;
+    type: 'message';
+    data: any;
   }> {
     return new Observable((subscriber) => {
       const runStream = async () => {
@@ -29,16 +29,23 @@ export class ChatService {
 
           const prompt = [
             new SystemMessage(
-              'You are a helpful project management assistant in a startup. You need to output your response in markdown format.',
+              `You are a helpful project management conversational assistant.
+              When you are asked to do something ask follow-up questions to gather more information if needed. Don't ask too many questions. 
+              You need to output your response in markdown format.
+              Do not respond to questions that are not related to the project.`,
             ),
             new HumanMessage(message),
           ];
 
           for await (const chunk of await model.stream(prompt)) {
             subscriber.next({
-              id: messageId,
-              type: 'ai',
-              data: chunk.text,
+              id: new Date().toISOString(),
+              type: 'message',
+              data: {
+                id: messageId,
+                text: chunk.text,
+                isUser: false,
+              },
             });
           }
 
