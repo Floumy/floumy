@@ -17,7 +17,7 @@ export const useChatStream = () => {
 
   useEffect(() => {
     return () => cleanup();
-  }, []);
+  }, [cleanup]);
 
   const sendMessage = useCallback(
     (message) => {
@@ -26,30 +26,47 @@ export const useChatStream = () => {
 
       cleanup();
 
+      // Add the user's message first
+      const userMessageId = crypto.randomUUID();
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: userMessageId,
+          text: message,
+          isUser: true,
+        },
+      ]);
+
       try {
         const eventSource = createChatStream(message);
         eventSourceRef.current = eventSource;
 
         eventSource.onmessage = (event) => {
-          const messageIndex = messages.findIndex((m) => m.id === event.id);
-          if (messageIndex !== -1) {
-            setMessages((prevMessages) => [
-              ...prevMessages.slice(0, messageIndex),
-              {
-                ...prevMessages[messageIndex],
-                text: `${prevMessages[messageIndex].text}${event.data}`,
-              },
-            ]);
-          } else {
-            setMessages([
-              {
-                id: event.id,
-                type: event.type,
-                text: event.data,
-              },
-            ]);
-          }
-          console.log(messages);
+          const eventData = JSON.parse(event.data);
+          setMessages((prevMessages) => {
+            const messageIndex = prevMessages.findIndex(
+              (m) => m.id === eventData.id,
+            );
+            if (messageIndex !== -1) {
+              // Update existing message
+              const updatedMessages = [...prevMessages];
+              updatedMessages[messageIndex] = {
+                ...updatedMessages[messageIndex],
+                text: updatedMessages[messageIndex].text + eventData.text,
+              };
+              return updatedMessages;
+            } else {
+              // Add new message
+              return [
+                ...prevMessages,
+                {
+                  id: eventData.id,
+                  text: eventData.text,
+                  isUser: eventData.isUser,
+                },
+              ];
+            }
+          });
         };
 
         eventSource.onerror = (error) => {

@@ -114,17 +114,6 @@ export default function AiChatSlideIn({
     }
   };
 
-  // Scroll to bottom of messages
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const handleSubmit = useCallback(() => {
     if (inputValue.trim()) {
       sendMessage(inputValue);
