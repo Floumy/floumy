@@ -3,12 +3,28 @@ import { ConfigService } from '@nestjs/config';
 import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { Observable } from 'rxjs';
+import { PostgresChatMessageHistory } from '@langchain/community/stores/message/postgres';
 
 @Injectable()
 export class ChatService {
   private readonly apiKey: string;
+  private readonly messageHistory: PostgresChatMessageHistory;
+
   constructor(private configService: ConfigService) {
     this.apiKey = this.configService.get('ai.apiKey');
+
+    this.messageHistory = new PostgresChatMessageHistory({
+      sessionId: 'default-session',
+      poolConfig: {
+        host: this.configService.get('database.host'),
+        port: this.configService.get('database.port'),
+        user: this.configService.get('database.username'),
+        password: this.configService.get('database.password'),
+        database: this.configService.get('database.name'),
+        ssl: false,
+      },
+      tableName: 'message_history',
+    });
   }
 
   public sendMessageStream(
@@ -23,27 +39,48 @@ export class ChatService {
       const runStream = async () => {
         try {
           const model = new ChatOpenAI({
-            model: 'gpt-3.5-turbo',
+            model: 'chatgpt-4o-latest',
             streaming: true,
+            openAIApiKey: this.apiKey,
+            temperature: 0.1,
           });
 
-          const prompt = [
-            new SystemMessage(
-              `You are a helpful project management conversational assistant.
-              When you are asked to do something ask follow-up questions to gather more information if needed. Don't ask too many questions. 
-              You need to output your response in markdown format.
-              Do not respond to questions that are not related to the project.`,
-            ),
-            new HumanMessage(message),
-          ];
+          await this.messageHistory.addMessage(new HumanMessage(message));
+          const historyMessages = await this.messageHistory.getMessages();
 
-          for await (const chunk of await model.stream(prompt)) {
+          const systemMessage = new SystemMessage(
+            `You are a helpful and concise project management assistant.
+                  Respond only in markdown format.
+                  Only ask follow-up questions when necessary to understand the request or provide a useful response.
+                  If clarification is needed, ask a single, specific question.
+                  Ignore unrelated topics.
+                  
+                  Example behavior:
+
+                  If the user says:
+                  
+                  Help me define OKRs
+                  
+                  The assistant could reply:
+                  
+                  Sure. What’s the main goal or focus area you’re working on?
+                  
+                  `,
+          );
+
+          const stream = await model.stream([
+            systemMessage,
+            ...historyMessages,
+            new HumanMessage(message),
+          ]);
+
+          for await (const chunk of stream) {
             subscriber.next({
               id: new Date().toISOString(),
               type: 'message',
               data: {
                 id: messageId,
-                text: chunk.text,
+                text: chunk.content,
                 isUser: false,
               },
             });
