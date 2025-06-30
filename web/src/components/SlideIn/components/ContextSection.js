@@ -5,7 +5,6 @@ import {
   ContextIcon,
   ContextInfo,
   ContextItem,
-  ContextMeta,
   ContextName,
   ContextSelect,
   ContextSwitcher,
@@ -46,7 +45,7 @@ const ContextSection = ({
         </ContextIcon>
         <ContextInfo>
           <ContextName>{selectedContext.name}</ContextName>
-          <ContextMeta>{selectedContext.meta}</ContextMeta>
+          {/*<ContextMeta>{selectedContext.meta}</ContextMeta>*/}
         </ContextInfo>
       </ContextItem>
     </ContextContainer>
