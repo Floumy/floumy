@@ -40,7 +40,7 @@ const ChatHeader = ({ toggle, startNewSession }) => {
       </div>
       <HeaderActions>
         <Button
-          color="light"
+          color="success"
           size="sm"
           onClick={startNewSession}
           style={{
@@ -50,10 +50,7 @@ const ChatHeader = ({ toggle, startNewSession }) => {
             padding: '0.375rem 0.75rem',
           }}
         >
-          <i
-            className="ni ni-chat-round"
-            style={{ marginRight: '5px' }}
-          ></i>
+          <i className="ni ni-fat-add" style={{ marginRight: '5px' }}></i>
           New Chat
         </Button>
         <Button

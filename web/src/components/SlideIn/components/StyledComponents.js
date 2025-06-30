@@ -536,7 +536,6 @@ export const ChatStyles = createGlobalStyle`
         background-color: #8a2be2;
         border-color: #8a2be2;
         font-weight: 500;
-        border-radius: 50%;
         transition: all 0.2s ease;
       }
 
