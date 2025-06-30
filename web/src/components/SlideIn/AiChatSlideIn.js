@@ -126,7 +126,7 @@ export default function AiChatSlideIn({
       <ChatStyles />
       {isOpen && (
         <ChatContainer>
-          <ChatHeader toggle={toggle} />
+          <ChatHeader toggle={toggle} startNewSession={startNewSession} />
           <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />
 
           {activeTab === 'chat' ? (
