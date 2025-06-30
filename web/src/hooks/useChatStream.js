@@ -20,7 +20,7 @@ export const useChatStream = () => {
   }, [cleanup]);
 
   const sendMessage = useCallback(
-    (message) => {
+    (sessionId, message) => {
       setError(null);
       setIsLoading(true);
 
@@ -38,7 +38,7 @@ export const useChatStream = () => {
       ]);
 
       try {
-        const eventSource = createChatStream(message);
+        const eventSource = createChatStream(sessionId, message);
         eventSourceRef.current = eventSource;
 
         eventSource.onmessage = (event) => {
