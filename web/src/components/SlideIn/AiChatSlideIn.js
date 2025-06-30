@@ -92,6 +92,9 @@ export default function AiChatSlideIn({
   // Handle selecting an example prompt
   const handleSelectPrompt = (prompt) => {
     setInputValue(prompt);
+    setInputMessage(prompt);
+    sendMessage(prompt);
+    setInputValue('');
   };
 
   // Handle context type change
@@ -150,6 +153,7 @@ export default function AiChatSlideIn({
                 isTyping={isLoading}
                 examplePrompts={examplePrompts}
                 handleSelectPrompt={handleSelectPrompt}
+                showExamplePrompts={messages?.length === 0}
               />
             </>
           ) : (

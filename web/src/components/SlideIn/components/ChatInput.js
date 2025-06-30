@@ -25,19 +25,22 @@ const ChatInput = ({
   isTyping,
   examplePrompts,
   handleSelectPrompt,
+  showExamplePrompts = true,
 }) => {
   return (
     <>
-      <ExamplePromptsContainer>
-        {examplePrompts.map((prompt, index) => (
-          <ExamplePromptChip
-            key={index}
-            onClick={() => handleSelectPrompt(prompt)}
-          >
-            {prompt}
-          </ExamplePromptChip>
-        ))}
-      </ExamplePromptsContainer>
+      {showExamplePrompts && (
+        <ExamplePromptsContainer>
+          {examplePrompts.map((prompt, index) => (
+            <ExamplePromptChip
+              key={index}
+              onClick={() => handleSelectPrompt(prompt)}
+            >
+              {prompt}
+            </ExamplePromptChip>
+          ))}
+        </ExamplePromptsContainer>
+      )}
 
       <ChatFooter>
         <div className="input-container">
