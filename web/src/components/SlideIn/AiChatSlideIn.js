@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Import components
 import ChatHeader from './components/ChatHeader';
-import TabsSection from './components/TabsSection';
 import ContextSection from './components/ContextSection';
 import ChatBody from './components/ChatBody';
 import ChatInput from './components/ChatInput';
@@ -130,7 +129,7 @@ export default function AiChatSlideIn({
       {isOpen && (
         <ChatContainer>
           <ChatHeader toggle={toggle} startNewSession={startNewSession} />
-          <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />
+          {/*<TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />*/}
 
           {activeTab === 'chat' ? (
             <>
