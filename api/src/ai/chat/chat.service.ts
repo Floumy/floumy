@@ -64,7 +64,6 @@ export class ChatService {
                   The assistant could reply:
                   
                   Sure. What’s the main goal or focus area you’re working on?
-                  
                   `,
           );
 

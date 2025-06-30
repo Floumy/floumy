@@ -10,9 +10,10 @@ import {
  *
  * @param {Object} props - Component props
  * @param {Function} props.toggle - Function to toggle the chat visibility
+ * @param {Function} props.startNewSession - Function to start a new chat session
  * @returns {JSX.Element} The ChatHeader component
  */
-const ChatHeader = ({ toggle }) => {
+const ChatHeader = ({ toggle, startNewSession }) => {
   return (
     <StyledChatHeader>
       <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -38,6 +39,23 @@ const ChatHeader = ({ toggle }) => {
         </span>
       </div>
       <HeaderActions>
+        <Button
+          color="light"
+          size="sm"
+          onClick={startNewSession}
+          style={{
+            marginRight: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0.375rem 0.75rem',
+          }}
+        >
+          <i
+            className="ni ni-chat-round"
+            style={{ marginRight: '5px' }}
+          ></i>
+          New Chat
+        </Button>
         <Button
           close
           onClick={toggle}
