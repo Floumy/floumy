@@ -35,14 +35,16 @@ function AdminNavbar({ sidenavOpen, toggleSidenav, aiChatOpen, toggleAiChat }) {
               </NavItem>
               <NavItem>
                 <Button
-                  className={classnames('btn-icon-only rounded-circle', {
-                    'btn-primary': aiChatOpen,
-                    'btn-outline-primary': !aiChatOpen,
-                  })}
+                  className="btn-icon-only rounded-circle"
+                  style={{
+                    color: '#8a2be2',
+                    fontSize: '14px',
+                    display: window.innerWidth > 2000 ? 'none' : 'block',
+                  }}
                   onClick={toggleAiChat}
                   title="AI Assistant"
                 >
-                  <i className="ni ni-atom" />
+                  <i className="fas fa-magic-wand-sparkles" />
                 </Button>
               </NavItem>
             </Nav>

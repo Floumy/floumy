@@ -30,7 +30,7 @@ const ChatHeader = ({ toggle, startNewSession }) => {
           }}
         >
           <i
-            className="ni ni-atom"
+            className="fas fa-magic-wand-sparkles"
             style={{ color: '#8a2be2', fontSize: '14px' }}
           ></i>
         </div>
@@ -60,6 +60,7 @@ const ChatHeader = ({ toggle, startNewSession }) => {
             color: '#6b7280',
             opacity: 0.6,
             transition: 'opacity 0.2s ease',
+            display: window.innerWidth > 2000 ? 'none' : 'block',
           }}
           onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
           onMouseOut={(e) => (e.currentTarget.style.opacity = '0.6')}

@@ -9,7 +9,6 @@ import {
   ContextName,
   ContextSelect,
   ContextSwitcher,
-  ContextTitle,
 } from './StyledComponents';
 
 /**
@@ -29,12 +28,10 @@ const ContextSection = ({
   return (
     <ContextContainer>
       <ContextHeader>
-        <ContextTitle>Current Context</ContextTitle>
         <ContextSwitcher>
-          <span style={{ fontSize: '12px', color: '#6b7280' }}>Change:</span>
           <ContextSelect value={contextType} onChange={handleContextTypeChange}>
-            <option value="okrs">Current</option>
-            <option value="initiatives">Everything</option>
+            <option value="okrs">Current Context</option>
+            <option value="initiatives">Entire Project</option>
           </ContextSelect>
         </ContextSwitcher>
       </ContextHeader>
