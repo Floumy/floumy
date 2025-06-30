@@ -8,13 +8,14 @@ import { PostgresChatMessageHistory } from '@langchain/community/stores/message/
 @Injectable()
 export class ChatService {
   private readonly apiKey: string;
-  private readonly messageHistory: PostgresChatMessageHistory;
 
   constructor(private configService: ConfigService) {
     this.apiKey = this.configService.get('ai.apiKey');
+  }
 
-    this.messageHistory = new PostgresChatMessageHistory({
-      sessionId: 'default-session',
+  private getMessageHistory(sessionId: string) {
+    return new PostgresChatMessageHistory({
+      sessionId: sessionId || 'default-session',
       poolConfig: {
         host: this.configService.get('database.host'),
         port: this.configService.get('database.port'),
@@ -28,6 +29,7 @@ export class ChatService {
   }
 
   public sendMessageStream(
+    sessionId: string,
     messageId: string,
     message: string,
   ): Observable<{
@@ -45,8 +47,11 @@ export class ChatService {
             temperature: 0.1,
           });
 
-          await this.messageHistory.addMessage(new HumanMessage(message));
-          const historyMessages = await this.messageHistory.getMessages();
+          await this.getMessageHistory(sessionId).addMessage(
+            new HumanMessage(message),
+          );
+          const historyMessages =
+            await this.getMessageHistory(sessionId).getMessages();
 
           const systemMessage = new SystemMessage(
             `You are a helpful and concise project management assistant.

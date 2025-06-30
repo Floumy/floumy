@@ -30,6 +30,7 @@ export default function AiChatSlideIn({
   const [selectedContext, setSelectedContext] = useState(mockContexts.okrs[0]);
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' or 'history'
   const [chatSessions, setChatSessions] = useState([]);
+  const [currentSessionId, setCurrentSessionId] = useState(crypto.randomUUID());
 
   const messagesEndRef = useRef(null);
   const [inputMessage, setInputMessage] = useState('');
@@ -45,6 +46,8 @@ export default function AiChatSlideIn({
 
   // Load chat sessions and current chat history from localStorage on mount
   useEffect(() => {
+    setMessages(initialMessages);
+
     try {
       // Load chat sessions
       const savedSessions = localStorage.getItem(CHAT_SESSIONS_KEY);
@@ -85,6 +88,7 @@ export default function AiChatSlideIn({
   // Function to start a new chat session
   const startNewSession = () => {
     setMessages(initialMessages);
+    setCurrentSessionId(crypto.randomUUID());
     setActiveTab('chat');
   };
 
@@ -92,7 +96,8 @@ export default function AiChatSlideIn({
   const handleSelectPrompt = (prompt) => {
     setInputValue(prompt);
     setInputMessage(prompt);
-    sendMessage(prompt);
+    setCurrentSessionId(crypto.randomUUID());
+    sendMessage(currentSessionId, prompt);
     setInputValue('');
   };
 
@@ -118,7 +123,7 @@ export default function AiChatSlideIn({
 
   const handleSubmit = useCallback(() => {
     if (inputValue.trim()) {
-      sendMessage(inputValue);
+      sendMessage(currentSessionId, inputValue);
       setInputValue('');
     }
   }, [inputValue, sendMessage]);
@@ -152,7 +157,7 @@ export default function AiChatSlideIn({
                 isTyping={isLoading}
                 examplePrompts={examplePrompts}
                 handleSelectPrompt={handleSelectPrompt}
-                showExamplePrompts={messages?.length === 0}
+                showExamplePrompts={messages?.length === 1}
               />
             </>
           ) : (
