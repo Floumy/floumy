@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChatOpenAI } from '@langchain/openai';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
+import {
+  AIMessage,
+  HumanMessage,
+  SystemMessage,
+} from '@langchain/core/messages';
 import { Observable } from 'rxjs';
 import { PostgresChatMessageHistory } from '@langchain/community/stores/message/postgres';
 
@@ -78,6 +82,7 @@ export class ChatService {
             new HumanMessage(message),
           ]);
 
+          let aiMessage = '';
           for await (const chunk of stream) {
             subscriber.next({
               id: new Date().toISOString(),
@@ -88,7 +93,12 @@ export class ChatService {
                 isUser: false,
               },
             });
+            aiMessage += chunk.text;
           }
+
+          await this.getMessageHistory(sessionId).addMessage(
+            new AIMessage(aiMessage),
+          );
 
           subscriber.complete();
         } catch (error) {
