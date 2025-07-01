@@ -8,12 +8,17 @@ import {
 } from '@langchain/core/messages';
 import { Observable } from 'rxjs';
 import { PostgresChatMessageHistory } from '@langchain/community/stores/message/postgres';
+import { DocumentVectorStoreService } from '../documents/document-vector-store.service';
+import { formatDocumentsAsString } from 'langchain/util/document';
 
 @Injectable()
 export class ChatService {
   private readonly apiKey: string;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private documentVectorStoreService: DocumentVectorStoreService,
+  ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
 
@@ -33,6 +38,8 @@ export class ChatService {
   }
 
   public sendMessageStream(
+    userId: string,
+    orgId: string,
     sessionId: string,
     messageId: string,
     message: string,
@@ -51,8 +58,29 @@ export class ChatService {
             temperature: 0.1,
           });
 
+          const relevantDocs =
+            await this.documentVectorStoreService.searchSimilarDocuments(
+              message,
+              userId,
+              orgId,
+              3,
+            );
+
+          let prompt = message;
+          if (relevantDocs.length > 0) {
+            const contextString = formatDocumentsAsString(relevantDocs);
+
+            prompt = `
+              Context information is below.
+              ---------------------
+              ${contextString}
+              ---------------------
+              Given the context information and not prior knowledge, answer the question: ${message}
+            `;
+          }
+
           await this.getMessageHistory(sessionId).addMessage(
-            new HumanMessage(message),
+            new HumanMessage(prompt),
           );
           const historyMessages =
             await this.getMessageHistory(sessionId).getMessages();
