@@ -1,9 +1,19 @@
-import { Controller, Logger, Param, Query, Sse } from '@nestjs/common';
+import {
+  Controller,
+  Logger,
+  Param,
+  Query,
+  Request,
+  Sse,
+  UseGuards,
+} from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { catchError, Observable } from 'rxjs';
 import { uuid } from 'uuidv4';
+import { AuthGuard } from '../../auth/auth.guard';
 
 @Controller('ai/chat')
+@UseGuards(AuthGuard)
 export class ChatController {
   private readonly logger = new Logger(ChatController.name);
 
@@ -11,6 +21,7 @@ export class ChatController {
 
   @Sse('stream/:sessionId')
   streamChat(
+    @Request() request,
     @Param('sessionId') sessionId: string,
     @Query('message') message: string,
   ): Observable<{
@@ -20,7 +31,13 @@ export class ChatController {
   }> {
     const messageId = uuid();
     return this.chatService
-      .sendMessageStream(sessionId, messageId, message)
+      .sendMessageStream(
+        request.user,
+        request.org,
+        sessionId,
+        messageId,
+        message,
+      )
       .pipe(
         catchError((error) => {
           this.logger.error(error);
