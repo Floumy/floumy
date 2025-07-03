@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Import components
 import ChatHeader from './components/ChatHeader';
-import ContextSection from './components/ContextSection';
 import ChatBody from './components/ChatBody';
 import ChatInput from './components/ChatInput';
 import HistorySection from './components/HistorySection';
@@ -96,7 +95,6 @@ export default function AiChatSlideIn({
   const handleSelectPrompt = (prompt) => {
     setInputValue(prompt);
     setInputMessage(prompt);
-    setCurrentSessionId(crypto.randomUUID());
     sendMessage(currentSessionId, prompt);
     setInputValue('');
   };
@@ -138,11 +136,11 @@ export default function AiChatSlideIn({
 
           {activeTab === 'chat' ? (
             <>
-              <ContextSection
-                contextType={contextType}
-                selectedContext={selectedContext}
-                handleContextTypeChange={handleContextTypeChange}
-              />
+              {/*<ContextSection*/}
+              {/*  contextType={contextType}*/}
+              {/*  selectedContext={selectedContext}*/}
+              {/*  handleContextTypeChange={handleContextTypeChange}*/}
+              {/*/>*/}
 
               <ChatBody
                 messages={messages}

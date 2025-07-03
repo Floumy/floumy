@@ -1,4 +1,4 @@
-import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../../auth/auth.guard';
 import { IndexingService } from './indexing.service';
 
@@ -7,8 +7,15 @@ import { IndexingService } from './indexing.service';
 export class IndexingController {
   constructor(private readonly indexingService: IndexingService) {}
 
-  @Get()
-  async indexEntities(@Request() request: any) {
-    return await this.indexingService.indexEntities(request.user.org);
+  @Get('start/:orgId')
+  async startIndexing(@Param('orgId') orgId: string) {
+    const taskId = await this.indexingService.startIndexing(orgId);
+    return { taskId };
+  }
+
+  @Get('cancel/:taskId')
+  async cancelIndexing(@Param('taskId') taskId: string) {
+    const result = await this.indexingService.cancelIndexing(taskId);
+    return { success: result };
   }
 }

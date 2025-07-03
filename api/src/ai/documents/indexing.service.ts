@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Objective } from '../../okrs/objective.entity';
 import { DocumentVectorStoreService } from './document-vector-store.service';
@@ -9,9 +9,12 @@ import { Milestone } from 'src/roadmap/milestones/milestone.entity';
 import { Sprint } from 'src/sprints/sprint.entity';
 import { FeatureRequest } from 'src/feature-requests/feature-request.entity';
 import { Issue } from 'src/issues/issue.entity';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 @Injectable()
 export class IndexingService {
+  private readonly logger = new Logger(IndexingService.name);
+
   constructor(
     private documentVectorStore: DocumentVectorStoreService,
     @InjectRepository(Objective)
@@ -28,9 +31,10 @@ export class IndexingService {
     private featureRequestRepository: Repository<FeatureRequest>,
     @InjectRepository(Issue)
     private issueRepository: Repository<Issue>,
+    private schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  async indexEntities(orgId: string) {
+  private async indexEntities(orgId: string) {
     await this.indexOKRs(orgId);
     await this.indexInitiatives(orgId);
     await this.indexWorkItems(orgId);
@@ -228,6 +232,36 @@ export class IndexingService {
         projectId: project.id,
         documentType: 'Issue',
       });
+    }
+  }
+
+  async startIndexing(orgId: string) {
+    const taskId = `indexing-${orgId}-${Date.now()}`;
+
+    const job = setTimeout(async () => {
+      try {
+        await this.indexEntities(orgId);
+      } catch (error) {
+        this.logger.error(`Indexing failed for org ${orgId}:`, error);
+      } finally {
+        // Clean up the task after completion
+        this.schedulerRegistry.deleteTimeout(taskId);
+      }
+    }, 0);
+
+    this.schedulerRegistry.addTimeout(taskId, job);
+    return taskId;
+  }
+
+  async cancelIndexing(taskId: string): Promise<boolean> {
+    try {
+      const job = this.schedulerRegistry.getTimeout(taskId);
+      this.schedulerRegistry.deleteTimeout(taskId);
+      clearTimeout(job);
+      return true;
+    } catch (error) {
+      this.logger.error(`Failed to cancel indexing task ${taskId}:`, error);
+      return false;
     }
   }
 }
