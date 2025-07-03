@@ -184,7 +184,7 @@
 /* Editor area styling */
 .pages-editor-container {
   border-radius: 10px;
-  overflow: scroll;
+  overflow: auto;
   min-height: calc(100vh - 180px); /* Adjust for header, footer, and padding */
   height: calc(100vh - 180px); /* Set a fixed height to fill the available space */
   display: flex;
