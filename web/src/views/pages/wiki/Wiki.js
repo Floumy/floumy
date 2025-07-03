@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -19,201 +19,19 @@ import RichTextEditor from 'components/RichTextEditor/RichTextEditor';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import { AnimatePresence, motion } from 'framer-motion';
 import './Wiki.css';
-
-const mockTree = [
-  {
-    id: 'page-1',
-    title: 'Introduction',
-    content: '<p>Welcome to the project wiki!</p>',
-    children: [
-      {
-        id: 'page-2',
-        title: 'Getting Started',
-        content: '<p>How to get started...</p>',
-        children: [
-          {
-            id: 'page-21',
-            title: 'Installation',
-            content: '<p>Installation steps...</p>',
-            children: [],
-          },
-          {
-            id: 'page-22',
-            title: 'Configuration',
-            content: '<p>Configuration guide...</p>',
-            children: [],
-          },
-        ],
-      },
-      {
-        id: 'page-23',
-        title: 'Advanced Usage',
-        content: '<p>Advanced usage tips...</p>',
-        children: [
-          {
-            id: 'page-231',
-            title: 'Performance Tuning',
-            content: '<p>How to tune performance...</p>',
-            children: [],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'page-3',
-    title: 'FAQ',
-    content: '<p>Frequently Asked Questions</p>',
-    children: [
-      {
-        id: 'page-31',
-        title: 'General Questions',
-        content: '<p>General questions answered...</p>',
-        children: [],
-      },
-      {
-        id: 'page-32',
-        title: 'Troubleshooting',
-        content: '<p>Troubleshooting common issues...</p>',
-        children: [
-          {
-            id: 'page-321',
-            title: 'Login Issues',
-            content: '<p>How to resolve login issues...</p>',
-            children: [],
-          },
-          {
-            id: 'page-322',
-            title: 'Network Problems',
-            content: '<p>Network troubleshooting...</p>',
-            children: [],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'page-4',
-    title: 'Changelog',
-    content: '<p>Changelog content</p>',
-    children: [
-      {
-        id: 'page-41',
-        title: 'v1.0.0',
-        content: '<p>Initial release notes...</p>',
-        children: [],
-      },
-      {
-        id: 'page-42',
-        title: 'v1.1.0',
-        content: '<p>New features in v1.1.0...</p>',
-        children: [],
-      },
-      {
-        id: 'page-43',
-        title: 'v2.0.0',
-        content: '<p>Major update in v2.0.0...</p>',
-        children: [],
-      },
-    ],
-  },
-  {
-    id: 'page-5',
-    title: 'User Guide',
-    content: '<p>User guide content...</p>',
-    children: [
-      {
-        id: 'page-51',
-        title: 'Account Management',
-        content: '<p>Managing your account...</p>',
-        children: [],
-      },
-      {
-        id: 'page-52',
-        title: 'Security',
-        content: '<p>Security best practices...</p>',
-        children: [],
-      },
-      {
-        id: 'page-53',
-        title: 'Integrations',
-        content: '<p>Integration options...</p>',
-        children: [
-          {
-            id: 'page-531',
-            title: 'Slack',
-            content: '<p>Slack integration guide...</p>',
-            children: [],
-          },
-          {
-            id: 'page-532',
-            title: 'GitHub',
-            content: '<p>GitHub integration guide...</p>',
-            children: [],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'page-6',
-    title: 'API Reference',
-    content: '<p>API reference documentation...</p>',
-    children: [
-      {
-        id: 'page-61',
-        title: 'Authentication API',
-        content: '<p>Auth API details...</p>',
-        children: [],
-      },
-      {
-        id: 'page-62',
-        title: 'Data API',
-        content: '<p>Data API details...</p>',
-        children: [],
-      },
-    ],
-  },
-  {
-    id: 'page-7',
-    title: 'Contributing',
-    content: '<p>How to contribute...</p>',
-    children: [
-      {
-        id: 'page-71',
-        title: 'Code Style',
-        content: '<p>Code style guide...</p>',
-        children: [],
-      },
-      {
-        id: 'page-72',
-        title: 'Pull Requests',
-        content: '<p>Pull request process...</p>',
-        children: [],
-      },
-    ],
-  },
-  {
-    id: 'page-8',
-    title: 'Release Process',
-    content: '<p>Release process documentation...</p>',
-    children: [],
-  },
-  {
-    id: 'page-9',
-    title: 'Roadmap',
-    content: '<p>Project roadmap...</p>',
-    children: [],
-  },
-  {
-    id: 'page-10',
-    title: 'Contact',
-    content: '<p>Contact information...</p>',
-    children: [],
-  },
-];
+import {
+  createPage,
+  deletePage,
+  getPagesByParentId,
+  updatePage,
+} from '../../../services/wiki/wiki.service';
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import DeleteWarning from '../components/DeleteWarning';
+import MovePageModal from './MovePageModal';
 
 function findPageById(tree, id) {
+  if (!Array.isArray(tree)) return null;
   for (const node of tree) {
     if (node.id === id) return node;
     if (node.children && node.children.length) {
@@ -224,7 +42,14 @@ function findPageById(tree, id) {
   return null;
 }
 
-const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
+const PageTree = ({
+  tree,
+  selectedId,
+  onSelect,
+  onAddPage,
+  onDeletePage,
+  onMovePage,
+}) => {
   const [openPages, setOpenPages] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState({});
   const [hovered, setHovered] = useState(null);
@@ -235,10 +60,6 @@ const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
 
   const toggleDropdown = (id) => {
     setDropdownOpen((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const handleOption = (action, node) => {
-    // Placeholder for option actions: rename, move, delete
   };
 
   const renderTree = (nodes) => {
@@ -258,12 +79,18 @@ const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
               transition={{ duration: 0.2 }}
             >
               <ListGroupItem
-                className={`wiki-list-group-item d-flex align-items-center py-2 ${isSelected ? 'selected' : ''}`}
+                className={`wiki-list-group-item d-flex align-items-center py-2 position-relative ${isSelected ? 'selected' : ''}`}
+                style={{
+                  overflow: 'visible',
+                  position: 'relative',
+                  zIndex: isHovered ? 2000 : 'auto',
+                }}
                 onClick={() => {
-                  if (node.children && node.children.length > 0) {
+                  const isToggled = openPages[node.id];
+                  if (isToggled) {
                     togglePage(node.id);
                   } else {
-                    onSelect(node.id);
+                    onSelect(node.id, togglePage);
                   }
                 }}
                 onMouseEnter={() => setHovered(node.id)}
@@ -277,17 +104,28 @@ const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
                   className="node-title"
                   style={
                     isHovered
-                      ? { marginRight: '90px', transition: 'margin-right 0.2s' }
+                      ? {
+                          marginRight: '90px',
+                          transition: 'margin-right 0.2s',
+                        }
                       : { transition: 'margin-right 0.2s' }
                   }
                 >
-                  {node.title}
+                  {node.title || 'Untitled'}
                 </span>
                 <div
                   className="hover-controls ml-auto"
                   style={
                     isHovered
-                      ? { position: 'absolute', right: 16, display: 'flex' }
+                      ? {
+                          position: 'absolute',
+                          right: 16,
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          zIndex: 3000,
+                          display: 'flex',
+                          alignItems: 'center',
+                        }
                       : { display: 'none' }
                   }
                 >
@@ -297,7 +135,7 @@ const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
                     title="Add Child Page"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onAddPage(node.id);
+                      onAddPage(node.id, isOpen, togglePage);
                     }}
                   >
                     <i className="fa fa-plus" />
@@ -308,7 +146,7 @@ const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
                       e.stopPropagation();
                       toggleDropdown(node.id);
                     }}
-                    direction="left"
+                    direction="right"
                   >
                     <DropdownToggle
                       color="link"
@@ -323,19 +161,7 @@ const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
                           className="dropdown-btn-item"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleOption('rename', node);
-                          }}
-                        >
-                          <i className="fa fa-edit mr-2" />
-                          Rename
-                        </Button>
-                      </DropdownItem>
-                      <DropdownItem>
-                        <Button
-                          className="dropdown-btn-item"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOption('move', node);
+                            onMovePage(node);
                           }}
                         >
                           <i className="fa fa-arrows-alt mr-2" />
@@ -347,7 +173,7 @@ const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
                           className="dropdown-btn-item"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleOption('delete', node);
+                            onDeletePage(node);
                           }}
                         >
                           <i className="fa fa-trash mr-2" />
@@ -366,6 +192,11 @@ const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
                     className="folder-children"
+                    style={{
+                      overflow: 'visible',
+                      position: 'relative',
+                      zIndex: 1,
+                    }}
                   >
                     {renderTree(node.children)}
                   </motion.div>
@@ -382,27 +213,180 @@ const PageTree = ({ tree, selectedId, onSelect, onAddPage }) => {
 };
 
 export const Wiki = () => {
-  const [tree, setTree] = useState(mockTree);
-  const [selectedId, setSelectedId] = useState('page-1');
+  const { orgId, projectId } = useParams();
+  const [tree, setTree] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [title, setTitle] = useState('');
-  const selectedPage = findPageById(tree, selectedId) || tree[0];
+  const selectedPage = selectedId ? findPageById(tree, selectedId) : null;
+  const [saveTimeout, setSaveTimeout] = useState(null);
+  const [pageToDelete, setPageToDelete] = useState(null);
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [pageToMove, setPageToMove] = useState(null);
 
-  // Update title when selected page changes
-  React.useEffect(() => {
-    if (selectedPage) {
+  useEffect(() => {
+    if (selectedPage && selectedPage.title) {
       setTitle(selectedPage.title);
+    } else {
+      setTitle('');
     }
+    // const handleSelectPage = async (id) => {
+    //   const children = await getPagesByParentId(orgId, projectId, id);
+    //   if (children.length > 0) {
+    //     setTree((prevTree) => {
+    //       const updatedTree = [...prevTree];
+    //       const parentPage = findPageById(updatedTree, id);
+    //       if (parentPage) {
+    //         parentPage.children = children;
+    //       }
+    //       return updatedTree;
+    //     });
+    //   }
+    // }
+    // if( selectedPage && selectedPage.id){
+    //   handleSelectPage(selectedPage.id)
+    //
+    // }
   }, [selectedPage]);
 
-  // Placeholder handlers
-  const handleAddFolder = () => {};
-  const handleAddPage = (folderId) => {};
+  useEffect(() => {
+    fetchPages(undefined);
+  }, []);
+
+  const fetchPages = async (searchTerm) => {
+    const pages = await getPagesByParentId(orgId, projectId, null, searchTerm);
+    setTree(pages);
+    if (pages.length > 0 && !selectedId) {
+      setSelectedId(pages[0].id);
+    }
+  };
+  useEffect(() => {
+    console.log(tree);
+  }, [tree]);
+  const handleAddPage = async (parentId, isOpened, toggle) => {
+    try {
+      const page = await createPage(orgId, projectId, parentId);
+      const newTree = [...tree];
+      if (parentId) {
+        const parentPage = findPageById(newTree, parentId);
+        if (parentPage) {
+          if (!parentPage.children) parentPage.children = [];
+          parentPage.children.push(page);
+        }
+      } else {
+        newTree.push(page);
+      }
+      setTree(newTree);
+      setSelectedId(page.id);
+      if (parentId && toggle) {
+        await fillChildren(parentId, isOpened, toggle);
+      }
+      toast.success('Page created successfully');
+    } catch (e) {
+      toast.error('Failed to create page.');
+    }
+  };
 
   // Handle title change
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
-    // In a real app, you would update the page title in the database
+    if (saveTimeout) clearTimeout(saveTimeout);
+    setSaveTimeout(
+      setTimeout(async () => {
+        if (selectedId) {
+          await updatePage(orgId, projectId, selectedId, {
+            title: e.target.value,
+          });
+        }
+      }, 1000),
+    );
+
+    // Update the selected page title immediately in the UI
+    if (selectedPage) {
+      selectedPage.title = e.target.value;
+      setTree([...tree]); // Trigger re-render
+    }
+  };
+
+  function handleContentChange(newContent) {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    setSaveTimeout(
+      setTimeout(async () => {
+        await updatePage(orgId, projectId, selectedId, { content: newContent });
+        selectedPage.content = newContent;
+        setTree([...tree]); // Trigger re-render
+      }, 1000),
+    );
+  }
+
+  const handleDeletePage = async (page) => {
+    try {
+      await deletePage(orgId, projectId, page.id);
+      // Refetch or update tree after deleting
+      const pages = await getPagesByParentId(orgId, projectId, null);
+      setTree(pages);
+      // If deleted page was selected, clear selection or select first page
+      if (selectedId === page.id) {
+        setSelectedId(pages.length > 0 ? pages[0].id : null);
+      }
+      toast.success('Page deleted successfully');
+    } catch (e) {
+      console.error('Failed to delete page:', e);
+      toast.error('Failed to delete page');
+    } finally {
+      setPageToDelete(null);
+    }
+  };
+
+  const handleMovePage = (page) => {
+    console.log(page);
+    setPageToMove(page);
+    setMoveModalOpen(true);
+  };
+
+  const handleMoveConfirm = async (newParentId) => {
+    if (!pageToMove) return;
+    try {
+      // You may need to implement this API in your backend if not present
+      await updatePage(orgId, projectId, pageToMove.id, {
+        parentId: newParentId,
+      });
+      toast.success('Page moved successfully');
+      await fetchPages(searchTerm);
+      setSelectedId(pageToMove.id);
+    } catch (e) {
+      toast.error('Failed to move page.');
+    } finally {
+      setMoveModalOpen(false);
+      setPageToMove(null);
+    }
+  };
+
+  const handleSelectPage = async (id, toggle) => {
+    setSelectedId(id);
+    await fillChildren(id, false, toggle);
+  };
+
+  const fillChildren = async (parentId, isOpened, toggle) => {
+    const children = await getPagesByParentId(orgId, projectId, parentId);
+    if (children.length > 0) {
+      setTree((prevTree) => {
+        const updatedTree = [...prevTree];
+        const parentPage = findPageById(updatedTree, parentId);
+        if (parentPage) {
+          parentPage.children = children;
+        }
+        return updatedTree;
+      });
+      if (!isOpened) {
+        toggle(parentId);
+      }
+    }
+  };
+
+  const handleSearch = async (term) => {
+    setSearchTerm(term);
+    await fetchPages(term);
   };
 
   return (
@@ -436,42 +420,67 @@ export const Wiki = () => {
                     <i className="fa fa-search"></i>
                     <Input
                       type="text"
-                      class="focus:shadow-none"
+                      className="focus:shadow-none"
                       placeholder="Search pages..."
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onChange={(e) => handleSearch(e.target.value)}
                     />
                   </div>
 
                   <PageTree
                     tree={tree}
                     selectedId={selectedId}
-                    onSelect={setSelectedId}
+                    onSelect={handleSelectPage}
                     onAddPage={handleAddPage}
+                    onDeletePage={setPageToDelete}
+                    onMovePage={handleMovePage}
                   />
                 </Col>
 
                 <Col md="9" className="pl-md-5">
                   <motion.div
-                    key={selectedId}
+                    key={selectedId || 'empty'}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.2 }}
                     className="wiki-editor-container"
                   >
-                    <Input
-                      type="text"
-                      className="wiki-title"
-                      value={title}
-                      onChange={handleTitleChange}
-                      placeholder="Untitled"
-                    />
-
-                    <RichTextEditor
-                      value={selectedPage?.content}
-                      toolbar={true}
-                      bordered={false}
-                    />
+                    {tree.length === 0 ? (
+                      <div className="wiki-empty-state text-center p-5">
+                        <h4>No pages yet</h4>
+                        <p>Create your first page to get started.</p>
+                        <Button
+                          color="primary"
+                          onClick={() => handleAddPage(null)}
+                        >
+                          <i className="fa fa-plus mr-2" /> Add Page
+                        </Button>
+                      </div>
+                    ) : selectedPage ? (
+                      <>
+                        <Input
+                          type="text"
+                          className="wiki-title"
+                          value={title}
+                          onChange={handleTitleChange}
+                          placeholder="Untitled"
+                        />
+                        <RichTextEditor
+                          value={selectedPage?.content}
+                          toolbar={true}
+                          bordered={false}
+                          onChange={handleContentChange}
+                        />
+                      </>
+                    ) : (
+                      <div className="wiki-empty-state text-center p-5">
+                        <h4>Select a page</h4>
+                        <p>
+                          Choose a page from the sidebar to view or edit its
+                          content.
+                        </p>
+                      </div>
+                    )}
                   </motion.div>
                 </Col>
               </Row>
@@ -479,6 +488,23 @@ export const Wiki = () => {
           </Card>
         </motion.div>
       </Container>
+      <DeleteWarning
+        entity={
+          'page' +
+          (pageToDelete && pageToDelete.title ? `: ${pageToDelete.title}` : '')
+        }
+        isOpen={pageToDelete !== null}
+        onDelete={() => handleDeletePage(pageToDelete)}
+        toggle={() => setPageToDelete(null)}
+      />
+      <MovePageModal
+        isOpen={moveModalOpen}
+        toggle={() => setMoveModalOpen(false)}
+        onMove={handleMoveConfirm}
+        pageTree={tree}
+        currentParentId={pageToMove ? pageToMove.parentId : null}
+        idToMove={pageToMove ? pageToMove.id : null}
+      />
     </>
   );
 };
