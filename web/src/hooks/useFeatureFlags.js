@@ -3,7 +3,7 @@ export const FEATURES = {
 };
 
 const DISABLED_FEATURES = {
-  production: ['PAGES'],
+  production: [],
   development: [],
 };
 
