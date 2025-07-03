@@ -1,59 +1,6 @@
 // Utility functions for the AI Chat component
 
 /**
- * Converts markdown text to HTML
- * @param {string} markdown - The markdown text to convert
- * @returns {string} The converted HTML
- */
-export const markdownToHtml = (markdown) => {
-  if (!markdown) return '';
-
-  // Convert bold text: **text** or __text__ to <strong>text</strong>
-  let html = markdown.replace(/(\*\*|__)(.*?)\1/g, '<strong>$2</strong>');
-
-  // Convert code blocks: ```code``` to <pre><code>code</code></pre>
-  html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-
-  // Convert inline code: `code` to <code>code</code>
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-  // Convert lists: - item to <ul><li>item</li></ul>
-  html = html.replace(/(?:^|\n)- (.*)/g, '<ul><li>$1</li></ul>');
-  html = html.replace(/<\/ul>\s*<ul>/g, '');
-
-  // Convert links: [text](url) to <a href="url">text</a>
-  html = html.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>',
-  );
-
-  // Convert paragraphs: add <p> tags for text blocks
-  html = html.replace(/(?:^|\n)([^\n<]+)(?:\n|$)/g, '<p>$1</p>');
-  html = html.replace(/<p>\s*<\/p>/g, '');
-
-  return html;
-};
-
-/**
- * Simulates typing effect for AI responses
- * @param {string} text - The text to simulate typing for
- * @param {Function} callback - Callback function to update the text
- * @param {number} speed - Speed of typing in milliseconds
- * @returns {number} The interval ID
- */
-export const simulateTyping = (text, callback, speed = 30) => {
-  let i = 0;
-  const interval = setInterval(() => {
-    callback(text.substring(0, i));
-    i++;
-    if (i > text.length) {
-      clearInterval(interval);
-    }
-  }, speed);
-  return interval;
-};
-
-/**
  * Formats a timestamp to a readable time
  * @param {Date} date - The date to format
  * @returns {string} The formatted time string
