@@ -11,7 +11,7 @@ import {
 import { Project } from '../projects/project.entity';
 
 @Entity()
-export class WikiPage {
+export class Page {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column({ default: null, nullable: true })
@@ -22,14 +22,14 @@ export class WikiPage {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @ManyToOne(() => WikiPage, (wikiPage) => wikiPage.children, {
+  @ManyToOne(() => Page, (page) => page.children, {
     nullable: true,
   })
-  parent: WikiPage;
-  @RelationId((wikiPage: WikiPage) => wikiPage.parent)
+  parent: Page;
+  @RelationId((page: Page) => page.parent)
   parentId: string | null;
-  @OneToMany(() => WikiPage, (wikiPage) => wikiPage.parent)
-  children: WikiPage[];
-  @ManyToOne(() => Project, (project) => project.wikiPages, { eager: true })
+  @OneToMany(() => Page, (page) => page.parent)
+  children: Page[];
+  @ManyToOne(() => Project, (project) => project.pages, { eager: true })
   project: Project;
 }

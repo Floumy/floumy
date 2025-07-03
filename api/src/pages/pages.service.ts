@@ -1,26 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { WikiPage } from './wiki-page.entity';
+import { Page } from './pages.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository, ILike } from 'typeorm';
 import { Project } from '../projects/project.entity';
-import { CreateWikiPageDto, UpdateWikiPageDto } from './wiki-page.dtos';
+import { CreatePageDto, UpdatePageDto } from './pages.dtos';
 
 @Injectable()
-export class WikiService {
+export class PagesService {
   constructor(
-    @InjectRepository(WikiPage)
-    private wikiPageRepository: Repository<WikiPage>,
+    @InjectRepository(Page)
+    private pageRepository: Repository<Page>,
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
   ) {}
 
-  async createPage(projectId, data: CreateWikiPageDto) {
-    const page = new WikiPage();
+  async createPage(projectId, data: CreatePageDto) {
+    const page = new Page();
     page.project = await this.projectRepository.findOneByOrFail({
       id: projectId,
     });
     if (data.parentId) {
-      const parentPage = await this.wikiPageRepository.findOneBy({
+      const parentPage = await this.pageRepository.findOneBy({
         id: data.parentId,
         project: { id: projectId },
       });
@@ -29,7 +29,7 @@ export class WikiService {
       }
       page.parent = parentPage;
     }
-    await this.wikiPageRepository.save(page);
+    await this.pageRepository.save(page);
     return {
       id: page.id,
       title: page.title,
@@ -48,7 +48,7 @@ export class WikiService {
     const project = await this.projectRepository.findOneByOrFail({
       id: projectId,
     });
-    const res = await this.wikiPageRepository.find({
+    const res = await this.pageRepository.find({
       where: {
         project: {
           id: project.id,
@@ -76,8 +76,8 @@ export class WikiService {
     });
   }
 
-  async updatePage(id: string, data: UpdateWikiPageDto) {
-    const page = await this.wikiPageRepository.findOneByOrFail({ id });
+  async updatePage(id: string, data: UpdatePageDto) {
+    const page = await this.pageRepository.findOneByOrFail({ id });
     if (data.title) {
       page.title = data.title;
     }
@@ -88,7 +88,7 @@ export class WikiService {
       if (data.parentId === null) {
         page.parent = null;
       } else {
-        const parentPage = await this.wikiPageRepository.findOneBy({
+        const parentPage = await this.pageRepository.findOneBy({
           id: data.parentId,
         });
         if (!parentPage) {
@@ -97,11 +97,11 @@ export class WikiService {
         page.parent = parentPage;
       }
     }
-    await this.wikiPageRepository.save(page);
+    await this.pageRepository.save(page);
   }
 
   async deletePage(id: string) {
-    const page = await this.wikiPageRepository.findOneByOrFail({ id });
-    await this.wikiPageRepository.remove(page);
+    const page = await this.pageRepository.findOneByOrFail({ id });
+    await this.pageRepository.remove(page);
   }
 }

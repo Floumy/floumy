@@ -1,12 +1,12 @@
-/* Notion-like styling for Wiki */
+/* Notion-like styling for pages */
 
 /* Sidebar styling */
-.wiki-list-group {
+.pages-list-group {
   margin-bottom: 0;
   padding: 0.25rem;
 }
 
-.wiki-list-group-item {
+.pages-list-group-item {
   border: none !important;
   border-radius: 6px !important;
   margin-bottom: 3px;
@@ -17,17 +17,17 @@
   overflow: hidden;
 }
 
-.wiki-list-group-item:hover {
+.pages-list-group-item:hover {
   background-color: rgba(55, 53, 47, 0.06);
   transform: translateX(2px);
 }
 
-.wiki-list-group-item.selected {
+.pages-list-group-item.selected {
   background-color: rgba(55, 53, 47, 0.08);
   font-weight: 500;
 }
 
-.wiki-list-group-item::after {
+.pages-list-group-item::after {
   content: '';
   position: absolute;
   left: 0;
@@ -38,11 +38,11 @@
   transition: width 0.2s ease;
 }
 
-.wiki-list-group-item.selected::after {
+.pages-list-group-item.selected::after {
   width: 3px;
 }
 
-.wiki-list-group-item .node-title {
+.pages-list-group-item .node-title {
   font-size: 14px;
   color: #37352f;
   flex: 1;
@@ -51,13 +51,13 @@
   text-overflow: ellipsis;
 }
 
-.wiki-list-group-item .folder-icon {
+.pages-list-group-item .folder-icon {
   color: #37352f;
   width: 16px;
   font-size: 12px;
 }
 
-.wiki-list-group-item .file-icon {
+.pages-list-group-item .file-icon {
   color: #37352f;
   opacity: 0.6;
   width: 16px;
@@ -71,22 +71,22 @@
 }
 
 /* Hover controls */
-.wiki-list-group-item .hover-controls {
+.pages-list-group-item .hover-controls {
   display: none;
   align-items: center;
   position: absolute;
   right: 8px;
 }
 
-.wiki-list-group-item {
+.pages-list-group-item {
   position: relative;
 }
 
-.wiki-list-group-item:hover .hover-controls {
+.pages-list-group-item:hover .hover-controls {
   display: flex;
 }
 
-.wiki-control-btn {
+.pages-control-btn {
   color: #6b7280 !important;
   padding: 2px 6px !important;
   margin-left: 2px;
@@ -94,12 +94,12 @@
   box-shadow: none !important;
 }
 
-.wiki-control-btn:hover {
+.pages-control-btn:hover {
   background-color: rgba(55, 53, 47, 0.08) !important;
   color: #37352f !important;
 }
 
-.wiki-dropdown-menu {
+.pages-dropdown-menu {
   border-radius: 8px;
   padding: 8px 0;
   min-width: 200px;
@@ -114,11 +114,11 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.wiki-dropdown-menu .dropdown-item {
+.pages-dropdown-menu .dropdown-item {
   padding: 0;
 }
 
-.wiki-dropdown-menu .dropdown-btn-item {
+.pages-dropdown-menu .dropdown-btn-item {
   background: none;
   border: none;
   width: 100%;
@@ -130,18 +130,18 @@
   border-radius: 0;
 }
 
-.wiki-dropdown-menu .dropdown-btn-item:hover {
+.pages-dropdown-menu .dropdown-btn-item:hover {
   background-color: rgba(55, 53, 47, 0.06);
   color: #5e72e4;
 }
 
 /* Search bar */
-.wiki-search {
+.pages-search {
   margin-bottom: 20px;
   position: relative;
 }
 
-.wiki-search input {
+.pages-search input {
   border-radius: 8px;
   border: 1px solid rgba(55, 53, 47, 0.16);
   padding: 10px 12px 10px 36px;
@@ -151,22 +151,22 @@
   width: 100%;
 }
 
-.wiki-search input:focus {
+.pages-search input:focus {
   border-color: #5e72e4;
   box-shadow: 0 0 0 2px rgba(94, 114, 228, 0.15);
   background-color: #fff;
 }
 
-.wiki-search input::placeholder {
+.pages-search input::placeholder {
   color: #9ca3af;
   transition: color 0.2s ease;
 }
 
-.wiki-search input:focus::placeholder {
+.pages-search input:focus::placeholder {
   color: #d1d5db;
 }
 
-.wiki-search i {
+.pages-search i {
   position: absolute;
   left: 12px;
   top: 50%;
@@ -176,13 +176,13 @@
   transition: color 0.2s ease;
 }
 
-.wiki-search input:focus + i,
-.wiki-search:hover i {
+.pages-search input:focus + i,
+.pages-search:hover i {
   color: #5e72e4;
 }
 
 /* Editor area styling */
-.wiki-editor-container {
+.pages-editor-container {
   border-radius: 10px;
   overflow: scroll;
   min-height: calc(100vh - 180px); /* Adjust for header, footer, and padding */
@@ -195,7 +195,7 @@
   position: relative;
 }
 
-.wiki-title {
+.pages-title {
   font-size: 36px;
   font-weight: 700;
   color: #37352f;
@@ -209,20 +209,20 @@
   letter-spacing: -0.01em;
 }
 
-.wiki-title:focus {
+.pages-title:focus {
   outline: none;
   box-shadow: none;
   border-radius: 0;
   border-bottom-color: rgba(55, 53, 47, 0.08);
 }
 
-.wiki-title::placeholder {
+.pages-title::placeholder {
   color: rgba(55, 53, 47, 0.4);
   font-weight: 500;
 }
 
 /* Sidebar header */
-.wiki-sidebar-header {
+.pages-sidebar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -231,7 +231,7 @@
   border-bottom: 1px solid rgba(55, 53, 47, 0.06);
 }
 
-.wiki-sidebar-title {
+.pages-sidebar-title {
   font-size: 16px;
   font-weight: 600;
   color: #37352f;
@@ -241,7 +241,7 @@
   padding-left: 2px;
 }
 
-.wiki-sidebar-title::after {
+.pages-sidebar-title::after {
   content: '';
   position: absolute;
   bottom: -4px;
@@ -252,12 +252,12 @@
   border-radius: 2px;
 }
 
-.wiki-add-buttons {
+.pages-add-buttons {
   display: flex;
   gap: 6px;
 }
 
-.wiki-add-btn {
+.pages-add-btn {
   color: #6b7280 !important;
   padding: 6px 10px !important;
   border-radius: 6px;
@@ -266,13 +266,13 @@
   overflow: hidden;
 }
 
-.wiki-add-btn:hover {
+.pages-add-btn:hover {
   background-color: rgba(94, 114, 228, 0.08) !important;
   color: #5e72e4 !important;
   transform: translateY(-1px);
 }
 
-.wiki-add-btn:active {
+.pages-add-btn:active {
   transform: translateY(0);
 }
 

@@ -59,7 +59,7 @@ import DetailOrgOKR from './views/pages/okrs/DetailOrgOKR';
 import DetailOrgKeyResult from './views/pages/okrs/DetailOrgKeyResult';
 import NewOrgOKR from './views/pages/okrs/NewOrgOKR';
 import PermissionDenied from './views/pages/errors/PermissionDenied';
-import { Wiki } from './views/pages/wiki/Wiki';
+import { Pages } from './views/pages/pages/Pages';
 
 const routes = [
   {
@@ -319,8 +319,8 @@ const routes = [
   },
   {
     redirect: true,
-    path: '/wiki',
-    component: <Wiki />,
+    path: '/pages',
+    component: <Pages />,
     layout: '/admin',
   },
   {
