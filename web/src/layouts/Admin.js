@@ -61,6 +61,7 @@ function Admin() {
     `/admin/orgs/${orgId}/projects/${projectId}/initiatives`,
   );
   useNavigationHotKey('8', `/admin/orgs/${orgId}/projects/${projectId}/code`);
+  useNavigationHotKey('9', `/admin/orgs/${orgId}/projects/${projectId}/pages`);
   useNavigationHotKey(
     'w',
     `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`,

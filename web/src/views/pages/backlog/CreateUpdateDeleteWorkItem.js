@@ -498,7 +498,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         </Col>
                       </Row>
                     )}
-                    <Row className="mb-3">
+                    <Row className="mb-5">
                       <Col>
                         <label
                           className="form-control-label"
