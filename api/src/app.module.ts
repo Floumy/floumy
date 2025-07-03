@@ -38,6 +38,7 @@ import { GitlabModule } from './gitlab/gitlab.module';
 import githubConfig from './config/github.config';
 import gitlabConfig from './config/gitlab.config';
 import { DemoModule } from './demo/demo.module';
+import { WikiModule } from './wiki/wiki.module';
 
 @Module({
   imports: [
@@ -70,7 +71,7 @@ import { DemoModule } from './demo/demo.module';
           migrations: [__dirname + '/migrations/*{.ts,.js}'],
           migrationsRun: true,
           synchronize: false,
-          logging: false,
+          logging: configService.get('app.environment') !== 'production',
         };
 
         if (configService.get('database.ssl')) {
@@ -112,6 +113,7 @@ import { DemoModule } from './demo/demo.module';
     GithubModule,
     GitlabModule,
     DemoModule,
+    WikiModule,
   ],
   providers: [
     {
