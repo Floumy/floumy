@@ -1,9 +1,9 @@
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { WikiController } from './wiki.controller';
-import { WikiService } from './wiki.service';
-import { WikiPage } from './wiki-page.entity';
+import { PagesController } from './pages.controller';
+import { PagesService } from './pages.service';
+import { Page } from './pages.entity';
 import { Project } from '../projects/project.entity';
-import { CreateWikiPageDto } from './wiki-page.dtos';
+import { CreatePageDto } from './pages.dtos';
 import { setupTestingModule } from '../../test/test.utils';
 import { User } from '../users/user.entity';
 import { AuthModule } from '../auth/auth.module';
@@ -11,8 +11,8 @@ import { Org } from '../orgs/org.entity';
 import { OrgsService } from '../orgs/orgs.service';
 import { UsersService } from '../users/users.service';
 
-describe('WikiController', () => {
-  let controller: WikiController;
+describe('PagesController', () => {
+  let controller: PagesController;
   let project: Project;
   let org: Org;
   let user: User;
@@ -20,12 +20,12 @@ describe('WikiController', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([WikiPage, Project, User]), AuthModule],
-      [WikiService],
-      [WikiController],
+      [TypeOrmModule.forFeature([Page, Project, User]), AuthModule],
+      [PagesService],
+      [PagesController],
     );
     cleanup = dbCleanup;
-    controller = module.get<WikiController>(WikiController);
+    controller = module.get<PagesController>(PagesController);
     const orgsService = module.get<OrgsService>(OrgsService);
     const usersService = module.get<UsersService>(UsersService);
     const orgsRepository = module.get(getRepositoryToken(Org));
@@ -46,7 +46,7 @@ describe('WikiController', () => {
   });
 
   it('should create a page', async () => {
-    const dto: CreateWikiPageDto = { parentId: null };
+    const dto: CreatePageDto = { parentId: null };
     const result = await controller.createPage(org.id, project.id, dto, {
       user: { org: org.id, id: user.id },
     });
@@ -56,7 +56,7 @@ describe('WikiController', () => {
   });
 
   it('should get pages by root parent', async () => {
-    const dto: CreateWikiPageDto = { parentId: null };
+    const dto: CreatePageDto = { parentId: null };
     const page = await controller.createPage(org.id, project.id, dto, {
       user: { org: org.id, id: user.id },
     });
@@ -73,11 +73,11 @@ describe('WikiController', () => {
   });
 
   it('should get pages by parent', async () => {
-    const dto: CreateWikiPageDto = { parentId: null };
+    const dto: CreatePageDto = { parentId: null };
     const page = await controller.createPage(org.id, project.id, dto, {
       user: { org: org.id, id: user.id },
     });
-    const childDto: CreateWikiPageDto = { parentId: page.id };
+    const childDto: CreatePageDto = { parentId: page.id };
     const childPage = await controller.createPage(
       org.id,
       project.id,
@@ -95,7 +95,7 @@ describe('WikiController', () => {
   });
 
   it('should search pages by title', async () => {
-    const dto: CreateWikiPageDto = { parentId: null };
+    const dto: CreatePageDto = { parentId: null };
     await controller.createPage(org.id, project.id, dto, {
       user: { org: org.id, id: user.id },
     });
@@ -121,7 +121,7 @@ describe('WikiController', () => {
   });
 
   it('should update a page', async () => {
-    const dto: CreateWikiPageDto = { parentId: null };
+    const dto: CreatePageDto = { parentId: null };
     const page = await controller.createPage(org.id, project.id, dto, {
       user: { org: org.id, id: user.id },
     });
@@ -143,7 +143,7 @@ describe('WikiController', () => {
     expect(result[0]).toHaveProperty('content', 'Updated Content');
   });
   it('should delete a page', async () => {
-    const dto: CreateWikiPageDto = { parentId: null };
+    const dto: CreatePageDto = { parentId: null };
     const page = await controller.createPage(org.id, project.id, dto, {
       user: { org: org.id, id: user.id },
     });
@@ -157,7 +157,7 @@ describe('WikiController', () => {
     expect(result).toHaveLength(0);
   });
   it('should move a page', async () => {
-    const dto: CreateWikiPageDto = { parentId: null };
+    const dto: CreatePageDto = { parentId: null };
     const page = await controller.createPage(org.id, project.id, dto, {
       user: { org: org.id, id: user.id },
     });

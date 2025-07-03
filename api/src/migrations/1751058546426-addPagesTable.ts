@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddWikiPagesTable1751058546426 implements MigrationInterface {
+export class AddPageTable1751058546426 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            CREATE TABLE "wiki_page"
+            CREATE TABLE "page"
             (
                 "id"        uuid PRIMARY KEY       DEFAULT uuid_generate_v4(),
                 "title"     VARCHAR                  DEFAULT NULL,
@@ -16,14 +16,14 @@ export class AddWikiPagesTable1751058546426 implements MigrationInterface {
             )`);
 
     await queryRunner.query(`
-            ALTER TABLE "wiki_page"
-                ADD CONSTRAINT "FK_wiki_page_parent" FOREIGN KEY ("parentId") REFERENCES "wiki_page" ("id") ON DELETE CASCADE
+            ALTER TABLE "page"
+                ADD CONSTRAINT "FK_page_parent" FOREIGN KEY ("parentId") REFERENCES "page" ("id") ON DELETE CASCADE
         `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            DROP TABLE "wiki_page"  
+            DROP TABLE "page"  
         `);
   }
 }

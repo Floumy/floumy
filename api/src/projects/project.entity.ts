@@ -28,7 +28,7 @@ import { GithubPullRequest } from '../github/github-pull-request.entity';
 import { GithubBranch } from '../github/github-branch.entity';
 import { GitlabBranch } from '../gitlab/gitlab-branch.entity';
 import { GitlabMergeRequest } from '../gitlab/gitlab-merge-request.entity';
-import { WikiPage } from '../wiki/wiki-page.entity';
+import { Page } from '../pages/pages.entity';
 
 @Entity()
 export class Project {
@@ -129,6 +129,6 @@ export class Project {
     { lazy: true },
   )
   gitlabMergeRequests: Promise<GitlabMergeRequest[]>;
-  @OneToMany(() => WikiPage, (wikiPage) => wikiPage.project, { lazy: true })
-  wikiPages: Promise<WikiPage[]>;
+  @OneToMany(() => Page, (wikiPage) => wikiPage.project, { lazy: true })
+  pages: Promise<Page[]>;
 }

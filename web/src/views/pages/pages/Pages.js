@@ -18,13 +18,13 @@ import {
 import RichTextEditor from 'components/RichTextEditor/RichTextEditor';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import { AnimatePresence, motion } from 'framer-motion';
-import './Wiki.css';
+import './Pages.css';
 import {
   createPage,
   deletePage,
   getPagesByParentId,
   updatePage,
-} from '../../../services/wiki/wiki.service';
+} from '../../../services/pages/pages.service';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import DeleteWarning from '../components/DeleteWarning';
@@ -65,7 +65,7 @@ const PageTree = ({
   const renderTree = (nodes) => {
     if (!Array.isArray(nodes)) return null;
     return (
-      <ListGroup flush className="wiki-list-group">
+      <ListGroup flush className="pages-list-group">
         {nodes.map((node) => {
           const isOpen = openPages[node.id] === true;
           const isHovered = hovered === node.id;
@@ -79,7 +79,7 @@ const PageTree = ({
               transition={{ duration: 0.2 }}
             >
               <ListGroupItem
-                className={`wiki-list-group-item d-flex align-items-center py-2 position-relative ${isSelected ? 'selected' : ''}`}
+                className={`pages-list-group-item d-flex align-items-center py-2 position-relative ${isSelected ? 'selected' : ''}`}
                 style={{
                   overflow: 'visible',
                   position: 'relative',
@@ -131,7 +131,7 @@ const PageTree = ({
                 >
                   <Button
                     color="link"
-                    className="wiki-control-btn focus:box-shadow-none"
+                    className="pages-control-btn focus:box-shadow-none"
                     title="Add Child Page"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -150,12 +150,12 @@ const PageTree = ({
                   >
                     <DropdownToggle
                       color="link"
-                      className="wiki-control-btn"
+                      className="pages-control-btn"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <i className="fa fa-ellipsis" />
                     </DropdownToggle>
-                    <DropdownMenu className="wiki-dropdown-menu">
+                    <DropdownMenu className="pages-dropdown-menu">
                       <DropdownItem>
                         <Button
                           className="dropdown-btn-item"
@@ -212,7 +212,7 @@ const PageTree = ({
   return renderTree(tree);
 };
 
-export const Wiki = () => {
+export const Pages = () => {
   const { orgId, projectId } = useParams();
   const [tree, setTree] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -402,12 +402,12 @@ export const Wiki = () => {
             <CardBody className="p-4">
               <Row>
                 <Col md="3" className="pr-md-0">
-                  <div className="wiki-sidebar-header">
-                    <h6 className="wiki-sidebar-title">Pages</h6>
-                    <div className="wiki-add-buttons">
+                  <div className="pages-sidebar-header">
+                    <h6 className="pages-sidebar-title">Pages</h6>
+                    <div className="pages-add-buttons">
                       <Button
                         color="link"
-                        className="wiki-add-btn"
+                        className="pages-add-btn"
                         title="Add Page"
                         onClick={() => handleAddPage(null)}
                       >
@@ -416,7 +416,7 @@ export const Wiki = () => {
                     </div>
                   </div>
 
-                  <div className="wiki-search">
+                  <div className="pages-search">
                     <i className="fa fa-search"></i>
                     <Input
                       type="text"
@@ -443,10 +443,10 @@ export const Wiki = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.2 }}
-                    className="wiki-editor-container"
+                    className="pages-editor-container"
                   >
                     {tree.length === 0 ? (
-                      <div className="wiki-empty-state text-center p-5">
+                      <div className="pages-empty-state text-center p-5">
                         <h4>No pages yet</h4>
                         <p>Create your first page to get started.</p>
                         <Button
@@ -460,7 +460,7 @@ export const Wiki = () => {
                       <>
                         <Input
                           type="text"
-                          className="wiki-title"
+                          className="pages-title"
                           value={title}
                           onChange={handleTitleChange}
                           placeholder="Untitled"
@@ -473,7 +473,7 @@ export const Wiki = () => {
                         />
                       </>
                     ) : (
-                      <div className="wiki-empty-state text-center p-5">
+                      <div className="pages-empty-state text-center p-5">
                         <h4>Select a page</h4>
                         <p>
                           Choose a page from the sidebar to view or edit its

@@ -12,21 +12,21 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { WikiService } from './wiki.service';
+import { PagesService } from './pages.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { CreateWikiPageDto, UpdateWikiPageDto } from './wiki-page.dtos';
+import { CreatePageDto, UpdatePageDto } from './pages.dtos';
 
-@Controller('/orgs/:orgId/projects/:projectId/wiki')
+@Controller('/orgs/:orgId/projects/:projectId/pages')
 @UseGuards(AuthGuard)
-export class WikiController {
-  constructor(private readonly wikiService: WikiService) {}
+export class PagesController {
+  constructor(private readonly pagesService: PagesService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createPage(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
-    @Body() body: CreateWikiPageDto,
+    @Body() body: CreatePageDto,
     @Request() request,
   ) {
     const { org: userOrgId } = request.user;
@@ -34,7 +34,7 @@ export class WikiController {
     if (orgId !== userOrgId) {
       throw new UnauthorizedException();
     }
-    return await this.wikiService.createPage(projectId, body);
+    return await this.pagesService.createPage(projectId, body);
   }
 
   @Get()
@@ -49,7 +49,7 @@ export class WikiController {
     if (orgId !== userOrgId) {
       throw new UnauthorizedException();
     }
-    return this.wikiService.getPagesByParent(
+    return this.pagesService.getPagesByParent(
       projectId,
       request.query.parentId,
       request.query.search,
@@ -61,14 +61,14 @@ export class WikiController {
     @Param('orgId') orgId: string,
     @Param('id') id: string,
     @Request() request,
-    @Body() body: UpdateWikiPageDto,
+    @Body() body: UpdatePageDto,
   ) {
     const { org: userOrgId } = request.user;
 
     if (orgId !== userOrgId) {
       throw new UnauthorizedException();
     }
-    return this.wikiService.updatePage(id, body);
+    return this.pagesService.updatePage(id, body);
   }
 
   @Delete(':id')
@@ -82,6 +82,6 @@ export class WikiController {
     if (orgId !== userOrgId) {
       throw new UnauthorizedException();
     }
-    return this.wikiService.deletePage(id);
+    return this.pagesService.deletePage(id);
   }
 }

@@ -3,7 +3,7 @@ export const FEATURES = {
 };
 
 const DISABLED_FEATURES = {
-  production: ['WIKI'],
+  production: ['PAGES'],
   development: [],
 };
 
