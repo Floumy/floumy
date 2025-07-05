@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ChatOpenAI } from '@langchain/openai';
 import {
   AIMessage,
+  AIMessageChunk,
   HumanMessage,
   SystemMessage,
 } from '@langchain/core/messages';
@@ -13,6 +14,10 @@ import { formatDocumentsAsString } from 'langchain/util/document';
 import { Repository } from 'typeorm';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { tool } from '@langchain/core/tools';
+import { z } from 'zod';
+import { createReactAgent } from '@langchain/langgraph/prebuilt';
+import { Org } from '../../orgs/org.entity';
 
 @Injectable()
 export class ChatService {
@@ -23,6 +28,8 @@ export class ChatService {
     private documentVectorStoreService: DocumentVectorStoreService,
     @InjectRepository(WorkItem)
     private workItemRepository: Repository<WorkItem>,
+    @InjectRepository(Org)
+    private orgRepository: Repository<Org>,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
@@ -89,50 +96,82 @@ export class ChatService {
       const runStream = async () => {
         try {
           const model = new ChatOpenAI({
-            model: 'chatgpt-4o-latest',
-            streaming: true,
+            model: 'gpt-4o',
             openAIApiKey: this.apiKey,
             temperature: 0.1,
           });
 
-          // const findOneWorkItem = tool(
-          //   async ({ workItemReference }) => {
-          //     if (!workItemReference) {
-          //       return 'Please provide a work item reference';
-          //     }
-          //
-          //     const workItem = await this.workItemRepository.findOneBy({
-          //       reference: workItemReference,
-          //       org: {
-          //         id: orgId,
-          //       },
-          //     });
-          //
-          //     return `
-          //     Title: ${workItem.title}
-          //     Description: ${workItem.description}
-          //     Estimation: ${workItem.estimation}
-          //     Priority: ${workItem.priority}
-          //     Type: ${workItem.type}
-          //     Status: ${workItem.status}
-          //     Reference: ${workItem.reference}
-          //     `;
-          //   },
-          //   {
-          //     name: 'find-one-work-item',
-          //     description:
-          //       'Find a work item in the system based on its reference.',
-          //     schema: z.object({
-          //       workItemReference: z
-          //         .string()
-          //         .describe(
-          //           'The work item reference to search for in the form of WI-123',
-          //         ),
-          //     }),
-          //   },
-          // );
-          //
-          // model.bindTools([findOneWorkItem]);
+          const findOneWorkItem = tool(
+            async ({ workItemReference }) => {
+              if (!workItemReference) {
+                return 'Please provide a work item reference';
+              }
+
+              const workItem = await this.workItemRepository.findOneBy({
+                reference: workItemReference,
+                org: {
+                  id: orgId,
+                },
+              });
+
+              return `
+              Title: ${workItem.title}
+              Description: ${workItem.description}
+              Estimation: ${workItem.estimation}
+              Priority: ${workItem.priority}
+              Type: ${workItem.type}
+              Status: ${workItem.status}
+              Reference: ${workItem.reference}
+              `;
+            },
+            {
+              name: 'find-one-work-item',
+              description:
+                'Find a work item in the system based on its reference.',
+              schema: z.object({
+                workItemReference: z
+                  .string()
+                  .describe(
+                    'The work item reference to search for in the form of WI-123',
+                  ),
+              }),
+            },
+          );
+
+          const createWorkItem = tool(
+            async ({ workItemTitle, workItemDescription }) => {
+              if (!workItemTitle) {
+                return 'Please provide a work item title';
+              }
+
+              if (!workItemDescription) {
+                return 'Please provide a work item description';
+              }
+              const org = await this.orgRepository.findOneByOrFail({
+                id: orgId,
+              });
+              const workItem = new WorkItem();
+              workItem.title = workItemTitle;
+              workItem.description = workItemDescription;
+              workItem.org = Promise.resolve(org);
+              await this.workItemRepository.save(workItem);
+            },
+            {
+              name: 'create-work-item',
+              description: 'Create a new work item in the system.',
+              schema: z.object({
+                workItemTitle: z.string().describe('The work item title.'),
+                workItemDescription: z
+                  .string()
+                  .describe('The work item description.'),
+              }),
+            },
+          );
+
+          const agent = createReactAgent({
+            llm: model,
+            tools: [findOneWorkItem, createWorkItem],
+          });
 
           let prompt = message;
 
@@ -184,24 +223,32 @@ export class ChatService {
                   `,
           );
 
-          const stream = await model.stream([
-            systemMessage,
-            ...historyMessages,
-            new HumanMessage(message),
-          ]);
+          const stream = await agent.stream(
+            {
+              messages: [
+                systemMessage,
+                ...historyMessages,
+                new HumanMessage(message),
+              ],
+            },
+            { streamMode: 'messages' },
+          );
 
           let aiMessage = '';
-          for await (const chunk of stream) {
-            subscriber.next({
-              id: new Date().toISOString(),
-              type: 'message',
-              data: {
-                id: messageId,
-                text: chunk.content,
-                isUser: false,
-              },
-            });
-            aiMessage += chunk.text;
+          for await (const record of stream) {
+            const chunk = record[0];
+            if (chunk instanceof AIMessageChunk) {
+              subscriber.next({
+                id: new Date().toISOString(),
+                type: 'message',
+                data: {
+                  id: messageId,
+                  text: chunk.content,
+                  isUser: false,
+                },
+              });
+              aiMessage += chunk.text;
+            }
           }
 
           await this.getMessageHistory(sessionId).addMessage(
