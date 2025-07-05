@@ -22,13 +22,8 @@ export const initialMessages = [
 // Example prompts for quick selection
 export const examplePrompts = [
   'Help me define OKRs',
-  'Create initiatives',
-  'Add work items to an initiative',
-  'Create work item',
-  'Define quarterly objectives',
-  'Track OKR progress',
-  'Prioritize work items',
-  'Create sprint plan',
+  'Help me define initiatives',
+  'Help me define work items',
 ];
 
 // Mock context data
