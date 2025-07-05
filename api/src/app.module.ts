@@ -38,6 +38,7 @@ import { GitlabModule } from './gitlab/gitlab.module';
 import githubConfig from './config/github.config';
 import gitlabConfig from './config/gitlab.config';
 import { DemoModule } from './demo/demo.module';
+import { PagesModule } from './pages/pages.module';
 
 @Module({
   imports: [
@@ -112,6 +113,7 @@ import { DemoModule } from './demo/demo.module';
     GithubModule,
     GitlabModule,
     DemoModule,
+    PagesModule,
   ],
   providers: [
     {

@@ -59,6 +59,7 @@ import DetailOrgOKR from './views/pages/okrs/DetailOrgOKR';
 import DetailOrgKeyResult from './views/pages/okrs/DetailOrgKeyResult';
 import NewOrgOKR from './views/pages/okrs/NewOrgOKR';
 import PermissionDenied from './views/pages/errors/PermissionDenied';
+import { Pages } from './views/pages/pages/Pages';
 
 const routes = [
   {
@@ -314,6 +315,12 @@ const routes = [
     redirect: true,
     path: '/code',
     component: <Code />,
+    layout: '/admin',
+  },
+  {
+    redirect: true,
+    path: '/pages',
+    component: <Pages />,
     layout: '/admin',
   },
   {
