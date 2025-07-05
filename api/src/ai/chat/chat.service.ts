@@ -10,6 +10,9 @@ import { Observable } from 'rxjs';
 import { PostgresChatMessageHistory } from '@langchain/community/stores/message/postgres';
 import { DocumentVectorStoreService } from '../documents/document-vector-store.service';
 import { formatDocumentsAsString } from 'langchain/util/document';
+import { Repository } from 'typeorm';
+import { WorkItem } from '../../backlog/work-items/work-item.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ChatService {
@@ -18,6 +21,8 @@ export class ChatService {
   constructor(
     private configService: ConfigService,
     private documentVectorStoreService: DocumentVectorStoreService,
+    @InjectRepository(WorkItem)
+    private workItemRepository: Repository<WorkItem>,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
@@ -89,6 +94,45 @@ export class ChatService {
             openAIApiKey: this.apiKey,
             temperature: 0.1,
           });
+
+          // const findOneWorkItem = tool(
+          //   async ({ workItemReference }) => {
+          //     if (!workItemReference) {
+          //       return 'Please provide a work item reference';
+          //     }
+          //
+          //     const workItem = await this.workItemRepository.findOneBy({
+          //       reference: workItemReference,
+          //       org: {
+          //         id: orgId,
+          //       },
+          //     });
+          //
+          //     return `
+          //     Title: ${workItem.title}
+          //     Description: ${workItem.description}
+          //     Estimation: ${workItem.estimation}
+          //     Priority: ${workItem.priority}
+          //     Type: ${workItem.type}
+          //     Status: ${workItem.status}
+          //     Reference: ${workItem.reference}
+          //     `;
+          //   },
+          //   {
+          //     name: 'find-one-work-item',
+          //     description:
+          //       'Find a work item in the system based on its reference.',
+          //     schema: z.object({
+          //       workItemReference: z
+          //         .string()
+          //         .describe(
+          //           'The work item reference to search for in the form of WI-123',
+          //         ),
+          //     }),
+          //   },
+          // );
+          //
+          // model.bindTools([findOneWorkItem]);
 
           let prompt = message;
 

@@ -26,7 +26,8 @@
   "dependencies": {
     "@gitbeaker/node": "^35.8.1",
     "@langchain/community": "^0.3.47",
-    "@langchain/core": "^0.3.61",
+    "@langchain/core": "^0.3.62",
+    "@langchain/langgraph": "^0.3.6",
     "@langchain/openai": "^0.5.16",
     "@nestjs/cache-manager": "^2.2.1",
     "@nestjs/common": "^10.0.0",
@@ -60,7 +61,8 @@
     "stripe": "^15.8.0",
     "uuidv4": "^6.2.13",
     "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "zod": "^3.25.74"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
