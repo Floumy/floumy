@@ -22,7 +22,7 @@ export const ChatContainer = styled(motion.div)`
   @media (max-width: 2000px) {
     box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
     /* On medium or smaller screens, don't push content, just overlay */
-    position: absolute;
+    position: fixed;
   }
 `;
 

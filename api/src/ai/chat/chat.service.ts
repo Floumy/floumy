@@ -37,6 +37,38 @@ export class ChatService {
     });
   }
 
+  private async shouldUseRag(message: string): Promise<boolean> {
+    const classifier = new ChatOpenAI({
+      model: 'gpt-3.5-turbo-0125',
+      streaming: true,
+      openAIApiKey: this.apiKey,
+      temperature: 0.1,
+    });
+
+    const response = await classifier.invoke([
+      new SystemMessage(`You are a query classifier that determines if a user's question requires accessing specific system data.
+        Reply with either "true" or "false" only.
+        
+        Return "true" if the query is about:
+        - Specific projects, tasks, or work items in the system
+        - OKRs, objectives, or key results
+        - Organization or team specific information
+        - Sprints or backlog items
+        - Any stored documents or internal data
+        - Anything that happened in the past
+        - Any reference like O-123, KR-123, I-123, WI-123, etc. 
+        
+        Return "false" if the query is about:
+        - General questions
+        - Generic concepts
+        - Conversational exchanges
+        - Technical support unrelated to system data`),
+      new HumanMessage(message),
+    ]);
+
+    return response.text.toLowerCase().includes('true');
+  }
+
   public sendMessageStream(
     userId: string,
     orgId: string,
@@ -58,25 +90,29 @@ export class ChatService {
             temperature: 0.1,
           });
 
-          const relevantDocs =
-            await this.documentVectorStoreService.searchSimilarDocuments(
-              message,
-              userId,
-              orgId,
-              3,
-            );
-
           let prompt = message;
-          if (relevantDocs.length > 0) {
-            const contextString = formatDocumentsAsString(relevantDocs);
 
-            prompt = `
+          if (await this.shouldUseRag(message)) {
+            const relevantDocs =
+              await this.documentVectorStoreService.searchSimilarDocuments(
+                message,
+                userId,
+                orgId,
+                3,
+              );
+
+            if (relevantDocs.length > 0) {
+              const contextString = formatDocumentsAsString(relevantDocs);
+
+              prompt = `
               Context information is below.
               ---------------------
               ${contextString}
               ---------------------
               Given the context information and not prior knowledge, answer the question: ${message}
+              Never mention or reference the context information in your answer.
             `;
+            }
           }
 
           await this.getMessageHistory(sessionId).addMessage(
