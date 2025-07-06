@@ -15,18 +15,21 @@ import {
   CHAT_SESSIONS_KEY,
   examplePrompts,
   initialMessages,
-  mockContexts,
 } from './components/utils';
 import { useChatStream } from '../../hooks/useChatStream';
+import ContextSection from './components/ContextSection';
+import { useProjects } from '../../contexts/ProjectsContext';
 
 export default function AiChatSlideIn({
   isOpen: initialIsOpen,
   toggle: externalToggle,
 }) {
+  const { currentProjectId } = useProjects();
+
   const [isOpen, setIsOpen] = useState(initialIsOpen);
   const [inputValue, setInputValue] = useState('');
-  const [contextType, setContextType] = useState('okrs');
-  const [selectedContext, setSelectedContext] = useState(mockContexts.okrs[0]);
+  const [contextType, setContextType] = useState('project');
+  const [selectedContext, setSelectedContext] = useState(currentProjectId);
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' or 'history'
   const [chatSessions, setChatSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(crypto.randomUUID());
@@ -95,7 +98,7 @@ export default function AiChatSlideIn({
   const handleSelectPrompt = (prompt) => {
     setInputValue(prompt);
     setInputMessage(prompt);
-    sendMessage(currentSessionId, prompt);
+    sendMessage(currentSessionId, prompt, selectedContext);
     setInputValue('');
   };
 
@@ -103,7 +106,7 @@ export default function AiChatSlideIn({
   const handleContextTypeChange = (e) => {
     const newType = e.target.value;
     setContextType(newType);
-    setSelectedContext(mockContexts[newType][0]);
+    setSelectedContext(currentProjectId);
   };
 
   // Update internal state when prop changes
@@ -121,7 +124,8 @@ export default function AiChatSlideIn({
 
   const handleSubmit = useCallback(() => {
     if (inputValue.trim()) {
-      sendMessage(currentSessionId, inputValue);
+      console.log(currentProjectId, selectedContext);
+      sendMessage(currentSessionId, inputValue, selectedContext);
       setInputValue('');
     }
   }, [inputValue, sendMessage]);
@@ -136,11 +140,11 @@ export default function AiChatSlideIn({
 
           {activeTab === 'chat' ? (
             <>
-              {/*<ContextSection*/}
-              {/*  contextType={contextType}*/}
-              {/*  selectedContext={selectedContext}*/}
-              {/*  handleContextTypeChange={handleContextTypeChange}*/}
-              {/*/>*/}
+              <ContextSection
+                contextType={contextType}
+                selectedContext={selectedContext}
+                handleContextTypeChange={handleContextTypeChange}
+              />
 
               <ChatBody
                 messages={messages}

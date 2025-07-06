@@ -7,17 +7,12 @@ import {
   HumanMessage,
   SystemMessage,
 } from '@langchain/core/messages';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import { PostgresChatMessageHistory } from '@langchain/community/stores/message/postgres';
 import { DocumentVectorStoreService } from '../documents/document-vector-store.service';
 import { formatDocumentsAsString } from 'langchain/util/document';
-import { Repository } from 'typeorm';
-import { WorkItem } from '../../backlog/work-items/work-item.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { tool } from '@langchain/core/tools';
-import { z } from 'zod';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
-import { Org } from '../../orgs/org.entity';
+import { WorkItemsToolsService } from './tools/work-items-tools.service';
 
 @Injectable()
 export class ChatService {
@@ -26,17 +21,14 @@ export class ChatService {
   constructor(
     private configService: ConfigService,
     private documentVectorStoreService: DocumentVectorStoreService,
-    @InjectRepository(WorkItem)
-    private workItemRepository: Repository<WorkItem>,
-    @InjectRepository(Org)
-    private orgRepository: Repository<Org>,
+    private workItemsToolsService: WorkItemsToolsService,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
 
   private getMessageHistory(sessionId: string) {
     return new PostgresChatMessageHistory({
-      sessionId: sessionId || 'default-session',
+      sessionId: sessionId,
       poolConfig: {
         host: this.configService.get('database.host'),
         port: this.configService.get('database.port'),
@@ -87,122 +79,51 @@ export class ChatService {
     sessionId: string,
     messageId: string,
     message: string,
+    projectId?: string,
   ): Observable<{
     id: string;
     type: 'message';
     data: any;
   }> {
     return new Observable((subscriber) => {
+      const timeout = setTimeout(() => {
+        subscriber.error(new Error('Stream timeout'));
+        subscriber.complete();
+      }, 30000);
+
       const runStream = async () => {
         try {
           const model = new ChatOpenAI({
             model: 'gpt-4o',
             openAIApiKey: this.apiKey,
             temperature: 0.1,
+            // callbacks: [new ConsoleCallbackHandler()],
           });
-
-          const findOneWorkItem = tool(
-            async ({ workItemReference }) => {
-              if (!workItemReference) {
-                return 'Please provide a work item reference';
-              }
-
-              const workItem = await this.workItemRepository.findOneBy({
-                reference: workItemReference,
-                org: {
-                  id: orgId,
-                },
-              });
-
-              return `
-              Title: ${workItem.title}
-              Description: ${workItem.description}
-              Estimation: ${workItem.estimation}
-              Priority: ${workItem.priority}
-              Type: ${workItem.type}
-              Status: ${workItem.status}
-              Reference: ${workItem.reference}
-              `;
-            },
-            {
-              name: 'find-one-work-item',
-              description:
-                'Find a work item in the system based on its reference.',
-              schema: z.object({
-                workItemReference: z
-                  .string()
-                  .describe(
-                    'The work item reference to search for in the form of WI-123',
-                  ),
-              }),
-            },
-          );
-
-          const createWorkItem = tool(
-            async ({ workItemTitle, workItemDescription }) => {
-              if (!workItemTitle) {
-                return 'Please provide a work item title';
-              }
-
-              if (!workItemDescription) {
-                return 'Please provide a work item description';
-              }
-              const org = await this.orgRepository.findOneByOrFail({
-                id: orgId,
-              });
-              const workItem = new WorkItem();
-              workItem.title = workItemTitle;
-              workItem.description = workItemDescription;
-              workItem.org = Promise.resolve(org);
-              await this.workItemRepository.save(workItem);
-            },
-            {
-              name: 'create-work-item',
-              description: 'Create a new work item in the system.',
-              schema: z.object({
-                workItemTitle: z.string().describe('The work item title.'),
-                workItemDescription: z
-                  .string()
-                  .describe('The work item description.'),
-              }),
-            },
-          );
 
           const agent = createReactAgent({
             llm: model,
-            tools: [findOneWorkItem, createWorkItem],
+            tools: this.workItemsToolsService.getTools(
+              orgId,
+              projectId,
+              userId,
+            ),
           });
 
           let prompt = message;
 
           if (await this.shouldUseRag(message)) {
-            const relevantDocs =
-              await this.documentVectorStoreService.searchSimilarDocuments(
-                message,
-                userId,
-                orgId,
-                3,
-              );
-
-            if (relevantDocs.length > 0) {
-              const contextString = formatDocumentsAsString(relevantDocs);
-
-              prompt = `
-              Context information is below.
-              ---------------------
-              ${contextString}
-              ---------------------
-              Given the context information and not prior knowledge, answer the question: ${message}
-              Never mention or reference the context information in your answer.
-            `;
-            }
+            prompt = await this.getPromptWithRelevantContextDocs(
+              message,
+              userId,
+              orgId,
+              prompt,
+            );
           }
 
-          await this.getMessageHistory(sessionId).addMessage(
-            new HumanMessage(prompt),
+          const historyMessages = await this.addCurrentPromptToHistory(
+            sessionId,
+            prompt,
           );
-          const historyMessages =
-            await this.getMessageHistory(sessionId).getMessages();
 
           const systemMessage = new SystemMessage(
             `You are a helpful and concise project management assistant.
@@ -236,32 +157,93 @@ export class ChatService {
 
           let aiMessage = '';
           for await (const record of stream) {
-            const chunk = record[0];
-            if (chunk instanceof AIMessageChunk) {
-              subscriber.next({
-                id: new Date().toISOString(),
-                type: 'message',
-                data: {
-                  id: messageId,
-                  text: chunk.content,
-                  isUser: false,
-                },
-              });
-              aiMessage += chunk.text;
-            }
+            aiMessage = this.sendNextChunkToTheSubscriber(
+              record,
+              subscriber,
+              messageId,
+              aiMessage,
+            );
           }
 
-          await this.getMessageHistory(sessionId).addMessage(
-            new AIMessage(aiMessage),
-          );
+          await this.addAiMessageToHistory(sessionId, aiMessage);
 
           subscriber.complete();
         } catch (error) {
           subscriber.error(error);
+        } finally {
+          clearTimeout(timeout);
         }
       };
 
       runStream();
     });
+  }
+
+  private async addAiMessageToHistory(sessionId: string, aiMessage: string) {
+    await this.getMessageHistory(sessionId).addMessage(
+      new AIMessage(aiMessage),
+    );
+  }
+
+  private sendNextChunkToTheSubscriber(
+    record: any,
+    subscriber: Subscriber<{
+      id: string;
+      type: 'message';
+      data: any;
+    }>,
+    messageId: string,
+    aiMessage: string,
+  ) {
+    const chunk = record[0];
+    if (chunk instanceof AIMessageChunk) {
+      subscriber.next({
+        id: new Date().toISOString(),
+        type: 'message',
+        data: {
+          id: messageId,
+          text: chunk.content,
+          isUser: false,
+        },
+      });
+      aiMessage += chunk.text;
+    }
+    return aiMessage;
+  }
+
+  private async addCurrentPromptToHistory(sessionId: string, prompt: string) {
+    await this.getMessageHistory(sessionId).addMessage(
+      new HumanMessage(prompt),
+    );
+    return await this.getMessageHistory(sessionId).getMessages();
+  }
+
+  private async getPromptWithRelevantContextDocs(
+    message: string,
+    userId: string,
+    orgId: string,
+    prompt: string,
+  ) {
+    const relevantDocs =
+      await this.documentVectorStoreService.searchSimilarDocuments(
+        message,
+        userId,
+        orgId,
+        3,
+      );
+
+    if (relevantDocs.length > 0) {
+      const contextString = formatDocumentsAsString(relevantDocs);
+
+      prompt = `
+              Context information is below.
+              ---------------------
+              ${contextString}
+              ---------------------
+              Given the context information and not prior knowledge, answer the question: ${message}
+              Never mention or reference the context information in your answer.
+            `;
+    }
+    return prompt;
   }
 }

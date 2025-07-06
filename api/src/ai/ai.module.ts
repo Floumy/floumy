@@ -24,6 +24,7 @@ import { DocumentVectorStoreService } from './documents/document-vector-store.se
 import { IndexingController } from './documents/indexing.controller';
 import { IndexingService } from './documents/indexing.service';
 import { Sprint } from '../sprints/sprint.entity';
+import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { Sprint } from '../sprints/sprint.entity';
     ChatService,
     DocumentVectorStoreService,
     IndexingService,
+    WorkItemsToolsService,
   ],
 })
 export class AiModule {}
