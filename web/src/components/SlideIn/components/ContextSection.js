@@ -2,10 +2,6 @@ import React from 'react';
 import {
   ContextContainer,
   ContextHeader,
-  ContextIcon,
-  ContextInfo,
-  ContextItem,
-  ContextName,
   ContextSelect,
   ContextSwitcher,
 } from './StyledComponents';
@@ -28,26 +24,29 @@ const ContextSection = ({
     <ContextContainer>
       <ContextHeader>
         <ContextSwitcher>
-          <ContextSelect value={contextType} onChange={handleContextTypeChange}>
-            <option value="okrs">Current Context</option>
-            <option value="initiatives">Entire Project</option>
+          <ContextSelect
+            value={contextType}
+            onChange={handleContextTypeChange}
+            disabled={true}
+          >
+            <option value="project">Entire Project</option>
           </ContextSelect>
         </ContextSwitcher>
       </ContextHeader>
 
-      {/* Selected context item */}
-      <ContextItem>
-        <ContextIcon
-          color={selectedContext.color}
-          iconColor={selectedContext.iconColor}
-        >
-          <i className={`ni ${selectedContext.icon}`}></i>
-        </ContextIcon>
-        <ContextInfo>
-          <ContextName>{selectedContext.name}</ContextName>
-          {/*<ContextMeta>{selectedContext.meta}</ContextMeta>*/}
-        </ContextInfo>
-      </ContextItem>
+      {/*/!* Selected context item *!/*/}
+      {/*<ContextItem>*/}
+      {/*  <ContextIcon*/}
+      {/*    color={selectedContext.color}*/}
+      {/*    iconColor={selectedContext.iconColor}*/}
+      {/*  >*/}
+      {/*    <i className={`ni ${selectedContext.icon}`}></i>*/}
+      {/*  </ContextIcon>*/}
+      {/*  <ContextInfo>*/}
+      {/*    <ContextName>{selectedContext.name}</ContextName>*/}
+      {/*    /!*<ContextMeta>{selectedContext.meta}</ContextMeta>*!/*/}
+      {/*  </ContextInfo>*/}
+      {/*</ContextItem>*/}
     </ContextContainer>
   );
 };

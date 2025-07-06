@@ -24,6 +24,7 @@ export class ChatController {
     @Request() request,
     @Param('sessionId') sessionId: string,
     @Query('message') message: string,
+    @Query('project') project?: string,
   ): Observable<{
     id: string;
     type: 'message';
@@ -32,11 +33,12 @@ export class ChatController {
     const messageId = uuid();
     return this.chatService
       .sendMessageStream(
-        request.user,
-        request.org,
+        request.user.sub,
+        request.user.org,
         sessionId,
         messageId,
         message,
+        project,
       )
       .pipe(
         catchError((error) => {
