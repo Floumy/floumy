@@ -51,6 +51,7 @@
   background: #ffffff;
   margin-bottom: 8px;
   border-radius: 5px 5px 0 0;
+  flex-wrap: wrap;
 }
 .tiptap-toolbar button {
   background: none;
@@ -181,4 +182,11 @@
 }
 .tippy-box {
   max-width: none !important;
+}
+
+@media (max-width: 600px) {
+  .tiptap-toolbar {
+    gap: 4px;
+    padding: 6px 4px;
+  }
 }
