@@ -8,7 +8,7 @@ import CurrentUserNav from './CurrentUserNav';
 import { FEATURES, useFeatureFlags } from '../../hooks/useFeatureFlags';
 import { useOrg } from '../../contexts/OrgContext';
 
-function AdminNavbar({ sidenavOpen, toggleSidenav, aiChatOpen, toggleAiChat }) {
+function AdminNavbar({ sidenavOpen, toggleSidenav, toggleAiChat }) {
   const { orgId } = useOrg();
   const { isFeatureEnabled } = useFeatureFlags();
   return (

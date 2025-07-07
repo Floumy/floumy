@@ -16,10 +16,9 @@ import {
  * @param {Object} props - Component props
  * @param {Array} props.chatSessions - Array of chat session objects
  * @param {Function} props.loadChatSession - Function to load a chat session
- * @param {Function} props.startNewSession - Function to start a new chat session
  * @returns {JSX.Element} The HistorySection component
  */
-const HistorySection = ({ chatSessions, loadChatSession, startNewSession }) => {
+const HistorySection = ({ chatSessions, loadChatSession }) => {
   return (
     <HistoryContainer>
       <HistoryList>

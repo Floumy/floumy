@@ -24,7 +24,6 @@ import { useProjects } from '../../contexts/ProjectsContext';
 import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
 import { useOrg } from '../../contexts/OrgContext';
-import { useFeatureFlags } from '../../hooks/useFeatureFlags';
 
 function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
@@ -36,7 +35,6 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
   } = useProjects();
   const { settings: bipSettings } = useBuildInPublic();
   const { currentOrg, loadingOrg } = useOrg();
-  const { isFeatureEnabled } = useFeatureFlags();
 
   // makes the sidenav normal on hover (actually when mouse enters on it)
   const onMouseEnterSidenav = () => {

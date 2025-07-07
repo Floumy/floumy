@@ -35,7 +35,7 @@ export default function AiChatSlideIn({
   const [currentSessionId, setCurrentSessionId] = useState(crypto.randomUUID());
 
   const messagesEndRef = useRef(null);
-  const [inputMessage, setInputMessage] = useState('');
+  // const [inputMessage, setInputMessage] = useState('');
   const {
     messages,
     setMessages,
@@ -97,7 +97,7 @@ export default function AiChatSlideIn({
   // Handle selecting an example prompt
   const handleSelectPrompt = (prompt) => {
     setInputValue(prompt);
-    setInputMessage(prompt);
+    // setInputMessage(prompt);
     sendMessage(currentSessionId, prompt, selectedContext);
     setInputValue('');
   };
