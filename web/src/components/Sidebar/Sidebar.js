@@ -24,7 +24,7 @@ import { useProjects } from '../../contexts/ProjectsContext';
 import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
 import { useOrg } from '../../contexts/OrgContext';
-import { FEATURES, useFeatureFlags } from '../../hooks/useFeatureFlags';
+import { useFeatureFlags } from '../../hooks/useFeatureFlags';
 
 function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
@@ -96,15 +96,13 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
       {currentOrg && currentProject && (
         <>
           <div className="navbar-inner mb-2">
-            {isFeatureEnabled(FEATURES.ORG_WIDE_APP_SECTION) && (
-              <h2 className="mb-4">
-                <Link to={`/orgs/${orgId}/objectives`} className="p-0">
-                  <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
-                    <i className="fa fa-arrow-left"></i> Org Dashboard
-                  </span>
-                </Link>
-              </h2>
-            )}
+            <h2 className="mb-4">
+              <Link to={`/orgs/${orgId}/objectives`} className="p-0">
+                <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
+                  <i className="fa fa-arrow-left"></i> Org Dashboard
+                </span>
+              </Link>
+            </h2>
             {currentOrg.name && (
               <h5 className="navbar-project-name text-light text-xl pb-0 mb-0 text-break">
                 {currentOrg.name}
@@ -522,7 +520,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                 </NavItem>
                 <NavItem>
                   <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={10}>
+                    <Col xs={7}>
                       <NavLink
                         to={`/admin/orgs/${orgId}/projects/${currentProject.id}/pages`}
                         onClick={closeSidenav}
@@ -531,6 +529,17 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         <i className="fa fa-file" />
                         <span className="nav-link-text">Pages</span>
                       </NavLink>
+                    </Col>
+                    <Col
+                      xs={3}
+                      style={{ padding: '0.675rem 1.5rem' }}
+                      className="text-right"
+                    >
+                      <div>
+                        <Badge color="warning" pill={true}>
+                          BETA
+                        </Badge>
+                      </div>
                     </Col>
                     <Col xs={2} className="text-right pr-2 pt-2">
                       <ShortcutIcon shortcutKey={9} />
@@ -568,18 +577,6 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <span className="nav-link-text">Build In Public</span>
                   </NavLink>
                 </NavItem>
-                {!isFeatureEnabled(FEATURES.ORG_WIDE_APP_SECTION) && (
-                  <NavItem>
-                    <NavLink
-                      to={`/admin/orgs/${orgId}/projects/${currentProject.id}/members`}
-                      onClick={closeSidenav}
-                      tag={NavLinkRRD}
-                    >
-                      <i className="fa fa-users" />
-                      <span className="nav-link-text">Members</span>
-                    </NavLink>
-                  </NavItem>
-                )}
               </Nav>
             </Collapse>
           </div>

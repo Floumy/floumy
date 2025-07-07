@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'reactstrap';
+import { Badge, Button } from 'reactstrap';
 import {
   ChatHeader as StyledChatHeader,
   HeaderActions,
@@ -36,6 +36,9 @@ const ChatHeader = ({ toggle, startNewSession }) => {
         </div>
         <span style={{ fontWeight: '600', color: '#343541' }}>
           AI Assistant
+          <Badge color="warning" className="mx-2" pill={true}>
+            BETA
+          </Badge>
         </span>
       </div>
       <HeaderActions>
