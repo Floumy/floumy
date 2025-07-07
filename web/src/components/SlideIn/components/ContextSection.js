@@ -11,15 +11,10 @@ import {
  *
  * @param {Object} props - Component props
  * @param {string} props.contextType - Current context type
- * @param {Object} props.selectedContext - Currently selected context
  * @param {Function} props.handleContextTypeChange - Handler for context type change
  * @returns {JSX.Element} The ContextSection component
  */
-const ContextSection = ({
-  contextType,
-  selectedContext,
-  handleContextTypeChange,
-}) => {
+const ContextSection = ({ contextType, handleContextTypeChange }) => {
   return (
     <ContextContainer>
       <ContextHeader>
