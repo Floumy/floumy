@@ -176,9 +176,7 @@
 .tiptap-editor-container tr:hover td {
   background: #f1f7ff;
 }
-.dropdown-menu{
-}
-.dropdown-menu .dropdown-item{
+.tiptap-editor-container .dropdown-menu .dropdown-item{
   padding: 0;
 }
 .tippy-box {
