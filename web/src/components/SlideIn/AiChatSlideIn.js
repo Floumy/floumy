@@ -124,7 +124,6 @@ export default function AiChatSlideIn({
 
   const handleSubmit = useCallback(() => {
     if (inputValue.trim()) {
-      console.log(currentProjectId, selectedContext);
       sendMessage(currentSessionId, inputValue, selectedContext);
       setInputValue('');
     }

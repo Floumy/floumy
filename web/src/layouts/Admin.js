@@ -14,13 +14,15 @@ import { ProjectsProvider } from '../contexts/ProjectsContext';
 import { OrgProvider } from '../contexts/OrgContext';
 import NotFound from '../views/pages/errors/NotFound';
 import AiChatSlideIn from '../components/SlideIn/AiChatSlideIn';
+import { FEATURES, useFeatureFlags } from '../hooks/useFeatureFlags';
 
 function Admin() {
   const { location, mainContentRef, getRoutes } = useLayoutHandler('admin');
   const [sidenavOpen, setSidenavOpen] = useState(true);
-  const [aiChatOpen, setAiChatOpen] = useState(true);
+  const [aiChatOpen, setAiChatOpen] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 2000);
   const { orgId, projectId } = useParams();
+  const { isFeatureEnabled } = useFeatureFlags();
 
   // Keep chat always open on larger screens and track screen size
   useEffect(() => {
@@ -149,7 +151,13 @@ function Admin() {
             <div
               className="main-content"
               ref={mainContentRef}
-              style={{ marginRight: isLargeScreen ? '600px' : '0' }}
+              style={{
+                marginRight:
+                  isLargeScreen &&
+                  isFeatureEnabled(FEATURES.AI_CHAT_ASSISTANT, orgId)
+                    ? '600px'
+                    : '0',
+              }}
             >
               <AdminNavbar
                 theme={'dark'}
@@ -164,10 +172,12 @@ function Admin() {
               </Routes>
               <Footer />
             </div>
-            <AiChatSlideIn
-              isOpen={aiChatOpen}
-              toggle={() => setAiChatOpen(!aiChatOpen)}
-            />
+            {isFeatureEnabled(FEATURES.AI_CHAT_ASSISTANT, orgId) && (
+              <AiChatSlideIn
+                isOpen={aiChatOpen}
+                toggle={() => setAiChatOpen(!aiChatOpen)}
+              />
+            )}
             {sidenavOpen ? (
               <div
                 className="backdrop d-xl-none"

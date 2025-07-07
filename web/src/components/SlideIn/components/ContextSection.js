@@ -24,6 +24,9 @@ const ContextSection = ({
     <ContextContainer>
       <ContextHeader>
         <ContextSwitcher>
+          <span style={{ fontSize: '12px', color: '#6b7280' }}>
+            Current Context:
+          </span>
           <ContextSelect
             value={contextType}
             onChange={handleContextTypeChange}

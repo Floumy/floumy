@@ -57,6 +57,10 @@ const ChatInput = ({
             }}
             rows={3}
             className={`chat-input ${inputValue.trim() ? 'with-button' : ''}`}
+            data-gramm="false"
+            data-gramm_editor="false"
+            data-enable-grammarly="false"
+            spellCheck="false"
           />
           {inputValue.trim() && (
             <Button

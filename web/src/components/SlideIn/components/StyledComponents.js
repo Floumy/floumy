@@ -14,7 +14,7 @@ export const ChatContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 1000;
+  z-index: 9999;
   resize: horizontal;
   min-width: 500px;
   border-left: 1px solid #e6e6e6;
@@ -528,6 +528,10 @@ export const ChatStyles = createGlobalStyle`
         box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
       }
 
+      .chat-input.with-button {
+        padding-right: 80px;
+      }
+
       .input-container {
         position: relative;
       }
@@ -541,8 +545,8 @@ export const ChatStyles = createGlobalStyle`
 
       .send-button {
         position: absolute;
-        bottom: 10px;
-        right: 10px;
+        top: 32px;
+        right: 30px;
         width: 36px;
         height: 36px;
         display: flex;
