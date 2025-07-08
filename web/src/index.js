@@ -30,7 +30,11 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <>
-    <ToastContainer theme="dark" hideProgressBar={true} />
+    <ToastContainer
+      theme="dark"
+      hideProgressBar={true}
+      position={'top-center'}
+    />
     <BrowserRouter>
       <Routes>
         <Route
