@@ -29,6 +29,13 @@ export class DocumentVectorStoreService implements OnModuleInit {
         user: this.configService.get('database.username'),
         password: this.configService.get('database.password'),
         database: this.configService.get('database.name'),
+        ssl:
+          this.configService.get('database.ssl') === 'true'
+            ? {
+                rejectUnauthorized: true,
+                ca: this.configService.get('database.sslCertificate'),
+              }
+            : false,
       },
       tableName: 'documents',
       columns: {
