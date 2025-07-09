@@ -13,11 +13,33 @@ import { BuildInPublicProvider } from '../contexts/BuidInPublicContext';
 import { ProjectsProvider } from '../contexts/ProjectsContext';
 import { OrgProvider } from '../contexts/OrgContext';
 import NotFound from '../views/pages/errors/NotFound';
+import AiChatSlideIn from '../components/SlideIn/AiChatSlideIn';
+import { FEATURES, useFeatureFlags } from '../hooks/useFeatureFlags';
 
 function Admin() {
   const { location, mainContentRef, getRoutes } = useLayoutHandler('admin');
   const [sidenavOpen, setSidenavOpen] = useState(true);
+  const [aiChatOpen, setAiChatOpen] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 2000);
   const { orgId, projectId } = useParams();
+  const { isFeatureEnabled } = useFeatureFlags();
+
+  // Keep chat always open on larger screens and track screen size
+  useEffect(() => {
+    const handleResize = () => {
+      const largeScreen = window.innerWidth >= 2000;
+      setIsLargeScreen(largeScreen);
+
+      if (largeScreen) {
+        setAiChatOpen(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial check
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   function isNavigationReplace() {
     let replace = false;
@@ -126,11 +148,23 @@ function Admin() {
                 imgAlt: 'Floumy Logo',
               }}
             />
-            <div className="main-content" ref={mainContentRef}>
+            <div
+              className="main-content"
+              ref={mainContentRef}
+              style={{
+                marginRight:
+                  isLargeScreen &&
+                  isFeatureEnabled(FEATURES.AI_CHAT_ASSISTANT, orgId)
+                    ? '600px'
+                    : '0',
+              }}
+            >
               <AdminNavbar
                 theme={'dark'}
                 sidenavOpen={sidenavOpen}
                 toggleSidenav={toggleSidenav}
+                aiChatOpen={aiChatOpen}
+                toggleAiChat={() => setAiChatOpen(!aiChatOpen)}
               />
               <Routes>
                 {getRoutes(routes)}
@@ -138,6 +172,12 @@ function Admin() {
               </Routes>
               <Footer />
             </div>
+            {isFeatureEnabled(FEATURES.AI_CHAT_ASSISTANT, orgId) && (
+              <AiChatSlideIn
+                isOpen={aiChatOpen}
+                toggle={() => setAiChatOpen(!aiChatOpen)}
+              />
+            )}
             {sidenavOpen ? (
               <div
                 className="backdrop d-xl-none"

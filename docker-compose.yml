@@ -22,7 +22,7 @@ services:
     working_dir: /app
 
   db:
-    image: postgres:17
+    image: pgvector/pgvector:pg17
     container_name: floumy-db
     environment:
       POSTGRES_USER: floumy
