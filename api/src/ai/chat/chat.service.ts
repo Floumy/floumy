@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChatOpenAI } from '@langchain/openai';
 import {
@@ -17,6 +17,7 @@ import { WorkItemsToolsService } from './tools/work-items-tools.service';
 @Injectable()
 export class ChatService {
   private readonly apiKey: string;
+  private readonly logger = new Logger(ChatService.name);
 
   constructor(
     private configService: ConfigService,
@@ -35,13 +36,12 @@ export class ChatService {
         user: this.configService.get('database.username'),
         password: this.configService.get('database.password'),
         database: this.configService.get('database.name'),
-        ssl:
-          this.configService.get('database.ssl') === 'true'
-            ? {
-                rejectUnauthorized: true,
-                ca: this.configService.get('database.sslCertificate'),
-              }
-            : false,
+        ssl: this.configService.get('database.ssl')
+          ? {
+              rejectUnauthorized: true,
+              ca: this.configService.get('database.sslCertificate'),
+            }
+          : false,
       },
       tableName: 'message_history',
     });
@@ -186,9 +186,13 @@ export class ChatService {
   }
 
   private async addAiMessageToHistory(sessionId: string, aiMessage: string) {
-    await this.getMessageHistory(sessionId).addMessage(
-      new AIMessage(aiMessage),
-    );
+    try {
+      await this.getMessageHistory(sessionId).addMessage(
+        new AIMessage(aiMessage),
+      );
+    } catch (e) {
+      this.logger.error(e);
+    }
   }
 
   private sendNextChunkToTheSubscriber(
@@ -218,10 +222,14 @@ export class ChatService {
   }
 
   private async addCurrentPromptToHistory(sessionId: string, prompt: string) {
-    await this.getMessageHistory(sessionId).addMessage(
-      new HumanMessage(prompt),
-    );
-    return await this.getMessageHistory(sessionId).getMessages();
+    try {
+      await this.getMessageHistory(sessionId).addMessage(
+        new HumanMessage(prompt),
+      );
+      return await this.getMessageHistory(sessionId).getMessages();
+    } catch (e) {
+      this.logger.error(e);
+    }
   }
 
   private async getPromptWithRelevantContextDocs(

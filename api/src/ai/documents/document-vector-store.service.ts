@@ -1,5 +1,5 @@
 // src/services/document-vector-store.service.ts
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 import { OpenAIEmbeddings } from '@langchain/openai';
@@ -10,6 +10,7 @@ import { DocumentMetadata } from './document-metadata.interface';
 export class DocumentVectorStoreService implements OnModuleInit {
   private vectorStore: PGVectorStore;
   private readonly embeddings: OpenAIEmbeddings;
+  private readonly logger = new Logger(DocumentVectorStoreService.name);
 
   constructor(private configService: ConfigService) {
     this.embeddings = new OpenAIEmbeddings({
@@ -18,7 +19,11 @@ export class DocumentVectorStoreService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    await this.initVectorStore();
+    try {
+      await this.initVectorStore();
+    } catch (e) {
+      this.logger.error(e);
+    }
   }
 
   private async initVectorStore() {
@@ -29,13 +34,12 @@ export class DocumentVectorStoreService implements OnModuleInit {
         user: this.configService.get('database.username'),
         password: this.configService.get('database.password'),
         database: this.configService.get('database.name'),
-        ssl:
-          this.configService.get('database.ssl') === 'true'
-            ? {
-                rejectUnauthorized: true,
-                ca: this.configService.get('database.sslCertificate'),
-              }
-            : false,
+        ssl: this.configService.get('database.ssl')
+          ? {
+              rejectUnauthorized: true,
+              ca: this.configService.get('database.sslCertificate'),
+            }
+          : false,
       },
       tableName: 'documents',
       columns: {
