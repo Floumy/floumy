@@ -13,6 +13,7 @@ import { AuthGuard } from '../auth/auth.guard';
 @Controller('/ai')
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard)
+// TODO: Harden the security on this endpoint
 export class AiController {
   constructor(private aiService: AiService) {}
 

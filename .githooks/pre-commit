@@ -1,0 +1,29 @@
+#!/bin/bash
+
+echo "Running pre-commit hook: Fixing lint issues..."
+
+# Store the current working directory
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Check if there are any staged changes in the API directory
+API_CHANGES=$(git diff --cached --name-only -- "$REPO_ROOT/api")
+if [ -n "$API_CHANGES" ]; then
+  echo "Fixing lint issues in API..."
+  cd "$REPO_ROOT/api" || exit 1
+  npm run lint:fix
+  # Stage the fixed files
+  git add "$API_CHANGES"
+fi
+
+# Check if there are any staged changes in the Web directory
+WEB_CHANGES=$(git diff --cached --name-only -- "$REPO_ROOT/web")
+if [ -n "$WEB_CHANGES" ]; then
+  echo "Fixing lint issues in Web..."
+  cd "$REPO_ROOT/web" || exit 1
+  npm run lint:fix
+  # Stage the fixed files
+  git add "$WEB_CHANGES"
+fi
+
+echo "Pre-commit hook completed successfully."
+exit 0

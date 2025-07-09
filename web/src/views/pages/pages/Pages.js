@@ -260,9 +260,7 @@ export const Pages = () => {
       setSelectedId(pages[0].id);
     }
   };
-  useEffect(() => {
-    console.log(tree);
-  }, [tree]);
+
   const handleAddPage = async (parentId, isOpened, toggle) => {
     try {
       const page = await createPage(orgId, projectId, parentId);
@@ -339,7 +337,6 @@ export const Pages = () => {
   };
 
   const handleMovePage = (page) => {
-    console.log(page);
     setPageToMove(page);
     setMoveModalOpen(true);
   };

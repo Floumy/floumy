@@ -205,7 +205,7 @@ const Tiptap = ({
   const editor = useEditor({
     extensions,
     content,
-    autofocus: true,
+    autofocus: false,
     editable: enabled !== false,
     onUpdate: ({ editor }) => {
       if (onChange) {

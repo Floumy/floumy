@@ -18,6 +18,13 @@ import { Issue } from '../issues/issue.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Objective } from '../okrs/objective.entity';
+import { ChatController } from './chat/chat.controller';
+import { ChatService } from './chat/chat.service';
+import { DocumentVectorStoreService } from './documents/document-vector-store.service';
+import { IndexingController } from './documents/indexing.controller';
+import { IndexingService } from './documents/indexing.service';
+import { Sprint } from '../sprints/sprint.entity';
+import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 
 @Module({
   imports: [
@@ -35,12 +42,19 @@ import { Objective } from '../okrs/objective.entity';
       KeyResult,
       Issue,
       Milestone,
-      Milestone,
       FeatureRequest,
       Objective,
+      Sprint,
     ]),
   ],
-  controllers: [AiController],
-  providers: [AiService, OpenaiService],
+  controllers: [AiController, ChatController, IndexingController],
+  providers: [
+    AiService,
+    OpenaiService,
+    ChatService,
+    DocumentVectorStoreService,
+    IndexingService,
+    WorkItemsToolsService,
+  ],
 })
 export class AiModule {}
