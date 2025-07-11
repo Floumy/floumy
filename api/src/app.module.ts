@@ -39,8 +39,7 @@ import githubConfig from './config/github.config';
 import gitlabConfig from './config/gitlab.config';
 import { DemoModule } from './demo/demo.module';
 import { PagesModule } from './pages/pages.module';
-import { McpModule } from '@rekog/mcp-nest';
-import { GreetingTool } from './mcp/tools/greeting.tool';
+import { FloumyMcpModule } from './mcp/mcp.module';
 
 @Module({
   imports: [
@@ -91,10 +90,6 @@ import { GreetingTool } from './mcp/tools/greeting.tool';
       inject: [ConfigService],
       imports: [ConfigModule],
     }),
-    McpModule.forRoot({
-      name: 'floumy-mcp-server',
-      version: '1.0.0',
-    }),
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     EncryptionModule,
@@ -120,13 +115,13 @@ import { GreetingTool } from './mcp/tools/greeting.tool';
     GitlabModule,
     DemoModule,
     PagesModule,
+    FloumyMcpModule,
   ],
   providers: [
     {
       provide: APP_FILTER,
       useClass: SentryGlobalFilter,
     },
-    GreetingTool,
   ],
 })
 export class AppModule {}
