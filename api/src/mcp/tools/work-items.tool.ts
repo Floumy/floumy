@@ -13,7 +13,7 @@ import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 
 @Injectable({
-    scope: Scope.REQUEST,
+  scope: Scope.REQUEST,
 })
 export class WorkItemsTool {
   constructor(
@@ -45,19 +45,19 @@ export class WorkItemsTool {
       org: { id: orgId },
     });
     return {
-        content: [
-            {
-                type: 'text',
-                text: `
+      content: [
+        {
+          type: 'text',
+          text: `
                 Title: ${workItem.title}
                 Description: ${workItem.description}
                 Type: ${workItem.type}
                 Status: ${workItem.status}
                 Reference: ${workItem.reference}
-                `
-            }
-        ]
-    }
+                `,
+        },
+      ],
+    };
   }
 
   @Tool({
@@ -119,13 +119,15 @@ export class WorkItemsTool {
         .describe('The work item type.'),
     }),
   })
-  async createWorkItem(
-    {
-      title,
-      description,
-      type,
-    }: { title: string; description: string; type: string },
-  ) {
+  async createWorkItem({
+    title,
+    description,
+    type,
+  }: {
+    title: string;
+    description: string;
+    type: string;
+  }) {
     const workItem = new WorkItem();
     workItem.title = title;
     workItem.description = description;
@@ -159,14 +161,17 @@ export class WorkItemsTool {
         .describe('The work item type.'),
     }),
   })
-  async updateWorkItemByReference(
-    {
-      reference,
-      title,
-      description,
-      type,
-    }: { reference: string; title: string; description: string; type: string },
-  ) {
+  async updateWorkItemByReference({
+    reference,
+    title,
+    description,
+    type,
+  }: {
+    reference: string;
+    title: string;
+    description: string;
+    type: string;
+  }) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       reference,
       org: { id: this.request.get('floumy-org-id') },
