@@ -12,7 +12,7 @@ import { FeatureRequest } from 'src/feature-requests/feature-request.entity';
 import { KeyResult } from 'src/okrs/key-result.entity';
 import { Objective } from 'src/okrs/objective.entity';
 import { Milestone } from 'src/roadmap/milestones/milestone.entity';
-import { McpModule } from '@rekog/mcp-nest';
+import { McpModule, McpTransportType } from '@rekog/mcp-nest';
 import { WorkItemsTool } from './tools/work-items.tool';
 
 @Module({
@@ -21,8 +21,6 @@ import { WorkItemsTool } from './tools/work-items.tool';
     McpModule.forRoot({
       name: 'floumy-mcp-server',
       version: '1.0.0',
-      sseEndpoint: '/mcp/:orgId/:userId/sse',
-      messagesEndpoint: '/mcp/:orgId/:userId/messages',
     }),
     TypeOrmModule.forFeature([
       User,

@@ -19,10 +19,27 @@ export const ChatContainer = styled(motion.div)`
   min-width: 500px;
   border-left: 1px solid #e6e6e6;
 
-  @media (max-width: 2000px) {
-    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
-    /* On medium or smaller screens, don't push content, just overlay */
-    position: fixed;
+  @media (max-width: 900px) {
+    width: 100vw;
+    min-width: 0;
+    left: 0;
+    right: 0;
+    border-left: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  @media (max-width: 600px) {
+    width: 100vw;
+    min-width: 0;
+    left: 0;
+    right: 0;
+    border-left: none;
+    border-radius: 0;
+    box-shadow: none;
+    height: 100dvh;
+    max-width: 100vw;
+    padding: 0;
   }
 `;
 
@@ -37,6 +54,11 @@ export const ChatHeader = styled.div`
   font-size: 16px;
   letter-spacing: 0.3px;
   border-bottom: 1px solid #e5e5e6;
+
+  @media (max-width: 600px) {
+    padding: 12px 8px;
+    font-size: 15px;
+  }
 `;
 
 export const ContextContainer = styled.div`
@@ -523,6 +545,15 @@ export const ChatStyles = createGlobalStyle`
         box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.1);
       }
 
+      @media (max-width: 600px) {
+        .chat-input {
+          font-size: 14px;
+          padding: 12px 12px;
+          min-height: 60px;
+          max-height: 120px;
+        }
+      }
+
       .chat-input:focus {
         border-color: #8a2be2;
         box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
@@ -534,6 +565,12 @@ export const ChatStyles = createGlobalStyle`
 
       .input-container {
         position: relative;
+        width: 100%;
+      }
+      @media (max-width: 600px) {
+        .input-container {
+          padding: 0 4px;
+        }
       }
 
       .btn-primary {
@@ -555,6 +592,15 @@ export const ChatStyles = createGlobalStyle`
         padding: 0;
         font-size: 14px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      @media (max-width: 600px) {
+        .send-button {
+          top: 16px;
+          right: 10px;
+          width: 32px;
+          height: 32px;
+          font-size: 13px;
+        }
       }
 
       .btn-primary:hover,

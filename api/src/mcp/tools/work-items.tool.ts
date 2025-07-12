@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Param, Req, Scope } from '@nestjs/common';
 import { Resource, Tool } from '@rekog/mcp-nest';
 import { Context } from 'vm';
 import z from 'zod';
-import type { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WorkItem } from 'src/backlog/work-items/work-item.entity';
 import { Repository } from 'typeorm';
@@ -10,8 +9,12 @@ import { WorkItemStatus } from 'src/backlog/work-items/work-item-status.enum';
 import { WorkItemType } from 'src/backlog/work-items/work-item-type.enum';
 import { Org } from 'src/orgs/org.entity';
 import { Project } from 'src/projects/project.entity';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 
-@Injectable()
+@Injectable({
+    scope: Scope.REQUEST,
+})
 export class WorkItemsTool {
   constructor(
     @InjectRepository(WorkItem)
@@ -20,6 +23,7 @@ export class WorkItemsTool {
     private orgRepository: Repository<Org>,
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
+    @Inject(REQUEST) private request: Request,
   ) {}
 
   @Tool({
@@ -33,25 +37,40 @@ export class WorkItemsTool {
   async findWorkItemByReference(
     { reference }: { reference: string },
     context: Context,
-    request: Request,
   ) {
-    const orgId = request.params.orgId;
+    const orgId = this.request.get('floumy-org-id');
+    const userId = this.request.get('floumy-user-id');
     const workItem = await this.workItemsRepository.findOneBy({
       reference,
       org: { id: orgId },
     });
-    return workItem;
+    return {
+        content: [
+            {
+                type: 'text',
+                text: `
+                Title: ${workItem.title}
+                Description: ${workItem.description}
+                Type: ${workItem.type}
+                Status: ${workItem.status}
+                Reference: ${workItem.reference}
+                `
+            }
+        ]
+    }
   }
 
   @Tool({
     name: 'find-my-in-progress-work-items',
     description: 'Find all work items in progress for the current user.',
   })
-  async findMyInProgressWorkItems(request: Request) {
+  async findMyInProgressWorkItems() {
+    const orgId = this.request.get('floumy-org-id');
+    const userId = this.request.get('floumy-user-id');
     const workItems = await this.workItemsRepository.find({
       where: {
-        org: { id: request.params.orgId },
-        assignedTo: { id: request.params.userId },
+        org: { id: orgId },
+        assignedTo: { id: userId },
         status: WorkItemStatus.IN_PROGRESS,
       },
     });
@@ -62,11 +81,13 @@ export class WorkItemsTool {
     name: 'find-my-work-items',
     description: 'Find all work items for the current user.',
   })
-  async findMyWorkItems(request: Request) {
+  async findMyWorkItems() {
+    const orgId = this.request.get('floumy-org-id');
+    const userId = this.request.get('floumy-user-id');
     const workItems = await this.workItemsRepository.find({
       where: {
-        org: { id: request.params.orgId },
-        assignedTo: { id: request.params.userId },
+        org: { id: orgId },
+        assignedTo: { id: userId },
       },
     });
     return workItems;
@@ -76,10 +97,11 @@ export class WorkItemsTool {
     name: 'find-work-items-by-project-name',
     description: 'Find all work items for a specific project.',
   })
-  async findWorkItemsByProject({ name }: { name: string }, request: Request) {
+  async findWorkItemsByProject({ name }: { name: string }) {
+    const orgId = this.request.get('floumy-org-id');
     const workItems = await this.workItemsRepository.find({
       where: {
-        org: { id: request.params.orgId },
+        org: { id: orgId },
         project: { name },
       },
     });
@@ -103,19 +125,20 @@ export class WorkItemsTool {
       description,
       type,
     }: { title: string; description: string; type: string },
-    request: Request,
   ) {
     const workItem = new WorkItem();
     workItem.title = title;
     workItem.description = description;
     workItem.type = WorkItemType[type];
+    const orgId = this.request.get('floumy-org-id');
+    const projectId = this.request.get('floumy-project-id');
     const org = await this.orgRepository.findOneByOrFail({
-      id: request.params.orgId,
+      id: orgId,
     });
     const project = await this.projectRepository.findOneByOrFail({
-      id: request.params.projectId,
+      id: projectId,
       org: {
-        id: request.params.orgId,
+        id: orgId,
       },
     });
     workItem.org = Promise.resolve(org);
@@ -143,11 +166,10 @@ export class WorkItemsTool {
       description,
       type,
     }: { reference: string; title: string; description: string; type: string },
-    request: Request,
   ) {
     const workItem = await this.workItemsRepository.findOneByOrFail({
       reference,
-      org: { id: request.params.orgId },
+      org: { id: this.request.get('floumy-org-id') },
     });
     workItem.title = title;
     workItem.description = description;
