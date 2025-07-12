@@ -1,4 +1,5 @@
 import api from '../api/api.service';
+import axios from 'axios';
 
 function handleAuthentication(response) {
   if (response.data.lastSignedIn) {
@@ -97,11 +98,12 @@ export async function logout() {
 
 export async function isAuthenticated() {
   try {
-    const response = await api.get(
+    const response = await axios.get(
       `${process.env.REACT_APP_API_URL}/auth/is-authenticated`,
+      { withCredentials: true },
     );
     return response.data.isAuthenticated;
   } catch (e) {
-    throw new Error('Authentication check failed');
+    return false;
   }
 }
