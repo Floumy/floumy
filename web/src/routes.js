@@ -60,6 +60,7 @@ import DetailOrgKeyResult from './views/pages/okrs/DetailOrgKeyResult';
 import NewOrgOKR from './views/pages/okrs/NewOrgOKR';
 import PermissionDenied from './views/pages/errors/PermissionDenied';
 import { Pages } from './views/pages/pages/Pages';
+import AiSettings from './views/pages/users/AiSettings';
 
 const routes = [
   {
@@ -505,6 +506,21 @@ export const orgsRoutes = [
     path: '/permission-denied',
     component: <PermissionDenied />,
     layout: '/orgs',
+  },
+];
+
+export const userRoutes = [
+  {
+    redirect: true,
+    path: '/my-profile',
+    component: <MyProfile />,
+    layout: '/user',
+  },
+  {
+    redirect: true,
+    path: '/ai-settings',
+    component: <AiSettings />,
+    layout: '/user',
   },
 ];
 

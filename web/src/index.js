@@ -25,6 +25,7 @@ import PublicLayout from './layouts/Public';
 import { BlankLayout } from './layouts/Blank';
 import OrgLayout from './layouts/Org';
 import { CurrentUserProvider } from './contexts/CurrentUserContext';
+import UserLayout from './layouts/User';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -58,6 +59,14 @@ root.render(
           element={
             <CurrentUserProvider>
               <OrgLayout />
+            </CurrentUserProvider>
+          }
+        />
+        <Route
+          path="/user/*"
+          element={
+            <CurrentUserProvider>
+              <UserLayout />
             </CurrentUserProvider>
           }
         />

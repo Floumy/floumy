@@ -12,7 +12,7 @@ import { FeatureRequest } from 'src/feature-requests/feature-request.entity';
 import { KeyResult } from 'src/okrs/key-result.entity';
 import { Objective } from 'src/okrs/objective.entity';
 import { Milestone } from 'src/roadmap/milestones/milestone.entity';
-import { McpModule, McpTransportType } from '@rekog/mcp-nest';
+import { McpModule } from '@rekog/mcp-nest';
 import { WorkItemsTool } from './tools/work-items.tool';
 
 @Module({
