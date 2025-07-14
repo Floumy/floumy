@@ -104,6 +104,7 @@ function UserSidebar({ toggleSidenav, logo, rtlActive }) {
                           to={`/user/my-profile`}
                           onClick={closeSidenav}
                           tag={NavLinkRRD}
+                          replace={true}
                         >
                           <i className="fas fa-user" />
                           <span className="nav-link-text">My Profile</span>
@@ -120,6 +121,7 @@ function UserSidebar({ toggleSidenav, logo, rtlActive }) {
                             to={`/user/ai-settings`}
                             onClick={closeSidenav}
                             tag={NavLinkRRD}
+                            replace={true}
                           >
                             <i className="fas fa-magic-wand-sparkles" />
                             <span className="nav-link-text">AI Settings</span>
