@@ -81,4 +81,26 @@ export class UsersController {
       throw new HttpException(e.message, HttpStatus.NOT_FOUND);
     }
   }
+
+  @Get('me/mcp-token')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(BasicAuthGuard)
+  async getMcpToken(@Request() req: any) {
+    try {
+      return await this.usersService.getMcpToken(req.user.sub);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @Post('me/mcp-token/refresh')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(BasicAuthGuard)
+  async refreshMcpToken(@Request() req: any) {
+    try {
+      return await this.usersService.refreshMcpToken(req.user.sub);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+    }
+  }
 }

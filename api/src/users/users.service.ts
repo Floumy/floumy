@@ -11,6 +11,7 @@ import { Org } from '../orgs/org.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PatchUserDto } from './dtos';
 import { UserRole } from './enums';
+import { uuid } from 'uuidv4';
 
 @Injectable()
 export class UsersService {
@@ -205,5 +206,19 @@ export class UsersService {
     }
     user.role = UserRole[role];
     await this.usersRepository.save(user);
+  }
+
+  async refreshMcpToken(userId: string): Promise<string> {
+    const token = uuid();
+    await this.usersRepository.update(userId, { mcpToken: token });
+    return token;
+  }
+
+  async getMcpToken(userId: string): Promise<string> {
+    const user = await this.usersRepository.findOneByOrFail({ id: userId });
+    if (!user.mcpToken) {
+      throw new Error('MCP token not found for user');
+    }
+    return user.mcpToken;
   }
 }
