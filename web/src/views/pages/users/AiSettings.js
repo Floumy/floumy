@@ -22,7 +22,6 @@ export default function AiSettings() {
   const [isLoading, setIsLoading] = useState(true);
 
   React.useEffect(() => {
-    // Simulate fetching the MCP token
     const fetchMcpToken = async () => {
       try {
         setIsLoading(true);
@@ -61,8 +60,8 @@ export default function AiSettings() {
             <Card className="mb-5 shadow">
               <CardHeader className="bg-white border-0">
                 <h3 className="mb-0">
-                  <span class="mr-2">MCP Server Setup Instructions</span>
-                  <span class="badge badge-warning badge-pill">BETA</span>
+                  <span className="mr-2">MCP Server Setup Instructions</span>
+                  <span className="badge badge-warning badge-pill">BETA</span>
                 </h3>
               </CardHeader>
               {isLoading && <LoadingSpinnerBox />}
