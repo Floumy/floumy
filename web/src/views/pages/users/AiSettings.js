@@ -148,7 +148,7 @@ export default function AiSettings() {
                                 Under Scroll to Cascade &rarr; MCP servers
                               </li>
                               <li className="mb-3">
-                                Select Add Server -> Add custom server
+                                Select Add Server &rarr; Add custom server
                               </li>
                               <li className="mb-3">
                                 Add the following:
