@@ -13,6 +13,11 @@ export class McpService {
 
   async getUserFromRequest(request: Request): Promise<User | null> {
     const mcpToken = request.get('floumy-user-token');
+    console.log('MCP Token:', mcpToken);
+    if (!mcpToken) {
+      return null;
+    }
+
     const user = await this.usersRepository.findOne({
       where: { mcpToken },
     });
