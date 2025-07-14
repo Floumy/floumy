@@ -11,9 +11,12 @@ import { memberNameInitials, textToColor } from '../../services/utils/utils';
 import { logoutUser } from '../../services/api/api.service';
 import React from 'react';
 import Notifications from './Notifications';
+import { FEATURES, useFeatureFlags } from '../../hooks/useFeatureFlags';
 
 export default function CurrentUserNav() {
   const currentUserName = localStorage.getItem('currentUserName');
+  const currentOrgId = localStorage.getItem('currentUserOrgId');
+  const { isFeatureEnabled } = useFeatureFlags();
 
   if (!currentUserName) {
     return (
@@ -58,10 +61,12 @@ export default function CurrentUserNav() {
             <i className="fas fa-user" />
             <span>My profile</span>
           </DropdownItem>
-          <DropdownItem href={`/user/ai-settings`}>
-            <i className="fas fa-magic-wand-sparkles" />
-            <span>AI Settings</span>
-          </DropdownItem>
+          {isFeatureEnabled(FEATURES.AI_SETTINGS, currentOrgId) && (
+            <DropdownItem href={`/user/ai-settings`}>
+              <i className="fas fa-magic-wand-sparkles" />
+              <span>AI Settings</span>
+            </DropdownItem>
+          )}
           <div className="dropdown-divider"></div>
           <DropdownItem
             href="#pablo"

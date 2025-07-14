@@ -1,5 +1,6 @@
 export const FEATURES = {
   AI_CHAT_ASSISTANT: Symbol('AI_CHAT_ASSISTANT'),
+  AI_SETTINGS: Symbol('AI_SETTINGS'),
 };
 
 // Map features to lists of enabled organization IDs
@@ -10,11 +11,13 @@ const ENABLED_FEATURES_BY_ORG = {
     // Example: [FEATURES.ORG_WIDE_APP_SECTION]: ['org1', 'org2']
     // Example to enable for all orgs: [FEATURES.ORG_WIDE_APP_SECTION]: ['*']
     [FEATURES.AI_CHAT_ASSISTANT]: ['bcb58baf-dd09-4bac-9b6b-b76887cf7289'],
+    [FEATURES.AI_SETTINGS]: ['bcb58baf-dd09-4bac-9b6b-b76887cf7289'],
   },
   development: {
     // Example: [FEATURES.ORG_WIDE_APP_SECTION]: ['org1', 'org2']
     // Example to enable for all orgs: [FEATURES.ORG_WIDE_APP_SECTION]: ['*']
     [FEATURES.AI_CHAT_ASSISTANT]: ['*'],
+    [FEATURES.AI_SETTINGS]: ['*'],
   },
 };
 
