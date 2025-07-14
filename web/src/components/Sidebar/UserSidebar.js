@@ -17,10 +17,13 @@ import {
   Row,
 } from 'reactstrap';
 import { useCurrentUser } from '../../contexts/CurrentUserContext';
+import { FEATURES, useFeatureFlags } from '../../hooks/useFeatureFlags';
 
 function UserSidebar({ toggleSidenav, logo, rtlActive }) {
   const { currentUser } = useCurrentUser();
+
   const navigate = useNavigate();
+  const { isFeatureEnabled } = useFeatureFlags();
   // makes the sidenav normal on hover (actually when mouse enters on it)
   const onMouseEnterSidenav = () => {
     if (!document.body.classList.contains('g-sidenav-pinned')) {
@@ -107,18 +110,23 @@ function UserSidebar({ toggleSidenav, logo, rtlActive }) {
                         </NavLink>
                       </Col>
                     </Row>
-                    <Row style={{ maxWidth: '100%', height: '47px' }}>
-                      <Col xs={12}>
-                        <NavLink
-                          to={`/user/ai-settings`}
-                          onClick={closeSidenav}
-                          tag={NavLinkRRD}
-                        >
-                          <i className="fas fa-magic-wand-sparkles" />
-                          <span className="nav-link-text">AI Settings</span>
-                        </NavLink>
-                      </Col>
-                    </Row>
+                    {isFeatureEnabled(
+                      FEATURES.AI_SETTINGS,
+                      currentUser.orgId,
+                    ) && (
+                      <Row style={{ maxWidth: '100%', height: '47px' }}>
+                        <Col xs={12}>
+                          <NavLink
+                            to={`/user/ai-settings`}
+                            onClick={closeSidenav}
+                            tag={NavLinkRRD}
+                          >
+                            <i className="fas fa-magic-wand-sparkles" />
+                            <span className="nav-link-text">AI Settings</span>
+                          </NavLink>
+                        </Col>
+                      </Row>
+                    )}
                   </NavItem>
                 </Nav>
               </div>

@@ -92,7 +92,7 @@ export default function AiSettings() {
   "mcpServers": {
     "floumy": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.floumy.com/sse", "--header", "floumy-user-token:${mcpToken}"]
+      "args": ["-y", "mcp-remote", "https://api.floumy.com/sse", "--header", "floumy-user-token:${mcpToken}"]
     }
   }
 }`}</pre>
@@ -120,7 +120,7 @@ export default function AiSettings() {
                                 Enter the following configuration, and hit
                                 enter.
                                 <div className="bg-lighter p-3 rounded mt-2 mb-2">
-                                  npx mcp-remote https://mcp.floumy.com/sse
+                                  npx mcp-remote https://api.floumy.com/sse
                                   --header floumy-user-token:{mcpToken}
                                 </div>
                               </li>
@@ -145,7 +145,7 @@ export default function AiSettings() {
                                 CTRL/CMD + , to open Windsurf settings.
                               </li>
                               <li className="mb-3">
-                                Under Scroll to Cascade -> MCP servers
+                                Under Scroll to Cascade &rarr; MCP servers
                               </li>
                               <li className="mb-3">
                                 Select Add Server -> Add custom server
@@ -157,7 +157,7 @@ export default function AiSettings() {
   "mcpServers": {
     "floumy": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.floumy.com/sse", "--header", "floumy-user-token:${mcpToken}"]
+      "args": ["-y", "mcp-remote", "https://api.floumy.com/sse", "--header", "floumy-user-token:${mcpToken}"]
     }
   }
 }`}</pre>
@@ -182,7 +182,7 @@ export default function AiSettings() {
     "floumy": {
       "command": {
         "path": "npx",
-        "args": ["-y", "mcp-remote", "https://mcp.floumy.com/sse", "--header", "floumy-user-token:${mcpToken}"],
+        "args": ["-y", "mcp-remote", "https://api.floumy.com/sse", "--header", "floumy-user-token:${mcpToken}"],
         "env": {}
       },
       "settings": {}
