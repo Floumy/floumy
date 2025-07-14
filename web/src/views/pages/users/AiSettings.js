@@ -7,10 +7,33 @@ import {
   Container,
   Row,
 } from 'reactstrap';
-import React from 'react';
+import React, { useState } from 'react';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
+import { toast } from 'react-toastify';
+import { getCurrentUserMcpToken } from '../../../services/users/users.service';
 
 export default function AiSettings() {
+  const [mcpToken, setMcpToken] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    // Simulate fetching the MCP token
+    const fetchMcpToken = async () => {
+      try {
+        setIsLoading(true);
+        const token = await getCurrentUserMcpToken();
+        console.log(token);
+        setMcpToken(token);
+      } catch (error) {
+        toast.error('Failed to fetch MCP token');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMcpToken();
+  }, []);
+
   return (
     <>
       <SimpleHeader />
@@ -19,52 +42,19 @@ export default function AiSettings() {
           <Col>
             <Card className="mb-5 shadow">
               <CardHeader className="bg-white border-0">
-                <h3 className="mb-0">AI Settings</h3>
+                <h3 className="mb-0">
+                  <span class="mr-2">MCP Server Setup Instructions</span>
+                  <span class="badge badge-warning badge-pill">BETA</span>
+                </h3>
               </CardHeader>
               <CardBody className="pt-0">
                 <Row>
                   <Col>
-                    <h4 className="mt-4 mb-3 text-lg">
-                      MCP Server Setup Instructions
-                    </h4>
                     <div className="mb-4">
                       <div className="mb-5">
-                        <h5 className="font-weight-bold mb-3">
-                          Claude.ai (Team, Enterprise)
-                        </h5>
-                        <div className="pl-4 border-left border-light">
-                          <ol className="pl-3">
-                            <li className="mb-3">
-                              Navigate to Settings in the sidebar on web or
-                              desktop
-                            </li>
-                            <li className="mb-3">
-                              Scroll to Integrations at the bottom and click Add
-                              more
-                            </li>
-                            <li className="mb-3">
-                              In the prompt enter:
-                              <div className="bg-light p-3 rounded mt-2 mb-2">
-                                <p className="mb-1">
-                                  <strong>Integration name:</strong> Linear
-                                </p>
-                                <p className="mb-0">
-                                  <strong>Integration URL:</strong>{' '}
-                                  https://mcp.linear.app/sse
-                                </p>
-                              </div>
-                            </li>
-                            <li>
-                              Make sure to enable the tools in any new chats
-                            </li>
-                          </ol>
-                        </div>
-                      </div>
-
-                      <div className="mb-5">
-                        <h5 className="font-weight-bold mb-3">
+                        <h4 className="font-weight-bold mb-3">
                           Claude for Desktop (Free, Pro)
-                        </h5>
+                        </h4>
                         <div className="pl-4 border-left border-light">
                           <ol className="pl-3">
                             <li className="mb-3">
@@ -80,9 +70,9 @@ export default function AiSettings() {
                               <div className="bg-light p-3 rounded mt-2 mb-2 code-block">
                                 <pre className="mb-0">{`{
   "mcpServers": {
-    "linear": {
+    "floumy": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.linear.app/sse"]
+      "args": ["-y", "mcp-remote", "https://mcp.floumy.com/sse"]
     }
   }
 }`}</pre>
@@ -93,7 +83,7 @@ export default function AiSettings() {
                       </div>
 
                       <div className="mb-5">
-                        <h5 className="font-weight-bold mb-3">Cursor</h5>
+                        <h4 className="font-weight-bold mb-3">Cursor</h4>
                         <div className="pl-4 border-left border-light">
                           <p className="mb-3">
                             Install here, or from Cursor's MCP tools page.
@@ -110,25 +100,25 @@ export default function AiSettings() {
                               Enter the following configuration, and hit enter.
                               <div className="bg-light p-3 rounded mt-2 mb-2">
                                 <code>
-                                  npx mcp-remote https://mcp.linear.app/sse
+                                  npx mcp-remote https://mcp.floumy.com/sse
                                 </code>
                               </div>
                             </li>
                             <li className="mb-3">
-                              Enter the name <strong>Linear</strong> and hit
+                              Enter the name <strong>Floumy</strong> and hit
                               enter.
                             </li>
                             <li className="mb-3">
                               Activate the server using{' '}
                               <strong>MCP: List Servers</strong> and selecting
-                              Linear, and selecting Start Server.
+                              Floumy, and selecting Start Server.
                             </li>
                           </ol>
                         </div>
                       </div>
 
                       <div className="mb-5">
-                        <h5 className="font-weight-bold mb-3">Windsurf</h5>
+                        <h4 className="font-weight-bold mb-3">Windsurf</h4>
                         <div className="pl-4 border-left border-light">
                           <ol className="pl-3">
                             <li className="mb-3">
@@ -145,9 +135,9 @@ export default function AiSettings() {
                               <div className="bg-light p-3 rounded mt-2 mb-2 code-block">
                                 <pre className="mb-0">{`{
   "mcpServers": {
-    "linear": {
+    "floumy": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.linear.app/sse"]
+      "args": ["-y", "mcp-remote", "https://mcp.floumy.com/sse"]
     }
   }
 }`}</pre>
@@ -158,7 +148,7 @@ export default function AiSettings() {
                       </div>
 
                       <div className="mb-5">
-                        <h5 className="font-weight-bold mb-3">Zed</h5>
+                        <h4 className="font-weight-bold mb-3">Zed</h4>
                         <div className="pl-4 border-left border-light">
                           <ol className="pl-3">
                             <li className="mb-3">
@@ -169,10 +159,10 @@ export default function AiSettings() {
                               <div className="bg-light p-3 rounded mt-2 mb-2 code-block">
                                 <pre className="mb-0">{`{
   "context_servers": {
-    "linear": {
+    "floumy": {
       "command": {
         "path": "npx",
-        "args": ["-y", "mcp-remote", "https://mcp.linear.app/sse"],
+        "args": ["-y", "mcp-remote", "https://mcp.floumy.com/sse"],
         "env": {}
       },
       "settings": {}
@@ -189,11 +179,12 @@ export default function AiSettings() {
                     <div className="mt-4">
                       <p className="text-muted mb-3">
                         <i className="fas fa-info-circle mr-2"></i>
-                        The setup instructions above will use your generated API
-                        key for authentication.
+                        The setup instructions above will use your generated
+                        personal token for authentication.
                       </p>
                       <Button color="primary" className="mt-2">
-                        <i className="fas fa-key mr-2"></i>Generate API Key
+                        <i className="fas fa-key mr-2"></i>Refresh Personal MCP
+                        Token
                       </Button>
                     </div>
                   </Col>
