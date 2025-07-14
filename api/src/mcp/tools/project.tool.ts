@@ -63,7 +63,6 @@ export class ProjectTool {
     }
 
     const org = await user.org;
-    console.log(org.id);
     const projects = await this.projectRepository.find({
       where: { org: { id: org.id } },
       order: { name: 'ASC' },
