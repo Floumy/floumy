@@ -1,6 +1,6 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Project } from '../../projects/project.entity';
 import { McpService } from '../services/mcp.service';
 import { REQUEST } from '@nestjs/core';
@@ -35,7 +35,7 @@ export class ProjectTool {
 
     const org = await user.org;
     const project = await this.projectRepository.findOne({
-      where: { name: name.toLowerCase(), org: { id: org.id } },
+      where: { name: ILike(`%${name}%`), org: { id: org.id } },
     });
 
     if (!project) {
@@ -63,6 +63,7 @@ export class ProjectTool {
     }
 
     const org = await user.org;
+    console.log(org.id);
     const projects = await this.projectRepository.find({
       where: { org: { id: org.id } },
       order: { name: 'ASC' },
