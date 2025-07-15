@@ -6,6 +6,7 @@ import { ProjectMapper } from './mappers';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class ProjectsService {
@@ -15,6 +16,7 @@ export class ProjectsService {
     @InjectRepository(Org) private readonly orgsRepository: Repository<Org>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly eventEmitter: EventEmitter2,
+    private readonly fileService: FilesService,
   ) {}
 
   async listProjects(orgId: string) {
@@ -89,6 +91,12 @@ export class ProjectsService {
       id: projectId,
       org: { id: orgId },
     });
+    const files = await project.files;
+    if (files && files.length > 0) {
+      for (const file of files) {
+        await this.fileService.deleteFile(orgId, projectId, file.id);
+      }
+    }
     await this.projectsRepository.remove(project);
   }
 
