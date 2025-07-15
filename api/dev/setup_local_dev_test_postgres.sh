@@ -9,7 +9,7 @@ DB_PORT=5455
 
 # Pull the PostgreSQL image
 echo "Pulling the PostgreSQL image..."
-docker pull postgres
+docker pull pgvector/pgvector:pg17
 
 # Check if the container already exists
 CONTAINER_EXISTS=$(docker ps -a --filter "name=^/${DB_CONTAINER_NAME}$" --format '{{.Names}}')
@@ -31,7 +31,7 @@ fi
 
 # Create and start the PostgreSQL container
 echo "Starting PostgreSQL container..."
-docker run --name $DB_CONTAINER_NAME -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PASSWORD -p $DB_PORT:5432 -d postgres
+docker run --name $DB_CONTAINER_NAME -e POSTGRES_DB=$DB_NAME -e POSTGRES_USER=$DB_USER -e POSTGRES_PASSWORD=$DB_PASSWORD -p $DB_PORT:5432 -d pgvector/pgvector:pg17
 
 # Wait for PostgreSQL to be ready
 echo "Waiting for PostgreSQL to be ready..."

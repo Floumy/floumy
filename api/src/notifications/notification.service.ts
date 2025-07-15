@@ -216,6 +216,7 @@ export class NotificationService {
           default:
             return undefined;
         }
+        const createdBy = await notification.createdBy;
         return {
           id: notification.id,
           entity: notification.entity,
@@ -225,7 +226,11 @@ export class NotificationService {
           entityUrl: entityUrl,
           entityId: notification.entityId,
           createdAt: notification.createdAt,
-          createdBy: await notification.createdBy,
+          createdBy: {
+            id: createdBy.id,
+            name: createdBy.name,
+            email: createdBy.email,
+          },
         };
       }),
     );

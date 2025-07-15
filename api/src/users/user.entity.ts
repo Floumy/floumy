@@ -20,6 +20,7 @@ import { Issue } from '../issues/issue.entity';
 import { Project } from '../projects/project.entity';
 import { Notification } from '../notifications/notification.entity';
 import { UserRole } from './enums';
+import { uuid } from 'uuidv4';
 
 @Entity()
 export class User {
@@ -41,6 +42,8 @@ export class User {
   activationToken: string;
   @Column({ nullable: true })
   passwordResetToken: string;
+  @Column({ nullable: true })
+  mcpToken: string;
   @Column({ nullable: true })
   lastSignedIn: Date;
   @Column({
@@ -109,5 +112,6 @@ export class User {
     this.name = name;
     this.email = email;
     this.password = password;
+    this.mcpToken = uuid();
   }
 }

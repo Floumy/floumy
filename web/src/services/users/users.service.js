@@ -74,3 +74,25 @@ export async function updateUserRole(userId, role) {
     throw new Error(e.response.data.message);
   }
 }
+
+export async function getCurrentUserMcpToken() {
+  try {
+    const response = await api.get(
+      `${process.env.REACT_APP_API_URL}/users/me/mcp-token`,
+    );
+    return response.data;
+  } catch (e) {
+    throw new Error(e.response.data.message);
+  }
+}
+
+export async function refreshCurrentUserMcpToken() {
+  try {
+    const response = await api.post(
+      `${process.env.REACT_APP_API_URL}/users/me/mcp-token/refresh`,
+    );
+    return response.data;
+  } catch (e) {
+    throw new Error(e.response.data.message);
+  }
+}

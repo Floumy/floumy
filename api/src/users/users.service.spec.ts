@@ -206,4 +206,18 @@ describe('UsersService', () => {
       ).rejects.toThrow();
     });
   });
+
+  describe('when regenerating the mcp token', () => {
+    it('should update the mcp token for the user', async () => {
+      const user = await service.createUserWithOrg(
+        'Test User',
+        'test@example.com',
+        'testtesttest',
+      );
+      const oldToken = user.mcpToken;
+      const newToken = await service.refreshMcpToken(user.id);
+      expect(newToken).toBeDefined();
+      expect(newToken).not.toEqual(oldToken);
+    });
+  });
 });
