@@ -52,6 +52,13 @@ export default function CreateFeatureRequest({ onSubmit }) {
     document.title = 'Floumy | Feature Request';
   }, []);
 
+  const currentUserId = localStorage.getItem('currentUserId');
+
+  if (!currentUserId) {
+    window.location.href = `/auth/sign-in?redirectTo=${encodeURI(window.location.pathname)}`;
+    return null;
+  }
+
   const validationSchema = Yup.object({
     title: Yup.string().required('The title is required'),
     description: Yup.string().required('The description is required'),
