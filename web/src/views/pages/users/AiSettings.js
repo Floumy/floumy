@@ -91,7 +91,7 @@ export default function AiSettings() {
   "mcpServers": {
     "floumy": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://api.floumy.com/sse", "--header", "floumy-user-token:${mcpToken}"]
+      "args": ["-y", "mcp-remote", "https://api.floumy.com/mcp", "--header", "floumy-user-token:${mcpToken}"]
     }
   }
 }`}</pre>
@@ -119,7 +119,7 @@ export default function AiSettings() {
                                 Enter the following configuration, and hit
                                 enter.
                                 <div className="bg-lighter p-3 rounded mt-2 mb-2">
-                                  npx mcp-remote https://api.floumy.com/sse
+                                  npx mcp-remote https://api.floumy.com/mcp
                                   --header floumy-user-token:{mcpToken}
                                 </div>
                               </li>
@@ -156,7 +156,7 @@ export default function AiSettings() {
   "mcpServers": {
     "floumy": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://api.floumy.com/sse", "--header", "floumy-user-token:${mcpToken}"]
+      "args": ["-y", "mcp-remote", "https://api.floumy.com/mcp", "--header", "floumy-user-token:${mcpToken}"]
     }
   }
 }`}</pre>
@@ -181,7 +181,7 @@ export default function AiSettings() {
     "floumy": {
       "command": {
         "path": "npx",
-        "args": ["-y", "mcp-remote", "https://api.floumy.com/sse", "--header", "floumy-user-token:${mcpToken}"],
+        "args": ["-y", "mcp-remote", "https://api.floumy.com/mcp", "--header", "floumy-user-token:${mcpToken}"],
         "env": {}
       },
       "settings": {}
