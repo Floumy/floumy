@@ -7,6 +7,7 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import { OrgsService } from '../orgs/orgs.service';
+import { FilesModule } from '../files/files.module';
 
 describe('ProjectsService', () => {
   let service: ProjectsService;
@@ -20,7 +21,7 @@ describe('ProjectsService', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Project, User])],
+      [TypeOrmModule.forFeature([Project, User]), FilesModule],
       [ProjectsService, UsersService],
     );
     service = module.get<ProjectsService>(ProjectsService);
