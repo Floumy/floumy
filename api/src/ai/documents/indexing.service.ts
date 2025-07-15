@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { chunkText } from './chunk.util';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Objective } from '../../okrs/objective.entity';
 import { DocumentVectorStoreService } from './document-vector-store.service';
@@ -63,12 +64,17 @@ export class IndexingService {
 
       const org = await objective.org;
       const project = await objective.project;
-      await this.documentVectorStore.addDocument(content, {
-        userId: assignedTo?.id,
-        orgId: org.id,
-        projectId: project?.id,
-        documentType: 'Objective',
-      });
+      const chunks = chunkText(content, 4000);
+      for (let idx = 0; idx < chunks.length; idx++) {
+        await this.documentVectorStore.addDocument(chunks[idx], {
+          userId: assignedTo?.id,
+          orgId: org.id,
+          projectId: project?.id,
+          documentType: 'Objective',
+          chunkIndex: idx,
+          totalChunks: chunks.length,
+        });
+      }
 
       const keyResults = await objective.keyResults;
       for (const keyResult of keyResults) {
@@ -80,12 +86,17 @@ export class IndexingService {
         Reference: ${keyResult.reference || 'N/A'}
         Assignee: ${assignedTo?.name || 'N/A'}
         `;
-        await this.documentVectorStore.addDocument(content, {
-          userId: assignedTo?.id,
-          orgId: org.id,
-          projectId: project?.id,
-          documentType: 'Key Result',
-        });
+        const krChunks = chunkText(content, 4000);
+        for (let idx = 0; idx < krChunks.length; idx++) {
+          await this.documentVectorStore.addDocument(krChunks[idx], {
+            userId: assignedTo?.id,
+            orgId: org.id,
+            projectId: project?.id,
+            documentType: 'Key Result',
+            chunkIndex: idx,
+            totalChunks: krChunks.length,
+          });
+        }
       }
     }
   }
@@ -109,12 +120,17 @@ export class IndexingService {
 
       const org = await initiative.org;
       const project = await initiative.project;
-      await this.documentVectorStore.addDocument(content, {
-        userId: assignedTo?.id,
-        orgId: org.id,
-        projectId: project.id,
-        documentType: 'Initiative',
-      });
+      const chunks = chunkText(content, 4000);
+      for (let idx = 0; idx < chunks.length; idx++) {
+        await this.documentVectorStore.addDocument(chunks[idx], {
+          userId: assignedTo?.id,
+          orgId: org.id,
+          projectId: project.id,
+          documentType: 'Initiative',
+          chunkIndex: idx,
+          totalChunks: chunks.length,
+        });
+      }
     }
   }
 
@@ -136,12 +152,17 @@ export class IndexingService {
 
       const org = await workItem.org;
       const project = await workItem.project;
-      await this.documentVectorStore.addDocument(content, {
-        userId: assignedTo?.id,
-        orgId: org.id,
-        projectId: project.id,
-        documentType: 'Work Item',
-      });
+      const chunks = chunkText(content, 4000);
+      for (let idx = 0; idx < chunks.length; idx++) {
+        await this.documentVectorStore.addDocument(chunks[idx], {
+          userId: assignedTo?.id,
+          orgId: org.id,
+          projectId: project.id,
+          documentType: 'Work Item',
+          chunkIndex: idx,
+          totalChunks: chunks.length,
+        });
+      }
     }
   }
 
@@ -158,11 +179,16 @@ export class IndexingService {
 
       const org = await milestone.org;
       const project = await milestone.project;
-      await this.documentVectorStore.addDocument(content, {
-        orgId: org.id,
-        projectId: project.id,
-        documentType: 'Milestone',
-      });
+      const chunks = chunkText(content, 4000);
+      for (let idx = 0; idx < chunks.length; idx++) {
+        await this.documentVectorStore.addDocument(chunks[idx], {
+          orgId: org.id,
+          projectId: project.id,
+          documentType: 'Milestone',
+          chunkIndex: idx,
+          totalChunks: chunks.length,
+        });
+      }
     }
   }
 
@@ -180,11 +206,16 @@ export class IndexingService {
 
       const org = await sprint.org;
       const project = await sprint.project;
-      await this.documentVectorStore.addDocument(content, {
-        orgId: org.id,
-        projectId: project.id,
-        documentType: 'Sprint',
-      });
+      const chunks = chunkText(content, 4000);
+      for (let idx = 0; idx < chunks.length; idx++) {
+        await this.documentVectorStore.addDocument(chunks[idx], {
+          orgId: org.id,
+          projectId: project.id,
+          documentType: 'Sprint',
+          chunkIndex: idx,
+          totalChunks: chunks.length,
+        });
+      }
     }
   }
 
@@ -204,11 +235,16 @@ export class IndexingService {
 
       const org = await featureRequest.org;
       const project = await featureRequest.project;
-      await this.documentVectorStore.addDocument(content, {
-        orgId: org.id,
-        projectId: project.id,
-        documentType: 'Feature Request',
-      });
+      const chunks = chunkText(content, 4000);
+      for (let idx = 0; idx < chunks.length; idx++) {
+        await this.documentVectorStore.addDocument(chunks[idx], {
+          orgId: org.id,
+          projectId: project.id,
+          documentType: 'Feature Request',
+          chunkIndex: idx,
+          totalChunks: chunks.length,
+        });
+      }
     }
   }
 
@@ -227,11 +263,16 @@ export class IndexingService {
 
       const org = await issue.org;
       const project = await issue.project;
-      await this.documentVectorStore.addDocument(content, {
-        orgId: org.id,
-        projectId: project.id,
-        documentType: 'Issue',
-      });
+      const chunks = chunkText(content, 4000);
+      for (let idx = 0; idx < chunks.length; idx++) {
+        await this.documentVectorStore.addDocument(chunks[idx], {
+          orgId: org.id,
+          projectId: project.id,
+          documentType: 'Issue',
+          chunkIndex: idx,
+          totalChunks: chunks.length,
+        });
+      }
     }
   }
 
