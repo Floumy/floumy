@@ -23,5 +23,9 @@ export interface ViewNotificationDto {
   entityName: string;
   entityUrl: string;
   createdAt: Date;
-  createdBy: User;
+  createdBy: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }

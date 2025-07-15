@@ -39,6 +39,7 @@ import githubConfig from './config/github.config';
 import gitlabConfig from './config/gitlab.config';
 import { DemoModule } from './demo/demo.module';
 import { PagesModule } from './pages/pages.module';
+import { FloumyMcpModule } from './mcp/mcp.module';
 
 @Module({
   imports: [
@@ -114,6 +115,7 @@ import { PagesModule } from './pages/pages.module';
     GitlabModule,
     DemoModule,
     PagesModule,
+    FloumyMcpModule,
   ],
   providers: [
     {

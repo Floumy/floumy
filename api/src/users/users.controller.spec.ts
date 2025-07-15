@@ -82,4 +82,25 @@ describe('UsersController', () => {
       expect(foundUser.role).toEqual(UserRole.ADMIN);
     });
   });
+
+  describe('when getting the MCP token', () => {
+    it('should return the MCP token', async () => {
+      const mcpToken = await controller.getMcpToken({
+        user: { sub: user.id },
+      });
+      expect(mcpToken).toBeDefined();
+      expect(mcpToken).toEqual(user.mcpToken);
+    });
+  });
+
+  describe('when regenerating the MCP token', () => {
+    it('should return a new MCP token', async () => {
+      const oldToken = user.mcpToken;
+      const newToken = await controller.refreshMcpToken({
+        user: { sub: user.id },
+      });
+      expect(newToken).toBeDefined();
+      expect(newToken).not.toEqual(oldToken);
+    });
+  });
 });

@@ -10,13 +10,13 @@ import {
 import { memberNameInitials, textToColor } from '../../services/utils/utils';
 import { logoutUser } from '../../services/api/api.service';
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import Notifications from './Notifications';
+import { FEATURES, useFeatureFlags } from '../../hooks/useFeatureFlags';
 
 export default function CurrentUserNav() {
-  const { orgId, projectId } = useParams();
-
   const currentUserName = localStorage.getItem('currentUserName');
+  const currentOrgId = localStorage.getItem('currentUserOrgId');
+  const { isFeatureEnabled } = useFeatureFlags();
 
   if (!currentUserName) {
     return (
@@ -57,12 +57,16 @@ export default function CurrentUserNav() {
           </Media>
         </DropdownToggle>
         <DropdownMenu right className="border border-dark">
-          <DropdownItem
-            href={`/admin/orgs/${orgId}/projects/${projectId}/my-profile`}
-          >
-            <i className="ni ni-single-02" />
+          <DropdownItem href={`/user/my-profile`}>
+            <i className="fas fa-user" />
             <span>My profile</span>
           </DropdownItem>
+          {isFeatureEnabled(FEATURES.AI_SETTINGS, currentOrgId) && (
+            <DropdownItem href={`/user/ai-settings`}>
+              <i className="fas fa-magic-wand-sparkles" />
+              <span>AI Settings</span>
+            </DropdownItem>
+          )}
           <div className="dropdown-divider"></div>
           <DropdownItem
             href="#pablo"
@@ -72,7 +76,7 @@ export default function CurrentUserNav() {
               window.location.href = '/auth/sign-in';
             }}
           >
-            <i className="ni ni-user-run" />
+            <i className="fas fa-sign-out" />
             <span>Logout</span>
           </DropdownItem>
         </DropdownMenu>
