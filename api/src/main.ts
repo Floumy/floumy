@@ -14,20 +14,36 @@ import {
 } from 'nest-winston';
 import 'winston-daily-rotate-file';
 
-const transports = [
-  new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.ms(),
-      nestWinstonModuleUtilities.format.nestLike('Floumy', {
-        colors: true,
-        prettyPrint: true,
-        processId: true,
-        appName: true,
-      }),
-    ),
-  }),
-];
+const transports = [];
+
+if (process.env.NODE_ENV === 'development') {
+  transports.push(
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.ms(),
+        nestWinstonModuleUtilities.format.nestLike('Floumy', {
+          colors: true,
+          prettyPrint: true,
+          processId: true,
+          appName: true,
+        }),
+      ),
+    }),
+  );
+}
+
+if (process.env.NODE_ENV === 'production') {
+  transports.push(
+    new winston.transports.DailyRotateFile({
+      filename: 'application-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '14d',
+    }),
+  );
+}
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
