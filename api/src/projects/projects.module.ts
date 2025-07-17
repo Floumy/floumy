@@ -10,6 +10,7 @@ import { Org } from '../orgs/org.entity';
 import { PublicController } from './public/public.controller';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PublicService } from './public/public.service';
+import { FilesModule } from '../files/files.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PublicService } from './public/public.service';
     TypeOrmModule.forFeature([Project, User, Org]),
     UsersModule,
     AuthModule,
+    FilesModule,
   ],
   providers: [ProjectsService, PublicService],
   controllers: [ProjectsController, PublicController],

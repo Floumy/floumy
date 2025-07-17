@@ -8,6 +8,7 @@ import { ProjectsService } from './projects.service';
 import { UsersModule } from '../users/users.module';
 import { UsersService } from '../users/users.service';
 import { setupTestingModule } from '../../test/test.utils';
+import { FilesModule } from '../files/files.module';
 
 describe('ProjectsController', () => {
   let controller: ProjectsController;
@@ -19,7 +20,11 @@ describe('ProjectsController', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User, Project]), UsersModule],
+      [
+        TypeOrmModule.forFeature([Org, User, Project]),
+        UsersModule,
+        FilesModule,
+      ],
       [ProjectsService],
       [ProjectsController],
     );
