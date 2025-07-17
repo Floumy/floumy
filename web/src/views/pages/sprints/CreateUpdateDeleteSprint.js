@@ -167,9 +167,9 @@ function CreateUpdateDeleteSprint({
     setWorkItems(sortByPriority(workItemsToUpdate));
   }
 
-  async function start(sprintId) {
+  async function start(orgId, projectId, sprintId) {
     try {
-      await startSprint(sprintId);
+      await startSprint(orgId, projectId, sprintId);
       setSprintStatus('active');
       toast.success('The sprint has been started');
     } catch (e) {
