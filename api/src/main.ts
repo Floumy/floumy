@@ -36,6 +36,7 @@ if (process.env.NODE_ENV === 'development') {
 if (process.env.NODE_ENV === 'production') {
   transports.push(
     new winston.transports.DailyRotateFile({
+      dirname: '/usr/src/log/',
       filename: 'application-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
