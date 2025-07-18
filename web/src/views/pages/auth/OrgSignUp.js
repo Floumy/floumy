@@ -244,7 +244,7 @@ function OrgSignUp() {
                               <span className="text-muted">
                                 I agree with the{' '}
                                 <a
-                                  href="https://app.termly.io/policy-viewer/policy.html?policyUUID=fb8deed6-e77a-43cd-aa76-1c655b357e4c"
+                                  href="https://floumy.com/privacy"
                                   target="_blank"
                                   rel="noreferrer"
                                 >
@@ -252,7 +252,7 @@ function OrgSignUp() {
                                 </a>{' '}
                                 and{' '}
                                 <a
-                                  href="https://app.termly.io/policy-viewer/policy.html?policyUUID=b76fc02b-bf3a-4da0-a77b-dcb50b8d37c2"
+                                  href="https://floumy.com/terms"
                                   target="_blank"
                                   rel="noreferrer"
                                 >
