@@ -5,4 +5,6 @@ export interface DocumentMetadata {
   projectId?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  chunkIndex?: number;
+  totalChunks?: number;
 }
