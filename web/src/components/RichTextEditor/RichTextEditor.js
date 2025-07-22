@@ -216,24 +216,10 @@ const Tiptap = ({
     },
   });
 
-  // Update editor content when `content` prop changes from outside
-  useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content || '', false);
-    }
-  }, [content, editor]);
-
-  const focusEditor = () => {
-    if (editor) {
-      editor.chain().focus().run();
-    }
-  };
-
   return (
     <div
       id={id}
       className={`tiptap-editor-container ${bordered ? 'tiptap-editor-container-border' : ''}`}
-      onClick={focusEditor}
     >
       {toolbar && (
         <div className="tiptap-toolbar">
