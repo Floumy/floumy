@@ -216,10 +216,17 @@ const Tiptap = ({
     },
   });
 
+  const focusEditor = () => {
+    if (editor) {
+      editor.chain().focus().run();
+    }
+  };
+
   return (
     <div
       id={id}
       className={`tiptap-editor-container ${bordered ? 'tiptap-editor-container-border' : ''}`}
+      onClick={focusEditor}
     >
       {toolbar && (
         <div className="tiptap-toolbar">
