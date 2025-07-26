@@ -115,7 +115,7 @@ export class IndexingService {
       Reference: ${initiative.reference || 'N/A'}
       Assignee: ${assignedTo?.name || 'N/A'}
       Priority: ${initiative.priority}
-      Description: ${initiative.description || 'N/A'}
+      Description: ${this.stripNonTextualData(initiative.description) || 'N/A'}
       `;
 
       const org = await initiative.org;
@@ -147,7 +147,7 @@ export class IndexingService {
       Reference: ${workItem.reference || 'N/A'}
       Assignee: ${assignedTo?.name || 'N/A'}
       Priority: ${workItem.priority}
-      Description: ${workItem.description || 'N/A'}
+      Description: ${this.stripNonTextualData(workItem.description) || 'N/A'}
       `;
 
       const org = await workItem.org;
@@ -227,7 +227,9 @@ export class IndexingService {
       const content = `
       Type: Feature Request
       Title: ${featureRequest.title}
-      Description: ${featureRequest.description || 'N/A'}
+      Description: ${
+        this.stripNonTextualData(featureRequest.description) || 'N/A'
+      }
       Status: ${featureRequest.status}
       estimation: ${featureRequest.estimation || 'N/A'}
       votesCount: ${featureRequest.votesCount || 'N/A'}
@@ -256,7 +258,7 @@ export class IndexingService {
       const content = `
       Type: Issue
       Title: ${issue.title}
-      Description: ${issue.description || 'N/A'}
+      Description: ${this.stripNonTextualData(issue.description) || 'N/A'}
       Status: ${issue.status}
       priority: ${issue.priority}
       `;
@@ -304,5 +306,17 @@ export class IndexingService {
       this.logger.error(`Failed to cancel indexing task ${taskId}:`, error);
       return false;
     }
+  }
+
+  stripNonTextualData(data: string): string {
+    if (!data) {
+      return '';
+    }
+    // First, remove img elements specifically
+    const imgRegex = /<img[^>]*>/g;
+    // Then remove all remaining HTML tags
+    const htmlTagRegex = /<[^>]*>/g;
+
+    return data.replace(imgRegex, '[image]').replace(htmlTagRegex, '');
   }
 }
