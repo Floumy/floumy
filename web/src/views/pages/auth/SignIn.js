@@ -148,7 +148,7 @@ function SignIn() {
       await logoutUser();
       setError('You are not a member of any organization.');
     } catch (e) {
-      setError(e.message);
+      setError('The email or password is incorrect.');
     } finally {
       setSubmitting(false);
     }
