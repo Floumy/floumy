@@ -113,4 +113,56 @@ export class DocumentVectorStoreService implements OnModuleInit {
       updatedAt: new Date(),
     } as DocumentMetadata);
   }
+
+  /**
+   * Get all documents by entity ID using direct metadata filtering
+   * This is more efficient than similarity search when you only need to filter by metadata
+   * @param entityId The entity ID to filter by
+   * @returns Array of documents matching the entity ID
+   */
+  async getAllDocumentsByEntityId(entityId: string) {
+    // Access the underlying PGVectorStore's client to perform a direct metadata query
+    const client = this.vectorStore.client;
+
+    // Use the tableName and columns configuration from the vectorStore
+    const tableName = this.vectorStore.tableName;
+    const columns = {
+      idColumnName: this.vectorStore.idColumnName,
+      contentColumnName: this.vectorStore.contentColumnName,
+      metadataColumnName: this.vectorStore.metadataColumnName,
+    };
+
+    // Query documents directly by metadata
+    const result = await client.query(
+      `SELECT ${columns.idColumnName}, ${columns.contentColumnName}, ${columns.metadataColumnName}
+       FROM ${tableName}
+       WHERE ${columns.metadataColumnName} ->> 'entityId' = $1`,
+      [entityId],
+    );
+
+    // Convert the query results to Document objects
+    return result.rows.map((row) => {
+      return new Document({
+        pageContent: row[columns.contentColumnName],
+        metadata: row[columns.metadataColumnName],
+      });
+    });
+  }
+
+  async deleteAllDocumentsByEntityId(entityId: string) {
+    // Access the underlying PGVectorStore's client to perform a direct metadata query
+    const client = this.vectorStore.client;
+
+    // Use the tableName and columns configuration from the vectorStore
+    const tableName = this.vectorStore.tableName;
+
+    const metadataColumnName = this.vectorStore.metadataColumnName;
+
+    // Delete documents directly by metadata
+    await client.query(
+      `DELETE FROM ${tableName}
+       WHERE ${metadataColumnName} ->> 'entityId' = $1`,
+      [entityId],
+    );
+  }
 }

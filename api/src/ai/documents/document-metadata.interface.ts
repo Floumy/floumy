@@ -1,4 +1,5 @@
 export interface DocumentMetadata {
+  entityId: string;
   orgId: string;
   documentType: string;
   userId?: string;

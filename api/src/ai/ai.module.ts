@@ -26,6 +26,7 @@ import { IndexingService } from './documents/indexing.service';
 import { Sprint } from '../sprints/sprint.entity';
 import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 import { Page } from 'src/pages/pages.entity';
+import { ObjectiveSubscriber } from './documents/entity-subscribers/objective-subscriber';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { Page } from 'src/pages/pages.entity';
     DocumentVectorStoreService,
     IndexingService,
     WorkItemsToolsService,
+    ObjectiveSubscriber,
   ],
 })
 export class AiModule {}
