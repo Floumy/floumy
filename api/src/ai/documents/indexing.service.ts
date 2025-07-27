@@ -11,6 +11,7 @@ import { Sprint } from 'src/sprints/sprint.entity';
 import { FeatureRequest } from 'src/feature-requests/feature-request.entity';
 import { Issue } from 'src/issues/issue.entity';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { Page } from '../../pages/pages.entity';
 
 @Injectable()
 export class IndexingService {
@@ -32,6 +33,8 @@ export class IndexingService {
     private featureRequestRepository: Repository<FeatureRequest>,
     @InjectRepository(Issue)
     private issueRepository: Repository<Issue>,
+    @InjectRepository(Page)
+    private pageRepository: Repository<Page>,
     private schedulerRegistry: SchedulerRegistry,
   ) {}
 
@@ -43,6 +46,7 @@ export class IndexingService {
     await this.indexSprints(orgId);
     await this.indexFeatureRequests(orgId);
     await this.indexIssues(orgId);
+    await this.indexPages(orgId);
   }
 
   private async indexOKRs(orgId: string) {
@@ -269,6 +273,32 @@ export class IndexingService {
           orgId: org.id,
           projectId: project.id,
           documentType: 'Issue',
+          chunkIndex: idx,
+          totalChunks: chunks.length,
+        });
+      }
+    }
+  }
+
+  private async indexPages(orgId: string) {
+    const documents = await this.pageRepository.find({
+      where: { project: { org: { id: orgId } } },
+    });
+    for (const document of documents) {
+      const content = `
+      Type: Document
+      Title: ${document.title}
+      Content: ${document.content || 'N/A'}
+      `;
+
+      const project = await document.project;
+      const org = await project.org;
+      const chunks = chunkText(content, 4000);
+      for (let idx = 0; idx < chunks.length; idx++) {
+        await this.documentVectorStore.addDocument(chunks[idx], {
+          orgId: org.id,
+          projectId: project.id,
+          documentType: 'Document',
           chunkIndex: idx,
           totalChunks: chunks.length,
         });

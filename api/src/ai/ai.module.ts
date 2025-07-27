@@ -25,6 +25,7 @@ import { IndexingController } from './documents/indexing.controller';
 import { IndexingService } from './documents/indexing.service';
 import { Sprint } from '../sprints/sprint.entity';
 import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
+import { Page } from 'src/pages/pages.entity';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
       FeatureRequest,
       Objective,
       Sprint,
+      Page,
     ]),
   ],
   controllers: [AiController, ChatController, IndexingController],
