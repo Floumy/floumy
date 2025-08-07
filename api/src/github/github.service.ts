@@ -461,31 +461,13 @@ export class GithubService {
   }
 
   private async getPullRequestForProject(project: Project, pr: any) {
-    const workItemReference = await this.getPullRequestWorkItemReference(pr);
-
-    if (!workItemReference) {
-      return null;
-    }
-
     const org = await project.org;
-    const workItem = await this.workItemRepository.findOne({
-      where: {
-        reference: workItemReference.toUpperCase(),
-        org: { id: org.id },
-        project: { id: project.id },
-      },
-    });
-
-    if (!workItem) {
-      return null;
-    }
 
     return await this.githubPullRequestRepository.findOne({
       where: {
         githubId: pr.id,
         org: { id: org.id },
         project: { id: project.id },
-        workItem: { id: workItem.id },
       },
     });
   }
