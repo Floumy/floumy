@@ -1,6 +1,8 @@
 import api from '../api/api.service';
 import axios from 'axios';
 
+axios.defaults.withCredentials = true;
+
 function handleAuthentication(response) {
   if (response.data.lastSignedIn) {
     localStorage.setItem('lastSignedIn', response.data.lastSignedIn);
@@ -19,7 +21,7 @@ export async function orgSignUp(
   const requestData = { name, email, password, orgName, invitationToken };
 
   try {
-    await api.post(
+    await axios.post(
       `${process.env.REACT_APP_API_URL}/auth/org/sign-up`,
       requestData,
     );
@@ -32,7 +34,7 @@ export async function signIn(email, password) {
   const requestData = { email, password };
 
   try {
-    const response = await api.post(
+    const response = await axios.post(
       `${process.env.REACT_APP_API_URL}/auth/sign-in`,
       requestData,
     );
@@ -46,7 +48,7 @@ export async function signIn(email, password) {
 
 export async function activateAccount(activationToken) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/auth/activate`, {
+    await axios.post(`${process.env.REACT_APP_API_URL}/auth/activate`, {
       activationToken,
     });
   } catch (e) {
@@ -56,7 +58,7 @@ export async function activateAccount(activationToken) {
 
 export async function sendResetPasswordLink(email) {
   try {
-    await api.post(
+    await axios.post(
       `${process.env.REACT_APP_API_URL}/auth/send-reset-password-link`,
       { email },
     );
@@ -67,7 +69,7 @@ export async function sendResetPasswordLink(email) {
 
 export async function resetPassword(password, resetToken) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/auth/reset-password`, {
+    await axios.post(`${process.env.REACT_APP_API_URL}/auth/reset-password`, {
       password,
       resetToken,
     });
@@ -78,7 +80,7 @@ export async function resetPassword(password, resetToken) {
 
 export async function signUp(name, email, password) {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/auth/sign-up`, {
+    await axios.post(`${process.env.REACT_APP_API_URL}/auth/sign-up`, {
       name,
       email,
       password,
