@@ -6,16 +6,11 @@ import { DocumentVectorStoreService } from './document-vector-store.service';
 import { Repository } from 'typeorm';
 import { Initiative } from 'src/roadmap/initiatives/initiative.entity';
 import { WorkItem } from 'src/backlog/work-items/work-item.entity';
-import { Milestone } from 'src/roadmap/milestones/milestone.entity';
-import { Sprint } from 'src/sprints/sprint.entity';
 import { FeatureRequest } from 'src/feature-requests/feature-request.entity';
 import { Issue } from 'src/issues/issue.entity';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { Page } from '../../pages/pages.entity';
 import { KeyResult } from '../../okrs/key-result.entity';
-import { User } from '../../users/user.entity';
-import { Org } from '../../orgs/org.entity';
-import { Project } from '../../projects/project.entity';
 
 @Injectable()
 export class IndexingService {
@@ -29,10 +24,6 @@ export class IndexingService {
     private initiativeRepository: Repository<Initiative>,
     @InjectRepository(WorkItem)
     private workItemRepository: Repository<WorkItem>,
-    @InjectRepository(Milestone)
-    private milestoneRepository: Repository<Milestone>,
-    @InjectRepository(Sprint)
-    private sprintRepository: Repository<Sprint>,
     @InjectRepository(FeatureRequest)
     private featureRequestRepository: Repository<FeatureRequest>,
     @InjectRepository(Issue)
@@ -46,11 +37,10 @@ export class IndexingService {
     await this.indexOkrs(orgId);
     await this.indexInitiatives(orgId);
     await this.indexWorkItems(orgId);
-    await this.indexMilestones(orgId);
-    await this.indexSprints(orgId);
     await this.indexFeatureRequests(orgId);
     await this.indexIssues(orgId);
-    await this.indexPages(orgId);
+    // TODO: Enable the page indexing after implementing the page save instead of saving everytime someone types
+    // await this.indexPages(orgId);
   }
 
   async indexOkrs(orgId: string) {
@@ -60,34 +50,29 @@ export class IndexingService {
     });
 
     for (const objective of objectives) {
-      const { assignedTo, org, project } = await this.indexObjective(objective);
+      await this.indexObjective(objective);
 
       const keyResults = await objective.keyResults;
       for (const keyResult of keyResults) {
-        await this.indexKeyResult(keyResult, assignedTo, org, project);
+        await this.indexKeyResult(keyResult);
       }
     }
   }
 
-  async indexKeyResult(
-    keyResult: KeyResult,
-    assignedTo: User,
-    org: Org,
-    project: Project,
-  ) {
+  async indexKeyResult(keyResult: KeyResult) {
+    const org = await keyResult.org;
+    const project = await keyResult.project;
     const content = `
         Type: Key Result
         Title: ${keyResult.title}
         Progress: ${keyResult.progress || 0}%
         Status: ${keyResult.status}
         Reference: ${keyResult.reference || 'N/A'}
-        Assignee: ${assignedTo?.name || 'N/A'}
         `;
     const krChunks = chunkText(content, 4000);
     for (let idx = 0; idx < krChunks.length; idx++) {
       await this.documentVectorStore.addDocument(krChunks[idx], {
         entityId: keyResult.id,
-        userId: assignedTo?.id,
         orgId: org.id,
         projectId: project?.id,
         documentType: 'Key Result',
@@ -135,8 +120,13 @@ export class IndexingService {
     });
 
     for (const initiative of initiatives) {
-      const assignedTo = await initiative.assignedTo;
-      const content = `
+      await this.indexInitiative(initiative);
+    }
+  }
+
+  async indexInitiative(initiative: Initiative) {
+    const assignedTo = await initiative.assignedTo;
+    const content = `
       Type: Initiative
       Title: ${initiative.title}
       Status: ${initiative.status}
@@ -146,30 +136,33 @@ export class IndexingService {
       Description: ${initiative.description || 'N/A'}
       `;
 
-      const org = await initiative.org;
-      const project = await initiative.project;
-      const chunks = chunkText(content, 4000);
-      for (let idx = 0; idx < chunks.length; idx++) {
-        await this.documentVectorStore.addDocument(chunks[idx], {
-          entityId: initiative.id,
-          userId: assignedTo?.id,
-          orgId: org.id,
-          projectId: project.id,
-          documentType: 'Initiative',
-          chunkIndex: idx,
-          totalChunks: chunks.length,
-        });
-      }
+    const org = await initiative.org;
+    const project = await initiative.project;
+    const chunks = chunkText(content, 4000);
+    for (let idx = 0; idx < chunks.length; idx++) {
+      await this.documentVectorStore.addDocument(chunks[idx], {
+        entityId: initiative.id,
+        userId: assignedTo?.id,
+        orgId: org.id,
+        projectId: project.id,
+        documentType: 'Initiative',
+        chunkIndex: idx,
+        totalChunks: chunks.length,
+      });
     }
   }
-
   async indexWorkItems(orgId: string) {
     const workItems = await this.workItemRepository.find({
       where: { org: { id: orgId } },
     });
     for (const workItem of workItems) {
-      const assignedTo = await workItem.assignedTo;
-      const content = `
+      await this.indexWorkItem(workItem);
+    }
+  }
+
+  async indexWorkItem(workItem: WorkItem) {
+    const assignedTo = await workItem.assignedTo;
+    const content = `
       Type: Work Item
       Title: ${workItem.title}
       Status: ${workItem.status}
@@ -179,75 +172,19 @@ export class IndexingService {
       Description: ${workItem.description || 'N/A'}
       `;
 
-      const org = await workItem.org;
-      const project = await workItem.project;
-      const chunks = chunkText(content, 4000);
-      for (let idx = 0; idx < chunks.length; idx++) {
-        await this.documentVectorStore.addDocument(chunks[idx], {
-          entityId: workItem.id,
-          userId: assignedTo?.id,
-          orgId: org.id,
-          projectId: project.id,
-          documentType: 'Work Item',
-          chunkIndex: idx,
-          totalChunks: chunks.length,
-        });
-      }
-    }
-  }
-
-  async indexMilestones(orgId: string) {
-    const milestones = await this.milestoneRepository.find({
-      where: { org: { id: orgId } },
-    });
-    for (const milestone of milestones) {
-      const content = `
-      Type: Milestone
-      Title: ${milestone.title}
-      Due Date: ${milestone.dueDate}
-      `;
-
-      const org = await milestone.org;
-      const project = await milestone.project;
-      const chunks = chunkText(content, 4000);
-      for (let idx = 0; idx < chunks.length; idx++) {
-        await this.documentVectorStore.addDocument(chunks[idx], {
-          entityId: milestone.id,
-          orgId: org.id,
-          projectId: project.id,
-          documentType: 'Milestone',
-          chunkIndex: idx,
-          totalChunks: chunks.length,
-        });
-      }
-    }
-  }
-
-  async indexSprints(orgId: string) {
-    const sprints = await this.sprintRepository.find({
-      where: { org: { id: orgId } },
-    });
-    for (const sprint of sprints) {
-      const content = `
-      Type: Sprint
-      Title: ${sprint.title}
-      Start Date: ${sprint.startDate}
-      End Date: ${sprint.endDate}
-      `;
-
-      const org = await sprint.org;
-      const project = await sprint.project;
-      const chunks = chunkText(content, 4000);
-      for (let idx = 0; idx < chunks.length; idx++) {
-        await this.documentVectorStore.addDocument(chunks[idx], {
-          entityId: sprint.id,
-          orgId: org.id,
-          projectId: project.id,
-          documentType: 'Sprint',
-          chunkIndex: idx,
-          totalChunks: chunks.length,
-        });
-      }
+    const org = await workItem.org;
+    const project = await workItem.project;
+    const chunks = chunkText(content, 4000);
+    for (let idx = 0; idx < chunks.length; idx++) {
+      await this.documentVectorStore.addDocument(chunks[idx], {
+        entityId: workItem.id,
+        userId: assignedTo?.id,
+        orgId: org.id,
+        projectId: project.id,
+        documentType: 'Work Item',
+        chunkIndex: idx,
+        totalChunks: chunks.length,
+      });
     }
   }
 
@@ -256,7 +193,12 @@ export class IndexingService {
       where: { org: { id: orgId } },
     });
     for (const featureRequest of featureRequests) {
-      const content = `
+      await this.indexFeatureRequest(featureRequest);
+    }
+  }
+
+  async indexFeatureRequest(featureRequest: FeatureRequest) {
+    const content = `
       Type: Feature Request
       Title: ${featureRequest.title}
       Description: ${featureRequest.description || 'N/A'}
@@ -265,19 +207,18 @@ export class IndexingService {
       votesCount: ${featureRequest.votesCount || 'N/A'}
       `;
 
-      const org = await featureRequest.org;
-      const project = await featureRequest.project;
-      const chunks = chunkText(content, 4000);
-      for (let idx = 0; idx < chunks.length; idx++) {
-        await this.documentVectorStore.addDocument(chunks[idx], {
-          entityId: featureRequest.id,
-          orgId: org.id,
-          projectId: project.id,
-          documentType: 'Feature Request',
-          chunkIndex: idx,
-          totalChunks: chunks.length,
-        });
-      }
+    const org = await featureRequest.org;
+    const project = await featureRequest.project;
+    const chunks = chunkText(content, 4000);
+    for (let idx = 0; idx < chunks.length; idx++) {
+      await this.documentVectorStore.addDocument(chunks[idx], {
+        entityId: featureRequest.id,
+        orgId: org.id,
+        projectId: project.id,
+        documentType: 'Feature Request',
+        chunkIndex: idx,
+        totalChunks: chunks.length,
+      });
     }
   }
 
@@ -286,7 +227,12 @@ export class IndexingService {
       where: { org: { id: orgId } },
     });
     for (const issue of issues) {
-      const content = `
+      await this.indexIssue(issue);
+    }
+  }
+
+  async indexIssue(issue: Issue) {
+    const content = `
       Type: Issue
       Title: ${issue.title}
       Description: ${issue.description || 'N/A'}
@@ -294,46 +240,49 @@ export class IndexingService {
       priority: ${issue.priority}
       `;
 
-      const org = await issue.org;
-      const project = await issue.project;
-      const chunks = chunkText(content, 4000);
-      for (let idx = 0; idx < chunks.length; idx++) {
-        await this.documentVectorStore.addDocument(chunks[idx], {
-          entityId: issue.id,
-          orgId: org.id,
-          projectId: project.id,
-          documentType: 'Issue',
-          chunkIndex: idx,
-          totalChunks: chunks.length,
-        });
-      }
+    const org = await issue.org;
+    const project = await issue.project;
+    const chunks = chunkText(content, 4000);
+    for (let idx = 0; idx < chunks.length; idx++) {
+      await this.documentVectorStore.addDocument(chunks[idx], {
+        entityId: issue.id,
+        orgId: org.id,
+        projectId: project.id,
+        documentType: 'Issue',
+        chunkIndex: idx,
+        totalChunks: chunks.length,
+      });
     }
   }
 
   async indexPages(orgId: string) {
-    const documents = await this.pageRepository.find({
+    const pages = await this.pageRepository.find({
       where: { project: { org: { id: orgId } } },
     });
-    for (const document of documents) {
-      const content = `
+    for (const page of pages) {
+      await this.indexPage(page);
+    }
+  }
+
+  async indexPage(page: Page) {
+    const content = `
       Type: Document
-      Title: ${document.title}
-      Content: ${document.content || 'N/A'}
+      Title: ${page.title}
+      Content: ${page.content || 'N/A'}
       `;
 
-      const project = await document.project;
-      const org = await project.org;
-      const chunks = chunkText(content, 4000);
-      for (let idx = 0; idx < chunks.length; idx++) {
-        await this.documentVectorStore.addDocument(chunks[idx], {
-          entityId: document.id,
-          orgId: org.id,
-          projectId: project.id,
-          documentType: 'Document',
-          chunkIndex: idx,
-          totalChunks: chunks.length,
-        });
-      }
+    const project = page.project;
+    const org = await project.org;
+    const chunks = chunkText(content, 4000);
+    for (let idx = 0; idx < chunks.length; idx++) {
+      await this.documentVectorStore.addDocument(chunks[idx], {
+        entityId: page.id,
+        orgId: org.id,
+        projectId: project.id,
+        documentType: 'Document',
+        chunkIndex: idx,
+        totalChunks: chunks.length,
+      });
     }
   }
 
@@ -370,5 +319,25 @@ export class IndexingService {
   async updateObjectiveIndex(objective: Objective) {
     await this.deleteEntityIndex(objective.id);
     await this.indexObjective(objective);
+  }
+
+  async updateKeyResultIndex(keyResult: KeyResult) {
+    await this.deleteEntityIndex(keyResult.id);
+    await this.indexKeyResult(keyResult);
+  }
+
+  async updateWorkItemIndex(workItem: WorkItem) {
+    await this.deleteEntityIndex(workItem.id);
+    await this.indexWorkItem(workItem);
+  }
+
+  async updateFeatureRequestIndex(featureRequest: FeatureRequest) {
+    await this.deleteEntityIndex(featureRequest.id);
+    await this.indexFeatureRequest(featureRequest);
+  }
+
+  async updateIssueIndex(issue: Issue) {
+    await this.deleteEntityIndex(issue.id);
+    await this.indexIssue(issue);
   }
 }

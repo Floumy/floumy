@@ -26,7 +26,7 @@ import { IndexingService } from './documents/indexing.service';
 import { Sprint } from '../sprints/sprint.entity';
 import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 import { Page } from 'src/pages/pages.entity';
-import { ObjectiveSubscriber } from './documents/entity-subscribers/objective-subscriber';
+import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
 
 @Module({
   imports: [
@@ -58,7 +58,7 @@ import { ObjectiveSubscriber } from './documents/entity-subscribers/objective-su
     DocumentVectorStoreService,
     IndexingService,
     WorkItemsToolsService,
-    ObjectiveSubscriber,
+    IndexingEventHandlerService,
   ],
 })
 export class AiModule {}

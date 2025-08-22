@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Page } from './pages.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository, ILike } from 'typeorm';
+import { ILike, IsNull, Repository } from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { CreatePageDto, UpdatePageDto } from './pages.dtos';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class PagesService {
@@ -12,9 +13,10 @@ export class PagesService {
     private pageRepository: Repository<Page>,
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
-  async createPage(projectId, data: CreatePageDto) {
+  async createPage(projectId: string, data: CreatePageDto) {
     const page = new Page();
     page.project = await this.projectRepository.findOneByOrFail({
       id: projectId,
@@ -30,7 +32,7 @@ export class PagesService {
       page.parent = parentPage;
     }
     await this.pageRepository.save(page);
-    return {
+    const pageDto = {
       id: page.id,
       title: page.title,
       content: page.content,
@@ -38,6 +40,10 @@ export class PagesService {
       updatedAt: page.updatedAt,
       parentId: page.parent ? page.parent.id : null,
     };
+
+    this.eventEmitter.emit('page.created', pageDto);
+
+    return pageDto;
   }
 
   async getPagesByParent(
@@ -78,6 +84,7 @@ export class PagesService {
 
   async updatePage(id: string, data: UpdatePageDto) {
     const page = await this.pageRepository.findOneByOrFail({ id });
+    const previousPage = { ...page };
     if (data.title) {
       page.title = data.title;
     }
@@ -98,10 +105,15 @@ export class PagesService {
       }
     }
     await this.pageRepository.save(page);
+    this.eventEmitter.emit('page.updated', {
+      previous: previousPage,
+      current: page,
+    });
   }
 
   async deletePage(id: string) {
     const page = await this.pageRepository.findOneByOrFail({ id });
     await this.pageRepository.remove(page);
+    this.eventEmitter.emit('page.deleted', { id });
   }
 }
