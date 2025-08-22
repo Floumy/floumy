@@ -80,7 +80,10 @@ export class FeatureRequestsService {
     featureRequestVote.vote = 1;
     await this.featureRequestVotesRepository.save(featureRequestVote);
 
-    return await FeatureRequestsMapper.toFeatureRequestDto(savedFeatureRequest);
+    const featureRequestDto =
+      await FeatureRequestsMapper.toFeatureRequestDto(savedFeatureRequest);
+    this.eventEmitter.emit('featureRequest.created', featureRequestDto);
+    return featureRequestDto;
   }
 
   async listFeatureRequests(
@@ -147,7 +150,8 @@ export class FeatureRequestsService {
         project: { id: projectId },
       },
     });
-
+    const previousFeatureRequestDto =
+      await FeatureRequestsMapper.toFeatureRequestDto(featureRequest);
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const featureRequestOrg = await featureRequest.org;
     const userOrg = await user.org;
@@ -166,7 +170,13 @@ export class FeatureRequestsService {
 
     const savedFeature =
       await this.featureRequestsRepository.save(featureRequest);
-    return await FeatureRequestsMapper.toFeatureRequestDto(savedFeature);
+    const featureRequestDto =
+      await FeatureRequestsMapper.toFeatureRequestDto(savedFeature);
+    this.eventEmitter.emit('featureRequest.updated', {
+      previous: previousFeatureRequestDto,
+      current: featureRequestDto,
+    });
+    return featureRequestDto;
   }
 
   async deleteFeatureRequest(
@@ -190,6 +200,9 @@ export class FeatureRequestsService {
       },
     });
 
+    const featureRequestDto =
+      await FeatureRequestsMapper.toFeatureRequestDto(featureRequest);
+
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const featureRequestOrg = await featureRequest.org;
     const userOrg = await user.org;
@@ -205,6 +218,7 @@ export class FeatureRequestsService {
     }
 
     await this.featureRequestsRepository.remove(featureRequest);
+    this.eventEmitter.emit('featureRequest.deleted', featureRequestDto);
   }
 
   async createFeatureRequestComment(

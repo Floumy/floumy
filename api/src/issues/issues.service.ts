@@ -60,7 +60,9 @@ export class IssuesService {
     issue.project = Promise.resolve(project);
     issue.createdBy = Promise.resolve(user);
     const savedIssue = await this.issuesRepository.save(issue);
-    return await IssueMapper.toDto(savedIssue);
+    const savedIssueDto = await IssueMapper.toDto(savedIssue);
+    this.eventEmitter.emit('issue.created', savedIssueDto);
+    return issueDto;
   }
 
   async listIssues(
@@ -124,6 +126,7 @@ export class IssuesService {
       org: { id: orgId },
       project: { id: projectId },
     });
+    const previousIssueDto = await IssueMapper.toDto(issue);
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const createdBy = await issue.createdBy;
     const userOrg = await user.org;
@@ -139,7 +142,12 @@ export class IssuesService {
     issue.status = issueDto.status;
     issue.priority = issueDto.priority;
     const savedIssue = await this.issuesRepository.save(issue);
-    return await IssueMapper.toDto(savedIssue);
+    const savedIssueDto = await IssueMapper.toDto(savedIssue);
+    this.eventEmitter.emit('issue.updated', {
+      previous: previousIssueDto,
+      current: savedIssueDto,
+    });
+    return savedIssueDto;
   }
 
   async deleteIssue(
@@ -153,6 +161,7 @@ export class IssuesService {
       org: { id: orgId },
       project: { id: projectId },
     });
+    const issueDto = await IssueMapper.toDto(issue);
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const createdBy = await issue.createdBy;
     const userOrg = await user.org;
@@ -172,6 +181,7 @@ export class IssuesService {
     }
 
     await this.issuesRepository.remove(issue);
+    this.eventEmitter.emit('issue.deleted', issueDto);
   }
 
   async createIssueComment(
