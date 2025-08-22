@@ -62,7 +62,7 @@ export class IssuesService {
     const savedIssue = await this.issuesRepository.save(issue);
     const savedIssueDto = await IssueMapper.toDto(savedIssue);
     this.eventEmitter.emit('issue.created', savedIssueDto);
-    return issueDto;
+    return savedIssueDto;
   }
 
   async listIssues(
