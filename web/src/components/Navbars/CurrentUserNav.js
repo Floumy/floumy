@@ -64,7 +64,7 @@ export default function CurrentUserNav() {
           {isFeatureEnabled(FEATURES.AI_SETTINGS, currentOrgId) && (
             <DropdownItem href={`/user/ai-settings`}>
               <i className="fas fa-magic-wand-sparkles" />
-              <span>AI Settings</span>
+              <span>MCP Server</span>
             </DropdownItem>
           )}
           <div className="dropdown-divider"></div>
