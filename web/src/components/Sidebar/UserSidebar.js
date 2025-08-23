@@ -124,7 +124,7 @@ function UserSidebar({ toggleSidenav, logo, rtlActive }) {
                             replace={true}
                           >
                             <i className="fas fa-magic-wand-sparkles" />
-                            <span className="nav-link-text">AI Settings</span>
+                            <span className="nav-link-text">MCP Server</span>
                           </NavLink>
                         </Col>
                       </Row>
