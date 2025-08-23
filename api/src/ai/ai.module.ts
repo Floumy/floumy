@@ -27,6 +27,7 @@ import { Sprint } from '../sprints/sprint.entity';
 import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 import { Page } from 'src/pages/pages.entity';
 import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
+import { BacklogModule } from '../backlog/backlog.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { IndexingEventHandlerService } from './documents/indexing-event-handler.
     RoadmapModule,
     UsersModule,
     AuthModule,
+    BacklogModule,
     CacheModule.register(),
     TypeOrmModule.forFeature([
       Org,

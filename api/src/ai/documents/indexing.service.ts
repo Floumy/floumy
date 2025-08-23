@@ -326,6 +326,11 @@ export class IndexingService {
     await this.indexKeyResult(keyResult);
   }
 
+  async updateInitiativeIndex(initiative: Initiative) {
+    await this.deleteEntityIndex(initiative.id);
+    await this.indexInitiative(initiative);
+  }
+
   async updateWorkItemIndex(workItem: WorkItem) {
     await this.deleteEntityIndex(workItem.id);
     await this.indexWorkItem(workItem);
