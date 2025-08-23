@@ -107,7 +107,7 @@ export class IndexingEventHandlerService {
     });
 
     if (initiative) {
-      await this.indexingService.indexInitiative(initiative);
+      await this.indexingService.updateInitiativeIndex(initiative);
     }
   }
 
