@@ -176,20 +176,17 @@ export class OrgOkrsService {
     const keyResults = await this.keyResultRepository.findBy({
       objective: { id, org: { id: orgId } },
     });
-    await this.keyResultRepository.delete({
-      objective: { id, org: { id: orgId } },
-    });
-    await this.removeKeyResultsAssociations(orgId, id);
-    await this.removeObjectiveAssociations(orgId, id);
-    await this.keyResultRepository.delete({
-      objective: { id, org: { id: orgId } },
-    });
     for (const keyResult of keyResults) {
       this.eventEmitter.emit(
         'keyResult.deleted',
         await KeyResultMapper.toDTO(keyResult),
       );
     }
+    await this.removeKeyResultsAssociations(orgId, id);
+    await this.removeObjectiveAssociations(orgId, id);
+    await this.keyResultRepository.delete({
+      objective: { id, org: { id: orgId } },
+    });
     await this.objectiveRepository.delete({
       id,
       org: { id: orgId },
