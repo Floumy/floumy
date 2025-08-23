@@ -518,7 +518,7 @@ export const userRoutes = [
   },
   {
     redirect: true,
-    path: '/ai-settings',
+    path: '/mcp-server-settings',
     component: <AiSettings />,
     layout: '/user',
   },
