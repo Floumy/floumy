@@ -20,13 +20,8 @@ import aiConfig from './config/ai.config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
-import { BipModule } from './bip/bip.module';
-import { PaymentsModule } from './payments/payments.module';
-import { StripeModule } from './stripe/stripe.module';
-import { FeedModule } from './feed/feed.module';
 import { FeatureRequestsModule } from './feature-requests/feature-requests.module';
 import { IssuesModule } from './issues/issues.module';
-import stripeConfig from './config/stripe.config';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { ProjectsModule } from './projects/projects.module';
@@ -53,7 +48,6 @@ import { FloumyMcpModule } from './mcp/mcp.module';
         fileStorageConfig,
         emailConfig,
         appConfig,
-        stripeConfig,
         aiConfig,
         githubConfig,
         gitlabConfig,
@@ -96,16 +90,12 @@ import { FloumyMcpModule } from './mcp/mcp.module';
     AuthModule,
     UsersModule,
     OkrsModule,
-    StripeModule,
     OrgsModule,
     RoadmapModule,
     BacklogModule,
     SprintsModule,
     FilesModule,
     MailNotificationsModule,
-    BipModule,
-    PaymentsModule,
-    FeedModule,
     FeatureRequestsModule,
     IssuesModule,
     ProjectsModule,

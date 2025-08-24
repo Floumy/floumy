@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -15,10 +14,6 @@ import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Sprint } from '../sprints/sprint.entity';
 import { File } from '../files/file.entity';
-import { BipSettings } from '../bip/bip-settings.entity';
-import { PaymentPlan } from '../auth/payment.plan';
-import { Invoice } from '../payments/invoice.entity';
-import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
 import { Project } from '../projects/project.entity';
@@ -42,21 +37,6 @@ export class Org {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @Column({
-    type: 'enum',
-    enum: PaymentPlan,
-    default: PaymentPlan.FREE,
-    nullable: false,
-  })
-  paymentPlan: PaymentPlan = PaymentPlan.FREE;
-  @Column({ default: false })
-  isSubscribed: boolean;
-  @Column({ default: null, nullable: true })
-  nextPaymentDate: Date;
-  @Column({ default: null, nullable: true })
-  stripeCustomerId: string;
-  @Column({ default: null, nullable: true })
-  stripeSubscriptionId: string;
   @OneToMany(() => Objective, (objective) => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })
@@ -73,18 +53,8 @@ export class Org {
   featureRequests: Promise<FeatureRequest[]>;
   @OneToMany(() => Sprint, (sprint) => sprint.org, { lazy: true })
   sprints: Promise<Sprint[]>;
-  @OneToMany(() => Invoice, (invoice) => invoice.org, { lazy: true })
-  invoices: Promise<Invoice[]>;
   @OneToMany(() => File, (file) => file.org, { lazy: true })
   files: Promise<File[]>;
-
-  @OneToMany(() => FeedItem, (feedItem) => feedItem.org, { lazy: true })
-  feedItems: Promise<FeedItem[]>;
-
-  @OneToOne(() => BipSettings, (bipSettings) => bipSettings.org, {
-    lazy: true,
-  })
-  bipSettings: Promise<BipSettings>;
   @OneToMany(() => Issue, (issue) => issue.org, { lazy: true })
   issues: Promise<Issue[]>;
 

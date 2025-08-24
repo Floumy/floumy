@@ -9,7 +9,6 @@ import { FeatureRequest } from './feature-request.entity';
 import { In, Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Org } from '../orgs/org.entity';
-import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequestsMapper } from './feature-requests.mapper';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { FeatureRequestVote } from './feature-request-vote.entity';
@@ -53,11 +52,6 @@ export class FeatureRequestsService {
     createFeatureRequestDto: CreateFeatureRequestDto,
   ): Promise<FeatureRequestDto> {
     const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error(
-        'You need to upgrade your plan to create a feature request',
-      );
-    }
 
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const featureRequest = new FeatureRequest();
@@ -89,12 +83,6 @@ export class FeatureRequestsService {
     page: number = 1,
     limit: number = 0,
   ) {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade your plan to view feature requests');
-    }
-
     const featureRequests = await this.featureRequestsRepository.find({
       where: { org: { id: orgId }, project: { id: projectId } },
       take: limit,
@@ -110,12 +98,6 @@ export class FeatureRequestsService {
     projectId: string,
     featureRequestId: string,
   ): Promise<FeatureRequestDto> {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade your plan to view feature requests');
-    }
-
     const featureRequest = await this.featureRequestsRepository.findOneOrFail({
       where: {
         id: featureRequestId,
@@ -133,13 +115,6 @@ export class FeatureRequestsService {
     featureRequestId: string,
     updateFeatureRequestDto: UpdateFeatureRequestDto,
   ): Promise<FeatureRequestDto> {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error(
-        'You need to upgrade your plan to update a feature request',
-      );
-    }
-
     const featureRequest = await this.featureRequestsRepository.findOneOrFail({
       where: {
         id: featureRequestId,
@@ -175,13 +150,6 @@ export class FeatureRequestsService {
     projectId: string,
     featureRequestId: string,
   ) {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error(
-        'You need to upgrade your plan to delete a feature request',
-      );
-    }
-
     const featureRequest = await this.featureRequestsRepository.findOneOrFail({
       where: {
         id: featureRequestId,
@@ -223,9 +191,6 @@ export class FeatureRequestsService {
       },
     );
     const org = await featureRequest.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
     if (!createCommentDto.content || createCommentDto.content.trim() === '') {
       throw new Error('Comment content is required');
     }
@@ -293,9 +258,6 @@ export class FeatureRequestsService {
       },
     );
     const org = await featureRequest.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
     if (!createCommentDto.content || createCommentDto.content.trim() === '') {
       throw new Error('Comment content is required');
     }

@@ -20,15 +20,13 @@ import { WorkItemsStatusStats } from './work-items/work-items-status-stats.entit
 import { WorkItemsEventHandler } from './work-items/work-items.event-handler';
 import { FilesModule } from '../files/files.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { PublicService } from './work-items/public/public.service';
-import { PublicController } from './work-items/public/public.controller';
 import { WorkItemComment } from './work-items/work-item-comment.entity';
 import { Issue } from '../issues/issue.entity';
 import { Project } from '../projects/project.entity';
 
 @Module({
-  controllers: [WorkItemsController, PublicController],
-  providers: [WorkItemsService, WorkItemsEventHandler, PublicService],
+  controllers: [WorkItemsController],
+  providers: [WorkItemsService, WorkItemsEventHandler],
   imports: [
     CacheModule.register(),
     TypeOrmModule.forFeature([

@@ -9,18 +9,16 @@ import { AuthModule } from '../auth/auth.module';
 import { Sprint } from './sprint.entity';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
-import { PublicService } from './public/public.service';
-import { PublicController } from './public/public.controller';
 import { Project } from '../projects/project.entity';
 
 @Module({
-  controllers: [SprintsController, PublicController],
+  controllers: [SprintsController],
   imports: [
     CacheModule.register(),
     TypeOrmModule.forFeature([Org, WorkItem, Sprint, User, Project]),
     OrgsModule,
     AuthModule,
   ],
-  providers: [SprintsService, PublicService],
+  providers: [SprintsService],
 })
 export class SprintsModule {}

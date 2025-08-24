@@ -8,7 +8,6 @@ import { setupTestingModule } from '../../../test/test.utils';
 import { InitiativesService } from './initiatives.service';
 import { UsersService } from '../../users/users.service';
 import { OrgsService } from '../../orgs/orgs.service';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { InitiativeQueryBuilder } from './initiative.query-builder';
 import { OkrsService } from '../../okrs/okrs.service';
 import { MilestonesService } from '../milestones/milestones.service';
@@ -75,7 +74,6 @@ describe('FeatureQueryBuilder', () => {
   async function getTestPremiumOrgAndUser() {
     const premiumOrg = new Org();
     premiumOrg.name = 'Premium Org';
-    premiumOrg.paymentPlan = PaymentPlan.PREMIUM;
     const org = await orgsRepository.save(premiumOrg);
 
     const premiumUser = new User(

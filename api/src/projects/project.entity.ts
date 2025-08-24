@@ -6,7 +6,6 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -18,8 +17,6 @@ import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Sprint } from '../sprints/sprint.entity';
 import { File } from '../files/file.entity';
-import { BipSettings } from '../bip/bip-settings.entity';
-import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
 import { Org } from '../orgs/org.entity';
@@ -95,12 +92,6 @@ export class Project {
   sprints: Promise<Sprint[]>;
   @OneToMany(() => File, (file) => file.project, { lazy: true })
   files: Promise<File[]>;
-  @OneToMany(() => FeedItem, (feedItem) => feedItem.project, { lazy: true })
-  feedItems: Promise<FeedItem[]>;
-  @OneToOne(() => BipSettings, (bipSettings) => bipSettings.project, {
-    lazy: true,
-  })
-  bipSettings: Promise<BipSettings>;
   @OneToMany(() => Issue, (issue) => issue.project, { lazy: true })
   issues: Promise<Issue[]>;
   @ManyToOne(() => Org, (org) => org.projects, { lazy: true })

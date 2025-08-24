@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { Org } from './org.entity';
 import { OrgsMapper } from './orgs.mapper';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PaymentPlan } from '../auth/payment.plan';
 import { Project } from '../projects/project.entity';
 
 @Injectable()
@@ -25,7 +24,6 @@ export class OrgsService {
    */
   async createForUser(user: User) {
     const org = new Org();
-    org.paymentPlan = PaymentPlan.FREE;
     org.users = Promise.resolve([user]);
     org.hadDemo = false;
     const savedOrg = await this.orgRepository.save(org);
@@ -77,9 +75,6 @@ export class OrgsService {
   private async createOrg(orgName?: string) {
     const org = new Org();
     org.name = orgName;
-    org.paymentPlan = PaymentPlan.PREMIUM;
-    org.isSubscribed = false;
-    org.nextPaymentDate = null;
     org.hadDemo = false;
     const savedOrg = await this.orgRepository.save(org);
     const demoProject = new Project();

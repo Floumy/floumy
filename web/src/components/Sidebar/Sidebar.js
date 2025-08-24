@@ -7,7 +7,6 @@ import { Link, NavLink as NavLinkRRD } from 'react-router-dom';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 // reactstrap components
 import {
-  Badge,
   Col,
   Collapse,
   Nav,
@@ -16,10 +15,7 @@ import {
   NavItem,
   NavLink,
   Row,
-  UncontrolledTooltip,
 } from 'reactstrap';
-import ShortcutIcon from '../Shortcuts/ShortcutIcon';
-import { useBuildInPublic } from '../../contexts/BuidInPublicContext';
 import { useProjects } from '../../contexts/ProjectsContext';
 import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
@@ -33,7 +29,6 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
     orgId,
     loading: loadingProjects,
   } = useProjects();
-  const { settings: bipSettings } = useBuildInPublic();
   const { currentOrg, loadingOrg } = useOrg();
 
   // makes the sidenav normal on hover (actually when mouse enters on it)
@@ -114,466 +109,62 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                 onNewProject={toggleNewProjectModal}
                 showNewProject={true}
               />
-              <div className="mb-3">
-                <h6 className="navbar-heading p-0 text-muted">
-                  <span
-                    className="docs-normal"
-                    style={{ whiteSpace: 'nowrap' }}
-                  >
-                    Feedback
-                  </span>
-                </h6>
-                <Nav navbar>
-                  <NavItem>
-                    <Row style={{ maxWidth: '100%', height: '47px' }}>
-                      <Col xs={7}>
-                        <NavLink
-                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/issues`}
-                          onClick={closeSidenav}
-                          tag={NavLinkRRD}
-                        >
-                          <i className="fa fa-exclamation-triangle" />
-                          <span className="nav-link-text">Issues</span>
-                        </NavLink>
-                      </Col>
-                      <Col
-                        xs={3}
-                        style={{ padding: '0.675rem 1.5rem' }}
-                        className="text-right"
-                      >
-                        <div
-                          className={
-                            bipSettings.isIssuesPagePublic ? '' : 'd-none'
-                          }
-                        >
-                          <UncontrolledTooltip
-                            target="feed-nav-item"
-                            placement="top"
-                          >
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Link
-                            to={`/public/orgs/${orgId}/projects/${currentProject.id}/issues`}
-                            target="_blank"
-                            role="button"
-                          >
-                            <Badge
-                              id="feed-nav-item"
-                              color="success"
-                              pill={true}
-                            >
-                              PUBLIC
-                            </Badge>
-                          </Link>
-                        </div>
-                      </Col>
-                      <Col xs={2} className="text-right pr-2 pt-2"></Col>
-                    </Row>
-                  </NavItem>
-                  <NavItem>
-                    <Row style={{ maxWidth: '100%', height: '47px' }}>
-                      <Col xs={7}>
-                        <NavLink
-                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/feature-requests`}
-                          onClick={closeSidenav}
-                          tag={NavLinkRRD}
-                        >
-                          <i className="fa fa-pen-to-square" />
-                          <span className="nav-link-text">
-                            Feature Requests
-                          </span>
-                        </NavLink>
-                      </Col>
-                      <Col
-                        xs={3}
-                        style={{ padding: '0.675rem 1.5rem' }}
-                        className="text-right"
-                      >
-                        <div
-                          className={
-                            bipSettings.isFeatureRequestsPagePublic
-                              ? ''
-                              : 'd-none'
-                          }
-                        >
-                          <UncontrolledTooltip
-                            target="feed-nav-item"
-                            placement="top"
-                          >
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Link
-                            to={`/public/orgs/${orgId}/projects/${currentProject.id}/feature-requests`}
-                            target="_blank"
-                            role="button"
-                          >
-                            <Badge
-                              id="feed-nav-item"
-                              color="success"
-                              pill={true}
-                            >
-                              PUBLIC
-                            </Badge>
-                          </Link>
-                        </div>
-                      </Col>
-                      <Col xs={2} className="text-right pr-2 pt-2"></Col>
-                    </Row>
-                  </NavItem>
-                </Nav>
-              </div>
-              <h6 className="navbar-heading p-0 text-muted">
-                <span className="docs-normal" style={{ whiteSpace: 'nowrap' }}>
-                  Project
-                </span>
-              </h6>
               <Nav navbar>
                 <NavItem>
                   <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={7}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/feed`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-newspaper" />
-                        <span className="nav-link-text">Feed</span>
-                      </NavLink>
-                    </Col>
-                    <Col
-                      xs={3}
-                      style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
-                    >
-                      <div
-                        className={bipSettings.isFeedPagePublic ? '' : 'd-none'}
-                      >
-                        <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/feed`}
-                          target="_blank"
-                          role="button"
-                        >
-                          <UncontrolledTooltip
-                            target="feed-nav-item"
-                            placement="top"
-                          >
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge id="feed-nav-item" color="success" pill={true}>
-                            PUBLIC
-                          </Badge>
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={1} />
-                    </Col>
-                  </Row>
-                </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={7}>
+                    <Col xs={12}>
                       <NavLink
                         to={`/admin/orgs/${orgId}/projects/${currentProject.id}/okrs`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
                         <i className="fa fa-bullseye" />
-                        <span className="nav-link-text">Objectives</span>
+                        <span className="nav-link-text">Strategy</span>
                       </NavLink>
-                    </Col>
-                    <Col
-                      xs={3}
-                      style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
-                    >
-                      <div
-                        className={
-                          bipSettings.isObjectivesPagePublic ? '' : 'd-none'
-                        }
-                      >
-                        <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/objectives`}
-                          target="_blank"
-                          role="button"
-                        >
-                          <UncontrolledTooltip
-                            target="objectives-nav-item"
-                            placement="top"
-                          >
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge
-                            id="objectives-nav-item"
-                            color="success"
-                            pill={true}
-                          >
-                            PUBLIC
-                          </Badge>
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={2} />
                     </Col>
                   </Row>
                 </NavItem>
                 <NavItem>
                   <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={7}>
+                    <Col xs={12}>
                       <NavLink
                         to={`/admin/orgs/${orgId}/projects/${currentProject.id}/roadmap`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
                         <i className="fa fa-road" />
-                        <span className="nav-link-text">
-                          Initiatives Roadmap
-                        </span>
+                        <span className="nav-link-text">Roadmap</span>
                       </NavLink>
-                    </Col>
-                    <Col
-                      xs={3}
-                      style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
-                    >
-                      <div
-                        className={
-                          bipSettings.isRoadmapPagePublic ? '' : 'd-none'
-                        }
-                      >
-                        <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/roadmap`}
-                          target="_blank"
-                          role="button"
-                        >
-                          <UncontrolledTooltip
-                            target="roadmap-nav-item"
-                            placement="top"
-                          >
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge
-                            id="roadmap-nav-item"
-                            color="success"
-                            pill={true}
-                          >
-                            PUBLIC
-                          </Badge>
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={3} />
                     </Col>
                   </Row>
                 </NavItem>
                 <NavItem>
                   <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={7}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/sprints`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-refresh" />
-                        <span className="nav-link-text">Sprints</span>
-                      </NavLink>
-                    </Col>
-                    <Col
-                      xs={3}
-                      style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
-                    >
-                      <div
-                        className={
-                          bipSettings.isSprintsPagePublic ? '' : 'd-none'
-                        }
-                      >
-                        <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/sprints`}
-                          target="_blank"
-                          role="button"
-                        >
-                          <UncontrolledTooltip
-                            target="sprints-nav-item"
-                            placement="top"
-                          >
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge
-                            id="sprints-nav-item"
-                            color="success"
-                            pill={true}
-                          >
-                            PUBLIC
-                          </Badge>
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={4} />
-                    </Col>
-                  </Row>
-                </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={7}>
+                    <Col xs={12}>
                       <NavLink
                         to={`/admin/orgs/${orgId}/projects/${currentProject.id}/active-sprint`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
                         <i className="fa fa-rocket" />
-                        <span className="nav-link-text">Active Sprint</span>
+                        <span className="nav-link-text">Delivery</span>
                       </NavLink>
-                    </Col>
-                    <Col
-                      xs={3}
-                      style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
-                    >
-                      <div
-                        className={
-                          bipSettings.isActiveSprintsPagePublic ? '' : 'd-none'
-                        }
-                      >
-                        <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/active-sprint`}
-                          target="_blank"
-                          role="button"
-                        >
-                          <UncontrolledTooltip
-                            target="sprints-nav-item"
-                            placement="top"
-                            popperClassName="p-2"
-                          >
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge
-                            id="sprints-nav-item"
-                            color="success"
-                            pill={true}
-                          >
-                            PUBLIC
-                          </Badge>
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={5} />
-                    </Col>
-                  </Row>
-                </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%' }}>
-                    <Col xs={10}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/work-items`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-tasks" />
-                        <span className="nav-link-text">All Work Items</span>
-                      </NavLink>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={6} />
-                    </Col>
-                  </Row>
-                </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%' }}>
-                    <Col xs={10}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/initiatives`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-list-alt" />
-                        <span className="nav-link-text">All Initiatives</span>
-                      </NavLink>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={7} />
                     </Col>
                   </Row>
                 </NavItem>
                 <NavItem>
                   <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={10}>
+                    <Col xs={12}>
                       <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/code`}
+                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/sprints`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
-                        <i className="fa fa-code-pull-request" />
-                        <span className="nav-link-text">Code</span>
+                        <i className="fa fa-refresh" />
+                        <span className="nav-link-text">Backlog</span>
                       </NavLink>
                     </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={8} />
-                    </Col>
                   </Row>
-                </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={7}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/pages`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-file" />
-                        <span className="nav-link-text">Pages</span>
-                      </NavLink>
-                    </Col>
-                    <Col
-                      xs={3}
-                      style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
-                    >
-                      <div>
-                        <Badge color="warning" pill={true}>
-                          BETA
-                        </Badge>
-                      </div>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={9} />
-                    </Col>
-                  </Row>
-                </NavItem>
-              </Nav>
-            </Collapse>
-          </div>
-          <div className="navbar-inner">
-            <Collapse navbar isOpen={true}>
-              <h6 className="navbar-heading p-0 text-muted">
-                <span className="docs-normal" style={{ whiteSpace: 'nowrap' }}>
-                  Settings
-                </span>
-              </h6>
-              <Nav className="mb-md-3" navbar>
-                <NavItem>
-                  <NavLink
-                    to={`/admin/orgs/${orgId}/projects/${currentProject.id}/project`}
-                    onClick={closeSidenav}
-                    tag={NavLinkRRD}
-                  >
-                    <i className="fa fa-atom" />
-                    <span className="nav-link-text">Project</span>
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink
-                    to={`/admin/orgs/${orgId}/projects/${currentProject.id}/build-in-public`}
-                    onClick={closeSidenav}
-                    tag={NavLinkRRD}
-                  >
-                    <i className="fa fa-eye" />
-                    <span className="nav-link-text">Build In Public</span>
-                  </NavLink>
                 </NavItem>
               </Nav>
             </Collapse>

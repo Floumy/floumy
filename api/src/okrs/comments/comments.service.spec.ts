@@ -10,7 +10,6 @@ import { User } from '../../users/user.entity';
 import { KeyResultComment } from '../key-result-comment.entity';
 import { UsersService } from '../../users/users.service';
 import { OrgsService } from '../../orgs/orgs.service';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { ObjectiveStatus } from '../okrstatus.enum';
 import { CommentsService } from './comments.service';
 import { Project } from '../../projects/project.entity';
@@ -53,7 +52,6 @@ describe('CommentsService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    org.paymentPlan = PaymentPlan.PREMIUM;
     project = (await org.projects)[0];
     await orgsRepository.save(org);
   });
@@ -119,7 +117,6 @@ describe('CommentsService', () => {
   });
   describe('when updating a comment for a key result', () => {
     it('should update the comment', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
 
       const objective = await okrsService.createObjective(org.id, project.id, {
@@ -230,7 +227,6 @@ describe('CommentsService', () => {
   });
   describe('when deleting a comment for a key result', () => {
     it('should delete the comment', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
 
       const objective = await okrsService.createObjective(org.id, project.id, {
@@ -328,7 +324,6 @@ describe('CommentsService', () => {
   });
   describe('when updating a comment for an objective', () => {
     it('should update the comment', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
 
       const objective = await okrsService.createObjective(org.id, project.id, {
@@ -381,7 +376,6 @@ describe('CommentsService', () => {
   });
   describe('when deleting a comment for an objective', () => {
     it('should delete the comment', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
 
       const objective = await okrsService.createObjective(org.id, project.id, {

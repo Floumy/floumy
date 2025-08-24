@@ -25,7 +25,6 @@ import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { InitiativeFile } from './initiative-file.entity';
 import { InitiativeComment } from './initiative-comment.entity';
 import { Repository } from 'typeorm';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { FeatureRequestsService } from '../../feature-requests/feature-requests.service';
 import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
@@ -298,7 +297,6 @@ describe('FeaturesService', () => {
       expect(initiative.assignedTo.name).toEqual(otherUser.name);
     });
     it('should update the initiative request', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
@@ -900,7 +898,6 @@ describe('FeaturesService', () => {
       expect(updatedFeature.files[0].name).toEqual(file.name);
     });
     it('should update the initiative request', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
@@ -947,7 +944,6 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should update the feature request to null', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
@@ -993,7 +989,6 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should not update the feature request if the update is for another field', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
@@ -1544,7 +1539,6 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should update the feature request', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
@@ -1587,7 +1581,6 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should update the feature request to null', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       await featureRequestsService.addFeatureRequest(
         user.id,
@@ -1632,7 +1625,6 @@ describe('FeaturesService', () => {
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should not update the feature request if the update is for another field', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const featureRequest = await featureRequestsService.addFeatureRequest(
         user.id,
@@ -1762,7 +1754,6 @@ describe('FeaturesService', () => {
 
   describe('when listing initiative comments', () => {
     it('should return a list of comments if the org is premium', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiative = await service.createInitiative(
         org.id,
@@ -1788,7 +1779,6 @@ describe('FeaturesService', () => {
 
   describe('when creating a initiative comment', () => {
     it('should create a comment if the org is premium', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiative = await service.createInitiative(
         org.id,
@@ -1816,7 +1806,6 @@ describe('FeaturesService', () => {
 
   describe('when deleting a initiative comment', () => {
     it('should delete the comment if it exists', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiative = await service.createInitiative(
         org.id,
@@ -1867,7 +1856,6 @@ describe('FeaturesService', () => {
 
   describe('when updating a initiative comment', () => {
     it('should update the comment if it exists and the org is premium', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiative = await service.createInitiative(
         org.id,
@@ -1927,7 +1915,6 @@ describe('FeaturesService', () => {
     });
 
     it('should throw an error if the comment content is empty', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiative = await service.createInitiative(
         org.id,

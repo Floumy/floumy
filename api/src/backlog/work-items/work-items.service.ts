@@ -14,7 +14,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FilesService } from '../../files/files.service';
 import { CommentMapper } from '../../comments/mappers';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { WorkItemComment } from './work-item-comment.entity';
 import { Issue } from '../../issues/issue.entity';
 import { Project } from '../../projects/project.entity';
@@ -325,9 +324,6 @@ export class WorkItemsService {
       project: { id: projectId },
     });
     const org = await workItem.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
     if (!createCommentDto.content || createCommentDto.content.trim() === '') {
       throw new Error('Comment content is required');
     }
@@ -382,9 +378,6 @@ export class WorkItemsService {
       id: workItemId,
     });
     const org = await workItem.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
     if (!createCommentDto.content || createCommentDto.content.trim() === '') {
       throw new Error('Comment content is required');
     }
@@ -577,74 +570,5 @@ export class WorkItemsService {
 
   private isReference(search: string) {
     return /^[Ww][Ii]-\d+$/.test(search);
-  }
-
-  private async searchWorkItemsByTitleOrDescription(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-            SELECT *
-            FROM work_item
-            WHERE work_item."orgId" = $1
-              AND work_item."projectId" = $2
-              AND (work_item.title ILIKE $3 OR work_item.description ILIKE $3)
-            ORDER BY CASE
-                         WHEN work_item."priority" = 'high' THEN 1
-                         WHEN work_item."priority" = 'medium' THEN 2
-                         WHEN work_item."priority" = 'low' THEN 3
-                         ELSE 4
-                         END,
-                     work_item."createdAt" DESC
-        `;
-    let params = [orgId, projectId, `%${search}%`] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, `%${search}%`, offset, limit];
-    }
-
-    const workItems = await this.workItemsRepository.query(query, params);
-
-    return WorkItemMapper.toSimpleListDto(workItems);
-  }
-
-  private async searchWorkItemsByReference(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-            SELECT *
-            FROM work_item
-            WHERE work_item."orgId" = $1
-              AND work_item."projectId" = $2
-              AND LOWER(work_item."reference") = LOWER($3)
-            ORDER BY CASE
-                         WHEN work_item."priority" = 'high' THEN 1
-                         WHEN work_item."priority" = 'medium' THEN 2
-                         WHEN work_item."priority" = 'low' THEN 3
-                         ELSE 4
-                         END,
-                     work_item."createdAt" DESC
-        `;
-
-    let params = [orgId, projectId, search] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, search, offset, limit];
-    }
-
-    const workItems = await this.workItemsRepository.query(query, params);
-
-    return WorkItemMapper.toSimpleListDto(workItems);
   }
 }

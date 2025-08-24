@@ -9,8 +9,6 @@ import { KeyResult } from './key-result.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { User } from '../users/user.entity';
 import { CacheModule } from '@nestjs/cache-manager';
-import { PublicController } from './public/public.controller';
-import { PublicService } from './public/public.service';
 import { Org } from '../orgs/org.entity';
 import { CommentsService } from './comments/comments.service';
 import { KeyResultComment } from './key-result-comment.entity';
@@ -35,8 +33,8 @@ import { OrgOkrsService } from './org-okrs.service';
     OrgsModule,
     AuthModule,
   ],
-  providers: [OkrsService, OrgOkrsService, PublicService, CommentsService],
-  controllers: [OkrsController, PublicController, OrgOkrsController],
+  providers: [OkrsService, OrgOkrsService, CommentsService],
+  controllers: [OkrsController, OrgOkrsController],
   exports: [OkrsService],
 })
 export class OkrsModule {}

@@ -19,11 +19,6 @@ import { InitiativeFile } from './initiatives/initiative-file.entity';
 import { User } from '../users/user.entity';
 import { FilesModule } from '../files/files.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { PublicController as MilestonesPublicController } from './milestones/public/public.controller';
-import { PublicService as MilestonesPublicService } from './milestones/public/public.service';
-import { PublicController as FeaturesPublicController } from './initiatives/public/public.controller';
-import { PublicService as FeaturesPublicService } from './initiatives/public/public.service';
-import { StripeModule } from '../stripe/stripe.module';
 import { InitiativeComment } from './initiatives/initiative-comment.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Project } from '../projects/project.entity';
@@ -53,21 +48,13 @@ import { Notification } from '../notifications/notification.entity';
     AuthModule,
     BacklogModule,
     FilesModule,
-    StripeModule,
   ],
-  controllers: [
-    InitiativesController,
-    MilestonesController,
-    FeaturesPublicController,
-    MilestonesPublicController,
-  ],
+  controllers: [InitiativesController, MilestonesController],
   providers: [
     InitiativesService,
     OrgsService,
     OkrsModule,
     MilestonesService,
-    FeaturesPublicService,
-    MilestonesPublicService,
     NotificationListener,
   ],
   exports: [InitiativesService],

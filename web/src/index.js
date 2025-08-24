@@ -21,7 +21,6 @@ import '@mdxeditor/editor/style.css';
 import AdminLayout from 'layouts/Admin.js';
 import AuthLayout from 'layouts/Auth.js';
 import { ToastContainer } from 'react-toastify';
-import PublicLayout from './layouts/Public';
 import { BlankLayout } from './layouts/Blank';
 import OrgLayout from './layouts/Org';
 import { CurrentUserProvider } from './contexts/CurrentUserContext';
@@ -69,10 +68,6 @@ root.render(
               <UserLayout />
             </CurrentUserProvider>
           }
-        />
-        <Route
-          path="/public/orgs/:orgId/projects/:projectId/*"
-          element={<PublicLayout />}
         />
         <Route path="/auth/*" element={<AuthLayout />} />
         <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />

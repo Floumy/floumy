@@ -4,7 +4,6 @@ import { User } from '../users/user.entity';
 import { Repository } from 'typeorm';
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestVote } from './feature-request-vote.entity';
-import { PaymentPlan } from '../auth/payment.plan';
 
 @Injectable()
 export class FeatureRequestVoteService {
@@ -30,12 +29,7 @@ export class FeatureRequestVoteService {
       org: { id: orgId },
       project: { id: projectId },
     });
-    const org = await featureRequest.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error(
-        'You need to upgrade your plan to upvote a feature request',
-      );
-    }
+
     let userFeatureRequestVote =
       await this.featureRequestVoteRepository.findOneBy({
         user: { id: userId },
@@ -72,13 +66,6 @@ export class FeatureRequestVoteService {
       org: { id: orgId },
       project: { id: projectId },
     });
-
-    const org = await featureRequest.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error(
-        'You need to upgrade your plan to downvote a feature request',
-      );
-    }
 
     let userFeatureRequestVote =
       await this.featureRequestVoteRepository.findOneBy({

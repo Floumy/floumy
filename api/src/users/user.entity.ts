@@ -13,7 +13,6 @@ import { Org } from '../orgs/org.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Objective } from '../okrs/objective.entity';
-import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { FeatureRequestVote } from '../feature-requests/feature-request-vote.entity';
 import { Issue } from '../issues/issue.entity';
@@ -65,8 +64,6 @@ export class User {
   createdInitiatives: Promise<Initiative[]>;
   @OneToMany(() => Initiative, (feature) => feature.assignedTo, { lazy: true })
   assignedInitiatives: Promise<Initiative[]>;
-  @OneToMany(() => FeedItem, (feedItem) => feedItem.user, { lazy: true })
-  feedItems: Promise<FeedItem[]>;
   @OneToMany(
     () => FeatureRequest,
     (featureRequest) => featureRequest.createdBy,

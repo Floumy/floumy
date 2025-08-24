@@ -24,30 +24,15 @@ import ForgotPassword from './views/pages/auth/ForgotPassword';
 import ResetPassword from './views/pages/auth/ResetPassword';
 import ResetEmailSent from './views/pages/auth/ResetEmailSent';
 import PasswordReset from './views/pages/auth/PasswordReset';
-import BuildInPublic from './views/pages/settings/BuildInPublic';
-import PublicRoadmap from './views/pages/roadmap/PublicRoadmap';
-import { PublicDetailInitiative } from './views/pages/initiatives/PublicDetailInitiative';
-import PublicDetailWorkItem from './views/pages/backlog/PublicDetailWorkItem';
-import PublicOKRs from './views/pages/okrs/PublicOKRs';
-import PublicDetailOKR from './views/pages/okrs/PublicDetailOKR';
-import PublicDetailKeyResult from './views/pages/okrs/PublicDetailKeyResult';
-import PublicSprints from './views/pages/sprints/PublicSprints';
-import PublicSprint from './views/pages/sprints/PublicSprint';
-import PublicMilestone from './views/pages/roadmap/PublicMilestone';
-import PublicActiveSprint from './views/pages/development/PublicActiveSprint';
 import Project from './views/pages/settings/Project';
 import MyProfile from './views/pages/users/MyProfile';
-import PrivateFeed from './views/pages/feed/PrivateFeed';
-import PublicFeed from './views/pages/feed/PublicFeed';
 import SignUp from './views/pages/auth/SignUp';
 import FeatureRequests from './views/pages/feature-requests/FeatureRequests';
 import NewFeatureRequest from './views/pages/feature-requests/NewFeatureRequest';
 import EditFeatureRequest from './views/pages/feature-requests/EditFeatureRequest';
-import FeatureRequestDetails from './views/pages/feature-requests/FeatureRequestDetails';
 import Issues from './views/pages/issues/Issues';
 import NewIssue from './views/pages/issues/NewIssue';
 import EditIssue from './views/pages/issues/EditIssue';
-import IssueDetails from './views/pages/issues/IssueDetails';
 import Code from './views/pages/code/Code';
 import GitHub from './views/pages/code/GitHub';
 import GitLab from './views/pages/code/GitLab';
@@ -104,15 +89,6 @@ const routes = [
     path: '/issues/edit/:issueId',
     component: <EditIssue />,
     layout: '/admin',
-  },
-  {
-    collapse: false,
-    name: 'Feed',
-    icon: 'fa fa-newspaper',
-    path: '/feed',
-    component: <PrivateFeed />,
-    layout: '/admin',
-    shortcut: '1',
   },
   {
     collapse: false,
@@ -236,12 +212,6 @@ const routes = [
   },
   {
     redirect: true,
-    path: '/build-in-public',
-    component: <BuildInPublic />,
-    layout: '/admin',
-  },
-  {
-    redirect: true,
     path: '/project',
     component: <Project />,
     layout: '/admin',
@@ -350,111 +320,6 @@ export const blankRoutes = [
     path: '/demo',
     component: <Demo />,
     layout: '/blank',
-  },
-];
-
-export const publicRoutes = [
-  {
-    redirect: true,
-    path: '/roadmap',
-    component: <PublicRoadmap />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/roadmap/initiatives/detail/:initiativeId',
-    component: <PublicDetailInitiative />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/work-item/detail/:workItemId',
-    component: <PublicDetailWorkItem />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/objectives',
-    component: <PublicOKRs />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/okrs/detail/:okrId',
-    component: <PublicDetailOKR />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/kr/detail/:keyResultId',
-    component: <PublicDetailKeyResult />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/sprints',
-    component: <PublicSprints />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/sprints/detail/:sprintId',
-    component: <PublicSprint />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/milestones/detail/:milestoneId',
-    component: <PublicMilestone />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/active-sprint',
-    component: <PublicActiveSprint />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/feed',
-    component: <PublicFeed />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/feature-requests',
-    component: <FeatureRequests isPublic={true} />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/issues',
-    component: <Issues isPublic={true} />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/issues/new',
-    component: <NewIssue />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/feature-requests/new',
-    component: <NewFeatureRequest />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/feature-requests/:featureRequestId',
-    component: <FeatureRequestDetails />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/issues/:issueId',
-    component: <IssueDetails />,
-    layout: '/public',
   },
 ];
 

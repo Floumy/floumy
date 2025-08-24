@@ -9,7 +9,6 @@ import AdminNavbar from '../components/Navbars/AdminNavbar';
 import useLayoutHandler from './useLayoutHandler';
 import useNavigationHotKey from './useNavigationHotKey';
 import Footer from '../components/Footers/Footer';
-import { BuildInPublicProvider } from '../contexts/BuidInPublicContext';
 import { ProjectsProvider } from '../contexts/ProjectsContext';
 import { OrgProvider } from '../contexts/OrgContext';
 import NotFound from '../views/pages/errors/NotFound';
@@ -136,59 +135,57 @@ function Admin() {
 
   return (
     <>
-      <BuildInPublicProvider orgId={orgId} projectId={projectId}>
-        <OrgProvider orgId={orgId}>
-          <ProjectsProvider orgId={orgId} projectId={projectId}>
-            <Sidebar
+      <OrgProvider orgId={orgId}>
+        <ProjectsProvider orgId={orgId} projectId={projectId}>
+          <Sidebar
+            toggleSidenav={toggleSidenav}
+            logo={{
+              outterLink: 'https://floumy.com',
+              // innerLink: "/admin/okrs",
+              imgSrc: require('assets/img/brand/logo.png'),
+              imgAlt: 'Floumy Logo',
+            }}
+          />
+          <div
+            className="main-content"
+            ref={mainContentRef}
+            style={{
+              marginRight:
+                isLargeScreen &&
+                isFeatureEnabled(FEATURES.AI_CHAT_ASSISTANT, orgId)
+                  ? '600px'
+                  : '0',
+            }}
+          >
+            <AdminNavbar
+              theme={'dark'}
+              sidenavOpen={sidenavOpen}
               toggleSidenav={toggleSidenav}
-              logo={{
-                outterLink: 'https://floumy.com',
-                // innerLink: "/admin/okrs",
-                imgSrc: require('assets/img/brand/logo.png'),
-                imgAlt: 'Floumy Logo',
-              }}
+              aiChatOpen={aiChatOpen}
+              toggleAiChat={() => setAiChatOpen(!aiChatOpen)}
             />
+            <Routes>
+              {getRoutes(routes)}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Footer />
+          </div>
+          {isFeatureEnabled(FEATURES.AI_CHAT_ASSISTANT, orgId) && (
+            <AiChatSlideIn
+              isOpen={aiChatOpen}
+              toggle={() => setAiChatOpen(!aiChatOpen)}
+            />
+          )}
+          {sidenavOpen ? (
             <div
-              className="main-content"
-              ref={mainContentRef}
-              style={{
-                marginRight:
-                  isLargeScreen &&
-                  isFeatureEnabled(FEATURES.AI_CHAT_ASSISTANT, orgId)
-                    ? '600px'
-                    : '0',
-              }}
-            >
-              <AdminNavbar
-                theme={'dark'}
-                sidenavOpen={sidenavOpen}
-                toggleSidenav={toggleSidenav}
-                aiChatOpen={aiChatOpen}
-                toggleAiChat={() => setAiChatOpen(!aiChatOpen)}
-              />
-              <Routes>
-                {getRoutes(routes)}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Footer />
-            </div>
-            {isFeatureEnabled(FEATURES.AI_CHAT_ASSISTANT, orgId) && (
-              <AiChatSlideIn
-                isOpen={aiChatOpen}
-                toggle={() => setAiChatOpen(!aiChatOpen)}
-              />
-            )}
-            {sidenavOpen ? (
-              <div
-                className="backdrop d-xl-none"
-                onClick={toggleSidenav}
-                onKeyDown={toggleSidenav}
-                role="button"
-              />
-            ) : null}
-          </ProjectsProvider>
-        </OrgProvider>
-      </BuildInPublicProvider>
+              className="backdrop d-xl-none"
+              onClick={toggleSidenav}
+              onKeyDown={toggleSidenav}
+              role="button"
+            />
+          ) : null}
+        </ProjectsProvider>
+      </OrgProvider>
     </>
   );
 }

@@ -7,7 +7,6 @@ import { User } from '../users/user.entity';
 import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Issue } from './issue.entity';
-import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
 import { IssueStatus } from './issue-status.enum';
 import { Priority } from '../common/priority.enum';
@@ -51,7 +50,6 @@ describe('IssuesService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    org.paymentPlan = PaymentPlan.PREMIUM;
     await orgsRepository.save(org);
     project = new Project();
     project.name = 'Test Project';
@@ -80,20 +78,6 @@ describe('IssuesService', () => {
       expect(issue.description).toEqual('Test Description');
       expect(issue.status).toEqual(IssueStatus.SUBMITTED);
       expect(issue.priority).toEqual(Priority.MEDIUM);
-    });
-
-    it('should create a new issue only if the org is premium', () => {
-      const freeOrg = orgsRepository.create({
-        name: 'Free Org',
-        paymentPlan: PaymentPlan.FREE,
-      });
-
-      expect(
-        service.addIssue(user.id, freeOrg.id, project.id, {
-          title: 'Test Issue',
-          description: 'Test Description',
-        }),
-      ).rejects.toThrow();
     });
   });
 
@@ -133,17 +117,6 @@ describe('IssuesService', () => {
       expect(issues).toHaveLength(1);
       expect(issues[0].title).toEqual('Test Issue 2');
     });
-
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const freeOrg = orgsRepository.create({
-        name: 'Free Org',
-        paymentPlan: PaymentPlan.FREE,
-      });
-
-      await expect(
-        service.listIssues(freeOrg.id, project.id),
-      ).rejects.toThrow();
-    });
   });
 
   describe('when getting an issue by id', () => {
@@ -181,18 +154,6 @@ describe('IssuesService', () => {
 
       await expect(
         service.getIssueById(otherOrg.id, project.id, issue.id),
-      ).rejects.toThrow();
-    });
-
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const issue = await service.addIssue(user.id, org.id, project.id, {
-        title: 'Test Issue',
-        description: 'Test Description',
-      });
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-      await expect(
-        service.getIssueById(org.id, project.id, issue.id),
       ).rejects.toThrow();
     });
   });
@@ -276,23 +237,6 @@ describe('IssuesService', () => {
         }),
       ).rejects.toThrow();
     });
-
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const issue = await service.addIssue(user.id, org.id, project.id, {
-        title: 'Test Issue',
-        description: 'Test Description',
-      });
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-      await expect(
-        service.updateIssue(user.id, org.id, project.id, issue.id, {
-          title: 'Updated Issue',
-          description: 'Updated Description',
-          status: IssueStatus.IN_PROGRESS,
-          priority: Priority.HIGH,
-        }),
-      ).rejects.toThrow('You need to upgrade your plan to update an issue');
-    });
   });
 
   describe('when deleting an issue', () => {
@@ -327,18 +271,6 @@ describe('IssuesService', () => {
       await expect(
         service.deleteIssue(user.id, otherOrg.id, project.id, issue.id),
       ).rejects.toThrow();
-    });
-
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const issue = await service.addIssue(user.id, org.id, project.id, {
-        title: 'Test Issue',
-        description: 'Test Description',
-      });
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-      await expect(
-        service.deleteIssue(user.id, org.id, project.id, issue.id),
-      ).rejects.toThrow('You need to upgrade your plan to delete an issue');
     });
 
     it('should remove the issue from the work items', async () => {

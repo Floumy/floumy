@@ -6,7 +6,6 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestVoteService } from './feature-request-votes.service';
 import { FeatureRequestVote } from './feature-request-vote.entity';
@@ -67,7 +66,6 @@ describe('FeatureRequestVotesService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    org.paymentPlan = PaymentPlan.PREMIUM;
     await orgsRepository.save(org);
     project = new Project();
     project.name = 'Test Project';
@@ -145,7 +143,6 @@ describe('FeatureRequestVotesService', () => {
           description: 'Test Description',
         },
       );
-      org.paymentPlan = PaymentPlan.FREE;
       await orgsRepository.save(org);
       await expect(
         service.upvoteFeatureRequest(
@@ -246,29 +243,6 @@ describe('FeatureRequestVotesService', () => {
           featureRequest.id,
         ),
       ).rejects.toThrow();
-    });
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const featureRequest = await featureRequestService.addFeatureRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-      await expect(
-        service.downvoteFeatureRequest(
-          user.id,
-          org.id,
-          project.id,
-          featureRequest.id,
-        ),
-      ).rejects.toThrow(
-        'You need to upgrade your plan to downvote a feature request',
-      );
     });
   });
   describe('when getting my votes', () => {

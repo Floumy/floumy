@@ -6,7 +6,6 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { uuid } from 'uuidv4';
@@ -63,7 +62,6 @@ describe('FeatureRequestsService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    org.paymentPlan = PaymentPlan.PREMIUM;
     await orgsRepository.save(org);
     project = new Project();
     project.name = 'Test Project';
@@ -100,20 +98,6 @@ describe('FeatureRequestsService', () => {
       expect(featureRequest.completedAt).toBeNull();
       expect(featureRequest.org).toBeDefined();
       expect(featureRequest.createdBy).toBeDefined();
-    });
-
-    it('should create a new feature request only if the org is premium', () => {
-      const freeOrg = orgsRepository.create({
-        name: 'Free Org',
-        paymentPlan: PaymentPlan.FREE,
-      });
-
-      expect(
-        service.addFeatureRequest(user.id, freeOrg.id, uuid(), {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        }),
-      ).rejects.toThrow();
     });
   });
 
@@ -161,16 +145,6 @@ describe('FeatureRequestsService', () => {
       );
       expect(featureRequests).toHaveLength(1);
       expect(featureRequests[0].title).toEqual('Test Feature Request 2');
-    });
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const freeOrg = orgsRepository.create({
-        name: 'Free Org',
-        paymentPlan: PaymentPlan.FREE,
-      });
-
-      await expect(
-        service.listFeatureRequests(freeOrg.id, project.id),
-      ).rejects.toThrow();
     });
   });
 
@@ -225,22 +199,6 @@ describe('FeatureRequestsService', () => {
           otherOrgProject.id,
           featureRequest.id,
         ),
-      ).rejects.toThrow();
-    });
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const featureRequest = await service.addFeatureRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-      await expect(
-        service.getFeatureRequestById(org.id, project.id, featureRequest.id),
       ).rejects.toThrow();
     });
   });
@@ -354,35 +312,6 @@ describe('FeatureRequestsService', () => {
         ),
       ).rejects.toThrow();
     });
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const featureRequest = await service.addFeatureRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
-      org.paymentPlan = PaymentPlan.FREE;
-      await orgsRepository.save(org);
-      await expect(
-        service.updateFeatureRequest(
-          user.id,
-          org.id,
-          project.id,
-          featureRequest.id,
-          {
-            title: 'Updated Feature Request',
-            description: 'Updated Description',
-            status: FeatureRequestStatus.IN_PROGRESS,
-            estimation: 5,
-          },
-        ),
-      ).rejects.toThrow(
-        'You need to upgrade your plan to update a feature request',
-      );
-    });
   });
   describe('when deleting a feature request', () => {
     it('should delete the feature request', async () => {
@@ -439,29 +368,6 @@ describe('FeatureRequestsService', () => {
         featureRequest.id,
       ),
     ).rejects.toThrow();
-  });
-  it('should throw an error if the org is not on the premium plan', async () => {
-    const featureRequest = await service.addFeatureRequest(
-      user.id,
-      org.id,
-      project.id,
-      {
-        title: 'Test Feature Request',
-        description: 'Test Description',
-      },
-    );
-    org.paymentPlan = PaymentPlan.FREE;
-    await orgsRepository.save(org);
-    await expect(
-      service.deleteFeatureRequest(
-        user.id,
-        org.id,
-        project.id,
-        featureRequest.id,
-      ),
-    ).rejects.toThrow(
-      'You need to upgrade your plan to delete a feature request',
-    );
   });
   it('should remove the feature request from the initiatives', async () => {
     const featureRequest = new FeatureRequest();
