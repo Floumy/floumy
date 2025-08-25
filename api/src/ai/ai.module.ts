@@ -25,6 +25,9 @@ import { IndexingController } from './documents/indexing.controller';
 import { IndexingService } from './documents/indexing.service';
 import { Sprint } from '../sprints/sprint.entity';
 import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
+import { Page } from 'src/pages/pages.entity';
+import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
+import { BacklogModule } from '../backlog/backlog.module';
 
 @Module({
   imports: [
@@ -32,6 +35,7 @@ import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
     RoadmapModule,
     UsersModule,
     AuthModule,
+    BacklogModule,
     CacheModule.register(),
     TypeOrmModule.forFeature([
       Org,
@@ -45,6 +49,7 @@ import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
       FeatureRequest,
       Objective,
       Sprint,
+      Page,
     ]),
   ],
   controllers: [AiController, ChatController, IndexingController],
@@ -55,6 +60,7 @@ import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
     DocumentVectorStoreService,
     IndexingService,
     WorkItemsToolsService,
+    IndexingEventHandlerService,
   ],
 })
 export class AiModule {}

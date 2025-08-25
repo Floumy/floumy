@@ -5,13 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { WorkItem } from 'src/backlog/work-items/work-item.entity';
 import { Repository } from 'typeorm';
 import { WorkItemType } from 'src/backlog/work-items/work-item-type.enum';
-import { Org } from 'src/orgs/org.entity';
 import { Project } from 'src/projects/project.entity';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { McpService } from '../services/mcp.service';
 import { entityNotFound } from '../utils';
 import { WorkItemStatus } from '../../backlog/work-items/work-item-status.enum';
+import { WorkItemsService } from '../../backlog/work-items/work-items.service';
+import { Priority } from '../../common/priority.enum';
 
 @Injectable({
   scope: Scope.REQUEST,
@@ -20,11 +21,10 @@ export class WorkItemsTool {
   constructor(
     @InjectRepository(WorkItem)
     private workItemsRepository: Repository<WorkItem>,
-    @InjectRepository(Org)
-    private orgRepository: Repository<Org>,
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
     private mcpService: McpService,
+    private workItemsService: WorkItemsService,
     @Inject(REQUEST) private request: Request,
   ) {}
 
@@ -141,18 +141,30 @@ export class WorkItemsTool {
     });
     workItem.org = Promise.resolve(org);
     workItem.project = Promise.resolve(project);
-    const savedWorkItem = await this.workItemsRepository.save(workItem);
+    const savedWorkItem = await this.workItemsService.createWorkItem(
+      org.id,
+      project.id,
+      user.id,
+      {
+        title: title,
+        type: WorkItemType[type],
+        description: description,
+        status: WorkItemStatus.PLANNED,
+        priority: Priority.MEDIUM,
+      },
+    );
     return {
       content: [
         {
           type: 'text',
           text: `
-                Work Item Created:
-                Title: ${savedWorkItem.title}
-                Description: ${savedWorkItem.description}
-                Type: ${savedWorkItem.type}
-                Status: ${savedWorkItem.status}
-                Reference: ${savedWorkItem.reference}
+                Successfully created work item with reference ${savedWorkItem.reference}
+                Work Item Details
+                title: ${savedWorkItem.title}
+                type: ${savedWorkItem.type}
+                description: ${savedWorkItem.description}
+                status: ${savedWorkItem.status}
+                priority: ${savedWorkItem.priority}
               `,
         },
       ],

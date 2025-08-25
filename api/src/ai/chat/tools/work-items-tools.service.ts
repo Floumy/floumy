@@ -8,6 +8,9 @@ import { User } from '../../../users/user.entity';
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
 import { WorkItemType } from '../../../backlog/work-items/work-item-type.enum';
+import { WorkItemsService } from '../../../backlog/work-items/work-items.service';
+import { Priority } from '../../../common/priority.enum';
+import { WorkItemStatus } from '../../../backlog/work-items/work-item-status.enum';
 
 @Injectable()
 export class WorkItemsToolsService {
@@ -20,6 +23,7 @@ export class WorkItemsToolsService {
     private projectRepository: Repository<Project>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private workItemsService: WorkItemsService,
   ) {}
 
   getTools(orgId: string, projectId?: string, userId?: string) {
@@ -102,19 +106,28 @@ export class WorkItemsToolsService {
           const user = await this.userRepository.findOneByOrFail({
             id: userId,
           });
-          const workItem = new WorkItem();
-          workItem.title = workItemTitle;
-          workItem.type = workItemType as WorkItemType;
-          workItem.description = workItemDescription;
-          workItem.org = Promise.resolve(org);
-          workItem.project = Promise.resolve(project);
-          workItem.createdBy = Promise.resolve(user);
-          await this.workItemRepository.save(workItem);
-          const savedWorkItem = await this.workItemRepository.findOneByOrFail({
-            id: workItem.id,
-          });
 
-          return `Successfully created work item with reference ${savedWorkItem.reference}`;
+          const savedWorkItem = await this.workItemsService.createWorkItem(
+            org.id,
+            project.id,
+            user.id,
+            {
+              title: workItemTitle,
+              type: workItemType as WorkItemType,
+              description: workItemDescription,
+              status: WorkItemStatus.PLANNED,
+              priority: Priority.MEDIUM,
+            },
+          );
+
+          return `Successfully created work item with reference ${savedWorkItem.reference}
+          Work Item Details
+          title: ${savedWorkItem.title}
+          type: ${savedWorkItem.type}
+          description: ${savedWorkItem.description}
+          status: ${savedWorkItem.status}
+          priority: ${savedWorkItem.priority}
+          `;
         } catch (e) {
           return 'Failed to create work item because ' + e.message;
         }

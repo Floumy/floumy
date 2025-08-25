@@ -72,7 +72,12 @@ export class OrgOkrsService {
     const objectiveOrg = await objective.org;
     keyResultEntity.org = Promise.resolve(objectiveOrg);
     keyResultEntity.project = Promise.resolve(await objective.project);
-    return await this.keyResultRepository.save(keyResultEntity);
+    const savedKeyResult = await this.keyResultRepository.save(keyResultEntity);
+    this.eventEmitter.emit(
+      'keyResult.created',
+      await KeyResultMapper.toDTO(savedKeyResult),
+    );
+    return savedKeyResult;
   }
 
   async findObjectiveById(id: string) {
@@ -168,6 +173,15 @@ export class OrgOkrsService {
 
   async delete(orgId: string, id: string) {
     const okr = await this.get(orgId, id);
+    const keyResults = await this.keyResultRepository.findBy({
+      objective: { id, org: { id: orgId } },
+    });
+    for (const keyResult of keyResults) {
+      this.eventEmitter.emit(
+        'keyResult.deleted',
+        await KeyResultMapper.toDTO(keyResult),
+      );
+    }
     await this.removeKeyResultsAssociations(orgId, id);
     await this.removeObjectiveAssociations(orgId, id);
     await this.keyResultRepository.delete({
