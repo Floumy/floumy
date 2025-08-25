@@ -15,9 +15,11 @@ import { Issue } from '../issues/issue.entity';
 import { User } from '../users/user.entity';
 import { McpService } from './services/mcp.service';
 import { ProjectTool } from './tools/project.tool';
+import { BacklogModule } from '../backlog/backlog.module';
 
 @Module({
   imports: [
+    BacklogModule,
     TypeOrmModule.forFeature([
       User,
       Org,

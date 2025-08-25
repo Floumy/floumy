@@ -118,13 +118,13 @@ function UserSidebar({ toggleSidenav, logo, rtlActive }) {
                       <Row style={{ maxWidth: '100%', height: '47px' }}>
                         <Col xs={12}>
                           <NavLink
-                            to={`/user/ai-settings`}
+                            to={`/user/mcp-server-settings`}
                             onClick={closeSidenav}
                             tag={NavLinkRRD}
                             replace={true}
                           >
                             <i className="fas fa-magic-wand-sparkles" />
-                            <span className="nav-link-text">AI Settings</span>
+                            <span className="nav-link-text">MCP Server</span>
                           </NavLink>
                         </Col>
                       </Row>

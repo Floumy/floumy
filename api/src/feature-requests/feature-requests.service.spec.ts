@@ -469,11 +469,13 @@ describe('FeatureRequestsService', () => {
     featureRequest.description = 'Test Description';
     featureRequest.org = Promise.resolve(org);
     featureRequest.project = Promise.resolve(project);
+    featureRequest.createdBy = Promise.resolve(user);
     await featureRequestsRepository.save(featureRequest);
     const feature = new Initiative();
     feature.title = 'Test Feature';
     feature.description = 'Test Description';
     feature.org = Promise.resolve(org);
+    feature.createdBy = Promise.resolve(user);
     feature.project = Promise.resolve(project);
     feature.featureRequest = Promise.resolve(featureRequest);
     await featuresRepository.save(feature);
