@@ -329,4 +329,34 @@ export class IndexingService {
 
     return data.replace(imgRegex, '[image]').replace(htmlTagRegex, '');
   }
+
+  async updateObjectiveIndex(objective: Objective) {
+    await this.deleteEntityIndex(objective.id);
+    await this.indexObjective(objective);
+  }
+
+  async updateKeyResultIndex(keyResult: KeyResult) {
+    await this.deleteEntityIndex(keyResult.id);
+    await this.indexKeyResult(keyResult);
+  }
+
+  async updateInitiativeIndex(initiative: Initiative) {
+    await this.deleteEntityIndex(initiative.id);
+    await this.indexInitiative(initiative);
+  }
+
+  async updateWorkItemIndex(workItem: WorkItem) {
+    await this.deleteEntityIndex(workItem.id);
+    await this.indexWorkItem(workItem);
+  }
+
+  async updateFeatureRequestIndex(featureRequest: FeatureRequest) {
+    await this.deleteEntityIndex(featureRequest.id);
+    await this.indexFeatureRequest(featureRequest);
+  }
+
+  async updateIssueIndex(issue: Issue) {
+    await this.deleteEntityIndex(issue.id);
+    await this.indexIssue(issue);
+  }
 }
