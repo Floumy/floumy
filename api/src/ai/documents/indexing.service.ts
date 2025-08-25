@@ -133,7 +133,7 @@ export class IndexingService {
       Reference: ${initiative.reference || 'N/A'}
       Assignee: ${assignedTo?.name || 'N/A'}
       Priority: ${initiative.priority}
-      Description: ${initiative.description || 'N/A'}
+      Description: ${this.stripNonTextualData(initiative.description) || 'N/A'}
       `;
 
     const org = await initiative.org;
@@ -169,7 +169,7 @@ export class IndexingService {
       Reference: ${workItem.reference || 'N/A'}
       Assignee: ${assignedTo?.name || 'N/A'}
       Priority: ${workItem.priority}
-      Description: ${workItem.description || 'N/A'}
+      Description: ${this.stripNonTextualData(workItem.description) || 'N/A'}
       `;
 
     const org = await workItem.org;
@@ -201,7 +201,9 @@ export class IndexingService {
     const content = `
       Type: Feature Request
       Title: ${featureRequest.title}
-      Description: ${featureRequest.description || 'N/A'}
+      Description: ${
+        this.stripNonTextualData(featureRequest.description) || 'N/A'
+      }
       Status: ${featureRequest.status}
       estimation: ${featureRequest.estimation || 'N/A'}
       votesCount: ${featureRequest.votesCount || 'N/A'}
@@ -235,7 +237,7 @@ export class IndexingService {
     const content = `
       Type: Issue
       Title: ${issue.title}
-      Description: ${issue.description || 'N/A'}
+      Description: ${this.stripNonTextualData(issue.description) || 'N/A'}
       Status: ${issue.status}
       priority: ${issue.priority}
       `;
@@ -316,33 +318,15 @@ export class IndexingService {
     }
   }
 
-  async updateObjectiveIndex(objective: Objective) {
-    await this.deleteEntityIndex(objective.id);
-    await this.indexObjective(objective);
-  }
+  stripNonTextualData(data: string): string {
+    if (!data) {
+      return '';
+    }
+    // First, remove img elements specifically
+    const imgRegex = /<img[^>]*>/g;
+    // Then remove all remaining HTML tags
+    const htmlTagRegex = /<[^>]*>/g;
 
-  async updateKeyResultIndex(keyResult: KeyResult) {
-    await this.deleteEntityIndex(keyResult.id);
-    await this.indexKeyResult(keyResult);
-  }
-
-  async updateInitiativeIndex(initiative: Initiative) {
-    await this.deleteEntityIndex(initiative.id);
-    await this.indexInitiative(initiative);
-  }
-
-  async updateWorkItemIndex(workItem: WorkItem) {
-    await this.deleteEntityIndex(workItem.id);
-    await this.indexWorkItem(workItem);
-  }
-
-  async updateFeatureRequestIndex(featureRequest: FeatureRequest) {
-    await this.deleteEntityIndex(featureRequest.id);
-    await this.indexFeatureRequest(featureRequest);
-  }
-
-  async updateIssueIndex(issue: Issue) {
-    await this.deleteEntityIndex(issue.id);
-    await this.indexIssue(issue);
+    return data.replace(imgRegex, '[image]').replace(htmlTagRegex, '');
   }
 }

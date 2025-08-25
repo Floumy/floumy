@@ -138,10 +138,12 @@ const Tiptap = ({
       },
       suggestion: {
         char: '@',
-        items: async (query) => {
+        items: async ({ query }) => {
           const users = await getUsersByOrgId(orgId);
           return users
-            .filter((user) => user.name.toLowerCase().includes(query.query))
+            .filter((user) =>
+              user.name.toLowerCase().includes(query.toLowerCase()),
+            )
             .map((user) => ({ id: user.id, name: user.name }));
         },
         render: () => {
