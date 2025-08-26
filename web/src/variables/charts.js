@@ -171,16 +171,49 @@ function parseOptions(parent, options) {
 }
 
 const burndownChartOptions = {
+  legend: {
+    display: true,
+    position: 'bottom',
+    labels: {
+      usePointStyle: true,
+      padding: 16,
+      fontColor: colors.gray[700],
+      boxWidth: 10,
+    },
+  },
   tooltips: {
+    enabled: true,
+    mode: 'index',
+    intersect: false,
+    backgroundColor: '#111827',
+    titleFontColor: colors.white,
+    bodyFontColor: colors.white,
+    cornerRadius: 6,
+    xPadding: 12,
+    yPadding: 12,
     callbacks: {
       label: function (tooltipItem, data) {
         let label = data.datasets[tooltipItem.datasetIndex].label || '';
         if (label) {
           label += ': ';
         }
-        label += Math.round(tooltipItem.yLabel);
+        label += Math.round(tooltipItem.yLabel) + ' pts';
         return label;
       },
+    },
+  },
+  hover: { mode: 'nearest', intersect: false },
+  elements: {
+    line: {
+      tension: 0.25,
+      borderWidth: 3,
+      borderCapStyle: 'round',
+    },
+    point: {
+      radius: 3,
+      hitRadius: 10,
+      hoverRadius: 5,
+      hoverBorderWidth: 2,
     },
   },
   scales: {
@@ -189,16 +222,21 @@ const burndownChartOptions = {
         gridLines: {
           color: colors.gray[200],
           zeroLineColor: colors.gray[200],
+          drawTicks: false,
         },
         ticks: {
-          display: false,
+          display: true,
+          beginAtZero: true,
+          padding: 8,
+          fontColor: colors.gray[600],
           callback: function (value) {
             return value;
           },
         },
         scaleLabel: {
-          display: true,
-          labelString: 'Effort',
+          display: false,
+          // label removed per design
+          labelString: 'Effort (pts)',
         },
       },
     ],
@@ -207,18 +245,27 @@ const burndownChartOptions = {
         gridLines: {
           color: colors.gray[200],
           zeroLineColor: colors.gray[200],
+          drawBorder: false,
+          drawTicks: false,
         },
         ticks: {
-          display: false,
+          display: true,
+          autoSkip: true,
+          maxTicksLimit: 8,
+          padding: 8,
+          maxRotation: 0,
+          fontColor: colors.gray[600],
         },
         scaleLabel: {
-          display: true,
+          display: false,
+          // label removed per design
           labelString: 'Time',
         },
       },
     ],
   },
-  animation: false,
+  layout: { padding: { left: 4, right: 8, top: 8, bottom: 0 } },
+  animation: { duration: 700, easing: 'easeOutCubic' },
 };
 
 const cumulativeIssuesChartOptions = {

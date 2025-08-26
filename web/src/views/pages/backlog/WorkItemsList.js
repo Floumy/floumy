@@ -29,6 +29,9 @@ function WorkItemsList({
   workItems,
   showInitiative = true,
   showAssignedTo = false,
+  showEstimation = false,
+  showStatus = false,
+  showPriority = false,
   headerClassName = 'thead-light',
   onAddNewWorkItem,
   onChangeSprint,
@@ -196,15 +199,21 @@ function WorkItemsList({
                   Assigned To
                 </th>
               )}
-              <th scope="col" width={'5%'}>
-                Est.
-              </th>
-              <th scope="col" width={'10%'}>
-                Status
-              </th>
-              <th scope="col" width={'5%'}>
-                Priority
-              </th>
+              {showEstimation && (
+                <th scope="col" width={'5%'}>
+                  Est.
+                </th>
+              )}
+              {showStatus && (
+                <th scope="col" width={'10%'}>
+                  Status
+                </th>
+              )}
+              {showPriority && (
+                <th scope="col" width={'5%'}>
+                  Priority
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="list">
@@ -255,7 +264,6 @@ function WorkItemsList({
                         {workItem.initiative.title}
                       </Link>
                     )}
-                    {!workItem.initiative && '-'}
                   </td>
                 )}
                 {showAssignedTo && (
@@ -281,29 +289,36 @@ function WorkItemsList({
                         </span>
                       </>
                     )}
-                    {!workItem.assignedTo && '-'}
                   </td>
                 )}
-                <td>
-                  {workItem.estimation && workItem.estimation > 0
-                    ? workItem.estimation
-                    : '-'}
-                </td>
-                <td>
-                  <Badge color="" className="badge-dot mr-4">
-                    <i
-                      className={workItemStatusColorClassName(workItem.status)}
-                    />
-                    <span className="status">
-                      {formatHyphenatedString(workItem.status)}
-                    </span>
-                  </Badge>
-                </td>
-                <td>
-                  <Badge color={priorityColor(workItem.priority)} pill={true}>
-                    {workItem.priority}
-                  </Badge>
-                </td>
+                {showEstimation && (
+                  <td>
+                    {workItem.estimation && workItem.estimation > 0
+                      ? workItem.estimation
+                      : ''}
+                  </td>
+                )}
+                {showStatus && (
+                  <td>
+                    <Badge color="" className="badge-dot mr-4">
+                      <i
+                        className={workItemStatusColorClassName(
+                          workItem.status,
+                        )}
+                      />
+                      <span className="status">
+                        {formatHyphenatedString(workItem.status)}
+                      </span>
+                    </Badge>
+                  </td>
+                )}
+                {showPriority && (
+                  <td>
+                    <Badge color={priorityColor(workItem.priority)} pill={true}>
+                      {workItem.priority}
+                    </Badge>
+                  </td>
+                )}
               </tr>
             ))}
             {onAddNewWorkItem && (

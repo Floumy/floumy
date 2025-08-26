@@ -260,8 +260,11 @@ function ActiveSprint() {
                       </Row>
                       <WorkItemsList
                         workItems={workItemsByStatus[status]}
-                        showInitiative={true}
+                        showInitiative={false}
                         showAssignedTo={true}
+                        showStatus={false}
+                        showEstimation={true}
+                        showPriority={true}
                         onChangeSprint={handleChangeSprint}
                         onChangeStatus={updateWorkItemsStatus}
                         onChangePriority={updateWorkItemsPriority}
