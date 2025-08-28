@@ -222,44 +222,63 @@ function DetailOKRStats({ okr }) {
             <CardBody>
               <div className="chart">
                 <Line
-                  data={(canvas) => {
-                    const ctx = canvas.getContext('2d');
-                    const gradient = ctx.createLinearGradient(
-                      0,
-                      0,
-                      0,
-                      canvas.height || 300,
-                    );
-                    gradient.addColorStop(0, 'rgba(94, 67, 135, 0.35)');
-                    gradient.addColorStop(0.5, 'rgba(94, 67, 135, 0.18)');
-                    gradient.addColorStop(1, 'rgba(94, 67, 135, 0.04)');
-                    return {
-                      labels,
-                      datasets: [
-                        {
-                          label: 'Effort Left (%)',
-                          data,
-                          borderColor: '#5e4387',
-                          borderWidth: 2,
-                          backgroundColor: gradient,
-                          fill: true,
-                          pointRadius: 3,
-                          pointHoverRadius: 5,
-                          lineTension: 0.25,
-                        },
-                        {
-                          label: 'Ideal Burndown (%)',
-                          data: idealBurndown,
-                          borderColor: 'rgba(82, 95, 127, 0.5)',
-                          backgroundColor: 'rgba(0,0,0,0)',
-                          borderWidth: 2,
-                          borderDash: [6, 6],
-                          pointRadius: 0,
-                          fill: false,
-                        },
-                      ],
-                    };
-                  }}
+                  data={
+                    (/* canvas */) => {
+                      return {
+                        labels,
+                        datasets: [
+                          {
+                            label: 'Effort Left (%)',
+                            data,
+                            borderColor: '#5e4387',
+                            borderWidth: 2,
+                            // Use scriptable background to rebuild gradient after any update/resize
+                            backgroundColor: function (context) {
+                              const chart = context.chart;
+                              const { ctx, chartArea } = chart || {};
+                              if (!chartArea) {
+                                // This happens on initial chart load before the layout is computed.
+                                return 'rgba(94, 67, 135, 0.2)';
+                              }
+                              const gradient = ctx.createLinearGradient(
+                                0,
+                                chartArea.top,
+                                0,
+                                chartArea.bottom,
+                              );
+                              gradient.addColorStop(
+                                0,
+                                'rgba(94, 67, 135, 0.35)',
+                              );
+                              gradient.addColorStop(
+                                0.5,
+                                'rgba(94, 67, 135, 0.18)',
+                              );
+                              gradient.addColorStop(
+                                1,
+                                'rgba(94, 67, 135, 0.04)',
+                              );
+                              return gradient;
+                            },
+                            fill: true,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            lineTension: 0.25,
+                          },
+                          {
+                            label: 'Ideal Burndown (%)',
+                            data: idealBurndown,
+                            borderColor: 'rgba(82, 95, 127, 0.5)',
+                            backgroundColor: 'rgba(0,0,0,0)',
+                            borderWidth: 2,
+                            borderDash: [6, 6],
+                            pointRadius: 0,
+                            fill: false,
+                          },
+                        ],
+                      };
+                    }
+                  }
                   options={{
                     ...burndownChartOptions,
                     legend: { display: true },
