@@ -344,6 +344,13 @@ function Sprints() {
               );
             },
           },
+          {
+            name: 'All Work Items',
+            id: 'all-work-items',
+            action: () => {
+              navigate(`/admin/orgs/${orgId}/projects/${projectId}/work-items`);
+            },
+          },
         ]}
       />
       <Container className="mt--6" fluid id="OKRs">
@@ -641,7 +648,7 @@ function Sprints() {
             <WorkItemsListCard
               id={'backlog'}
               workItems={backlogWorkItems}
-              title={'Work Items Backlog'}
+              title={'Backlog'}
               isLoading={isLoadingWorkItems}
               onAddWorkItem={handleAddWorkItemToBacklog}
               onChangeSprint={handleChangeWorkItemsSprint}
@@ -655,6 +662,13 @@ function Sprints() {
                 updateWorkItemAssigneeInBacklog(workItems, assignee);
               }}
               onDelete={deleteWorkItemsFromBacklog}
+              extraButtonLabel={'All Work Items'}
+              extraButtonId={'all-work-items-backlog'}
+              onExtraButtonClick={() => {
+                navigate(
+                  `/admin/orgs/${orgId}/projects/${projectId}/work-items`,
+                );
+              }}
             />
           </Col>
         </Row>

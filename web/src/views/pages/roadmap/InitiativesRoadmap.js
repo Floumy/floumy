@@ -209,6 +209,15 @@ function InitiativesRoadmap() {
               );
             },
           },
+          {
+            name: 'All Initiatives',
+            id: 'all-initiatives',
+            action: () => {
+              navigate(
+                `/admin/orgs/${orgId}/projects/${projectId}/initiatives`,
+              );
+            },
+          },
         ]}
       />
       <Container className="mt--6" fluid>
@@ -304,7 +313,7 @@ function InitiativesRoadmap() {
             </Card>
             <div id={'initiatives-backlog'} />
             <InitiativesListCard
-              title="Initiatives Backlog"
+              title="Backlog"
               initiatives={initiatives}
               isLoading={isLoadingInitiatives}
               onAddInitiative={onAddInitiative}
@@ -312,6 +321,13 @@ function InitiativesRoadmap() {
               onChangeStatus={updateBacklogInitiativesStatus}
               onChangeAssignedTo={updateBacklogInitiativesAssignedTo}
               onDelete={onDeleteInitiative}
+              extraButtonLabel={'All Initiatives'}
+              extraButtonId={'all-initiatives-backlog'}
+              onExtraButtonClick={() => {
+                navigate(
+                  `/admin/orgs/${orgId}/projects/${projectId}/initiatives`,
+                );
+              }}
             />
           </Col>
         </Row>
