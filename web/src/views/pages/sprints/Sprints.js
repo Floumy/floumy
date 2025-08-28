@@ -595,12 +595,6 @@ function Sprints() {
                             showAssignedTo={true}
                             workItems={sortByPriority(sprint.workItems)}
                             headerClassName={'thead'}
-                            onAddNewWorkItem={async (workItem) => {
-                              await handleAddWorkItemWithSprint(
-                                workItem,
-                                sprint.id,
-                              );
-                            }}
                             onChangeSprint={handleChangeWorkItemsSprint}
                             onChangeStatus={(workItems, status) => {
                               updateWorkItemsStatusInSprint(
