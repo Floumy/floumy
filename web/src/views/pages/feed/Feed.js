@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, Container, Input } from 'reactstrap';
+import { Card, CardBody, Container } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import React, { useEffect, useState } from 'react';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
@@ -7,7 +7,6 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { formatDateWithTime } from '../../../services/utils/utils';
 import { Link, useParams } from 'react-router-dom';
 import {
-  addTextFeedItem,
   getInitiativeTitle,
   getInitiativeUpdates,
   getKeyResultUpdates,
@@ -16,21 +15,18 @@ import {
   getTitle,
   getWorkItemUpdates,
 } from './feed.service';
-import { toast } from 'react-toastify';
 import AutoResizeTextArea from '../../../components/AutoResizeTextArea/AutoResizeTextArea';
 
 export default function Feed({
   listFeedItems,
   getLinkUrl,
   showPageExplanation = true,
-  showPostFeedItem = true,
 }) {
   const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMoreFeedItems, setHasMoreFeedItems] = useState(true);
-  const [postText, setPostText] = useState('');
 
   useEffect(() => {
     setIsLoading(true);
@@ -127,16 +123,6 @@ export default function Feed({
     return [];
   }
 
-  async function postFeedItem(postText) {
-    try {
-      const feedItem = await addTextFeedItem(orgId, projectId, postText);
-      setFeedItems([feedItem, ...feedItems]);
-      setPostText('');
-    } catch (e) {
-      toast.error('The feed item could not be posted');
-    }
-  }
-
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
@@ -169,32 +155,6 @@ export default function Feed({
             )}
 
             <div className="mx-auto" style={{ maxWidth: '600px' }}>
-              {showPostFeedItem && feedItems?.length > 0 && (
-                <div className="py-4 border-bottom border-gray-200">
-                  <Input
-                    type="textarea"
-                    placeholder="What's new?"
-                    value={postText}
-                    onChange={(e) => setPostText(e.target.value)}
-                    maxLength={500}
-                    style={{ height: '100px' }}
-                  />
-                  <span className="text-muted text-sm">
-                    <small>{postText.length} / 500 characters</small>
-                  </span>
-                  <br />
-                  <Button
-                    type="submit"
-                    className="btn btn-primary bg-primary text-white my-2 shadow-none shadow-none--hover"
-                    onClick={async () => {
-                      await postFeedItem(postText);
-                      setPostText('');
-                    }}
-                  >
-                    Post Update
-                  </Button>
-                </div>
-              )}
               {feedItems?.length > 0 && (
                 <div
                   className="timeline timeline-one-side my-5"
