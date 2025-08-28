@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 // javascript plugin that creates a sortable object from a dom object
 // reactstrap components
 import {
-  Badge,
   Card,
   CardBody,
   CardHeader,
@@ -11,23 +10,15 @@ import {
   Container,
   Progress,
   Row,
-  Table,
-  UncontrolledTooltip,
 } from 'reactstrap';
 // core components
 import SimpleHeader from 'components/Headers/SimpleHeader.js';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { listOKRs, getOkrStats } from '../../../services/okrs/okrs.service';
+import { getOkrStats, listOKRs } from '../../../services/okrs/okrs.service';
 import Select2 from 'react-select2-wrapper';
-import {
-  formatHyphenatedString,
-  formatOKRsProgress,
-  memberNameInitials,
-  okrStatusColorClassName,
-  textToColor,
-} from '../../../services/utils/utils';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import OKR from './OKR';
 
 function OKRs() {
   let location = useLocation();
@@ -242,128 +233,11 @@ function OKRs() {
                   </div>
                 </div>
               )}
-              {!isLoading && (
-                <div className="table-responsive">
-                  <Table
-                    className="align-items-center table-flush no-select"
-                    onContextMenu={(e) => e.preventDefault()}
-                  >
-                    <thead className="thead-light">
-                      <tr>
-                        <th className={'sort'} scope="col" width={'5%'}>
-                          Reference
-                        </th>
-                        <th className="sort" scope="col" width={'40%'}>
-                          Objective
-                        </th>
-                        <th className="sort" scope="col" width={'30%'}>
-                          Progress
-                        </th>
-                        <th className="sort" scope="col" width={'20%'}>
-                          Status
-                        </th>
-                        <th className="sort" scope="col" width={'5%'}>
-                          Assigned To
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="list">
-                      {okrs.length > 0 ? (
-                        okrs.map((okr) => (
-                          <tr key={okr.id}>
-                            {/*Display empty row with message if is template*/}
-                            {okr.id === 0 && (
-                              <td colSpan={5} className={'text-center'}>
-                                <h3 className="text-center m-0">
-                                  No objectives found for this timeline.
-                                </h3>
-                              </td>
-                            )}
-                            {okr.id !== 0 && (
-                              <>
-                                <td>
-                                  <Link
-                                    to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${okr.id}`}
-                                    className={'okr-detail'}
-                                  >
-                                    {okr.reference}
-                                  </Link>
-                                </td>
-                                <td className="title-cell">
-                                  <Link
-                                    to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${okr.id}`}
-                                    className={'okr-detail'}
-                                  >
-                                    {okr.title}
-                                  </Link>
-                                </td>
-                                <td>
-                                  <div className="d-flex align-items-center">
-                                    <span className="mr-2">
-                                      {formatOKRsProgress(okr.progress)}%
-                                    </span>
-                                    <div>
-                                      <Progress
-                                        max="100"
-                                        value={formatOKRsProgress(okr.progress)}
-                                        color="primary"
-                                      />
-                                    </div>
-                                  </div>
-                                </td>
-                                <td>
-                                  <Badge color="" className="badge-dot mr-4">
-                                    <i
-                                      className={okrStatusColorClassName(
-                                        okr.status,
-                                      )}
-                                    />
-                                    <span className="status">
-                                      {formatHyphenatedString(okr.status)}
-                                    </span>
-                                  </Badge>
-                                </td>
-                                <td>
-                                  {okr.assignedTo && okr.assignedTo.name && (
-                                    <>
-                                      <UncontrolledTooltip
-                                        target={'assigned-to-' + okr.id}
-                                        placement="top"
-                                      >
-                                        {okr.assignedTo.name}
-                                      </UncontrolledTooltip>
-                                      <span
-                                        className="avatar avatar-xs rounded-circle"
-                                        style={{
-                                          backgroundColor: textToColor(
-                                            okr.assignedTo.name,
-                                          ),
-                                        }}
-                                        id={'assigned-to-' + okr.id}
-                                      >
-                                        {memberNameInitials(
-                                          okr.assignedTo.name,
-                                        )}
-                                      </span>
-                                    </>
-                                  )}
-                                  {!okr.assignedTo && '-'}
-                                </td>
-                              </>
-                            )}
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className={'text-center'}>
-                            No objectives found.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </Table>
-                </div>
-              )}
+              <div className="py-4 px-4">
+                {!isLoading &&
+                  okrs &&
+                  okrs.map((okr) => <OKR key={okr.id} okr={okr} />)}
+              </div>
             </Card>
           </div>
         </Row>
