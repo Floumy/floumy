@@ -38,19 +38,15 @@ function IssueStats({ issues }) {
         closed: [],
       };
 
-      // Initialize the data structure with dates for the current quarter, plus tomorrow
+      // Initialize the data structure by week for the current quarter, plus tomorrow
       const endDate = new Date(now);
       endDate.setDate(endDate.getDate() + 1);
-      for (
-        let d = new Date(quarterStart);
-        d <= endDate;
-        d.setDate(d.getDate() + 1)
-      ) {
-        const dateStr = d.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-        });
-        data.labels.push(dateStr);
+      const MS_PER_DAY = 24 * 60 * 60 * 1000;
+      // Total number of days inclusive of endDate
+      const totalDays = Math.floor((endDate - quarterStart) / MS_PER_DAY) + 1;
+      const totalWeeks = Math.ceil(totalDays / 7);
+      for (let i = 0; i < totalWeeks; i++) {
+        data.labels.push(`Week ${i + 1}`);
         data.open.push(0);
         data.closed.push(0);
       }
@@ -60,7 +56,9 @@ function IssueStats({ issues }) {
 
       sortedIssues.forEach((issue) => {
         const date = new Date(issue.createdAt);
-        const index = Math.floor((date - quarterStart) / (24 * 60 * 60 * 1000));
+        const MS_PER_DAY = 24 * 60 * 60 * 1000;
+        const dayIndex = Math.floor((date - quarterStart) / MS_PER_DAY);
+        const weekIndex = Math.floor(dayIndex / 7);
 
         if (
           ['resolved', 'closed', 'cannot-reproduce', 'duplicate'].includes(
@@ -72,7 +70,7 @@ function IssueStats({ issues }) {
           openCount++;
         }
 
-        for (let i = index; i < data.labels.length; i++) {
+        for (let i = weekIndex; i < data.labels.length; i++) {
           data.open[i] = openCount;
           data.closed[i] = closedCount;
         }
