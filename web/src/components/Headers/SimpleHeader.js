@@ -3,7 +3,7 @@ import React from 'react';
 // reactstrap components
 import { Button, Col, Container, Row } from 'reactstrap';
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs';
-import { KeyShortcut, ShortcutIcon } from '../Shortcuts';
+import { ShortcutIcon } from '../Shortcuts';
 
 function SimpleHeader({
   headerButtons,
