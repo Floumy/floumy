@@ -32,14 +32,14 @@ function DevelopmentStats({ sprint }) {
 
   // Helpers to choose progress bar colors
   const getCompletionColor = (value) => {
-    if (value >= 66) return 'success';
-    if (value >= 33) return 'warning';
+    if (value >= 60) return 'success';
+    if (value >= 30) return 'warning';
     return 'danger';
   };
   const getEffortLeftColor = (value) => {
     // Lower remaining effort is better
-    if (value <= 25) return 'success';
-    if (value <= 60) return 'warning';
+    if (value >= 60) return 'success';
+    if (value >= 30) return 'warning';
     return 'danger';
   };
 
@@ -214,6 +214,7 @@ function DevelopmentStats({ sprint }) {
                           borderColor: '#5e4387',
                           backgroundColor: gradient,
                           fill: true,
+                          borderWidth: 2,
                           pointRadius: 3,
                           pointHoverRadius: 5,
                           lineTension: 0.25,
@@ -231,7 +232,41 @@ function DevelopmentStats({ sprint }) {
                       ],
                     };
                   }}
-                  options={burndownChartOptions}
+                  options={{
+                    ...burndownChartOptions,
+                    legend: { display: true },
+                    scales: {
+                      ...(burndownChartOptions.scales || {}),
+                      xAxes: [
+                        {
+                          ...((burndownChartOptions.scales &&
+                            burndownChartOptions.scales.xAxes &&
+                            burndownChartOptions.scales.xAxes[0]) ||
+                            {}),
+                          scaleLabel: { display: false },
+                        },
+                      ],
+                      yAxes: [
+                        {
+                          ...((burndownChartOptions.scales &&
+                            burndownChartOptions.scales.yAxes &&
+                            burndownChartOptions.scales.yAxes[0]) ||
+                            {}),
+                          scaleLabel: { display: false },
+                          ticks: {
+                            ...((burndownChartOptions.scales &&
+                              burndownChartOptions.scales.yAxes &&
+                              burndownChartOptions.scales.yAxes[0] &&
+                              burndownChartOptions.scales.yAxes[0].ticks) ||
+                              {}),
+                            suggestedMax: totalEstimation
+                              ? Math.ceil(totalEstimation * 1.05)
+                              : undefined,
+                          },
+                        },
+                      ],
+                    },
+                  }}
                   className="chart-canvas"
                 />
               </div>

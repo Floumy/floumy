@@ -34,13 +34,13 @@ function DetailOKRStats({ okr }) {
 
   // Helpers to choose progress bar colors for the stat tiles
   const getCompletionColor = (value) => {
-    if (value >= 66) return 'success';
-    if (value >= 33) return 'warning';
+    if (value >= 60) return 'success';
+    if (value >= 30) return 'warning';
     return 'danger';
   };
   const getEffortLeftColor = (value) => {
-    if (value <= 25) return 'success';
-    if (value <= 60) return 'warning';
+    if (value >= 60) return 'success';
+    if (value >= 30) return 'warning';
     return 'danger';
   };
 
@@ -240,6 +240,7 @@ function DetailOKRStats({ okr }) {
                           label: 'Effort Left (%)',
                           data,
                           borderColor: '#5e4387',
+                          borderWidth: 2,
                           backgroundColor: gradient,
                           fill: true,
                           pointRadius: 3,
@@ -261,6 +262,36 @@ function DetailOKRStats({ okr }) {
                   }}
                   options={{
                     ...burndownChartOptions,
+                    legend: { display: true },
+                    scales: {
+                      ...(burndownChartOptions.scales || {}),
+                      xAxes: [
+                        {
+                          ...((burndownChartOptions.scales &&
+                            burndownChartOptions.scales.xAxes &&
+                            burndownChartOptions.scales.xAxes[0]) ||
+                            {}),
+                          scaleLabel: { display: false },
+                        },
+                      ],
+                      yAxes: [
+                        {
+                          ...((burndownChartOptions.scales &&
+                            burndownChartOptions.scales.yAxes &&
+                            burndownChartOptions.scales.yAxes[0]) ||
+                            {}),
+                          scaleLabel: { display: false },
+                          ticks: {
+                            ...((burndownChartOptions.scales &&
+                              burndownChartOptions.scales.yAxes &&
+                              burndownChartOptions.scales.yAxes[0] &&
+                              burndownChartOptions.scales.yAxes[0].ticks) ||
+                              {}),
+                            suggestedMax: 102,
+                          },
+                        },
+                      ],
+                    },
                     tooltips: {
                       ...burndownChartOptions.tooltips,
                       callbacks: {
