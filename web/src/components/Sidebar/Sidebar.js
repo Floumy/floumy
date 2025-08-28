@@ -136,7 +136,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Col
                       xs={3}
                       style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
+                      className="text-left"
                     >
                       <div
                         className={
@@ -184,7 +184,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Col
                       xs={3}
                       style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
+                      className="text-left"
                     >
                       <div
                         className={
@@ -232,7 +232,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Col
                       xs={3}
                       style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
+                      className="text-left"
                     >
                       <div
                         className={
@@ -281,7 +281,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Col
                       xs={3}
                       style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
+                      className="text-left"
                     >
                       <div
                         className={
@@ -363,7 +363,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Col
                       xs={3}
                       style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-right"
+                      className="text-left"
                     >
                       <div>
                         <Badge color="warning" pill={true}>
@@ -419,7 +419,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       <Col
                         xs={3}
                         style={{ padding: '0.675rem 1.5rem' }}
-                        className="text-right"
+                        className="text-left"
                       >
                         <div
                           className={
@@ -467,7 +467,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       <Col
                         xs={3}
                         style={{ padding: '0.675rem 1.5rem' }}
-                        className="text-right"
+                        className="text-left"
                       >
                         <div
                           className={
