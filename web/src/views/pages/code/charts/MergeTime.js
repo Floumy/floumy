@@ -121,27 +121,85 @@ export function MergeTime({ orgId, projectId, getPrData }) {
           <CardBody>
             <div className="chart">
               <Line
-                data={{
-                  labels,
-                  datasets: [
-                    {
-                      label: 'Merge time',
-                      data,
-                      tension: 0.4,
-                      order: 1,
-                    },
-                    {
-                      label: 'Number of PRs',
-                      data: prCount,
-                      fill: true,
-                      type: 'bar',
-                      barThickness: 20,
-                      order: 2,
-                      backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                    },
-                  ],
+                data={
+                  (/* canvas */) => {
+                    return {
+                      labels,
+                      datasets: [
+                        {
+                          label: 'Merge time',
+                          data,
+                          borderColor: '#5e4387',
+                          backgroundColor: function (context) {
+                            const chart = context.chart;
+                            const { ctx, chartArea } = chart || {};
+                            if (!chartArea) {
+                              return 'rgba(94, 67, 135, 0.2)';
+                            }
+                            const gradient = ctx.createLinearGradient(
+                              0,
+                              chartArea.top,
+                              0,
+                              chartArea.bottom,
+                            );
+                            gradient.addColorStop(0, 'rgba(94, 67, 135, 0.35)');
+                            gradient.addColorStop(
+                              0.5,
+                              'rgba(94, 67, 135, 0.18)',
+                            );
+                            gradient.addColorStop(1, 'rgba(94, 67, 135, 0.04)');
+                            return gradient;
+                          },
+                          fill: true,
+                          borderWidth: 2,
+                          pointRadius: 3,
+                          pointHoverRadius: 5,
+                          lineTension: 0.25,
+                          order: 1,
+                        },
+                        {
+                          label: 'Number of PRs',
+                          data: prCount,
+                          fill: true,
+                          type: 'bar',
+                          barThickness: 20,
+                          order: 2,
+                          backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                        },
+                      ],
+                    };
+                  }
+                }
+                options={{
+                  ...averageMergeTimeChartOptions,
+                  legend: { display: true },
+                  scales: {
+                    ...(averageMergeTimeChartOptions &&
+                    averageMergeTimeChartOptions.scales
+                      ? averageMergeTimeChartOptions.scales
+                      : {}),
+                    xAxes: [
+                      {
+                        ...((averageMergeTimeChartOptions &&
+                          averageMergeTimeChartOptions.scales &&
+                          averageMergeTimeChartOptions.scales.xAxes &&
+                          averageMergeTimeChartOptions.scales.xAxes[0]) ||
+                          {}),
+                        scaleLabel: { display: false },
+                      },
+                    ],
+                    yAxes: [
+                      {
+                        ...((averageMergeTimeChartOptions &&
+                          averageMergeTimeChartOptions.scales &&
+                          averageMergeTimeChartOptions.scales.yAxes &&
+                          averageMergeTimeChartOptions.scales.yAxes[0]) ||
+                          {}),
+                        scaleLabel: { display: false },
+                      },
+                    ],
+                  },
                 }}
-                options={averageMergeTimeChartOptions}
                 className="chart-canvas"
               />
             </div>
