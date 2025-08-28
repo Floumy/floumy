@@ -18,16 +18,28 @@ import {
   Row,
   UncontrolledTooltip,
 } from 'reactstrap';
-import ShortcutIcon from '../Shortcuts/ShortcutIcon';
 import { useBuildInPublic } from '../../contexts/BuidInPublicContext';
 import { useProjects } from '../../contexts/ProjectsContext';
 import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
 import { useOrg } from '../../contexts/OrgContext';
-import { KeyShortcut } from '../Shortcuts';
+import { KeyShortcut, ShortcutsModal } from '../Shortcuts';
 
 function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = React.useState(false);
+  const toggleShortcutsModal = () => setShortcutsOpen((s) => !s);
+  React.useEffect(() => {
+    const onKeyDown = (e) => {
+      // Open shortcuts modal on '?'
+      if ((e.shiftKey && e.key === '/') || e.key === '?') {
+        e.preventDefault();
+        setShortcutsOpen(true);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
   const {
     currentProject,
     projects,
@@ -74,6 +86,22 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const toggleNewProjectModal = () => {
     setNewProjectModal(!newProjectModal);
   };
+
+  const shortcutsItems = [
+    { description: 'Go to OKRs', keys: ['1'], id: 'okrs' },
+    { description: 'Go to Roadmap', keys: ['2'], id: 'roadmap' },
+    { description: 'Go to Active Sprint', keys: ['3'], id: 'active-sprint' },
+    { description: 'Go to Sprints', keys: ['4'], id: 'sprints' },
+    { description: 'Go to Pages', keys: ['5'], id: 'pages' },
+    { description: 'Go to Code', keys: ['6'], id: 'code' },
+    { description: 'Go to Issues', keys: ['7'], id: 'issues' },
+    {
+      description: 'Go to Feature Requests',
+      keys: ['8'],
+      id: 'feature-requests',
+    },
+    { description: 'Open Shortcuts', keys: ['?'], id: 'help' },
+  ];
 
   const scrollBarInner = (
     <div className="scrollbar-inner">
@@ -165,7 +193,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </div>
                     </Col>
                     <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={2} />
+                      <span
+                        id="shortcut-okrs"
+                        role="button"
+                        onClick={toggleShortcutsModal}
+                      >
+                        <KeyShortcut keys={['1']} />
+                      </span>
+                      <UncontrolledTooltip
+                        target="shortcut-okrs"
+                        placement="top"
+                      >
+                        Press 1 to go to OKRs. Click to see all shortcuts.
+                      </UncontrolledTooltip>
                     </Col>
                   </Row>
                 </NavItem>
@@ -213,7 +253,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </div>
                     </Col>
                     <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={3} />
+                      <span
+                        id="shortcut-roadmap"
+                        role="button"
+                        onClick={toggleShortcutsModal}
+                      >
+                        <KeyShortcut keys={['2']} />
+                      </span>
+                      <UncontrolledTooltip
+                        target="shortcut-roadmap"
+                        placement="top"
+                      >
+                        Press 2 to go to Roadmap. Click to see all shortcuts.
+                      </UncontrolledTooltip>
                     </Col>
                   </Row>
                 </NavItem>
@@ -262,7 +314,20 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </div>
                     </Col>
                     <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={5} />
+                      <span
+                        id="shortcut-active-sprint"
+                        role="button"
+                        onClick={toggleShortcutsModal}
+                      >
+                        <KeyShortcut keys={['3']} />
+                      </span>
+                      <UncontrolledTooltip
+                        target="shortcut-active-sprint"
+                        placement="top"
+                      >
+                        Press 3 to go to Active Sprint. Click to see all
+                        shortcuts.
+                      </UncontrolledTooltip>
                     </Col>
                   </Row>
                 </NavItem>
@@ -310,7 +375,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </div>
                     </Col>
                     <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={4} />
+                      <span
+                        id="shortcut-sprints"
+                        role="button"
+                        onClick={toggleShortcutsModal}
+                      >
+                        <KeyShortcut keys={['4']} />
+                      </span>
+                      <UncontrolledTooltip
+                        target="shortcut-sprints"
+                        placement="top"
+                      >
+                        Press 4 to go to Sprints. Click to see all shortcuts.
+                      </UncontrolledTooltip>
                     </Col>
                   </Row>
                 </NavItem>
@@ -372,7 +449,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </div>
                     </Col>
                     <Col xs={2} className="text-right pr-2 pt-2">
-                      <ShortcutIcon shortcutKey={9} />
+                      <span
+                        id="shortcut-pages"
+                        role="button"
+                        onClick={toggleShortcutsModal}
+                      >
+                        <KeyShortcut keys={['5']} />
+                      </span>
+                      <UncontrolledTooltip
+                        target="shortcut-pages"
+                        placement="top"
+                      >
+                        Press 5 to go to Pages. Click to see all shortcuts.
+                      </UncontrolledTooltip>
                     </Col>
                   </Row>
                 </NavItem>
@@ -389,7 +478,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       </NavLink>
                     </Col>
                     <Col xs={2} className="text-right pr-2 pt-2">
-                      <KeyShortcut keys={['1']} />
+                      <span
+                        id="shortcut-code"
+                        role="button"
+                        onClick={toggleShortcutsModal}
+                      >
+                        <KeyShortcut keys={['6']} />
+                      </span>
+                      <UncontrolledTooltip
+                        target="shortcut-code"
+                        placement="top"
+                      >
+                        Press 6 to go to Code. Click to see all shortcuts.
+                      </UncontrolledTooltip>
                     </Col>
                   </Row>
                 </NavItem>
@@ -447,7 +548,21 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           </Link>
                         </div>
                       </Col>
-                      <Col xs={2} className="text-right pr-2 pt-2"></Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <span
+                          id="shortcut-issues"
+                          role="button"
+                          onClick={toggleShortcutsModal}
+                        >
+                          <KeyShortcut keys={['7']} />
+                        </span>
+                        <UncontrolledTooltip
+                          target="shortcut-issues"
+                          placement="top"
+                        >
+                          Press 7 to go to Issues. Click to see all shortcuts.
+                        </UncontrolledTooltip>
+                      </Col>
                     </Row>
                   </NavItem>
                   <NavItem>
@@ -497,7 +612,22 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           </Link>
                         </div>
                       </Col>
-                      <Col xs={2} className="text-right pr-2 pt-2"></Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <span
+                          id="shortcut-feature-requests"
+                          role="button"
+                          onClick={toggleShortcutsModal}
+                        >
+                          <KeyShortcut keys={['8']} />
+                        </span>
+                        <UncontrolledTooltip
+                          target="shortcut-feature-requests"
+                          placement="top"
+                        >
+                          Press 8 to go to Feature Requests. Click to see all
+                          shortcuts.
+                        </UncontrolledTooltip>
+                      </Col>
                     </Row>
                   </NavItem>
                 </Nav>
@@ -553,6 +683,11 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
       <NewProjectModal
         isOpen={newProjectModal}
         toggleModal={toggleNewProjectModal}
+      />
+      <ShortcutsModal
+        isOpen={shortcutsOpen}
+        onClose={toggleShortcutsModal}
+        items={shortcutsItems}
       />
       <Navbar
         className={

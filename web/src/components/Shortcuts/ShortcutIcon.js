@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { KeyShortcut } from './index';
 
 // Styled-components for the shortcut display
 const ShortcutContainer = styled.div`
@@ -31,7 +32,7 @@ const ShortcutKey = styled.span`
 const ShortcutIcon = ({ itemName, shortcutKey }) => (
   <ShortcutContainer>
     <ItemName>{itemName}</ItemName>
-    <ShortcutKey>{shortcutKey}</ShortcutKey>
+    <KeyShortcut keys={[shortcutKey]} />
   </ShortcutContainer>
 );
 
