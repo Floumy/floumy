@@ -34,13 +34,13 @@ function DetailOKRStats({ okr }) {
 
   // Helpers to choose progress bar colors for the stat tiles
   const getCompletionColor = (value) => {
-    if (value >= 60) return 'success';
-    if (value >= 30) return 'warning';
+    if (value >= 66) return 'success';
+    if (value >= 33) return 'warning';
     return 'danger';
   };
   const getEffortLeftColor = (value) => {
-    if (value >= 60) return 'success';
-    if (value >= 30) return 'warning';
+    if (value <= 66) return 'success';
+    if (value <= 33) return 'warning';
     return 'danger';
   };
 

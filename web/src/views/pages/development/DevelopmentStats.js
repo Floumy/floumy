@@ -32,14 +32,14 @@ function DevelopmentStats({ sprint }) {
 
   // Helpers to choose progress bar colors
   const getCompletionColor = (value) => {
-    if (value >= 60) return 'success';
-    if (value >= 30) return 'warning';
+    if (value >= 66) return 'success';
+    if (value >= 33) return 'warning';
     return 'danger';
   };
   const getEffortLeftColor = (value) => {
     // Lower remaining effort is better
-    if (value >= 60) return 'success';
-    if (value >= 30) return 'warning';
+    if (value <= 33) return 'success';
+    if (value <= 66) return 'warning';
     return 'danger';
   };
 

@@ -7,6 +7,7 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
+  Progress,
   Row,
   UncontrolledDropdown,
 } from 'reactstrap';
@@ -46,9 +47,22 @@ function ExecutionStats({ workItems }) {
 
   const [overallCompletion, setOverallCompletion] = useState(0);
 
-  const [effortLeftByEstimation, setEffortLeftByEstimation] = useState(0);
+  const [effortLeftByEstimation, seteffortLeftByEstimation] = useState(0);
 
   const [showWorkItemsBy, setShowWorkItemsBy] = useState('status');
+
+  // Helpers to choose progress bar colors
+  const getCompletionColor = (value) => {
+    if (value >= 66) return 'success';
+    if (value >= 33) return 'warning';
+    return 'danger';
+  };
+  const getEffortLeftColor = (value) => {
+    // Lower remaining effort is better
+    if (value <= 33) return 'success';
+    if (value <= 66) return 'warning';
+    return 'danger';
+  };
 
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
@@ -117,12 +131,12 @@ function ExecutionStats({ workItems }) {
       }
     });
     if (totalCompletedEstimation === 0) {
-      setEffortLeftByEstimation(0);
+      seteffortLeftByEstimation(0);
       return;
     }
     const completedEstimationPercentage =
       totalCompletedEstimation / totalEstimation;
-    setEffortLeftByEstimation(
+    seteffortLeftByEstimation(
       Math.round((1 - completedEstimationPercentage) * 100),
     );
   }
@@ -348,19 +362,27 @@ function ExecutionStats({ workItems }) {
         </Col>
       </Row>
       <Row>
-        <Col md={12} lg={6}>
+        <Col sm={12} md={6}>
           <Card>
             <CardBody>
               <Row>
-                <div className="col">
-                  <CardTitle className="text-uppercase text-muted mb-0 ">
+                <Col>
+                  <CardTitle className="text-uppercase text-muted mb-1 ">
                     Completed Items
                   </CardTitle>
-                  <span className="h2 font-weight-bold mb-0 ">
-                    {overallCompletion}%
-                  </span>
-                </div>
-                <Col className="col-auto">
+                  <div className="d-flex align-items-baseline mb-2">
+                    <span className="h2 font-weight-bold mb-0 mr-2 ">
+                      {overallCompletion}%
+                    </span>
+                  </div>
+                  <Progress
+                    max={100}
+                    value={overallCompletion}
+                    color={getCompletionColor(overallCompletion)}
+                    className="progress-sm"
+                  />
+                </Col>
+                <Col className="text-right col-auto">
                   <div className="icon icon-shape bg-white text-primary rounded-circle bg-lighter">
                     <i className="ni ni-check-bold" />
                   </div>
@@ -369,19 +391,27 @@ function ExecutionStats({ workItems }) {
             </CardBody>
           </Card>
         </Col>
-        <Col md={12} lg={6}>
+        <Col sm={12} md={6}>
           <Card>
             <CardBody>
               <Row>
-                <div className="col">
-                  <CardTitle className="text-uppercase text-muted mb-0 ">
+                <Col>
+                  <CardTitle className="text-uppercase text-muted mb-1 ">
                     Effort Left
                   </CardTitle>
-                  <span className="h2 font-weight-bold mb-0 ">
-                    {effortLeftByEstimation}%
-                  </span>
-                </div>
-                <Col className="col-auto">
+                  <div className="d-flex align-items-baseline mb-2 ">
+                    <span className="h2 font-weight-bold mb-0 mr-2 ">
+                      {effortLeftByEstimation}%
+                    </span>
+                  </div>
+                  <Progress
+                    max={100}
+                    value={effortLeftByEstimation}
+                    color={getEffortLeftColor(effortLeftByEstimation)}
+                    className="progress-sm"
+                  />
+                </Col>
+                <Col className="text-right col-auto">
                   <div className="icon icon-shape bg-white text-primary rounded-circle bg-lighter">
                     <i className="ni ni-building" />
                   </div>
