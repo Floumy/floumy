@@ -209,15 +209,6 @@ function InitiativesRoadmap() {
               );
             },
           },
-          {
-            name: 'All Initiatives',
-            id: 'all-initiatives',
-            action: () => {
-              navigate(
-                `/admin/orgs/${orgId}/projects/${projectId}/initiatives`,
-              );
-            },
-          },
         ]}
       />
       <Container className="mt--6" fluid>

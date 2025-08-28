@@ -344,13 +344,6 @@ function Sprints() {
               );
             },
           },
-          {
-            name: 'All Work Items',
-            id: 'all-work-items',
-            action: () => {
-              navigate(`/admin/orgs/${orgId}/projects/${projectId}/work-items`);
-            },
-          },
         ]}
       />
       <Container className="mt--6" fluid id="OKRs">
