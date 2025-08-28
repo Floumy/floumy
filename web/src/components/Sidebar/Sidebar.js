@@ -100,6 +100,31 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
       keys: ['8'],
       id: 'feature-requests',
     },
+    {
+      description: 'Create a Work Item',
+      keys: ['w'],
+      id: 'create-work-item',
+    },
+    {
+      description: 'Create an Initiative',
+      keys: ['i'],
+      id: 'create-initiative',
+    },
+    {
+      description: 'Create an OKR',
+      keys: ['o'],
+      id: 'create-initiative',
+    },
+    {
+      description: 'Create a Sprint',
+      keys: ['s'],
+      id: 'create-initiative',
+    },
+    {
+      description: 'Create a Roadmap Milestone',
+      keys: ['m'],
+      id: 'create-initiative',
+    },
     { description: 'Open Shortcuts', keys: ['?'], id: 'help' },
   ];
 

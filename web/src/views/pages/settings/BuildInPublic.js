@@ -269,26 +269,7 @@ function BuildInPublic() {
                     </Row>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
-                        Feed
-                      </Col>
-                      <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle">
-                          <input
-                            checked={buildInPublicSettings.isFeedPagePublic}
-                            onChange={togglePublicPage('isFeedPagePublic')}
-                            type="checkbox"
-                          />
-                          <span
-                            className="custom-toggle-slider"
-                            data-label-off="No"
-                            data-label-on="Yes"
-                          />
-                        </label>
-                      </Col>
-                    </Row>
-                    <Row className="mb-3">
-                      <Col xs={6} sm={3} md={2}>
-                        Objectives
+                        OKRs
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle mr-1">
@@ -330,13 +311,17 @@ function BuildInPublic() {
                     </Row>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
-                        Sprints
+                        Active Sprint
                       </Col>
                       <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle mr-1">
+                        <label className="custom-toggle">
                           <input
-                            checked={buildInPublicSettings.isSprintsPagePublic}
-                            onChange={togglePublicPage('isSprintsPagePublic')}
+                            checked={
+                              buildInPublicSettings.isActiveSprintsPagePublic
+                            }
+                            onChange={togglePublicPage(
+                              'isActiveSprintsPagePublic',
+                            )}
                             type="checkbox"
                           />
                           <span
@@ -349,17 +334,13 @@ function BuildInPublic() {
                     </Row>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
-                        Active Sprint
+                        Sprints
                       </Col>
                       <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle">
+                        <label className="custom-toggle mr-1">
                           <input
-                            checked={
-                              buildInPublicSettings.isActiveSprintsPagePublic
-                            }
-                            onChange={togglePublicPage(
-                              'isActiveSprintsPagePublic',
-                            )}
+                            checked={buildInPublicSettings.isSprintsPagePublic}
+                            onChange={togglePublicPage('isSprintsPagePublic')}
                             type="checkbox"
                           />
                           <span

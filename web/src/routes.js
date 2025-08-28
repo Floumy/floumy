@@ -38,7 +38,6 @@ import PublicActiveSprint from './views/pages/development/PublicActiveSprint';
 import Project from './views/pages/settings/Project';
 import MyProfile from './views/pages/users/MyProfile';
 import PrivateFeed from './views/pages/feed/PrivateFeed';
-import PublicFeed from './views/pages/feed/PublicFeed';
 import SignUp from './views/pages/auth/SignUp';
 import FeatureRequests from './views/pages/feature-requests/FeatureRequests';
 import NewFeatureRequest from './views/pages/feature-requests/NewFeatureRequest';
@@ -412,12 +411,6 @@ export const publicRoutes = [
     redirect: true,
     path: '/active-sprint',
     component: <PublicActiveSprint />,
-    layout: '/public',
-  },
-  {
-    redirect: true,
-    path: '/feed',
-    component: <PublicFeed />,
     layout: '/public',
   },
   {
