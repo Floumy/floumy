@@ -30,7 +30,7 @@ const ShortcutKey = styled.span`
 `;
 
 const ShortcutIcon = ({ itemName, shortcutKey }) => (
-  <ShortcutContainer>
+  <ShortcutContainer className="py-1">
     <ItemName>{itemName}</ItemName>
     <KeyShortcut keys={[shortcutKey]} />
   </ShortcutContainer>
