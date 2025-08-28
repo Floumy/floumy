@@ -104,17 +104,6 @@ function Sprints() {
     }
   }
 
-  async function handleAddWorkItemWithSprint(workItem, sprintId) {
-    workItem.sprint = sprintId;
-    const savedWorkItem = await addWorkItem(orgId, projectId, workItem);
-    const workItems = sprints.find(
-      (sprint) => sprint.id === sprintId,
-    ).workItems;
-    workItems.push(savedWorkItem);
-    sortByPriority(workItems);
-    setSprints([...sprints]);
-  }
-
   async function handleAddWorkItemToBacklog(workItem) {
     const savedWorkItem = await addWorkItem(orgId, projectId, workItem);
     backlogWorkItems.push(savedWorkItem);

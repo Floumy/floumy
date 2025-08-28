@@ -80,6 +80,7 @@ export class OKRMapper {
 
   static async toListItemDto(objective: Objective) {
     const assignedTo = await objective.assignedTo;
+    const keyResults = await objective.keyResults;
     return {
       id: objective.id,
       reference: objective.reference,
@@ -97,6 +98,9 @@ export class OKRMapper {
             name: assignedTo.name,
           }
         : null,
+      keyResults: keyResults
+        ? await Promise.all(keyResults.map(KeyResultMapper.toDTO))
+        : [],
       createdAt: objective.createdAt,
       updatedAt: objective.updatedAt,
     };
