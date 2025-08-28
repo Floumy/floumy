@@ -72,12 +72,12 @@
   }
 
   tr:hover {
-    background-color: #d5e9ff;
+    background-color: #f7f3ff;
   }
 
   tr {
     &.selected-row {
-      background-color: #badbff;
+      background-color: #f1ebff;
 
       .text-gray {
         color: #8a8a8a !important;
