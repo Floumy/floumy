@@ -135,10 +135,8 @@ const Description = styled.span`
 `;
 
 const KeyCap = styled.kbd`
-  background: linear-gradient(180deg, #2a2f3a 0%, #1e232b 100%);
+  background: #1e232b;
   color: #e6e6e6;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-bottom-color: rgba(0, 0, 0, 0.35);
   border-radius: 6px;
   padding: ${(p) => sizes[p.$size || 'md'].padding};
   min-width: ${(p) => sizes[p.$size || 'md'].capMinWidth};
@@ -155,9 +153,6 @@ const KeyCap = styled.kbd`
     'Courier New', monospace;
   letter-spacing: 0.2px;
   user-select: none;
-  box-shadow:
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.05);
 `;
 
 const Plus = styled.span`
