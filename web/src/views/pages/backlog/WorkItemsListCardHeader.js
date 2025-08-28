@@ -11,11 +11,28 @@ export default function WorkItemsListCardHeader({
   setFilterByType,
   filterByStatus,
   setFilterByStatus,
+  extraButtonLabel,
+  extraButtonId,
+  onExtraButtonClick,
 }) {
   return (
-    <Row>
+    <Row className="align-items-center">
       <Col xs={12} sm={3} className="pb-2">
-        <CardTitle tag="h2">{title}</CardTitle>
+        <div className="d-flex align-items-center justify-content-between">
+          <CardTitle tag="h2" className="mb-0">
+            {title}
+          </CardTitle>
+          {extraButtonLabel && (
+            <button
+              id={extraButtonId}
+              type="button"
+              className="btn btn-sm btn-outline-primary"
+              onClick={onExtraButtonClick}
+            >
+              {extraButtonLabel}
+            </button>
+          )}
+        </div>
       </Col>
       {showFilters && (
         <>

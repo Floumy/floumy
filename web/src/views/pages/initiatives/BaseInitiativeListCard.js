@@ -24,6 +24,9 @@ function BaseInitiativeListCard({
   onSearch,
   searchPlaceholder = 'Search by title',
   renderInitiativeList,
+  extraButtonLabel,
+  extraButtonId,
+  onExtraButtonClick,
 }) {
   const [filterByPriority, setFilterByPriority] = useState('all');
   const [filterByStatus, setFilterByStatus] = useState('all');
@@ -57,9 +60,23 @@ function BaseInitiativeListCard({
   return (
     <Card>
       <CardHeader className="rounded-lg">
-        <Row>
+        <Row className="align-items-center">
           <Col className="pb-2">
-            <CardTitle tag="h2">{title}</CardTitle>
+            <div className="d-flex align-items-center justify-content-between">
+              <CardTitle tag="h2" className="mb-0">
+                {title}
+              </CardTitle>
+              {extraButtonLabel && (
+                <button
+                  id={extraButtonId}
+                  type="button"
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={onExtraButtonClick}
+                >
+                  {extraButtonLabel}
+                </button>
+              )}
+            </div>
           </Col>
           {showFilters && (
             <>

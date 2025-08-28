@@ -18,6 +18,9 @@ function InitiativesListCard({
   showFilters = true,
   showAssignedTo = true,
   searchPlaceholder = 'Search by title',
+  extraButtonLabel,
+  extraButtonId,
+  onExtraButtonClick,
 }) {
   const [filteredInitiatives, setFilteredInitiatives] = useState([]);
 
@@ -87,6 +90,9 @@ function InitiativesListCard({
       onSearch={onSearch}
       searchPlaceholder={searchPlaceholder}
       renderInitiativeList={renderInitiativeList}
+      extraButtonLabel={extraButtonLabel}
+      extraButtonId={extraButtonId}
+      onExtraButtonClick={onExtraButtonClick}
     />
   );
 }
@@ -107,4 +113,7 @@ InitiativesListCard.propTypes = {
   onChangeAssignedTo: PropTypes.func,
   onDelete: PropTypes.func,
   enableContextMenu: PropTypes.bool,
+  extraButtonLabel: PropTypes.string,
+  extraButtonId: PropTypes.string,
+  onExtraButtonClick: PropTypes.func,
 };
