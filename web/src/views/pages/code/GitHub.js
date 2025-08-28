@@ -171,6 +171,39 @@ function GitHub() {
         />
         <Row>
           <Col>
+            {!isLoading && currentProject && repo && (
+              <CycleTime
+                orgId={orgId}
+                projectId={currentProject.id}
+                getPrData={getPRsCycleTime}
+              />
+            )}
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {!isLoading && currentProject && repo && (
+              <MergeTime
+                orgId={orgId}
+                projectId={currentProject.id}
+                getPrData={getPRsAverageMergeTime}
+              />
+            )}
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {!isLoading && currentProject && repo && (
+              <FirstReviewTime
+                orgId={orgId}
+                projectId={currentProject.id}
+                getPrData={getPRsFirstReviewTime}
+              />
+            )}
+          </Col>
+        </Row>
+        <Row>
+          <Col>
             <Card className="mb-5">
               <CardHeader>
                 <Row>
@@ -282,39 +315,6 @@ function GitHub() {
                 )}
               </CardBody>
             </Card>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            {!isLoading && currentProject && repo && (
-              <CycleTime
-                orgId={orgId}
-                projectId={currentProject.id}
-                getPrData={getPRsCycleTime}
-              />
-            )}
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            {!isLoading && currentProject && repo && (
-              <MergeTime
-                orgId={orgId}
-                projectId={currentProject.id}
-                getPrData={getPRsAverageMergeTime}
-              />
-            )}
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            {!isLoading && currentProject && repo && (
-              <FirstReviewTime
-                orgId={orgId}
-                projectId={currentProject.id}
-                getPrData={getPRsFirstReviewTime}
-              />
-            )}
           </Col>
         </Row>
       </Container>

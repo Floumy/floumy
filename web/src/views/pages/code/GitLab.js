@@ -156,6 +156,39 @@ function GitLab() {
         />
         <Row>
           <Col>
+            {!isLoading && projectId && gitlabProject && (
+              <CycleTime
+                orgId={orgId}
+                projectId={projectId}
+                getPrData={getMergeRequestsCycleTime}
+              />
+            )}
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {!isLoading && projectId && gitlabProject && (
+              <MergeTime
+                orgId={orgId}
+                projectId={projectId}
+                getPrData={getMergeRequestsMergeTime}
+              />
+            )}
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {!isLoading && projectId && gitlabProject && (
+              <FirstReviewTime
+                orgId={orgId}
+                projectId={projectId}
+                getPrData={getMergeRequestsFirstReviewTime}
+              />
+            )}
+          </Col>
+        </Row>
+        <Row>
+          <Col>
             <Card className="mb-5">
               <CardHeader>
                 <Row>
@@ -270,39 +303,6 @@ function GitLab() {
                   )}
               </CardBody>
             </Card>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            {!isLoading && projectId && gitlabProject && (
-              <CycleTime
-                orgId={orgId}
-                projectId={projectId}
-                getPrData={getMergeRequestsCycleTime}
-              />
-            )}
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            {!isLoading && projectId && gitlabProject && (
-              <MergeTime
-                orgId={orgId}
-                projectId={projectId}
-                getPrData={getMergeRequestsMergeTime}
-              />
-            )}
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            {!isLoading && projectId && gitlabProject && (
-              <FirstReviewTime
-                orgId={orgId}
-                projectId={projectId}
-                getPrData={getMergeRequestsFirstReviewTime}
-              />
-            )}
           </Col>
         </Row>
       </Container>
