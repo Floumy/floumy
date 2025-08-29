@@ -20,7 +20,6 @@ function PublicWorkItemsListCard({
   workItems,
   isLoading,
   showFilters = true,
-  showAssignedTo = true,
   showInitiative = true,
   searchPlaceholder = 'Search by title',
 }) {
@@ -87,7 +86,6 @@ function PublicWorkItemsListCard({
         {(!isLoading || filteredWorkItems.length > 0) && (
           <PublicWorkItemsList
             id={id}
-            showAssignedTo={showAssignedTo}
             showInitiative={showInitiative}
             workItems={filteredWorkItems}
             orgId={orgId}

@@ -137,6 +137,7 @@ function PublicActiveSprint() {
                         workItems={workItemsByStatus[status]}
                         showInitiative={true}
                         headerClassName={'thead'}
+                        showStatus={false}
                       />
                     </div>
                   ))}

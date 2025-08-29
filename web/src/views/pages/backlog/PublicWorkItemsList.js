@@ -13,6 +13,7 @@ function PublicWorkItemsList({
   orgId,
   workItems,
   showInitiative = true,
+  showStatus = true,
   headerClassName = 'thead-light',
 }) {
   const { projectId } = useParams();
@@ -39,9 +40,11 @@ function PublicWorkItemsList({
               <th scope="col" width={'5%'}>
                 Est.
               </th>
-              <th scope="col" width={'10%'}>
-                Status
-              </th>
+              {showStatus && (
+                <th scope="col" width={'10%'}>
+                  Status
+                </th>
+              )}
               <th scope="col" width={'5%'}>
                 Priority
               </th>
@@ -90,16 +93,20 @@ function PublicWorkItemsList({
                   </td>
                 )}
                 <td>{workItem?.estimation}</td>
-                <td>
-                  <Badge color="" className="badge-dot mr-4">
-                    <i
-                      className={workItemStatusColorClassName(workItem.status)}
-                    />
-                    <span className="status">
-                      {formatHyphenatedString(workItem.status)}
-                    </span>
-                  </Badge>
-                </td>
+                {showStatus && (
+                  <td>
+                    <Badge color="" className="badge-dot mr-4">
+                      <i
+                        className={workItemStatusColorClassName(
+                          workItem.status,
+                        )}
+                      />
+                      <span className="status">
+                        {formatHyphenatedString(workItem.status)}
+                      </span>
+                    </Badge>
+                  </td>
+                )}
                 <td>
                   <Badge color={priorityColor(workItem.priority)} pill={true}>
                     {workItem.priority}
