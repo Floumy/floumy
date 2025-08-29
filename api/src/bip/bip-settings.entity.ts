@@ -28,8 +28,6 @@ export class BipSettings {
   @Column({ default: false })
   isActiveSprintsPagePublic: boolean = false;
   @Column({ default: false })
-  isFeedPagePublic: boolean = false;
-  @Column({ default: false })
   isIssuesPagePublic: boolean = false;
   @Column({ default: false })
   isFeatureRequestsPagePublic: boolean = false;

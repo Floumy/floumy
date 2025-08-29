@@ -20,7 +20,6 @@ export class BipSettingsMapper {
       isRoadmapPagePublic: bipSettings.isRoadmapPagePublic,
       isSprintsPagePublic: bipSettings.isSprintsPagePublic,
       isActiveSprintsPagePublic: bipSettings.isActiveSprintsPagePublic,
-      isFeedPagePublic: bipSettings.isFeedPagePublic,
       isIssuesPagePublic: bipSettings.isIssuesPagePublic,
       isFeatureRequestsPagePublic: bipSettings.isFeatureRequestsPagePublic,
     };

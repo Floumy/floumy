@@ -8,8 +8,6 @@ import { FeedItem } from './feed-item.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
 import { OrgsModule } from '../orgs/orgs.module';
-import { PublicController } from './public/public.controller';
-import { PublicService } from './public/public.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Project } from '../projects/project.entity';
 
@@ -20,7 +18,7 @@ import { Project } from '../projects/project.entity';
     OrgsModule,
     TypeOrmModule.forFeature([User, Org, FeedItem, Project]),
   ],
-  providers: [FeedService, FeedEventHandler, PublicService],
-  controllers: [FeedController, PublicController],
+  providers: [FeedService, FeedEventHandler],
+  controllers: [FeedController],
 })
 export class FeedModule {}

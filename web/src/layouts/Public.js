@@ -22,7 +22,6 @@ function PublicLayout() {
     isRoadmapPagePublic: false,
     isSprintsPagePublic: false,
     isActiveSprintsPagePublic: false,
-    isFeedPagePublic: false,
     isIssuesPagePublic: false,
     isFeatureRequestsPagePublic: false,
   });

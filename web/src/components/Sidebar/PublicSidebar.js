@@ -69,7 +69,6 @@ function PublicSidebar({
 
   function isProjectEnabled() {
     return (
-      buildingInPublicSettings.isFeedPagePublic ||
       buildingInPublicSettings.isObjectivesPagePublic ||
       buildingInPublicSettings.isRoadmapPagePublic ||
       buildingInPublicSettings.isSprintsPagePublic ||

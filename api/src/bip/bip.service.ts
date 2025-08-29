@@ -88,7 +88,6 @@ export class BipService {
     bipSettings.isRoadmapPagePublic = settings.isRoadmapPagePublic;
     bipSettings.isSprintsPagePublic = settings.isSprintsPagePublic;
     bipSettings.isActiveSprintsPagePublic = settings.isActiveSprintsPagePublic;
-    bipSettings.isFeedPagePublic = settings.isFeedPagePublic;
     bipSettings.isFeatureRequestsPagePublic =
       settings.isFeatureRequestsPagePublic;
     bipSettings.isIssuesPagePublic = settings.isIssuesPagePublic;
