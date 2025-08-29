@@ -113,7 +113,7 @@ function PublicInitiativesList({
                         </span>
                       </>
                     )}
-                    {!initiative.assignedTo && '-'}
+                    {!initiative.assignedTo}
                   </td>
                 )}
                 <td>

@@ -289,7 +289,7 @@ function InitiativesList({
                         </span>
                       </>
                     )}
-                    {!initiative.assignedTo && '-'}
+                    {!initiative.assignedTo}
                   </td>
                 )}
                 <td>

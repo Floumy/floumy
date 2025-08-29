@@ -15,9 +15,9 @@ import {
   UncontrolledTooltip,
 } from 'reactstrap';
 import {
-  initiativeStatusColorClassName,
   formatHyphenatedString,
   formatProgress,
+  initiativeStatusColorClassName,
   memberNameInitials,
   priorityColor,
   textToColor,
@@ -312,7 +312,7 @@ function SearchInitiativesListCard({
                       </span>
                     </>
                   )}
-                  {!initiative.assignedTo && '-'}
+                  {!initiative.assignedTo}
                 </td>
                 <td>
                   <Badge color={priorityColor(initiative.priority)} pill={true}>

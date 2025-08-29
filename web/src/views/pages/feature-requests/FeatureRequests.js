@@ -17,8 +17,8 @@ import {
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
-  initiativeStatusColorClassName,
   formatHyphenatedString,
+  initiativeStatusColorClassName,
 } from '../../../services/utils/utils';
 import {
   downvoteFeatureRequest,
@@ -313,12 +313,7 @@ export default function FeatureRequests({ isPublic = false }) {
                                   {featureRequest.title}
                                 </Link>
                               </td>
-                              <td>
-                                {featureRequest.estimation &&
-                                featureRequest.estimation > 0
-                                  ? featureRequest.estimation
-                                  : '-'}
-                              </td>
+                              <td>{featureRequest?.estimation}</td>
                               <td>
                                 <Badge color="" className="badge-dot mr-4">
                                   <i
