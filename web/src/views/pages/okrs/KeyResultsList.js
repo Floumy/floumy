@@ -5,7 +5,7 @@ import {
   okrStatusColorClassName,
 } from '../../../services/utils/utils';
 import { Badge, Progress, Table } from 'reactstrap';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 
 export default function KeyResultsList({
   orgId,
