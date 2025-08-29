@@ -53,7 +53,6 @@ function BuildInPublic() {
           isSprintsPagePublic: buildInPublicSettings.isSprintsPagePublic,
           isActiveSprintsPagePublic:
             buildInPublicSettings.isActiveSprintsPagePublic,
-          isFeedPagePublic: buildInPublicSettings.isFeedPagePublic,
           isIssuesPagePublic: buildInPublicSettings.isIssuesPagePublic,
           isFeatureRequestsPagePublic:
             buildInPublicSettings.isFeatureRequestsPagePublic,
@@ -102,11 +101,7 @@ function BuildInPublic() {
       isBuildInPublicEnabledBasedOnSettings(buildInPublicSettings),
     );
 
-    if (buildInPublicSettings.isFeedPagePublic) {
-      setPublicLink(
-        createUrl(`/public/orgs/${orgId}/projects/${projectId}/feed`),
-      );
-    } else if (buildInPublicSettings.isObjectivesPagePublic) {
+    if (buildInPublicSettings.isObjectivesPagePublic) {
       setPublicLink(
         createUrl(`/public/orgs/${orgId}/projects/${projectId}/okrs`),
       );
@@ -142,7 +137,6 @@ function BuildInPublic() {
         isRoadmapPagePublic: !isBuildInPublicEnabled,
         isSprintsPagePublic: !isBuildInPublicEnabled,
         isActiveSprintsPagePublic: !isBuildInPublicEnabled,
-        isFeedPagePublic: !isBuildInPublicEnabled,
         isIssuesPagePublic: !isBuildInPublicEnabled,
         isFeatureRequestsPagePublic: !isBuildInPublicEnabled,
       };

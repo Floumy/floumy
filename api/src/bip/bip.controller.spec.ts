@@ -57,7 +57,6 @@ describe('BipController', () => {
           isRoadmapPagePublic: true,
           isSprintsPagePublic: true,
           isActiveSprintsPagePublic: true,
-          isFeedPagePublic: true,
           isIssuesPagePublic: true,
           isFeatureRequestsPagePublic: true,
         },
@@ -68,7 +67,6 @@ describe('BipController', () => {
         isRoadmapPagePublic: true,
         isSprintsPagePublic: true,
         isActiveSprintsPagePublic: true,
-        isFeedPagePublic: true,
         isIssuesPagePublic: true,
         isFeatureRequestsPagePublic: true,
       });
@@ -91,7 +89,6 @@ describe('BipController', () => {
           isRoadmapPagePublic: true,
           isSprintsPagePublic: true,
           isActiveSprintsPagePublic: true,
-          isFeedPagePublic: true,
           isIssuesPagePublic: true,
           isFeatureRequestsPagePublic: true,
         },
@@ -103,7 +100,6 @@ describe('BipController', () => {
         isRoadmapPagePublic: true,
         isSprintsPagePublic: true,
         isActiveSprintsPagePublic: true,
-        isFeedPagePublic: true,
         isIssuesPagePublic: true,
         isFeatureRequestsPagePublic: true,
       });

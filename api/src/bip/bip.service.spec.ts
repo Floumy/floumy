@@ -53,7 +53,6 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isSprintsPagePublic: true,
         isActiveSprintsPagePublic: true,
-        isFeedPagePublic: true,
         isIssuesPagePublic: true,
         isFeatureRequestsPagePublic: true,
       };
@@ -70,7 +69,6 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isSprintsPagePublic: true,
         isActiveSprintsPagePublic: true,
-        isFeedPagePublic: true,
         isIssuesPagePublic: true,
         isFeatureRequestsPagePublic: true,
       };
@@ -90,7 +88,6 @@ describe('BipService', () => {
         isRoadmapPagePublic: false,
         isSprintsPagePublic: false,
         isActiveSprintsPagePublic: false,
-        isFeedPagePublic: false,
         isIssuesPagePublic: false,
         isFeatureRequestsPagePublic: false,
       });
@@ -106,7 +103,6 @@ describe('BipService', () => {
         isRoadmapPagePublic: false,
         isSprintsPagePublic: false,
         isActiveSprintsPagePublic: false,
-        isFeedPagePublic: false,
         isIssuesPagePublic: false,
         isFeatureRequestsPagePublic: false,
       });
@@ -118,7 +114,6 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isSprintsPagePublic: true,
         isActiveSprintsPagePublic: true,
-        isFeedPagePublic: true,
         isIssuesPagePublic: true,
         isFeatureRequestsPagePublic: true,
       };
@@ -134,7 +129,6 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isSprintsPagePublic: true,
         isActiveSprintsPagePublic: true,
-        isFeedPagePublic: true,
         isIssuesPagePublic: true,
         isFeatureRequestsPagePublic: true,
       };
