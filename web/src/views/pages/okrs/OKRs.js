@@ -173,7 +173,7 @@ function OKRs() {
               <CardHeader>
                 <Row>
                   <Col xs={12} sm={8}>
-                    <CardTitle tag="h2">Objectives</CardTitle>
+                    <CardTitle tag="h2">OKRs</CardTitle>
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2
@@ -236,7 +236,14 @@ function OKRs() {
               <div className="py-4 px-4">
                 {!isLoading &&
                   okrs &&
-                  okrs.map((okr) => <OKR key={okr.id} okr={okr} />)}
+                  okrs.map((okr) => (
+                    <OKR
+                      key={okr.id}
+                      okr={okr}
+                      orgId={orgId}
+                      projectId={projectId}
+                    />
+                  ))}
               </div>
             </Card>
           </div>

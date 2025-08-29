@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Badge,
   Card,
   CardBody,
   CardHeader,
@@ -9,25 +8,19 @@ import {
   Container,
   Progress,
   Row,
-  Table,
-  UncontrolledTooltip,
 } from 'reactstrap';
 import SimpleHeader from 'components/Headers/SimpleHeader.js';
 import Select2 from 'react-select2-wrapper';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
+import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import {
-  formatHyphenatedString,
-  formatOKRsProgress,
-  memberNameInitials,
-  okrStatusColorClassName,
-  textToColor,
-} from '../../../services/utils/utils';
+// utils not needed for the simplified org list view
 import { getOkrStats, listOKRs } from '../../../services/okrs/org-okrs.service';
+import OKR from './OKR';
 
 function OrgOKRs() {
   let location = useLocation();
-  const { orgId, projectId } = useParams();
+  const { orgId } = useParams();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get('timeline') || 'this-quarter';
   const navigate = useNavigate();
@@ -83,7 +76,8 @@ function OrgOKRs() {
           },
         ]}
       />
-      <Container className="mt--6" fluid>
+      {isLoading && <InfiniteLoadingBar />}
+      <Container className="mt--6" fluid id="OKRs">
         {!statsLoading && !statsError && stats && (
           <Row className="my-4">
             <Col lg="4" sm="12">
@@ -166,7 +160,7 @@ function OrgOKRs() {
               <CardHeader>
                 <Row>
                   <Col xs={12} sm={8}>
-                    <CardTitle tag="h2">Org Objectives</CardTitle>
+                    <CardTitle tag="h2">Org OKRs</CardTitle>
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2
@@ -216,7 +210,7 @@ function OrgOKRs() {
                         achieving your goals. .
                         <br />
                         <Link
-                          to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/new`}
+                          to={`/orgs/${orgId}/okrs/new`}
                           className="text-blue font-weight-bold"
                         >
                           Create an Objective with Key Results
@@ -227,124 +221,12 @@ function OrgOKRs() {
                 </div>
               )}
               {!isLoading && (
-                <div className="table-responsive">
-                  <Table
-                    className="align-items-center table-flush no-select"
-                    onContextMenu={(e) => e.preventDefault()}
-                  >
-                    <thead className="thead-light">
-                      <tr>
-                        <th className={'sort'} scope="col" width={'5%'}>
-                          Reference
-                        </th>
-                        <th className="sort" scope="col" width={'40%'}>
-                          Objective
-                        </th>
-                        <th className="sort" scope="col" width={'30%'}>
-                          Progress
-                        </th>
-                        <th className="sort" scope="col" width={'20%'}>
-                          Status
-                        </th>
-                        <th className="sort" scope="col" width={'5%'}>
-                          Assigned To
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="list">
-                      {okrs.length > 0 ? (
-                        okrs.map((okr) => (
-                          <tr key={okr.id}>
-                            {okr.id === 0 && (
-                              <td colSpan={5} className={'text-center'}>
-                                <h3 className="text-center m-0">
-                                  No objectives found for this timeline.
-                                </h3>
-                              </td>
-                            )}
-                            {okr.id !== 0 && (
-                              <>
-                                <td>
-                                  <Link
-                                    to={`/orgs/${orgId}/okrs/detail/${okr.id}`}
-                                    className={'okr-detail'}
-                                  >
-                                    {okr.reference}
-                                  </Link>
-                                </td>
-                                <td className="title-cell">
-                                  <Link
-                                    to={`/orgs/${orgId}/okrs/detail/${okr.id}`}
-                                    className={'okr-detail'}
-                                  >
-                                    {okr.title}
-                                  </Link>
-                                </td>
-                                <td>
-                                  <div className="d-flex align-items-center">
-                                    <span className="mr-2">
-                                      {formatOKRsProgress(okr.progress)}%
-                                    </span>
-                                    <div>
-                                      <Progress
-                                        max="100"
-                                        value={formatOKRsProgress(okr.progress)}
-                                        color="primary"
-                                      />
-                                    </div>
-                                  </div>
-                                </td>
-                                <td>
-                                  <Badge color="" className="badge-dot mr-4">
-                                    <i
-                                      className={okrStatusColorClassName(
-                                        okr.status,
-                                      )}
-                                    />
-                                    <span className="status">
-                                      {formatHyphenatedString(okr.status)}
-                                    </span>
-                                  </Badge>
-                                </td>
-                                <td>
-                                  {okr.assignedTo && okr.assignedTo.name && (
-                                    <>
-                                      <UncontrolledTooltip
-                                        target={'assigned-to-' + okr.id}
-                                        placement="top"
-                                      >
-                                        {okr.assignedTo.name}
-                                      </UncontrolledTooltip>
-                                      <span
-                                        className="avatar avatar-xs rounded-circle"
-                                        style={{
-                                          backgroundColor: textToColor(
-                                            okr.assignedTo.name,
-                                          ),
-                                        }}
-                                        id={'assigned-to-' + okr.id}
-                                      >
-                                        {memberNameInitials(
-                                          okr.assignedTo.name,
-                                        )}
-                                      </span>
-                                    </>
-                                  )}
-                                  {!okr.assignedTo}
-                                </td>
-                              </>
-                            )}
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className={'text-center'}>
-                            No objectives found.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </Table>
+                <div className="py-4 px-4">
+                  {!isLoading &&
+                    okrs &&
+                    okrs.map((okr) => (
+                      <OKR key={okr.id} okr={okr} orgId={orgId} />
+                    ))}
                 </div>
               )}
             </Card>

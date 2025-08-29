@@ -100,7 +100,7 @@ function OrgSidebar({ toggleSidenav, logo, rtlActive }) {
                           tag={NavLinkRRD}
                         >
                           <i className="fa fa-bullseye" />
-                          <span className="nav-link-text">Objectives</span>
+                          <span className="nav-link-text">Org OKRs</span>
                         </NavLink>
                       </Col>
                     </Row>
