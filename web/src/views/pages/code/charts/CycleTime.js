@@ -197,6 +197,7 @@ export function CycleTime({ orgId, projectId, getPrData }) {
                           cycleTimeChartOptions.scales.xAxes[0]) ||
                           {}),
                         scaleLabel: { display: false },
+                        ticks: { display: false },
                       },
                     ],
                     yAxes: [

@@ -192,6 +192,7 @@ export function FirstReviewTime({ orgId, projectId, getPrData }) {
                           averageMergeTimeChartOptions.scales.xAxes[0]) ||
                           {}),
                         scaleLabel: { display: false },
+                        ticks: { display: false },
                       },
                     ],
                     yAxes: [
