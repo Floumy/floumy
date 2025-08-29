@@ -5,12 +5,28 @@ import {
   okrStatusColorClassName,
 } from '../../../services/utils/utils';
 import { Badge, Progress, Table } from 'reactstrap';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 
-export default function KeyResultsList({ orgId, projectId, keyResults }) {
+export default function KeyResultsList({
+  orgId,
+  keyResults,
+  projectId = null,
+}) {
   if (!keyResults) {
     return;
   }
+
+  const getKeyResultUrl = useCallback(
+    (keyResultId) => {
+      if (projectId) {
+        return `/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResultId}`;
+      }
+
+      return `/orgs/${orgId}/kr/detail/${keyResultId}`;
+    },
+    [projectId],
+  );
+
   return (
     <Table
       className="table align-items-center no-select"
@@ -48,7 +64,7 @@ export default function KeyResultsList({ orgId, projectId, keyResults }) {
             <tr key={keyResult.id}>
               <td>
                 <Link
-                  to={`/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`}
+                  to={getKeyResultUrl(keyResult.id)}
                   className={'okr-detail'}
                 >
                   {keyResult.reference}
@@ -56,7 +72,7 @@ export default function KeyResultsList({ orgId, projectId, keyResults }) {
               </td>
               <td className="title-cell">
                 <Link
-                  to={`/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResult.id}`}
+                  to={getKeyResultUrl(keyResult.id)}
                   className={'okr-detail'}
                 >
                   {keyResult.title}

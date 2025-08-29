@@ -1,10 +1,9 @@
 import { Col, Row } from 'reactstrap';
-import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import KeyResultsList from './KeyResultsList';
 
-export default function OKR({ okr }) {
-  const { orgId, projectId } = useParams();
+export default function OKR({ okr, orgId, projectId = null }) {
   const [keyResults, setKeyResults] = useState([]);
   const [showKeyResults, setShowKeyResults] = useState(true);
   useEffect(() => {
@@ -18,7 +17,18 @@ export default function OKR({ okr }) {
     setKeyResults(keyResults);
   }, [okr?.keyResults]);
 
-  function getokrHeader() {
+  const getObjectiveUrl = useCallback(
+    (objectiveId) => {
+      if (projectId) {
+        return `/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${objectiveId}`;
+      }
+
+      return `/orgs/${orgId}/okrs/detail/${objectiveId}`;
+    },
+    [projectId],
+  );
+
+  function getOkrHeader() {
     return (
       <>
         <h3 className="pt-2 pr-4">
@@ -32,9 +42,7 @@ export default function OKR({ okr }) {
             {!showKeyResults && <i className="ni ni-bold-right" />}
             {showKeyResults && <i className="ni ni-bold-down" />}
           </button>
-          <Link
-            to={`/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${okr.id}`}
-          >
+          <Link to={getObjectiveUrl(okr.id)}>
             <span className="text-gray">{okr.reference}:</span> {okr.title}{' '}
             <span className="text-muted text-sm"></span>
           </Link>
@@ -52,7 +60,7 @@ export default function OKR({ okr }) {
     <>
       <div className="mb-5">
         <Row className="pl-4 pr-4 pb-2">
-          <Col sm={12}>{getokrHeader()}</Col>
+          <Col sm={12}>{getOkrHeader()}</Col>
         </Row>
         <Row>
           <Col>
