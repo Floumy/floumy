@@ -86,14 +86,10 @@ function PublicWorkItemsList({
                         {workItem.initiative.title}
                       </Link>
                     )}
-                    {!workItem.initiative && '-'}
+                    {!workItem.initiative}
                   </td>
                 )}
-                <td>
-                  {workItem.estimation && workItem.estimation > 0
-                    ? workItem.estimation
-                    : '-'}
-                </td>
+                <td>{workItem?.estimation}</td>
                 <td>
                   <Badge color="" className="badge-dot mr-4">
                     <i

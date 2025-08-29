@@ -315,7 +315,7 @@ function SearchWorkItemsListCard({
                       </span>
                     </>
                   )}
-                  {!workItem.assignedTo && '-'}
+                  {!workItem.assignedTo}
                 </td>
                 <td>
                   <Badge color="" className="badge-dot mr-4">

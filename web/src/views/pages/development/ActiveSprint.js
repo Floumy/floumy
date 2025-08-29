@@ -262,6 +262,7 @@ function ActiveSprint() {
                         workItems={workItemsByStatus[status]}
                         showInitiative={true}
                         showAssignedTo={true}
+                        showStatus={false}
                         onChangeSprint={handleChangeSprint}
                         onChangeStatus={updateWorkItemsStatus}
                         onChangePriority={updateWorkItemsPriority}

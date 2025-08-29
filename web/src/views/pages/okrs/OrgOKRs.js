@@ -330,7 +330,7 @@ function OrgOKRs() {
                                       </span>
                                     </>
                                   )}
-                                  {!okr.assignedTo && '-'}
+                                  {!okr.assignedTo}
                                 </td>
                               </>
                             )}
