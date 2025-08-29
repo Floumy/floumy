@@ -667,6 +667,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                 <Nav navbar className="mb-3">
                   <NavItem>
                     <NavLink
+                      to={`/admin/orgs/${orgId}/projects/${currentProject.id}/build-in-public`}
+                      onClick={closeSidenav}
+                      tag={NavLinkRRD}
+                    >
+                      <i className="fa fa-eye" />
+                      <span className="nav-link-text">Build In Public</span>
+                    </NavLink>
+                  </NavItem>
+                  <NavItem>
+                    <NavLink
                       to={`/admin/orgs/${orgId}/projects/${currentProject.id}/feed`}
                       onClick={closeSidenav}
                       tag={NavLinkRRD}
@@ -682,17 +692,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       tag={NavLinkRRD}
                     >
                       <i className="fa fa-atom" />
-                      <span className="nav-link-text">Project</span>
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      to={`/admin/orgs/${orgId}/projects/${currentProject.id}/build-in-public`}
-                      onClick={closeSidenav}
-                      tag={NavLinkRRD}
-                    >
-                      <i className="fa fa-eye" />
-                      <span className="nav-link-text">Build In Public</span>
+                      <span className="nav-link-text">Project Settings</span>
                     </NavLink>
                   </NavItem>
                 </Nav>

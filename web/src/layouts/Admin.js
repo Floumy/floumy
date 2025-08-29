@@ -60,30 +60,26 @@ function Admin() {
     setSidenavOpen(!sidenavOpen);
   };
 
-  useNavigationHotKey('1', `/admin/orgs/${orgId}/projects/${projectId}/feed`);
-  useNavigationHotKey('2', `/admin/orgs/${orgId}/projects/${projectId}/okrs`);
+  useNavigationHotKey('1', `/admin/orgs/${orgId}/projects/${projectId}/okrs`);
+  useNavigationHotKey(
+    '2',
+    `/admin/orgs/${orgId}/projects/${projectId}/roadmap`,
+  );
   useNavigationHotKey(
     '3',
-    `/admin/orgs/${orgId}/projects/${projectId}/roadmap`,
+    `/admin/orgs/${orgId}/projects/${projectId}/active-sprint`,
   );
   useNavigationHotKey(
     '4',
     `/admin/orgs/${orgId}/projects/${projectId}/sprints`,
   );
+  useNavigationHotKey('5', `/admin/orgs/${orgId}/projects/${projectId}/pages`);
+  useNavigationHotKey('6', `/admin/orgs/${orgId}/projects/${projectId}/code`);
+  useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/issues`);
   useNavigationHotKey(
-    '5',
-    `/admin/orgs/${orgId}/projects/${projectId}/active-sprint`,
+    '8',
+    `/admin/orgs/${orgId}/projects/${projectId}/feature-requests`,
   );
-  useNavigationHotKey(
-    '6',
-    `/admin/orgs/${orgId}/projects/${projectId}/work-items`,
-  );
-  useNavigationHotKey(
-    '7',
-    `/admin/orgs/${orgId}/projects/${projectId}/initiatives`,
-  );
-  useNavigationHotKey('8', `/admin/orgs/${orgId}/projects/${projectId}/code`);
-  useNavigationHotKey('9', `/admin/orgs/${orgId}/projects/${projectId}/pages`);
   useNavigationHotKey(
     'w',
     `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`,
