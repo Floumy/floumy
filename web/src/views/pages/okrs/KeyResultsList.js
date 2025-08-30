@@ -10,6 +10,7 @@ import React, { useCallback } from 'react';
 export default function KeyResultsList({
   orgId,
   keyResults,
+  isPublic = false,
   projectId = null,
 }) {
   if (!keyResults) {
@@ -18,13 +19,17 @@ export default function KeyResultsList({
 
   const getKeyResultUrl = useCallback(
     (keyResultId) => {
+      if (isPublic) {
+        return `/public/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResultId}`;
+      }
+
       if (projectId) {
         return `/admin/orgs/${orgId}/projects/${projectId}/kr/detail/${keyResultId}`;
       }
 
       return `/orgs/${orgId}/kr/detail/${keyResultId}`;
     },
-    [projectId],
+    [projectId, orgId, isPublic],
   );
 
   return (

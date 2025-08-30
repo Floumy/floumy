@@ -23,7 +23,7 @@ export class PublicService {
       timeline,
     );
 
-    return objectives.map(PublicOkrMapper.toDTO);
+    return await Promise.all(objectives.map(PublicOkrMapper.toDTO));
   }
 
   async getObjective(orgId: string, projectId: string, okrId: string) {
