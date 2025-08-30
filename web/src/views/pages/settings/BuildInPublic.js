@@ -70,7 +70,14 @@ function BuildInPublic() {
   }, []);
 
   function isBuildInPublicEnabledBasedOnSettings(settings) {
-    return Object.values(settings).some((value) => value === true);
+    return (
+      settings.isObjectivesPagePublic ||
+      settings.isRoadmapPagePublic ||
+      settings.isActiveSprintsPagePublic ||
+      settings.isSprintsPagePublic ||
+      settings.isIssuesPagePublic ||
+      settings.isFeatureRequestsPagePublic
+    );
   }
 
   function togglePublicPage(page) {
@@ -335,6 +342,48 @@ function BuildInPublic() {
                           <input
                             checked={buildInPublicSettings.isSprintsPagePublic}
                             onChange={togglePublicPage('isSprintsPagePublic')}
+                            type="checkbox"
+                          />
+                          <span
+                            className="custom-toggle-slider"
+                            data-label-off="No"
+                            data-label-on="Yes"
+                          />
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row className="mb-3">
+                      <Col xs={6} sm={3} md={2}>
+                        Issues
+                      </Col>
+                      <Col xs={6} sm={9} md={10}>
+                        <label className="custom-toggle mr-1">
+                          <input
+                            checked={buildInPublicSettings.isIssuesPagePublic}
+                            onChange={togglePublicPage('isIssuesPagePublic')}
+                            type="checkbox"
+                          />
+                          <span
+                            className="custom-toggle-slider"
+                            data-label-off="No"
+                            data-label-on="Yes"
+                          />
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row className="mb-3">
+                      <Col xs={6} sm={3} md={2}>
+                        Feature Requests
+                      </Col>
+                      <Col xs={6} sm={9} md={10}>
+                        <label className="custom-toggle mr-1">
+                          <input
+                            checked={
+                              buildInPublicSettings.isFeatureRequestsPagePublic
+                            }
+                            onChange={togglePublicPage(
+                              'isFeatureRequestsPagePublic',
+                            )}
                             type="checkbox"
                           />
                           <span
