@@ -197,7 +197,7 @@ function Members() {
                       {members.length === 0 && (
                         <tr>
                           <td colSpan={6} className="text-center">
-                            No members found.
+                            No members added yet
                           </td>
                         </tr>
                       )}

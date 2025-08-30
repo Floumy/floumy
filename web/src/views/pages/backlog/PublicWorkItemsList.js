@@ -54,7 +54,7 @@ function PublicWorkItemsList({
             {workItems.length === 0 && (
               <tr>
                 <td colSpan={showInitiative ? 7 : 6} className="text-center">
-                  No work items found.
+                  No work items added yet
                 </td>
               </tr>
             )}
