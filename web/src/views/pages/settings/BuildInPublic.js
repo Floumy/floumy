@@ -171,13 +171,13 @@ function BuildInPublic() {
           <Col>
             <Card className="mb-5">
               <CardHeader>
-                <Row>
+                <Row className="align-items-center">
                   <Col xs={12} md={8}>
-                    <CardTitle tag="h2" className="mb-3">
+                    <CardTitle tag="h2" className="mb-2">
                       Build In Public
                     </CardTitle>
                   </Col>
-                  <Col xs={12} md={4}>
+                  <Col xs={12} md={4} className="mt-3 mt-md-0">
                     {!isLoadingBuildInPublicSettings &&
                       isBuildInPublicEnabled && (
                         <div className="text-xs-left text-sm-right">
@@ -207,6 +207,24 @@ function BuildInPublic() {
                 )}
                 {!isLoadingBuildInPublicSettings && (
                   <>
+                    <div className="bg-white border rounded p-3 mb-4 d-flex align-items-start">
+                      <div
+                        className="border rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style={{ width: 36, height: 36 }}
+                      >
+                        <i className="fas fa-info text-primary" />
+                      </div>
+                      <div className="flex-fill">
+                        <div className="font-weight-bold mb-1">
+                          What is Build in Public?
+                        </div>
+                        <div className="text-muted small">
+                          Build in Public lets you share a read-only view of
+                          selected project areas with anyone via a public link.
+                          It’s great for transparency and community updates.
+                        </div>
+                      </div>
+                    </div>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
                         <h3>Public Pages</h3>
@@ -226,6 +244,7 @@ function BuildInPublic() {
                         </label>
                       </Col>
                     </Row>
+                    <hr className="my-4" />
                     <Row className="mb-3" hidden={paymentPlan !== 'premium'}>
                       <Col xs={6} sm={3} md={2}>
                         Issues
