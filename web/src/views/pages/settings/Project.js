@@ -214,7 +214,6 @@ function Project() {
                           Save
                         </Button>
                         <Button
-                          color="danger"
                           type="button"
                           onClick={() => setDeleteWarning(true)}
                         >
