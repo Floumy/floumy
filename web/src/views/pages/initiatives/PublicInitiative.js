@@ -6,7 +6,6 @@ import {
   initiativeStatusName,
   priorityName,
 } from '../../../services/utils/utils';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 import { Link, useParams } from 'react-router-dom';
 
 function PublicInitiative({ initiative }) {
@@ -21,11 +20,6 @@ function PublicInitiative({ initiative }) {
             createdAt={initiative.createdAt}
             updatedAt={initiative.updatedAt}
           />
-          {initiative && (
-            <div className="py-2">
-              <PublicShareButtons title={initiative.title} />
-            </div>
-          )}
         </CardHeader>
         <CardBody>
           <Form className="needs-validation" noValidate>

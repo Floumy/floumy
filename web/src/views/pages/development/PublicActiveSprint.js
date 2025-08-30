@@ -3,8 +3,8 @@ import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import {
   Badge,
   Card,
-  CardHeader,
   CardBody,
+  CardHeader,
   Col,
   Container,
   Row,
@@ -22,7 +22,6 @@ import {
 import { getPublicActiveSprint } from '../../../services/sprints/sprints.service';
 import DevelopmentStats from './DevelopmentStats';
 import PublicWorkItemsList from '../backlog/PublicWorkItemsList';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 import { getWorkItemsGroupedByStatus } from '../../../services/utils/workItemUtils';
 
 function PublicActiveSprint() {
@@ -135,11 +134,6 @@ function PublicActiveSprint() {
                         | {activeSprint.title}
                       </h3>
                       <p className="text-muted mb-0">{activeSprint.goal}</p>
-                      {activeSprint && (
-                        <div className="py-2">
-                          <PublicShareButtons title={activeSprint.title} />
-                        </div>
-                      )}
                     </Col>
                   </Row>
                 </CardHeader>

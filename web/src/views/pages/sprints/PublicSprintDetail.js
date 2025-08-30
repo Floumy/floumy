@@ -11,7 +11,6 @@ import {
 import { sortByPriority } from '../../../services/utils/utils';
 import ExecutionStats from '../components/stats/ExecutionStats';
 import PublicWorkItemsListCard from '../backlog/PublicWorkItemsListCard';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 
 function PublicSprintDetail({
   orgId,
@@ -55,11 +54,6 @@ function PublicSprintDetail({
               <span className="badge badge-primary text-white">Planned</span>
             )}
           </h3>
-          {sprint && (
-            <div className="py-2">
-              <PublicShareButtons title={sprint.title} />
-            </div>
-          )}
         </CardHeader>
         <CardBody>
           <Row>

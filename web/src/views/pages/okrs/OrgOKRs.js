@@ -78,7 +78,7 @@ function OrgOKRs() {
       />
       {isLoading && <InfiniteLoadingBar />}
       <Container className="mt--6" fluid id="OKRs">
-        {!statsLoading && !statsError && stats && (
+        {okrs.length > 0 && !statsLoading && !statsError && stats && (
           <Row className="my-4">
             <Col lg="4" sm="12">
               <Card className="card-stats">
