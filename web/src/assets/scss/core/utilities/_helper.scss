@@ -21,3 +21,32 @@
 .cursor-pointer {
   cursor: pointer !important;
 }
+
+// Sidebar Project Selector dropdown styling
+// Keep dark purple theme when open and ensure hover covers full item height
+.sidebar-project-menu {
+  background-color: #5e4387; // app primary (dark purple)
+  color: #fff;
+  box-shadow: 0 .125rem .25rem rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0; // remove default dropdown-menu vertical padding
+
+  .dropdown-item {
+    color: #fff;
+    margin: 0 !important; // remove any margins that create gaps above/below items
+    border-radius: 0; // make hover background flush with item edges
+
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      background-color: darken($primary, 6%); // darker hover for better contrast
+      color: #fff; // keep text readable on dark hover
+    }
+  }
+
+  .dropdown-divider {
+    border-top-color: rgba(255, 255, 255, 0.12);
+    margin: 0 !important; // remove vertical gaps so hover covers full item height
+  }
+}
