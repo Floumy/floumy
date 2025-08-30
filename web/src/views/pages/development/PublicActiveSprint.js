@@ -1,6 +1,14 @@
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Badge, Card, CardHeader, Col, Container, Row } from 'reactstrap';
+import {
+  Badge,
+  Card,
+  CardHeader,
+  CardBody,
+  Col,
+  Container,
+  Row,
+} from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -80,13 +88,38 @@ function PublicActiveSprint() {
                     </Col>
                   </Row>
                 </CardHeader>
-                <Row>
-                  <Col sm={12}>
-                    <h3 className="text-center pt-3 py-2">
-                      No active sprint found.
-                    </h3>
-                  </Col>
-                </Row>
+                <div className="p-5 text-center">
+                  <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                    <h3 className="mb-3">No active sprint yet</h3>
+                    <p className="text-muted">
+                      The active sprint will appear here once it starts.
+                    </p>
+                    <Row className="mt-4 text-left">
+                      <Col md="6" className="mb-3">
+                        <Card>
+                          <CardBody>
+                            <h5 className="mb-2">What is a Sprint?</h5>
+                            <p className="mb-0 text-sm text-muted">
+                              A fixed timeframe where the team focuses on a set
+                              of prioritized work items.
+                            </p>
+                          </CardBody>
+                        </Card>
+                      </Col>
+                      <Col md="6" className="mb-3">
+                        <Card>
+                          <CardBody>
+                            <h5 className="mb-2">What is a Work Item?</h5>
+                            <p className="mb-0 text-sm text-muted">
+                              A task, bug, or story tracked within a sprint to
+                              deliver value incrementally.
+                            </p>
+                          </CardBody>
+                        </Card>
+                      </Col>
+                    </Row>
+                  </div>
+                </div>
               </Card>
             )}
             {activeSprint && (
