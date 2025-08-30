@@ -158,7 +158,7 @@ const Projects = () => {
                       className="btn btn-primary mt-3"
                       onClick={() => setIsNewProjectModalOpen(true)}
                     >
-                      Create New Project
+                      Create a new Project
                     </button>
                   </div>
                 </Card>

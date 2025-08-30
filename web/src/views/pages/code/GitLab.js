@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import {
-  Alert,
   Card,
   CardBody,
   CardHeader,
@@ -236,13 +235,18 @@ function GitLab() {
                 {!isLoading && !isGitLabConnected && (
                   <form onSubmit={saveToken}>
                     <div className="form-group">
-                      <Alert variant="warning" color="warning" className="mb-3">
-                        <i className="fa fa-exclamation-triangle mr-2" />
-                        <span>
-                          The access token must have the <b>API</b> scope and{' '}
-                          <b>Maintainer</b> role.
-                        </span>
-                      </Alert>
+                      <div className="p-3 mb-3 border rounded bg-white">
+                        <div className="d-flex align-items-start">
+                          <i className="fa fa-key mr-3 mt-1 text-warning" />
+                          <div className="text-left">
+                            <h5 className="mb-1">Before you connect</h5>
+                            <p className="mb-0 text-sm">
+                              The access token must have the <b>API</b> scope
+                              and <b>Maintainer</b> role.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                       <label htmlFor="access-token">Access Token</label>
                       <input
                         className="form-control"
