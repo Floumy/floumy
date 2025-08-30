@@ -701,6 +701,39 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     </NavLink>
                   </NavItem>
                 </Nav>
+                <Nav navbar className="mb-3">
+                  <NavItem>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={10}>
+                        <NavLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            toggleShortcutsModal();
+                          }}
+                        >
+                          <i className="fa fa-keyboard" />
+                          <span className="nav-link-text">Shortcuts</span>
+                        </NavLink>
+                      </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <span
+                          id="shortcut-help"
+                          role="button"
+                          onClick={toggleShortcutsModal}
+                        >
+                          <KeyShortcut keys={['?']} />
+                        </span>
+                        <UncontrolledTooltip
+                          target="shortcut-help"
+                          placement="top"
+                        >
+                          Press ? to open Shortcuts. Click to see all shortcuts.
+                        </UncontrolledTooltip>
+                      </Col>
+                    </Row>
+                  </NavItem>
+                </Nav>
               </div>
             </Collapse>
           </div>
