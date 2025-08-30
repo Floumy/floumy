@@ -8,13 +8,12 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { listPublicSprintsWithWorkItemsForTimeline } from '../../../services/sprints/sprints.service';
 import {
   formatDate,
+  formatTimeline,
   getSprintEndDate,
   getSprintStartDate,
   sortByPriority,
-  formatTimeline,
 } from '../../../services/utils/utils';
 import PublicWorkItemsList from '../backlog/PublicWorkItemsList';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 
 function PublicSprints() {
   let location = useLocation();
@@ -80,7 +79,6 @@ function PublicSprints() {
                 <Row>
                   <Col xs={12} sm={8}>
                     <h2>Sprints</h2>
-                    <PublicShareButtons title={'Sprints'} />
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2

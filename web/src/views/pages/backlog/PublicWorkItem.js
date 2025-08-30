@@ -7,7 +7,6 @@ import {
   workItemStatusName,
   workItemTypeName,
 } from '../../../services/utils/utils';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 import {
   addComment,
   deleteComment,
@@ -79,11 +78,6 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                 createdAt={workItem.createdAt}
                 updatedAt={workItem.updatedAt}
               />
-              {workItem && (
-                <div className="py-2">
-                  <PublicShareButtons title={workItem.title} />
-                </div>
-              )}
             </CardHeader>
             <CardBody>
               <Form className="needs-validation" noValidate>

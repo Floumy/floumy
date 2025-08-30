@@ -33,7 +33,6 @@ import {
 } from '../../../services/utils/utils';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { toast } from 'react-toastify';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 import Comments from '../../../components/Comments/Comments';
 
 function PublicDetailOKR() {
@@ -134,11 +133,6 @@ function PublicDetailOKR() {
                 <h3 className="mb-0">
                   Objective {okr && okr.objective.reference}
                 </h3>
-                {okr && (
-                  <div className="py-2">
-                    <PublicShareButtons title={okr.objective.title} />
-                  </div>
-                )}
               </CardHeader>
               <CardBody className="border-bottom">
                 {isLoading && <LoadingSpinnerBox />}

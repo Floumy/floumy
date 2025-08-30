@@ -26,7 +26,6 @@ import {
   getPublicKeyResult,
   updateKeyResultComment,
 } from '../../../services/okrs/okrs.service';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 import Comments from '../../../components/Comments/Comments';
 
 function PublicDetailKeyResult() {
@@ -126,11 +125,6 @@ function PublicDetailKeyResult() {
                     <h3 className="mb-0">
                       Key Result {keyResult && keyResult.reference}
                     </h3>
-                    {keyResult && (
-                      <div className="py-2">
-                        <PublicShareButtons title={keyResult.title} />
-                      </div>
-                    )}
                   </div>
                 </div>
               </CardHeader>

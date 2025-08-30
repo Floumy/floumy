@@ -1,5 +1,5 @@
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Card, CardHeader, CardBody, Col, Container, Row } from 'reactstrap';
+import { Card, CardBody, CardHeader, Col, Container, Row } from 'reactstrap';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './Roadmap.scss';
@@ -9,7 +9,6 @@ import { listPublicMilestonesWithInitiatives } from '../../../services/roadmap/r
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import PublicMilestoneRoadmapItem from './PublicMilestoneRoadmapItem';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 
 function PublicRoadmap() {
   let location = useLocation();
@@ -59,7 +58,6 @@ function PublicRoadmap() {
                 <Row>
                   <Col xs={12} sm={8}>
                     <h2>Roadmap</h2>
-                    <PublicShareButtons title={'Roadmap'} />
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2

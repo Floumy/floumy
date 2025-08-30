@@ -22,7 +22,6 @@ import Select2 from 'react-select2-wrapper';
 import { formatTimeline } from '../../../services/utils/utils';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 import OKR from './OKR';
 
 function PublicOKRs() {
@@ -90,7 +89,7 @@ function PublicOKRs() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
-        {!statsLoading && !statsError && stats && (
+        {okrs?.length > 0 && !statsLoading && !statsError && stats && (
           <Row className="my-4">
             <Col lg="4" sm="12">
               <Card className="card-stats">
@@ -172,7 +171,6 @@ function PublicOKRs() {
                 <Row>
                   <Col xs={12} sm={8}>
                     <CardTitle tag="h2">OKRs</CardTitle>
-                    <PublicShareButtons title={'OKRs'} />
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2
