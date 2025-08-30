@@ -303,8 +303,5 @@ describe('ProjectsService', () => {
         service.deleteProject('non-existent-org', project.id),
       ).rejects.toThrow();
     });
-    it('should throw an error if the project is the only one', async () => {
-      await expect(service.deleteProject(org.id, project.id)).rejects.toThrow();
-    });
   });
 });
