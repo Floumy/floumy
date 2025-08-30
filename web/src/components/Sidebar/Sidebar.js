@@ -148,16 +148,21 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
       {currentOrg && currentProject && (
         <>
           <div className="navbar-inner">
-            <h2 className="mb-4">
-              <Link to={`/orgs/${orgId}/objectives`} className="p-0">
-                <span className="text-muted" style={{ whiteSpace: 'nowrap' }}>
-                  <i className="fa fa-arrow-left"></i> Org Dashboard
-                </span>
-              </Link>
-            </h2>
             {currentOrg.name && (
-              <h5 className="navbar-project-name text-light text-xl pb-0 mb-0 text-break">
-                {currentOrg.name}
+              <h5 className="navbar-project-name text-light text-xl pb-0 text-break">
+                <Link
+                  to={`/orgs/${orgId}/objectives`}
+                  className="p-0 d-inline-flex align-items-center text-decoration-none"
+                  onClick={closeSidenav}
+                >
+                  <i
+                    className="fa fa-arrow-left text-muted mr-2"
+                    aria-hidden="true"
+                  ></i>
+                  <span className="text-white" style={{ whiteSpace: 'nowrap' }}>
+                    {currentOrg.name}
+                  </span>
+                </Link>
               </h5>
             )}
             <Collapse navbar isOpen={true}>
