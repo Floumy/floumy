@@ -244,7 +244,7 @@ export default function FeatureRequests({ isPublic = false }) {
                         {featureRequests.length === 0 && (
                           <tr>
                             <td colSpan={4} className="text-center">
-                              No feature requests found.
+                              No feature requests yet
                             </td>
                           </tr>
                         )}
