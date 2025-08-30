@@ -190,10 +190,12 @@ function OrgOKRs() {
                   <div className="p-5 text-center">
                     <div className="mx-auto" style={{ maxWidth: '680px' }}>
                       <h3 className="mb-3">
-                        No OKRs for {formatTimeline(timelineQueryFilter).toLowerCase()} yet
+                        No OKRs for{' '}
+                        {formatTimeline(timelineQueryFilter).toLowerCase()} yet
                       </h3>
                       <p className="text-muted">
-                        Add an Objective to align your team and track measurable outcomes with Key Results.
+                        Add an Objective to align your team and track measurable
+                        outcomes with Key Results.
                       </p>
                       <div className="my-4">
                         <Link
@@ -209,7 +211,8 @@ function OrgOKRs() {
                             <CardBody>
                               <h5 className="mb-2">What is an Objective?</h5>
                               <p className="mb-0 text-sm text-muted">
-                                A concise, qualitative goal that provides direction for the quarter.
+                                A concise, qualitative goal that provides
+                                direction for the quarter.
                               </p>
                             </CardBody>
                           </Card>
@@ -219,7 +222,8 @@ function OrgOKRs() {
                             <CardBody>
                               <h5 className="mb-2">What is a Key Result?</h5>
                               <p className="mb-0 text-sm text-muted">
-                                A measurable outcome that indicates progress toward the Objective.
+                                A measurable outcome that indicates progress
+                                toward the Objective.
                               </p>
                             </CardBody>
                           </Card>
