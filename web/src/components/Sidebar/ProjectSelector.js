@@ -27,7 +27,7 @@ function ProjectSelector({
     <UncontrolledDropdown group className="mb-4 text-left w-100">
       <DropdownToggle
         caret
-        className="btn btn-outline-light w-100 d-flex justify-content-between align-items-center shadow-none py-2 px-3 text-left"
+        className="btn btn-outline-light w-100 d-flex justify-content-between align-items-center shadow-none py-3 px-3 text-left"
       >
         <span className="text-truncate mr-2" style={{ flexGrow: 1 }}>
           {currentProject?.name}
