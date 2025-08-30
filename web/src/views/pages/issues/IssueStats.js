@@ -38,17 +38,15 @@ function IssueStats({ issues }) {
         closed: [],
       };
 
-      // Initialize the data structure with dates for the current quarter
-      for (
-        let d = new Date(quarterStart);
-        d <= now;
-        d.setDate(d.getDate() + 1)
-      ) {
-        const dateStr = d.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-        });
-        data.labels.push(dateStr);
+      // Initialize the data structure by week for the current quarter, plus tomorrow
+      const endDate = new Date(now);
+      endDate.setDate(endDate.getDate() + 1);
+      const MS_PER_DAY = 24 * 60 * 60 * 1000;
+      // Total number of days inclusive of endDate
+      const totalDays = Math.floor((endDate - quarterStart) / MS_PER_DAY) + 1;
+      const totalWeeks = Math.ceil(totalDays / 7);
+      for (let i = 0; i < totalWeeks; i++) {
+        data.labels.push(`Week ${i + 1}`);
         data.open.push(0);
         data.closed.push(0);
       }
@@ -58,7 +56,9 @@ function IssueStats({ issues }) {
 
       sortedIssues.forEach((issue) => {
         const date = new Date(issue.createdAt);
-        const index = Math.floor((date - quarterStart) / (24 * 60 * 60 * 1000));
+        const MS_PER_DAY = 24 * 60 * 60 * 1000;
+        const dayIndex = Math.floor((date - quarterStart) / MS_PER_DAY);
+        const weekIndex = Math.floor(dayIndex / 7);
 
         if (
           ['resolved', 'closed', 'cannot-reproduce', 'duplicate'].includes(
@@ -70,7 +70,7 @@ function IssueStats({ issues }) {
           openCount++;
         }
 
-        for (let i = index; i < data.labels.length; i++) {
+        for (let i = weekIndex; i < data.labels.length; i++) {
           data.open[i] = openCount;
           data.closed[i] = closedCount;
         }
@@ -86,25 +86,74 @@ function IssueStats({ issues }) {
     }
   }, [issues]);
 
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        label: 'Open Issues',
-        data: openIssues,
-        borderColor: '#fb6340',
-        backgroundColor: 'rgba(251, 99, 64, 0.1)',
-        fill: true,
-      },
-      {
-        label: 'Closed Issues',
-        data: closedIssues,
-        borderColor: '#2dce89',
-        backgroundColor: 'rgba(45, 206, 137, 0.1)',
-        fill: true,
-      },
-    ],
+  const chartData = (/* canvas */) => {
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Open Issues',
+          data: openIssues,
+          borderColor: '#fb6340',
+          // Use scriptable background to rebuild gradient after any update/resize
+          backgroundColor: function (context) {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart || {};
+            if (!chartArea) {
+              return 'rgba(251, 99, 64, 0.2)';
+            }
+            const gradient = ctx.createLinearGradient(
+              0,
+              chartArea.top,
+              0,
+              chartArea.bottom,
+            );
+            gradient.addColorStop(0, 'rgba(251, 99, 64, 0.35)');
+            gradient.addColorStop(0.5, 'rgba(251, 99, 64, 0.18)');
+            gradient.addColorStop(1, 'rgba(251, 99, 64, 0.04)');
+            return gradient;
+          },
+          fill: true,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          lineTension: 0.25,
+        },
+        {
+          label: 'Closed Issues',
+          data: closedIssues,
+          borderColor: '#2dce89',
+          backgroundColor: function (context) {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart || {};
+            if (!chartArea) {
+              return 'rgba(45, 206, 137, 0.2)';
+            }
+            const gradient = ctx.createLinearGradient(
+              0,
+              chartArea.top,
+              0,
+              chartArea.bottom,
+            );
+            gradient.addColorStop(0, 'rgba(45, 206, 137, 0.35)');
+            gradient.addColorStop(0.5, 'rgba(45, 206, 137, 0.18)');
+            gradient.addColorStop(1, 'rgba(45, 206, 137, 0.04)');
+            return gradient;
+          },
+          fill: true,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          lineTension: 0.25,
+        },
+      ],
+    };
   };
+
+  // Ensure the line is fully visible by padding the top of the Y-axis slightly
+  const maxYValue = Math.max(
+    ...(openIssues && openIssues.length ? openIssues : [0]),
+    ...(closedIssues && closedIssues.length ? closedIssues : [0]),
+  );
 
   if (issues.length === 0) {
     return null;
@@ -119,7 +168,55 @@ function IssueStats({ issues }) {
           </CardHeader>
           <CardBody>
             <div className="chart">
-              <Line data={chartData} options={cumulativeIssuesChartOptions} />
+              <Line
+                data={chartData}
+                options={{
+                  ...cumulativeIssuesChartOptions,
+                  legend: { display: true },
+                  scales: {
+                    ...(cumulativeIssuesChartOptions.scales || {}),
+                    xAxes: [
+                      {
+                        ...((cumulativeIssuesChartOptions.scales &&
+                          cumulativeIssuesChartOptions.scales.xAxes &&
+                          cumulativeIssuesChartOptions.scales.xAxes[0]) ||
+                          {}),
+                        ticks: {
+                          ...((cumulativeIssuesChartOptions.scales &&
+                            cumulativeIssuesChartOptions.scales.xAxes &&
+                            cumulativeIssuesChartOptions.scales.xAxes[0] &&
+                            cumulativeIssuesChartOptions.scales.xAxes[0]
+                              .ticks) ||
+                            {}),
+                          display: false,
+                        },
+                        scaleLabel: { display: false },
+                      },
+                    ],
+                    yAxes: [
+                      {
+                        ...((cumulativeIssuesChartOptions.scales &&
+                          cumulativeIssuesChartOptions.scales.yAxes &&
+                          cumulativeIssuesChartOptions.scales.yAxes[0]) ||
+                          {}),
+                        scaleLabel: { display: false },
+                        ticks: {
+                          ...((cumulativeIssuesChartOptions.scales &&
+                            cumulativeIssuesChartOptions.scales.yAxes &&
+                            cumulativeIssuesChartOptions.scales.yAxes[0] &&
+                            cumulativeIssuesChartOptions.scales.yAxes[0]
+                              .ticks) ||
+                            {}),
+                          // Add slight headroom so the top line/points are not clipped
+                          suggestedMax: maxYValue
+                            ? Math.ceil(maxYValue * 1.05)
+                            : undefined,
+                        },
+                      },
+                    ],
+                  },
+                }}
+              />
             </div>
           </CardBody>
         </Card>

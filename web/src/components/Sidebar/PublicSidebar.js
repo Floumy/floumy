@@ -69,7 +69,6 @@ function PublicSidebar({
 
   function isProjectEnabled() {
     return (
-      buildingInPublicSettings.isFeedPagePublic ||
       buildingInPublicSettings.isObjectivesPagePublic ||
       buildingInPublicSettings.isRoadmapPagePublic ||
       buildingInPublicSettings.isSprintsPagePublic ||
@@ -101,6 +100,63 @@ function PublicSidebar({
               {project.name}
             </h5>
           )}
+          {isProjectEnabled() && (
+            <h6 className="navbar-heading p-0 text-muted">
+              <span className="docs-normal" style={{ whiteSpace: 'nowrap' }}>
+                Project
+              </span>
+            </h6>
+          )}
+          <Nav className="mb-md-3" navbar>
+            {buildingInPublicSettings.isObjectivesPagePublic && (
+              <NavItem>
+                <NavLink
+                  to={`/public/orgs/${orgId}/projects/${project.id}/objectives`}
+                  onClick={closeSidenav}
+                  tag={NavLinkRRD}
+                >
+                  <i className="fa fa-bullseye" />
+                  <span className="nav-link-text">OKRs</span>
+                </NavLink>
+              </NavItem>
+            )}
+            {buildingInPublicSettings.isRoadmapPagePublic && (
+              <NavItem>
+                <NavLink
+                  to={`/public/orgs/${orgId}/projects/${project.id}/roadmap`}
+                  onClick={closeSidenav}
+                  tag={NavLinkRRD}
+                >
+                  <i className="fa fa-road" />
+                  <span className="nav-link-text">Roadmap</span>
+                </NavLink>
+              </NavItem>
+            )}
+            {buildingInPublicSettings.isActiveSprintsPagePublic && (
+              <NavItem>
+                <NavLink
+                  to={`/public/orgs/${orgId}/projects/${project.id}/active-sprint`}
+                  onClick={closeSidenav}
+                  tag={NavLinkRRD}
+                >
+                  <i className="fa fa-rocket" />
+                  <span className="nav-link-text">Active Sprint</span>
+                </NavLink>
+              </NavItem>
+            )}
+            {buildingInPublicSettings.isSprintsPagePublic && (
+              <NavItem>
+                <NavLink
+                  to={`/public/orgs/${orgId}/projects/${project.id}/sprints`}
+                  onClick={closeSidenav}
+                  tag={NavLinkRRD}
+                >
+                  <i className="fa fa-refresh" />
+                  <span className="nav-link-text">Sprints</span>
+                </NavLink>
+              </NavItem>
+            )}
+          </Nav>
           <div className="mb-3">
             {isFeedbackEnabled() && (
               <h6 className="navbar-heading p-0 text-muted">
@@ -150,75 +206,6 @@ function PublicSidebar({
               )}
             </Nav>
           </div>
-          {isProjectEnabled() && (
-            <h6 className="navbar-heading p-0 text-muted">
-              <span className="docs-normal" style={{ whiteSpace: 'nowrap' }}>
-                Project
-              </span>
-            </h6>
-          )}
-          <Nav className="mb-md-3" navbar>
-            {buildingInPublicSettings.isFeedPagePublic && (
-              <NavItem>
-                <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/feed`}
-                  onClick={closeSidenav}
-                  tag={NavLinkRRD}
-                >
-                  <i className="fa fa-newspaper" />
-                  <span className="nav-link-text">Feed</span>
-                </NavLink>
-              </NavItem>
-            )}
-            {buildingInPublicSettings.isObjectivesPagePublic && (
-              <NavItem>
-                <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/objectives`}
-                  onClick={closeSidenav}
-                  tag={NavLinkRRD}
-                >
-                  <i className="fa fa-bullseye" />
-                  <span className="nav-link-text">Objectives</span>
-                </NavLink>
-              </NavItem>
-            )}
-            {buildingInPublicSettings.isRoadmapPagePublic && (
-              <NavItem>
-                <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/roadmap`}
-                  onClick={closeSidenav}
-                  tag={NavLinkRRD}
-                >
-                  <i className="fa fa-road" />
-                  <span className="nav-link-text">Initiatives Roadmap</span>
-                </NavLink>
-              </NavItem>
-            )}
-            {buildingInPublicSettings.isSprintsPagePublic && (
-              <NavItem>
-                <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/sprints`}
-                  onClick={closeSidenav}
-                  tag={NavLinkRRD}
-                >
-                  <i className="fa fa-refresh" />
-                  <span className="nav-link-text">Sprints</span>
-                </NavLink>
-              </NavItem>
-            )}
-            {buildingInPublicSettings.isActiveSprintsPagePublic && (
-              <NavItem>
-                <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/active-sprint`}
-                  onClick={closeSidenav}
-                  tag={NavLinkRRD}
-                >
-                  <i className="fa fa-rocket" />
-                  <span className="nav-link-text">Active Sprint</span>
-                </NavLink>
-              </NavItem>
-            )}
-          </Nav>
         </Collapse>
       </div>
     </div>

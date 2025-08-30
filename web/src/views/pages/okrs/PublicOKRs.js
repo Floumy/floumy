@@ -2,32 +2,27 @@ import React, { useEffect, useState } from 'react';
 // javascript plugin that creates a sortable object from a dom object
 // reactstrap components
 import {
-  Badge,
   Card,
   CardBody,
   CardHeader,
+  CardTitle,
   Col,
   Container,
   Progress,
   Row,
-  Table,
 } from 'reactstrap';
 // core components
 import SimpleHeader from 'components/Headers/SimpleHeader.js';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   getPublicOkrStats,
   listPublicObjectives,
 } from '../../../services/okrs/okrs.service';
 import Select2 from 'react-select2-wrapper';
-import {
-  formatHyphenatedString,
-  formatOKRsProgress,
-  okrStatusColorClassName,
-} from '../../../services/utils/utils';
+import { formatTimeline } from '../../../services/utils/utils';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
+import OKR from './OKR';
 
 function PublicOKRs() {
   const { orgId, projectId } = useParams();
@@ -94,7 +89,7 @@ function PublicOKRs() {
       {isLoading && <InfiniteLoadingBar />}
       <SimpleHeader />
       <Container className="mt--6" fluid id="OKRs">
-        {!statsLoading && !statsError && stats && (
+        {okrs?.length > 0 && !statsLoading && !statsError && stats && (
           <Row className="my-4">
             <Col lg="4" sm="12">
               <Card className="card-stats">
@@ -175,8 +170,7 @@ function PublicOKRs() {
               <CardHeader>
                 <Row>
                   <Col xs={12} sm={8}>
-                    <h2>Objectives</h2>
-                    <PublicShareButtons title={'Objectives'} />
+                    <CardTitle tag="h2">OKRs</CardTitle>
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2
@@ -199,99 +193,73 @@ function PublicOKRs() {
                   </Col>
                 </Row>
               </CardHeader>
-              {isLoading && <LoadingSpinnerBox />}
-              {!isLoading && okrs.length === 0 && (
-                <div className="pt-3">
-                  <h3 className="text-center pb-2">
-                    No objectives found for this timeline.
-                  </h3>
-                </div>
-              )}
-              {!isLoading && okrs.length > 0 && (
-                <div className="table-responsive">
-                  <Table
-                    className="align-items-center table-flush no-select"
-                    onContextMenu={(e) => e.preventDefault()}
-                  >
-                    <thead className="thead-light">
-                      <tr>
-                        <th className={'sort'} scope="col" width={'5%'}>
-                          Reference
-                        </th>
-                        <th className="sort" scope="col" width={'40%'}>
-                          Objective
-                        </th>
-                        <th className="sort" scope="col" width={'30%'}>
-                          Progress
-                        </th>
-                        <th className="sort" scope="col" width={'20%'}>
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="list">
-                      {okrs.map((okr) => (
-                        <tr key={okr.id}>
-                          {/*Display empty row with message if is template*/}
-                          {okr.id === 0 && (
-                            <td colSpan={5} className={'text-center'}>
-                              <h3 className="text-center m-0">
-                                No objectives found for this timeline.
-                              </h3>
-                            </td>
-                          )}
-                          {okr.id !== 0 && (
-                            <>
-                              <td>
-                                <Link
-                                  to={`/public/orgs/${orgId}/projects/${projectId}/okrs/detail/${okr.id}`}
-                                  className={'okr-detail'}
-                                >
-                                  {okr.reference}
-                                </Link>
-                              </td>
-                              <td className="title-cell">
-                                <Link
-                                  to={`/public/orgs/${orgId}/projects/${projectId}/okrs/detail/${okr.id}`}
-                                  className={'okr-detail'}
-                                >
-                                  {okr.title}
-                                </Link>
-                              </td>
-                              <td>
-                                <div className="d-flex align-items-center">
-                                  <span className="mr-2">
-                                    {formatOKRsProgress(okr.progress)}%
-                                  </span>
-                                  <div>
-                                    <Progress
-                                      max="100"
-                                      value={formatOKRsProgress(okr.progress)}
-                                      color="primary"
-                                    />
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <Badge color="" className="badge-dot mr-4">
-                                  <i
-                                    className={okrStatusColorClassName(
-                                      okr.status,
-                                    )}
-                                  />
-                                  <span className="status">
-                                    {formatHyphenatedString(okr.status)}
-                                  </span>
-                                </Badge>
-                              </td>
-                            </>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </div>
-              )}
+              <div className="p-4">
+                {isLoading && <LoadingSpinnerBox />}
+                {!isLoading &&
+                  okrs.length === 0 &&
+                  timelineQueryFilter !== 'past' && (
+                    <div className="p-5 text-center">
+                      <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                        <h3 className="mb-3">
+                          No OKRs for{' '}
+                          {formatTimeline(timelineQueryFilter).toLowerCase()}{' '}
+                          yet
+                        </h3>
+                        <p className="text-muted">
+                          OKRs will appear here once they are published for this
+                          timeline.
+                        </p>
+                        <Row className="mt-4 text-left">
+                          <Col md="6" className="mb-3">
+                            <Card>
+                              <CardBody>
+                                <h5 className="mb-2">What is an Objective?</h5>
+                                <p className="mb-0 text-sm text-muted">
+                                  A concise, qualitative goal that provides
+                                  direction for the quarter.
+                                </p>
+                              </CardBody>
+                            </Card>
+                          </Col>
+                          <Col md="6" className="mb-3">
+                            <Card>
+                              <CardBody>
+                                <h5 className="mb-2">What is a Key Result?</h5>
+                                <p className="mb-0 text-sm text-muted">
+                                  A measurable outcome that indicates progress
+                                  toward the Objective.
+                                </p>
+                              </CardBody>
+                            </Card>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  )}
+                {!isLoading &&
+                  okrs.length === 0 &&
+                  timelineQueryFilter === 'past' && (
+                    <div className="p-5 text-center">
+                      <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                        <h3 className="mb-3">No OKRs in the past</h3>
+                        <p className="text-muted mb-0">
+                          There are no OKRs recorded for past timelines.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                {!isLoading &&
+                  okrs &&
+                  okrs.map((okr) => (
+                    <OKR
+                      key={okr.id}
+                      okr={okr}
+                      orgId={orgId}
+                      projectId={projectId}
+                      isPublic={true}
+                    />
+                  ))}
+              </div>
             </Card>
           </div>
         </Row>

@@ -162,25 +162,49 @@ function ActiveSprint() {
                   </Row>
                 </CardHeader>
                 <CardBody>
-                  <div
-                    style={{ maxWidth: '600px' }}
-                    className="mx-auto font-italic"
-                  >
-                    <h3>Active Sprint</h3>
-                    <p>
-                      The active Sprint is the current period where your team is
-                      actively working on tasks. They keep you focused on
-                      immediate priorities and ensure steady progress. Review
-                      your active sprint regularly to stay on track and adjust
-                      as needed for optimal performance.
-                      <br />
-                      <Link
-                        to={`/admin/orgs/${orgId}/projects/${projectId}/sprints`}
-                        className="text-blue font-weight-bold"
-                      >
-                        Manage the Active Sprint
-                      </Link>
-                    </p>
+                  <div className="p-5 text-center">
+                    <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                      <h3 className="mb-3">No active sprint</h3>
+                      <p className="text-muted">
+                        Start a sprint to begin tracking work in the current
+                        cycle and keep your team focused on the highest
+                        priorities.
+                      </p>
+                      <div className="my-4">
+                        <Link
+                          to={`/admin/orgs/${orgId}/projects/${projectId}/sprints/new`}
+                          className="btn btn-primary"
+                        >
+                          Plan a Sprint
+                        </Link>
+                      </div>
+                      <Row className="mt-4 text-left">
+                        <Col md="6" className="mb-3">
+                          <Card>
+                            <CardBody>
+                              <h5 className="mb-2">What is a Sprint?</h5>
+                              <p className="mb-0 text-sm text-muted">
+                                A short, time-boxed period to deliver
+                                prioritized work and maintain momentum.
+                              </p>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                        <Col md="6" className="mb-3">
+                          <Card>
+                            <CardBody>
+                              <h5 className="mb-2">
+                                What is an Active Sprint?
+                              </h5>
+                              <p className="mb-0 text-sm text-muted">
+                                The currently running sprint where your team
+                                executes planned work and tracks daily progress.
+                              </p>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                      </Row>
+                    </div>
                   </div>
                 </CardBody>
               </Card>
@@ -262,6 +286,7 @@ function ActiveSprint() {
                         workItems={workItemsByStatus[status]}
                         showInitiative={true}
                         showAssignedTo={true}
+                        showStatus={false}
                         onChangeSprint={handleChangeSprint}
                         onChangeStatus={updateWorkItemsStatus}
                         onChangePriority={updateWorkItemsPriority}

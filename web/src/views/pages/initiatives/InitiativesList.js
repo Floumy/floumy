@@ -206,7 +206,7 @@ function InitiativesList({
             {sortedInitiatives.length === 0 && (
               <tr>
                 <td colSpan={6} className={'text-center'}>
-                  No initiatives found.
+                  No initiatives added yet
                 </td>
               </tr>
             )}
@@ -289,7 +289,7 @@ function InitiativesList({
                         </span>
                       </>
                     )}
-                    {!initiative.assignedTo && '-'}
+                    {!initiative.assignedTo}
                   </td>
                 )}
                 <td>

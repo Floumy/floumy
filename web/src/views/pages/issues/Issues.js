@@ -205,7 +205,7 @@ export default function Issues({ isPublic = false }) {
                         {issues.length === 0 ? (
                           <tr>
                             <td colSpan="3" className="text-center">
-                              No issues found.
+                              No issues yet
                             </td>
                           </tr>
                         ) : (

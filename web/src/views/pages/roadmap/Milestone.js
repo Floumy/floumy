@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import InitiativesList from '../initiatives/InitiativesList';
 import { Col, Row } from 'reactstrap';
 import { Link, useParams } from 'react-router-dom';
-import { addInitiative } from '../../../services/roadmap/roadmap.service';
 import { getUser } from '../../../services/okrs/okrs.service';
 import { sortByPriority } from '../../../services/utils/utils';
 
@@ -49,13 +48,6 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
         )}
       </>
     );
-  }
-
-  async function handleAddInitiativeWithMilestone(initiative, milestoneId) {
-    initiative.milestone = milestoneId;
-    const savedInitiative = await addInitiative(orgId, projectId, initiative);
-    initiatives.push(savedInitiative);
-    setInitiatives([...initiatives]);
   }
 
   function updateInitiativesStatus(updatedInitiatives, status) {
@@ -121,12 +113,6 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
                 initiatives={initiatives}
                 showAssignedTo={true}
                 headerClassName={'thead'}
-                onAddInitiative={async (initiative) => {
-                  await handleAddInitiativeWithMilestone(
-                    initiative,
-                    milestone.id,
-                  );
-                }}
                 onChangeAssignedTo={updateInitiativesAssignedTo}
                 onChangePriority={updateInitiativesPriority}
                 onChangeStatus={updateInitiativesStatus}

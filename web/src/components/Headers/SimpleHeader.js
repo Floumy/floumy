@@ -2,8 +2,8 @@ import React from 'react';
 // nodejs library to set properties for components
 // reactstrap components
 import { Button, Col, Container, Row } from 'reactstrap';
-import ShortcutIcon from '../Shortcuts/ShortcutIcon';
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs';
+import { ShortcutIcon } from '../Shortcuts';
 
 function SimpleHeader({
   headerButtons,

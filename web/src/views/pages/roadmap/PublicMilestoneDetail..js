@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Card, CardBody, CardHeader, Col, Input, Row } from 'reactstrap';
 import PublicInitiativesListCard from '../initiatives/PublicInitiativesListCard';
 import { useParams } from 'react-router-dom';
-import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
 
 function PublicMilestoneDetail({
   milestone = { id: '', title: '', description: '', dueDate: '' },
@@ -18,11 +17,6 @@ function PublicMilestoneDetail({
       <Card>
         <CardHeader>
           <h3 className="mb-0">Milestone</h3>
-          {milestone && (
-            <div className="py-2">
-              <PublicShareButtons title={milestone.title} />
-            </div>
-          )}
         </CardHeader>
         <CardBody>
           <Row>

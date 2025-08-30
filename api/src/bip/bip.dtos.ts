@@ -4,7 +4,6 @@ export interface BipSettingsDto {
   isRoadmapPagePublic: boolean;
   isSprintsPagePublic: boolean;
   isActiveSprintsPagePublic: boolean;
-  isFeedPagePublic: boolean;
   isIssuesPagePublic: boolean;
   isFeatureRequestsPagePublic: boolean;
 }

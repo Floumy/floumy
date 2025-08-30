@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, Container, Input } from 'reactstrap';
+import { Card, CardBody, Col, Container, Row } from 'reactstrap';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import React, { useEffect, useState } from 'react';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
@@ -7,7 +7,6 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { formatDateWithTime } from '../../../services/utils/utils';
 import { Link, useParams } from 'react-router-dom';
 import {
-  addTextFeedItem,
   getInitiativeTitle,
   getInitiativeUpdates,
   getKeyResultUpdates,
@@ -16,21 +15,18 @@ import {
   getTitle,
   getWorkItemUpdates,
 } from './feed.service';
-import { toast } from 'react-toastify';
 import AutoResizeTextArea from '../../../components/AutoResizeTextArea/AutoResizeTextArea';
 
 export default function Feed({
   listFeedItems,
   getLinkUrl,
   showPageExplanation = true,
-  showPostFeedItem = true,
 }) {
   const { orgId, projectId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMoreFeedItems, setHasMoreFeedItems] = useState(true);
-  const [postText, setPostText] = useState('');
 
   useEffect(() => {
     setIsLoading(true);
@@ -127,16 +123,6 @@ export default function Feed({
     return [];
   }
 
-  async function postFeedItem(postText) {
-    try {
-      const feedItem = await addTextFeedItem(orgId, projectId, postText);
-      setFeedItems([feedItem, ...feedItems]);
-      setPostText('');
-    } catch (e) {
-      toast.error('The feed item could not be posted');
-    }
-  }
-
   return (
     <>
       {isLoading && <InfiniteLoadingBar />}
@@ -145,56 +131,80 @@ export default function Feed({
         <Card>
           <CardBody>
             {!isLoading && feedItems?.length === 0 && showPageExplanation && (
-              <div className="p-4">
-                <div
-                  className="mx-auto font-italic"
-                  style={{ maxWidth: '600px' }}
-                >
-                  <h3>Feed</h3>
-                  <p>
-                    This is the feed page. Here you can see the latest updates
-                    on everything that is happening in the system. You can see
-                    the latest changes on work items, initiatives and sprints.
-                    Go ahead and create, update or delete some items to see them
-                    in the feed.
+              <div className="p-5 text-center">
+                <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                  <h3 className="mb-3">No activity in the Audit Log</h3>
+                  <p className="text-muted">
+                    The Audit Log shows a chronological list of important
+                    changes across your project. As you and your team create,
+                    update, or delete items, entries will appear here.
                   </p>
+                  <Row className="mt-4 text-left">
+                    <Col md="6" className="mb-3">
+                      <Card>
+                        <CardBody>
+                          <h5 className="mb-2">What is the Audit Log?</h5>
+                          <p className="mb-0 text-sm text-muted">
+                            A read-only timeline of key events to help you
+                            understand who changed what and when.
+                          </p>
+                        </CardBody>
+                      </Card>
+                    </Col>
+                    <Col md="6" className="mb-3">
+                      <Card>
+                        <CardBody>
+                          <h5 className="mb-2">What gets tracked?</h5>
+                          <p className="mb-0 text-sm text-muted">
+                            Changes to objectives and key results, work items,
+                            initiatives, and more.
+                          </p>
+                        </CardBody>
+                      </Card>
+                    </Col>
+                  </Row>
                 </div>
               </div>
             )}
 
             {!isLoading && feedItems?.length === 0 && !showPageExplanation && (
-              <h3 className="text-center text-lg">
-                There are no updates in the feed
-              </h3>
+              <div className="p-5 text-center">
+                <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                  <h3 className="mb-3">No activity in the Audit Log</h3>
+                  <p className="text-muted">
+                    The Audit Log shows a chronological list of important
+                    changes across your project. As you and your team create,
+                    update, or delete items, entries will appear here.
+                  </p>
+                  <Row className="mt-4 text-left">
+                    <Col md="6" className="mb-3">
+                      <Card>
+                        <CardBody>
+                          <h5 className="mb-2">What is the Audit Log?</h5>
+                          <p className="mb-0 text-sm text-muted">
+                            A read-only timeline of key events to help you
+                            understand who changed what and when.
+                          </p>
+                        </CardBody>
+                      </Card>
+                    </Col>
+                    <Col md="6" className="mb-3">
+                      <Card>
+                        <CardBody>
+                          <h5 className="mb-2">What gets tracked?</h5>
+                          <p className="mb-0 text-sm text-muted">
+                            Changes to Objectives and Key Results, work items,
+                            initiatives, and more.
+                          </p>
+                        </CardBody>
+                      </Card>
+                    </Col>
+                  </Row>
+                </div>
+              </div>
             )}
 
             <div className="mx-auto" style={{ maxWidth: '600px' }}>
-              {showPostFeedItem && feedItems?.length > 0 && (
-                <div className="py-4 border-bottom border-gray-200">
-                  <Input
-                    type="textarea"
-                    placeholder="What's new?"
-                    value={postText}
-                    onChange={(e) => setPostText(e.target.value)}
-                    maxLength={500}
-                    style={{ height: '100px' }}
-                  />
-                  <span className="text-muted text-sm">
-                    <small>{postText.length} / 500 characters</small>
-                  </span>
-                  <br />
-                  <Button
-                    type="submit"
-                    className="btn btn-primary bg-primary text-white my-2 shadow-none shadow-none--hover"
-                    onClick={async () => {
-                      await postFeedItem(postText);
-                      setPostText('');
-                    }}
-                  >
-                    Post Update
-                  </Button>
-                </div>
-              )}
               {feedItems?.length > 0 && (
                 <div
                   className="timeline timeline-one-side my-5"

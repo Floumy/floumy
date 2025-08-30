@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 // core components
 import { orgsRoutes } from 'routes.js';
-import AdminNavbar from '../components/Navbars/AdminNavbar';
+import OrgNavbar from '../components/Navbars/OrgNavbar';
 import useLayoutHandler from './useLayoutHandler';
 import useNavigationHotKey from './useNavigationHotKey';
 import Footer from '../components/Footers/Footer';
@@ -58,7 +58,7 @@ function OrgLayout() {
         }}
       />
       <div className="main-content" ref={mainContentRef}>
-        <AdminNavbar
+        <OrgNavbar
           theme={'dark'}
           sidenavOpen={sidenavOpen}
           toggleSidenav={toggleSidenav}

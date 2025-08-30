@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
   DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  UncontrolledDropdown,
 } from 'reactstrap';
 import { useProjects } from '../../contexts/ProjectsContext';
 import { useNavigate } from 'react-router-dom';
@@ -24,24 +24,19 @@ function ProjectSelector({
   }
 
   return (
-    <UncontrolledDropdown group className="mb-4 text-left">
+    <UncontrolledDropdown group className="mb-4 text-left w-100">
       <DropdownToggle
         caret
-        className="text-left overflow-hidden transparent background-none d-flex justify-content-between align-items-center"
-        style={{ borderColor: '#686868', backgroundColor: '#b3b0c6' }}
+        className="btn btn-outline-light w-100 d-flex justify-content-between align-items-center shadow-none py-3 px-3 text-left"
       >
-        <span
-          className="text-truncate"
-          style={{ flexGrow: 1, marginRight: '8px' }}
-        >
+        <span className="text-truncate mr-2" style={{ flexGrow: 1 }}>
           {currentProject?.name}
         </span>
       </DropdownToggle>
       <DropdownMenu
-        className="w-100 text-white mt-1 py-0 rounded-sm"
+        className="w-100 mt-1 rounded-sm sidebar-project-menu"
         style={{
-          backgroundColor: '#b3b0c6',
-          maxHeight: '300px',
+          maxHeight: '420px',
           overflowY: 'auto',
         }}
       >
@@ -49,36 +44,33 @@ function ProjectSelector({
           <DropdownItem
             key={project.id}
             onClick={() => handleProjectClick(project)}
-            className="d-flex align-items-center py-2"
-            style={{
-              backgroundColor: '#b3b0c6',
-              '&:hover': {
-                backgroundColor: '#b3b0c6',
-              },
-              borderBottom: '1px solid #939393',
-            }}
+            className="d-flex align-items-center py-2 text-light py-3 border-bottom border-light"
             tag="button"
+            title={project.name}
           >
             <span className="text-truncate" style={{ flexGrow: 1 }}>
               {project.name}
             </span>
+            {currentProject?.id === project.id && (
+              <i
+                className="fa fa-check text-success"
+                aria-hidden="true"
+                style={{ margin: '0' }}
+              />
+            )}
           </DropdownItem>
         ))}
         {showNewProject && (
-          <DropdownItem
-            className="text-xs py-3 font-italic"
-            onClick={onNewProject}
-            style={{
-              backgroundColor: '#b3b0c6',
-              '&:hover': {
-                backgroundColor: '#b3b0c6',
-              },
-            }}
-          >
-            <span className="d-md-inline">
-              <i className="fas fa-plus text-xs mr-2" /> New Project
-            </span>
-          </DropdownItem>
+          <>
+            <div className="dropdown-divider" />
+            <DropdownItem
+              className="py-3 text-light"
+              onClick={onNewProject}
+              tag="button"
+            >
+              <i className="fas fa-plus mr-2" /> New Project
+            </DropdownItem>
+          </>
         )}
       </DropdownMenu>
     </UncontrolledDropdown>

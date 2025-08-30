@@ -450,7 +450,7 @@ export const Pages = () => {
                           color="primary"
                           onClick={() => handleAddPage(null)}
                         >
-                          <i className="fa fa-plus mr-2" /> Add Page
+                          Add a Page
                         </Button>
                       </div>
                     ) : selectedPage ? (

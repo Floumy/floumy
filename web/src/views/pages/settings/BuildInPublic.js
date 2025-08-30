@@ -53,7 +53,6 @@ function BuildInPublic() {
           isSprintsPagePublic: buildInPublicSettings.isSprintsPagePublic,
           isActiveSprintsPagePublic:
             buildInPublicSettings.isActiveSprintsPagePublic,
-          isFeedPagePublic: buildInPublicSettings.isFeedPagePublic,
           isIssuesPagePublic: buildInPublicSettings.isIssuesPagePublic,
           isFeatureRequestsPagePublic:
             buildInPublicSettings.isFeatureRequestsPagePublic,
@@ -71,7 +70,14 @@ function BuildInPublic() {
   }, []);
 
   function isBuildInPublicEnabledBasedOnSettings(settings) {
-    return Object.values(settings).some((value) => value === true);
+    return (
+      settings.isObjectivesPagePublic ||
+      settings.isRoadmapPagePublic ||
+      settings.isActiveSprintsPagePublic ||
+      settings.isSprintsPagePublic ||
+      settings.isIssuesPagePublic ||
+      settings.isFeatureRequestsPagePublic
+    );
   }
 
   function togglePublicPage(page) {
@@ -102,11 +108,7 @@ function BuildInPublic() {
       isBuildInPublicEnabledBasedOnSettings(buildInPublicSettings),
     );
 
-    if (buildInPublicSettings.isFeedPagePublic) {
-      setPublicLink(
-        createUrl(`/public/orgs/${orgId}/projects/${projectId}/feed`),
-      );
-    } else if (buildInPublicSettings.isObjectivesPagePublic) {
+    if (buildInPublicSettings.isObjectivesPagePublic) {
       setPublicLink(
         createUrl(`/public/orgs/${orgId}/projects/${projectId}/okrs`),
       );
@@ -142,7 +144,6 @@ function BuildInPublic() {
         isRoadmapPagePublic: !isBuildInPublicEnabled,
         isSprintsPagePublic: !isBuildInPublicEnabled,
         isActiveSprintsPagePublic: !isBuildInPublicEnabled,
-        isFeedPagePublic: !isBuildInPublicEnabled,
         isIssuesPagePublic: !isBuildInPublicEnabled,
         isFeatureRequestsPagePublic: !isBuildInPublicEnabled,
       };
@@ -170,13 +171,13 @@ function BuildInPublic() {
           <Col>
             <Card className="mb-5">
               <CardHeader>
-                <Row>
+                <Row className="align-items-center">
                   <Col xs={12} md={8}>
-                    <CardTitle tag="h2" className="mb-3">
+                    <CardTitle tag="h2" className="mb-2">
                       Build In Public
                     </CardTitle>
                   </Col>
-                  <Col xs={12} md={4}>
+                  <Col xs={12} md={4} className="mt-3 mt-md-0">
                     {!isLoadingBuildInPublicSettings &&
                       isBuildInPublicEnabled && (
                         <div className="text-xs-left text-sm-right">
@@ -206,6 +207,24 @@ function BuildInPublic() {
                 )}
                 {!isLoadingBuildInPublicSettings && (
                   <>
+                    <div className="bg-white border rounded p-3 mb-4 d-flex align-items-start">
+                      <div
+                        className="border rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style={{ width: 36, height: 36 }}
+                      >
+                        <i className="fas fa-info text-primary" />
+                      </div>
+                      <div className="flex-fill">
+                        <div className="font-weight-bold mb-1">
+                          What is Build in Public?
+                        </div>
+                        <div className="text-muted small">
+                          Build in Public lets you share a read-only view of
+                          selected project areas with anyone via a public link.
+                          It’s great for transparency and community updates.
+                        </div>
+                      </div>
+                    </div>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
                         <h3>Public Pages</h3>
@@ -225,6 +244,7 @@ function BuildInPublic() {
                         </label>
                       </Col>
                     </Row>
+                    <hr className="my-4" />
                     <Row className="mb-3" hidden={paymentPlan !== 'premium'}>
                       <Col xs={6} sm={3} md={2}>
                         Issues
@@ -269,26 +289,7 @@ function BuildInPublic() {
                     </Row>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
-                        Feed
-                      </Col>
-                      <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle">
-                          <input
-                            checked={buildInPublicSettings.isFeedPagePublic}
-                            onChange={togglePublicPage('isFeedPagePublic')}
-                            type="checkbox"
-                          />
-                          <span
-                            className="custom-toggle-slider"
-                            data-label-off="No"
-                            data-label-on="Yes"
-                          />
-                        </label>
-                      </Col>
-                    </Row>
-                    <Row className="mb-3">
-                      <Col xs={6} sm={3} md={2}>
-                        Objectives
+                        OKRs
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle mr-1">
@@ -330,6 +331,29 @@ function BuildInPublic() {
                     </Row>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
+                        Active Sprint
+                      </Col>
+                      <Col xs={6} sm={9} md={10}>
+                        <label className="custom-toggle">
+                          <input
+                            checked={
+                              buildInPublicSettings.isActiveSprintsPagePublic
+                            }
+                            onChange={togglePublicPage(
+                              'isActiveSprintsPagePublic',
+                            )}
+                            type="checkbox"
+                          />
+                          <span
+                            className="custom-toggle-slider"
+                            data-label-off="No"
+                            data-label-on="Yes"
+                          />
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row className="mb-3">
+                      <Col xs={6} sm={3} md={2}>
                         Sprints
                       </Col>
                       <Col xs={6} sm={9} md={10}>
@@ -349,16 +373,35 @@ function BuildInPublic() {
                     </Row>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
-                        Active Sprint
+                        Issues
                       </Col>
                       <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle">
+                        <label className="custom-toggle mr-1">
+                          <input
+                            checked={buildInPublicSettings.isIssuesPagePublic}
+                            onChange={togglePublicPage('isIssuesPagePublic')}
+                            type="checkbox"
+                          />
+                          <span
+                            className="custom-toggle-slider"
+                            data-label-off="No"
+                            data-label-on="Yes"
+                          />
+                        </label>
+                      </Col>
+                    </Row>
+                    <Row className="mb-3">
+                      <Col xs={6} sm={3} md={2}>
+                        Feature Requests
+                      </Col>
+                      <Col xs={6} sm={9} md={10}>
+                        <label className="custom-toggle mr-1">
                           <input
                             checked={
-                              buildInPublicSettings.isActiveSprintsPagePublic
+                              buildInPublicSettings.isFeatureRequestsPagePublic
                             }
                             onChange={togglePublicPage(
-                              'isActiveSprintsPagePublic',
+                              'isFeatureRequestsPagePublic',
                             )}
                             type="checkbox"
                           />

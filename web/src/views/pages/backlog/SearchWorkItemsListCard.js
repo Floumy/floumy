@@ -270,7 +270,7 @@ function SearchWorkItemsListCard({
             {workItems.length === 0 && (
               <tr>
                 <td colSpan={7} className={'text-center'}>
-                  No work items found.
+                  No work items added yet
                 </td>
               </tr>
             )}
@@ -315,7 +315,7 @@ function SearchWorkItemsListCard({
                       </span>
                     </>
                   )}
-                  {!workItem.assignedTo && '-'}
+                  {!workItem.assignedTo}
                 </td>
                 <td>
                   <Badge color="" className="badge-dot mr-4">

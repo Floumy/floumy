@@ -20,6 +20,7 @@ import {
 } from '../../../services/sprints/sprints.service';
 import {
   formatDate,
+  formatTimeline,
   getSprintEndDate,
   getSprintStartDate,
   sortByPriority,
@@ -102,17 +103,6 @@ function Sprints() {
     } catch (e) {
       console.error(e);
     }
-  }
-
-  async function handleAddWorkItemWithSprint(workItem, sprintId) {
-    workItem.sprint = sprintId;
-    const savedWorkItem = await addWorkItem(orgId, projectId, workItem);
-    const workItems = sprints.find(
-      (sprint) => sprint.id === sprintId,
-    ).workItems;
-    workItems.push(savedWorkItem);
-    sortByPriority(workItems);
-    setSprints([...sprints]);
   }
 
   async function handleAddWorkItemToBacklog(workItem) {
@@ -378,43 +368,67 @@ function Sprints() {
                 </Row>
               </CardHeader>
               <div className="p-4">
-                {sprints.length === 0 && !isLoadingSprints && (
-                  <div
-                    style={{ maxWidth: '600px' }}
-                    className="mx-auto font-italic"
-                  >
-                    <h3>Sprints</h3>
-                    <p>
-                      Sprints are short, time-boxed periods during which your
-                      team works to complete specific work items. They help you
-                      deliver incremental progress and adapt quickly to changes.
-                      Plan your sprints to maintain a steady development pace
-                      and ensure continuous improvement.
-                      <br />
-                      <Link
-                        to={`/admin/orgs/${orgId}/projects/${projectId}/sprints/new`}
-                        className="text-blue font-weight-bold"
-                      >
-                        Plan a Sprint
-                      </Link>
-                    </p>
-                    <h3>Work Items</h3>
-                    <p>
-                      Work Items are the tasks and activities that need to be
-                      completed to develop your features. They break down the
-                      work into manageable chunks, making it easier to track
-                      progress and stay organized. Create work items to keep
-                      your team aligned and projective.
-                      <br />
-                      <Link
-                        to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/new`}
-                        className="text-blue font-weight-bold"
-                      >
-                        Create a Work Item
-                      </Link>
-                    </p>
-                  </div>
-                )}
+                {!isLoadingSprints &&
+                  sprints.length === 0 &&
+                  timelineFilterValue !== 'past' && (
+                    <div className="p-5 text-center">
+                      <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                        <h3 className="mb-3">
+                          No sprints for{' '}
+                          {formatTimeline(timelineFilterValue).toLowerCase()}{' '}
+                          yet
+                        </h3>
+                        <p className="text-muted">
+                          Plan a sprint to focus your team and deliver
+                          incremental progress on your work items.
+                        </p>
+                        <div className="my-4">
+                          <Link
+                            to={`/admin/orgs/${orgId}/projects/${projectId}/sprints/new`}
+                            className="btn btn-primary"
+                          >
+                            Plan a Sprint
+                          </Link>
+                        </div>
+                        <Row className="mt-4 text-left">
+                          <Col md="6" className="mb-3">
+                            <Card>
+                              <CardBody>
+                                <h5 className="mb-2">What is a Sprint?</h5>
+                                <p className="mb-0 text-sm text-muted">
+                                  A short, time-boxed period to deliver
+                                  prioritized work and maintain momentum.
+                                </p>
+                              </CardBody>
+                            </Card>
+                          </Col>
+                          <Col md="6" className="mb-3">
+                            <Card>
+                              <CardBody>
+                                <h5 className="mb-2">What is a Work Item?</h5>
+                                <p className="mb-0 text-sm text-muted">
+                                  A task or unit of work that helps break
+                                  features into manageable steps.
+                                </p>
+                              </CardBody>
+                            </Card>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  )}
+                {!isLoadingSprints &&
+                  sprints.length === 0 &&
+                  timelineFilterValue === 'past' && (
+                    <div className="p-5 text-center">
+                      <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                        <h3 className="mb-3">No sprints in the past</h3>
+                        <p className="text-muted mb-0">
+                          There are no sprints recorded for past timelines.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 {sprints.length > 0 &&
                   !isLoadingSprints &&
                   sprints.map((sprint) => (
@@ -595,12 +609,6 @@ function Sprints() {
                             showAssignedTo={true}
                             workItems={sortByPriority(sprint.workItems)}
                             headerClassName={'thead'}
-                            onAddNewWorkItem={async (workItem) => {
-                              await handleAddWorkItemWithSprint(
-                                workItem,
-                                sprint.id,
-                              );
-                            }}
                             onChangeSprint={handleChangeWorkItemsSprint}
                             onChangeStatus={(workItems, status) => {
                               updateWorkItemsStatusInSprint(
@@ -641,7 +649,7 @@ function Sprints() {
             <WorkItemsListCard
               id={'backlog'}
               workItems={backlogWorkItems}
-              title={'Work Items Backlog'}
+              title={'Backlog'}
               isLoading={isLoadingWorkItems}
               onAddWorkItem={handleAddWorkItemToBacklog}
               onChangeSprint={handleChangeWorkItemsSprint}
@@ -655,6 +663,13 @@ function Sprints() {
                 updateWorkItemAssigneeInBacklog(workItems, assignee);
               }}
               onDelete={deleteWorkItemsFromBacklog}
+              extraButtonLabel={'All Work Items'}
+              extraButtonId={'all-work-items-backlog'}
+              onExtraButtonClick={() => {
+                navigate(
+                  `/admin/orgs/${orgId}/projects/${projectId}/work-items`,
+                );
+              }}
             />
           </Col>
         </Row>

@@ -7,7 +7,8 @@ import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { CommentMapper } from '../../comments/mappers';
 
 export class PublicOkrMapper {
-  static toDTO(objective: Objective): ObjectiveDto {
+  static async toDTO(objective: Objective): Promise<ObjectiveDto> {
+    const keyResults = (await objective.keyResults) || [];
     return {
       id: objective.id,
       reference: objective.reference,
@@ -17,6 +18,7 @@ export class PublicOkrMapper {
         objective.endDate,
       ),
       progress: parseFloat(objective.progress.toFixed(2)),
+      keyResults: keyResults.map(PublicOkrMapper.toObjectiveKeyResultDto),
       status: objective.status,
       createdAt: objective.createdAt,
       updatedAt: objective.updatedAt,
@@ -71,6 +73,18 @@ export class PublicOkrMapper {
     }
 
     return breadcrumbs.reverse();
+  }
+
+  static toObjectiveKeyResultDto(keyResult: KeyResult) {
+    return {
+      id: keyResult.id,
+      reference: keyResult.reference,
+      title: keyResult.title,
+      progress: parseFloat(keyResult.progress.toFixed(2)),
+      status: keyResult.status,
+      createdAt: keyResult.createdAt,
+      updatedAt: keyResult.updatedAt,
+    };
   }
 
   static async toKeyResultDto(keyResult: KeyResult) {

@@ -27,7 +27,6 @@ export class OrgsService {
     const org = new Org();
     org.paymentPlan = PaymentPlan.FREE;
     org.users = Promise.resolve([user]);
-    org.hadDemo = false;
     const savedOrg = await this.orgRepository.save(org);
 
     const project = new Project();
@@ -80,14 +79,8 @@ export class OrgsService {
     org.paymentPlan = PaymentPlan.PREMIUM;
     org.isSubscribed = false;
     org.nextPaymentDate = null;
-    org.hadDemo = false;
-    const savedOrg = await this.orgRepository.save(org);
-    const demoProject = new Project();
-    demoProject.name = `${orgName} Demo`;
-    demoProject.org = Promise.resolve(savedOrg);
-    await this.projectRepository.save(demoProject);
-    this.eventEmitter.emit('project.created', demoProject);
-    return savedOrg;
+
+    return await this.orgRepository.save(org);
   }
 
   async getUsers(orgId: string) {

@@ -31,6 +31,9 @@ function WorkItemsListCard({
   showAssignedTo = true,
   showInitiative = true,
   searchPlaceholder = 'Search by title',
+  extraButtonLabel,
+  extraButtonId,
+  onExtraButtonClick,
 }) {
   const [filterByPriority, setFilterByPriority] = useState('all');
   const [filterByType, setFilterByType] = useState('all');
@@ -86,6 +89,9 @@ function WorkItemsListCard({
             setFilterByType={setFilterByType}
             filterByStatus={filterByStatus}
             setFilterByStatus={setFilterByStatus}
+            extraButtonLabel={extraButtonLabel}
+            extraButtonId={extraButtonId}
+            onExtraButtonClick={onExtraButtonClick}
           />
         </CardHeader>
         <CardHeader className="py-0">
