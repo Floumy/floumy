@@ -9,7 +9,6 @@ import {
 } from 'reactstrap';
 import SimpleHeader from '../../../../components/Headers/SimpleHeader';
 import React, { useEffect, useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import NewProjectModal from '../../../../components/Sidebar/NewProjectModal';
 import { Link, useParams } from 'react-router-dom';
 import { listProjects } from '../../../../services/projects/projects.service';
@@ -41,8 +40,6 @@ const Projects = () => {
   }, [orgId]);
 
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
-
-  useHotkeys('n', () => setIsNewProjectModalOpen(true));
 
   return (
     <>
@@ -161,14 +158,8 @@ const Projects = () => {
                       className="btn btn-primary mt-3"
                       onClick={() => setIsNewProjectModalOpen(true)}
                     >
-                      <i className="fa fa-plus mr-2"></i>
                       Create New Project
                     </button>
-                    <div className="mt-3">
-                      <small className="text-muted">
-                        Pro tip: Press 'N' to quickly create a new project
-                      </small>
-                    </div>
                   </div>
                 </Card>
               </Col>

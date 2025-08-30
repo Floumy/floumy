@@ -43,7 +43,6 @@ export class OrgsMapper {
       updatedAt: org.updatedAt,
       projects: projects.map(ProjectMapper.toProject),
       members: MembersMapper.toMembers(await org.users),
-      hadDemo: org.hadDemo,
     };
   }
 }

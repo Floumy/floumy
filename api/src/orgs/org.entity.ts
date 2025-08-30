@@ -115,6 +115,4 @@ export class Org {
     { lazy: true },
   )
   gitlabMergeRequests: Promise<GitlabMergeRequest[]>;
-  @Column()
-  hadDemo: boolean;
 }

@@ -14,9 +14,9 @@ import Select2 from 'react-select2-wrapper';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-// utils not needed for the simplified org list view
 import { getOkrStats, listOKRs } from '../../../services/okrs/org-okrs.service';
 import OKR from './OKR';
+import { formatTimeline } from '../../../services/utils/utils';
 
 function OrgOKRs() {
   let location = useLocation();
@@ -184,42 +184,62 @@ function OrgOKRs() {
                 </Row>
               </CardHeader>
               {isLoading && <LoadingSpinnerBox />}
-              {!isLoading && okrs.length === 0 && (
-                <div className="p-4">
-                  <div>
-                    <div
-                      style={{ maxWidth: '600px' }}
-                      className="mx-auto font-italic"
-                    >
-                      <h3>Objectives</h3>
-                      <p>
-                        Objectives are your high-level goals that you want to
-                        achieve with your project. They provide direction and
-                        purpose, helping your team stay focused on what matters
-                        most. Start by defining your main objectives to give
-                        your project a clear path forward.
-                        <br />
+              {!isLoading &&
+                okrs.length === 0 &&
+                timelineQueryFilter !== 'past' && (
+                  <div className="p-5 text-center">
+                    <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                      <h3 className="mb-3">
+                        No OKRs for {formatTimeline(timelineQueryFilter).toLowerCase()} yet
+                      </h3>
+                      <p className="text-muted">
+                        Add an Objective to align your team and track measurable outcomes with Key Results.
                       </p>
-                      <br />
-                      <h3>Key Results</h3>
-                      <p>
-                        Key Results are specific, measurable outcomes that
-                        indicate progress towards your objectives. They help you
-                        track your success and ensure you're on the right track.
-                        Think of them as targets that show how close you are to
-                        achieving your goals. .
-                        <br />
+                      <div className="my-4">
                         <Link
                           to={`/orgs/${orgId}/okrs/new`}
-                          className="text-blue font-weight-bold"
+                          className="btn btn-primary"
                         >
-                          Create an Objective with Key Results
+                          Create a new OKR
                         </Link>
+                      </div>
+                      <Row className="mt-4 text-left">
+                        <Col md="6" className="mb-3">
+                          <Card>
+                            <CardBody>
+                              <h5 className="mb-2">What is an Objective?</h5>
+                              <p className="mb-0 text-sm text-muted">
+                                A concise, qualitative goal that provides direction for the quarter.
+                              </p>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                        <Col md="6" className="mb-3">
+                          <Card>
+                            <CardBody>
+                              <h5 className="mb-2">What is a Key Result?</h5>
+                              <p className="mb-0 text-sm text-muted">
+                                A measurable outcome that indicates progress toward the Objective.
+                              </p>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                      </Row>
+                    </div>
+                  </div>
+                )}
+              {!isLoading &&
+                okrs.length === 0 &&
+                timelineQueryFilter === 'past' && (
+                  <div className="p-5 text-center">
+                    <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                      <h3 className="mb-3">No OKRs in the past</h3>
+                      <p className="text-muted mb-0">
+                        There are no OKRs recorded for past timelines.
                       </p>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
               {!isLoading && (
                 <div className="py-4 px-4">
                   {!isLoading &&

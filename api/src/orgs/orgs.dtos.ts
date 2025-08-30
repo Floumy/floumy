@@ -18,7 +18,6 @@ export interface OrgDto {
   updatedAt: Date;
   projects: ProjectDto[];
   members: MemberDto[];
-  hadDemo: boolean;
 }
 
 export interface ProjectDto {
