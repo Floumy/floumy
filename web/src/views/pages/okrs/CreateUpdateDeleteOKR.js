@@ -211,7 +211,7 @@ function CreateUpdateDeleteOKR({ onSubmit, okr }) {
       {isLoading && <InfiniteLoadingBar />}
       <Card>
         <CardHeader>
-          <h3 className="mb-0">{okr ? 'Edit Objective' : 'New Objective'}</h3>
+          <h3 className="mb-0">{okr ? 'Edit OKR' : 'New OKR'}</h3>
         </CardHeader>
         <CardBody>
           <Formik

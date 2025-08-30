@@ -1,5 +1,13 @@
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Card, CardHeader, CardTitle, Col, Container, Row } from 'reactstrap';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Container,
+  Row,
+} from 'reactstrap';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Milestone from './Milestone';
@@ -13,7 +21,7 @@ import {
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { sortByPriority } from '../../../services/utils/utils';
+import { formatTimeline, sortByPriority } from '../../../services/utils/utils';
 import InitiativesListCard from '../initiatives/InitiativesListCard';
 import { getUser } from '../../../services/okrs/okrs.service';
 
@@ -244,53 +252,67 @@ function InitiativesRoadmap() {
               </CardHeader>
               <div className="p-4">
                 {isLoadingMilestones && <LoadingSpinnerBox />}
-                {!isLoadingMilestones && milestones.length === 0 && (
-                  <div
-                    style={{ maxWidth: '600px' }}
-                    className="mx-auto font-italic"
-                  >
-                    <h3>Roadmap</h3>
-                    <p>
-                      The Roadmap is your project's strategic plan that outlines
-                      the vision, direction, and progress over time. It helps
-                      you communicate your plans and priorities to stakeholders.
-                      Start by creating a roadmap to visualize your project's
-                      journey and keep everyone informed.
-                    </p>
-                    <h3>Milestones</h3>
-                    <p>
-                      Milestones are significant points or achievements in your
-                      project timeline. They help you track major progress and
-                      ensure you're meeting key deadlines. Set milestones to
-                      celebrate your accomplishments and keep your project on
-                      schedule.
-                      <br />
-                      <Link
-                        to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`}
-                        className="text-blue font-weight-bold"
-                      >
-                        Set a Milestone
-                      </Link>
-                    </p>
-                    <h3>Initiatives</h3>
-                    <p>
-                      Initiatives are high-level efforts that encompass multiple
-                      projects or tasks aimed at achieving a strategic goal.
-                      They provide a broader context for your work, aligning
-                      various activities towards a common objective. Define
-                      initiatives to prioritize efforts, allocate resources
-                      effectively, and ensure your team is working towards the
-                      same strategic vision.
-                      <br />
-                      <Link
-                        to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/initiatives/new`}
-                        className="text-blue font-weight-bold"
-                      >
-                        Add an Initiative
-                      </Link>
-                    </p>
-                  </div>
-                )}
+                {!isLoadingMilestones &&
+                  milestones.length === 0 &&
+                  timelineFilterValue !== 'past' && (
+                    <div className="p-5 text-center">
+                      <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                        <h3 className="mb-3">
+                          No milestones for{' '}
+                          {formatTimeline(timelineFilterValue).toLowerCase()}{' '}
+                          yet
+                        </h3>
+                        <p className="text-muted">
+                          Add a milestone to frame your roadmap and then group
+                          related work with initiatives.
+                        </p>
+                        <div className="my-4">
+                          <Link
+                            to={`/admin/orgs/${orgId}/projects/${projectId}/roadmap/milestones/new`}
+                            className="btn btn-primary"
+                          >
+                            Create a new Milestone
+                          </Link>
+                        </div>
+                        <Row className="mt-4 text-left">
+                          <Col md="6" className="mb-3">
+                            <Card>
+                              <CardBody>
+                                <h5 className="mb-2">What is an Initiative?</h5>
+                                <p className="mb-0 text-sm text-muted">
+                                  A high-level effort that groups related work
+                                  to achieve a strategic outcome.
+                                </p>
+                              </CardBody>
+                            </Card>
+                          </Col>
+                          <Col md="6" className="mb-3">
+                            <Card>
+                              <CardBody>
+                                <h5 className="mb-2">What is a Milestone?</h5>
+                                <p className="mb-0 text-sm text-muted">
+                                  A significant checkpoint in your roadmap that
+                                  helps you track progress and deadlines.
+                                </p>
+                              </CardBody>
+                            </Card>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  )}
+                {!isLoadingMilestones &&
+                  milestones.length === 0 &&
+                  timelineFilterValue === 'past' && (
+                    <div className="p-5 text-center">
+                      <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                        <h3 className="mb-3">No milestones in the past</h3>
+                        <p className="text-muted mb-0">
+                          There are no milestones recorded for past timelines.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 {!isLoadingMilestones &&
                   milestones.length > 0 &&
                   milestones.map((milestone) => (
