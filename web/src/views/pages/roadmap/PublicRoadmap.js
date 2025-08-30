@@ -91,10 +91,13 @@ function PublicRoadmap() {
                     <div className="p-5 text-center">
                       <div className="mx-auto" style={{ maxWidth: '680px' }}>
                         <h3 className="mb-3">
-                          No milestones for {formatTimeline(timelineFilterValue).toLowerCase()} yet
+                          No milestones for{' '}
+                          {formatTimeline(timelineFilterValue).toLowerCase()}{' '}
+                          yet
                         </h3>
                         <p className="text-muted">
-                          Milestones and their initiatives will appear here once they are published for this timeline.
+                          Milestones and their initiatives will appear here once
+                          they are published for this timeline.
                         </p>
                         <Row className="mt-4 text-left">
                           <Col md="6" className="mb-3">
@@ -102,7 +105,8 @@ function PublicRoadmap() {
                               <CardBody>
                                 <h5 className="mb-2">What is an Initiative?</h5>
                                 <p className="mb-0 text-sm text-muted">
-                                  A high-level effort that groups related work to achieve a strategic outcome.
+                                  A high-level effort that groups related work
+                                  to achieve a strategic outcome.
                                 </p>
                               </CardBody>
                             </Card>
@@ -112,7 +116,8 @@ function PublicRoadmap() {
                               <CardBody>
                                 <h5 className="mb-2">What is a Milestone?</h5>
                                 <p className="mb-0 text-sm text-muted">
-                                  A significant checkpoint in your roadmap that helps you track progress and deadlines.
+                                  A significant checkpoint in your roadmap that
+                                  helps you track progress and deadlines.
                                 </p>
                               </CardBody>
                             </Card>
