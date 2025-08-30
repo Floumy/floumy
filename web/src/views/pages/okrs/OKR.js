@@ -3,7 +3,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import KeyResultsList from './KeyResultsList';
 
-export default function OKR({ okr, orgId, projectId = null }) {
+export default function OKR({
+  okr,
+  orgId,
+  isPublic = false,
+  projectId = null,
+}) {
   const [keyResults, setKeyResults] = useState([]);
   const [showKeyResults, setShowKeyResults] = useState(true);
   useEffect(() => {
@@ -19,13 +24,17 @@ export default function OKR({ okr, orgId, projectId = null }) {
 
   const getObjectiveUrl = useCallback(
     (objectiveId) => {
+      if (isPublic) {
+        return `/public/orgs/${orgId}/projects/${projectId}/okrs/detail/${objectiveId}`;
+      }
+
       if (projectId) {
         return `/admin/orgs/${orgId}/projects/${projectId}/okrs/detail/${objectiveId}`;
       }
 
       return `/orgs/${orgId}/okrs/detail/${objectiveId}`;
     },
-    [projectId],
+    [projectId, isPublic, orgId],
   );
 
   function getOkrHeader() {
@@ -68,6 +77,7 @@ export default function OKR({ okr, orgId, projectId = null }) {
               <KeyResultsList
                 orgId={orgId}
                 projectId={projectId}
+                isPublic={isPublic}
                 keyResults={keyResults}
               />
             </div>
