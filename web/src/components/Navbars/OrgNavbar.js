@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import { Collapse, Container, Nav, Navbar, NavItem } from 'reactstrap';
 import CurrentUserNav from './CurrentUserNav';
 
-function AdminNavbar({ sidenavOpen, toggleSidenav }) {
+function OrgNavbar({ sidenavOpen, toggleSidenav }) {
   return (
     <>
       <Navbar
@@ -42,4 +42,4 @@ function AdminNavbar({ sidenavOpen, toggleSidenav }) {
   );
 }
 
-export default AdminNavbar;
+export default OrgNavbar;

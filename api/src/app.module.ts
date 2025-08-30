@@ -37,7 +37,6 @@ import { EncryptionModule } from './encryption/encryption.module';
 import { GitlabModule } from './gitlab/gitlab.module';
 import githubConfig from './config/github.config';
 import gitlabConfig from './config/gitlab.config';
-import { DemoModule } from './demo/demo.module';
 import { PagesModule } from './pages/pages.module';
 import { FloumyMcpModule } from './mcp/mcp.module';
 
@@ -113,7 +112,6 @@ import { FloumyMcpModule } from './mcp/mcp.module';
     NotificationModule,
     GithubModule,
     GitlabModule,
-    DemoModule,
     PagesModule,
     FloumyMcpModule,
   ],

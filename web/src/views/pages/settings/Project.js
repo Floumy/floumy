@@ -60,7 +60,7 @@ function Project() {
   });
 
   async function handleSubmit(values, setErrors) {
-    const projectName = values.orgName;
+    const projectName = values.projectName;
     const projectDescription = values.projectDescription;
     try {
       setIsSubmitting(true);
@@ -102,7 +102,7 @@ function Project() {
       const firstProject = projectsWithoutCurrentProject[0];
       setCurrentProject(firstProject);
       toast.success('Project deleted');
-      navigate(`/admin/orgs/${orgId}/projects/${firstProject.id}/dashboard`);
+      navigate(`/orgs/${orgId}/projects`);
     } catch (e) {
       toast.error(e.message);
     } finally {
@@ -213,15 +213,13 @@ function Project() {
                         >
                           Save
                         </Button>
-                        {projects && projects.length > 1 && (
-                          <Button
-                            color="danger"
-                            type="button"
-                            onClick={() => setDeleteWarning(true)}
-                          >
-                            Delete Project
-                          </Button>
-                        )}
+                        <Button
+                          color="danger"
+                          type="button"
+                          onClick={() => setDeleteWarning(true)}
+                        >
+                          Delete Project
+                        </Button>
                       </div>
                     </Form>
                   )}
