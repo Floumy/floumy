@@ -612,7 +612,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                   <h4>Branches</h4>
                   <ul className="list-unstyled">
                     {workItem.branches?.length === 0 && (
-                      <li className="mb-2">No branches found</li>
+                      <li className="mb-2">No branches added yet</li>
                     )}
                     {workItem.branches?.map((branch) => (
                       <li key={branch.id} className="mb-2">

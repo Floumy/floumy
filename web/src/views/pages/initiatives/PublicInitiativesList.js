@@ -56,7 +56,7 @@ function PublicInitiativesList({
             {sortedInitiatives.length === 0 && (
               <tr>
                 <td colSpan={7} className={'text-center'}>
-                  No initiatives found.
+                  No initiatives added yet
                 </td>
               </tr>
             )}
