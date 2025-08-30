@@ -11,6 +11,7 @@ import {
   getSprintEndDate,
   getSprintStartDate,
   sortByPriority,
+  formatTimeline,
 } from '../../../services/utils/utils';
 import PublicWorkItemsList from '../backlog/PublicWorkItemsList';
 import PublicShareButtons from '../../../components/PublicShareButtons/PublicShareButtons';
@@ -104,9 +105,48 @@ function PublicSprints() {
                 </Row>
               </CardHeader>
               <div className="pt-3 pb-2">
-                {sprints.length === 0 && !isLoadingSprints && (
-                  <div className="text-center">
-                    <h3>No sprints found for this timeline.</h3>
+                {!isLoadingSprints && sprints.length === 0 && timelineFilterValue !== 'past' && (
+                  <div className="p-5 text-center">
+                    <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                      <h3 className="mb-3">
+                        No sprints for {formatTimeline(timelineFilterValue).toLowerCase()} yet
+                      </h3>
+                      <p className="text-muted">
+                        Planned sprints and their work items will appear here once they are published for this timeline.
+                      </p>
+                      <Row className="mt-4 text-left">
+                        <Col md="6" className="mb-3">
+                          <Card>
+                            <CardBody>
+                              <h5 className="mb-2">What is a Sprint?</h5>
+                              <p className="mb-0 text-sm text-muted">
+                                A fixed timeframe where the team focuses on a set of prioritized work items.
+                              </p>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                        <Col md="6" className="mb-3">
+                          <Card>
+                            <CardBody>
+                              <h5 className="mb-2">What is a Work Item?</h5>
+                              <p className="mb-0 text-sm text-muted">
+                                A task, bug, or story tracked within a sprint to deliver value incrementally.
+                              </p>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                      </Row>
+                    </div>
+                  </div>
+                )}
+                {!isLoadingSprints && sprints.length === 0 && timelineFilterValue === 'past' && (
+                  <div className="p-5 text-center">
+                    <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                      <h3 className="mb-3">No sprints in the past</h3>
+                      <p className="text-muted mb-0">
+                        There are no sprints recorded for past timelines.
+                      </p>
+                    </div>
                   </div>
                 )}
                 {sprints.length > 0 &&

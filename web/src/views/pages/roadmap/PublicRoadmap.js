@@ -1,9 +1,10 @@
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Card, CardHeader, Col, Container, Row } from 'reactstrap';
+import { Card, CardHeader, CardBody, Col, Container, Row } from 'reactstrap';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './Roadmap.scss';
 import Select2 from 'react-select2-wrapper';
+import { formatTimeline } from '../../../services/utils/utils';
 import { listPublicMilestonesWithInitiatives } from '../../../services/roadmap/roadmap.service';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
@@ -84,11 +85,54 @@ function PublicRoadmap() {
               </CardHeader>
               <div className="pt-3">
                 {isLoadingMilestones && <LoadingSpinnerBox />}
-                {!isLoadingMilestones && milestones.length === 0 && (
-                  <h3 className="text-center pb-3">
-                    No milestones found for this timeline.
-                  </h3>
-                )}
+                {!isLoadingMilestones &&
+                  milestones.length === 0 &&
+                  timelineFilterValue !== 'past' && (
+                    <div className="p-5 text-center">
+                      <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                        <h3 className="mb-3">
+                          No milestones for {formatTimeline(timelineFilterValue).toLowerCase()} yet
+                        </h3>
+                        <p className="text-muted">
+                          Milestones and their initiatives will appear here once they are published for this timeline.
+                        </p>
+                        <Row className="mt-4 text-left">
+                          <Col md="6" className="mb-3">
+                            <Card>
+                              <CardBody>
+                                <h5 className="mb-2">What is an Initiative?</h5>
+                                <p className="mb-0 text-sm text-muted">
+                                  A high-level effort that groups related work to achieve a strategic outcome.
+                                </p>
+                              </CardBody>
+                            </Card>
+                          </Col>
+                          <Col md="6" className="mb-3">
+                            <Card>
+                              <CardBody>
+                                <h5 className="mb-2">What is a Milestone?</h5>
+                                <p className="mb-0 text-sm text-muted">
+                                  A significant checkpoint in your roadmap that helps you track progress and deadlines.
+                                </p>
+                              </CardBody>
+                            </Card>
+                          </Col>
+                        </Row>
+                      </div>
+                    </div>
+                  )}
+                {!isLoadingMilestones &&
+                  milestones.length === 0 &&
+                  timelineFilterValue === 'past' && (
+                    <div className="p-5 text-center">
+                      <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                        <h3 className="mb-3">No milestones in the past</h3>
+                        <p className="text-muted mb-0">
+                          There are no milestones recorded for past timelines.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 {!isLoadingMilestones &&
                   milestones.length > 0 &&
                   milestones.map((milestone) => (

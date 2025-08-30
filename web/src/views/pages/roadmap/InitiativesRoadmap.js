@@ -226,7 +226,7 @@ function InitiativesRoadmap() {
               <CardHeader className="rounded-lg">
                 <Row>
                   <Col xs={12} sm={8}>
-                    <CardTitle tag="h2">Initiatives Roadmap</CardTitle>
+                    <CardTitle tag="h2">Roadmap</CardTitle>
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2
