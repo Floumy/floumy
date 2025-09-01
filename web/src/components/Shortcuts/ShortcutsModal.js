@@ -31,7 +31,6 @@ export default function ShortcutsModal({ isOpen, onClose, items = [] }) {
       <ModalBody>
         <p className="text-muted mb-3">
           You can use these shortcuts to quickly navigate within the project.
-          Press '?' anytime to open this list.
         </p>
         <ShortcutsList items={items} />
       </ModalBody>

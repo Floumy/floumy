@@ -29,17 +29,6 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
   const [shortcutsOpen, setShortcutsOpen] = React.useState(false);
   const toggleShortcutsModal = () => setShortcutsOpen((s) => !s);
-  React.useEffect(() => {
-    const onKeyDown = (e) => {
-      // Open shortcuts modal on '?'
-      if ((e.shiftKey && e.key === '/') || e.key === '?') {
-        e.preventDefault();
-        setShortcutsOpen(true);
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
   const {
     currentProject,
     projects,
@@ -125,7 +114,6 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
       keys: ['m'],
       id: 'create-initiative',
     },
-    { description: 'Open Shortcuts', keys: ['?'], id: 'help' },
   ];
 
   const scrollBarInner = (
@@ -704,7 +692,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                 <Nav navbar className="mb-3">
                   <NavItem>
                     <Row style={{ maxWidth: '100%', height: '47px' }}>
-                      <Col xs={10}>
+                      <Col xs={12}>
                         <NavLink
                           href="#"
                           onClick={(e) => {
@@ -715,21 +703,6 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           <i className="fa fa-keyboard" />
                           <span className="nav-link-text">Shortcuts</span>
                         </NavLink>
-                      </Col>
-                      <Col xs={2} className="text-right pr-2 pt-2">
-                        <span
-                          id="shortcut-help"
-                          role="button"
-                          onClick={toggleShortcutsModal}
-                        >
-                          <KeyShortcut keys={['?']} />
-                        </span>
-                        <UncontrolledTooltip
-                          target="shortcut-help"
-                          placement="top"
-                        >
-                          Press ? to open Shortcuts. Click to see all shortcuts.
-                        </UncontrolledTooltip>
                       </Col>
                     </Row>
                   </NavItem>
