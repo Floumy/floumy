@@ -13,6 +13,7 @@ The all-in-one tool to plan, track, and deliver software projects.
 
 ![test](https://github.com/Floumy/floumy/actions/workflows/test.yml/badge.svg)
 ![deploy](https://github.com/Floumy/floumy/actions/workflows/deploy.yml/badge.svg)
+![License](https://img.shields.io/badge/license-AGPL%20v3-blue.svg)
 
 </div> 
 
@@ -35,3 +36,6 @@ organizations reduce overhead, move faster, and earn trust through transparency.
 
 - [Get started on cloud](https://app.floumy.com)
 - [Get Started with local development](docs/get-started-local-dev.md)
+
+## License
+This project is licensed under the AGPL v3 License - see the [LICENSE](LICENSE.md) file for details.
