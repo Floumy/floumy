@@ -1,7 +1,21 @@
-## Stack
+# Get Started with local development
+
 The stack is composed of the following services:
-- [Floumy Api](./api)
-- [Floumy Web](./web)
+- [Floumy Api](../api)
+- [Floumy Web](../web)
+
+## Prerequisites
+To run the stack, you need to have the following installed on your machine:
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+## Configuration
+Before starting the stack you need to copy the example environment files and modify them if needed:
+```bash
+cp api/.env.example api/.env
+cp web/.env.example web/.env
+```
+You can modify the environment variables in the `.env` files to suit your needs. The default configuration should work for most cases.
 
 ## Start the stack
 To start the stack, you need to run the following commands:
@@ -16,6 +30,8 @@ To start the stack, you need to run the following commands:
 * `./dev/stop.sh`: Stop the stack
 * `./dev/enter-api.sh`: Enter the api container
 * `./dev/enter-web.sh`: Enter the web container
+* `./dev/api-tests.sh`: Run the api tests
+* `./dev/start-on-host.sh`: Start the stack on the host machine (requires Node.js)
 
 ## Development Setup
 

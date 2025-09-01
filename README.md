@@ -34,4 +34,4 @@ organizations reduce overhead, move faster, and earn trust through transparency.
 ## Documentation
 
 - [Get started on cloud](https://app.floumy.com)
-- [Get started self-hosted](./docs/get-started.md)
+- [Get Started with local development](docs/get-started-local-dev.md)
