@@ -42,7 +42,7 @@ services:
       - "9001:9001"
     environment:
       MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY:
+      MINIO_SECRET_KEY: secret
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: miniopass
     command: server /data --console-address ":9001"
