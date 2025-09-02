@@ -218,6 +218,12 @@ const Tiptap = ({
     },
   });
 
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content, false);
+    }
+  }, [editor, content]);
+
   const focusEditor = () => {
     if (editor) {
       editor.chain().focus().run();
