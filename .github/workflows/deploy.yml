@@ -1,45 +1,27 @@
 name: Deploy
 
 on:
-  push:
-    tags:
-      - '*'
+  workflow_run:
+    workflows: [ 'Publish to Docker Hub' ]
+    types:
+      - completed
 
 jobs:
-  build-and-deploy-api:
+  deploy-api:
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'refs/tags/')
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Log in to DigitalOcean Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.digitalocean.com
-          username: _token
-          password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        with:
-          file: ./api/Dockerfile
-          context: ./api
-          push: true
-          tags: registry.digitalocean.com/floumy-registry/api:latest
-          build-args: |
-            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Deploy to Droplet
+      - name: Deploy API to Droplet
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
-            doctl registry login
-            docker pull registry.digitalocean.com/floumy-registry/api:latest
+            VERSION=${{ github.ref_name }}
+            docker pull docker.io/floumy/api:${VERSION}
             docker stop api || true
             docker rm api || true
             docker run --network host \
@@ -78,41 +60,27 @@ jobs:
             -e GITHUB_WEBHOOK_SECRET=${{ secrets.GHUB_WEBHOOK_SECRET }} \
             -e GITLAB_WEBHOOK_URL_BASE=${{ secrets.GITLAB_WEBHOOK_URL_BASE }} \
             -e GITLAB_WEBHOOK_SECRET=${{ secrets.GITLAB_WEBHOOK_SECRET }} \
-            -p 4000:8080 registry.digitalocean.com/floumy-registry/api:latest
+            -p 4000:8080 docker.io/floumy/api:${VERSION}
             docker image prune -f
 
-  build-and-deploy-web:
+  deploy-web:
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Log in to DigitalOcean Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.digitalocean.com
-          username: _token
-          password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          file: ./web/Dockerfile
-          context: ./web
-          push: true
-          build-args: |
-            REACT_APP_API_URL=https://api.floumy.com
-          tags: registry.digitalocean.com/floumy-registry/web-app:latest
-
-      - name: Deploy to Droplet
+      - name: Deploy Web to Droplet
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DROPLET_IP_WEB }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
-            doctl registry login
-            docker pull registry.digitalocean.com/floumy-registry/web-app:latest
+            VERSION=${{ github.ref_name }}
+            docker pull docker.io/floumy/web:${VERSION}
             docker stop web-app || true
             docker rm web-app || true
-            docker run -d --restart=always --name web-app -p 3000:80 registry.digitalocean.com/floumy-registry/web-app:latest
+            docker run -d --restart=always --name web-app \
+            -p 3000:80 docker.io/floumy/web:${VERSION} \
+            -e REACT_APP_API_URL=https://api.floumy.com
             docker image prune -f
