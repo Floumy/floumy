@@ -1,16 +1,10 @@
 name: Deploy
 
 on:
-  workflow_run:
-    workflows: [ 'Publish to Docker Hub' ]
-    types:
-      - completed
+  workflow_dispatch:
 
 jobs:
   deploy-api:
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - name: Deploy API to Droplet
@@ -69,9 +63,6 @@ jobs:
             docker image prune -f
 
   deploy-web:
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - name: Deploy Web to Droplet

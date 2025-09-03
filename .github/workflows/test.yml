@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - '*'
-    tags:
-      - '*'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     services:
