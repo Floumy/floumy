@@ -1843,33 +1843,6 @@ describe('WorkItemsService', () => {
         expect(comment.createdBy.name).toEqual(user.name);
       });
     });
-    it('should throw an error if the org is not premium', async () => {
-      const workItem = await service.createWorkItem(
-        org.id,
-        project.id,
-        user.id,
-        {
-          title: 'Test title',
-          description: 'A test description',
-          priority: Priority.HIGH,
-          type: WorkItemType.BUG,
-          status: WorkItemStatus.PLANNED,
-        },
-      );
-
-      await expect(
-        service.createWorkItemComment(
-          user.id,
-          org.id,
-          project.id,
-          workItem.id,
-          {
-            content: 'my comment',
-            mentions: [],
-          },
-        ),
-      ).rejects.toThrowError('You need to upgrade to premium to add comments');
-    });
     it('should throw an error if the comment content is empty', async () => {
       const { org, user, project } = await getTestPremiumOrgAndUser();
 

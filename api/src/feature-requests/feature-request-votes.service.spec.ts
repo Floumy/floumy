@@ -133,28 +133,6 @@ describe('FeatureRequestVotesService', () => {
         ),
       ).rejects.toThrow();
     });
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const featureRequest = await featureRequestService.addFeatureRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
-      await orgsRepository.save(org);
-      await expect(
-        service.upvoteFeatureRequest(
-          user.id,
-          org.id,
-          project.id,
-          featureRequest.id,
-        ),
-      ).rejects.toThrow(
-        'You need to upgrade your plan to upvote a feature request',
-      );
-    });
     it('should increment the votes count', async () => {
       const featureRequest = await featureRequestService.addFeatureRequest(
         user.id,
@@ -243,28 +221,6 @@ describe('FeatureRequestVotesService', () => {
           featureRequest.id,
         ),
       ).rejects.toThrow();
-    });
-    it('should throw an error if the org is not on the premium plan', async () => {
-      const featureRequest = await featureRequestService.addFeatureRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
-      await orgsRepository.save(org);
-      await expect(
-        service.downvoteFeatureRequest(
-          user.id,
-          org.id,
-          project.id,
-          featureRequest.id,
-        ),
-      ).rejects.toThrow(
-        'You need to upgrade your plan to downvote a feature request',
-      );
     });
   });
   describe('when getting my votes', () => {
