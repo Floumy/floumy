@@ -44,7 +44,6 @@ export class FeatureMapper {
   static async toDto(initiative: Initiative) {
     const workItems = (await initiative.workItems) || [];
     const comments = await initiative.comments;
-    const org = await initiative.org;
     const featureRequest = await initiative.featureRequest;
     const mappedFeature = {
       id: initiative.id,
