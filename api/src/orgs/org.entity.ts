@@ -17,7 +17,6 @@ import { Sprint } from '../sprints/sprint.entity';
 import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
 import { PaymentPlan } from '../auth/payment.plan';
-import { Invoice } from '../payments/invoice.entity';
 import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
@@ -53,10 +52,6 @@ export class Org {
   isSubscribed: boolean;
   @Column({ default: null, nullable: true })
   nextPaymentDate: Date;
-  @Column({ default: null, nullable: true })
-  stripeCustomerId: string;
-  @Column({ default: null, nullable: true })
-  stripeSubscriptionId: string;
   @OneToMany(() => Objective, (objective) => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })
@@ -73,8 +68,6 @@ export class Org {
   featureRequests: Promise<FeatureRequest[]>;
   @OneToMany(() => Sprint, (sprint) => sprint.org, { lazy: true })
   sprints: Promise<Sprint[]>;
-  @OneToMany(() => Invoice, (invoice) => invoice.org, { lazy: true })
-  invoices: Promise<Invoice[]>;
   @OneToMany(() => File, (file) => file.org, { lazy: true })
   files: Promise<File[]>;
 
