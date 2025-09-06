@@ -51,8 +51,6 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
   const [featureRequests, setFeatureRequests] = useState([]);
   const [featureRequest, setFeatureRequest] = useState('');
 
-  const paymentPlan = localStorage.getItem('paymentPlan');
-
   const fetchAndSetKeyResults = useCallback(async () => {
     const keyResults = await listKeyResults(orgId, projectId);
     keyResults.push({ id: '', title: 'None' });
@@ -377,39 +375,37 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                     ></Select2>
                   </Col>
                 </Row>
-                {paymentPlan === 'premium' && (
-                  <Row className="mb-3">
-                    <Col>
-                      <label
-                        className="form-control-label"
-                        htmlFor="validationCustom01"
-                      >
-                        {featureRequest ? (
-                          <Link
-                            to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequest}`}
-                          >
-                            Feature Request
-                            <i className="fa fa-link ml-2" />
-                          </Link>
-                        ) : (
-                          'Feature Request'
-                        )}
-                      </label>
-                      <Select2
-                        className="react-select-container"
-                        defaultValue={featureRequest}
-                        placeholder="Select a feature request"
-                        data={featureRequests.map((featureRequest) => {
-                          return {
-                            id: featureRequest.id,
-                            text: featureRequest.title,
-                          };
-                        })}
-                        onChange={(e) => setFeatureRequest(e.target.value)}
-                      ></Select2>
-                    </Col>
-                  </Row>
-                )}
+                <Row className="mb-3">
+                  <Col>
+                    <label
+                      className="form-control-label"
+                      htmlFor="validationCustom01"
+                    >
+                      {featureRequest ? (
+                        <Link
+                          to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequest}`}
+                        >
+                          Feature Request
+                          <i className="fa fa-link ml-2" />
+                        </Link>
+                      ) : (
+                        'Feature Request'
+                      )}
+                    </label>
+                    <Select2
+                      className="react-select-container"
+                      defaultValue={featureRequest}
+                      placeholder="Select a feature request"
+                      data={featureRequests.map((featureRequest) => {
+                        return {
+                          id: featureRequest.id,
+                          text: featureRequest.title,
+                        };
+                      })}
+                      onChange={(e) => setFeatureRequest(e.target.value)}
+                    ></Select2>
+                  </Col>
+                </Row>
                 <Row className="mb-5">
                   <Col>
                     <label

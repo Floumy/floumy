@@ -27,9 +27,6 @@ export async function logoutUser() {
   localStorage.removeItem('currentUserOrgId');
   localStorage.removeItem('currentOrg');
   localStorage.removeItem('currentOrgName');
-  localStorage.removeItem('paymentPlan');
-  localStorage.removeItem('isSubscribed');
-  localStorage.removeItem('nextPaymentDate');
   await logout();
 }
 
