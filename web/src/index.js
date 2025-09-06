@@ -15,7 +15,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import 'assets/vendor/nucleo/css/nucleo.css';
 import 'react-toastify/dist/ReactToastify.css';
 // core styles
-import 'assets/scss/argon-dashboard-pro-react.scss?v1.2.1';
+import './assets/scss/main.scss?v1.2.1';
 import '@mdxeditor/editor/style.css';
 
 import AdminLayout from 'layouts/Admin.js';
