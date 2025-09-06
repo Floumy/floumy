@@ -28,7 +28,6 @@ import { InitiativeFile } from '../../roadmap/initiatives/initiative-file.entity
 import { User } from '../../users/user.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { uuid } from 'uuidv4';
 import { Project } from '../../projects/project.entity';
 
@@ -103,7 +102,6 @@ describe('WorkItemsController', () => {
   async function getTestPremiumOrgAndUser() {
     const premiumOrg = new Org();
     premiumOrg.name = 'Premium Org';
-    premiumOrg.paymentPlan = PaymentPlan.PREMIUM;
     const org = await orgsRepository.save(premiumOrg);
 
     const premiumUser = new User(

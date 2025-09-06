@@ -60,7 +60,7 @@ export class PublicWorkItemMapper {
       type: workItem.type,
       status: workItem.status,
       estimation: workItem.estimation,
-      org: { id: org.id, name: org.name, paymentPlan: org.paymentPlan },
+      org: { id: org.id, name: org.name },
       initiative: initiative
         ? { id: initiative.id, title: initiative.title }
         : null,

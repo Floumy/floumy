@@ -16,7 +16,6 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Sprint } from '../sprints/sprint.entity';
 import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
-import { PaymentPlan } from '../auth/payment.plan';
 import { FeedItem } from '../feed/feed-item.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Issue } from '../issues/issue.entity';
@@ -41,17 +40,6 @@ export class Org {
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
-  @Column({
-    type: 'enum',
-    enum: PaymentPlan,
-    default: PaymentPlan.FREE,
-    nullable: false,
-  })
-  paymentPlan: PaymentPlan = PaymentPlan.FREE;
-  @Column({ default: false })
-  isSubscribed: boolean;
-  @Column({ default: null, nullable: true })
-  nextPaymentDate: Date;
   @OneToMany(() => Objective, (objective) => objective.org, { lazy: true })
   objectives: Promise<Objective[]>;
   @OneToMany(() => KeyResult, (keyResult) => keyResult.org, { lazy: true })

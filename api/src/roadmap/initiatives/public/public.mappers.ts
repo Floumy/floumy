@@ -3,7 +3,6 @@ import { KeyResult } from '../../../okrs/key-result.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
 import { Initiative } from '../initiative.entity';
 import { CommentMapper } from '../../../comments/mappers';
-import { PaymentPlan } from '../../../auth/payment.plan';
 
 class BreadcrumbMapper {
   static async toDto(
@@ -67,14 +66,13 @@ export class FeatureMapper {
       featureRequest: undefined,
       breadcrumbs: await BreadcrumbMapper.toDto(initiative),
     };
-    if (org.paymentPlan === PaymentPlan.PREMIUM) {
-      mappedFeature.featureRequest = featureRequest
-        ? {
-            id: featureRequest.id,
-            title: featureRequest.title,
-          }
-        : null;
-    }
+    mappedFeature.featureRequest = featureRequest
+      ? {
+          id: featureRequest.id,
+          title: featureRequest.title,
+        }
+      : null;
+
     return mappedFeature;
   }
 

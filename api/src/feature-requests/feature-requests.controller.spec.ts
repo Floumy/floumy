@@ -8,7 +8,6 @@ import { UsersModule } from '../users/users.module';
 import { OrgsService } from '../orgs/orgs.service';
 import { UsersService } from '../users/users.service';
 import { FeatureRequestsService } from './feature-requests.service';
-import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { FeatureRequestVoteService } from './feature-request-votes.service';
@@ -53,7 +52,7 @@ describe('FeatureRequestsController', () => {
     org = await orgsService.createForUser(user);
     project = (await org.projects)[0];
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
-    org.paymentPlan = PaymentPlan.PREMIUM;
+
     await orgsRepository.save(org);
   });
 

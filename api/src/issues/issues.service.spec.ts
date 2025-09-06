@@ -7,7 +7,6 @@ import { User } from '../users/user.entity';
 import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Issue } from './issue.entity';
-import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
 import { IssueStatus } from './issue-status.enum';
 import { Priority } from '../common/priority.enum';
@@ -51,7 +50,7 @@ describe('IssuesService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    org.paymentPlan = PaymentPlan.PREMIUM;
+
     await orgsRepository.save(org);
     project = new Project();
     project.name = 'Test Project';
@@ -85,7 +84,6 @@ describe('IssuesService', () => {
     it('should create a new issue only if the org is premium', () => {
       const freeOrg = orgsRepository.create({
         name: 'Free Org',
-        paymentPlan: PaymentPlan.FREE,
       });
 
       expect(
@@ -137,7 +135,6 @@ describe('IssuesService', () => {
     it('should throw an error if the org is not on the premium plan', async () => {
       const freeOrg = orgsRepository.create({
         name: 'Free Org',
-        paymentPlan: PaymentPlan.FREE,
       });
 
       await expect(
@@ -189,7 +186,7 @@ describe('IssuesService', () => {
         title: 'Test Issue',
         description: 'Test Description',
       });
-      org.paymentPlan = PaymentPlan.FREE;
+
       await orgsRepository.save(org);
       await expect(
         service.getIssueById(org.id, project.id, issue.id),
@@ -282,7 +279,7 @@ describe('IssuesService', () => {
         title: 'Test Issue',
         description: 'Test Description',
       });
-      org.paymentPlan = PaymentPlan.FREE;
+
       await orgsRepository.save(org);
       await expect(
         service.updateIssue(user.id, org.id, project.id, issue.id, {
@@ -334,7 +331,7 @@ describe('IssuesService', () => {
         title: 'Test Issue',
         description: 'Test Description',
       });
-      org.paymentPlan = PaymentPlan.FREE;
+
       await orgsRepository.save(org);
       await expect(
         service.deleteIssue(user.id, org.id, project.id, issue.id),

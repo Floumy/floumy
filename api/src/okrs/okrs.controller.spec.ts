@@ -11,7 +11,6 @@ import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Timeline } from '../common/timeline.enum';
 import { Repository } from 'typeorm';
-import { PaymentPlan } from '../auth/payment.plan';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { Project } from '../projects/project.entity';
@@ -44,7 +43,7 @@ describe('OkrsController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    org.paymentPlan = PaymentPlan.PREMIUM;
+
     project = (await org.projects)[0];
     await orgsRepository.save(org);
   });

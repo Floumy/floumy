@@ -26,7 +26,6 @@ import { InitiativeFile } from '../../roadmap/initiatives/initiative-file.entity
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { WorkItemComment } from './work-item-comment.entity';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { IssuesService } from '../../issues/issues.service';
 import { Project } from '../../projects/project.entity';
 
@@ -115,7 +114,6 @@ describe('WorkItemsService', () => {
   async function getTestPremiumOrgAndUser() {
     const premiumOrg = new Org();
     premiumOrg.name = 'Premium Org';
-    premiumOrg.paymentPlan = PaymentPlan.PREMIUM;
     const org = await orgsRepository.save(premiumOrg);
 
     const premiumUser = new User(
@@ -261,7 +259,6 @@ describe('WorkItemsService', () => {
       expect(workItem.files[1].id).toEqual(savedFile2.id);
     });
     it('should create a work item with an issue', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const issue = await issuesService.addIssue(user.id, org.id, project.id, {
         title: 'My Issue',
@@ -825,7 +822,6 @@ describe('WorkItemsService', () => {
       ).rejects.toThrow(EntityNotFoundError);
     });
     it('should update the issue', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const issue = await issuesService.addIssue(user.id, org.id, project.id, {
         title: 'My Issue',
@@ -863,7 +859,6 @@ describe('WorkItemsService', () => {
       expect(updatedWorkItem.issue.id).toEqual(issue.id);
     });
     it('should update the issue to null', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const issue = await issuesService.addIssue(user.id, org.id, project.id, {
         title: 'My Issue',

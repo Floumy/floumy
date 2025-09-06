@@ -9,7 +9,6 @@ import { NotFoundException } from '@nestjs/common';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Timeline } from '../common/timeline.enum';
 import { Repository } from 'typeorm';
-import { PaymentPlan } from '../auth/payment.plan';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { OrgOkrsController } from './org-okrs.controller';
@@ -42,7 +41,7 @@ describe('OrgOkrsController', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    org.paymentPlan = PaymentPlan.PREMIUM;
+
     await orgsRepository.save(org);
   });
 

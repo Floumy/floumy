@@ -6,7 +6,6 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { PaymentPlan } from '../auth/payment.plan';
 import { FeatureRequest } from './feature-request.entity';
 import { FeatureRequestStatus } from './feature-request-status.enum';
 import { uuid } from 'uuidv4';
@@ -63,7 +62,7 @@ describe('FeatureRequestsService', () => {
       'testtesttest',
     );
     org = await orgsService.createForUser(user);
-    org.paymentPlan = PaymentPlan.PREMIUM;
+
     await orgsRepository.save(org);
     project = new Project();
     project.name = 'Test Project';
@@ -105,7 +104,6 @@ describe('FeatureRequestsService', () => {
     it('should create a new feature request only if the org is premium', () => {
       const freeOrg = orgsRepository.create({
         name: 'Free Org',
-        paymentPlan: PaymentPlan.FREE,
       });
 
       expect(
@@ -165,7 +163,6 @@ describe('FeatureRequestsService', () => {
     it('should throw an error if the org is not on the premium plan', async () => {
       const freeOrg = orgsRepository.create({
         name: 'Free Org',
-        paymentPlan: PaymentPlan.FREE,
       });
 
       await expect(
@@ -237,7 +234,7 @@ describe('FeatureRequestsService', () => {
           description: 'Test Description',
         },
       );
-      org.paymentPlan = PaymentPlan.FREE;
+
       await orgsRepository.save(org);
       await expect(
         service.getFeatureRequestById(org.id, project.id, featureRequest.id),
@@ -364,7 +361,7 @@ describe('FeatureRequestsService', () => {
           description: 'Test Description',
         },
       );
-      org.paymentPlan = PaymentPlan.FREE;
+
       await orgsRepository.save(org);
       await expect(
         service.updateFeatureRequest(
@@ -450,7 +447,7 @@ describe('FeatureRequestsService', () => {
         description: 'Test Description',
       },
     );
-    org.paymentPlan = PaymentPlan.FREE;
+
     await orgsRepository.save(org);
     await expect(
       service.deleteFeatureRequest(
