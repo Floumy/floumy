@@ -6,7 +6,7 @@
   "private": true,
   "license": "Proprietary",
   "scripts": {
-    "build": "nest build && npm run sentry:sourcemaps",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "NODE_ENV=development nest start",
     "start:dev": "NODE_ENV=development nest start --watch",
@@ -19,8 +19,7 @@
     "test:cov": "jest --coverage --runInBand",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
-    "typeorm": "typeorm-ts-node-commonjs",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org floumy --project floumy-api ./dist && sentry-cli sourcemaps upload --org floumy --project floumy-api ./dist"
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "dependencies": {
     "@gitbeaker/node": "^35.8.1",
@@ -39,9 +38,6 @@
     "@nestjs/schedule": "^4.0.1",
     "@nestjs/typeorm": "^10.0.0",
     "@rekog/mcp-nest": "^1.6.2",
-    "@sentry/cli": "^2.36.6",
-    "@sentry/nestjs": "^8.33.1",
-    "@sentry/profiling-node": "^8.33.1",
     "aws-sdk": "^2.1541.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",

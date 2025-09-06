@@ -24,8 +24,6 @@ import { BipModule } from './bip/bip.module';
 import { FeedModule } from './feed/feed.module';
 import { FeatureRequestsModule } from './feature-requests/feature-requests.module';
 import { IssuesModule } from './issues/issues.module';
-import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
-import { APP_FILTER } from '@nestjs/core';
 import { ProjectsModule } from './projects/projects.module';
 import { AiModule } from './ai/ai.module';
 import { NotificationModule } from './notifications/notification.module';
@@ -39,7 +37,6 @@ import { FloumyMcpModule } from './mcp/mcp.module';
 
 @Module({
   imports: [
-    SentryModule.forRoot(),
     CacheModule.register(),
     ConfigModule.forRoot({
       load: [
@@ -108,12 +105,6 @@ import { FloumyMcpModule } from './mcp/mcp.module';
     GitlabModule,
     PagesModule,
     FloumyMcpModule,
-  ],
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: SentryGlobalFilter,
-    },
   ],
 })
 export class AppModule {}
