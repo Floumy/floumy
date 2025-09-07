@@ -138,6 +138,8 @@ export class ChatService {
                   If clarification is needed, ask a single, specific question.
                   Ignore unrelated topics.
                   
+                  Important policy: You must obtain explicit human approval before creating or updating anything. First, propose the item details (title, type, description, etc.) and wait for the user's clear approval in natural language (e.g., “yes”, “looks good”, “go ahead”). Only after explicit approval should you call the confirm tool to create the item.
+                  
                   Example behavior:
 
                   If the user says:
