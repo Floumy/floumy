@@ -7,7 +7,6 @@ import { setupTestingModule } from '../../test/test.utils';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { TokensService } from '../auth/tokens.service';
 import { BipSettings } from './bip-settings.entity';
-import { PaymentPlan } from '../auth/payment.plan';
 import { Repository } from 'typeorm';
 import { Project } from '../projects/project.entity';
 
@@ -61,7 +60,6 @@ describe('BipService', () => {
       expect(updatedSettings).toEqual(settings);
     });
     it('should update the settings if the org is premium', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const settings = {
         isBuildInPublicEnabled: true,
@@ -93,7 +91,6 @@ describe('BipService', () => {
       });
     });
     it('should create the default building in public settings on org created event when the org is premium', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       await service.createSettings(project);
       const settings = await service.getSettings(org.id, project.id);

@@ -8,7 +8,6 @@ import { UsersModule } from '../users/users.module';
 import { OrgsService } from '../orgs/orgs.service';
 import { UsersService } from '../users/users.service';
 import { IssuesService } from './issues.service';
-import { PaymentPlan } from '../auth/payment.plan';
 import { Issue } from './issue.entity';
 import { IssueComment } from './issue-comment.entity';
 import { IssueStatus } from './issue-status.enum';
@@ -44,7 +43,7 @@ describe('IssuesController', () => {
     projectsRepository = module.get<Repository<Project>>(
       getRepositoryToken(Project),
     );
-    org.paymentPlan = PaymentPlan.PREMIUM;
+
     await orgsRepository.save(org);
     project = new Project();
     project.name = 'Test Project';

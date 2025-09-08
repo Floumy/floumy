@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
 import { IssueListItemMapper, IssueMapper } from './issue.mapper';
 import { CreateUpdateCommentDto } from '../comments/dtos';
-import { PaymentPlan } from '../auth/payment.plan';
 import { IssueComment } from './issue-comment.entity';
 import { CommentMapper } from '../comments/mappers';
 import { Project } from '../projects/project.entity';
@@ -49,9 +48,6 @@ export class IssuesService {
       id: projectId,
       org: { id: orgId },
     });
-    if (org.paymentPlan !== 'premium') {
-      throw new Error('You need to upgrade your plan to add issues');
-    }
     const user = await this.usersRepository.findOneByOrFail({ id: userId });
     const issue = new Issue();
     issue.title = issueDto.title;
@@ -71,12 +67,6 @@ export class IssuesService {
     page: number = 1,
     limit: number = 0,
   ) {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade your plan to view issues');
-    }
-
     let query = `
         SELECT *
         FROM issue
@@ -102,10 +92,6 @@ export class IssuesService {
   }
 
   async getIssueById(orgId: string, projectId: string, issueId: string) {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    if (org.paymentPlan !== 'premium') {
-      throw new Error('You need to upgrade your plan to view issues');
-    }
     const issue = await this.issuesRepository.findOneByOrFail({
       id: issueId,
       org: { id: orgId },
@@ -132,10 +118,6 @@ export class IssuesService {
     const userOrg = await user.org;
     if (createdBy.id !== userId || orgId !== userOrg.id) {
       throw new Error('You are not allowed to update this issue');
-    }
-    const org = await issue.org;
-    if (org.paymentPlan !== 'premium') {
-      throw new Error('You need to upgrade your plan to update an issue');
     }
     issue.title = issueDto.title;
     issue.description = issueDto.description;
@@ -168,10 +150,6 @@ export class IssuesService {
     if (createdBy.id !== userId || orgId !== userOrg.id) {
       throw new Error('You are not allowed to delete this issue');
     }
-    const org = await issue.org;
-    if (org.paymentPlan !== 'premium') {
-      throw new Error('You need to upgrade your plan to delete an issue');
-    }
 
     // Remove the issue from the work items
     const workItems = await issue.workItems;
@@ -194,9 +172,6 @@ export class IssuesService {
       id: issueId,
     });
     const org = await issue.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to add comments');
-    }
     if (!createCommentDto.content || createCommentDto.content.trim() === '') {
       throw new Error('Comment content is required');
     }
@@ -247,9 +222,6 @@ export class IssuesService {
       id: issueId,
     });
     const org = await issue.org;
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade to premium to update comments');
-    }
     if (!updateCommentDto.content || updateCommentDto.content.trim() === '') {
       throw new Error('Comment content is required');
     }
@@ -289,11 +261,6 @@ export class IssuesService {
     page: number = 1,
     limit: number = 0,
   ) {
-    const org = await this.orgsRepository.findOneByOrFail({ id: orgId });
-    if (org.paymentPlan !== PaymentPlan.PREMIUM) {
-      throw new Error('You need to upgrade your plan to search issues');
-    }
-
     let query = `
         SELECT *
         FROM issue

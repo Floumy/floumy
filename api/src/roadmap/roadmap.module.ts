@@ -23,7 +23,6 @@ import { PublicController as MilestonesPublicController } from './milestones/pub
 import { PublicService as MilestonesPublicService } from './milestones/public/public.service';
 import { PublicController as FeaturesPublicController } from './initiatives/public/public.controller';
 import { PublicService as FeaturesPublicService } from './initiatives/public/public.service';
-import { StripeModule } from '../stripe/stripe.module';
 import { InitiativeComment } from './initiatives/initiative-comment.entity';
 import { FeatureRequest } from '../feature-requests/feature-request.entity';
 import { Project } from '../projects/project.entity';
@@ -53,7 +52,6 @@ import { Notification } from '../notifications/notification.entity';
     AuthModule,
     BacklogModule,
     FilesModule,
-    StripeModule,
   ],
   controllers: [
     InitiativesController,

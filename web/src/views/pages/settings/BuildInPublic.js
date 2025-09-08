@@ -37,8 +37,6 @@ function BuildInPublic() {
     return `${protocol}//${host}${path}`;
   }
 
-  const paymentPlan = localStorage.getItem('paymentPlan');
-
   useEffect(() => {
     async function fetchData() {
       setIsLoadingBuildInPublicSettings(true);
@@ -245,7 +243,7 @@ function BuildInPublic() {
                       </Col>
                     </Row>
                     <hr className="my-4" />
-                    <Row className="mb-3" hidden={paymentPlan !== 'premium'}>
+                    <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
                         Issues
                       </Col>
@@ -264,7 +262,7 @@ function BuildInPublic() {
                         </label>
                       </Col>
                     </Row>
-                    <Row className="mb-3" hidden={paymentPlan !== 'premium'}>
+                    <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
                         Feature Requests
                       </Col>

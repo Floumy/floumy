@@ -26,7 +26,6 @@ import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { InitiativeComment } from './initiative-comment.entity';
 import { Repository } from 'typeorm';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
 import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
@@ -528,7 +527,6 @@ describe('InitiativesController', () => {
   });
   describe('when listing initiative comments', () => {
     it('should return the list of comments', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiativeResponse = await controller.create(
         org.id,
@@ -566,7 +564,6 @@ describe('InitiativesController', () => {
   });
   describe('when adding a comment to a initiative', () => {
     it('should return the newly added comment', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiativeResponse = await controller.create(
         org.id,
@@ -603,7 +600,6 @@ describe('InitiativesController', () => {
   });
   describe('when deleting a comment from a initiative', () => {
     it('should delete it successfully', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiativeResponse = await controller.create(
         org.id,
@@ -648,7 +644,6 @@ describe('InitiativesController', () => {
   });
   describe('when updating a comment from a initiative', () => {
     it('should return the updated comment', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiativeResponse = await controller.create(
         org.id,
@@ -699,7 +694,6 @@ describe('InitiativesController', () => {
   });
   describe('when changing the assigned user of a initiative', () => {
     it('should update the assigned user', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const initiativeResponse = await controller.create(
         org.id,

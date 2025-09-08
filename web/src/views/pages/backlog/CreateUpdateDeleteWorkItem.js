@@ -62,7 +62,6 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const [assignedTo, setAssignedTo] = useState('');
   const uploadedFiles = workItem.files || [];
   const navigate = useNavigate();
-  const paymentPlan = localStorage.getItem('paymentPlan');
   const [comments, setComments] = useState([]);
   const [issues, setIssues] = useState([{ id: '', text: 'None' }]);
   const [issue, setIssue] = useState(workItem.issue ? workItem.issue.id : '');
@@ -470,34 +469,32 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         ></Select2>
                       </Col>
                     </Row>
-                    {paymentPlan === 'premium' && (
-                      <Row className="mb-3">
-                        <Col>
-                          <label
-                            className="form-control-label"
-                            htmlFor="validationCustom01"
-                          >
-                            {issue ? (
-                              <Link
-                                to={`/admin/orgs/${orgId}/projects/${projectId}/issues/edit/${issue}`}
-                              >
-                                Issue
-                                <i className="fa fa-link ml-2" />
-                              </Link>
-                            ) : (
-                              'Issue'
-                            )}
-                          </label>
-                          <Select2
-                            className="react-select-container"
-                            defaultValue={issue}
-                            placeholder="Select an issue"
-                            data={issues}
-                            onChange={(e) => setIssue(e.target.value)}
-                          ></Select2>
-                        </Col>
-                      </Row>
-                    )}
+                    <Row className="mb-3">
+                      <Col>
+                        <label
+                          className="form-control-label"
+                          htmlFor="validationCustom01"
+                        >
+                          {issue ? (
+                            <Link
+                              to={`/admin/orgs/${orgId}/projects/${projectId}/issues/edit/${issue}`}
+                            >
+                              Issue
+                              <i className="fa fa-link ml-2" />
+                            </Link>
+                          ) : (
+                            'Issue'
+                          )}
+                        </label>
+                        <Select2
+                          className="react-select-container"
+                          defaultValue={issue}
+                          placeholder="Select an issue"
+                          data={issues}
+                          onChange={(e) => setIssue(e.target.value)}
+                        ></Select2>
+                      </Col>
+                    </Row>
                     <Row className="mb-5">
                       <Col>
                         <label
