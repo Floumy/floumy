@@ -111,18 +111,18 @@ describe('WorkItemsService', () => {
     await cleanup();
   });
 
-  async function getTestPremiumOrgAndUser() {
-    const premiumOrg = new Org();
-    premiumOrg.name = 'Premium Org';
-    const org = await orgsRepository.save(premiumOrg);
+  async function getTestOrgAndUser() {
+    const unsavedOrg = new Org();
+    unsavedOrg.name = 'Premium Org';
+    const org = await orgsRepository.save(unsavedOrg);
 
-    const premiumUser = new User(
+    const unsavedUser = new User(
       'Premium User',
       'premium@example.com',
       'testtesttest',
     );
-    premiumUser.org = Promise.resolve(org);
-    const user = await usersRepository.save(premiumUser);
+    unsavedUser.org = Promise.resolve(org);
+    const user = await usersRepository.save(unsavedUser);
     const project = new Project();
     project.name = 'Test Project';
     project.org = Promise.resolve(org);
@@ -1774,7 +1774,7 @@ describe('WorkItemsService', () => {
 
   describe('when creating a work item comment', () => {
     it('should create the work item comment', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = await service.createWorkItem(
         org.id,
@@ -1806,7 +1806,7 @@ describe('WorkItemsService', () => {
     });
     describe('when creating a work item comment with mentions', () => {
       it('should create the work item comment', async () => {
-        const { org, user, project } = await getTestPremiumOrgAndUser();
+        const { org, user, project } = await getTestOrgAndUser();
         const secondUser = await usersService.createUser(
           'second user',
           'second@example.com',
@@ -1844,7 +1844,7 @@ describe('WorkItemsService', () => {
       });
     });
     it('should throw an error if the comment content is empty', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = await service.createWorkItem(
         org.id,
@@ -1876,7 +1876,7 @@ describe('WorkItemsService', () => {
 
   describe('when listing the comments of a work item', () => {
     it('should return the list of comments of the work item', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = new WorkItem();
       workItem.title = 'my work item';
@@ -1916,7 +1916,7 @@ describe('WorkItemsService', () => {
   });
   describe('when deleting a work item comment', () => {
     it('should delete the work item comment', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = new WorkItem();
       workItem.title = 'my work item';
@@ -1949,7 +1949,7 @@ describe('WorkItemsService', () => {
   });
   describe('when updating a work item comment', () => {
     it('should update the work item comment', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = new WorkItem();
       workItem.title = 'my work item';
@@ -1982,7 +1982,7 @@ describe('WorkItemsService', () => {
       expect(updatedComment.content).toEqual('my updated comment');
     });
     it('should throw an error if the comment is empty', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = new WorkItem();
       workItem.title = 'my work item';
@@ -2012,7 +2012,7 @@ describe('WorkItemsService', () => {
   });
   describe('when updating a work item comment with mentions', () => {
     it('should update the work item comment', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
       const secondUser = await usersService.createUser(
         'second user',
         'second@example.com',
