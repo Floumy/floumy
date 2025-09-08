@@ -40,13 +40,18 @@ export class WorkItemsToolsService {
     private workItemsService: WorkItemsService,
   ) {}
 
-  getTools(orgId: string, projectId?: string, userId?: string) {
+  getTools(
+    sessionId: string,
+    orgId: string,
+    projectId?: string,
+    userId?: string,
+  ) {
     const tools: DynamicStructuredTool[] = [
       this.findOneWorkItem(orgId, projectId),
     ];
     if (projectId && userId) {
-      tools.push(this.proposeWorkItem(orgId, projectId, userId));
-      tools.push(this.confirmWorkItem(orgId, projectId, userId));
+      tools.push(this.proposeWorkItem(sessionId, orgId, projectId, userId));
+      tools.push(this.confirmWorkItem(sessionId, orgId, projectId, userId));
     }
     return tools;
   }
@@ -98,7 +103,12 @@ export class WorkItemsToolsService {
     );
   }
 
-  private proposeWorkItem(orgId: string, projectId: string, userId: string) {
+  private proposeWorkItem(
+    sessionid: string,
+    orgId: string,
+    projectId: string,
+    userId: string,
+  ) {
     return tool(
       async ({ workItemTitle, workItemDescription, workItemType }) => {
         if (!workItemTitle) {
@@ -107,9 +117,7 @@ export class WorkItemsToolsService {
         if (!workItemDescription) {
           return 'Please provide a work item description';
         }
-        // Validate inputs and create a pending proposal id
-        const proposalId = `${userId}:${Date.now()}`;
-        this.pendingProposals.set(proposalId, {
+        this.pendingProposals.set(sessionid, {
           orgId,
           projectId,
           userId,
@@ -139,48 +147,25 @@ export class WorkItemsToolsService {
     );
   }
 
-  private confirmWorkItem(orgId: string, projectId: string, userId: string) {
+  private confirmWorkItem(
+    sessionId: string,
+    orgId: string,
+    projectId: string,
+    userId: string,
+  ) {
     return tool(
-      async ({ confirmationCode }) => {
-        // Allow relaxed confirmations without requiring the user to paste a code.
-        // If no code is provided, pick the most recent pending proposal for this user/org/project.
-        let keyToUse = confirmationCode;
-        if (!keyToUse) {
-          let newest: { key: string; createdAt: number } | undefined;
-          for (const [k, v] of this.pendingProposals.entries()) {
-            if (
-              v.orgId === orgId &&
-              v.projectId === projectId &&
-              v.userId === userId
-            ) {
-              if (!newest || v.createdAt > newest.createdAt) {
-                newest = { key: k, createdAt: v.createdAt };
-              }
-            }
-          }
-          if (newest) {
-            keyToUse = newest.key;
-          }
-        }
-        if (!keyToUse) {
-          return "I don't have any recent drafts to confirm. Let me propose one first.";
-        }
-        const pending = this.pendingProposals.get(keyToUse);
+      async () => {
+        const pending = this.pendingProposals.get(sessionId);
         if (!pending) {
-          return 'Invalid or expired confirmation code.';
+          return 'Invalid or expired confirmation window.';
         }
-        // Basic expiry: 30 minutes
-        if (Date.now() - pending.createdAt > 30 * 60 * 1000) {
-          this.pendingProposals.delete(keyToUse);
-          return 'Confirmation code expired. Please propose the work item again.';
-        }
-        // Ensure code belongs to same org/project/user context
+        // Ensure code belongs to the same org / project / user context
         if (
           pending.orgId !== orgId ||
           pending.projectId !== projectId ||
           pending.userId !== userId
         ) {
-          return 'Confirmation code does not match the current context.';
+          return 'Confirmation does not match the current context.';
         }
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
@@ -205,7 +190,7 @@ export class WorkItemsToolsService {
             },
           );
 
-          this.pendingProposals.delete(keyToUse);
+          this.pendingProposals.delete(sessionId);
 
           return `Successfully created work item with reference ${savedWorkItem.reference}\nWork Item Details\n- title: ${savedWorkItem.title}\n- type: ${savedWorkItem.type}\n- description: ${savedWorkItem.description}\n- status: ${savedWorkItem.status}\n- priority: ${savedWorkItem.priority}`;
         } catch (e) {
