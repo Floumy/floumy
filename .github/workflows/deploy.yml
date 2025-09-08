@@ -76,6 +76,6 @@ jobs:
             docker stop web-app || true
             docker rm web-app || true
             docker run -d --restart=always --name web-app \
-            -p 3000:80 docker.io/floumy/web:${VERSION} \
-            -e REACT_APP_API_URL=https://api.floumy.com
+            -e REACT_APP_API_URL=https://api.floumy.com \
+            -p 3000:80 docker.io/floumy/web:${VERSION}
             docker image prune -f
