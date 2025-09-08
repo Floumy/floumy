@@ -81,6 +81,8 @@ jobs:
           file: ./web/Dockerfile
           context: ./web
           push: true
+          build-args: |
+            REACT_APP_API_URL=https://api.floumy.com
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
