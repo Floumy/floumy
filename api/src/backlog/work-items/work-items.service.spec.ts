@@ -26,7 +26,6 @@ import { InitiativeFile } from '../../roadmap/initiatives/initiative-file.entity
 import { FilesService } from '../../files/files.service';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { WorkItemComment } from './work-item-comment.entity';
-import { PaymentPlan } from '../../auth/payment.plan';
 import { IssuesService } from '../../issues/issues.service';
 import { Project } from '../../projects/project.entity';
 
@@ -112,19 +111,18 @@ describe('WorkItemsService', () => {
     await cleanup();
   });
 
-  async function getTestPremiumOrgAndUser() {
-    const premiumOrg = new Org();
-    premiumOrg.name = 'Premium Org';
-    premiumOrg.paymentPlan = PaymentPlan.PREMIUM;
-    const org = await orgsRepository.save(premiumOrg);
+  async function getTestOrgAndUser() {
+    const unsavedOrg = new Org();
+    unsavedOrg.name = 'Premium Org';
+    const org = await orgsRepository.save(unsavedOrg);
 
-    const premiumUser = new User(
+    const unsavedUser = new User(
       'Premium User',
       'premium@example.com',
       'testtesttest',
     );
-    premiumUser.org = Promise.resolve(org);
-    const user = await usersRepository.save(premiumUser);
+    unsavedUser.org = Promise.resolve(org);
+    const user = await usersRepository.save(unsavedUser);
     const project = new Project();
     project.name = 'Test Project';
     project.org = Promise.resolve(org);
@@ -261,7 +259,6 @@ describe('WorkItemsService', () => {
       expect(workItem.files[1].id).toEqual(savedFile2.id);
     });
     it('should create a work item with an issue', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const issue = await issuesService.addIssue(user.id, org.id, project.id, {
         title: 'My Issue',
@@ -825,7 +822,6 @@ describe('WorkItemsService', () => {
       ).rejects.toThrow(EntityNotFoundError);
     });
     it('should update the issue', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const issue = await issuesService.addIssue(user.id, org.id, project.id, {
         title: 'My Issue',
@@ -863,7 +859,6 @@ describe('WorkItemsService', () => {
       expect(updatedWorkItem.issue.id).toEqual(issue.id);
     });
     it('should update the issue to null', async () => {
-      org.paymentPlan = PaymentPlan.PREMIUM;
       await orgsRepository.save(org);
       const issue = await issuesService.addIssue(user.id, org.id, project.id, {
         title: 'My Issue',
@@ -1779,7 +1774,7 @@ describe('WorkItemsService', () => {
 
   describe('when creating a work item comment', () => {
     it('should create the work item comment', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = await service.createWorkItem(
         org.id,
@@ -1811,7 +1806,7 @@ describe('WorkItemsService', () => {
     });
     describe('when creating a work item comment with mentions', () => {
       it('should create the work item comment', async () => {
-        const { org, user, project } = await getTestPremiumOrgAndUser();
+        const { org, user, project } = await getTestOrgAndUser();
         const secondUser = await usersService.createUser(
           'second user',
           'second@example.com',
@@ -1848,35 +1843,8 @@ describe('WorkItemsService', () => {
         expect(comment.createdBy.name).toEqual(user.name);
       });
     });
-    it('should throw an error if the org is not premium', async () => {
-      const workItem = await service.createWorkItem(
-        org.id,
-        project.id,
-        user.id,
-        {
-          title: 'Test title',
-          description: 'A test description',
-          priority: Priority.HIGH,
-          type: WorkItemType.BUG,
-          status: WorkItemStatus.PLANNED,
-        },
-      );
-
-      await expect(
-        service.createWorkItemComment(
-          user.id,
-          org.id,
-          project.id,
-          workItem.id,
-          {
-            content: 'my comment',
-            mentions: [],
-          },
-        ),
-      ).rejects.toThrowError('You need to upgrade to premium to add comments');
-    });
     it('should throw an error if the comment content is empty', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = await service.createWorkItem(
         org.id,
@@ -1908,7 +1876,7 @@ describe('WorkItemsService', () => {
 
   describe('when listing the comments of a work item', () => {
     it('should return the list of comments of the work item', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = new WorkItem();
       workItem.title = 'my work item';
@@ -1948,7 +1916,7 @@ describe('WorkItemsService', () => {
   });
   describe('when deleting a work item comment', () => {
     it('should delete the work item comment', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = new WorkItem();
       workItem.title = 'my work item';
@@ -1981,7 +1949,7 @@ describe('WorkItemsService', () => {
   });
   describe('when updating a work item comment', () => {
     it('should update the work item comment', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = new WorkItem();
       workItem.title = 'my work item';
@@ -2014,7 +1982,7 @@ describe('WorkItemsService', () => {
       expect(updatedComment.content).toEqual('my updated comment');
     });
     it('should throw an error if the comment is empty', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
 
       const workItem = new WorkItem();
       workItem.title = 'my work item';
@@ -2044,7 +2012,7 @@ describe('WorkItemsService', () => {
   });
   describe('when updating a work item comment with mentions', () => {
     it('should update the work item comment', async () => {
-      const { org, user, project } = await getTestPremiumOrgAndUser();
+      const { org, user, project } = await getTestOrgAndUser();
       const secondUser = await usersService.createUser(
         'second user',
         'second@example.com',

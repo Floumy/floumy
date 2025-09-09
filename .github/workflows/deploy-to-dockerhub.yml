@@ -81,6 +81,8 @@ jobs:
           file: ./web/Dockerfile
           context: ./web
           push: true
+          build-args: |
+            REACT_APP_API_URL=https://api.floumy.com
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -120,16 +122,12 @@ jobs:
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@v6
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         with:
           file: ./api/Dockerfile
           context: ./api
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v3

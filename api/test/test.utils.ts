@@ -13,12 +13,9 @@ import { User } from '../src/users/user.entity';
 import { RefreshToken } from '../src/auth/refresh-token.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CacheModule } from '@nestjs/cache-manager';
-import { StripeService } from '../src/stripe/stripe.service';
 import { OrgsService } from '../src/orgs/orgs.service';
-import { PaymentsService } from '../src/payments/payments.service';
 import { Org } from '../src/orgs/org.entity';
 import { TokensService } from '../src/auth/tokens.service';
-import { Invoice } from '../src/payments/invoice.entity';
 import { BipService } from '../src/bip/bip.service';
 import { BipSettings } from '../src/bip/bip-settings.entity';
 import { WorkItemComment } from '../src/backlog/work-items/work-item-comment.entity';
@@ -83,42 +80,6 @@ export async function setupTestingModule(
   const postmarkClientMock = {
     sendEmail: jest.fn().mockImplementation(() => {}),
   };
-  const stripeClientMock = {
-    webhooks: {
-      constructEvent: jest.fn().mockImplementation(() => {}),
-    },
-    subscriptions: {
-      list: jest.fn().mockImplementation(() => {
-        return {
-          data: [],
-        };
-      }),
-    },
-    checkout: {
-      sessions: {
-        create: jest.fn().mockImplementation(() => {
-          return {
-            url: 'https://checkout.stripe.com/checkout/session',
-          };
-        }),
-      },
-    },
-    customers: {
-      create: jest.fn().mockImplementation(() => {
-        return {
-          id: 'cus_test',
-        };
-      }),
-    },
-    invoices: {
-      retrieve: jest.fn().mockImplementation(() => {
-        return {
-          id: 'in_test',
-          invoice_pdf: 'https://stripe.com/invoice.pdf',
-        };
-      }),
-    },
-  };
 
   const module: TestingModule = await Test.createTestingModule({
     controllers,
@@ -130,7 +91,6 @@ export async function setupTestingModule(
         User,
         RefreshToken,
         Org,
-        Invoice,
         BipSettings,
         WorkItemComment,
         InitiativeComment,
@@ -166,19 +126,13 @@ export async function setupTestingModule(
         provide: 'POSTMARK_CLIENT',
         useValue: postmarkClientMock,
       },
-      {
-        provide: 'STRIPE_CLIENT',
-        useValue: stripeClientMock,
-      },
       MailNotificationsService,
       {
         provide: 'GITHUB_CLIENT',
         useValue: githubClientMock,
       },
-      StripeService,
       OrgsService,
       BipService,
-      PaymentsService,
       TokensService,
       CommentsService,
     ],

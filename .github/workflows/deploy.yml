@@ -54,12 +54,11 @@ jobs:
             -e GITHUB_WEBHOOK_SECRET=${{ secrets.GHUB_WEBHOOK_SECRET }} \
             -e GITLAB_WEBHOOK_URL_BASE=${{ secrets.GITLAB_WEBHOOK_URL_BASE }} \
             -e GITLAB_WEBHOOK_SECRET=${{ secrets.GITLAB_WEBHOOK_SECRET }} \
-            -p 4000:8080 docker.io/floumy/api:${VERSION} \
             -e LANGSMITH_TRACING=${{ secrets.LANGSMITH_TRACING }} \
             -e LANGSMITH_ENDPOINT=${{ secrets.LANGSMITH_ENDPOINT }} \
             -e LANGSMITH_API_KEY=${{ secrets.LANGSMITH_API_KEY }} \
             -e LANGSMITH_PROJECT=${{ secrets.LANGSMITH_PROJECT }} \
-            -p 4000:8080 registry.digitalocean.com/floumy-registry/api:latest
+            -p 4000:8080 docker.io/floumy/api:${VERSION}
             docker image prune -f
 
   deploy-web:
@@ -77,6 +76,6 @@ jobs:
             docker stop web-app || true
             docker rm web-app || true
             docker run -d --restart=always --name web-app \
-            -p 3000:80 docker.io/floumy/web:${VERSION} \
-            -e REACT_APP_API_URL=https://api.floumy.com
+            -e REACT_APP_API_URL=https://api.floumy.com \
+            -p 3000:80 docker.io/floumy/web:${VERSION}
             docker image prune -f
