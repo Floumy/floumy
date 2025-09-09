@@ -109,6 +109,7 @@ export class ChatService {
           const agent = createReactAgent({
             llm: model,
             tools: this.workItemsToolsService.getTools(
+              sessionId,
               orgId,
               projectId,
               userId,
@@ -137,6 +138,8 @@ export class ChatService {
                   Only ask follow-up questions when necessary to understand the request or provide a useful response.
                   If clarification is needed, ask a single, specific question.
                   Ignore unrelated topics.
+                  
+                  Important policy: You must obtain explicit human approval before creating or updating anything. First, propose the item details (title, type, description, etc.) and wait for the user's clear approval in natural language (e.g., “yes”, “looks good”, “go ahead”). Only after explicit approval should you call the confirm tool to create the item.
                   
                   Example behavior:
 
