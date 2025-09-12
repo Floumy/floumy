@@ -28,6 +28,7 @@ import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 import { Page } from 'src/pages/pages.entity';
 import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
 import { BacklogModule } from '../backlog/backlog.module';
+import { PendingToolProposal } from './chat/tools/pending-tool-proposals.entity';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { BacklogModule } from '../backlog/backlog.module';
       Objective,
       Sprint,
       Page,
+      PendingToolProposal,
     ]),
   ],
   controllers: [AiController, ChatController, IndexingController],

@@ -11,23 +11,10 @@ import { WorkItemType } from '../../../backlog/work-items/work-item-type.enum';
 import { WorkItemsService } from '../../../backlog/work-items/work-items.service';
 import { Priority } from '../../../common/priority.enum';
 import { WorkItemStatus } from '../../../backlog/work-items/work-item-status.enum';
+import { PendingToolProposal } from './pending-tool-proposals.entity';
 
 @Injectable()
 export class WorkItemsToolsService {
-  // In-memory pending proposals for human-in-the-loop confirmation
-  private pendingProposals = new Map<
-    string,
-    {
-      orgId: string;
-      projectId: string;
-      userId: string;
-      title: string;
-      description: string;
-      type: WorkItemType;
-      createdAt: number;
-    }
-  >();
-
   constructor(
     @InjectRepository(WorkItem)
     private workItemRepository: Repository<WorkItem>,
@@ -37,6 +24,8 @@ export class WorkItemsToolsService {
     private projectRepository: Repository<Project>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(PendingToolProposal)
+    private pendingToolApprovalRepository: Repository<PendingToolProposal>,
     private workItemsService: WorkItemsService,
   ) {}
 
@@ -104,7 +93,7 @@ export class WorkItemsToolsService {
   }
 
   private proposeWorkItem(
-    sessionid: string,
+    sessionId: string,
     orgId: string,
     projectId: string,
     userId: string,
@@ -117,14 +106,16 @@ export class WorkItemsToolsService {
         if (!workItemDescription) {
           return 'Please provide a work item description';
         }
-        this.pendingProposals.set(sessionid, {
+        await this.pendingToolApprovalRepository.save({
+          sessionId: sessionId,
           orgId,
-          projectId,
           userId,
-          title: workItemTitle,
-          description: workItemDescription,
-          type: workItemType as WorkItemType,
-          createdAt: Date.now(),
+          data: {
+            projectId,
+            title: workItemTitle,
+            description: workItemDescription,
+            type: workItemType as WorkItemType,
+          },
         });
         return `Here’s a draft for a new work item:\n- title: ${workItemTitle}\n- type: ${workItemType}\n- description: ${workItemDescription}\n\nDoes this look good as is, or would you like any changes? If you’re happy with it, just say so and I’ll create it.`;
       },
@@ -155,16 +146,16 @@ export class WorkItemsToolsService {
   ) {
     return tool(
       async () => {
-        const pending = this.pendingProposals.get(sessionId);
+        const pending = await this.pendingToolApprovalRepository.findOne({
+          where: { sessionId, orgId, userId },
+          order: { createdAt: 'DESC' },
+        });
         if (!pending) {
           return 'Invalid or expired confirmation window.';
         }
         // Ensure code belongs to the same org / project / user context
-        if (
-          pending.orgId !== orgId ||
-          pending.projectId !== projectId ||
-          pending.userId !== userId
-        ) {
+        const data = pending.data as any;
+        if (!data || data.projectId !== projectId) {
           return 'Confirmation does not match the current context.';
         }
         try {
@@ -182,19 +173,19 @@ export class WorkItemsToolsService {
             project.id,
             user.id,
             {
-              title: pending.title,
-              type: pending.type,
-              description: pending.description,
+              title: data.title,
+              type: data.type,
+              description: data.description,
               status: WorkItemStatus.PLANNED,
               priority: Priority.MEDIUM,
             },
           );
 
-          this.pendingProposals.delete(sessionId);
+          await this.pendingToolApprovalRepository.delete({ id: pending.id });
 
           return `Successfully created work item with reference ${savedWorkItem.reference}\nWork Item Details\n- title: ${savedWorkItem.title}\n- type: ${savedWorkItem.type}\n- description: ${savedWorkItem.description}\n- status: ${savedWorkItem.status}\n- priority: ${savedWorkItem.priority}`;
         } catch (e) {
-          return 'Failed to create work item because ' + e.message;
+          return 'Failed to create work item because ' + (e as any).message;
         }
       },
       {
