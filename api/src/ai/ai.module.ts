@@ -29,6 +29,7 @@ import { Page } from 'src/pages/pages.entity';
 import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
 import { BacklogModule } from '../backlog/backlog.module';
 import { PendingToolProposal } from './chat/tools/pending-tool-proposals.entity';
+import { PendingToolProposalsService } from './chat/tools/pending-tool-proposals.service';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { PendingToolProposal } from './chat/tools/pending-tool-proposals.entity'
     IndexingService,
     WorkItemsToolsService,
     IndexingEventHandlerService,
+    PendingToolProposalsService,
   ],
 })
 export class AiModule {}

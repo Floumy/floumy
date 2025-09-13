@@ -7,11 +7,10 @@ import { Project } from '../../../projects/project.entity';
 import { User } from '../../../users/user.entity';
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
-import { WorkItemType } from '../../../backlog/work-items/work-item-type.enum';
 import { WorkItemsService } from '../../../backlog/work-items/work-items.service';
 import { Priority } from '../../../common/priority.enum';
 import { WorkItemStatus } from '../../../backlog/work-items/work-item-status.enum';
-import { PendingToolProposal } from './pending-tool-proposals.entity';
+import { PendingToolProposalsService } from './pending-tool-proposals.service';
 
 @Injectable()
 export class WorkItemsToolsService {
@@ -24,8 +23,7 @@ export class WorkItemsToolsService {
     private projectRepository: Repository<Project>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    @InjectRepository(PendingToolProposal)
-    private pendingToolApprovalRepository: Repository<PendingToolProposal>,
+    private pendingToolProposalsService: PendingToolProposalsService,
     private workItemsService: WorkItemsService,
   ) {}
 
@@ -106,17 +104,17 @@ export class WorkItemsToolsService {
         if (!workItemDescription) {
           return 'Please provide a work item description';
         }
-        await this.pendingToolApprovalRepository.save({
-          sessionId: sessionId,
+        await this.pendingToolProposalsService.addPendingToolProposal(
+          sessionId,
           orgId,
           userId,
-          data: {
-            projectId,
+          {
+            projectId: projectId,
             title: workItemTitle,
             description: workItemDescription,
-            type: workItemType as WorkItemType,
+            type: workItemType,
           },
-        });
+        );
         return `Here’s a draft for a new work item:\n- title: ${workItemTitle}\n- type: ${workItemType}\n- description: ${workItemDescription}\n\nDoes this look good as is, or would you like any changes? If you’re happy with it, just say so and I’ll create it.`;
       },
       {
@@ -146,10 +144,12 @@ export class WorkItemsToolsService {
   ) {
     return tool(
       async () => {
-        const pending = await this.pendingToolApprovalRepository.findOne({
-          where: { sessionId, orgId, userId },
-          order: { createdAt: 'DESC' },
-        });
+        const pending =
+          await this.pendingToolProposalsService.findPendingToolProposal(
+            sessionId,
+            orgId,
+            userId,
+          );
         if (!pending) {
           return 'Invalid or expired confirmation window.';
         }
@@ -181,7 +181,9 @@ export class WorkItemsToolsService {
             },
           );
 
-          await this.pendingToolApprovalRepository.delete({ id: pending.id });
+          await this.pendingToolProposalsService.removePendingToolProposal(
+            pending.id,
+          );
 
           return `Successfully created work item with reference ${savedWorkItem.reference}\nWork Item Details\n- title: ${savedWorkItem.title}\n- type: ${savedWorkItem.type}\n- description: ${savedWorkItem.description}\n- status: ${savedWorkItem.status}\n- priority: ${savedWorkItem.priority}`;
         } catch (e) {

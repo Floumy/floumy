@@ -7,9 +7,9 @@ export class CreatePendingToolProposals1757708126572
     await queryRunner.query(`
       CREATE TABLE "pending_tool_proposals" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-        "sessionId" character varying NOT NULL,
-        "orgId" character varying NOT NULL,
-        "userId" character varying NOT NULL,
+        "sessionId" TEXT NOT NULL,
+        "orgId" uuid NOT NULL,
+        "userId" uuid NOT NULL,
         "data" jsonb NOT NULL,
         "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
         CONSTRAINT "PK_pending_tool_proposals_id" PRIMARY KEY ("id")
