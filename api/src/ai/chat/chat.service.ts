@@ -133,7 +133,7 @@ export class ChatService {
           );
 
           const systemMessage = new SystemMessage(
-            `You are a helpful and concise project management assistant.
+            `You are a helpful project management assistant.
                   Respond only in markdown format.
                   Only ask follow-up questions when necessary to understand the request or provide a useful response.
                   If clarification is needed, ask a single, specific question.
