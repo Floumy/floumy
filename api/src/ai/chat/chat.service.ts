@@ -109,7 +109,6 @@ export class ChatService {
           const agent = createReactAgent({
             llm: model,
             tools: this.workItemsToolsService.getTools(
-              sessionId,
               orgId,
               projectId,
               userId,
