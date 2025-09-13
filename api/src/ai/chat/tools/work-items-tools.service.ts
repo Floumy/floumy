@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { WorkItemsService } from '../../../backlog/work-items/work-items.service';
 import { Priority } from '../../../common/priority.enum';
 import { WorkItemStatus } from '../../../backlog/work-items/work-item-status.enum';
-import { PendingToolProposalsService } from './pending-tool-proposals.service';
+import { WorkItemType } from '../../../backlog/work-items/work-item-type.enum';
 
 @Injectable()
 export class WorkItemsToolsService {
@@ -23,22 +23,15 @@ export class WorkItemsToolsService {
     private projectRepository: Repository<Project>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private pendingToolProposalsService: PendingToolProposalsService,
     private workItemsService: WorkItemsService,
   ) {}
 
-  getTools(
-    sessionId: string,
-    orgId: string,
-    projectId?: string,
-    userId?: string,
-  ) {
+  getTools(orgId: string, projectId?: string, userId?: string) {
     const tools: DynamicStructuredTool[] = [
       this.findOneWorkItem(orgId, projectId),
     ];
     if (projectId && userId) {
-      tools.push(this.proposeWorkItem(sessionId, orgId, projectId, userId));
-      tools.push(this.confirmWorkItem(sessionId, orgId, projectId, userId));
+      tools.push(this.confirmAndCreateWorkItem(orgId, projectId, userId));
     }
     return tools;
   }
@@ -90,74 +83,13 @@ export class WorkItemsToolsService {
     );
   }
 
-  private proposeWorkItem(
-    sessionId: string,
+  private confirmAndCreateWorkItem(
     orgId: string,
     projectId: string,
     userId: string,
   ) {
     return tool(
       async ({ workItemTitle, workItemDescription, workItemType }) => {
-        if (!workItemTitle) {
-          return 'Please provide a work item title';
-        }
-        if (!workItemDescription) {
-          return 'Please provide a work item description';
-        }
-        await this.pendingToolProposalsService.addPendingToolProposal(
-          sessionId,
-          orgId,
-          userId,
-          {
-            projectId: projectId,
-            title: workItemTitle,
-            description: workItemDescription,
-            type: workItemType,
-          },
-        );
-        return `Here’s a draft for a new work item:\n- title: ${workItemTitle}\n- type: ${workItemType}\n- description: ${workItemDescription}\n\nDoes this look good as is, or would you like any changes? If you’re happy with it, just say so and I’ll create it.`;
-      },
-      {
-        name: 'propose-work-item',
-        description:
-          'Draft a new work item and present it to the user for approval. Do not actually create anything. Ask the user to confirm.',
-        schema: z.object({
-          workItemTitle: z.string().describe('The work item title.'),
-          workItemDescription: z
-            .string()
-            .describe('The work item description.'),
-          workItemType: z
-            .enum(['user-story', 'task', 'bug', 'spike', 'technical-debt'])
-            .describe(
-              'One of the options user-story, task, bug, spike, technical-debt',
-            ),
-        }),
-      },
-    );
-  }
-
-  private confirmWorkItem(
-    sessionId: string,
-    orgId: string,
-    projectId: string,
-    userId: string,
-  ) {
-    return tool(
-      async () => {
-        const pending =
-          await this.pendingToolProposalsService.findPendingToolProposal(
-            sessionId,
-            orgId,
-            userId,
-          );
-        if (!pending) {
-          return 'Invalid or expired confirmation window.';
-        }
-        // Ensure code belongs to the same org / project / user context
-        const data = pending.data as any;
-        if (!data || data.projectId !== projectId) {
-          return 'Confirmation does not match the current context.';
-        }
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
           const project = await this.projectRepository.findOneByOrFail({
@@ -173,16 +105,12 @@ export class WorkItemsToolsService {
             project.id,
             user.id,
             {
-              title: data.title,
-              type: data.type,
-              description: data.description,
+              title: workItemTitle,
+              type: WorkItemType[workItemType],
+              description: workItemDescription,
               status: WorkItemStatus.PLANNED,
               priority: Priority.MEDIUM,
             },
-          );
-
-          await this.pendingToolProposalsService.removePendingToolProposal(
-            pending.id,
           );
 
           return `Successfully created work item with reference ${savedWorkItem.reference}\nWork Item Details\n- title: ${savedWorkItem.title}\n- type: ${savedWorkItem.type}\n- description: ${savedWorkItem.description}\n- status: ${savedWorkItem.status}\n- priority: ${savedWorkItem.priority}`;
@@ -193,13 +121,16 @@ export class WorkItemsToolsService {
       {
         name: 'confirm-work-item',
         description:
-          'After the user explicitly approves a proposal in natural language, call this tool to create the work item. Passing a confirmation code is optional; if omitted, the most recent pending draft for this user/project/org will be used.',
+          'After the user explicitly approves a proposal in natural language, call this tool to create the work item.',
         schema: z.object({
-          confirmationCode: z
+          workItemTitle: z.string().describe('The work item title.'),
+          workItemDescription: z
             .string()
-            .optional()
+            .describe('The work item description.'),
+          workItemType: z
+            .enum(['user-story', 'task', 'bug', 'spike', 'technical-debt'])
             .describe(
-              'Optional: a confirmation code identifying a specific draft; omit to use the latest pending draft.',
+              'One of the options user-story, task, bug, spike, technical-debt',
             ),
         }),
       },

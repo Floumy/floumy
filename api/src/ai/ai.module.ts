@@ -28,8 +28,6 @@ import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 import { Page } from 'src/pages/pages.entity';
 import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
 import { BacklogModule } from '../backlog/backlog.module';
-import { PendingToolProposal } from './chat/tools/pending-tool-proposals.entity';
-import { PendingToolProposalsService } from './chat/tools/pending-tool-proposals.service';
 
 @Module({
   imports: [
@@ -52,7 +50,6 @@ import { PendingToolProposalsService } from './chat/tools/pending-tool-proposals
       Objective,
       Sprint,
       Page,
-      PendingToolProposal,
     ]),
   ],
   controllers: [AiController, ChatController, IndexingController],
@@ -64,7 +61,6 @@ import { PendingToolProposalsService } from './chat/tools/pending-tool-proposals
     IndexingService,
     WorkItemsToolsService,
     IndexingEventHandlerService,
-    PendingToolProposalsService,
   ],
 })
 export class AiModule {}
