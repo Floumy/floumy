@@ -120,13 +120,4 @@ export class AiController {
       throw new BadRequestException(e.message);
     }
   }
-
-  @Get('demo-project-items')
-  async generateDemoProjectItems(@Query('description') description: string) {
-    try {
-      return await this.aiService.generateDemoProjectItems(description);
-    } catch (e) {
-      throw new BadRequestException(e.message);
-    }
-  }
 }
