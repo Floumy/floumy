@@ -28,6 +28,7 @@ import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 import { Page } from 'src/pages/pages.entity';
 import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
 import { BacklogModule } from '../backlog/backlog.module';
+import { AgentService } from './chat/agent.service';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { BacklogModule } from '../backlog/backlog.module';
     IndexingService,
     WorkItemsToolsService,
     IndexingEventHandlerService,
+    AgentService,
   ],
 })
 export class AiModule {}

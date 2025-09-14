@@ -11,8 +11,7 @@ import { Observable, Subscriber } from 'rxjs';
 import { PostgresChatMessageHistory } from '@langchain/community/stores/message/postgres';
 import { DocumentVectorStoreService } from '../documents/document-vector-store.service';
 import { formatDocumentsAsString } from 'langchain/util/document';
-import { createReactAgent } from '@langchain/langgraph/prebuilt';
-import { WorkItemsToolsService } from './tools/work-items-tools.service';
+import { AgentService } from './agent.service';
 
 @Injectable()
 export class ChatService {
@@ -22,7 +21,7 @@ export class ChatService {
   constructor(
     private configService: ConfigService,
     private documentVectorStoreService: DocumentVectorStoreService,
-    private workItemsToolsService: WorkItemsToolsService,
+    private agentService: AgentService,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
@@ -99,23 +98,7 @@ export class ChatService {
 
       const runStream = async () => {
         try {
-          const model = new ChatOpenAI({
-            model: 'gpt-4o',
-            openAIApiKey: this.apiKey,
-            temperature: 0.1,
-            // callbacks: [new ConsoleCallbackHandler()],
-          });
-
-          const agent = createReactAgent({
-            llm: model,
-            tools: this.workItemsToolsService.getTools(
-              sessionId,
-              orgId,
-              projectId,
-              userId,
-            ),
-          });
-
+          // Keep RAG and history behavior the same
           let prompt = message;
 
           if (await this.shouldUseRag(message)) {
@@ -132,54 +115,58 @@ export class ChatService {
             prompt,
           );
 
-          const systemMessage = new SystemMessage(
-            `You are a helpful project management assistant.
-                  Respond only in markdown format.
-                  Only ask follow-up questions when necessary to understand the request or provide a useful response.
-                  If clarification is needed, ask a single, specific question.
-                  Ignore unrelated topics.
-                  
-                  Important policy: You must obtain explicit human approval before creating or updating anything. First, propose the item details (title, type, description, etc.) and wait for the user's clear approval in natural language (e.g., “yes”, “looks good”, “go ahead”). Only after explicit approval should you call the confirm tool to create the item.
-                  
-                  Example behavior:
-
-                  If the user says:
-                  
-                  Help me define OKRs
-                  
-                  The assistant could reply:
-                  
-                  Sure. What’s the main goal or focus area you’re working on?
-                  `,
-          );
-
-          const stream = await agent.stream(
-            {
-              messages: [
-                systemMessage,
-                ...historyMessages,
-                new HumanMessage(message),
-              ],
-            },
-            { streamMode: 'messages' },
+          // Build and stream from the multi-agent graph via AgentService
+          const graph = await this.agentService.buildMultiAgentGraph(
+            orgId,
+            projectId ?? '',
+            userId,
           );
 
           let aiMessage = '';
-          for await (const record of stream) {
-            aiMessage = this.sendNextChunkToTheSubscriber(
-              record,
-              subscriber,
-              messageId,
-              aiMessage,
-            );
-          }
+          const stream$ = this.agentService.streamMultiAgentAsObservable(
+            graph,
+            message, // keep using the original user message for userInput
+            historyMessages ?? [],
+            { modelId: 'gpt-4o' },
+          );
 
-          await this.addAiMessageToHistory(sessionId, aiMessage);
+          const subscription = stream$.subscribe({
+            next: (evt) => {
+              const textDelta = evt.data.textDelta ?? '';
+              subscriber.next({
+                id: new Date().toISOString(),
+                type: 'message',
+                data: {
+                  id: messageId,
+                  text: textDelta,
+                  isUser: false,
+                },
+              });
+              aiMessage += textDelta;
+            },
+            error: (error) => {
+              subscriber.error(error);
+              clearTimeout(timeout);
+            },
+            complete: async () => {
+              try {
+                await this.addAiMessageToHistory(sessionId, aiMessage);
+              } catch (e) {
+                this.logger.error(e);
+              } finally {
+                subscriber.complete();
+                clearTimeout(timeout);
+              }
+            },
+          });
 
-          subscriber.complete();
+          // Teardown for Observable
+          return () => {
+            subscription.unsubscribe();
+            clearTimeout(timeout);
+          };
         } catch (error) {
           subscriber.error(error);
-        } finally {
           clearTimeout(timeout);
         }
       };
