@@ -13,6 +13,7 @@ import { DocumentVectorStoreService } from '../documents/document-vector-store.s
 import { formatDocumentsAsString } from 'langchain/util/document';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { WorkItemsToolsService } from './tools/work-items-tools.service';
+import { InitiativesToolsService } from './tools/initiatives-tools.service';
 
 @Injectable()
 export class ChatService {
@@ -23,6 +24,7 @@ export class ChatService {
     private configService: ConfigService,
     private documentVectorStoreService: DocumentVectorStoreService,
     private workItemsToolsService: WorkItemsToolsService,
+    private initiativesToolsService: InitiativesToolsService,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
@@ -108,11 +110,14 @@ export class ChatService {
 
           const agent = createReactAgent({
             llm: model,
-            tools: this.workItemsToolsService.getTools(
-              orgId,
-              projectId,
-              userId,
-            ),
+            tools: [
+              ...this.workItemsToolsService.getTools(orgId, projectId, userId),
+              ...this.initiativesToolsService.getTools(
+                orgId,
+                projectId,
+                userId,
+              ),
+            ],
           });
 
           let prompt = message;

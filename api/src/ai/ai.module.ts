@@ -28,6 +28,7 @@ import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 import { Page } from 'src/pages/pages.entity';
 import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
 import { BacklogModule } from '../backlog/backlog.module';
+import { InitiativesToolsService } from './chat/tools/initiatives-tools.service';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { BacklogModule } from '../backlog/backlog.module';
     DocumentVectorStoreService,
     IndexingService,
     WorkItemsToolsService,
+    InitiativesToolsService,
     IndexingEventHandlerService,
   ],
 })
