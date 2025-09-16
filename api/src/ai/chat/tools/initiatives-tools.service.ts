@@ -28,6 +28,7 @@ export class InitiativesToolsService {
   getTools(orgId: string, projectId?: string, userId?: string) {
     const tools: DynamicStructuredTool[] = [
       this.findOneInitiative(orgId, projectId),
+      this.listInitiativeWorkItems(orgId),
     ];
     if (projectId && userId) {
       tools.push(this.confirmAndCreateInitiative(orgId, projectId, userId));
