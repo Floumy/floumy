@@ -104,7 +104,7 @@ export class ChatService {
           const model = new ChatOpenAI({
             model: 'gpt-4o',
             openAIApiKey: this.apiKey,
-            temperature: 0.1,
+            streaming: true,
             // callbacks: [new ConsoleCallbackHandler()],
           });
 

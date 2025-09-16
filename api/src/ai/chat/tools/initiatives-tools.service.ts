@@ -81,6 +81,46 @@ export class InitiativesToolsService {
     );
   }
 
+  private listInitiativeWorkItems(orgId: string) {
+    return tool(
+      async ({ initiativeReference }) => {
+        if (!initiativeReference) {
+          return 'Please provide an initiative reference';
+        }
+
+        const findOptions = {
+          reference: initiativeReference,
+          org: {
+            id: orgId,
+          },
+        };
+
+        const initiative =
+          await this.initiativeRepository.findOneBy(findOptions);
+
+        const workItems = await initiative.workItems;
+
+        let output = '';
+        for (const workItem of workItems) {
+          output += `${workItem.reference}: ${workItem.title}\n`;
+        }
+
+        return output;
+      },
+      {
+        name: 'list-initiative-work-item',
+        description: 'List the work items within a given initiative.',
+        schema: z.object({
+          initiativeReference: z
+            .string()
+            .describe(
+              'The initiative reference to search for in the form of I-123',
+            ),
+        }),
+      },
+    );
+  }
+
   private confirmAndCreateInitiative(
     orgId: string,
     projectId: string,

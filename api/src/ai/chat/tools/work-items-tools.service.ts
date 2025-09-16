@@ -11,12 +11,15 @@ import { WorkItemsService } from '../../../backlog/work-items/work-items.service
 import { Priority } from '../../../common/priority.enum';
 import { WorkItemStatus } from '../../../backlog/work-items/work-item-status.enum';
 import { WorkItemType } from '../../../backlog/work-items/work-item-type.enum';
+import { Initiative } from '../../../roadmap/initiatives/initiative.entity';
 
 @Injectable()
 export class WorkItemsToolsService {
   constructor(
     @InjectRepository(WorkItem)
     private workItemRepository: Repository<WorkItem>,
+    @InjectRepository(Initiative)
+    private initiativeRepository: Repository<Initiative>,
     @InjectRepository(Org)
     private orgRepository: Repository<Org>,
     @InjectRepository(Project)
@@ -89,7 +92,12 @@ export class WorkItemsToolsService {
     userId: string,
   ) {
     return tool(
-      async ({ workItemTitle, workItemDescription, workItemType }) => {
+      async ({
+        workItemTitle,
+        workItemDescription,
+        workItemType,
+        workItemInitiative,
+      }) => {
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
           const project = await this.projectRepository.findOneByOrFail({
@@ -100,20 +108,41 @@ export class WorkItemsToolsService {
             id: userId,
           });
 
+          const createWorkItemDto = {
+            title: workItemTitle,
+            type: WorkItemType[workItemType],
+            description: workItemDescription,
+            status: WorkItemStatus.PLANNED,
+            priority: Priority.MEDIUM,
+          };
+
+          if (workItemInitiative) {
+            const initiative = await this.initiativeRepository.findOneByOrFail({
+              reference: workItemInitiative,
+              org: {
+                id: orgId,
+              },
+              project: {
+                id: projectId,
+              },
+            });
+            createWorkItemDto['initiative'] = initiative.id;
+          }
+
           const savedWorkItem = await this.workItemsService.createWorkItem(
             org.id,
             project.id,
             user.id,
-            {
-              title: workItemTitle,
-              type: WorkItemType[workItemType],
-              description: workItemDescription,
-              status: WorkItemStatus.PLANNED,
-              priority: Priority.MEDIUM,
-            },
+            createWorkItemDto,
           );
 
-          return `Successfully created work item with reference ${savedWorkItem.reference}\nWork Item Details\n- title: ${savedWorkItem.title}\n- type: ${savedWorkItem.type}\n- description: ${savedWorkItem.description}\n- status: ${savedWorkItem.status}\n- priority: ${savedWorkItem.priority}`;
+          return `Successfully created work item with reference ${savedWorkItem.reference}\n
+                  Work Item Details\n
+                  - title: ${savedWorkItem.title}\n
+                  - type: ${savedWorkItem.type}\n
+                  - description: ${savedWorkItem.description}\n
+                  - status: ${savedWorkItem.status}\n
+                  - priority: ${savedWorkItem.priority}`;
         } catch (e) {
           return 'Failed to create work item because ' + (e as any).message;
         }
@@ -131,6 +160,12 @@ export class WorkItemsToolsService {
             .enum(['user-story', 'task', 'bug', 'spike', 'technical-debt'])
             .describe(
               'One of the options user-story, task, bug, spike, technical-debt',
+            ),
+          workItemInitiative: z
+            .string()
+            .optional()
+            .describe(
+              'The initiative reference of the form I-123 that needs to be associated with the work item',
             ),
         }),
       },
