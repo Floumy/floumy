@@ -131,7 +131,7 @@ export class WorkItemsTool {
     const workItem = new WorkItem();
     workItem.title = title;
     workItem.description = description;
-    workItem.type = WorkItemType[type];
+    workItem.type = type as WorkItemType;
     const org = await user.org;
     const project = await this.projectRepository.findOneByOrFail({
       id: projectId,
@@ -147,7 +147,7 @@ export class WorkItemsTool {
       user.id,
       {
         title: title,
-        type: WorkItemType[type],
+        type: type as WorkItemType,
         description: description,
         status: WorkItemStatus.PLANNED,
         priority: Priority.MEDIUM,
@@ -235,11 +235,11 @@ export class WorkItemsTool {
     }
 
     if (type) {
-      workItem.type = WorkItemType[type];
+      workItem.type = type as WorkItemType;
     }
 
     if (status) {
-      workItem.status = WorkItemStatus[status];
+      workItem.status = status as WorkItemStatus;
     }
 
     const savedWorkItem = await this.workItemsRepository.save(workItem);

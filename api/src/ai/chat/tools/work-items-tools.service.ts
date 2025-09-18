@@ -10,8 +10,8 @@ import { z } from 'zod';
 import { WorkItemsService } from '../../../backlog/work-items/work-items.service';
 import { Priority } from '../../../common/priority.enum';
 import { WorkItemStatus } from '../../../backlog/work-items/work-item-status.enum';
-import { WorkItemType } from '../../../backlog/work-items/work-item-type.enum';
 import { Initiative } from '../../../roadmap/initiatives/initiative.entity';
+import { WorkItemType } from '../../../backlog/work-items/work-item-type.enum';
 
 @Injectable()
 export class WorkItemsToolsService {
@@ -110,7 +110,7 @@ export class WorkItemsToolsService {
 
           const createWorkItemDto = {
             title: workItemTitle,
-            type: WorkItemType[workItemType],
+            type: workItemType as WorkItemType,
             description: workItemDescription,
             status: WorkItemStatus.PLANNED,
             priority: Priority.MEDIUM,
