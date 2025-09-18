@@ -1,12 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChatOpenAI } from '@langchain/openai';
-import {
-  AIMessage,
-  AIMessageChunk,
-  HumanMessage,
-  SystemMessage,
-} from '@langchain/core/messages';
+import { AIMessage, AIMessageChunk, HumanMessage, SystemMessage, } from '@langchain/core/messages';
 import { Observable, Subscriber } from 'rxjs';
 import { PostgresChatMessageHistory } from '@langchain/community/stores/message/postgres';
 import { DocumentVectorStoreService } from '../documents/document-vector-store.service';
@@ -142,7 +137,9 @@ export class ChatService {
                   If clarification is needed, ask a single, specific question.
                   Ignore unrelated topics.
                   
-                  Important policy: You must obtain explicit human approval before creating or updating anything. First, propose the item details (title, type, description, etc.) and wait for the user's clear approval in natural language (e.g., “yes”, “looks good”, “go ahead”). Only after explicit approval should you call the confirm tool to create the item.
+                  Important policies: 
+                  - You must obtain explicit human approval before creating or updating anything. First, propose the item details (title, type, description, etc.) and wait for the user's clear approval in natural language (e.g., “yes”, “looks good”, “go ahead”). Only after explicit approval should you call the confirm tool to create the item.
+                  - When asked to update a specific entity get its details first and try to propose changes based on existing content
                   
                   Example behavior:
 
