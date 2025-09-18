@@ -1,9 +1,10 @@
 import api from '../api/api.service';
+import { apiUrl } from '../../config';
 
 export async function getIsGitLabConnected(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/gitlab/auth/orgs/${orgId}/projects/${projectId}/is-connected`,
+      `${apiUrl}/gitlab/auth/orgs/${orgId}/projects/${projectId}/is-connected`,
     );
     return response.data;
   } catch (e) {
@@ -14,7 +15,7 @@ export async function getIsGitLabConnected(orgId, projectId) {
 export async function listMergeRequests(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}`,
+      `${apiUrl}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}`,
     );
     return response.data;
   } catch (e) {
@@ -25,7 +26,7 @@ export async function listMergeRequests(orgId, projectId) {
 export async function listProjects(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/gitlab/projects/orgs/${orgId}/projects/${projectId}`,
+      `${apiUrl}/gitlab/projects/orgs/${orgId}/projects/${projectId}`,
     );
     return response.data;
   } catch (e) {
@@ -36,7 +37,7 @@ export async function listProjects(orgId, projectId) {
 export async function setProject(orgId, projectId, gitlabProjectId) {
   try {
     const response = await api.put(
-      `${process.env.REACT_APP_API_URL}/gitlab/projects/orgs/${orgId}/projects/${projectId}`,
+      `${apiUrl}/gitlab/projects/orgs/${orgId}/projects/${projectId}`,
       { project: gitlabProjectId },
     );
     return response.data;
@@ -48,7 +49,7 @@ export async function setProject(orgId, projectId, gitlabProjectId) {
 export async function setToken(orgId, projectId, token) {
   try {
     const response = await api.put(
-      `${process.env.REACT_APP_API_URL}/gitlab/auth/orgs/${orgId}/projects/${projectId}/token`,
+      `${apiUrl}/gitlab/auth/orgs/${orgId}/projects/${projectId}/token`,
       { token },
     );
     return response.data;
@@ -60,7 +61,7 @@ export async function setToken(orgId, projectId, token) {
 export async function disconnectProject(orgId, projectId) {
   try {
     const response = await api.delete(
-      `${process.env.REACT_APP_API_URL}/gitlab/auth/orgs/${orgId}/projects/${projectId}`,
+      `${apiUrl}/gitlab/auth/orgs/${orgId}/projects/${projectId}`,
     );
     return response.data;
   } catch (e) {
@@ -74,7 +75,7 @@ export async function getMergeRequestsCycleTime(
 ) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}/mrs/cycle-time`,
+      `${apiUrl}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}/mrs/cycle-time`,
       {
         params: {
           timeframeInDays,
@@ -93,7 +94,7 @@ export async function getMergeRequestsMergeTime(
 ) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}/mrs/merge-time`,
+      `${apiUrl}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}/mrs/merge-time`,
       {
         params: {
           timeframeInDays,
@@ -113,7 +114,7 @@ export async function getMergeRequestsFirstReviewTime(
 ) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}/mrs/first-review-time`,
+      `${apiUrl}/gitlab/merge-requests/orgs/${orgId}/projects/${projectId}/mrs/first-review-time`,
       {
         params: {
           timeframeInDays,

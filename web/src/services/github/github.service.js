@@ -1,9 +1,10 @@
 import api from '../api/api.service';
+import { apiUrl } from '../../config';
 
 export async function getIsGithubConnected(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/is-connected`,
+      `${apiUrl}/github/auth/orgs/${orgId}/projects/${projectId}/is-connected`,
     );
     return response.data;
   } catch (e) {
@@ -14,7 +15,7 @@ export async function getIsGithubConnected(orgId, projectId) {
 export async function getGithubUrl(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}`,
+      `${apiUrl}/github/auth/orgs/${orgId}/projects/${projectId}`,
     );
     return response.data;
   } catch (e) {
@@ -25,7 +26,7 @@ export async function getGithubUrl(orgId, projectId) {
 export async function getGithubRepos(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/repos`,
+      `${apiUrl}/github/auth/orgs/${orgId}/projects/${projectId}/repos`,
     );
     return response.data;
   } catch (e) {
@@ -36,7 +37,7 @@ export async function getGithubRepos(orgId, projectId) {
 export async function updateProjectGithubRepo(orgId, projectId, repoId) {
   try {
     const response = await api.put(
-      `${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/repo`,
+      `${apiUrl}/github/auth/orgs/${orgId}/projects/${projectId}/github/repo`,
       { id: repoId },
     );
     return response.data;
@@ -48,7 +49,7 @@ export async function updateProjectGithubRepo(orgId, projectId, repoId) {
 export async function deleteProjectGithubRepo(orgId, projectId) {
   try {
     const response = await api.delete(
-      `${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/repo`,
+      `${apiUrl}/github/auth/orgs/${orgId}/projects/${projectId}/github/repo`,
     );
     return response.data;
   } catch (e) {
@@ -59,7 +60,7 @@ export async function deleteProjectGithubRepo(orgId, projectId) {
 export async function getPullRequests(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs`,
+      `${apiUrl}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs`,
     );
     return response.data;
   } catch (e) {
@@ -70,7 +71,7 @@ export async function getPullRequests(orgId, projectId) {
 export async function getPRsCycleTime(orgId, projectId, timeframeInDays) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs/cycle-time`,
+      `${apiUrl}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs/cycle-time`,
       {
         params: {
           timeframeInDays,
@@ -90,7 +91,7 @@ export async function getPRsAverageMergeTime(
 ) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs/merge-time`,
+      `${apiUrl}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs/merge-time`,
       {
         params: {
           timeframeInDays,
@@ -106,7 +107,7 @@ export async function getPRsAverageMergeTime(
 export async function getPRsFirstReviewTime(orgId, projectId, timeframeInDays) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs/first-review-time`,
+      `${apiUrl}/github/auth/orgs/${orgId}/projects/${projectId}/github/prs/first-review-time`,
       {
         params: {
           timeframeInDays,

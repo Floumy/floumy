@@ -1,10 +1,11 @@
 import api from '../api/api.service';
 import axios from 'axios';
+import { apiUrl } from '../../config';
 
 export async function updateBuildInPublicSettings(orgId, projectId, settings) {
   try {
     await api.put(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/build-in-public/settings`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/build-in-public/settings`,
       settings,
     );
   } catch (e) {
@@ -15,7 +16,7 @@ export async function updateBuildInPublicSettings(orgId, projectId, settings) {
 export async function getBuildInPublicSettings(orgId, projectId) {
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/build-in-public/settings`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/build-in-public/settings`,
     );
     return response.data;
   } catch (e) {

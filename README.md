@@ -12,7 +12,7 @@
 The all-in-one tool to plan, track, and deliver software projects.
 
 ![test](https://github.com/Floumy/floumy/actions/workflows/test.yml/badge.svg)
-![deploy](https://github.com/Floumy/floumy/actions/workflows/deploy.yml/badge.svg)
+![deploy-to-dockerhub](https://github.com/Floumy/floumy/actions/workflows/deploy-to-dockerhub.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-AGPL%20v3-blue.svg)
 
 </div> 

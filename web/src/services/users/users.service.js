@@ -1,8 +1,9 @@
 import api, { logoutUser } from '../api/api.service';
+import { apiUrl } from '../../config';
 
 export async function getCurrentUser() {
   try {
-    const response = await api.get(`${process.env.REACT_APP_API_URL}/users/me`);
+    const response = await api.get(`${apiUrl}/users/me`);
     return response.data;
   } catch (e) {
     throw new Error(e.response.data.message);
@@ -11,10 +12,7 @@ export async function getCurrentUser() {
 
 export async function patchCurrentUser(data) {
   try {
-    const response = await api.patch(
-      `${process.env.REACT_APP_API_URL}/users/me`,
-      data,
-    );
+    const response = await api.patch(`${apiUrl}/users/me`, data);
     const currentUser = response.data;
     setCurrentUserToLocalStorage(currentUser);
     return currentUser;
@@ -44,9 +42,7 @@ export function setCurrentUserToLocalStorage(currentUser) {
 
 export async function deactivateUser(userId) {
   try {
-    await api.post(
-      `${process.env.REACT_APP_API_URL}/users/${userId}/deactivate`,
-    );
+    await api.post(`${apiUrl}/users/${userId}/deactivate`);
   } catch (e) {
     throw new Error(e.response.data.message);
   }
@@ -54,9 +50,7 @@ export async function deactivateUser(userId) {
 
 export async function getUsersByOrgId(orgId) {
   try {
-    const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/users`,
-    );
+    const response = await api.get(`${apiUrl}/orgs/${orgId}/users`);
     return response.data;
   } catch (e) {
     throw new Error(e.response.data.message);
@@ -65,10 +59,7 @@ export async function getUsersByOrgId(orgId) {
 
 export async function updateUserRole(userId, role) {
   try {
-    const response = await api.put(
-      `${process.env.REACT_APP_API_URL}/users/${userId}/role`,
-      { role },
-    );
+    const response = await api.put(`${apiUrl}/users/${userId}/role`, { role });
     return response.data;
   } catch (e) {
     throw new Error(e.response.data.message);
@@ -77,9 +68,7 @@ export async function updateUserRole(userId, role) {
 
 export async function getCurrentUserMcpToken() {
   try {
-    const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/users/me/mcp-token`,
-    );
+    const response = await api.get(`${apiUrl}/users/me/mcp-token`);
     return response.data;
   } catch (e) {
     throw new Error(e.response.data.message);
@@ -88,9 +77,7 @@ export async function getCurrentUserMcpToken() {
 
 export async function refreshCurrentUserMcpToken() {
   try {
-    const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/users/me/mcp-token/refresh`,
-    );
+    const response = await api.post(`${apiUrl}/users/me/mcp-token/refresh`);
     return response.data;
   } catch (e) {
     throw new Error(e.response.data.message);

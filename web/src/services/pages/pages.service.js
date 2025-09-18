@@ -1,9 +1,10 @@
 import api from '../api/api.service';
+import { apiUrl } from '../../config';
 
 export async function createPage(orgId, projectId, parentId) {
   try {
     const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/pages`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/pages`,
       { parentId },
     );
     return response.data;
@@ -15,7 +16,7 @@ export async function createPage(orgId, projectId, parentId) {
 export async function getPagesByParentId(orgId, projectId, parentId, search) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/pages`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/pages`,
       {
         params: { parentId, search },
       },
@@ -29,7 +30,7 @@ export async function getPagesByParentId(orgId, projectId, parentId, search) {
 export async function updatePage(orgId, projectId, id, data) {
   try {
     const response = await api.patch(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/pages/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/pages/${id}`,
       data,
     );
     return response.data;
@@ -41,7 +42,7 @@ export async function updatePage(orgId, projectId, id, data) {
 export async function deletePage(orgId, projectId, id) {
   try {
     await api.delete(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/pages/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/pages/${id}`,
     );
   } catch (e) {
     throw new Error(e.message);

@@ -1,5 +1,6 @@
 import api from '../api/api.service';
 import axios from 'axios';
+import { apiUrl } from '../../config';
 
 axios.defaults.withCredentials = true;
 
@@ -21,10 +22,7 @@ export async function orgSignUp(
   const requestData = { name, email, password, orgName, invitationToken };
 
   try {
-    await axios.post(
-      `${process.env.REACT_APP_API_URL}/auth/org/sign-up`,
-      requestData,
-    );
+    await axios.post(`${apiUrl}/auth/org/sign-up`, requestData);
   } catch (e) {
     throw new Error('Your user could not be created');
   }
@@ -34,10 +32,7 @@ export async function signIn(email, password) {
   const requestData = { email, password };
 
   try {
-    const response = await axios.post(
-      `${process.env.REACT_APP_API_URL}/auth/sign-in`,
-      requestData,
-    );
+    const response = await axios.post(`${apiUrl}/auth/sign-in`, requestData);
     return handleAuthentication(response);
   } catch (e) {
     throw new Error(
@@ -48,7 +43,7 @@ export async function signIn(email, password) {
 
 export async function activateAccount(activationToken) {
   try {
-    await axios.post(`${process.env.REACT_APP_API_URL}/auth/activate`, {
+    await axios.post(`${apiUrl}/auth/activate`, {
       activationToken,
     });
   } catch (e) {
@@ -58,10 +53,7 @@ export async function activateAccount(activationToken) {
 
 export async function sendResetPasswordLink(email) {
   try {
-    await axios.post(
-      `${process.env.REACT_APP_API_URL}/auth/send-reset-password-link`,
-      { email },
-    );
+    await axios.post(`${apiUrl}/auth/send-reset-password-link`, { email });
   } catch (e) {
     throw new Error('Your reset password link could not be sent');
   }
@@ -69,7 +61,7 @@ export async function sendResetPasswordLink(email) {
 
 export async function resetPassword(password, resetToken) {
   try {
-    await axios.post(`${process.env.REACT_APP_API_URL}/auth/reset-password`, {
+    await axios.post(`${apiUrl}/auth/reset-password`, {
       password,
       resetToken,
     });
@@ -80,7 +72,7 @@ export async function resetPassword(password, resetToken) {
 
 export async function signUp(name, email, password) {
   try {
-    await axios.post(`${process.env.REACT_APP_API_URL}/auth/sign-up`, {
+    await axios.post(`${apiUrl}/auth/sign-up`, {
       name,
       email,
       password,
@@ -92,7 +84,7 @@ export async function signUp(name, email, password) {
 
 export async function logout() {
   try {
-    await api.post(`${process.env.REACT_APP_API_URL}/auth/logout`);
+    await api.post(`${apiUrl}/auth/logout`);
   } catch (e) {
     throw new Error('You could not be logged out');
   }
@@ -100,10 +92,9 @@ export async function logout() {
 
 export async function isAuthenticated() {
   try {
-    const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/auth/is-authenticated`,
-      { withCredentials: true },
-    );
+    const response = await axios.get(`${apiUrl}/auth/is-authenticated`, {
+      withCredentials: true,
+    });
     return response.data.isAuthenticated;
   } catch (e) {
     return false;

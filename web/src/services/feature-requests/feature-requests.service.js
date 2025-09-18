@@ -1,10 +1,11 @@
 import api from '../api/api.service';
 import { isAuthenticated } from '../auth/auth.service';
+import { apiUrl } from '../../config';
 
 export async function addFeatureRequest(orgId, projectId, featureRequest) {
   try {
     const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests`,
       featureRequest,
     );
     return response.data;
@@ -21,7 +22,7 @@ export async function listFeatureRequests(
 ) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests?page=${page}&limit=${limit}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests?page=${page}&limit=${limit}`,
     );
     return response.data;
   } catch (e) {
@@ -32,7 +33,7 @@ export async function listFeatureRequests(
 export async function getFeatureRequest(orgId, projectId, featureRequestId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`,
     );
     return response.data;
   } catch (e) {
@@ -48,7 +49,7 @@ export async function updateFeatureRequest(
 ) {
   try {
     await api.put(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`,
       featureRequest,
     );
   } catch (e) {
@@ -59,7 +60,7 @@ export async function updateFeatureRequest(
 export async function deleteFeatureRequest(orgId, projectId, featureRequestId) {
   try {
     await api.delete(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -73,7 +74,7 @@ export async function upvoteFeatureRequest(orgId, projectId, featureRequestId) {
 
   try {
     await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/upvote`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/upvote`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -91,7 +92,7 @@ export async function downvoteFeatureRequest(
 
   try {
     await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/downvote`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/downvote`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -105,7 +106,7 @@ export async function listCurrentUserFeatureRequestVotes(orgId, projectId) {
 
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/my-votes`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/my-votes`,
     );
     return response.data;
   } catch (e) {
@@ -125,7 +126,7 @@ export async function addFeatureRequestComment(
 
   try {
     const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments`,
       {
         content: comment.content,
         mentions: comment.mentions,
@@ -150,7 +151,7 @@ export async function updateFeatureRequestComment(
 
   try {
     const response = await api.put(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments/${commentId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments/${commentId}`,
       {
         content: comment.content,
         mentions: comment.mentions,
@@ -174,7 +175,7 @@ export async function deleteFeatureRequestComment(
 
   try {
     await api.delete(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments/${commentId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments/${commentId}`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -194,7 +195,7 @@ export async function searchFeatureRequests(
 
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feature-requests/search?q=${searchText}&page=${page}&limit=${limit}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/search?q=${searchText}&page=${page}&limit=${limit}`,
     );
     return response.data;
   } catch (e) {
