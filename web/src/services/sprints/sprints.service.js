@@ -1,10 +1,11 @@
 import api from '../api/api.service';
 import axios from 'axios';
+import { apiUrl } from '../../config';
 
 export async function getSprint(orgId, projectId, id) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/sprints/${id}`,
     );
     return response.data;
   } catch (e) {
@@ -15,7 +16,7 @@ export async function getSprint(orgId, projectId, id) {
 export async function getPublicSprint(orgId, projectId, id) {
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/sprints/${id}`,
+      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/sprints/${id}`,
     );
     return response.data;
   } catch (e) {
@@ -26,7 +27,7 @@ export async function getPublicSprint(orgId, projectId, id) {
 export async function updateSprint(orgId, projectId, id, sprint) {
   try {
     const response = await api.put(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/sprints/${id}`,
       sprint,
     );
     return response.data;
@@ -38,7 +39,7 @@ export async function updateSprint(orgId, projectId, id, sprint) {
 export async function addSprint(orgId, projectId, sprint) {
   try {
     const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/sprints`,
       sprint,
     );
     return response.data;
@@ -50,7 +51,7 @@ export async function addSprint(orgId, projectId, sprint) {
 export async function listSprints(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/sprints`,
     );
     return response.data;
   } catch (e) {
@@ -65,7 +66,7 @@ export async function listSprintsWithWorkItemsForTimeline(
 ) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints/timeline/${timeline}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/sprints/timeline/${timeline}`,
     );
     return response.data;
   } catch (e) {
@@ -80,7 +81,7 @@ export async function listPublicSprintsWithWorkItemsForTimeline(
 ) {
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/sprints/timeline/${timeline}`,
+      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/sprints/timeline/${timeline}`,
     );
     return response.data;
   } catch (e) {
@@ -91,7 +92,7 @@ export async function listPublicSprintsWithWorkItemsForTimeline(
 export async function deleteSprint(orgId, projectId, id) {
   try {
     await api.delete(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/sprints/${id}`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -101,7 +102,7 @@ export async function deleteSprint(orgId, projectId, id) {
 export async function startSprint(orgId, projectId, id) {
   try {
     await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints/${id}/start`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/sprints/${id}/start`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -111,7 +112,7 @@ export async function startSprint(orgId, projectId, id) {
 export async function completeSprint(orgId, projectId, id) {
   try {
     await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints/${id}/complete`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/sprints/${id}/complete`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -121,7 +122,7 @@ export async function completeSprint(orgId, projectId, id) {
 export async function getActiveSprint(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/sprints/active`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/sprints/active`,
     );
     return response.data;
   } catch (e) {
@@ -132,7 +133,7 @@ export async function getActiveSprint(orgId, projectId) {
 export async function getPublicActiveSprint(orgId, projectId) {
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/sprints/active`,
+      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/sprints/active`,
     );
     return response.data;
   } catch (e) {

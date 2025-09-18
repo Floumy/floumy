@@ -1,4 +1,5 @@
 import api from '../api/api.service';
+import { apiUrl } from '../../config';
 
 export async function uploadFile(orgId, projectId, file, onUploadProgress) {
   try {
@@ -6,7 +7,7 @@ export async function uploadFile(orgId, projectId, file, onUploadProgress) {
     const formData = new FormData();
     formData.append('file', file);
     const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/files/`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/files/`,
       formData,
       {
         headers: {
@@ -29,7 +30,7 @@ export async function uploadFile(orgId, projectId, file, onUploadProgress) {
 export async function downloadFile(orgId, projectId, id) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/files/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/files/${id}`,
       {
         responseType: 'blob',
       },
@@ -62,7 +63,7 @@ export async function downloadFile(orgId, projectId, id) {
 export async function deleteFile(orgId, projectId, id) {
   try {
     await api.delete(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/files/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/files/${id}`,
     );
   } catch (e) {
     throw new Error(e.message);

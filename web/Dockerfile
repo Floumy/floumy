@@ -1,10 +1,6 @@
 # Stage 1: Build the React application
 FROM node:20.11.1 as build-stage
 
-# Set the REACT_APP_API_URL environment variable
-ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=$REACT_APP_API_URL
-
 # Set the working directory in the Docker container
 WORKDIR /app
 
@@ -31,6 +27,11 @@ COPY default.conf /etc/nginx/conf.d/default.conf
 
 # Copy the build output to replace the default nginx contents.
 COPY --from=build-stage /app/build /usr/share/nginx/html
+COPY --from=build-stage /app/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Use the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Expose port 80 to the outside once the container has launched
 EXPOSE 80

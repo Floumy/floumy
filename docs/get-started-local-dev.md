@@ -10,10 +10,9 @@ To run the stack, you need to have the following installed on your machine:
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
 ## Configuration
-Before starting the stack you need to copy the example environment files and modify them if needed:
+Before starting the stack you need to copy the example environment file and modify them if needed:
 ```bash
 cp api/.env.example api/.env
-cp web/.env.example web/.env
 ```
 You can modify the environment variables in the `.env` files to suit your needs. The default configuration should work for most cases.
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { logout } from '../auth/auth.service';
+import { apiUrl } from '../../config';
 
 // Create an Axios instance
 const api = axios.create({
@@ -8,7 +9,7 @@ const api = axios.create({
 
 async function refreshTokens() {
   await axios.post(
-    `${process.env.REACT_APP_API_URL}/auth/refresh-token`,
+    `${apiUrl}/auth/refresh-token`,
     {},
     {
       withCredentials: true,

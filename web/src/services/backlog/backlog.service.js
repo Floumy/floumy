@@ -1,9 +1,10 @@
 import api from '../api/api.service';
+import { apiUrl } from '../../config';
 
 export async function addWorkItem(orgId, projectId, workItem) {
   try {
     const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items`,
       workItem,
     );
     return response.data;
@@ -15,7 +16,7 @@ export async function addWorkItem(orgId, projectId, workItem) {
 export async function listWorkItems(orgId, projectId, page = 1, limit = 50) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items?page=${page}&limit=${limit}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items?page=${page}&limit=${limit}`,
     );
     return response.data;
   } catch (e) {
@@ -69,7 +70,7 @@ export async function searchWorkItemsWithOptions(
       params.append('f', JSON.stringify(filters));
     }
 
-    const url = `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/search?${params.toString()}`;
+    const url = `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/search?${params.toString()}`;
 
     const response = await api.get(url);
     return response.data;
@@ -81,7 +82,7 @@ export async function searchWorkItemsWithOptions(
 export async function listOpenWorkItems(orgId, projectId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/open`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/open`,
     );
     return response.data;
   } catch (e) {
@@ -92,7 +93,7 @@ export async function listOpenWorkItems(orgId, projectId) {
 export async function getWorkItem(orgId, projectId, id) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
     );
     return response.data;
   } catch (e) {
@@ -103,7 +104,7 @@ export async function getWorkItem(orgId, projectId, id) {
 export async function getPublicWorkItem(orgId, projectId, workItemId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}`,
+      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}`,
     );
     return response.data;
   } catch (e) {
@@ -114,7 +115,7 @@ export async function getPublicWorkItem(orgId, projectId, workItemId) {
 export async function updateWorkItem(orgId, projectId, id, workItem) {
   try {
     const response = await api.put(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
       workItem,
     );
     return response.data;
@@ -126,7 +127,7 @@ export async function updateWorkItem(orgId, projectId, id, workItem) {
 export async function deleteWorkItem(orgId, projectId, id) {
   try {
     await api.delete(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -136,7 +137,7 @@ export async function deleteWorkItem(orgId, projectId, id) {
 export async function updateWorkItemSprint(orgId, projectId, id, sprintId) {
   try {
     await api.patch(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
       { sprint: sprintId },
     );
   } catch (e) {
@@ -147,7 +148,7 @@ export async function updateWorkItemSprint(orgId, projectId, id, sprintId) {
 export async function updateWorkItemStatus(orgId, projectId, id, status) {
   try {
     await api.patch(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
       { status: status },
     );
   } catch (e) {
@@ -158,7 +159,7 @@ export async function updateWorkItemStatus(orgId, projectId, id, status) {
 export async function updateWorkItemPriority(orgId, projectId, id, priority) {
   try {
     await api.patch(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
       { priority: priority },
     );
   } catch (e) {
@@ -169,7 +170,7 @@ export async function updateWorkItemPriority(orgId, projectId, id, priority) {
 export async function addComment(orgId, projectId, workItemId, comment) {
   try {
     const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`,
       { content: comment.content, mentions: comment.mentions },
     );
     return response.data;
@@ -187,7 +188,7 @@ export async function updateComment(
 ) {
   try {
     const response = await api.put(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`,
       { content: comment.content, mentions: comment.mentions },
     );
     return response.data;
@@ -199,7 +200,7 @@ export async function updateComment(
 export async function deleteComment(orgId, projectId, workItemId, commentId) {
   try {
     await api.delete(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments/${commentId}`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -209,7 +210,7 @@ export async function deleteComment(orgId, projectId, workItemId, commentId) {
 export async function listComments(orgId, projectId, workItemId) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/comments`,
     );
     return response.data;
   } catch (e) {
@@ -225,7 +226,7 @@ export async function changeWorkItemAssignee(
 ) {
   try {
     await api.patch(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/assignee`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${workItemId}/assignee`,
       { assignee: userId },
     );
   } catch (e) {
