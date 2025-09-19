@@ -186,6 +186,8 @@ export class WorkItemsToolsService {
         workItemType,
         workItemInitiative,
         workItemStatus,
+        workItemPriority,
+        workItemEstimation,
       }) => {
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
@@ -212,7 +214,7 @@ export class WorkItemsToolsService {
             type: workItemType as WorkItemType,
             description: workItemDescription,
             status: workItemStatus as WorkItemStatus,
-            priority: Priority.MEDIUM,
+            priority: workItemPriority as Priority,
           };
 
           if (workItemInitiative) {
@@ -228,11 +230,15 @@ export class WorkItemsToolsService {
             updateWorkItemDto['initiative'] = initiative.id;
           }
 
+          if (workItemEstimation) {
+            updateWorkItemDto['estimation'] = workItemEstimation;
+          }
+
           const updatedWorkItem = await this.workItemsService.updateWorkItem(
+            user.id,
             org.id,
             project.id,
             workItem.id,
-            user.id,
             updateWorkItemDto,
           );
 
@@ -250,30 +256,35 @@ export class WorkItemsToolsService {
       {
         name: 'confirm-update-work-item',
         description:
-          'After the user explicitly approves a status update in natural language, call this tool to update the work item status.',
+          'After the user explicitly approves a work item update in natural language, call this tool to update the work item.',
         schema: z.object({
           workItemReference: z
             .string()
             .describe(
               'The work item reference to update in the form of WI-123',
             ),
-          workItemTitle: z.string().optional().describe('The work item title.'),
+          workItemTitle: z.string().describe('The work item title.'),
           workItemDescription: z
             .string()
-            .optional()
             .describe('The work item description.'),
           workItemType: z
             .enum(['user-story', 'task', 'bug', 'spike', 'technical-debt'])
-            .optional()
             .describe(
               'One of the options user-story, task, bug, spike, technical-debt',
             ),
+          workItemPriority: z
+            .enum(['low', 'medium', 'high'])
+            .describe('One of the options low, medium, high'),
           workItemInitiative: z
             .string()
             .optional()
             .describe(
               'The initiative reference of the form I-123 that needs to be associated with the work item',
             ),
+          workItemEstimation: z
+            .number()
+            .optional()
+            .describe('The numeric estimation for the work item'),
           workItemStatus: z
             .enum([
               'planned',
