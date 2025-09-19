@@ -32,6 +32,7 @@ export class InitiativesToolsService {
     ];
     if (projectId && userId) {
       tools.push(this.confirmAndCreateInitiative(orgId, projectId, userId));
+      tools.push(this.confirmAndUpdateInitiative(orgId, projectId, userId));
     }
     return tools;
   }
@@ -166,6 +167,95 @@ export class InitiativesToolsService {
           initiativeDescription: z
             .string()
             .describe('The initiative description.'),
+        }),
+      },
+    );
+  }
+  private confirmAndUpdateInitiative(
+    orgId: string,
+    projectId: string,
+    userId: string,
+  ) {
+    return tool(
+      async ({
+        initiativeReference,
+        initiativeTitle,
+        initiativeDescription,
+        initiativePriority,
+        initiativeStatus,
+      }) => {
+        try {
+          const org = await this.orgRepository.findOneByOrFail({ id: orgId });
+          const project = await this.projectRepository.findOneByOrFail({
+            id: projectId,
+            org: { id: orgId },
+          });
+          const user = await this.userRepository.findOneByOrFail({
+            id: userId,
+          });
+
+          const initiative = await this.initiativeRepository.findOneByOrFail({
+            reference: initiativeReference,
+            org: {
+              id: orgId,
+            },
+            project: {
+              id: projectId,
+            },
+          });
+
+          const updateInitiativeDto = {
+            title: initiativeTitle,
+            description: initiativeDescription,
+            priority: initiativePriority as Priority,
+            status: initiativeStatus as InitiativeStatus,
+          };
+
+          const updatedInitiative =
+            await this.initiativesService.updateInitiative(
+              user.id,
+              org.id,
+              project.id,
+              initiative.id,
+              updateInitiativeDto,
+            );
+
+          return `Successfully updated initiative ${updatedInitiative.reference}\n
+                  Initiative Details\n
+                  - title: ${updatedInitiative.title}\n
+                  - description: ${updatedInitiative.description}\n
+                  - status: ${updatedInitiative.status}\n
+                  - priority: ${updatedInitiative.priority}`;
+        } catch (e) {
+          return 'Failed to update initiative because ' + (e as any).message;
+        }
+      },
+      {
+        name: 'confirm-update-initiative',
+        description:
+          'After the user explicitly approves an initiative update in natural language, call this tool to update the initiative.',
+        schema: z.object({
+          initiativeReference: z
+            .string()
+            .describe(
+              'The initiative reference to update in the form of I-123',
+            ),
+          initiativeTitle: z.string().describe('The initiative title.'),
+          initiativeDescription: z
+            .string()
+            .describe('The initiative description.'),
+          initiativePriority: z
+            .enum(['low', 'medium', 'high'])
+            .describe('One of the options low, medium, high'),
+          initiativeStatus: z
+            .enum([
+              'planned',
+              'ready-to-start',
+              'in-progress',
+              'completed',
+              'closed',
+            ])
+            .describe('The new status for the initiative'),
         }),
       },
     );
