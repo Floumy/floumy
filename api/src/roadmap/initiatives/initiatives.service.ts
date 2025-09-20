@@ -19,9 +19,16 @@ import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { InitiativeComment } from './initiative-comment.entity';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { Project } from '../../projects/project.entity';
-import { FilterOptions, InitiativeQueryBuilder, } from './initiative.query-builder';
+import {
+  FilterOptions,
+  InitiativeQueryBuilder,
+} from './initiative.query-builder';
 import { InitiativeStatus } from './initiativestatus.enum';
-import { ActionType, EntityType, StatusType, } from '../../notifications/notification.entity';
+import {
+  ActionType,
+  EntityType,
+  StatusType,
+} from '../../notifications/notification.entity';
 import { CreateNotificationDto } from '../../notifications/dtos';
 
 @Injectable()
