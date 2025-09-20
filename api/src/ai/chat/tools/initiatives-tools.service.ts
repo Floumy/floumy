@@ -58,16 +58,20 @@ export class InitiativesToolsService {
           };
         }
 
-        const initiative =
-          await this.initiativeRepository.findOneBy(findOptions);
+        try {
+          const initiative =
+            await this.initiativeRepository.findOneByOrFail(findOptions);
 
-        return `
+          return `
               Title: ${initiative.title}
               Description: ${initiative.description}
               Priority: ${initiative.priority}
               Status: ${initiative.status}
               Reference: ${initiative.reference}
               `;
+        } catch (e) {
+          return 'Failed to find the initiative';
+        }
       },
       {
         name: 'find-one-initiative',
@@ -97,17 +101,21 @@ export class InitiativesToolsService {
           },
         };
 
-        const initiative =
-          await this.initiativeRepository.findOneBy(findOptions);
+        try {
+          const initiative =
+            await this.initiativeRepository.findOneByOrFail(findOptions);
 
-        const workItems = await initiative.workItems;
+          const workItems = await initiative.workItems;
 
-        let output = '';
-        for (const workItem of workItems) {
-          output += `${workItem.reference}: ${workItem.title}\n`;
+          let output = '';
+          for (const workItem of workItems) {
+            output += `${workItem.reference}: ${workItem.title}\n`;
+          }
+
+          return output;
+        } catch (e) {
+          return 'Failed to find the initiative';
         }
-
-        return output;
       },
       {
         name: 'list-initiative-work-item',

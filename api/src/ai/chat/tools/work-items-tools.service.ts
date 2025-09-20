@@ -61,9 +61,11 @@ export class WorkItemsToolsService {
           };
         }
 
-        const workItem = await this.workItemRepository.findOneBy(findOptions);
+        try {
+          const workItem =
+            await this.workItemRepository.findOneByOrFail(findOptions);
 
-        return `
+          return `
               Title: ${workItem.title}
               Description: ${workItem.description}
               Estimation: ${workItem.estimation}
@@ -72,6 +74,9 @@ export class WorkItemsToolsService {
               Status: ${workItem.status}
               Reference: ${workItem.reference}
               `;
+        } catch (e) {
+          return 'Failed to find the work item';
+        }
       },
       {
         name: 'find-one-work-item',
@@ -145,7 +150,7 @@ export class WorkItemsToolsService {
                   - status: ${savedWorkItem.status}\n
                   - priority: ${savedWorkItem.priority}`;
         } catch (e) {
-          return 'Failed to create work item because ' + (e as any).message;
+          return 'Failed to create work item';
         }
       },
       {
@@ -250,7 +255,7 @@ export class WorkItemsToolsService {
                   - status: ${updatedWorkItem.status}\n
                   - priority: ${updatedWorkItem.priority}`;
         } catch (e) {
-          return 'Failed to update work item because ' + (e as any).message;
+          return 'Failed to update work item';
         }
       },
       {
