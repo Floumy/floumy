@@ -1,9 +1,10 @@
 import api from '../api/api.service';
+import { apiUrl } from '../../config';
 
 export async function generateKeyResults(objective) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/ai/key-results?objective=${objective}`,
+      `${apiUrl}/ai/key-results?objective=${objective}`,
     );
     return response.data;
   } catch (e) {
@@ -14,7 +15,7 @@ export async function generateKeyResults(objective) {
 export async function generateInitiativesForOKR(objective, keyResult) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/ai/okrs-initiatives?objective=${objective}&keyResult=${keyResult}`,
+      `${apiUrl}/ai/okrs-initiatives?objective=${objective}&keyResult=${keyResult}`,
     );
     return response.data;
   } catch (e) {
@@ -28,7 +29,7 @@ export async function generateInitiativesForFeatureRequest(
 ) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/ai/feature-requests-initiatives?featureRequest=${featureRequest}&description=${featureRequestDescription}`,
+      `${apiUrl}/ai/feature-requests-initiatives?featureRequest=${featureRequest}&description=${featureRequestDescription}`,
     );
     return response.data;
   } catch (e) {
@@ -39,7 +40,7 @@ export async function generateInitiativesForFeatureRequest(
 export async function generateWorkItemsForInitiative(initiative, description) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/ai/initiatives-work-items?initiative=${initiative}&description=${description}`,
+      `${apiUrl}/ai/initiatives-work-items?initiative=${initiative}&description=${description}`,
     );
     return response.data;
   } catch (e) {
@@ -50,7 +51,7 @@ export async function generateWorkItemsForInitiative(initiative, description) {
 export async function generateWorkItemsForIssue(issue, description) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/ai/issues-work-items?issue=${issue}&description=${description}`,
+      `${apiUrl}/ai/issues-work-items?issue=${issue}&description=${description}`,
     );
     return response.data;
   } catch (e) {
@@ -66,7 +67,7 @@ export async function getWorkItemDescription(
 ) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/ai/work-item-description?workItem=${workItem}&workItemType=${workItemType}&initiativeId=${initiativeId}&issueId=${issueId}`,
+      `${apiUrl}/ai/work-item-description?workItem=${workItem}&workItemType=${workItemType}&initiativeId=${initiativeId}&issueId=${issueId}`,
     );
     return response.data;
   } catch (e) {
@@ -82,7 +83,7 @@ export async function getInitiativeDescription(
 ) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/ai/initiative-description?initiative=${initiative}&keyResultId=${keyResultId}&milestoneId=${milestoneId}&featureRequestId=${featureRequestId}`,
+      `${apiUrl}/ai/initiative-description?initiative=${initiative}&keyResultId=${keyResultId}&milestoneId=${milestoneId}&featureRequestId=${featureRequestId}`,
     );
     return response.data;
   } catch (e) {
@@ -93,7 +94,7 @@ export async function getInitiativeDescription(
 export async function generateDemoProjectItems(description) {
   try {
     const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/ai/demo-project-items?description=${description}`,
+      `${apiUrl}/ai/demo-project-items?description=${description}`,
     );
     return response.data;
   } catch (e) {

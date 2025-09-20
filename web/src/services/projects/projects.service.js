@@ -1,11 +1,10 @@
 import api from '../api/api.service';
 import axios from 'axios';
+import { apiUrl } from '../../config';
 
 export async function listProjects(orgId) {
   try {
-    const response = await api.get(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/my-projects/`,
-    );
+    const response = await api.get(`${apiUrl}/orgs/${orgId}/my-projects/`);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -14,10 +13,10 @@ export async function listProjects(orgId) {
 
 export async function createProject(orgId, projectName, projectDescription) {
   try {
-    const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/my-projects`,
-      { name: projectName, description: projectDescription },
-    );
+    const response = await api.post(`${apiUrl}/orgs/${orgId}/my-projects`, {
+      name: projectName,
+      description: projectDescription,
+    });
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -32,7 +31,7 @@ export async function updateProject(
 ) {
   try {
     const response = await api.put(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/my-projects/${projectId}`,
+      `${apiUrl}/orgs/${orgId}/my-projects/${projectId}`,
       { name: projectName, description: projectDescription },
     );
     return response.data;
@@ -43,9 +42,7 @@ export async function updateProject(
 
 export async function deleteProject(orgId, projectId) {
   try {
-    await api.delete(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/my-projects/${projectId}`,
-    );
+    await api.delete(`${apiUrl}/orgs/${orgId}/my-projects/${projectId}`);
   } catch (e) {
     throw new Error(e.message);
   }
@@ -54,7 +51,7 @@ export async function deleteProject(orgId, projectId) {
 export async function getPublicProject(orgId, projectId) {
   try {
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL}/public/orgs/${orgId}/projects/${projectId}`,
+      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}`,
     );
     return response.data;
   } catch (e) {

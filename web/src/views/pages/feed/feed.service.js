@@ -7,6 +7,7 @@ import {
   priorityName,
 } from '../../../services/utils/utils';
 import api from '../../../services/api/api.service';
+import { apiUrl } from '../../../config';
 
 export function getWorkItemUpdates(item) {
   const updates = [];
@@ -236,7 +237,7 @@ export function getInitiativeTitle(item) {
 export async function addTextFeedItem(orgId, projectId, feedItemText) {
   try {
     const response = await api.post(
-      `${process.env.REACT_APP_API_URL}/orgs/${orgId}/projects/${projectId}/feed`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feed`,
       { text: feedItemText },
     );
     return response.data;
