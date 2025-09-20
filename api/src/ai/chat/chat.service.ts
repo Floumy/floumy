@@ -13,6 +13,7 @@ import { DocumentVectorStoreService } from '../documents/document-vector-store.s
 import { formatDocumentsAsString } from 'langchain/util/document';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { WorkItemsToolsService } from './tools/work-items-tools.service';
+import { InitiativesToolsService } from './tools/initiatives-tools.service';
 
 @Injectable()
 export class ChatService {
@@ -23,6 +24,7 @@ export class ChatService {
     private configService: ConfigService,
     private documentVectorStoreService: DocumentVectorStoreService,
     private workItemsToolsService: WorkItemsToolsService,
+    private initiativesToolsService: InitiativesToolsService,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
@@ -102,17 +104,19 @@ export class ChatService {
           const model = new ChatOpenAI({
             model: 'gpt-4o',
             openAIApiKey: this.apiKey,
-            temperature: 0.1,
+            streaming: true,
             // callbacks: [new ConsoleCallbackHandler()],
           });
-
           const agent = createReactAgent({
             llm: model,
-            tools: this.workItemsToolsService.getTools(
-              orgId,
-              projectId,
-              userId,
-            ),
+            tools: [
+              ...this.workItemsToolsService.getTools(orgId, projectId, userId),
+              ...this.initiativesToolsService.getTools(
+                orgId,
+                projectId,
+                userId,
+              ),
+            ],
           });
 
           let prompt = message;
@@ -138,7 +142,9 @@ export class ChatService {
                   If clarification is needed, ask a single, specific question.
                   Ignore unrelated topics.
                   
-                  Important policy: You must obtain explicit human approval before creating or updating anything. First, propose the item details (title, type, description, etc.) and wait for the user's clear approval in natural language (e.g., “yes”, “looks good”, “go ahead”). Only after explicit approval should you call the confirm tool to create the item.
+                  Important policies: 
+                  - You must obtain explicit human approval before creating or updating anything. First, propose the item details (title, type, description, etc.) and wait for the user's clear approval in natural language (e.g., “yes”, “looks good”, “go ahead”). Only after explicit approval should you call the confirm tool to create the item.
+                  - When asked to update a specific entity get its details first and try to propose changes based on existing content
                   
                   Example behavior:
 
