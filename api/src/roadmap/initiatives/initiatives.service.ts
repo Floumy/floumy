@@ -19,16 +19,9 @@ import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { InitiativeComment } from './initiative-comment.entity';
 import { FeatureRequest } from '../../feature-requests/feature-request.entity';
 import { Project } from '../../projects/project.entity';
-import {
-  InitiativeQueryBuilder,
-  FilterOptions,
-} from './initiative.query-builder';
+import { FilterOptions, InitiativeQueryBuilder, } from './initiative.query-builder';
 import { InitiativeStatus } from './initiativestatus.enum';
-import {
-  ActionType,
-  EntityType,
-  StatusType,
-} from '../../notifications/notification.entity';
+import { ActionType, EntityType, StatusType, } from '../../notifications/notification.entity';
 import { CreateNotificationDto } from '../../notifications/dtos';
 
 @Injectable()
@@ -222,7 +215,7 @@ export class InitiativesService {
     initiative.status = updateInitiativeDto.status;
     initiative.mentions = Promise.resolve(
       await this.usersRepository.findBy({
-        id: In(updateInitiativeDto.mentions),
+        id: In(updateInitiativeDto.mentions || []),
       }),
     );
 
@@ -689,75 +682,6 @@ export class InitiativesService {
 
   private isReference(search: string) {
     return /^[iI]-\d+$/.test(search);
-  }
-
-  private async searchInitiativesByTitleOrDescription(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-            SELECT *
-            FROM feature
-            WHERE feature."orgId" = $1
-              AND feature."projectId" = $2
-              AND (feature.title ILIKE $3 OR feature.description ILIKE $3)
-            ORDER BY CASE
-                         WHEN feature."priority" = 'high' THEN 1
-                         WHEN feature."priority" = 'medium' THEN 2
-                         WHEN feature."priority" = 'low' THEN 3
-                         ELSE 4
-                         END,
-                     feature."createdAt" DESC
-        `;
-    let params = [orgId, projectId, `%${search}%`] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, `%${search}%`, offset, limit];
-    }
-
-    const initiatives = await this.initiativeRepository.query(query, params);
-
-    return await InitiativeMapper.toListDtoWithoutAssignees(initiatives);
-  }
-
-  private async searchInitiativesByReference(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-            SELECT *
-            FROM feature
-            WHERE feature."orgId" = $1
-              AND feature."projectId" = $2
-              AND LOWER(feature.reference) LIKE LOWER($3)
-            ORDER BY CASE
-                         WHEN feature."priority" = 'high' THEN 1
-                         WHEN feature."priority" = 'medium' THEN 2
-                         WHEN feature."priority" = 'low' THEN 3
-                         ELSE 4
-                         END,
-                     feature."createdAt" DESC
-        `;
-
-    let params = [orgId, projectId, search] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, search, offset, limit];
-    }
-
-    const initiatives = await this.initiativeRepository.query(query, params);
-
-    return await InitiativeMapper.toListDtoWithoutAssignees(initiatives);
   }
 
   private async updateInitiativeFeatureRequest(

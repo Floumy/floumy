@@ -227,7 +227,7 @@ export class InitiativesToolsService {
                   - status: ${updatedInitiative.status}\n
                   - priority: ${updatedInitiative.priority}`;
         } catch (e) {
-          return 'Failed to update initiative because ' + (e as any).message;
+          return 'Failed to update initiative';
         }
       },
       {
