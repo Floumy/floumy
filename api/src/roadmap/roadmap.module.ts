@@ -68,6 +68,6 @@ import { Notification } from '../notifications/notification.entity';
     MilestonesPublicService,
     NotificationListener,
   ],
-  exports: [InitiativesService],
+  exports: [InitiativesService, MilestonesService],
 })
 export class RoadmapModule {}

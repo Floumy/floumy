@@ -1,12 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChatOpenAI } from '@langchain/openai';
-import {
-  AIMessage,
-  AIMessageChunk,
-  HumanMessage,
-  SystemMessage,
-} from '@langchain/core/messages';
+import { AIMessage, AIMessageChunk, HumanMessage, SystemMessage, } from '@langchain/core/messages';
 import { Observable, Subscriber } from 'rxjs';
 import { PostgresChatMessageHistory } from '@langchain/community/stores/message/postgres';
 import { DocumentVectorStoreService } from '../documents/document-vector-store.service';
@@ -14,6 +9,7 @@ import { formatDocumentsAsString } from 'langchain/util/document';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { WorkItemsToolsService } from './tools/work-items-tools.service';
 import { InitiativesToolsService } from './tools/initiatives-tools.service';
+import { MilestonesToolsService } from './tools/milestones-tools.service';
 
 @Injectable()
 export class ChatService {
@@ -25,6 +21,7 @@ export class ChatService {
     private documentVectorStoreService: DocumentVectorStoreService,
     private workItemsToolsService: WorkItemsToolsService,
     private initiativesToolsService: InitiativesToolsService,
+    private milestonesToolsService: MilestonesToolsService,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
@@ -87,7 +84,7 @@ export class ChatService {
     sessionId: string,
     messageId: string,
     message: string,
-    projectId?: string,
+    projectId: string,
   ): Observable<{
     id: string;
     type: 'message';
@@ -116,6 +113,7 @@ export class ChatService {
                 projectId,
                 userId,
               ),
+              ...this.milestonesToolsService.getTools(orgId, projectId),
             ],
           });
 
@@ -137,6 +135,7 @@ export class ChatService {
 
           const systemMessage = new SystemMessage(
             `You are a helpful and concise project management assistant.
+                  The current date is ${new Date().toISOString()}
                   Respond only in markdown format.
                   Only ask follow-up questions when necessary to understand the request or provide a useful response.
                   If clarification is needed, ask a single, specific question.
@@ -145,6 +144,8 @@ export class ChatService {
                   Important policies: 
                   - You must obtain explicit human approval before creating or updating anything. First, propose the item details (title, type, description, etc.) and wait for the user's clear approval in natural language (e.g., “yes”, “looks good”, “go ahead”). Only after explicit approval should you call the confirm tool to create the item.
                   - When asked to update a specific entity get its details first and try to propose changes based on existing content
+                  - When asked about the roadmap, use the milestones tools because the roadmap is a series of milestones
+                  - When asked to create a roadmap, find existing milestones and propose new ones to associate with the initiatives provided
                   
                   Example behavior:
 

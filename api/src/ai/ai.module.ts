@@ -29,6 +29,7 @@ import { Page } from 'src/pages/pages.entity';
 import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
 import { BacklogModule } from '../backlog/backlog.module';
 import { InitiativesToolsService } from './chat/tools/initiatives-tools.service';
+import { MilestonesToolsService } from './chat/tools/milestones-tools.service';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { InitiativesToolsService } from './chat/tools/initiatives-tools.service'
     IndexingService,
     WorkItemsToolsService,
     InitiativesToolsService,
+    MilestonesToolsService,
     IndexingEventHandlerService,
   ],
 })

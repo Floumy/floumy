@@ -24,7 +24,7 @@ export class ChatController {
     @Request() request,
     @Param('sessionId') sessionId: string,
     @Query('message') message: string,
-    @Query('project') project?: string,
+    @Query('project') project: string,
   ): Observable<{
     id: string;
     type: 'message';
