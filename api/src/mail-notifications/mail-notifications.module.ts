@@ -1,11 +1,21 @@
 import { Module } from '@nestjs/common';
 import { MailNotificationsService } from './mail-notifications.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ServerClient } from 'postmark';
+import { Message, ServerClient } from 'postmark';
 
 const postmarkClientProvider = {
   provide: 'POSTMARK_CLIENT',
   useFactory: (configService: ConfigService) => {
+    if (!configService.get('mail.enabled')) {
+      return {
+        sendEmail: async (payload: Message) => {
+          console.log(
+            'Email not sent because mail is disabled; payload:',
+            payload,
+          );
+        },
+      };
+    }
     // This is a workaround to avoid creating the provider if the API key is not set
     // which is the case when running tests
     if (!configService.get('mail.postmarkApiKey')) {
