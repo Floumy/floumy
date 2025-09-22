@@ -108,6 +108,9 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@rekog/mcp-nest)"
+    ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
