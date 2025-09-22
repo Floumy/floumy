@@ -68,7 +68,7 @@ export class WorkItemsTool {
 
   @Tool({
     name: 'find-my-work-items',
-    description: 'Find all work items for the current user.',
+    description: 'Find the latest 10 work items assigned to the current user.',
   })
   async findMyWorkItems() {
     const user = await this.mcpService.getUserFromRequest(this.request);
@@ -81,6 +81,10 @@ export class WorkItemsTool {
         org: { id: org.id },
         assignedTo: { id: user.id },
       },
+      order: {
+        updatedAt: 'DESC',
+      },
+      take: 10,
     });
 
     return {
