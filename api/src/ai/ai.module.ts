@@ -30,6 +30,7 @@ import { IndexingEventHandlerService } from './documents/indexing-event-handler.
 import { BacklogModule } from '../backlog/backlog.module';
 import { InitiativesToolsService } from './chat/tools/initiatives-tools.service';
 import { MilestonesToolsService } from './chat/tools/milestones-tools.service';
+import { OkrsToolsService } from './chat/tools/okrs-tools.service';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { MilestonesToolsService } from './chat/tools/milestones-tools.service';
     WorkItemsToolsService,
     InitiativesToolsService,
     MilestonesToolsService,
+    OkrsToolsService,
     IndexingEventHandlerService,
   ],
 })
