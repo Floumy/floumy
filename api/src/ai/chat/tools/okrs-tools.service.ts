@@ -6,10 +6,13 @@ import { z } from 'zod';
 import { KeyResult } from '../../../okrs/key-result.entity';
 import { OkrsService } from '../../../okrs/okrs.service';
 import { Timeline } from '../../../common/timeline.enum';
+import { Objective } from '../../../okrs/objective.entity';
 
 @Injectable()
 export class OkrsToolsService {
   constructor(
+    @InjectRepository(Objective)
+    private objectiveRepository: Repository<Objective>,
     @InjectRepository(KeyResult)
     private keyResultRepository: Repository<KeyResult>,
     private okrsService: OkrsService,
@@ -18,6 +21,7 @@ export class OkrsToolsService {
   getTools(orgId: string, projectId: string, userId?: string) {
     const tools: DynamicStructuredTool[] = [
       this.findOneOkr(orgId, projectId),
+      this.findOneKeyResult(orgId, projectId),
       this.listOkrs(orgId, projectId),
       this.getOkrStats(orgId, projectId),
       this.confirmAndUpdateKeyResult(orgId, projectId),
@@ -33,38 +37,46 @@ export class OkrsToolsService {
 
   private findOneOkr(orgId: string, projectId: string) {
     return tool(
-      async ({ objectiveId }) => {
-        if (!objectiveId) {
+      async ({ objectiveReference }) => {
+        if (!objectiveReference) {
           return 'Please provide an objective ID';
         }
 
         try {
-          const okr = await this.okrsService.get(orgId, projectId, objectiveId);
-
-          if (!okr) {
-            return 'OKR not found';
-          }
+          const objective = await this.objectiveRepository.findOneByOrFail({
+            reference: objectiveReference,
+            org: {
+              id: orgId,
+            },
+            project: {
+              id: projectId,
+            },
+          });
 
           let output = `
             OKR Details:
-            ID: ${okr.objective.id}
-            Title: ${okr.objective.title}
-            Status: ${okr.objective.status}
-            Progress: ${Math.round(okr.objective.progress * 100)}%
-            Timeline: ${okr.objective.startDate ? new Date(okr.objective.startDate).toLocaleDateString() + ' to ' + new Date(okr.objective.endDate).toLocaleDateString() : 'Not scheduled'}
+            ID: ${objective.id}
+            Reference: ${objective.reference}
+            Title: ${objective.title}
+            Status: ${objective.status}
+            Progress: ${Math.round(objective.progress * 100)}%
+            Timeline: ${objective.startDate ? new Date(objective.startDate).toLocaleDateString() + ' to ' + new Date(objective.endDate).toLocaleDateString() : 'Not scheduled'}
             
             Key Results:
             `;
 
-          if (!okr.keyResults || okr.keyResults.length === 0) {
+          const keyResults = await objective.keyResults;
+
+          if (!keyResults || keyResults.length === 0) {
             output += 'No key results defined for this objective.\n';
           } else {
-            for (const kr of okr.keyResults) {
-              output += `- ID: ${kr.id}\n  Title: ${kr.title}\n  Progress: ${Math.round(kr.progress * 100)}%\n  Status: ${kr.status}\n\n`;
+            for (const kr of keyResults) {
+              output += `- ID: ${kr.id}\n  Reference: ${kr.reference} Title: ${kr.title}\n  Progress: ${Math.round(kr.progress * 100)}%\n  Status: ${kr.status}\n\n`;
 
-              if (kr.initiatives && kr.initiatives.length > 0) {
+              const initiatives = await kr.initiatives;
+              if (initiatives && initiatives.length > 0) {
                 output += '  Related Initiatives:\n';
-                for (const initiative of kr.initiatives) {
+                for (const initiative of initiatives) {
                   output += `  - ${initiative.reference}: ${initiative.title}\n`;
                 }
                 output += '\n';
@@ -80,9 +92,68 @@ export class OkrsToolsService {
       {
         name: 'find-one-okr',
         description:
-          'Find an OKR (objective and its key results) in the system based on the objective ID.',
+          'Find an OKR (objective and its key results) in the system based on the objective reference of the format O-123.',
         schema: z.object({
-          objectiveId: z.string().describe('The objective ID to search for'),
+          objectiveReference: z
+            .string()
+            .describe(
+              'The objective reference to search for in the format O-123',
+            ),
+        }),
+      },
+    );
+  }
+
+  private findOneKeyResult(orgId: string, projectId: string) {
+    return tool(
+      async ({ keyResultReference }) => {
+        try {
+          const keyResult = await this.keyResultRepository.findOneByOrFail({
+            reference: keyResultReference,
+            org: {
+              id: orgId,
+            },
+            project: {
+              id: projectId,
+            },
+          });
+
+          let output = `
+            Key Result Details:
+            ID: ${keyResult.id}
+            Reference: ${keyResult.reference}
+            Title: ${keyResult.title}
+            Status: ${keyResult.status}
+            Progress: ${Math.round(keyResult.progress * 100)}%
+     
+            
+            Key Results:
+            `;
+
+          const initiatives = await keyResult.initiatives;
+          if (initiatives && initiatives.length > 0) {
+            output += '  Related Initiatives:\n';
+            for (const initiative of initiatives) {
+              output += `  - ${initiative.reference}: ${initiative.title}\n`;
+            }
+            output += '\n';
+          }
+
+          return output;
+        } catch (e) {
+          return 'Failed to find the Key Result: ' + (e as any).message;
+        }
+      },
+      {
+        name: 'find-one-key-result',
+        description:
+          'Find an key result in the system based on the reference of the format KR-123.',
+        schema: z.object({
+          keyResultReference: z
+            .string()
+            .describe(
+              'The key result reference to search for in the format KR-123',
+            ),
         }),
       },
     );
@@ -184,7 +255,7 @@ export class OkrsToolsService {
           timeline: z
             .enum(['this-quarter', 'next-quarter', 'past', 'later'])
             .describe(
-              'The timeline to get stats for: current, next, past, or later',
+              'The timeline to get stats for: this-quarter, next-quarter, past, or later',
             )
             .optional(),
         }),
@@ -248,9 +319,9 @@ export class OkrsToolsService {
         schema: z.object({
           objectiveTitle: z.string().describe('The title for the objective'),
           objectiveTimeline: z
-            .enum(['current', 'next', 'past', 'later'])
+            .enum(['this-quarter', 'next-quarter', 'past', 'later'])
             .describe(
-              'The timeline for the objective: current, next, past, or later',
+              'The timeline for the objective: this-quarter, next-quarter, past, or later',
             )
             .optional(),
           keyResults: z
