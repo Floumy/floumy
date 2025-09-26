@@ -55,8 +55,7 @@ export class OkrsToolsService {
 
           let output = `
             OKR Details:
-            ID: ${objective.id}
-            Reference: ${objective.reference}
+            Objective Reference: ${objective.reference}
             Title: ${objective.title}
             Status: ${objective.status}
             Progress: ${Math.round(objective.progress * 100)}%
@@ -71,7 +70,7 @@ export class OkrsToolsService {
             output += 'No key results defined for this objective.\n';
           } else {
             for (const kr of keyResults) {
-              output += `- ID: ${kr.id}\n  Reference: ${kr.reference} Title: ${kr.title}\n  Progress: ${Math.round(kr.progress * 100)}%\n  Status: ${kr.status}\n\n`;
+              output += `- Reference: ${kr.reference} Title: ${kr.title}\n  Progress: ${Math.round(kr.progress * 100)}%\n  Status: ${kr.status}\n\n`;
 
               const initiatives = await kr.initiatives;
               if (initiatives && initiatives.length > 0) {
@@ -120,7 +119,6 @@ export class OkrsToolsService {
 
           let output = `
             Key Result Details:
-            ID: ${keyResult.id}
             Reference: ${keyResult.reference}
             Title: ${keyResult.title}
             Status: ${keyResult.status}
@@ -181,12 +179,12 @@ export class OkrsToolsService {
           let output = `OKRs for ${timeline} timeline:\n\n`;
 
           for (const okr of okrs) {
-            output += `ID: ${okr.id}\nTitle: ${okr.title}\nProgress: ${Math.round(okr.progress * 100)}%\nStatus: ${okr.status}\n\n`;
+            output += `- Reference: ${okr.reference}\nTitle: ${okr.title}\nProgress: ${Math.round(okr.progress * 100)}%\nStatus: ${okr.status}\n\n`;
 
             if (okr.keyResults && okr.keyResults.length > 0) {
               output += 'Key Results:\n';
               for (const kr of okr.keyResults) {
-                output += `- ${kr.title} (${Math.round(kr.progress * 100)}% complete)\n`;
+                output += `- Reference ${kr.reference}\nTitle ${kr.title}\nProgress:${Math.round(kr.progress * 100)}%\n`;
               }
               output += '\n';
             } else {
@@ -292,7 +290,7 @@ export class OkrsToolsService {
           Successfully created OKR!
           
           Objective Details:
-          - ID: ${savedOkr.objective.id}
+          - Reference: ${savedOkr.objective.reference}
           - Title: ${savedOkr.objective.title}
           - Timeline: ${okrDto.objective.timeline}
           - Status: ${savedOkr.objective.status}
@@ -301,7 +299,7 @@ export class OkrsToolsService {
           if (savedOkr.keyResults && savedOkr.keyResults.length > 0) {
             output += '\nKey Results:\n';
             for (const kr of savedOkr.keyResults) {
-              output += `- ID: ${kr.id}\n  Title: ${kr.title}\n  Status: ${kr.status}\n`;
+              output += `- Reference: ${kr.reference}\n  Title: ${kr.title}\n  Status: ${kr.status}\n`;
             }
           } else {
             output += '\nNo key results were created with this objective.';
@@ -387,7 +385,7 @@ export class OkrsToolsService {
           Successfully updated OKR!
           
           Updated Objective Details:
-          - ID: ${updatedOkr.objective.id}
+          - Reference: ${updatedOkr.objective.reference}
           - Title: ${updatedOkr.objective.title}
           - Status: ${updatedOkr.objective.status}
           - Timeline: ${objectiveTimeline || 'unchanged'}
@@ -397,7 +395,7 @@ export class OkrsToolsService {
           if (createdKeyResults.length > 0) {
             output += '\nNewly Added Key Results:\n';
             for (const kr of createdKeyResults) {
-              output += `- ID: ${kr.id}\n  Title: ${kr.title}\n  Status: ${kr.status}\n`;
+              output += `- Reference: ${kr.reference}\n  Title: ${kr.title}\n  Status: ${kr.status}\n`;
             }
           }
 
@@ -484,11 +482,11 @@ export class OkrsToolsService {
           Successfully updated key result!
           
           Updated Key Result Details:
-          - ID: ${updatedKeyResult.id}
+          - Reference: ${updatedKeyResult.reference}
           - Title: ${updatedKeyResult.title}
           - Progress: ${Math.round(updatedKeyResult.progress * 100)}%
           - Status: ${updatedKeyResult.status}
-          - Objective: ${objective.title} (ID: ${objective.id})
+          - Objective: ${objective.title}
           `;
         } catch (e) {
           return 'Failed to update key result: ' + (e as any).message;

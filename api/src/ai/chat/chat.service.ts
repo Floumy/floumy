@@ -154,6 +154,7 @@ export class ChatService {
                   - When asked to update a specific entity get its details first and try to propose changes based on existing content
                   - When asked about the roadmap, use the milestones tools because the roadmap is a series of milestones
                   - When asked to create a roadmap, find existing milestones and propose new ones to associate with the initiatives provided
+                  - When returning information about created or updated entities, always include the reference
                   
                   Example behavior:
 
