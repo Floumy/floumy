@@ -10,6 +10,7 @@ import { Priority } from '../../../common/priority.enum';
 import { Initiative } from '../../../roadmap/initiatives/initiative.entity';
 import { InitiativesService } from '../../../roadmap/initiatives/initiatives.service';
 import { InitiativeStatus } from '../../../roadmap/initiatives/initiativestatus.enum';
+import { KeyResult } from '../../../okrs/key-result.entity';
 
 @Injectable()
 export class InitiativesToolsService {
@@ -22,6 +23,8 @@ export class InitiativesToolsService {
     private projectRepository: Repository<Project>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(KeyResult)
+    private keyResultsRepository: Repository<KeyResult>,
     private initiativesService: InitiativesService,
   ) {}
 
@@ -137,7 +140,11 @@ export class InitiativesToolsService {
     userId: string,
   ) {
     return tool(
-      async ({ initiativeTitle, initiativeDescription }) => {
+      async ({
+        initiativeTitle,
+        initiativeDescription,
+        keyResultReference,
+      }) => {
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
           const project = await this.projectRepository.findOneByOrFail({
@@ -148,17 +155,34 @@ export class InitiativesToolsService {
             id: userId,
           });
 
+          const createInitiativeDto = {
+            title: initiativeTitle,
+            description: initiativeDescription,
+            status: InitiativeStatus.PLANNED,
+            priority: Priority.MEDIUM,
+            keyResult: undefined,
+          };
+
+          if (keyResultReference) {
+            const keyResult = await this.keyResultsRepository.findOneByOrFail({
+              reference: keyResultReference,
+              org: {
+                id: orgId,
+              },
+              project: {
+                id: projectId,
+              },
+            });
+
+            createInitiativeDto['keyResult'] = keyResult.id;
+          }
+
           const savedInitiative =
             await this.initiativesService.createInitiative(
               org.id,
               project.id,
               user.id,
-              {
-                title: initiativeTitle,
-                description: initiativeDescription,
-                status: InitiativeStatus.PLANNED,
-                priority: Priority.MEDIUM,
-              },
+              createInitiativeDto,
             );
 
           return `Successfully created initiative with reference ${savedInitiative.reference}\nInitiative Details\n- title: ${savedInitiative.title}\n- description: ${savedInitiative.description}\n- status: ${savedInitiative.status}\n- priority: ${savedInitiative.priority}`;
@@ -175,6 +199,12 @@ export class InitiativesToolsService {
           initiativeDescription: z
             .string()
             .describe('The initiative description.'),
+          keyResultReference: z
+            .string()
+            .optional()
+            .describe(
+              'The key result reference with the format KR-123 to associate the initiative to',
+            ),
         }),
       },
     );
@@ -191,6 +221,7 @@ export class InitiativesToolsService {
         initiativeDescription,
         initiativePriority,
         initiativeStatus,
+        keyResultReference,
       }) => {
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
@@ -217,7 +248,22 @@ export class InitiativesToolsService {
             description: initiativeDescription,
             priority: initiativePriority as Priority,
             status: initiativeStatus as InitiativeStatus,
+            keyResult: undefined,
           };
+
+          if (keyResultReference) {
+            const keyResult = await this.keyResultsRepository.findOneByOrFail({
+              reference: keyResultReference,
+              org: {
+                id: orgId,
+              },
+              project: {
+                id: projectId,
+              },
+            });
+
+            updateInitiativeDto['keyResult'] = keyResult.id;
+          }
 
           const updatedInitiative =
             await this.initiativesService.updateInitiative(
@@ -264,6 +310,12 @@ export class InitiativesToolsService {
               'closed',
             ])
             .describe('The new status for the initiative'),
+          keyResultReference: z
+            .string()
+            .optional()
+            .describe(
+              'The key result reference with the format KR-123 to associate the initiative to',
+            ),
         }),
       },
     );

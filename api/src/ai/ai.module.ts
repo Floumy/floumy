@@ -30,6 +30,8 @@ import { IndexingEventHandlerService } from './documents/indexing-event-handler.
 import { BacklogModule } from '../backlog/backlog.module';
 import { InitiativesToolsService } from './chat/tools/initiatives-tools.service';
 import { MilestonesToolsService } from './chat/tools/milestones-tools.service';
+import { OkrsToolsService } from './chat/tools/okrs-tools.service';
+import { OkrsModule } from '../okrs/okrs.module';
 
 @Module({
   imports: [
@@ -38,6 +40,7 @@ import { MilestonesToolsService } from './chat/tools/milestones-tools.service';
     UsersModule,
     AuthModule,
     BacklogModule,
+    OkrsModule,
     CacheModule.register(),
     TypeOrmModule.forFeature([
       Org,
@@ -64,6 +67,7 @@ import { MilestonesToolsService } from './chat/tools/milestones-tools.service';
     WorkItemsToolsService,
     InitiativesToolsService,
     MilestonesToolsService,
+    OkrsToolsService,
     IndexingEventHandlerService,
   ],
 })
