@@ -124,7 +124,6 @@ export class OkrsToolsService {
             Status: ${keyResult.status}
             Progress: ${Math.round(keyResult.progress * 100)}%
             
-            Key Results:
             `;
 
           const initiatives = await keyResult.initiatives;
