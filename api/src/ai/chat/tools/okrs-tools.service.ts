@@ -123,7 +123,6 @@ export class OkrsToolsService {
             Title: ${keyResult.title}
             Status: ${keyResult.status}
             Progress: ${Math.round(keyResult.progress * 100)}%
-     
             
             Key Results:
             `;
