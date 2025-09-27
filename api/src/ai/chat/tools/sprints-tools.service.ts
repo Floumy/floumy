@@ -447,7 +447,12 @@ export class SprintsToolsService {
 
   private confirmAndCreateSprint(orgId: string, projectId: string) {
     return tool(
-      async ({ sprintGoal, sprintStartDate, sprintDuration }) => {
+      async ({
+        sprintGoal,
+        sprintStartDate,
+        sprintDuration,
+        workItemReferences,
+      }) => {
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
           const project = await this.projectRepository.findOneByOrFail({
@@ -465,6 +470,7 @@ export class SprintsToolsService {
             return 'Duration must be a positive integer representing the number of weeks';
           }
 
+          // Create the sprint first
           const savedSprint = await this.sprintsService.create(
             org.id,
             project.id,
@@ -475,15 +481,53 @@ export class SprintsToolsService {
             },
           );
 
+          // If work item references are provided, add them to the sprint
+          let addedWorkItemsCount = 0;
+          const failedWorkItemReferences = [];
+
+          if (workItemReferences && workItemReferences.length > 0) {
+            const sprint = await this.sprintRepository.findOneByOrFail({
+              id: savedSprint.id,
+            });
+
+            for (const reference of workItemReferences) {
+              try {
+                // Find the work item
+                const workItem = await this.workItemRepository.findOneByOrFail({
+                  reference: reference,
+                  org: { id: orgId },
+                  project: { id: projectId },
+                });
+
+                // Associate the work item with the sprint
+                workItem.sprint = Promise.resolve(sprint);
+
+                // Save the work item
+                await this.workItemRepository.save(workItem);
+                addedWorkItemsCount++;
+              } catch (error) {
+                failedWorkItemReferences.push(reference);
+              }
+            }
+          }
+
+          let workItemsMessage = '';
+          if (workItemReferences && workItemReferences.length > 0) {
+            workItemsMessage = `\n- Added ${addedWorkItemsCount} work items to the sprint`;
+            if (failedWorkItemReferences.length > 0) {
+              workItemsMessage += `\n- Failed to add the following work items: ${failedWorkItemReferences.join(', ')}`;
+            }
+          }
+
           return `Successfully created sprint\n
-          Sprint Details\n
-          - title: ${savedSprint.title}\n
-          - goal: ${savedSprint.goal}\n
-          - start date: ${new Date(savedSprint.startDate).toISOString().split('T')[0]}\n
-          - end date: ${new Date(savedSprint.endDate).toISOString().split('T')[0]}\n
-          - duration: ${savedSprint.duration} weeks\n
-          - status: ${savedSprint.status}\n
-          - id: ${savedSprint.id}`;
+        Sprint Details\n
+        - title: ${savedSprint.title}\n
+        - goal: ${savedSprint.goal}\n
+        - start date: ${new Date(savedSprint.startDate).toISOString().split('T')[0]}\n
+        - end date: ${new Date(savedSprint.endDate).toISOString().split('T')[0]}\n
+        - duration: ${savedSprint.duration} weeks\n
+        - status: ${savedSprint.status}\n
+        - id: ${savedSprint.id}${workItemsMessage}`;
         } catch (e) {
           return 'Failed to create sprint because ' + (e as any).message;
         }
@@ -491,7 +535,7 @@ export class SprintsToolsService {
       {
         name: 'confirm-create-sprint',
         description:
-          'After the user explicitly approves a proposal in natural language, call this tool to create the sprint.',
+          'After the user explicitly approves a proposal in natural language, call this tool to create the sprint with optional work items.',
         schema: z.object({
           sprintGoal: z.string().describe('The sprint goal.'),
           sprintStartDate: z
@@ -500,6 +544,12 @@ export class SprintsToolsService {
           sprintDuration: z
             .number()
             .describe('The sprint duration in weeks (integer).'),
+          workItemReferences: z
+            .array(z.string())
+            .optional()
+            .describe(
+              'Optional array of work item references (e.g., ["WI-123", "WI-124"]) to add to the sprint.',
+            ),
         }),
       },
     );

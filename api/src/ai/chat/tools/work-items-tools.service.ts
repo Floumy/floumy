@@ -12,6 +12,7 @@ import { Priority } from '../../../common/priority.enum';
 import { WorkItemStatus } from '../../../backlog/work-items/work-item-status.enum';
 import { Initiative } from '../../../roadmap/initiatives/initiative.entity';
 import { WorkItemType } from '../../../backlog/work-items/work-item-type.enum';
+import { Sprint } from '../../../sprints/sprint.entity';
 
 @Injectable()
 export class WorkItemsToolsService {
@@ -26,6 +27,8 @@ export class WorkItemsToolsService {
     private projectRepository: Repository<Project>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Sprint)
+    private sprintRepository: Repository<Sprint>,
     private workItemsService: WorkItemsService,
   ) {}
 
@@ -103,6 +106,10 @@ export class WorkItemsToolsService {
         workItemDescription,
         workItemType,
         workItemInitiative,
+        workItemSprintId,
+        workItemEstimation,
+        workItemPriority,
+        workItemStatus,
       }) => {
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
@@ -114,13 +121,21 @@ export class WorkItemsToolsService {
             id: userId,
           });
 
-          const createWorkItemDto = {
+          const createWorkItemDto: any = {
             title: workItemTitle,
             type: workItemType as WorkItemType,
             description: workItemDescription,
-            status: WorkItemStatus.PLANNED,
-            priority: Priority.MEDIUM,
+            status: workItemStatus
+              ? (workItemStatus as WorkItemStatus)
+              : WorkItemStatus.PLANNED,
+            priority: workItemPriority
+              ? (workItemPriority as Priority)
+              : Priority.MEDIUM,
           };
+
+          if (workItemEstimation) {
+            createWorkItemDto.estimation = workItemEstimation;
+          }
 
           if (workItemInitiative) {
             const initiative = await this.initiativeRepository.findOneByOrFail({
@@ -132,9 +147,10 @@ export class WorkItemsToolsService {
                 id: projectId,
               },
             });
-            createWorkItemDto['initiative'] = initiative.id;
+            createWorkItemDto.initiative = initiative.id;
           }
 
+          // Create the work item
           const savedWorkItem = await this.workItemsService.createWorkItem(
             org.id,
             project.id,
@@ -142,15 +158,47 @@ export class WorkItemsToolsService {
             createWorkItemDto,
           );
 
+          // If a sprint ID is provided, associate the work item with the sprint
+          let sprintAssociationMessage = '';
+          if (workItemSprintId) {
+            try {
+              // Find the newly created work item
+              const workItem = await this.workItemRepository.findOneByOrFail({
+                id: savedWorkItem.id,
+                org: { id: orgId },
+                project: { id: projectId },
+              });
+
+              // Find the sprint
+              const sprint = await this.sprintRepository.findOneByOrFail({
+                id: workItemSprintId,
+                org: { id: orgId },
+                project: { id: projectId },
+              });
+
+              // Associate work item with sprint
+              workItem.sprint = Promise.resolve(sprint);
+              await this.workItemRepository.save(workItem);
+
+              sprintAssociationMessage = `\n- Added to sprint: ${sprint.title}`;
+            } catch (error) {
+              sprintAssociationMessage = `\n- Failed to add to sprint: ${error.message}`;
+            }
+          }
+
           return `Successfully created work item with reference ${savedWorkItem.reference}\n
-                  Work Item Details\n
-                  - title: ${savedWorkItem.title}\n
-                  - type: ${savedWorkItem.type}\n
-                  - description: ${savedWorkItem.description}\n
-                  - status: ${savedWorkItem.status}\n
-                  - priority: ${savedWorkItem.priority}`;
+                Work Item Details\n
+                - title: ${savedWorkItem.title}\n
+                - type: ${savedWorkItem.type}\n
+                - description: ${savedWorkItem.description}\n
+                - status: ${savedWorkItem.status}\n
+                - priority: ${savedWorkItem.priority}${
+                  workItemEstimation
+                    ? `\n- estimation: ${workItemEstimation}`
+                    : ''
+                }${sprintAssociationMessage}`;
         } catch (e) {
-          return 'Failed to create work item';
+          return 'Failed to create work item: ' + e.message;
         }
       },
       {
@@ -173,6 +221,38 @@ export class WorkItemsToolsService {
             .describe(
               'The initiative reference of the form I-123 that needs to be associated with the work item',
             ),
+          workItemSprintId: z
+            .string()
+            .optional()
+            .describe('Optional sprint ID to associate the work item with'),
+          workItemEstimation: z
+            .number()
+            .optional()
+            .describe('The numeric estimation for the work item'),
+          workItemPriority: z
+            .enum(['low', 'medium', 'high'])
+            .optional()
+            .describe(
+              'One of the options low, medium, high. Defaults to medium if not provided.',
+            ),
+          workItemStatus: z
+            .enum([
+              'planned',
+              'ready-to-start',
+              'in-progress',
+              'blocked',
+              'code-review',
+              'testing',
+              'revisions',
+              'ready-for-deployment',
+              'deployed',
+              'done',
+              'closed',
+            ])
+            .optional()
+            .describe(
+              'The initial status for the work item. Defaults to planned if not provided.',
+            ),
         }),
       },
     );
@@ -193,6 +273,7 @@ export class WorkItemsToolsService {
         workItemStatus,
         workItemPriority,
         workItemEstimation,
+        workItemSprintId,
       }) => {
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
@@ -214,13 +295,21 @@ export class WorkItemsToolsService {
             },
           });
 
-          const updateWorkItemDto = {
+          const updateWorkItemDto: any = {
             title: workItemTitle,
             type: workItemType as WorkItemType,
             description: workItemDescription,
-            status: workItemStatus as WorkItemStatus,
-            priority: workItemPriority as Priority,
+            status: workItem.status,
+            priority: workItem.priority,
           };
+
+          if (workItemStatus) {
+            updateWorkItemDto.status = workItemStatus as WorkItemStatus;
+          }
+
+          if (workItemPriority) {
+            updateWorkItemDto.priority = workItemPriority as Priority;
+          }
 
           if (workItemInitiative) {
             const initiative = await this.initiativeRepository.findOneBy({
@@ -232,11 +321,11 @@ export class WorkItemsToolsService {
                 id: projectId,
               },
             });
-            updateWorkItemDto['initiative'] = initiative.id;
+            updateWorkItemDto.initiative = initiative.id;
           }
 
-          if (workItemEstimation) {
-            updateWorkItemDto['estimation'] = workItemEstimation;
+          if (workItemEstimation !== undefined) {
+            updateWorkItemDto.estimation = workItemEstimation;
           }
 
           const updatedWorkItem = await this.workItemsService.updateWorkItem(
@@ -247,15 +336,51 @@ export class WorkItemsToolsService {
             updateWorkItemDto,
           );
 
+          // Handle sprint association changes
+          let sprintMessage = '';
+          if (workItemSprintId !== undefined) {
+            try {
+              const freshWorkItem =
+                await this.workItemRepository.findOneByOrFail({
+                  id: updatedWorkItem.id,
+                });
+
+              if (workItemSprintId === null) {
+                // Remove work item from any sprint
+                freshWorkItem.sprint = Promise.resolve(null);
+                await this.workItemRepository.save(freshWorkItem);
+                sprintMessage = '\n- Removed from sprint';
+              } else {
+                // Add to a specified sprint
+                const sprint = await this.sprintRepository.findOneByOrFail({
+                  id: workItemSprintId,
+                  org: { id: orgId },
+                  project: { id: projectId },
+                });
+
+                freshWorkItem.sprint = Promise.resolve(sprint);
+                await this.workItemRepository.save(freshWorkItem);
+
+                sprintMessage = `\n- Added to sprint: ${sprint.title}`;
+              }
+            } catch (error) {
+              sprintMessage = `\n- Failed to update sprint association: ${error.message}`;
+            }
+          }
+
           return `Successfully updated work item ${updatedWorkItem.reference}\n
-                  Work Item Details\n
-                  - title: ${updatedWorkItem.title}\n
-                  - type: ${updatedWorkItem.type}\n
-                  - description: ${updatedWorkItem.description}\n
-                  - status: ${updatedWorkItem.status}\n
-                  - priority: ${updatedWorkItem.priority}`;
+                Work Item Details\n
+                - title: ${updatedWorkItem.title}\n
+                - type: ${updatedWorkItem.type}\n
+                - description: ${updatedWorkItem.description}\n
+                - status: ${updatedWorkItem.status}\n
+                - priority: ${updatedWorkItem.priority}${
+                  updatedWorkItem.estimation
+                    ? `\n- estimation: ${updatedWorkItem.estimation}`
+                    : ''
+                }${sprintMessage}`;
         } catch (e) {
-          return 'Failed to update work item';
+          return 'Failed to update work item: ' + e.message;
         }
       },
       {
@@ -279,6 +404,7 @@ export class WorkItemsToolsService {
             ),
           workItemPriority: z
             .enum(['low', 'medium', 'high'])
+            .optional()
             .describe('One of the options low, medium, high'),
           workItemInitiative: z
             .string()
@@ -306,6 +432,13 @@ export class WorkItemsToolsService {
             ])
             .optional()
             .describe('The new status for the work item'),
+          workItemSprintId: z
+            .string()
+            .nullable()
+            .optional()
+            .describe(
+              'Optional sprint ID to associate the work item with. Set to null to remove from sprint.',
+            ),
         }),
       },
     );
