@@ -262,7 +262,7 @@ export class InitiativesToolsService {
               },
             });
 
-            updateInitiativeDto['keyResult'] = keyResult.id;
+            updateInitiativeDto.keyResult = keyResult.id;
           }
 
           const updatedInitiative =
