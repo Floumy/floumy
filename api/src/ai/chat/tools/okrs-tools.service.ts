@@ -183,7 +183,7 @@ export class OkrsToolsService {
             if (okr.keyResults && okr.keyResults.length > 0) {
               output += 'Key Results:\n';
               for (const kr of okr.keyResults) {
-                output += `- Reference ${kr.reference}\nTitle ${kr.title}\nProgress:${Math.round(kr.progress * 100)}%\n`;
+                output += `- Reference: ${kr.reference}\nTitle: ${kr.title}\nProgress: ${Math.round(kr.progress * 100)}%\n`;
               }
               output += '\n';
             } else {
