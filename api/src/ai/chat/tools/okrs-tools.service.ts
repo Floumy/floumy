@@ -273,7 +273,7 @@ export class OkrsToolsService {
           const okrDto = {
             objective: {
               title: objectiveTitle,
-              timeline: objectiveTimeline || 'current',
+              timeline: objectiveTimeline || 'this-quarter',
               assignedTo: userId,
             },
             keyResults: keyResultsArray.map((title) => ({ title })),
