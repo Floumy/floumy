@@ -121,7 +121,17 @@ export class WorkItemsToolsService {
             id: userId,
           });
 
-          const createWorkItemDto: any = {
+          type CreateWorkItemDto = {
+            title: string;
+            type: WorkItemType;
+            description: string;
+            status: WorkItemStatus;
+            priority: Priority;
+            estimation?: number;
+            initiative?: string | number;
+          };
+
+          const createWorkItemDto: CreateWorkItemDto = {
             title: workItemTitle,
             type: workItemType as WorkItemType,
             description: workItemDescription,
