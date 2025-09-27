@@ -353,6 +353,12 @@ export class WorkItemsToolsService {
               const freshWorkItem =
                 await this.workItemRepository.findOneByOrFail({
                   id: updatedWorkItem.id,
+                  org: {
+                    id: orgId,
+                  },
+                  project: {
+                    id: projectId,
+                  },
                 });
 
               if (workItemSprintId === null) {

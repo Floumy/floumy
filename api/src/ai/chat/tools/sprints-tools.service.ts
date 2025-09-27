@@ -694,34 +694,16 @@ export class SprintsToolsService {
         }
 
         try {
-          // Get all sprints for the org and project
-          const sprints = await this.sprintRepository.find({
-            where: {
-              org: {
-                id: orgId,
-              },
-              project: {
-                id: projectId,
-              },
-            },
-            order: {
-              createdAt: 'DESC', // Order by creation date, newest first
-            },
-            relations: ['workItems'],
-          });
-
-          if (sprints.length === 0) {
-            return 'No sprints found';
-          }
-
-          // Create a regex pattern from the input
-          // If input is like "CW33-CW35", it will match titles containing that pattern
-          const regex = new RegExp(sprintNamePattern, 'i');
-
-          // Find the most recent sprint matching the pattern
-          const matchingSprint = sprints.find((sprint) =>
-            regex.test(sprint.title),
-          );
+          const matchingSprint = await this.sprintRepository
+            .createQueryBuilder('sprint')
+            .leftJoinAndSelect('sprint.workItems', 'workItems')
+            .where('sprint.orgId = :orgId', { orgId })
+            .andWhere('sprint.projectId = :projectId', { projectId })
+            .andWhere('sprint.title ~* :pattern', {
+              pattern: sprintNamePattern,
+            })
+            .orderBy('sprint.createdAt', 'DESC')
+            .getOne();
 
           if (!matchingSprint) {
             return `No sprint found matching pattern "${sprintNamePattern}"`;
