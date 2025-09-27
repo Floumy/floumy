@@ -144,7 +144,7 @@ export class OkrsToolsService {
       {
         name: 'find-one-key-result',
         description:
-          'Find an key result in the system based on the reference of the format KR-123.',
+          'Find a key result in the system based on the reference of the format KR-123.',
         schema: z.object({
           keyResultReference: z
             .string()
