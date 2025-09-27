@@ -22,5 +22,6 @@ import { Project } from '../projects/project.entity';
     AuthModule,
   ],
   providers: [SprintsService, PublicService],
+  exports: [SprintsService],
 })
 export class SprintsModule {}
