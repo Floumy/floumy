@@ -128,7 +128,7 @@ export class WorkItemsToolsService {
             status: WorkItemStatus;
             priority: Priority;
             estimation?: number;
-            initiative?: string | number;
+            initiative?: string;
           };
 
           const createWorkItemDto: CreateWorkItemDto = {
@@ -157,7 +157,7 @@ export class WorkItemsToolsService {
                 id: projectId,
               },
             });
-            createWorkItemDto.initiative = initiative.id;
+            createWorkItemDto.initiative = initiative.id.toString();
           }
 
           // Create the work item
@@ -305,7 +305,7 @@ export class WorkItemsToolsService {
             },
           });
 
-          const updateWorkItemDto: any = {
+          const updateWorkItemDto = {
             title: workItemTitle,
             type: workItemType as WorkItemType,
             description: workItemDescription,
@@ -331,11 +331,11 @@ export class WorkItemsToolsService {
                 id: projectId,
               },
             });
-            updateWorkItemDto.initiative = initiative.id;
+            updateWorkItemDto['initiative'] = initiative.id;
           }
 
           if (workItemEstimation !== undefined) {
-            updateWorkItemDto.estimation = workItemEstimation;
+            updateWorkItemDto['estimation'] = workItemEstimation;
           }
 
           const updatedWorkItem = await this.workItemsService.updateWorkItem(
