@@ -427,7 +427,7 @@ export class OkrsToolsService {
             ])
             .describe('The updated status for the objective'),
           objectiveTimeline: z
-            .enum(['this-quarter', 'next-quarter', 'past', 'later', 'current'])
+            .enum(['this-quarter', 'next-quarter', 'past', 'later'])
             .describe('The updated timeline for the objective')
             .optional(),
           newKeyResults: z
