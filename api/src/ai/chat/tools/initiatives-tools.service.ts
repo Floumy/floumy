@@ -174,7 +174,7 @@ export class InitiativesToolsService {
               },
             });
 
-            createInitiativeDto['keyResult'] = keyResult.id;
+            createInitiativeDto.keyResult = keyResult.id;
           }
 
           const savedInitiative =
