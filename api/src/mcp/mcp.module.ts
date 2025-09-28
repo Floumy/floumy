@@ -18,11 +18,14 @@ import { ProjectTool } from './tools/project.tool';
 import { BacklogModule } from '../backlog/backlog.module';
 import { InitiativeTool } from './tools/initiative.tool';
 import { RoadmapModule } from '../roadmap/roadmap.module';
+import { SprintTool } from './tools/sprint.tool';
+import { SprintsModule } from '../sprints/sprints.module';
 
 @Module({
   imports: [
     BacklogModule,
     RoadmapModule,
+    SprintsModule,
     TypeOrmModule.forFeature([
       User,
       Org,
@@ -41,6 +44,12 @@ import { RoadmapModule } from '../roadmap/roadmap.module';
       version: '1.0.0',
     }),
   ],
-  providers: [ProjectTool, WorkItemsTool, InitiativeTool, McpService],
+  providers: [
+    ProjectTool,
+    WorkItemsTool,
+    InitiativeTool,
+    SprintTool,
+    McpService,
+  ],
 })
 export class FloumyMcpModule {}
