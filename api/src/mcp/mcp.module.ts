@@ -16,10 +16,13 @@ import { User } from '../users/user.entity';
 import { McpService } from './services/mcp.service';
 import { ProjectTool } from './tools/project.tool';
 import { BacklogModule } from '../backlog/backlog.module';
+import { InitiativeTool } from './tools/initiative.tool';
+import { RoadmapModule } from '../roadmap/roadmap.module';
 
 @Module({
   imports: [
     BacklogModule,
+    RoadmapModule,
     TypeOrmModule.forFeature([
       User,
       Org,
@@ -38,6 +41,6 @@ import { BacklogModule } from '../backlog/backlog.module';
       version: '1.0.0',
     }),
   ],
-  providers: [ProjectTool, WorkItemsTool, McpService],
+  providers: [ProjectTool, WorkItemsTool, InitiativeTool, McpService],
 })
 export class FloumyMcpModule {}
