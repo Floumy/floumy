@@ -330,9 +330,6 @@ export class WorkItemsTool {
         reference: workItemReference,
         org: { id: org.id },
       });
-      if (!workItem) {
-        return entityNotFound('work item');
-      }
       const sprint = await this.sprintRepository.findOneByOrFail({
         id: sprintId,
         org: { id: org.id },
