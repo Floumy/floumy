@@ -16,6 +16,7 @@ import { WorkItemsToolsService } from './tools/work-items-tools.service';
 import { InitiativesToolsService } from './tools/initiatives-tools.service';
 import { MilestonesToolsService } from './tools/milestones-tools.service';
 import { OkrsToolsService } from './tools/okrs-tools.service';
+import { SprintsToolsService } from './tools/sprints-tools.service';
 
 @Injectable()
 export class ChatService {
@@ -29,6 +30,7 @@ export class ChatService {
     private initiativesToolsService: InitiativesToolsService,
     private milestonesToolsService: MilestonesToolsService,
     private okrsToolsService: OkrsToolsService,
+    private sprintsToolsService: SprintsToolsService,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
@@ -122,6 +124,7 @@ export class ChatService {
               ),
               ...this.milestonesToolsService.getTools(orgId, projectId),
               ...this.okrsToolsService.getTools(orgId, projectId, userId),
+              ...this.sprintsToolsService.getTools(orgId, projectId),
             ],
           });
 

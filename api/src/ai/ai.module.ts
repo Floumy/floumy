@@ -32,6 +32,8 @@ import { InitiativesToolsService } from './chat/tools/initiatives-tools.service'
 import { MilestonesToolsService } from './chat/tools/milestones-tools.service';
 import { OkrsToolsService } from './chat/tools/okrs-tools.service';
 import { OkrsModule } from '../okrs/okrs.module';
+import { SprintsModule } from '../sprints/sprints.module';
+import { SprintsToolsService } from './chat/tools/sprints-tools.service';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { OkrsModule } from '../okrs/okrs.module';
     AuthModule,
     BacklogModule,
     OkrsModule,
+    SprintsModule,
     CacheModule.register(),
     TypeOrmModule.forFeature([
       Org,
@@ -68,6 +71,7 @@ import { OkrsModule } from '../okrs/okrs.module';
     InitiativesToolsService,
     MilestonesToolsService,
     OkrsToolsService,
+    SprintsToolsService,
     IndexingEventHandlerService,
   ],
 })
