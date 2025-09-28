@@ -89,6 +89,44 @@ export class InitiativeTool {
   }
 
   @Tool({
+    name: 'get-initiative-by-reference',
+    description:
+      'Get an initiative in the system based on its reference. The reference is in the form of I-123',
+    parameters: z.object({
+      reference: z
+        .string()
+        .describe(
+          'The reference of the initiative to retrieve. The reference is in the form of I-123',
+        ),
+    }),
+  })
+  async getInitiativeByReference({ reference }: { reference: string }) {
+    const user = await this.mcpService.getUserFromRequest(this.request);
+    if (!user) {
+      return entityNotFound('initiative');
+    }
+    const org = await user.org;
+    const initiative = await this.initiativeRepository.findOne({
+      where: { reference, org: { id: org.id } },
+    });
+    if (!initiative) {
+      return entityNotFound('initiative');
+    }
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Successfully retrieved initiative with reference: ${initiative.reference}
+          Title: ${initiative.title}
+          Description: ${initiative.description}
+          Status: ${initiative.status}
+          Priority: ${initiative.priority}`,
+        },
+      ],
+    };
+  }
+
+  @Tool({
     name: 'create-initiative',
     description: 'Create a new initiative with title and description.',
     parameters: z.object({
