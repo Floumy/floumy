@@ -15,6 +15,8 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { WorkItemsToolsService } from './tools/work-items-tools.service';
 import { InitiativesToolsService } from './tools/initiatives-tools.service';
 import { MilestonesToolsService } from './tools/milestones-tools.service';
+import { OkrsToolsService } from './tools/okrs-tools.service';
+import { SprintsToolsService } from './tools/sprints-tools.service';
 
 @Injectable()
 export class ChatService {
@@ -27,6 +29,8 @@ export class ChatService {
     private workItemsToolsService: WorkItemsToolsService,
     private initiativesToolsService: InitiativesToolsService,
     private milestonesToolsService: MilestonesToolsService,
+    private okrsToolsService: OkrsToolsService,
+    private sprintsToolsService: SprintsToolsService,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
   }
@@ -119,6 +123,8 @@ export class ChatService {
                 userId,
               ),
               ...this.milestonesToolsService.getTools(orgId, projectId),
+              ...this.okrsToolsService.getTools(orgId, projectId, userId),
+              ...this.sprintsToolsService.getTools(orgId, projectId),
             ],
           });
 
@@ -151,6 +157,7 @@ export class ChatService {
                   - When asked to update a specific entity get its details first and try to propose changes based on existing content
                   - When asked about the roadmap, use the milestones tools because the roadmap is a series of milestones
                   - When asked to create a roadmap, find existing milestones and propose new ones to associate with the initiatives provided
+                  - When returning information about created or updated entities, always include the reference
                   
                   Example behavior:
 
