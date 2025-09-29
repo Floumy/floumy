@@ -37,6 +37,6 @@ import { OrgOkrsService } from './org-okrs.service';
   ],
   providers: [OkrsService, OrgOkrsService, PublicService, CommentsService],
   controllers: [OkrsController, PublicController, OrgOkrsController],
-  exports: [OkrsService],
+  exports: [OkrsService, OrgOkrsService],
 })
 export class OkrsModule {}
