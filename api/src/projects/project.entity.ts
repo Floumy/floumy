@@ -29,6 +29,7 @@ import { GithubBranch } from '../github/github-branch.entity';
 import { GitlabBranch } from '../gitlab/gitlab-branch.entity';
 import { GitlabMergeRequest } from '../gitlab/gitlab-merge-request.entity';
 import { Page } from '../pages/pages.entity';
+import { ChatHistory } from '../ai/chat/chat-history.entity';
 
 @Entity()
 export class Project {
@@ -131,4 +132,9 @@ export class Project {
   gitlabMergeRequests: Promise<GitlabMergeRequest[]>;
   @OneToMany(() => Page, (wikiPage) => wikiPage.project, { lazy: true })
   pages: Promise<Page[]>;
+
+  @OneToMany(() => ChatHistory, (chatHistoryItem) => chatHistoryItem.project, {
+    lazy: true,
+  })
+  historyItems: Promise<ChatHistory[]>;
 }
