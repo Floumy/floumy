@@ -13,6 +13,7 @@ import { entityNotFound } from '../utils';
 import { WorkItemStatus } from '../../backlog/work-items/work-item-status.enum';
 import { WorkItemsService } from '../../backlog/work-items/work-items.service';
 import { Priority } from '../../common/priority.enum';
+import { Sprint } from '../../sprints/sprint.entity';
 
 @Injectable({
   scope: Scope.REQUEST,
@@ -25,6 +26,8 @@ export class WorkItemsTool {
     private projectRepository: Repository<Project>,
     private mcpService: McpService,
     private workItemsService: WorkItemsService,
+    @InjectRepository(Sprint)
+    private sprintRepository: Repository<Sprint>,
     @Inject(REQUEST) private request: Request,
   ) {}
 
@@ -262,5 +265,98 @@ export class WorkItemsTool {
         },
       ],
     };
+  }
+  @Tool({
+    name: 'list-work-items-for-sprint',
+    description: 'List all work items for a given sprint.',
+    parameters: z.object({
+      sprintId: z.string().describe('The ID of the sprint.'),
+    }),
+  })
+  async listWorkItemsForSprint({ sprintId }: { sprintId: string }) {
+    const user = await this.mcpService.getUserFromRequest(this.request);
+    if (!user) {
+      return entityNotFound('work item');
+    }
+    const org = await user.org;
+    const workItems = await this.workItemsRepository.find({
+      where: { sprint: { id: sprintId }, org: { id: org.id } },
+      order: { updatedAt: 'DESC' },
+    });
+    if (!workItems.length) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'No work items found for this sprint.',
+          },
+        ],
+      };
+    }
+    return {
+      content: workItems.map(async (wi) => {
+        const assignedTo = await wi.assignedTo;
+        return {
+          type: 'text',
+          text: `Title: ${wi.title}
+        Type: ${wi.type}
+        Status: ${wi.status}
+        Reference: ${wi.reference}
+        Assigned To: ${assignedTo ? assignedTo.name : 'Unassigned'}`,
+        };
+      }),
+    };
+  }
+  @Tool({
+    name: 'add-work-item-to-sprint',
+    description: 'Add a work item to a sprint.',
+    parameters: z.object({
+      workItemReference: z
+        .string()
+        .describe('The reference of the work item (e.g. WI-123).'),
+      sprintId: z.string().describe('The ID of the sprint.'),
+    }),
+  })
+  async addWorkItemToSprint({
+    workItemReference,
+    sprintId,
+  }: {
+    workItemReference: string;
+    sprintId: string;
+  }) {
+    const user = await this.mcpService.getUserFromRequest(this.request);
+    if (!user) {
+      return entityNotFound('work item');
+    }
+    const org = await user.org;
+    try {
+      const workItem = await this.workItemsRepository.findOneByOrFail({
+        reference: workItemReference,
+        org: { id: org.id },
+      });
+      const sprint = await this.sprintRepository.findOneByOrFail({
+        id: sprintId,
+        org: { id: org.id },
+      });
+      workItem.sprint = Promise.resolve(sprint);
+      await this.workItemsRepository.save(workItem);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Successfully added work item ${workItem.reference} to sprint.`,
+          },
+        ],
+      };
+    } catch (e) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error: ${e.message}`,
+          },
+        ],
+      };
+    }
   }
 }
