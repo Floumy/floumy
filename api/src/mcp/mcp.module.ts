@@ -20,12 +20,15 @@ import { InitiativeTool } from './tools/initiative.tool';
 import { RoadmapModule } from '../roadmap/roadmap.module';
 import { SprintTool } from './tools/sprint.tool';
 import { SprintsModule } from '../sprints/sprints.module';
+import { OkrTool } from './tools/okr.tool';
+import { OkrsModule } from '../okrs/okrs.module';
 
 @Module({
   imports: [
     BacklogModule,
     RoadmapModule,
     SprintsModule,
+    OkrsModule,
     TypeOrmModule.forFeature([
       User,
       Org,
@@ -49,6 +52,7 @@ import { SprintsModule } from '../sprints/sprints.module';
     WorkItemsTool,
     InitiativeTool,
     SprintTool,
+    OkrTool,
     McpService,
   ],
 })
