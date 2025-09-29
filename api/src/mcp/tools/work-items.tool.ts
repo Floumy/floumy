@@ -294,13 +294,17 @@ export class WorkItemsTool {
       };
     }
     return {
-      content: workItems.map((wi) => ({
-        type: 'text',
-        text: `Title: ${wi.title}
+      content: workItems.map(async (wi) => {
+        const assignedTo = await wi.assignedTo;
+        return {
+          type: 'text',
+          text: `Title: ${wi.title}
         Type: ${wi.type}
         Status: ${wi.status}
-        Reference: ${wi.reference}`,
-      })),
+        Reference: ${wi.reference}
+        Assigned To: ${assignedTo ? assignedTo.name : 'Unassigned'}`,
+        };
+      }),
     };
   }
   @Tool({

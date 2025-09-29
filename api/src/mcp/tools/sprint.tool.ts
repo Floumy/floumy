@@ -27,13 +27,13 @@ export class SprintTool {
   ) {}
 
   @Tool({
-    name: 'find-current-sprint',
+    name: 'find-active-sprint',
     description: 'Find the current active sprint in a project.',
     parameters: z.object({
       projectId: z.string().describe('The ID of the project.'),
     }),
   })
-  async findCurrentSprint({ projectId }: { projectId: string }) {
+  async findActiveSprint({ projectId }: { projectId: string }) {
     const user = await this.mcpService.getUserFromRequest(this.request);
     if (!user) {
       return entityNotFound('sprint');
@@ -86,14 +86,14 @@ export class SprintTool {
     const org = await user.org;
     const sprints = await this.sprintRepository.find({
       where: { org: { id: org.id } },
-      order: { updatedAt: 'DESC' },
+      order: { startDate: 'DESC' },
       take: 10,
     });
     return {
       content: sprints.map((sprint) => ({
         type: 'text',
         text: `Title: ${sprint.title}
-        Foal: ${sprint.goal}
+        Goal: ${sprint.goal}
         Status: ${sprint.status}
         Sprint ID: ${sprint.id}`,
       })),
@@ -119,7 +119,7 @@ export class SprintTool {
     });
     const sprints = await this.sprintRepository.find({
       where: { org: { id: org.id }, project: { id: project.id } },
-      order: { updatedAt: 'DESC' },
+      order: { startDate: 'DESC' },
       take: 10,
     });
     return {
@@ -195,116 +195,6 @@ export class SprintTool {
           {
             type: 'text',
             text: `Failed to create sprint: ${e.message}`,
-          },
-        ],
-      };
-    }
-  }
-
-  @Tool({
-    name: 'start-sprint',
-    description: 'Start a sprint in a project.',
-    parameters: z.object({
-      projectId: z
-        .string()
-        .describe('The ID of the project the sprint belongs to.'),
-      sprintId: z.string().describe('The ID of the sprint to start.'),
-    }),
-  })
-  async startSprint({
-    projectId,
-    sprintId,
-  }: {
-    projectId: string;
-    sprintId: string;
-  }) {
-    const user = await this.mcpService.getUserFromRequest(this.request);
-    if (!user) {
-      return entityNotFound('sprint');
-    }
-    const org = await user.org;
-    const project = await this.projectRepository.findOneByOrFail({
-      id: projectId,
-      org: { id: org.id },
-    });
-    try {
-      const sprint = await this.sprintsService.startSprint(
-        org.id,
-        project.id,
-        sprintId,
-      );
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Successfully started sprint with title: ${sprint.title}
-            Goal: ${sprint.goal}
-            Start date: ${sprint.startDate}
-            Status: ${sprint.status}`,
-          },
-        ],
-      };
-    } catch (e) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Failed to start sprint: ${e.message}`,
-          },
-        ],
-      };
-    }
-  }
-  @Tool({
-    name: 'complete-sprint',
-    description: 'Complete a sprint in a project.',
-    parameters: z.object({
-      projectId: z
-        .string()
-        .describe('The ID of the project the sprint belongs to.'),
-      sprintId: z.string().describe('The ID of the sprint to complete.'),
-    }),
-  })
-  async completeSprint({
-    projectId,
-    sprintId,
-  }: {
-    projectId: string;
-    sprintId: string;
-  }) {
-    const user = await this.mcpService.getUserFromRequest(this.request);
-    if (!user) {
-      return entityNotFound('sprint');
-    }
-    const org = await user.org;
-    const project = await this.projectRepository.findOneByOrFail({
-      id: projectId,
-      org: { id: org.id },
-    });
-    try {
-      const sprint = await this.sprintsService.completeSprint(
-        org.id,
-        project.id,
-        sprintId,
-      );
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Successfully completed sprint with reference: ${sprint.title}
-            Goal: ${sprint.goal}
-            Start date: ${sprint.startDate}
-            End date: ${sprint.endDate}
-            Status: ${sprint.status}`,
-          },
-        ],
-      };
-    } catch (e) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Failed to complete sprint: ${e.message}`,
           },
         ],
       };
