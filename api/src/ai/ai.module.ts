@@ -35,6 +35,7 @@ import { OkrsModule } from '../okrs/okrs.module';
 import { SprintsModule } from '../sprints/sprints.module';
 import { SprintsToolsService } from './chat/tools/sprints-tools.service';
 import { ChatHistory } from './chat/chat-history.entity';
+import { ChatMessageHistoryService } from './chat/chat-message-history.service';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { ChatHistory } from './chat/chat-history.entity';
     OkrsToolsService,
     SprintsToolsService,
     IndexingEventHandlerService,
+    ChatMessageHistoryService,
   ],
 })
 export class AiModule {}

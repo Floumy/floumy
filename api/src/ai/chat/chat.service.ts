@@ -1,14 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChatOpenAI } from '@langchain/openai';
-import {
-  AIMessage,
-  AIMessageChunk,
-  HumanMessage,
-  SystemMessage,
-} from '@langchain/core/messages';
+import { AIMessageChunk, HumanMessage, SystemMessage, } from '@langchain/core/messages';
 import { Observable, Subscriber } from 'rxjs';
-import { PostgresChatMessageHistory } from '@langchain/community/stores/message/postgres';
 import { DocumentVectorStoreService } from '../documents/document-vector-store.service';
 import { formatDocumentsAsString } from 'langchain/util/document';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
@@ -17,11 +11,11 @@ import { InitiativesToolsService } from './tools/initiatives-tools.service';
 import { MilestonesToolsService } from './tools/milestones-tools.service';
 import { OkrsToolsService } from './tools/okrs-tools.service';
 import { SprintsToolsService } from './tools/sprints-tools.service';
+import { ChatMessageHistoryService } from './chat-message-history.service';
 
 @Injectable()
 export class ChatService {
   private readonly apiKey: string;
-  private readonly logger = new Logger(ChatService.name);
 
   constructor(
     private configService: ConfigService,
@@ -31,28 +25,9 @@ export class ChatService {
     private milestonesToolsService: MilestonesToolsService,
     private okrsToolsService: OkrsToolsService,
     private sprintsToolsService: SprintsToolsService,
+    private chatMessageHistory: ChatMessageHistoryService,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
-  }
-
-  private getMessageHistory(sessionId: string) {
-    return new PostgresChatMessageHistory({
-      sessionId: sessionId,
-      poolConfig: {
-        host: this.configService.get('database.host'),
-        port: this.configService.get('database.port'),
-        user: this.configService.get('database.username'),
-        password: this.configService.get('database.password'),
-        database: this.configService.get('database.name'),
-        ssl: this.configService.get('database.ssl')
-          ? {
-              rejectUnauthorized: true,
-              ca: this.configService.get('database.sslCertificate'),
-            }
-          : false,
-      },
-      tableName: 'message_history',
-    });
   }
 
   private async shouldUseRag(message: string): Promise<boolean> {
@@ -68,15 +43,15 @@ export class ChatService {
         Reply with either "true" or "false" only.
         
         Return "true" if the query is about:
-        - Specific projects, tasks, or work items in the system
+        - Initiatives, tasks, or work items in the system
         - OKRs, objectives, or key results
         - Organization or team specific information
         - Sprints or backlog items
         - Any stored documents or internal data
         - Anything that happened in the past
-        - Any reference like O-123, KR-123, I-123, WI-123, etc. 
         
         Return "false" if the query is about:
+        - Any reference like O-123, KR-123, I-123, WI-123, etc. 
         - General questions
         - Generic concepts
         - Conversational exchanges
@@ -128,8 +103,9 @@ export class ChatService {
             ],
           });
 
-          let prompt = message;
+          await this.chatMessageHistory.addHumanMessage(sessionId, message);
 
+          let prompt = message;
           if (await this.shouldUseRag(message)) {
             prompt = await this.getPromptWithRelevantContextDocs(
               message,
@@ -138,11 +114,6 @@ export class ChatService {
               prompt,
             );
           }
-
-          const historyMessages = await this.addCurrentPromptToHistory(
-            sessionId,
-            prompt,
-          );
 
           const systemMessage = new SystemMessage(
             `You are a helpful and concise project management assistant.
@@ -171,12 +142,14 @@ export class ChatService {
                   `,
           );
 
+          const historyMessages =
+            await this.chatMessageHistory.getMessages(sessionId);
           const stream = await agent.stream(
             {
               messages: [
                 systemMessage,
                 ...historyMessages,
-                new HumanMessage(message),
+                new HumanMessage(prompt),
               ],
             },
             { streamMode: 'messages' },
@@ -184,15 +157,18 @@ export class ChatService {
 
           let aiMessage = '';
           for await (const record of stream) {
-            aiMessage = this.sendNextChunkToTheSubscriber(
-              record,
-              subscriber,
-              messageId,
-              aiMessage,
-            );
+            const chunk = record[0];
+            if (chunk instanceof AIMessageChunk) {
+              aiMessage = this.sendNextChunkToTheSubscriber(
+                chunk,
+                subscriber,
+                messageId,
+                aiMessage,
+              );
+            }
           }
 
-          await this.addAiMessageToHistory(sessionId, aiMessage);
+          await this.chatMessageHistory.addAiMessage(sessionId, aiMessage);
 
           subscriber.complete();
         } catch (error) {
@@ -206,18 +182,8 @@ export class ChatService {
     });
   }
 
-  private async addAiMessageToHistory(sessionId: string, aiMessage: string) {
-    try {
-      await this.getMessageHistory(sessionId).addMessage(
-        new AIMessage(aiMessage),
-      );
-    } catch (e) {
-      this.logger.error(e);
-    }
-  }
-
   private sendNextChunkToTheSubscriber(
-    record: any,
+    chunk: AIMessageChunk,
     subscriber: Subscriber<{
       id: string;
       type: 'message';
@@ -226,31 +192,18 @@ export class ChatService {
     messageId: string,
     aiMessage: string,
   ) {
-    const chunk = record[0];
-    if (chunk instanceof AIMessageChunk) {
-      subscriber.next({
-        id: new Date().toISOString(),
-        type: 'message',
-        data: {
-          id: messageId,
-          text: chunk.content,
-          isUser: false,
-        },
-      });
-      aiMessage += chunk.text;
-    }
-    return aiMessage;
-  }
+    subscriber.next({
+      id: new Date().toISOString(),
+      type: 'message',
+      data: {
+        id: messageId,
+        text: chunk.content,
+        isUser: false,
+      },
+    });
+    aiMessage += chunk.text;
 
-  private async addCurrentPromptToHistory(sessionId: string, prompt: string) {
-    try {
-      await this.getMessageHistory(sessionId).addMessage(
-        new HumanMessage(prompt),
-      );
-      return await this.getMessageHistory(sessionId).getMessages();
-    } catch (e) {
-      this.logger.error(e);
-    }
+    return aiMessage;
   }
 
   private async getPromptWithRelevantContextDocs(
