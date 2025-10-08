@@ -22,6 +22,7 @@ import { SprintTool } from './tools/sprint.tool';
 import { SprintsModule } from '../sprints/sprints.module';
 import { OkrTool } from './tools/okr.tool';
 import { OkrsModule } from '../okrs/okrs.module';
+import { RoadmapTool } from './tools/roadmap.tool';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { OkrsModule } from '../okrs/okrs.module';
     InitiativeTool,
     SprintTool,
     OkrTool,
+    RoadmapTool,
     McpService,
   ],
 })
