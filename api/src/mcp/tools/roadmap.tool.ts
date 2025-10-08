@@ -50,7 +50,7 @@ export class RoadmapTool {
   }) {
     const user = await this.mcpService.getUserFromRequest(this.request);
     const org = await user.org;
-    const project = await this.projectRepository.findOneBy({
+    const project = await this.projectRepository.findOneByOrFail({
       id: projectId,
       org: { id: org.id },
     });
