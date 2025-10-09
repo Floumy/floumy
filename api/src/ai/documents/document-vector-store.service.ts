@@ -89,11 +89,12 @@ export class DocumentVectorStoreService implements OnModuleInit {
     query: string,
     userId: string,
     orgId: string,
+    projectId: string,
     limit = 3,
   ) {
     return await this.vectorStore.similaritySearch(query, limit, {
       whereMetadata: {
-        $or: [{ userId }, { orgId }],
+        $and: [{ userId }, { orgId }, { projectId }],
       },
     });
   }

@@ -36,6 +36,8 @@ import { SprintsModule } from '../sprints/sprints.module';
 import { SprintsToolsService } from './chat/tools/sprints-tools.service';
 import { ChatHistory } from './chat/chat-history.entity';
 import { ChatMessageHistoryService } from './chat/chat-message-history.service';
+import { AiAgentService } from './chat/ai-agent.service';
+import { RagService } from './chat/rag.service';
 
 @Module({
   imports: [
@@ -77,6 +79,8 @@ import { ChatMessageHistoryService } from './chat/chat-message-history.service';
     SprintsToolsService,
     IndexingEventHandlerService,
     ChatMessageHistoryService,
+    AiAgentService,
+    RagService,
   ],
 })
 export class AiModule {}
