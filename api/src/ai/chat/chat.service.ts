@@ -1,23 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { AIMessageChunk, HumanMessage } from '@langchain/core/messages';
 import { Observable, Subscriber } from 'rxjs';
-import { ChatMessageHistoryService } from './chat-message-history.service';
 import { AiAgentService } from './ai-agent.service';
 import { RagService } from './rag.service';
+import { ChatHistoryService } from './chat-history.service';
 
 @Injectable()
 export class ChatService {
-  private readonly apiKey: string;
-
   constructor(
-    private configService: ConfigService,
-    private chatMessageHistory: ChatMessageHistoryService,
+    private chatHistoryService: ChatHistoryService,
     private aiAgentService: AiAgentService,
     private ragService: RagService,
-  ) {
-    this.apiKey = this.configService.get('ai.apiKey');
-  }
+  ) {}
 
   public sendMessageStream(
     userId: string,
@@ -39,8 +33,6 @@ export class ChatService {
 
       const runStream = async () => {
         try {
-          await this.chatMessageHistory.addHumanMessage(sessionId, message);
-
           const prompt = await this.ragService.getMessageWithContext(
             message,
             userId,
@@ -49,13 +41,20 @@ export class ChatService {
           );
 
           const historyMessages =
-            await this.chatMessageHistory.getMessages(sessionId);
+            await this.chatHistoryService.getOrCreateChatHistory(
+              message,
+              sessionId,
+              userId,
+              projectId,
+            );
+          console.log(historyMessages);
 
           const agent = this.aiAgentService.getChatAgent(
             orgId,
             projectId,
             userId,
           );
+
           const stream = await agent.stream(
             {
               messages: [...historyMessages, new HumanMessage(prompt)],
@@ -76,7 +75,12 @@ export class ChatService {
             }
           }
 
-          await this.chatMessageHistory.addAiMessage(sessionId, aiMessage);
+          await this.chatHistoryService.addAiMessage(
+            aiMessage,
+            sessionId,
+            userId,
+            projectId,
+          );
 
           subscriber.complete();
         } catch (error) {

@@ -4,8 +4,8 @@ import { AIMessage, HumanMessage } from '@langchain/core/messages';
 import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
-export class ChatMessageHistoryService {
-  private readonly logger = new Logger(ChatMessageHistoryService.name);
+export class ChatMessageHistoryStoreService {
+  private readonly logger = new Logger(ChatMessageHistoryStoreService.name);
 
   constructor(private configService: ConfigService) {}
 
@@ -37,9 +37,9 @@ export class ChatMessageHistoryService {
     }
   }
 
-  async addHumanMessage(sessionId: string, prompt: string) {
+  async addHumanMessage(sessionId: string, message: string) {
     try {
-      await this.getHistory(sessionId).addMessage(new HumanMessage(prompt));
+      await this.getHistory(sessionId).addMessage(new HumanMessage(message));
     } catch (e) {
       this.logger.error(e);
     }

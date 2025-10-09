@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from '../../users/user.entity';
 import { Project } from '../../projects/project.entity';
 
@@ -10,7 +16,7 @@ export class ChatHistory {
   title: string;
   @Column()
   sessionId: string;
-  @Column()
+  @CreateDateColumn()
   createdAt: Date;
   @ManyToOne(() => User, (user) => user.chatHistoryItems, { lazy: true })
   user: Promise<User>;
