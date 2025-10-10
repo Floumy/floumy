@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  ContextContainer,
-  ContextHeader,
-  ContextSelect,
-  ContextSwitcher,
-} from './StyledComponents';
+import { ContextContainer, ContextHeader, ContextSelect, ContextSwitcher, } from './StyledComponents';
 
 /**
  * ContextSection component for displaying and managing context
@@ -19,15 +14,13 @@ const ContextSection = ({ contextType, handleContextTypeChange }) => {
     <ContextContainer>
       <ContextHeader>
         <ContextSwitcher>
-          <span style={{ fontSize: '12px', color: '#6b7280' }}>
-            Current Context:
-          </span>
+          <span style={{ fontSize: '12px', color: '#6b7280' }}>Context:</span>
           <ContextSelect
             value={contextType}
             onChange={handleContextTypeChange}
             disabled={true}
           >
-            <option value="project">Entire Project</option>
+            <option value="project">Current Project</option>
           </ContextSelect>
         </ContextSwitcher>
       </ContextHeader>
