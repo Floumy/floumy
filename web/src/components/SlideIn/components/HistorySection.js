@@ -25,14 +25,14 @@ const HistorySection = ({ chatSessions, loadChatSession }) => {
         {chatSessions.length > 0 ? (
           chatSessions.map((session) => (
             <HistoryItem
-              key={session.id}
-              onClick={() => loadChatSession(session.id)}
+              key={session.sessionId}
+              onClick={() => loadChatSession(session.sessionId)}
             >
               <HistoryItemHeader>
                 <HistoryItemTitle>{session.title}</HistoryItemTitle>
                 <HistoryItemDate>
-                  {new Date(session.date).toLocaleDateString()}{' '}
-                  {new Date(session.date).toLocaleTimeString([], {
+                  {new Date(session.createdAt).toLocaleDateString()}{' '}
+                  {new Date(session.createdAt).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
                   })}

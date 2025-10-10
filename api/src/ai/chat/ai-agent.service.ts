@@ -55,6 +55,7 @@ export class AiAgentService {
                 - When asked about the roadmap, use the milestones tools because the roadmap is a series of milestones
                 - When asked to create a roadmap, find existing milestones and propose new ones to associate with the initiatives provided
                 - When returning information about created or updated entities, always include the reference
+                - Think through a request step by step
                 
                 Entities relationship information:
                 - OKRs are composed of Objectives and Key Results

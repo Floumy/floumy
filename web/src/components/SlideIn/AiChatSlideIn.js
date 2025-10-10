@@ -10,15 +10,13 @@ import HistorySection from './components/HistorySection';
 import { ChatContainer, ChatStyles } from './components/StyledComponents';
 
 // Import utilities and mock data
-import {
-  CHAT_HISTORY_KEY,
-  CHAT_SESSIONS_KEY,
-  examplePrompts,
-  initialMessages,
-} from './components/utils';
+import { examplePrompts, initialMessages } from './components/utils';
 import { useChatStream } from '../../hooks/useChatStream';
 import ContextSection from './components/ContextSection';
 import { useProjects } from '../../contexts/ProjectsContext';
+import TabsSection from './components/TabsSection';
+import { toast } from 'react-toastify';
+import { listHistory } from '../../services/ai/chat.service';
 
 export default function AiChatSlideIn({
   isOpen: initialIsOpen,
@@ -50,37 +48,24 @@ export default function AiChatSlideIn({
   useEffect(() => {
     setMessages(initialMessages);
 
-    try {
-      // Load chat sessions
-      const savedSessions = localStorage.getItem(CHAT_SESSIONS_KEY);
-      if (savedSessions) {
-        setChatSessions(JSON.parse(savedSessions));
-      }
+    const loadHistory = async () => {
+      const history = await listHistory(currentProjectId);
+      setChatSessions(history);
+    };
 
-      // Load current chat history
-      const savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
-      if (savedHistory) {
-        const parsedHistory = JSON.parse(savedHistory);
-        // Convert string timestamps back to Date objects
-        const messagesWithDates = parsedHistory.map((msg) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp),
-        }));
-        setMessages(messagesWithDates);
-      }
-    } catch (error) {
-      console.error('Error loading chat history:', error);
-    }
+    loadHistory().catch(() => {
+      toast.error('Error loading chat history');
+    });
   }, []);
 
   // Function to load a specific chat session
   const loadChatSession = (sessionId) => {
-    const session = chatSessions.find((s) => s.id === sessionId);
+    const session = chatSessions.find((s) => s.sessionId === sessionId);
     if (session) {
+      setCurrentSessionId(sessionId);
       setMessages(
         session.messages.map((msg) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp),
+          text: msg,
         })),
       );
       setActiveTab('chat');
@@ -135,7 +120,7 @@ export default function AiChatSlideIn({
       {isOpen && (
         <ChatContainer>
           <ChatHeader toggle={toggle} startNewSession={startNewSession} />
-          {/*<TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />*/}
+          <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />
 
           {activeTab === 'chat' ? (
             <>

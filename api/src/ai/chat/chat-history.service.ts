@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ChatMessageHistoryStoreService } from './chat-message-history-store.service';
 import { User } from '../../users/user.entity';
 import { Project } from '../../projects/project.entity';
+import { AIMessage, HumanMessage } from '@langchain/core/messages';
 
 @Injectable()
 export class ChatHistoryService {
@@ -41,6 +42,31 @@ export class ChatHistoryService {
     await this.addHumanMessage(message, sessionId, userId, projectId);
     return await this.chatMessageHistoryStoreServiceService.getMessages(
       sessionId,
+    );
+  }
+
+  async getChatHistoryByUserAndProject(userId: string, projectId: string) {
+    const chatHistoryItems = await this.chatHistoryRepository.findBy({
+      user: { id: userId },
+      project: { id: projectId },
+    });
+
+    return await Promise.all(
+      chatHistoryItems.map(async (chatHistory) => {
+        return {
+          sessionId: chatHistory.sessionId,
+          title: chatHistory.title,
+          createdAt: chatHistory.createdAt,
+          messages: (
+            await this.chatMessageHistoryStoreServiceService.getMessages(
+              chatHistory.sessionId,
+            )
+          ).map(
+            (historyMessage: AIMessage | HumanMessage) =>
+              historyMessage?.content,
+          ),
+        };
+      }),
     );
   }
 
@@ -108,7 +134,7 @@ export class ChatHistoryService {
     chatHistory.sessionId = sessionId;
     chatHistory.user = Promise.resolve(user);
     chatHistory.project = Promise.resolve(project);
-    chatHistory.title = message.slice(200);
+    chatHistory.title = message.slice(0, 200);
     return this.chatHistoryRepository.save(chatHistory);
   }
 }

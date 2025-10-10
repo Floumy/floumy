@@ -47,7 +47,6 @@ export class ChatService {
               userId,
               projectId,
             );
-          console.log(historyMessages);
 
           const agent = this.aiAgentService.getChatAgent(
             orgId,
@@ -116,5 +115,12 @@ export class ChatService {
     aiMessage += chunk.text;
 
     return aiMessage;
+  }
+
+  async getChatHistoryByUserAndProject(userId: string, projectId: string) {
+    return await this.chatHistoryService.getChatHistoryByUserAndProject(
+      userId,
+      projectId,
+    );
   }
 }

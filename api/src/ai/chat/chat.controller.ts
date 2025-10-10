@@ -1,5 +1,9 @@
 import {
+  BadRequestException,
   Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
   Logger,
   Param,
   Query,
@@ -61,5 +65,22 @@ export class ChatController {
           });
         }),
       );
+  }
+
+  @Get('history/projects/:projectId/')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getHistory(
+    @Param('projectId') projectId: string,
+    @Request() request: any,
+  ) {
+    try {
+      return await this.chatService.getChatHistoryByUserAndProject(
+        request.user.sub,
+        projectId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }
