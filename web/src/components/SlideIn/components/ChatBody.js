@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChatBody as StyledChatBody } from './StyledComponents';
 import MessageList from './MessageList';
+import LoadingSpinnerBox from '../../../views/pages/components/LoadingSpinnerBox';
 
 /**
  * ChatBody component for displaying the chat body
@@ -11,7 +12,20 @@ import MessageList from './MessageList';
  * @param {React.RefObject} props.messagesEndRef - Ref for scrolling to bottom
  * @returns {JSX.Element} The ChatBody component
  */
-const ChatBody = ({ messages, isTyping, messagesEndRef }) => {
+const ChatBody = ({
+  messages,
+  isTyping,
+  messagesEndRef,
+  isLoadingMessages,
+}) => {
+  if (isLoadingMessages) {
+    return (
+      <StyledChatBody>
+        <LoadingSpinnerBox />
+      </StyledChatBody>
+    );
+  }
+
   return (
     <StyledChatBody>
       <MessageList

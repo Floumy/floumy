@@ -116,11 +116,4 @@ export class ChatService {
 
     return aiMessage;
   }
-
-  async getChatHistoryByUserAndProject(userId: string, projectId: string) {
-    return await this.chatHistoryService.getChatHistoryByUserAndProject(
-      userId,
-      projectId,
-    );
-  }
 }

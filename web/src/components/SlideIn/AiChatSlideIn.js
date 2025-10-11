@@ -15,8 +15,11 @@ import { useChatStream } from '../../hooks/useChatStream';
 import ContextSection from './components/ContextSection';
 import { useProjects } from '../../contexts/ProjectsContext';
 import TabsSection from './components/TabsSection';
+import {
+  listHistorySessionMessages,
+  listHistorySessions,
+} from '../../services/ai/chat.service';
 import { toast } from 'react-toastify';
-import { listHistory } from '../../services/ai/chat.service';
 
 export default function AiChatSlideIn({
   isOpen: initialIsOpen,
@@ -31,6 +34,7 @@ export default function AiChatSlideIn({
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' or 'history'
   const [chatSessions, setChatSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(crypto.randomUUID());
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
   const messagesEndRef = useRef(null);
   // const [inputMessage, setInputMessage] = useState('');
@@ -48,27 +52,35 @@ export default function AiChatSlideIn({
   useEffect(() => {
     setMessages(initialMessages);
 
-    const loadHistory = async () => {
-      const history = await listHistory(currentProjectId);
-      setChatSessions(history);
+    const loadHistorySessions = async () => {
+      const sessions = await listHistorySessions(currentProjectId);
+      setChatSessions(sessions);
     };
 
-    loadHistory().catch(() => {
-      toast.error('Error loading chat history');
+    loadHistorySessions().catch(() => {
+      console.error('Error loading chat history');
     });
   }, []);
 
   // Function to load a specific chat session
-  const loadChatSession = (sessionId) => {
+  const loadChatSession = async (sessionId) => {
     const session = chatSessions.find((s) => s.sessionId === sessionId);
     if (session) {
-      setCurrentSessionId(sessionId);
-      setMessages(
-        session.messages.map((msg) => ({
-          text: msg,
-        })),
-      );
-      setActiveTab('chat');
+      try {
+        setActiveTab('chat');
+        setMessages([]);
+        setIsLoadingMessages(true);
+        const messages = await listHistorySessionMessages(sessionId);
+        setMessages(
+          messages.map((msg) => ({
+            text: msg,
+          })),
+        );
+        setCurrentSessionId(sessionId);
+        setIsLoadingMessages(false);
+      } catch (e) {
+        toast.error("Couldn't retrieve the messages");
+      }
     }
   };
 
@@ -131,6 +143,7 @@ export default function AiChatSlideIn({
               />
 
               <ChatBody
+                isLoadingMessages={isLoadingMessages}
                 messages={messages}
                 isTyping={isLoading}
                 messagesEndRef={messagesEndRef}

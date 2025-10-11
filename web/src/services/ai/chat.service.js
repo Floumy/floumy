@@ -12,10 +12,21 @@ export const createChatStream = (sessionId, message, projectId) => {
   });
 };
 
-export async function listHistory(projectId) {
+export async function listHistorySessions(projectId) {
   try {
     const response = await api.get(
-      `${apiUrl}/ai/chat/history/projects/${projectId}/`,
+      `${apiUrl}/ai/chat/history/sessions/projects/${projectId}/`,
+    );
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
+export async function listHistorySessionMessages(sessionId) {
+  try {
+    const response = await api.get(
+      `${apiUrl}/ai/chat/history/sessions/${sessionId}/messages`,
     );
     return response.data;
   } catch (e) {
