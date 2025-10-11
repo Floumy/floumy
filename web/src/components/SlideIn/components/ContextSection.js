@@ -1,5 +1,10 @@
 import React from 'react';
-import { ContextContainer, ContextHeader, ContextSelect, ContextSwitcher, } from './StyledComponents';
+import {
+  ContextContainer,
+  ContextHeader,
+  ContextSelect,
+  ContextSwitcher,
+} from './StyledComponents';
 
 /**
  * ContextSection component for displaying and managing context
