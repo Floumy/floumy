@@ -1,5 +1,9 @@
 import {
+  BadRequestException,
   Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
   Logger,
   Param,
   Query,
@@ -11,13 +15,17 @@ import { ChatService } from './chat.service';
 import { catchError, Observable } from 'rxjs';
 import { uuid } from 'uuidv4';
 import { AuthGuard } from '../../auth/auth.guard';
+import { ChatHistoryService } from './chat-history.service';
 
 @Controller('ai/chat')
 @UseGuards(AuthGuard)
 export class ChatController {
   private readonly logger = new Logger(ChatController.name);
 
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly chatHistoryService: ChatHistoryService,
+  ) {}
 
   @Sse('stream/:sessionId')
   streamChat(
@@ -61,5 +69,39 @@ export class ChatController {
           });
         }),
       );
+  }
+
+  @Get('history/sessions/projects/:projectId/')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getHistorySessions(
+    @Param('projectId') projectId: string,
+    @Request() request: any,
+  ) {
+    try {
+      return await this.chatHistoryService.getHistorySessions(
+        request.user.sub,
+        projectId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get('history/sessions/:sessionId/messages')
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async getHistorySessionMessages(
+    @Param('sessionId') sessionId: string,
+    @Request() request: any,
+  ) {
+    try {
+      return await this.chatHistoryService.getHistorySessionMessages(
+        request.user.sub,
+        sessionId,
+      );
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }

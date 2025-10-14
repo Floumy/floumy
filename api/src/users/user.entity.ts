@@ -21,6 +21,7 @@ import { Project } from '../projects/project.entity';
 import { Notification } from '../notifications/notification.entity';
 import { UserRole } from './enums';
 import { uuid } from 'uuidv4';
+import { ChatHistory } from '../ai/chat/chat-history.entity';
 
 @Entity()
 export class User {
@@ -107,6 +108,11 @@ export class User {
     lazy: true,
   })
   notifications: Promise<Notification[]>;
+
+  @OneToMany(() => ChatHistory, (chatHistoryItem) => chatHistoryItem.user, {
+    lazy: true,
+  })
+  chatHistoryItems: Promise<ChatHistory[]>;
 
   constructor(name: string, email: string, password: string) {
     this.name = name;
