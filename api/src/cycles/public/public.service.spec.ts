@@ -164,11 +164,7 @@ describe('PublicService', () => {
     it('should throw an error if the org does not exist', async () => {
       const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
-        service.getCycleById(
-          nonExistentUUID,
-          nonExistentUUID,
-          nonExistentUUID,
-        ),
+        service.getCycleById(nonExistentUUID, nonExistentUUID, nonExistentUUID),
       ).rejects.toThrow();
     });
   });

@@ -37,14 +37,10 @@ export class Request {
   @Column({ default: 1 })
   votesCount: number;
 
-  @OneToMany(
-    () => RequestVote,
-    (requestVote) => requestVote.request,
-    {
-      lazy: true,
-      onDelete: 'CASCADE',
-    },
-  )
+  @OneToMany(() => RequestVote, (requestVote) => requestVote.request, {
+    lazy: true,
+    onDelete: 'CASCADE',
+  })
   votes: Promise<RequestVote[]>;
 
   @Column({

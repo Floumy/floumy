@@ -8,7 +8,6 @@ import { KeyResult } from '../okrs/key-result.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
-import { Cycle } from '../cycles/cycle.entity';
 import { File } from '../files/file.entity';
 import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { InitiativeFile } from '../roadmap/initiatives/initiative-file.entity';
@@ -41,7 +40,6 @@ describe('OrgsController', () => {
           Initiative,
           WorkItem,
           Milestone,
-          Sprint,
           File,
           WorkItemFile,
           InitiativeFile,

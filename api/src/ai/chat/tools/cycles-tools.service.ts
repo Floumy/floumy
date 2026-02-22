@@ -753,9 +753,7 @@ export class CyclesToolsService {
         schema: z.object({
           cycleNamePattern: z
             .string()
-            .describe(
-              'The pattern to match in cycle names, e.g., "CW33-CW35"',
-            ),
+            .describe('The pattern to match in cycle names, e.g., "CW33-CW35"'),
         }),
       },
     );

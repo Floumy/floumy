@@ -68,9 +68,7 @@ describe('PublicService', () => {
       expect(projectResult.bipSettings.isCyclesPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isActiveCyclesPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isIssuesPagePublic).toBeDefined();
-      expect(
-        projectResult.bipSettings.isRequestsPagePublic,
-      ).toBeDefined();
+      expect(projectResult.bipSettings.isRequestsPagePublic).toBeDefined();
     });
     it('should throw an error if the project is not public', async () => {
       const bipSettings = await project.bipSettings;

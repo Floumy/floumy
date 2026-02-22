@@ -192,10 +192,6 @@ export class CyclesController {
       throw new UnauthorizedException();
     }
 
-    return await this.cyclesService.listForTimeline(
-      orgId,
-      projectId,
-      timeline,
-    );
+    return await this.cyclesService.listForTimeline(orgId, projectId, timeline);
   }
 }

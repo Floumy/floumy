@@ -85,12 +85,7 @@ describe('RequestVoteService', () => {
           description: 'Test Description',
         },
       );
-      await service.upvoteRequest(
-        user.id,
-        org.id,
-        project.id,
-        request.id,
-      );
+      await service.upvoteRequest(user.id, org.id, project.id, request.id);
       const requestVote = await requestVotesRepository.findOneByOrFail({
         user: { id: user.id },
         request: { id: request.id },
@@ -117,12 +112,7 @@ describe('RequestVoteService', () => {
       await orgsRepository.save(otherOrg);
 
       await expect(
-        service.upvoteRequest(
-          user.id,
-          otherOrg.id,
-          uuid(),
-          request.id,
-        ),
+        service.upvoteRequest(user.id, otherOrg.id, uuid(), request.id),
       ).rejects.toThrow();
     });
     it('should increment the votes count', async () => {
@@ -135,12 +125,7 @@ describe('RequestVoteService', () => {
           description: 'Test Description',
         },
       );
-      await service.upvoteRequest(
-        user.id,
-        org.id,
-        project.id,
-        request.id,
-      );
+      await service.upvoteRequest(user.id, org.id, project.id, request.id);
       const requestVote = await requestVotesRepository.findOneByOrFail({
         user: { id: user.id },
         request: { id: request.id },
@@ -160,12 +145,7 @@ describe('RequestVoteService', () => {
           description: 'Test Description',
         },
       );
-      await service.downvoteRequest(
-        user.id,
-        org.id,
-        project.id,
-        request.id,
-      );
+      await service.downvoteRequest(user.id, org.id, project.id, request.id);
       const requestVote = await requestVotesRepository.findOneByOrFail({
         user: { id: user.id },
         request: { id: request.id },
@@ -224,18 +204,8 @@ describe('RequestVoteService', () => {
         },
       );
 
-      await service.upvoteRequest(
-        user.id,
-        org.id,
-        project.id,
-        request.id,
-      );
-      await service.downvoteRequest(
-        user.id,
-        org.id,
-        project.id,
-        request.id,
-      );
+      await service.upvoteRequest(user.id, org.id, project.id, request.id);
+      await service.downvoteRequest(user.id, org.id, project.id, request.id);
 
       const votes = await service.getVotes(user.id, org.id, project.id);
 

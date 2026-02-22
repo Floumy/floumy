@@ -196,11 +196,7 @@ export class CyclesService {
   }
 
   async listForTimeline(orgId: string, projectId: string, timeline: Timeline) {
-    const cycles = await this.findCyclesForTimeline(
-      orgId,
-      projectId,
-      timeline,
-    );
+    const cycles = await this.findCyclesForTimeline(orgId, projectId, timeline);
     return await Promise.all(cycles.map((cycle) => CycleMapper.toDto(cycle)));
   }
 

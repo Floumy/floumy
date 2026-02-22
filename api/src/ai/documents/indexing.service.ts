@@ -201,9 +201,7 @@ export class IndexingService {
     const content = `
       Type: Request
       Title: ${request.title}
-      Description: ${
-        this.stripNonTextualData(request.description) || 'N/A'
-      }
+      Description: ${this.stripNonTextualData(request.description) || 'N/A'}
       Status: ${request.status}
       estimation: ${request.estimation || 'N/A'}
       votesCount: ${request.votesCount || 'N/A'}

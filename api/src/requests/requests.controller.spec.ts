@@ -9,14 +9,14 @@ import { OrgsService } from '../orgs/orgs.service';
 import { UsersService } from '../users/users.service';
 import { RequestsService } from './requests.service';
 import { Request } from './request.entity';
-import { RequestStatus } from './request-status.enum';
 import { RequestVoteService } from './request-votes.service';
 import { RequestVote } from './request-vote.entity';
 import { RequestComment } from './request-comment.entity';
 import { Project } from '../projects/project.entity';
+import { RequestStatus } from './request-status.enum';
 
 describe('RequestsController', () => {
-  let controller: FeatureRequestsController;
+  let controller: RequestsController;
   let cleanup: () => Promise<void>;
   let org: Org;
   let user: User;
@@ -94,7 +94,7 @@ describe('RequestsController', () => {
         project.id,
         createRequestDto,
       );
-      const result = await controller.listFeatureRequests(org.id, project.id);
+      const result = await controller.listRequests(org.id, project.id);
       expect(result.length).toBe(1);
       expect(result[0].title).toBe(createRequestDto.title);
       expect(result[0].description).toBe(createRequestDto.description);
@@ -114,18 +114,14 @@ describe('RequestsController', () => {
         project.id,
         createRequestDto,
       );
-      const result = await controller.getFeatureRequestById(
-        org.id,
-        project.id,
-        id,
-      );
+      const result = await controller.getRequestById(org.id, project.id, id);
       expect(result.title).toBe(createRequestDto.title);
       expect(result.description).toBe(createRequestDto.description);
     });
   });
   it('should throw an error if the org does not exist', async () => {
     await expect(
-      controller.getFeatureRequestById(org.id, project.id, 'non-existent-id'),
+      controller.getRequestById(org.id, project.id, 'non-existent-id'),
     ).rejects.toThrow();
   });
   describe('when updating a feature request', () => {
@@ -145,10 +141,10 @@ describe('RequestsController', () => {
       const updateFeatureRequestDto = {
         title: 'Updated Feature Request',
         description: 'This is an updated feature request',
-        status: FeatureRequestStatus.IN_PROGRESS,
+        status: RequestStatus.IN_PROGRESS,
         estimation: null,
       };
-      const result = await controller.updateFeatureRequest(
+      const result = await controller.updateRequest(
         {
           user: { sub: user.id },
         },
@@ -175,7 +171,7 @@ describe('RequestsController', () => {
         project.id,
         createRequestDto,
       );
-      await controller.deleteFeatureRequest(
+      await controller.deleteRequest(
         {
           user: { sub: user.id },
         },
@@ -184,7 +180,7 @@ describe('RequestsController', () => {
         id,
       );
       await expect(
-        controller.getFeatureRequestById(org.id, project.id, id),
+        controller.getRequestById(org.id, project.id, id),
       ).rejects.toThrow();
     });
   });
@@ -204,7 +200,7 @@ describe('RequestsController', () => {
         project.id,
         createRequestDto,
       );
-      await controller.upvoteFeatureRequest(
+      await controller.upvoteRequest(
         {
           user: {
             sub: user.id,
@@ -214,7 +210,7 @@ describe('RequestsController', () => {
         project.id,
         id,
       );
-      const featureRequest = await controller.getFeatureRequestById(
+      const featureRequest = await controller.getRequestById(
         org.id,
         project.id,
         id,
@@ -238,7 +234,7 @@ describe('RequestsController', () => {
         project.id,
         createRequestDto,
       );
-      await controller.downvoteFeatureRequest(
+      await controller.downvoteRequest(
         {
           user: {
             sub: user.id,
@@ -248,7 +244,7 @@ describe('RequestsController', () => {
         project.id,
         id,
       );
-      const featureRequest = await controller.getFeatureRequestById(
+      const featureRequest = await controller.getRequestById(
         org.id,
         project.id,
         id,
@@ -356,7 +352,7 @@ describe('RequestsController', () => {
           mentions: [],
         },
       );
-      await controller.deleteFeatureRequestComment(
+      await controller.deleteRequestComment(
         org.id,
         {
           user: {
@@ -366,7 +362,7 @@ describe('RequestsController', () => {
         id,
         comment.id,
       );
-      const featureRequestDto = await controller.getFeatureRequestById(
+      const featureRequestDto = await controller.getRequestById(
         org.id,
         project.id,
         id,
@@ -409,7 +405,7 @@ describe('RequestsController', () => {
         content: 'Updated Comment',
         mentions: [],
       };
-      const updatedComment = await controller.updateFeatureRequestComment(
+      const updatedComment = await controller.updateRequestComment(
         org.id,
         project.id,
         {
@@ -459,7 +455,7 @@ describe('RequestsController', () => {
         content: 'Updated Comment',
         mentions: [user.id],
       };
-      const updatedComment = await controller.updateFeatureRequestComment(
+      const updatedComment = await controller.updateRequestComment(
         org.id,
         project.id,
         {

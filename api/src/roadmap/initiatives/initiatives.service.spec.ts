@@ -1581,15 +1581,10 @@ describe('FeaturesService', () => {
     });
     it('should update the feature request to null', async () => {
       await orgsRepository.save(org);
-      await requestsService.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'My Feature Request',
-          description: 'My Feature Request Description',
-        },
-      );
+      await requestsService.addRequest(user.id, org.id, project.id, {
+        title: 'My Feature Request',
+        description: 'My Feature Request Description',
+      });
       const initiative = await service.createInitiative(
         org.id,
         project.id,

@@ -29,19 +29,13 @@ export class PublicService {
       timeline,
     );
 
-    return await Promise.all(
-      cycles.map((cycle) => CycleMapper.toDto(cycle)),
-    );
+    return await Promise.all(cycles.map((cycle) => CycleMapper.toDto(cycle)));
   }
 
   async getCycleById(orgId: string, projectId: string, cycleId: string) {
     await this.validateProjectHasBuildInPublicEnabled(orgId, projectId);
 
-    const cycle = await this.cyclesService.findCycle(
-      orgId,
-      projectId,
-      cycleId,
-    );
+    const cycle = await this.cyclesService.findCycle(orgId, projectId, cycleId);
     return CycleMapper.toDto(cycle);
   }
 

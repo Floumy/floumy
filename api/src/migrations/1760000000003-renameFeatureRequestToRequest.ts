@@ -149,7 +149,9 @@ export class RenameFeatureRequestToRequest1760000000003
     `);
 
     // 2. Revert request table
-    await queryRunner.query(`ALTER TABLE "request" RENAME TO "feature_request"`);
+    await queryRunner.query(
+      `ALTER TABLE "request" RENAME TO "feature_request"`,
+    );
 
     // 1. Revert request_status_enum
     await queryRunner.query(

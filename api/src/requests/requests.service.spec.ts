@@ -81,15 +81,10 @@ describe('RequestsService', () => {
 
   describe('when adding a new feature request', () => {
     it('should create a new feature request', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
 
       expect(request).toBeDefined();
       expect(request.id).toBeDefined();
@@ -114,19 +109,13 @@ describe('RequestsService', () => {
         description: 'Test Description 2',
       });
 
-      const requests = await service.listRequests(
-        org.id,
-        project.id,
-      );
+      const requests = await service.listRequests(org.id, project.id);
       expect(requests).toHaveLength(2);
       expect(requests[0].title).toEqual('Test Feature Request 2');
       expect(requests[1].title).toEqual('Test Feature Request 1');
     });
     it('should return an empty array if there are no feature requests', async () => {
-      const requests = await service.listRequests(
-        org.id,
-        project.id,
-      );
+      const requests = await service.listRequests(org.id, project.id);
       expect(requests).toHaveLength(0);
     });
     it('should return the feature requests in pages', async () => {
@@ -139,12 +128,7 @@ describe('RequestsService', () => {
         description: 'Test Description 2',
       });
 
-      const requests = await service.listRequests(
-        org.id,
-        project.id,
-        1,
-        1,
-      );
+      const requests = await service.listRequests(org.id, project.id, 1, 1);
       expect(requests).toHaveLength(1);
       expect(requests[0].title).toEqual('Test Feature Request 2');
     });
@@ -152,15 +136,10 @@ describe('RequestsService', () => {
 
   describe('when getting a feature request by id', () => {
     it('should return the feature request', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
 
       const foundFeatureRequest = await service.getRequestById(
         org.id,
@@ -178,15 +157,10 @@ describe('RequestsService', () => {
       ).rejects.toThrow();
     });
     it('should throw an error if the feature request does not belong to the org', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
 
       const otherOrg = await orgsService.createForUser(user);
       await orgsRepository.save(otherOrg);
@@ -196,26 +170,17 @@ describe('RequestsService', () => {
       await projectsRepository.save(otherOrgProject);
 
       await expect(
-        service.getRequestById(
-          otherOrg.id,
-          otherOrgProject.id,
-          request.id,
-        ),
+        service.getRequestById(otherOrg.id, otherOrgProject.id, request.id),
       ).rejects.toThrow();
     });
   });
 
   describe('when updating a feature request', () => {
     it('should update the feature request', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
 
       const updatedFeatureRequest = await service.updateRequest(
         user.id,
@@ -234,9 +199,7 @@ describe('RequestsService', () => {
       expect(updatedFeatureRequest.id).toEqual(request.id);
       expect(updatedFeatureRequest.title).toEqual('Updated Feature Request');
       expect(updatedFeatureRequest.description).toEqual('Updated Description');
-      expect(updatedFeatureRequest.status).toEqual(
-        RequestStatus.IN_PROGRESS,
-      );
+      expect(updatedFeatureRequest.status).toEqual(RequestStatus.IN_PROGRESS);
       expect(updatedFeatureRequest.estimation).toEqual(5);
     });
     it('should throw an error if the feature request does not exist', async () => {
@@ -250,15 +213,10 @@ describe('RequestsService', () => {
       ).rejects.toThrow();
     });
     it('should throw an error if the feature request does not belong to the org', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
 
       const otherOrg = await orgsService.createForUser(user);
       await orgsRepository.save(otherOrg);
@@ -283,15 +241,10 @@ describe('RequestsService', () => {
       ).rejects.toThrow();
     });
     it('should throw an error if the user does not belong to the org', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
 
       const otherUser = await usersService.createUserWithOrg(
         'Other User',
@@ -300,39 +253,23 @@ describe('RequestsService', () => {
       );
 
       await expect(
-        service.updateRequest(
-          otherUser.id,
-          org.id,
-          project.id,
-          request.id,
-          {
-            title: 'Updated Feature Request',
-            description: 'Updated Description',
-            status: RequestStatus.IN_PROGRESS,
-            estimation: 5,
-          },
-        ),
+        service.updateRequest(otherUser.id, org.id, project.id, request.id, {
+          title: 'Updated Feature Request',
+          description: 'Updated Description',
+          status: RequestStatus.IN_PROGRESS,
+          estimation: 5,
+        }),
       ).rejects.toThrow();
     });
   });
   describe('when deleting a feature request', () => {
     it('should delete the feature request', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
 
-      await service.deleteRequest(
-        user.id,
-        org.id,
-        project.id,
-        request.id,
-      );
+      await service.deleteRequest(user.id, org.id, project.id, request.id);
 
       await expect(
         service.getRequestById(org.id, project.id, request.id),
@@ -345,15 +282,10 @@ describe('RequestsService', () => {
     ).rejects.toThrow();
   });
   it('should throw an error if the feature request does not belong to the org', async () => {
-    const request = await service.addRequest(
-      user.id,
-      org.id,
-      project.id,
-      {
-        title: 'Test Feature Request',
-        description: 'Test Description',
-      },
-    );
+    const request = await service.addRequest(user.id, org.id, project.id, {
+      title: 'Test Feature Request',
+      description: 'Test Description',
+    });
 
     const otherOrg = await orgsService.createForUser(user);
     await orgsRepository.save(otherOrg);
@@ -387,12 +319,7 @@ describe('RequestsService', () => {
     feature.project = Promise.resolve(project);
     feature.request = Promise.resolve(requestEntity);
     await featuresRepository.save(feature);
-    await service.deleteRequest(
-      user.id,
-      org.id,
-      project.id,
-      requestEntity.id,
-    );
+    await service.deleteRequest(user.id, org.id, project.id, requestEntity.id);
     const features = await featuresRepository.find({
       where: { request: { id: requestEntity.id } },
     });
@@ -400,15 +327,10 @@ describe('RequestsService', () => {
   });
   describe('when adding a comment to a feature request', () => {
     it('should add a comment to the feature request', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
       const comment = await service.createRequestComment(
         org.id,
         project.id,
@@ -426,15 +348,10 @@ describe('RequestsService', () => {
   });
   describe('when adding a comment with mention to a feature request', () => {
     it('should add a comment to the feature request', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
       const comment = await service.createRequestComment(
         org.id,
         project.id,
@@ -452,15 +369,10 @@ describe('RequestsService', () => {
   });
   describe('when updating a comment for a feature request', () => {
     it('should update the comment', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
       const comment = await service.createRequestComment(
         org.id,
         project.id,
@@ -489,15 +401,10 @@ describe('RequestsService', () => {
   });
   describe('when updating a comment with mention for a feature request', () => {
     it('should update the comment', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
       const comment = await service.createRequestComment(
         org.id,
         project.id,
@@ -526,15 +433,10 @@ describe('RequestsService', () => {
   });
   describe('when deleting a comment for a feature request', () => {
     it('should delete the comment', async () => {
-      const request = await service.addRequest(
-        user.id,
-        org.id,
-        project.id,
-        {
-          title: 'Test Feature Request',
-          description: 'Test Description',
-        },
-      );
+      const request = await service.addRequest(user.id, org.id, project.id, {
+        title: 'Test Feature Request',
+        description: 'Test Description',
+      });
       const comment = await service.createRequestComment(
         org.id,
         project.id,
@@ -570,19 +472,16 @@ describe('RequestsService', () => {
         description: 'My Other Feature Request Description',
       });
 
-      const requests =
-        await service.searchRequestsByTitleOrDescription(
-          org.id,
-          project.id,
-          'my feature request',
-          1,
-          1,
-        );
+      const requests = await service.searchRequestsByTitleOrDescription(
+        org.id,
+        project.id,
+        'my feature request',
+        1,
+        1,
+      );
       expect(requests).toHaveLength(1);
       expect(requests[0].title).toEqual('My Feature Request');
-      expect(requests[0].description).toEqual(
-        'My Feature Request Description',
-      );
+      expect(requests[0].description).toEqual('My Feature Request Description');
     });
   });
 });

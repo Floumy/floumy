@@ -14,8 +14,6 @@ export class AddCodeEnabledToProject1760000000006
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `ALTER TABLE "project" DROP COLUMN "codeEnabled"`,
-    );
+    await queryRunner.query(`ALTER TABLE "project" DROP COLUMN "codeEnabled"`);
   }
 }
