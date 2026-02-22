@@ -14,7 +14,7 @@ import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { InitiativeFile } from '../roadmap/initiatives/initiative-file.entity';
 import { WorkItemsService } from '../backlog/work-items/work-items.service';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { Sprint } from '../sprints/sprint.entity';
+import { Cycle } from '../cycles/cycle.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Project } from '../projects/project.entity';
 
@@ -34,7 +34,7 @@ describe('FilesController', () => {
           InitiativeFile,
           WorkItem,
           Initiative,
-          Sprint,
+          Cycle,
         ]),
         UsersModule,
         AuthModule,

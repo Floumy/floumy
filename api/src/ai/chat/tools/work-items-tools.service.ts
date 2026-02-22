@@ -12,7 +12,7 @@ import { Priority } from '../../../common/priority.enum';
 import { WorkItemStatus } from '../../../backlog/work-items/work-item-status.enum';
 import { Initiative } from '../../../roadmap/initiatives/initiative.entity';
 import { WorkItemType } from '../../../backlog/work-items/work-item-type.enum';
-import { Sprint } from '../../../sprints/sprint.entity';
+import { Cycle } from '../../../cycles/cycle.entity';
 
 @Injectable()
 export class WorkItemsToolsService {
@@ -27,8 +27,8 @@ export class WorkItemsToolsService {
     private projectRepository: Repository<Project>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    @InjectRepository(Sprint)
-    private sprintRepository: Repository<Sprint>,
+    @InjectRepository(Cycle)
+    private cycleRepository: Repository<Cycle>,
     private workItemsService: WorkItemsService,
   ) {}
 
@@ -106,7 +106,7 @@ export class WorkItemsToolsService {
         workItemDescription,
         workItemType,
         workItemInitiative,
-        workItemSprintId,
+        workItemCycleId,
         workItemEstimation,
         workItemPriority,
         workItemStatus,
@@ -168,9 +168,9 @@ export class WorkItemsToolsService {
             createWorkItemDto,
           );
 
-          // If a sprint ID is provided, associate the work item with the sprint
-          let sprintAssociationMessage = '';
-          if (workItemSprintId) {
+          // If a cycle ID is provided, associate the work item with the cycle
+          let cycleAssociationMessage = '';
+          if (workItemCycleId) {
             try {
               // Find the newly created work item
               const workItem = await this.workItemRepository.findOneByOrFail({
@@ -179,20 +179,20 @@ export class WorkItemsToolsService {
                 project: { id: projectId },
               });
 
-              // Find the sprint
-              const sprint = await this.sprintRepository.findOneByOrFail({
-                id: workItemSprintId,
+              // Find the cycle
+              const cycle = await this.cycleRepository.findOneByOrFail({
+                id: workItemCycleId,
                 org: { id: orgId },
                 project: { id: projectId },
               });
 
-              // Associate work item with sprint
-              workItem.sprint = Promise.resolve(sprint);
+              // Associate work item with cycle
+              workItem.cycle = Promise.resolve(cycle);
               await this.workItemRepository.save(workItem);
 
-              sprintAssociationMessage = `\n- Added to sprint: ${sprint.title}`;
+              cycleAssociationMessage = `\n- Added to cycle: ${cycle.title}`;
             } catch (error) {
-              sprintAssociationMessage = `\n- Failed to add to sprint: ${error.message}`;
+              cycleAssociationMessage = `\n- Failed to add to cycle: ${error.message}`;
             }
           }
 
@@ -206,7 +206,7 @@ export class WorkItemsToolsService {
                   workItemEstimation
                     ? `\n- estimation: ${workItemEstimation}`
                     : ''
-                }${sprintAssociationMessage}`;
+                }${cycleAssociationMessage}`;
         } catch (e) {
           return 'Failed to create work item: ' + e.message;
         }
@@ -221,9 +221,9 @@ export class WorkItemsToolsService {
             .string()
             .describe('The work item description.'),
           workItemType: z
-            .enum(['user-story', 'task', 'bug', 'spike', 'technical-debt'])
+            .enum(['deliverable', 'task', 'defect', 'research', 'improvement'])
             .describe(
-              'One of the options user-story, task, bug, spike, technical-debt',
+              'One of the options deliverable, task, defect, research, improvement',
             ),
           workItemInitiative: z
             .string()
@@ -231,10 +231,10 @@ export class WorkItemsToolsService {
             .describe(
               'The initiative reference of the form I-123 that needs to be associated with the work item',
             ),
-          workItemSprintId: z
+          workItemCycleId: z
             .string()
             .optional()
-            .describe('Optional sprint ID to associate the work item with'),
+            .describe('Optional cycle ID to associate the work item with'),
           workItemEstimation: z
             .number()
             .optional()
@@ -251,11 +251,11 @@ export class WorkItemsToolsService {
               'ready-to-start',
               'in-progress',
               'blocked',
-              'code-review',
+              'review',
               'testing',
               'revisions',
-              'ready-for-deployment',
-              'deployed',
+              'ready-to-ship',
+              'shipped',
               'done',
               'closed',
             ])
@@ -283,7 +283,7 @@ export class WorkItemsToolsService {
         workItemStatus,
         workItemPriority,
         workItemEstimation,
-        workItemSprintId,
+        workItemCycleId,
       }) => {
         try {
           const org = await this.orgRepository.findOneByOrFail({ id: orgId });
@@ -346,9 +346,9 @@ export class WorkItemsToolsService {
             updateWorkItemDto,
           );
 
-          // Handle sprint association changes
-          let sprintMessage = '';
-          if (workItemSprintId !== undefined) {
+          // Handle cycle association changes
+          let cycleMessage = '';
+          if (workItemCycleId !== undefined) {
             try {
               const freshWorkItem =
                 await this.workItemRepository.findOneByOrFail({
@@ -361,26 +361,26 @@ export class WorkItemsToolsService {
                   },
                 });
 
-              if (workItemSprintId === null) {
-                // Remove work item from any sprint
-                freshWorkItem.sprint = Promise.resolve(null);
+              if (workItemCycleId === null) {
+                // Remove work item from any cycle
+                freshWorkItem.cycle = Promise.resolve(null);
                 await this.workItemRepository.save(freshWorkItem);
-                sprintMessage = '\n- Removed from sprint';
+                cycleMessage = '\n- Removed from cycle';
               } else {
-                // Add to a specified sprint
-                const sprint = await this.sprintRepository.findOneByOrFail({
-                  id: workItemSprintId,
+                // Add to a specified cycle
+                const cycle = await this.cycleRepository.findOneByOrFail({
+                  id: workItemCycleId,
                   org: { id: orgId },
                   project: { id: projectId },
                 });
 
-                freshWorkItem.sprint = Promise.resolve(sprint);
+                freshWorkItem.cycle = Promise.resolve(cycle);
                 await this.workItemRepository.save(freshWorkItem);
 
-                sprintMessage = `\n- Added to sprint: ${sprint.title}`;
+                cycleMessage = `\n- Added to cycle: ${cycle.title}`;
               }
             } catch (error) {
-              sprintMessage = `\n- Failed to update sprint association: ${error.message}`;
+              cycleMessage = `\n- Failed to update cycle association: ${error.message}`;
             }
           }
 
@@ -394,7 +394,7 @@ export class WorkItemsToolsService {
                   updatedWorkItem.estimation
                     ? `\n- estimation: ${updatedWorkItem.estimation}`
                     : ''
-                }${sprintMessage}`;
+                }${cycleMessage}`;
         } catch (e) {
           return 'Failed to update work item: ' + e.message;
         }
@@ -414,9 +414,9 @@ export class WorkItemsToolsService {
             .string()
             .describe('The work item description.'),
           workItemType: z
-            .enum(['user-story', 'task', 'bug', 'spike', 'technical-debt'])
+            .enum(['deliverable', 'task', 'defect', 'research', 'improvement'])
             .describe(
-              'One of the options user-story, task, bug, spike, technical-debt',
+              'One of the options deliverable, task, defect, research, improvement',
             ),
           workItemPriority: z
             .enum(['low', 'medium', 'high'])
@@ -438,22 +438,22 @@ export class WorkItemsToolsService {
               'ready-to-start',
               'in-progress',
               'blocked',
-              'code-review',
+              'review',
               'testing',
               'revisions',
-              'ready-for-deployment',
-              'deployed',
+              'ready-to-ship',
+              'shipped',
               'done',
               'closed',
             ])
             .optional()
             .describe('The new status for the work item'),
-          workItemSprintId: z
+          workItemCycleId: z
             .string()
             .nullable()
             .optional()
             .describe(
-              'Optional sprint ID to associate the work item with. Set to null to remove from sprint.',
+              'Optional cycle ID to associate the work item with. Set to null to remove from cycle.',
             ),
         }),
       },

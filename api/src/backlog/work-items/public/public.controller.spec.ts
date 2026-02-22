@@ -2,7 +2,7 @@ import { PublicController } from './public.controller';
 import { Org } from '../../../orgs/org.entity';
 import { User } from '../../../users/user.entity';
 import { InitiativesService } from '../../../roadmap/initiatives/initiatives.service';
-import { SprintsService } from '../../../sprints/sprints.service';
+import { CyclesService } from '../../../cycles/cycles.service';
 import { Repository } from 'typeorm';
 import { File } from '../../../files/file.entity';
 import { setupTestingModule } from '../../../../test/test.utils';
@@ -49,7 +49,7 @@ describe('PublicController', () => {
           Initiative,
           WorkItem,
           Milestone,
-          Sprint,
+          Cycle,
           File,
           InitiativeFile,
           WorkItemFile,
@@ -108,8 +108,8 @@ describe('PublicController', () => {
           title: 'Test Feature',
           description: 'Test Description',
           priority: Priority.HIGH,
-          type: WorkItemType.BUG,
-          status: WorkItemStatus.DEPLOYED,
+          type: WorkItemType.DEFECT,
+          status: WorkItemStatus.SHIPPED,
           estimation: 5,
         },
       );

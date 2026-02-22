@@ -33,6 +33,7 @@ function WorkItemsList({
   headerClassName = 'thead-light',
   onAddNewWorkItem,
   onChangeSprint,
+  onChangeCycle,
   onChangeStatus,
   onChangePriority,
   onChangeAssignee,
@@ -166,7 +167,7 @@ function WorkItemsList({
       {enableContextMenu && (
         <WorkItemsContextMenu
           menuId={id}
-          onChangeSprint={onChangeSprint}
+          onChangeSprint={onChangeSprint || onChangeCycle}
           onChangeStatus={onChangeStatus}
           onChangePriority={onChangePriority}
           onChangeAssignee={onChangeAssignee}

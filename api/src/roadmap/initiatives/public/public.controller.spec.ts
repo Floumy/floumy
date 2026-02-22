@@ -8,7 +8,7 @@ import { Objective } from '../../../okrs/objective.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
 import { Initiative } from '../initiative.entity';
 import { Milestone } from '../../milestones/milestone.entity';
-import { Sprint } from '../../../sprints/sprint.entity';
+import { Cycle } from '../../../cycles/cycle.entity';
 import { File } from '../../../files/file.entity';
 import { InitiativeFile } from '../initiative-file.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
@@ -47,7 +47,7 @@ describe('PublicController', () => {
           KeyResult,
           Initiative,
           Milestone,
-          Sprint,
+          Cycle,
           File,
           InitiativeFile,
           WorkItem,

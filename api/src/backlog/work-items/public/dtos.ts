@@ -11,7 +11,7 @@ export interface WorkItemDto {
     id: string;
     title: string;
   };
-  sprint: {
+  cycle: {
     id: string;
     title: string;
   };

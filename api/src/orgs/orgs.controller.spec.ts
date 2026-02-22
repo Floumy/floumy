@@ -8,7 +8,7 @@ import { KeyResult } from '../okrs/key-result.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
-import { Sprint } from '../sprints/sprint.entity';
+import { Cycle } from '../cycles/cycle.entity';
 import { File } from '../files/file.entity';
 import { WorkItemFile } from '../backlog/work-items/work-item-file.entity';
 import { InitiativeFile } from '../roadmap/initiatives/initiative-file.entity';
@@ -18,7 +18,7 @@ import { OrgsService } from './orgs.service';
 import { TokensService } from '../auth/tokens.service';
 import { InitiativesService } from '../roadmap/initiatives/initiatives.service';
 import { MilestonesService } from '../roadmap/milestones/milestones.service';
-import { SprintsService } from '../sprints/sprints.service';
+import { CyclesService } from '../cycles/cycles.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.entity';
 import { FilesService } from '../files/files.service';
@@ -55,7 +55,7 @@ describe('OrgsController', () => {
         InitiativesService,
         MilestonesService,
         WorkItemsService,
-        SprintsService,
+        CyclesService,
         FilesService,
         FilesStorageRepository,
       ],

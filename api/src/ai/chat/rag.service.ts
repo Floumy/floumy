@@ -81,7 +81,7 @@ export class RagService {
         - Initiatives, tasks, or work items in the system
         - OKRs, objectives, or key results
         - Organization or team specific information
-        - Sprints or backlog items
+        - Cycles or backlog items
         - Any stored documents or internal data
         - Anything that happened in the past
         

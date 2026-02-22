@@ -41,15 +41,15 @@ export class AiController {
     }
   }
 
-  @Get('feature-requests-initiatives')
-  async generateInitiativesForFeatureRequest(
-    @Query('featureRequest') featureRequest: string,
-    @Query('description') featureRequestDescription: string,
+  @Get('requests-initiatives')
+  async generateInitiativesForRequest(
+    @Query('request') request: string,
+    @Query('description') requestDescription: string,
   ) {
     try {
-      return await this.aiService.generateInitiativesForFeatureRequest(
-        featureRequest,
-        featureRequestDescription,
+      return await this.aiService.generateInitiativesForRequest(
+        request,
+        requestDescription,
       );
     } catch (e) {
       throw new BadRequestException(e.message);
@@ -107,14 +107,14 @@ export class AiController {
     @Query('initiative') initiative: string,
     @Query('keyResultId') keyResultId: string,
     @Query('milestoneId') milestoneId: string,
-    @Query('featureRequestId') featureRequestId: string,
+    @Query('requestId') requestId: string,
   ) {
     try {
       return await this.aiService.generateInitiativeDescription(
         initiative,
         keyResultId,
         milestoneId,
-        featureRequestId,
+        requestId,
       );
     } catch (e) {
       throw new BadRequestException(e.message);

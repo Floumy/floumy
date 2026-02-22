@@ -17,7 +17,7 @@ import { WorkItemsService } from '../../backlog/work-items/work-items.service';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { WorkItemType } from '../../backlog/work-items/work-item-type.enum';
 import { InitiativeStatus } from './initiativestatus.enum';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { FilesService } from '../../files/files.service';
@@ -25,10 +25,10 @@ import { FilesStorageRepository } from '../../files/files-storage.repository';
 import { InitiativeFile } from './initiative-file.entity';
 import { InitiativeComment } from './initiative-comment.entity';
 import { Repository } from 'typeorm';
-import { FeatureRequest } from '../../feature-requests/feature-request.entity';
-import { FeatureRequestsService } from '../../feature-requests/feature-requests.service';
-import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
-import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
+import { Request } from '../../requests/request.entity';
+import { RequestsService } from '../../requests/requests.service';
+import { RequestComment } from '../../requests/request-comment.entity';
+import { RequestVote } from '../../requests/request-vote.entity';
 import { Project } from '../../projects/project.entity';
 
 describe('FeaturesService', () => {
@@ -36,7 +36,7 @@ describe('FeaturesService', () => {
   let service: InitiativesService;
   let workItemsService: WorkItemsService;
   let milestonesService: MilestonesService;
-  let featureRequestsService: FeatureRequestsService;
+  let requestsService: RequestsService;
   let okrsService: OkrsService;
   let orgsService: OrgsService;
   let filesService: FilesService;
@@ -58,14 +58,15 @@ describe('FeaturesService', () => {
           User,
           Milestone,
           WorkItem,
-          Sprint,
+          Cycle,
           File,
           WorkItemFile,
           InitiativeFile,
           InitiativeComment,
-          FeatureRequest,
-          FeatureRequestComment,
-          FeatureRequestVote,
+          Request,
+          RequestComment,
+          RequestVote,
+          Project,
         ]),
       ],
       [
@@ -77,7 +78,7 @@ describe('FeaturesService', () => {
         WorkItemsService,
         FilesService,
         FilesStorageRepository,
-        FeatureRequestsService,
+        RequestsService,
       ],
     );
     cleanup = dbCleanup;
@@ -96,9 +97,7 @@ describe('FeaturesService', () => {
     );
     org = await orgsService.createForUser(user);
     project = (await org.projects)[0];
-    featureRequestsService = module.get<FeatureRequestsService>(
-      FeatureRequestsService,
-    );
+    requestsService = module.get<RequestsService>(RequestsService);
   });
 
   afterEach(async () => {
@@ -298,7 +297,7 @@ describe('FeaturesService', () => {
     });
     it('should update the initiative request', async () => {
       await orgsRepository.save(org);
-      const featureRequest = await featureRequestsService.addFeatureRequest(
+      const request = await requestsService.addRequest(
         user.id,
         org.id,
         project.id,
@@ -316,12 +315,12 @@ describe('FeaturesService', () => {
           description: 'my initiative description',
           priority: Priority.HIGH,
           status: InitiativeStatus.PLANNED,
-          featureRequest: featureRequest.id,
+          request: request.id,
         },
       );
 
-      expect(initiative.featureRequest).toBeDefined();
-      expect(initiative.featureRequest.id).toEqual(featureRequest.id);
+      expect(initiative.request).toBeDefined();
+      expect(initiative.request.id).toEqual(request.id);
     });
     it('should set the completedAt field if the status is completed', async () => {
       const initiative = await service.createInitiative(
@@ -899,7 +898,7 @@ describe('FeaturesService', () => {
     });
     it('should update the initiative request', async () => {
       await orgsRepository.save(org);
-      const featureRequest = await featureRequestsService.addFeatureRequest(
+      const request = await requestsService.addRequest(
         user.id,
         org.id,
         project.id,
@@ -930,22 +929,22 @@ describe('FeaturesService', () => {
           mentions: [user.id],
           priority: Priority.LOW,
           status: InitiativeStatus.PLANNED,
-          featureRequest: featureRequest.id,
+          request: request.id,
         },
       );
       expect(updatedFeature.title).toEqual('my initiative');
       expect(updatedFeature.description).toEqual('my initiative description');
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.status).toEqual(InitiativeStatus.PLANNED);
-      expect(updatedFeature.featureRequest).toBeDefined();
-      expect(updatedFeature.featureRequest.id).toEqual(featureRequest.id);
-      expect(updatedFeature.featureRequest.title).toEqual(featureRequest.title);
+      expect(updatedFeature.request).toBeDefined();
+      expect(updatedFeature.request.id).toEqual(request.id);
+      expect(updatedFeature.request.title).toEqual(request.title);
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should update the feature request to null', async () => {
       await orgsRepository.save(org);
-      const featureRequest = await featureRequestsService.addFeatureRequest(
+      const request = await requestsService.addRequest(
         user.id,
         org.id,
         project.id,
@@ -963,7 +962,7 @@ describe('FeaturesService', () => {
           description: 'my initiative description',
           priority: Priority.LOW,
           status: InitiativeStatus.PLANNED,
-          featureRequest: featureRequest.id,
+          request: request.id,
         },
       );
       const updatedFeature = await service.updateInitiative(
@@ -977,20 +976,20 @@ describe('FeaturesService', () => {
           mentions: [user.id],
           priority: Priority.LOW,
           status: InitiativeStatus.PLANNED,
-          featureRequest: null,
+          request: null,
         },
       );
       expect(updatedFeature.title).toEqual('my initiative');
       expect(updatedFeature.description).toEqual('my initiative description');
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.status).toEqual(InitiativeStatus.PLANNED);
-      expect(updatedFeature.featureRequest).toBeNull();
+      expect(updatedFeature.request).toBeNull();
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should not update the feature request if the update is for another field', async () => {
       await orgsRepository.save(org);
-      const featureRequest = await featureRequestsService.addFeatureRequest(
+      const request = await requestsService.addRequest(
         user.id,
         org.id,
         project.id,
@@ -1021,16 +1020,16 @@ describe('FeaturesService', () => {
           mentions: [user.id],
           priority: Priority.LOW,
           status: InitiativeStatus.PLANNED,
-          featureRequest: featureRequest.id,
+          request: request.id,
         },
       );
       expect(updatedFeature.title).toEqual('my initiative');
       expect(updatedFeature.description).toEqual('my initiative description');
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.status).toEqual(InitiativeStatus.PLANNED);
-      expect(updatedFeature.featureRequest).toBeDefined();
-      expect(updatedFeature.featureRequest.id).toEqual(featureRequest.id);
-      expect(updatedFeature.featureRequest.title).toEqual(featureRequest.title);
+      expect(updatedFeature.request).toBeDefined();
+      expect(updatedFeature.request.id).toEqual(request.id);
+      expect(updatedFeature.request.title).toEqual(request.title);
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });
@@ -1540,7 +1539,7 @@ describe('FeaturesService', () => {
     });
     it('should update the feature request', async () => {
       await orgsRepository.save(org);
-      const featureRequest = await featureRequestsService.addFeatureRequest(
+      const request = await requestsService.addRequest(
         user.id,
         org.id,
         project.id,
@@ -1567,22 +1566,22 @@ describe('FeaturesService', () => {
         {
           priority: Priority.LOW,
           status: InitiativeStatus.PLANNED,
-          featureRequest: featureRequest.id,
+          request: request.id,
         },
       );
       expect(updatedFeature.title).toEqual('my initiative');
       expect(updatedFeature.description).toEqual('my initiative description');
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.status).toEqual(InitiativeStatus.PLANNED);
-      expect(updatedFeature.featureRequest).toBeDefined();
-      expect(updatedFeature.featureRequest.id).toEqual(featureRequest.id);
-      expect(updatedFeature.featureRequest.title).toEqual(featureRequest.title);
+      expect(updatedFeature.request).toBeDefined();
+      expect(updatedFeature.request.id).toEqual(request.id);
+      expect(updatedFeature.request.title).toEqual(request.title);
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should update the feature request to null', async () => {
       await orgsRepository.save(org);
-      await featureRequestsService.addFeatureRequest(
+      await requestsService.addRequest(
         user.id,
         org.id,
         project.id,
@@ -1613,20 +1612,20 @@ describe('FeaturesService', () => {
           mentions: [user.id],
           priority: Priority.LOW,
           status: InitiativeStatus.PLANNED,
-          featureRequest: null,
+          request: null,
         },
       );
       expect(updatedFeature.title).toEqual('my initiative');
       expect(updatedFeature.description).toEqual('my initiative description');
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.status).toEqual(InitiativeStatus.PLANNED);
-      expect(updatedFeature.featureRequest).toBeNull();
+      expect(updatedFeature.request).toBeNull();
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });
     it('should not update the feature request if the update is for another field', async () => {
       await orgsRepository.save(org);
-      const featureRequest = await featureRequestsService.addFeatureRequest(
+      const request = await requestsService.addRequest(
         user.id,
         org.id,
         project.id,
@@ -1653,16 +1652,16 @@ describe('FeaturesService', () => {
         {
           priority: Priority.LOW,
           status: InitiativeStatus.PLANNED,
-          featureRequest: featureRequest.id,
+          request: request.id,
         },
       );
       expect(updatedFeature.title).toEqual('my initiative');
       expect(updatedFeature.description).toEqual('my initiative description');
       expect(updatedFeature.priority).toEqual(Priority.LOW);
       expect(updatedFeature.status).toEqual(InitiativeStatus.PLANNED);
-      expect(updatedFeature.featureRequest).toBeDefined();
-      expect(updatedFeature.featureRequest.id).toEqual(featureRequest.id);
-      expect(updatedFeature.featureRequest.title).toEqual(featureRequest.title);
+      expect(updatedFeature.request).toBeDefined();
+      expect(updatedFeature.request.id).toEqual(request.id);
+      expect(updatedFeature.request.title).toEqual(request.title);
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });

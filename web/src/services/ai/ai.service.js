@@ -23,13 +23,13 @@ export async function generateInitiativesForOKR(objective, keyResult) {
   }
 }
 
-export async function generateInitiativesForFeatureRequest(
-  featureRequest,
-  featureRequestDescription,
+export async function generateInitiativesForRequest(
+  request,
+  requestDescription,
 ) {
   try {
     const response = await api.get(
-      `${apiUrl}/ai/feature-requests-initiatives?featureRequest=${featureRequest}&description=${featureRequestDescription}`,
+      `${apiUrl}/ai/requests-initiatives?request=${request}&description=${requestDescription}`,
     );
     return response.data;
   } catch (e) {
@@ -79,11 +79,11 @@ export async function getInitiativeDescription(
   initiative,
   keyResultId,
   milestoneId,
-  featureRequestId,
+  requestId,
 ) {
   try {
     const response = await api.get(
-      `${apiUrl}/ai/initiative-description?initiative=${initiative}&keyResultId=${keyResultId}&milestoneId=${milestoneId}&featureRequestId=${featureRequestId}`,
+      `${apiUrl}/ai/initiative-description?initiative=${initiative}&keyResultId=${keyResultId}&milestoneId=${milestoneId}&requestId=${requestId}`,
     );
     return response.data;
   } catch (e) {

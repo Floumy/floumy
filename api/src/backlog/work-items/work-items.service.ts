@@ -6,7 +6,7 @@ import { In, Repository } from 'typeorm';
 import { WorkItem } from './work-item.entity';
 import WorkItemMapper from './work-item.mapper';
 import { WorkItemStatus } from './work-item-status.enum';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { User } from '../../users/user.entity';
@@ -32,8 +32,8 @@ export class WorkItemsService {
     private workItemsRepository: Repository<WorkItem>,
     @InjectRepository(Initiative)
     private initiativeRepository: Repository<Initiative>,
-    @InjectRepository(Sprint)
-    private sprintRepository: Repository<Sprint>,
+    @InjectRepository(Cycle)
+    private cycleRepository: Repository<Cycle>,
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(File) private filesRepository: Repository<File>,
     @InjectRepository(WorkItemFile)
@@ -201,7 +201,7 @@ export class WorkItemsService {
     );
   }
 
-  async listOpenWorkItemsWithoutSprints(orgId: string, projectId: string) {
+  async listOpenWorkItemsWithoutCycles(orgId: string, projectId: string) {
     const workItems = await this.workItemsRepository
       .createQueryBuilder('workItem')
       .leftJoinAndSelect('workItem.initiative', 'initiative')
@@ -212,7 +212,7 @@ export class WorkItemsService {
         closedStatus: WorkItemStatus.CLOSED,
         doneStatus: WorkItemStatus.DONE,
       })
-      .andWhere('workItem.sprintId IS NULL')
+      .andWhere('workItem.cycleId IS NULL')
       .getMany();
     return await WorkItemMapper.toListDto(workItems);
   }
@@ -229,9 +229,9 @@ export class WorkItemsService {
       project: { id: projectId },
     });
     const previous = await WorkItemMapper.toDto(workItem);
-    const currentSprint = await workItem.sprint;
+    const currentCycle = await workItem.cycle;
 
-    await this.updateSprint(workItem, workItemPatchDto, orgId, currentSprint);
+    await this.updateCycle(workItem, workItemPatchDto, orgId, currentCycle);
     this.updateStatusAndCompletionDate(workItem, workItemPatchDto);
     this.updatePriority(workItem, workItemPatchDto);
 
@@ -458,7 +458,7 @@ export class WorkItemsService {
       workItem.completedAt = new Date();
     }
     workItem.initiative = Promise.resolve(null);
-    workItem.sprint = Promise.resolve(null);
+    workItem.cycle = Promise.resolve(null);
     if (workItemDto.initiative) {
       const initiative = await this.initiativeRepository.findOneByOrFail({
         id: workItemDto.initiative,
@@ -466,12 +466,12 @@ export class WorkItemsService {
       });
       workItem.initiative = Promise.resolve(initiative);
     }
-    if (workItemDto.sprint) {
-      const sprint = await this.sprintRepository.findOneByOrFail({
-        id: workItemDto.sprint,
+    if (workItemDto.cycle) {
+      const cycle = await this.cycleRepository.findOneByOrFail({
+        id: workItemDto.cycle,
         org: { id: orgId },
       });
-      workItem.sprint = Promise.resolve(sprint);
+      workItem.cycle = Promise.resolve(cycle);
     }
     if (workItemDto.assignedTo) {
       const assignedTo = await this.usersRepository.findOneByOrFail({
@@ -513,20 +513,20 @@ export class WorkItemsService {
     }
   }
 
-  private async updateSprint(
+  private async updateCycle(
     workItem: WorkItem,
     workItemPatchDto: WorkItemPatchDto,
     orgId: string,
-    currentSprint: Sprint,
+    currentCycle: Cycle,
   ) {
-    if (workItemPatchDto.sprint) {
-      const sprint = await this.sprintRepository.findOneByOrFail({
-        id: workItemPatchDto.sprint,
+    if (workItemPatchDto.cycle) {
+      const cycle = await this.cycleRepository.findOneByOrFail({
+        id: workItemPatchDto.cycle,
         org: { id: orgId },
       });
-      workItem.sprint = Promise.resolve(sprint);
-    } else if (currentSprint != null && workItemPatchDto.sprint === null) {
-      workItem.sprint = Promise.resolve(null);
+      workItem.cycle = Promise.resolve(cycle);
+    } else if (currentCycle != null && workItemPatchDto.cycle === null) {
+      workItem.cycle = Promise.resolve(null);
     }
   }
 

@@ -218,14 +218,17 @@ export function getSprintEndDate(sprint) {
   return new Date(sprint.endDate);
 }
 
+export const getCycleStartDate = getSprintStartDate;
+export const getCycleEndDate = getSprintEndDate;
+
 export function workItemTypeName(type) {
   if (!type) return '';
   const typeMap = {
-    'user-story': 'User Story',
-    bug: 'Bug',
+    deliverable: 'Deliverable',
+    defect: 'Defect',
     task: 'Task',
-    'technical-debt': 'Technical Debt',
-    spike: 'Spike',
+    improvement: 'Improvement',
+    research: 'Research',
   };
   return typeMap[type];
 }
@@ -247,11 +250,11 @@ export function workItemStatusName(status) {
     'ready-to-start': 'Ready to Start',
     'in-progress': 'In Progress',
     blocked: 'Blocked',
-    'code-review': 'Code Review',
+    review: 'Review',
     testing: 'Testing',
     revisions: 'Revisions',
-    'ready-for-deployment': 'Ready for Deployment',
-    deployed: 'Deployed',
+    'ready-to-ship': 'Ready to Ship',
+    shipped: 'Shipped',
     done: 'Done',
     closed: 'Closed',
   };

@@ -14,15 +14,15 @@ export class WorkItemsStatusStats {
   @Column({ default: 0 })
   blocked: number;
   @Column({ default: 0 })
-  codeReview: number;
+  review: number;
   @Column({ default: 0 })
   testing: number;
   @Column({ default: 0 })
   revisions: number;
   @Column({ default: 0 })
-  readyForDeployment: number;
+  readyToShip: number;
   @Column({ default: 0 })
-  deployed: number;
+  shipped: number;
   @Column({ default: 0 })
   done: number;
   @Column({ default: 0 })

@@ -19,7 +19,7 @@ import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { InitiativeFile } from './initiative-file.entity';
 import { User } from '../../users/user.entity';
 import { InitiativeComment } from './initiative-comment.entity';
-import { FeatureRequest } from '../../feature-requests/feature-request.entity';
+import { Request } from '../../requests/request.entity';
 import { Project } from '../../projects/project.entity';
 
 @Entity()
@@ -88,14 +88,10 @@ export class Initiative {
     },
   )
   comments: Promise<InitiativeComment[]>;
-  @ManyToOne(
-    () => FeatureRequest,
-    (featureRequest) => featureRequest.initiatives,
-    {
-      lazy: true,
-    },
-  )
-  featureRequest: Promise<FeatureRequest>;
+  @ManyToOne(() => Request, (request) => request.initiatives, {
+    lazy: true,
+  })
+  request: Promise<Request>;
 
   @ManyToMany(() => User, {
     lazy: true,

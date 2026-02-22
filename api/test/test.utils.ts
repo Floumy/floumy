@@ -25,9 +25,9 @@ import { CommentsService } from '../src/okrs/comments/comments.service';
 import { KeyResult } from '../src/okrs/key-result.entity';
 import { ObjectiveComment } from '../src/okrs/objective-comment.entity';
 import { Objective } from '../src/okrs/objective.entity';
-import { FeatureRequestComment } from '../src/feature-requests/feature-request-comment.entity';
-import { FeatureRequestVote } from '../src/feature-requests/feature-request-vote.entity';
-import { FeatureRequest } from '../src/feature-requests/feature-request.entity';
+import { RequestComment } from '../src/requests/request-comment.entity';
+import { RequestVote } from '../src/requests/request-vote.entity';
+import { Request } from '../src/requests/request.entity';
 import { Issue } from '../src/issues/issue.entity';
 import { IssueComment } from '../src/issues/issue-comment.entity';
 import { Project } from '../src/projects/project.entity';
@@ -98,9 +98,9 @@ export async function setupTestingModule(
         ObjectiveComment,
         KeyResult,
         Objective,
-        FeatureRequest,
-        FeatureRequestVote,
-        FeatureRequestComment,
+        Request,
+        RequestVote,
+        RequestComment,
         Issue,
         IssueComment,
         WorkItem,

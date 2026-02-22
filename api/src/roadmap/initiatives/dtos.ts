@@ -2,7 +2,7 @@ import { Priority } from '../../common/priority.enum';
 import { InitiativeStatus } from './initiativestatus.enum';
 
 export interface CreateUpdateInitiativeDto {
-  featureRequest?: string;
+  request?: string;
   title: string;
   priority: Priority;
   status: InitiativeStatus;
@@ -19,7 +19,7 @@ export interface PatchInitiativeDto {
   status?: InitiativeStatus;
   milestone?: string;
   keyResult?: string;
-  featureRequest?: string;
+  request?: string;
 }
 
 export interface InitiativeDto {
@@ -46,7 +46,7 @@ export interface InitiativeDto {
     id: string;
     title: string;
   };
-  featureRequest?: {
+  request?: {
     id: string;
     title: string;
   };

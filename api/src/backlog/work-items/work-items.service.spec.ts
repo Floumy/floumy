@@ -17,9 +17,9 @@ import { WorkItemType } from './work-item-type.enum';
 import { EntityNotFoundError, Repository } from 'typeorm';
 import { WorkItemStatus } from './work-item-status.enum';
 import { InitiativeStatus } from '../../roadmap/initiatives/initiativestatus.enum';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 import { WorkItem } from './work-item.entity';
-import { SprintsService } from '../../sprints/sprints.service';
+import { CyclesService } from '../../cycles/cycles.service';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { InitiativeFile } from '../../roadmap/initiatives/initiative-file.entity';
@@ -33,7 +33,7 @@ describe('WorkItemsService', () => {
   let usersService: UsersService;
   let orgsService: OrgsService;
   let featuresService: InitiativesService;
-  let sprintService: SprintsService;
+  let cycleService: CyclesService;
   let filesRepository: Repository<File>;
   let workItemCommentsRepository: Repository<WorkItemComment>;
   let workItemsRepository: Repository<WorkItem>;
@@ -58,7 +58,7 @@ describe('WorkItemsService', () => {
           Initiative,
           User,
           Milestone,
-          Sprint,
+          Cycle,
           WorkItem,
           File,
           InitiativeFile,
@@ -73,7 +73,7 @@ describe('WorkItemsService', () => {
         UsersService,
         MilestonesService,
         WorkItemsService,
-        SprintsService,
+        CyclesService,
         FilesService,
         FilesStorageRepository,
         IssuesService,
@@ -81,7 +81,7 @@ describe('WorkItemsService', () => {
     );
     cleanup = dbCleanup;
     service = module.get<WorkItemsService>(WorkItemsService);
-    sprintService = module.get<SprintsService>(SprintsService);
+    cycleService = module.get<CyclesService>(CyclesService);
     featuresService = module.get<InitiativesService>(InitiativesService);
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
@@ -152,7 +152,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -162,7 +162,7 @@ describe('WorkItemsService', () => {
       expect(workItem.title).toEqual('my work item');
       expect(workItem.description).toEqual('my work item description');
       expect(workItem.priority).toEqual(Priority.HIGH);
-      expect(workItem.type).toEqual(WorkItemType.USER_STORY);
+      expect(workItem.type).toEqual(WorkItemType.DELIVERABLE);
       expect(workItem.initiative.id).toBeDefined();
       expect(workItem.initiative.title).toEqual('my feature');
       expect(workItem.createdBy.id).toEqual(user.id);
@@ -184,7 +184,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         estimation: 13,
         initiative: feature.id,
         status: WorkItemStatus.DONE,
@@ -193,7 +193,7 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         estimation: 13,
         initiative: feature.id,
         status: WorkItemStatus.IN_PROGRESS,
@@ -232,7 +232,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           status: WorkItemStatus.DONE,
           files: [
@@ -250,7 +250,7 @@ describe('WorkItemsService', () => {
       expect(workItem.title).toEqual('my work item');
       expect(workItem.description).toEqual('my work item description');
       expect(workItem.priority).toEqual(Priority.HIGH);
-      expect(workItem.type).toEqual(WorkItemType.USER_STORY);
+      expect(workItem.type).toEqual(WorkItemType.DELIVERABLE);
       expect(workItem.estimation).toEqual(13);
       expect(workItem.status).toEqual(WorkItemStatus.DONE);
       expect(workItem.files).toBeDefined();
@@ -272,7 +272,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           issue: issue.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -298,7 +298,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         initiative: feature.id,
         status: WorkItemStatus.PLANNED,
       });
@@ -308,7 +308,7 @@ describe('WorkItemsService', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual(Priority.HIGH);
-      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
+      expect(workItems[0].type).toEqual(WorkItemType.DELIVERABLE);
     });
     it('should return the list of work items paginated', async () => {
       const feature1 = await featuresService.createInitiative(
@@ -337,7 +337,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         initiative: feature1.id,
         status: WorkItemStatus.PLANNED,
       });
@@ -345,7 +345,7 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
@@ -355,7 +355,7 @@ describe('WorkItemsService', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual(Priority.HIGH);
-      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
+      expect(workItems[0].type).toEqual(WorkItemType.DELIVERABLE);
     });
   });
   describe('when getting a work item', () => {
@@ -379,7 +379,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -393,7 +393,7 @@ describe('WorkItemsService', () => {
       expect(foundWorkItem.title).toEqual('my work item');
       expect(foundWorkItem.description).toEqual('my work item description');
       expect(foundWorkItem.priority).toEqual(Priority.HIGH);
-      expect(foundWorkItem.type).toEqual(WorkItemType.USER_STORY);
+      expect(foundWorkItem.type).toEqual(WorkItemType.DELIVERABLE);
       expect(foundWorkItem.initiative.id).toBeDefined();
       expect(foundWorkItem.initiative.title).toEqual('my feature');
     });
@@ -430,7 +430,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           initiative: feature1.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -445,7 +445,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           initiative: feature2.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -456,7 +456,7 @@ describe('WorkItemsService', () => {
         'my work item description updated',
       );
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
-      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.type).toEqual(WorkItemType.IMPROVEMENT);
       expect(foundWorkItem.initiative.id).toBeDefined();
       expect(foundWorkItem.initiative.title).toEqual('my other feature');
     });
@@ -480,7 +480,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -495,7 +495,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -505,7 +505,7 @@ describe('WorkItemsService', () => {
         'my work item description updated',
       );
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
-      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.type).toEqual(WorkItemType.IMPROVEMENT);
       expect(foundWorkItem.initiative).toBeUndefined();
     });
     it('should update the completedAt field if the status is DONE', async () => {
@@ -517,7 +517,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -531,7 +531,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.DONE,
         },
       );
@@ -541,7 +541,7 @@ describe('WorkItemsService', () => {
         'my work item description updated',
       );
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
-      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.type).toEqual(WorkItemType.IMPROVEMENT);
       expect(foundWorkItem.completedAt).toBeDefined();
     });
     it('should update the completedAt field if the status is CLOSED', async () => {
@@ -553,7 +553,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -567,7 +567,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.CLOSED,
         },
       );
@@ -577,7 +577,7 @@ describe('WorkItemsService', () => {
         'my work item description updated',
       );
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
-      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.type).toEqual(WorkItemType.IMPROVEMENT);
       expect(foundWorkItem.completedAt).toBeDefined();
     });
     it('should update the work item files', async () => {
@@ -607,7 +607,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           status: WorkItemStatus.DONE,
           files: [
@@ -630,7 +630,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           estimation: 13,
           status: WorkItemStatus.DONE,
           files: [
@@ -646,7 +646,7 @@ describe('WorkItemsService', () => {
         'my work item description updated',
       );
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
-      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.type).toEqual(WorkItemType.IMPROVEMENT);
       expect(foundWorkItem.estimation).toEqual(13);
       expect(foundWorkItem.status).toEqual(WorkItemStatus.DONE);
       expect(foundWorkItem.files).toBeDefined();
@@ -668,7 +668,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -682,7 +682,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
           assignedTo: otherUser.id,
         },
@@ -693,7 +693,7 @@ describe('WorkItemsService', () => {
         'my work item description updated',
       );
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
-      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.type).toEqual(WorkItemType.IMPROVEMENT);
       expect(foundWorkItem.assignedTo).toBeDefined();
       expect(foundWorkItem.assignedTo.id).toEqual(otherUser.id);
       expect(foundWorkItem.assignedTo.name).toEqual(otherUser.name);
@@ -713,7 +713,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           status: WorkItemStatus.PLANNED,
           assignedTo: otherUser.id,
         },
@@ -728,7 +728,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -738,7 +738,7 @@ describe('WorkItemsService', () => {
         'my work item description updated',
       );
       expect(foundWorkItem.priority).toEqual(Priority.MEDIUM);
-      expect(foundWorkItem.type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(foundWorkItem.type).toEqual(WorkItemType.IMPROVEMENT);
       expect(foundWorkItem.assignedTo).toBeUndefined();
     });
   });
@@ -763,7 +763,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -800,7 +800,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           status: WorkItemStatus.DONE,
           files: [
@@ -835,7 +835,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           issue: issue.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -850,7 +850,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.LOW,
-          type: WorkItemType.BUG,
+          type: WorkItemType.DEFECT,
           issue: issue.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -872,7 +872,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           issue: issue.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -887,7 +887,7 @@ describe('WorkItemsService', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.LOW,
-          type: WorkItemType.BUG,
+          type: WorkItemType.DEFECT,
           issue: null,
           status: WorkItemStatus.PLANNED,
         },
@@ -923,7 +923,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         initiative: feature1.id,
         status: WorkItemStatus.PLANNED,
       });
@@ -931,11 +931,11 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
-      const workItems = await service.listOpenWorkItemsWithoutSprints(
+      const workItems = await service.listOpenWorkItemsWithoutCycles(
         org.id,
         project.id,
       );
@@ -946,7 +946,7 @@ describe('WorkItemsService', () => {
             title: 'my work item',
             description: 'my work item description',
             priority: Priority.HIGH,
-            type: WorkItemType.USER_STORY,
+            type: WorkItemType.DELIVERABLE,
             initiative: expect.objectContaining({
               id: expect.any(String), // or whatever type id is
               title: 'my feature',
@@ -956,7 +956,7 @@ describe('WorkItemsService', () => {
             title: 'my other work item',
             description: 'my other work item description',
             priority: Priority.MEDIUM,
-            type: WorkItemType.TECHNICAL_DEBT,
+            type: WorkItemType.IMPROVEMENT,
             initiative: expect.objectContaining({
               id: expect.any(String),
               title: 'my other feature',
@@ -966,7 +966,7 @@ describe('WorkItemsService', () => {
       );
     });
     it('should return the open work items that are not associated with an sprint', async () => {
-      const sprint = await sprintService.create(org.id, project.id, {
+      const sprint = await cycleService.create(org.id, project.id, {
         goal: 'my sprint description',
         startDate: '2020-01-01',
         duration: 7,
@@ -997,7 +997,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         initiative: feature1.id,
         status: WorkItemStatus.PLANNED,
         sprint: sprint.id,
@@ -1006,11 +1006,11 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
-      const workItems = await service.listOpenWorkItemsWithoutSprints(
+      const workItems = await service.listOpenWorkItemsWithoutCycles(
         org.id,
         project.id,
       );
@@ -1021,7 +1021,7 @@ describe('WorkItemsService', () => {
         'my other work item description',
       );
       expect(workItems[0].priority).toEqual(Priority.MEDIUM);
-      expect(workItems[0].type).toEqual(WorkItemType.TECHNICAL_DEBT);
+      expect(workItems[0].type).toEqual(WorkItemType.IMPROVEMENT);
       expect(workItems[0].initiative.id).toBeDefined();
       expect(workItems[0].initiative.title).toEqual('my other feature');
     });
@@ -1043,7 +1043,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         initiative: feature.id,
         estimation: 13,
         status: WorkItemStatus.DONE,
@@ -1052,7 +1052,7 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         initiative: feature.id,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
@@ -1080,7 +1080,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         initiative: feature.id,
         estimation: 13,
         status: WorkItemStatus.DONE,
@@ -1089,7 +1089,7 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         initiative: feature.id,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
@@ -1123,7 +1123,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.DONE,
@@ -1137,7 +1137,7 @@ describe('WorkItemsService', () => {
           title: 'my other work item',
           description: 'my other work item description',
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           estimation: 13,
           status: WorkItemStatus.IN_PROGRESS,
         },
@@ -1146,7 +1146,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         estimation: 13,
         status: WorkItemStatus.DONE,
         initiative: feature.id,
@@ -1155,7 +1155,7 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
         initiative: feature.id,
@@ -1187,7 +1187,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.DONE,
@@ -1201,7 +1201,7 @@ describe('WorkItemsService', () => {
           title: 'my other work item',
           description: 'my other work item description',
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
@@ -1211,7 +1211,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         estimation: 13,
         status: WorkItemStatus.DONE,
         initiative: feature.id,
@@ -1220,7 +1220,7 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
         initiative: null,
@@ -1263,7 +1263,7 @@ describe('WorkItemsService', () => {
           title: 'my work item 1',
           description: 'my work item description 1',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           initiative: feature1.id,
           status: WorkItemStatus.DONE,
@@ -1277,7 +1277,7 @@ describe('WorkItemsService', () => {
           title: 'my work item 2',
           description: 'my work item description 2',
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           estimation: 13,
           initiative: feature2.id,
           status: WorkItemStatus.IN_PROGRESS,
@@ -1287,7 +1287,7 @@ describe('WorkItemsService', () => {
         title: 'my work item 1',
         description: 'my work item description 1',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         estimation: 13,
         status: WorkItemStatus.DONE,
         initiative: feature2.id,
@@ -1296,7 +1296,7 @@ describe('WorkItemsService', () => {
         title: 'my work item 2',
         description: 'my work item description 2',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         estimation: 13,
         status: WorkItemStatus.IN_PROGRESS,
         initiative: feature2.id,
@@ -1338,7 +1338,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.DONE,
@@ -1352,7 +1352,7 @@ describe('WorkItemsService', () => {
           title: 'my other work item',
           description: 'my other work item description',
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
@@ -1387,7 +1387,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.DONE,
@@ -1401,7 +1401,7 @@ describe('WorkItemsService', () => {
           title: 'my other work item',
           description: 'my other work item description',
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
@@ -1434,7 +1434,7 @@ describe('WorkItemsService', () => {
         title: 'my work item 1',
         description: 'my work item description 1',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         estimation: 13,
         initiative: feature.id,
         status: WorkItemStatus.DONE,
@@ -1447,7 +1447,7 @@ describe('WorkItemsService', () => {
           title: 'my work item 2',
           description: 'my work item description 2',
           priority: Priority.MEDIUM,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
@@ -1457,7 +1457,7 @@ describe('WorkItemsService', () => {
         title: 'my work item 2',
         description: 'my work item description 2',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         estimation: 13,
         initiative: feature.id,
         status: WorkItemStatus.CLOSED,
@@ -1472,12 +1472,12 @@ describe('WorkItemsService', () => {
   });
   describe('when patching a work item', () => {
     it('should allow to patch the sprint', async () => {
-      await sprintService.create(org.id, project.id, {
+      await cycleService.create(org.id, project.id, {
         goal: 'my sprint description',
         startDate: '2020-01-01',
         duration: 7,
       });
-      const sprint2 = await sprintService.create(org.id, project.id, {
+      const sprint2 = await cycleService.create(org.id, project.id, {
         goal: 'my sprint description',
         startDate: '2020-01-01',
         duration: 7,
@@ -1490,7 +1490,7 @@ describe('WorkItemsService', () => {
           title: 'my work item 1',
           description: 'my work item description 1',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           status: WorkItemStatus.DONE,
         },
@@ -1514,7 +1514,7 @@ describe('WorkItemsService', () => {
           title: 'my work item 1',
           description: 'my work item description 1',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           status: WorkItemStatus.DONE,
         },
@@ -1549,7 +1549,7 @@ describe('WorkItemsService', () => {
           title: 'my work item 1',
           description: 'my work item description 1',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
@@ -1585,7 +1585,7 @@ describe('WorkItemsService', () => {
           title: 'my work item 1',
           description: 'my work item description 1',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.IN_PROGRESS,
@@ -1621,7 +1621,7 @@ describe('WorkItemsService', () => {
           title: 'my work item 1',
           description: 'my work item description 1',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           initiative: feature.id,
           status: WorkItemStatus.DONE,
@@ -1646,7 +1646,7 @@ describe('WorkItemsService', () => {
           title: 'my work item 1',
           description: 'my work item description 1',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           estimation: 13,
           status: WorkItemStatus.DONE,
         },
@@ -1690,7 +1690,7 @@ describe('WorkItemsService', () => {
         title: 'my work item',
         description: 'my work item description',
         priority: Priority.HIGH,
-        type: WorkItemType.USER_STORY,
+        type: WorkItemType.DELIVERABLE,
         initiative: feature1.id,
         status: WorkItemStatus.PLANNED,
       });
@@ -1698,7 +1698,7 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
@@ -1712,7 +1712,7 @@ describe('WorkItemsService', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual(Priority.HIGH);
-      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
+      expect(workItems[0].type).toEqual(WorkItemType.DELIVERABLE);
     });
     it('should return the work items that match the search query for the reference', async () => {
       const feature1 = await featuresService.createInitiative(
@@ -1745,7 +1745,7 @@ describe('WorkItemsService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           initiative: feature1.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -1754,7 +1754,7 @@ describe('WorkItemsService', () => {
         title: 'my other work item',
         description: 'my other work item description',
         priority: Priority.MEDIUM,
-        type: WorkItemType.TECHNICAL_DEBT,
+        type: WorkItemType.IMPROVEMENT,
         initiative: feature2.id,
         status: WorkItemStatus.PLANNED,
       });
@@ -1768,7 +1768,7 @@ describe('WorkItemsService', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual(Priority.HIGH);
-      expect(workItems[0].type).toEqual(WorkItemType.USER_STORY);
+      expect(workItems[0].type).toEqual(WorkItemType.DELIVERABLE);
     });
   });
 
@@ -1784,7 +1784,7 @@ describe('WorkItemsService', () => {
           title: 'Test title',
           description: 'A test description',
           priority: Priority.HIGH,
-          type: WorkItemType.BUG,
+          type: WorkItemType.DEFECT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -1822,7 +1822,7 @@ describe('WorkItemsService', () => {
             title: 'Test title',
             description: 'A test description',
             priority: Priority.HIGH,
-            type: WorkItemType.BUG,
+            type: WorkItemType.DEFECT,
             status: WorkItemStatus.PLANNED,
           },
         );
@@ -1854,7 +1854,7 @@ describe('WorkItemsService', () => {
           title: 'Test title',
           description: 'A test description',
           priority: Priority.HIGH,
-          type: WorkItemType.BUG,
+          type: WorkItemType.DEFECT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -1882,7 +1882,7 @@ describe('WorkItemsService', () => {
       workItem.title = 'my work item';
       workItem.description = 'my work item description';
       workItem.priority = Priority.HIGH;
-      workItem.type = WorkItemType.USER_STORY;
+      workItem.type = WorkItemType.DELIVERABLE;
       workItem.status = WorkItemStatus.PLANNED;
       workItem.org = Promise.resolve(org);
       workItem.createdBy = Promise.resolve(user);
@@ -1922,7 +1922,7 @@ describe('WorkItemsService', () => {
       workItem.title = 'my work item';
       workItem.description = 'my work item description';
       workItem.priority = Priority.HIGH;
-      workItem.type = WorkItemType.USER_STORY;
+      workItem.type = WorkItemType.DELIVERABLE;
       workItem.status = WorkItemStatus.PLANNED;
       workItem.org = Promise.resolve(org);
       workItem.createdBy = Promise.resolve(user);
@@ -1955,7 +1955,7 @@ describe('WorkItemsService', () => {
       workItem.title = 'my work item';
       workItem.description = 'my work item description';
       workItem.priority = Priority.HIGH;
-      workItem.type = WorkItemType.USER_STORY;
+      workItem.type = WorkItemType.DELIVERABLE;
       workItem.status = WorkItemStatus.PLANNED;
       workItem.org = Promise.resolve(org);
       workItem.createdBy = Promise.resolve(user);
@@ -1988,7 +1988,7 @@ describe('WorkItemsService', () => {
       workItem.title = 'my work item';
       workItem.description = 'my work item description';
       workItem.priority = Priority.HIGH;
-      workItem.type = WorkItemType.USER_STORY;
+      workItem.type = WorkItemType.DELIVERABLE;
       workItem.status = WorkItemStatus.PLANNED;
       workItem.org = Promise.resolve(org);
       workItem.createdBy = Promise.resolve(user);
@@ -2023,7 +2023,7 @@ describe('WorkItemsService', () => {
       workItem.title = 'my work item';
       workItem.description = 'my work item description';
       workItem.priority = Priority.HIGH;
-      workItem.type = WorkItemType.USER_STORY;
+      workItem.type = WorkItemType.DELIVERABLE;
       workItem.status = WorkItemStatus.PLANNED;
       workItem.org = Promise.resolve(org);
       workItem.createdBy = Promise.resolve(user);

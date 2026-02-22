@@ -2,7 +2,7 @@ import { PublicService } from './public.service';
 import { UsersService } from '../../../users/users.service';
 import { OrgsService } from '../../../orgs/orgs.service';
 import { InitiativesService } from '../../../roadmap/initiatives/initiatives.service';
-import { SprintsService } from '../../../sprints/sprints.service';
+import { CyclesService } from '../../../cycles/cycles.service';
 import { Repository } from 'typeorm';
 import { File } from '../../../files/file.entity';
 import { WorkItemsService } from '../work-items.service';
@@ -14,7 +14,7 @@ import { Objective } from '../../../okrs/objective.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
 import { Initiative } from '../../../roadmap/initiatives/initiative.entity';
 import { Milestone } from '../../../roadmap/milestones/milestone.entity';
-import { Sprint } from '../../../sprints/sprint.entity';
+import { Cycle } from '../../../cycles/cycle.entity';
 import { WorkItem } from '../work-item.entity';
 import { InitiativeFile } from '../../../roadmap/initiatives/initiative-file.entity';
 import { WorkItemFile } from '../work-item-file.entity';
@@ -50,7 +50,7 @@ describe('PublicService', () => {
           Initiative,
           User,
           Milestone,
-          Sprint,
+          Cycle,
           WorkItem,
           File,
           InitiativeFile,
@@ -66,7 +66,7 @@ describe('PublicService', () => {
         UsersService,
         MilestonesService,
         WorkItemsService,
-        SprintsService,
+        CyclesService,
         FilesService,
         FilesStorageRepository,
         PublicService,

@@ -79,15 +79,15 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const shortcutsItems = [
     { description: 'Go to OKRs', keys: ['1'], id: 'okrs' },
     { description: 'Go to Roadmap', keys: ['2'], id: 'roadmap' },
-    { description: 'Go to Active Sprint', keys: ['3'], id: 'active-sprint' },
-    { description: 'Go to Sprints', keys: ['4'], id: 'sprints' },
+    { description: 'Go to Active Cycle', keys: ['3'], id: 'active-cycle' },
+    { description: 'Go to Cycles', keys: ['4'], id: 'cycles' },
     { description: 'Go to Pages', keys: ['5'], id: 'pages' },
     { description: 'Go to Code', keys: ['6'], id: 'code' },
     { description: 'Go to Issues', keys: ['7'], id: 'issues' },
     {
-      description: 'Go to Feature Requests',
+      description: 'Go to Requests',
       keys: ['8'],
-      id: 'feature-requests',
+      id: 'requests',
     },
     {
       description: 'Create a Work Item',
@@ -105,7 +105,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
       id: 'create-initiative',
     },
     {
-      description: 'Create a Sprint',
+      description: 'Create a Cycle',
       keys: ['s'],
       id: 'create-initiative',
     },
@@ -291,12 +291,12 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                   <Row style={{ maxWidth: '100%', height: '47px' }}>
                     <Col xs={7}>
                       <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/active-sprint`}
+                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/active-cycle`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
                         <i className="fa fa-rocket" />
-                        <span className="nav-link-text">Active Sprint</span>
+                        <span className="nav-link-text">Active Cycle</span>
                       </NavLink>
                     </Col>
                     <Col
@@ -306,11 +306,11 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     >
                       <div
                         className={
-                          bipSettings.isActiveSprintsPagePublic ? '' : 'd-none'
+                          bipSettings.isActiveCyclesPagePublic ? '' : 'd-none'
                         }
                       >
                         <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/active-sprint`}
+                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/active-cycle`}
                           target="_blank"
                           role="button"
                         >
@@ -343,7 +343,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         target="shortcut-active-sprint"
                         placement="top"
                       >
-                        Press 3 to go to Active Sprint. Click to see all
+                        Press 3 to go to Active Cycle. Click to see all
                         shortcuts.
                       </UncontrolledTooltip>
                     </Col>
@@ -353,12 +353,12 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                   <Row style={{ maxWidth: '100%', height: '47px' }}>
                     <Col xs={7}>
                       <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/sprints`}
+                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/cycles`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
                         <i className="fa fa-refresh" />
-                        <span className="nav-link-text">Sprints</span>
+                        <span className="nav-link-text">Cycles</span>
                       </NavLink>
                     </Col>
                     <Col
@@ -368,11 +368,11 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     >
                       <div
                         className={
-                          bipSettings.isSprintsPagePublic ? '' : 'd-none'
+                          bipSettings.isCyclesPagePublic ? '' : 'd-none'
                         }
                       >
                         <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/sprints`}
+                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/cycles`}
                           target="_blank"
                           role="button"
                         >
@@ -404,7 +404,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         target="shortcut-sprints"
                         placement="top"
                       >
-                        Press 4 to go to Sprints. Click to see all shortcuts.
+                        Press 4 to go to Cycles. Click to see all shortcuts.
                       </UncontrolledTooltip>
                     </Col>
                   </Row>
@@ -587,14 +587,12 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Row style={{ maxWidth: '100%', height: '47px' }}>
                       <Col xs={7}>
                         <NavLink
-                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/feature-requests`}
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/requests`}
                           onClick={closeSidenav}
                           tag={NavLinkRRD}
                         >
                           <i className="fa fa-pen-to-square" />
-                          <span className="nav-link-text">
-                            Feature Requests
-                          </span>
+                          <span className="nav-link-text">Requests</span>
                         </NavLink>
                       </Col>
                       <Col
@@ -604,9 +602,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       >
                         <div
                           className={
-                            bipSettings.isFeatureRequestsPagePublic
-                              ? ''
-                              : 'd-none'
+                            bipSettings.isRequestsPagePublic ? '' : 'd-none'
                           }
                         >
                           <UncontrolledTooltip
@@ -616,7 +612,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                             This page is public and can be accessed by anyone.
                           </UncontrolledTooltip>
                           <Link
-                            to={`/public/orgs/${orgId}/projects/${currentProject.id}/feature-requests`}
+                            to={`/public/orgs/${orgId}/projects/${currentProject.id}/requests`}
                             target="_blank"
                             role="button"
                           >
@@ -642,8 +638,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           target="shortcut-feature-requests"
                           placement="top"
                         >
-                          Press 8 to go to Feature Requests. Click to see all
-                          shortcuts.
+                          Press 8 to go to Requests. Click to see all shortcuts.
                         </UncontrolledTooltip>
                       </Col>
                     </Row>

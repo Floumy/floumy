@@ -24,6 +24,7 @@ import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 function WorkItemsContextMenu({
   menuId,
   onChangeSprint,
+  onChangeCycle,
   onChangeStatus,
   onChangePriority,
   onChange,
@@ -94,8 +95,9 @@ function WorkItemsContextMenu({
 
   const callChangeSprintCallbacks = (sprintId, workItems) => {
     try {
-      if (onChangeSprint) {
-        onChangeSprint(workItems, sprintId);
+      const onChange = onChangeSprint || onChangeCycle;
+      if (onChange) {
+        onChange(workItems, sprintId);
       }
       if (onChange) {
         onChange(
@@ -361,6 +363,7 @@ function WorkItemsContextMenu({
 WorkItemsContextMenu.propTypes = {
   menuId: PropTypes.string.isRequired,
   onChangeSprint: PropTypes.func,
+  onChangeCycle: PropTypes.func,
   onChangePriority: PropTypes.func,
   onChangeStatus: PropTypes.func,
   onChange: PropTypes.func,

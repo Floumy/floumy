@@ -44,7 +44,7 @@ export class InitiativeMapper {
     const assignedTo = await initiative.assignedTo;
     const org = await initiative.org;
     const comments = await initiative.comments;
-    const featureRequest = await initiative.featureRequest;
+    const request = await initiative.request;
     const project = await initiative.project;
 
     const initiativeDto = {
@@ -65,10 +65,10 @@ export class InitiativeMapper {
       workItemsCount: initiative.workItemsCount,
       workItems: (await initiative.workItems).map(WorkItemMapper.toDto),
       comments: await CommentMapper.toDtoList(comments),
-      featureRequest: featureRequest
+      request: request
         ? {
-            id: featureRequest.id,
-            title: featureRequest.title,
+            id: request.id,
+            title: request.title,
           }
         : null,
       files: await Promise.all(

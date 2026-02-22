@@ -71,8 +71,8 @@ function PublicSidebar({
     return (
       buildingInPublicSettings.isObjectivesPagePublic ||
       buildingInPublicSettings.isRoadmapPagePublic ||
-      buildingInPublicSettings.isSprintsPagePublic ||
-      buildingInPublicSettings.isActiveSprintsPagePublic
+      buildingInPublicSettings.isCyclesPagePublic ||
+      buildingInPublicSettings.isActiveCyclesPagePublic
     );
   }
 
@@ -132,27 +132,27 @@ function PublicSidebar({
                 </NavLink>
               </NavItem>
             )}
-            {buildingInPublicSettings.isActiveSprintsPagePublic && (
+            {buildingInPublicSettings.isActiveCyclesPagePublic && (
               <NavItem>
                 <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/active-sprint`}
+                  to={`/public/orgs/${orgId}/projects/${project.id}/active-cycle`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >
                   <i className="fa fa-rocket" />
-                  <span className="nav-link-text">Active Sprint</span>
+                  <span className="nav-link-text">Active Cycle</span>
                 </NavLink>
               </NavItem>
             )}
-            {buildingInPublicSettings.isSprintsPagePublic && (
+            {buildingInPublicSettings.isCyclesPagePublic && (
               <NavItem>
                 <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/sprints`}
+                  to={`/public/orgs/${orgId}/projects/${project.id}/cycles`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >
                   <i className="fa fa-refresh" />
-                  <span className="nav-link-text">Sprints</span>
+                  <span className="nav-link-text">Cycles</span>
                 </NavLink>
               </NavItem>
             )}
@@ -183,12 +183,12 @@ function PublicSidebar({
                   <Row style={{ maxWidth: '100%' }}>
                     <Col xs={7}>
                       <NavLink
-                        to={`/public/orgs/${orgId}/projects/${project.id}/feature-requests`}
+                        to={`/public/orgs/${orgId}/projects/${project.id}/requests`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
                         <i className="fa fa-pen-to-square" />
-                        <span className="nav-link-text">Feature Requests</span>
+                        <span className="nav-link-text">Requests</span>
                       </NavLink>
                     </Col>
                     {sidenavOpen && (

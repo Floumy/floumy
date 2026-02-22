@@ -24,13 +24,13 @@ export class BipSettings {
   @Column({ default: false })
   isRoadmapPagePublic: boolean = false;
   @Column({ default: false })
-  isSprintsPagePublic: boolean = false;
+  isCyclesPagePublic: boolean = false;
   @Column({ default: false })
-  isActiveSprintsPagePublic: boolean = false;
+  isActiveCyclesPagePublic: boolean = false;
   @Column({ default: false })
   isIssuesPagePublic: boolean = false;
   @Column({ default: false })
-  isFeatureRequestsPagePublic: boolean = false;
+  isRequestsPagePublic: boolean = false;
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()

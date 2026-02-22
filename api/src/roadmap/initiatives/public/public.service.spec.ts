@@ -15,7 +15,7 @@ import { KeyResult } from '../../../okrs/key-result.entity';
 import { Initiative } from '../initiative.entity';
 import { Milestone } from '../../milestones/milestone.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
-import { Sprint } from '../../../sprints/sprint.entity';
+import { Cycle } from '../../../cycles/cycle.entity';
 import { File } from '../../../files/file.entity';
 import { WorkItemFile } from '../../../backlog/work-items/work-item-file.entity';
 import { InitiativeFile } from '../initiative-file.entity';
@@ -49,7 +49,7 @@ describe('PublicService', () => {
           User,
           Milestone,
           WorkItem,
-          Sprint,
+          Cycle,
           File,
           WorkItemFile,
           InitiativeFile,

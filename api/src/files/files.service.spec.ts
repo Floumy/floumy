@@ -16,7 +16,7 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { InitiativeFile } from '../roadmap/initiatives/initiative-file.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { WorkItemsService } from '../backlog/work-items/work-items.service';
-import { Sprint } from '../sprints/sprint.entity';
+import { Cycle } from '../cycles/cycle.entity';
 import { Project } from '../projects/project.entity';
 
 describe('FilesService', () => {
@@ -38,7 +38,7 @@ describe('FilesService', () => {
           InitiativeFile,
           WorkItem,
           Initiative,
-          Sprint,
+          Cycle,
         ]),
         UsersModule,
         AuthModule,

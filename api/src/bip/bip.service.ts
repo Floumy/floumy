@@ -86,10 +86,9 @@ export class BipService {
     bipSettings.isBuildInPublicEnabled = settings.isBuildInPublicEnabled;
     bipSettings.isObjectivesPagePublic = settings.isObjectivesPagePublic;
     bipSettings.isRoadmapPagePublic = settings.isRoadmapPagePublic;
-    bipSettings.isSprintsPagePublic = settings.isSprintsPagePublic;
-    bipSettings.isActiveSprintsPagePublic = settings.isActiveSprintsPagePublic;
-    bipSettings.isFeatureRequestsPagePublic =
-      settings.isFeatureRequestsPagePublic;
+    bipSettings.isCyclesPagePublic = settings.isCyclesPagePublic;
+    bipSettings.isActiveCyclesPagePublic = settings.isActiveCyclesPagePublic;
+    bipSettings.isRequestsPagePublic = settings.isRequestsPagePublic;
     bipSettings.isIssuesPagePublic = settings.isIssuesPagePublic;
     const updatedSettings = await this.bipSettingsRepository.save(bipSettings);
     return BipSettingsMapper.toDto(updatedSettings);

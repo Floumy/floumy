@@ -6,7 +6,7 @@ import { DocumentVectorStoreService } from './document-vector-store.service';
 import { Repository } from 'typeorm';
 import { Initiative } from 'src/roadmap/initiatives/initiative.entity';
 import { WorkItem } from 'src/backlog/work-items/work-item.entity';
-import { FeatureRequest } from 'src/feature-requests/feature-request.entity';
+import { Request } from 'src/requests/request.entity';
 import { Issue } from 'src/issues/issue.entity';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { Page } from '../../pages/pages.entity';
@@ -24,8 +24,8 @@ export class IndexingService {
     private initiativeRepository: Repository<Initiative>,
     @InjectRepository(WorkItem)
     private workItemRepository: Repository<WorkItem>,
-    @InjectRepository(FeatureRequest)
-    private featureRequestRepository: Repository<FeatureRequest>,
+    @InjectRepository(Request)
+    private requestRepository: Repository<Request>,
     @InjectRepository(Issue)
     private issueRepository: Repository<Issue>,
     @InjectRepository(Page)
@@ -37,7 +37,7 @@ export class IndexingService {
     await this.indexOkrs(orgId);
     await this.indexInitiatives(orgId);
     await this.indexWorkItems(orgId);
-    await this.indexFeatureRequests(orgId);
+    await this.indexRequests(orgId);
     await this.indexIssues(orgId);
     // TODO: Enable the page indexing after implementing the page save instead of saving everytime someone types
     // await this.indexPages(orgId);
@@ -188,36 +188,36 @@ export class IndexingService {
     }
   }
 
-  async indexFeatureRequests(orgId: string) {
-    const featureRequests = await this.featureRequestRepository.find({
+  async indexRequests(orgId: string) {
+    const requests = await this.requestRepository.find({
       where: { org: { id: orgId } },
     });
-    for (const featureRequest of featureRequests) {
-      await this.indexFeatureRequest(featureRequest);
+    for (const request of requests) {
+      await this.indexRequest(request);
     }
   }
 
-  async indexFeatureRequest(featureRequest: FeatureRequest) {
+  async indexRequest(request: Request) {
     const content = `
-      Type: Feature Request
-      Title: ${featureRequest.title}
+      Type: Request
+      Title: ${request.title}
       Description: ${
-        this.stripNonTextualData(featureRequest.description) || 'N/A'
+        this.stripNonTextualData(request.description) || 'N/A'
       }
-      Status: ${featureRequest.status}
-      estimation: ${featureRequest.estimation || 'N/A'}
-      votesCount: ${featureRequest.votesCount || 'N/A'}
+      Status: ${request.status}
+      estimation: ${request.estimation || 'N/A'}
+      votesCount: ${request.votesCount || 'N/A'}
       `;
 
-    const org = await featureRequest.org;
-    const project = await featureRequest.project;
+    const org = await request.org;
+    const project = await request.project;
     const chunks = chunkText(content, 4000);
     for (let idx = 0; idx < chunks.length; idx++) {
       await this.documentVectorStore.addDocument(chunks[idx], {
-        entityId: featureRequest.id,
+        entityId: request.id,
         orgId: org.id,
         projectId: project.id,
-        documentType: 'Feature Request',
+        documentType: 'Request',
         chunkIndex: idx,
         totalChunks: chunks.length,
       });
@@ -350,9 +350,9 @@ export class IndexingService {
     await this.indexWorkItem(workItem);
   }
 
-  async updateFeatureRequestIndex(featureRequest: FeatureRequest) {
-    await this.deleteEntityIndex(featureRequest.id);
-    await this.indexFeatureRequest(featureRequest);
+  async updateRequestIndex(request: Request) {
+    await this.deleteEntityIndex(request.id);
+    await this.indexRequest(request);
   }
 
   async updateIssueIndex(issue: Issue) {

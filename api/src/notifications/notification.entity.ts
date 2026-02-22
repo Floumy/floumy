@@ -13,7 +13,7 @@ import { Org } from '../orgs/org.entity';
 export enum EntityType {
   INITIATIVE_COMMENT = 'initiative_comment',
   INITIATIVE_DESCRIPTION = 'initiative_description',
-  FEATURE_REQUEST_COMMENT = 'feature_request_comment',
+  REQUEST_COMMENT = 'request_comment',
   ISSUE_COMMENT = 'issue_comment',
   KEY_RESULT_COMMENT = 'key_result_comment',
   OBJECTIVE_COMMENT = 'objective_comment',

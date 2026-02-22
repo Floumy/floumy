@@ -15,7 +15,7 @@ import { InitiativeComment } from '../roadmap/initiatives/initiative-comment.ent
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { WorkItemComment } from '../backlog/work-items/work-item-comment.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { FeatureRequestComment } from '../feature-requests/feature-request-comment.entity';
+import { RequestComment } from '../requests/request-comment.entity';
 import { IssueComment } from '../issues/issue-comment.entity';
 import { KeyResultComment } from '../okrs/key-result-comment.entity';
 import { ObjectiveComment } from '../okrs/objective-comment.entity';
@@ -45,7 +45,7 @@ describe('NotificationController', () => {
           Initiative,
           WorkItemComment,
           WorkItem,
-          FeatureRequestComment,
+          RequestComment,
           IssueComment,
           KeyResultComment,
           ObjectiveComment,

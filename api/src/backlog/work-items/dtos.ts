@@ -11,7 +11,7 @@ export interface CreateUpdateWorkItemDto {
   status: WorkItemStatus;
   estimation?: number;
   initiative?: string;
-  sprint?: string;
+  cycle?: string;
   assignedTo?: string;
   issue?: string;
   files?: { id: string }[];
@@ -37,7 +37,7 @@ export interface WorkItemDto {
     id: string;
     title: string;
   };
-  sprint?: {
+  cycle?: {
     id: string;
     title: string;
   };
@@ -79,7 +79,7 @@ export interface WorkItemDto {
 }
 
 export interface WorkItemPatchDto {
-  sprint?: string;
+  cycle?: string;
   status?: WorkItemStatus;
   priority?: Priority;
 }

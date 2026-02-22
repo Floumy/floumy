@@ -9,8 +9,8 @@ import { KeyResult } from '../../okrs/key-result.entity';
 import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { WorkItemDto } from '../../backlog/work-items/dtos';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
-import { FeatureRequestDto } from '../../feature-requests/dtos';
-import { FeatureRequest } from '../../feature-requests/feature-request.entity';
+import { RequestDto } from '../../requests/dtos';
+import { Request } from '../../requests/request.entity';
 import { Issue } from '../../issues/issue.entity';
 
 @Injectable()
@@ -24,8 +24,8 @@ export class IndexingEventHandlerService {
     private initiativeRepository: Repository<Initiative>,
     @InjectRepository(WorkItem)
     private workItemRepository: Repository<WorkItem>,
-    @InjectRepository(FeatureRequest)
-    private featureRequestRepository: Repository<FeatureRequest>,
+    @InjectRepository(Request)
+    private requestRepository: Repository<Request>,
     @InjectRepository(Issue)
     private issueRepository: Repository<Issue>,
     private indexingService: IndexingService,
@@ -146,33 +146,33 @@ export class IndexingEventHandlerService {
     await this.indexingService.deleteEntityIndex(event.id);
   }
 
-  @OnEvent('featureRequest.created')
-  async handleFeatureRequestCreated(event: FeatureRequestDto) {
-    const featureRequest = await this.featureRequestRepository.findOneBy({
+  @OnEvent('request.created')
+  async handleRequestCreated(event: RequestDto) {
+    const request = await this.requestRepository.findOneBy({
       id: event.id,
     });
 
-    if (featureRequest) {
-      await this.indexingService.indexFeatureRequest(featureRequest);
+    if (request) {
+      await this.indexingService.indexRequest(request);
     }
   }
 
-  @OnEvent('featureRequest.updated')
-  async handleFeatureRequestUpdated(event: {
-    previous: FeatureRequestDto;
-    current: FeatureRequestDto;
+  @OnEvent('request.updated')
+  async handleRequestUpdated(event: {
+    previous: RequestDto;
+    current: RequestDto;
   }) {
-    const featureRequest = await this.featureRequestRepository.findOneBy({
+    const request = await this.requestRepository.findOneBy({
       id: event.current.id,
     });
 
-    if (featureRequest) {
-      await this.indexingService.updateFeatureRequestIndex(featureRequest);
+    if (request) {
+      await this.indexingService.updateRequestIndex(request);
     }
   }
 
-  @OnEvent('featureRequest.deleted')
-  async handleFeatureRequestDeleted(event: FeatureRequestDto) {
+  @OnEvent('request.deleted')
+  async handleRequestDeleted(event: RequestDto) {
     await this.indexingService.deleteEntityIndex(event.id);
   }
 
