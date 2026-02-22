@@ -76,11 +76,18 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
     setNewProjectModal(!newProjectModal);
   };
 
+  const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
   const shortcutsItems = [
     { description: 'Go to OKRs', keys: ['1'], id: 'okrs' },
     { description: 'Go to Roadmap', keys: ['2'], id: 'roadmap' },
-    { description: 'Go to Active Cycle', keys: ['3'], id: 'active-cycle' },
-    { description: 'Go to Cycles', keys: ['4'], id: 'cycles' },
+    {
+      description: cyclesEnabled ? 'Go to Active Cycle' : 'Go to Active Work',
+      keys: ['3'],
+      id: 'active-cycle',
+    },
+    ...(cyclesEnabled
+      ? [{ description: 'Go to Cycles', keys: ['4'], id: 'cycles' }]
+      : []),
     { description: 'Go to Pages', keys: ['5'], id: 'pages' },
     { description: 'Go to Code', keys: ['6'], id: 'code' },
     { description: 'Go to Issues', keys: ['7'], id: 'issues' },
@@ -104,11 +111,15 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
       keys: ['o'],
       id: 'create-initiative',
     },
-    {
-      description: 'Create a Cycle',
-      keys: ['s'],
-      id: 'create-initiative',
-    },
+    ...(cyclesEnabled
+      ? [
+          {
+            description: 'Create a Cycle',
+            keys: ['s'],
+            id: 'create-initiative',
+          },
+        ]
+      : []),
     {
       description: 'Create a Roadmap Milestone',
       keys: ['m'],
@@ -296,7 +307,9 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         tag={NavLinkRRD}
                       >
                         <i className="fa fa-rocket" />
-                        <span className="nav-link-text">Active Cycle</span>
+                        <span className="nav-link-text">
+                          {cyclesEnabled ? 'Active Cycle' : 'Active Work'}
+                        </span>
                       </NavLink>
                     </Col>
                     <Col
@@ -306,7 +319,10 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     >
                       <div
                         className={
-                          bipSettings.isActiveCyclesPagePublic ? '' : 'd-none'
+                          cyclesEnabled &&
+                          bipSettings.isActiveCyclesPagePublic
+                            ? ''
+                            : 'd-none'
                         }
                       >
                         <Link
@@ -343,72 +359,75 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         target="shortcut-active-sprint"
                         placement="top"
                       >
-                        Press 3 to go to Active Cycle. Click to see all
-                        shortcuts.
+                        Press 3 to go to{' '}
+                        {cyclesEnabled ? 'Active Cycle' : 'Active Work'}. Click
+                        to see all shortcuts.
                       </UncontrolledTooltip>
                     </Col>
                   </Row>
                 </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={7}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/cycles`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-refresh" />
-                        <span className="nav-link-text">Cycles</span>
-                      </NavLink>
-                    </Col>
-                    <Col
-                      xs={3}
-                      style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-left"
-                    >
-                      <div
-                        className={
-                          bipSettings.isCyclesPagePublic ? '' : 'd-none'
-                        }
-                      >
-                        <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/cycles`}
-                          target="_blank"
-                          role="button"
+                {cyclesEnabled && (
+                  <NavItem>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={7}>
+                        <NavLink
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/cycles`}
+                          onClick={closeSidenav}
+                          tag={NavLinkRRD}
                         >
-                          <UncontrolledTooltip
-                            target="sprints-nav-item"
-                            placement="top"
-                          >
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge
-                            id="sprints-nav-item"
-                            color="success"
-                            pill={true}
-                          >
-                            PUBLIC
-                          </Badge>
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <span
-                        id="shortcut-sprints"
-                        role="button"
-                        onClick={toggleShortcutsModal}
+                          <i className="fa fa-refresh" />
+                          <span className="nav-link-text">Cycles</span>
+                        </NavLink>
+                      </Col>
+                      <Col
+                        xs={3}
+                        style={{ padding: '0.675rem 1.5rem' }}
+                        className="text-left"
                       >
-                        <KeyShortcut keys={['4']} />
-                      </span>
-                      <UncontrolledTooltip
-                        target="shortcut-sprints"
-                        placement="top"
-                      >
-                        Press 4 to go to Cycles. Click to see all shortcuts.
-                      </UncontrolledTooltip>
-                    </Col>
-                  </Row>
-                </NavItem>
+                        <div
+                          className={
+                            bipSettings.isCyclesPagePublic ? '' : 'd-none'
+                          }
+                        >
+                          <Link
+                            to={`/public/orgs/${orgId}/projects/${currentProject.id}/cycles`}
+                            target="_blank"
+                            role="button"
+                          >
+                            <UncontrolledTooltip
+                              target="sprints-nav-item"
+                              placement="top"
+                            >
+                              This page is public and can be accessed by anyone.
+                            </UncontrolledTooltip>
+                            <Badge
+                              id="sprints-nav-item"
+                              color="success"
+                              pill={true}
+                            >
+                              PUBLIC
+                            </Badge>
+                          </Link>
+                        </div>
+                      </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <span
+                          id="shortcut-sprints"
+                          role="button"
+                          onClick={toggleShortcutsModal}
+                        >
+                          <KeyShortcut keys={['4']} />
+                        </span>
+                        <UncontrolledTooltip
+                          target="shortcut-sprints"
+                          placement="top"
+                        >
+                          Press 4 to go to Cycles. Click to see all shortcuts.
+                        </UncontrolledTooltip>
+                      </Col>
+                    </Row>
+                  </NavItem>
+                )}
                 {/*<NavItem>*/}
                 {/*  <Row style={{ maxWidth: '100%' }}>*/}
                 {/*    <Col xs={10}>*/}

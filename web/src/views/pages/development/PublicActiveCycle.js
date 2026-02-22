@@ -20,6 +20,7 @@ import {
   workItemStatusColorClassName,
 } from '../../../services/utils/utils';
 import { getPublicActiveCycle } from '../../../services/cycles/cycles.service';
+import { getPublicProject } from '../../../services/projects/projects.service';
 import DevelopmentStats from './DevelopmentStats';
 import PublicWorkItemsList from '../backlog/PublicWorkItemsList';
 import { getWorkItemsGroupedByStatus } from '../../../services/utils/workItemUtils';
@@ -28,6 +29,7 @@ function PublicActiveSprint() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeCycle, setActiveSprint] = useState(null);
   const [workItemsByStatus, setWorkItemsByStatus] = useState({});
+  const [cyclesEnabled, setCyclesEnabled] = useState(true);
   const { orgId, projectId } = useParams();
 
   const setWorkItemsGroupedByStatus = useCallback((workItems) => {
@@ -41,10 +43,14 @@ function PublicActiveSprint() {
     async function fetchData() {
       try {
         setIsLoading(true);
-        const activeCycle = await getPublicActiveCycle(orgId, projectId);
-        setActiveSprint(activeCycle);
-        if (activeCycle && activeCycle.workItems.length > 0) {
-          setWorkItemsGroupedByStatus(activeCycle.workItems);
+        const [project, activeCycleData] = await Promise.all([
+          getPublicProject(orgId, projectId).catch(() => null),
+          getPublicActiveCycle(orgId, projectId).catch(() => null),
+        ]);
+        setCyclesEnabled(project?.cyclesEnabled ?? true);
+        setActiveSprint(activeCycleData);
+        if (activeCycleData && activeCycleData.workItems?.length > 0) {
+          setWorkItemsGroupedByStatus(activeCycleData.workItems);
         }
         setIsLoading(false);
       } catch (e) {
@@ -83,15 +89,21 @@ function PublicActiveSprint() {
                 <CardHeader>
                   <Row>
                     <Col sm={6}>
-                      <h3 className="mb-0">Active Sprint</h3>
+                      <h3 className="mb-0">Active Cycle</h3>
                     </Col>
                   </Row>
                 </CardHeader>
                 <div className="p-5 text-center">
                   <div className="mx-auto" style={{ maxWidth: '680px' }}>
-                    <h3 className="mb-3">No active sprint yet</h3>
+                    {!cyclesEnabled ? (
+                      <h3 className="mb-3">Cycles are disabled for this project</h3>
+                    ) : (
+                      <h3 className="mb-3">No active cycle yet</h3>
+                    )}
                     <p className="text-muted">
-                      The active sprint will appear here once it starts.
+                      {!cyclesEnabled
+                        ? 'This project does not use cycles. Active work is tracked differently.'
+                        : 'The active cycle will appear here once it starts.'}
                     </p>
                     <Row className="mt-4 text-left">
                       <Col md="6" className="mb-3">

@@ -1,6 +1,7 @@
 export interface ProjectDto {
   id: string;
   name: string;
+  cyclesEnabled: boolean;
   bipSettings: BipSettingsDto;
 }
 

@@ -31,9 +31,12 @@ import {
 } from '../../../services/backlog/backlog.service';
 import { useHotkeys } from 'react-hotkeys-hook';
 import WorkItemsListCard from '../backlog/WorkItemsListCard';
+import { useProjects } from '../../../contexts/ProjectsContext';
 
 function Cycles() {
   const { orgId, projectId } = useParams();
+  const { currentProject } = useProjects();
+  const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
   let location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const timelineQueryFilter = searchParams.get('timeline');
@@ -53,6 +56,13 @@ function Cycles() {
   });
 
   useEffect(() => {
+    if (!cyclesEnabled) {
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/active-cycle`);
+    }
+  }, [cyclesEnabled, navigate, orgId, projectId]);
+
+  useEffect(() => {
+    if (!cyclesEnabled) return;
     document.title = 'Floumy | Cycles';
 
     async function fetchCycles() {
@@ -77,9 +87,10 @@ function Cycles() {
     }
 
     fetchCycles();
-  }, [orgId, projectId, timelineFilterValue]);
+  }, [orgId, projectId, timelineFilterValue, cyclesEnabled]);
 
   useEffect(() => {
+    if (!cyclesEnabled) return;
     async function fetchBacklogWorkItems() {
       try {
         setIsLoadingWorkItems(true);
@@ -94,7 +105,7 @@ function Cycles() {
     }
 
     fetchBacklogWorkItems();
-  }, []);
+  }, [cyclesEnabled]);
 
   async function start(orgId, projectId, cycleId) {
     try {
@@ -307,6 +318,10 @@ function Cycles() {
     setBacklogWorkItems(
       backlogWorkItems.filter((wi) => !deletedIds.includes(wi.id)),
     );
+  }
+
+  if (!cyclesEnabled) {
+    return null;
   }
 
   return (

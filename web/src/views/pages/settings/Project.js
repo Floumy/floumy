@@ -8,6 +8,7 @@ import {
   FormGroup,
   Input,
   InputGroup,
+  Label,
   Row,
 } from 'reactstrap';
 import React, { useState } from 'react';
@@ -62,6 +63,7 @@ function Project() {
   async function handleSubmit(values, setErrors) {
     const projectName = values.projectName;
     const projectDescription = values.projectDescription;
+    const cyclesEnabled = values.cyclesEnabled;
     try {
       setIsSubmitting(true);
       const updatedProject = await updateProject(
@@ -69,6 +71,7 @@ function Project() {
         project.id,
         projectName,
         projectDescription,
+        cyclesEnabled,
       );
       setProjects(
         projects.map((p) => {
@@ -133,6 +136,7 @@ function Project() {
                   initialValues={{
                     projectName: project.name,
                     projectDescription: project.description,
+                    cyclesEnabled: project.cyclesEnabled ?? false,
                   }}
                   validationSchema={validationSchema}
                   onSubmit={async (values, { setErrors }) => {
@@ -204,6 +208,21 @@ function Project() {
                           name="projectDescription"
                           component={InputError}
                         />
+                      </FormGroup>
+                      <h4>Cycles</h4>
+                      <FormGroup check>
+                        <Label check>
+                          <Field
+                            name="cyclesEnabled"
+                            type="checkbox"
+                            as={Input}
+                          />
+                          Enable cycles (sprints) for this project
+                        </Label>
+                        <small className="form-text text-muted d-block">
+                          When enabled, you can plan work in time-boxed cycles.
+                          When disabled, use Active Work to track all open items.
+                        </small>
                       </FormGroup>
                       <div>
                         <Button

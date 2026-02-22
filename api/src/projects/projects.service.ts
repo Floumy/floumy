@@ -68,7 +68,11 @@ export class ProjectsService {
   async updateProject(
     orgId: string,
     projectId: string,
-    updateProjectDto: { name: string; description?: string },
+    updateProjectDto: {
+      name: string;
+      description?: string;
+      cyclesEnabled?: boolean;
+    },
   ) {
     const project = await this.projectsRepository.findOneByOrFail({
       id: projectId,
@@ -81,6 +85,9 @@ export class ProjectsService {
 
     project.name = updateProjectDto.name;
     project.description = updateProjectDto?.description;
+    if (updateProjectDto.cyclesEnabled !== undefined) {
+      project.cyclesEnabled = updateProjectDto.cyclesEnabled;
+    }
     await this.projectsRepository.save(project);
     return await ProjectMapper.toDto(project);
   }

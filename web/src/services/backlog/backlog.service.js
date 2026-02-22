@@ -134,11 +134,11 @@ export async function deleteWorkItem(orgId, projectId, id) {
   }
 }
 
-export async function updateWorkItemSprint(orgId, projectId, id, sprintId) {
+export async function updateWorkItemSprint(orgId, projectId, id, cycleId) {
   try {
     await api.patch(
       `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
-      { sprint: sprintId },
+      { cycle: cycleId },
     );
   } catch (e) {
     throw new Error(e.message);

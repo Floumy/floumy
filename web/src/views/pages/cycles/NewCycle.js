@@ -1,12 +1,24 @@
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
 import { Col, Container, Row } from 'reactstrap';
-import React from 'react';
+import React, { useEffect } from 'react';
 import CreateUpdateDeleteCycle from './CreateUpdateDeleteCycle';
 import { addCycle } from '../../../services/cycles/cycles.service';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useProjects } from '../../../contexts/ProjectsContext';
 
 function NewSprint() {
   const { orgId, projectId } = useParams();
+  const navigate = useNavigate();
+  const { currentProject } = useProjects();
+  const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
+
+  useEffect(() => {
+    if (!cyclesEnabled) {
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/active-cycle`);
+    }
+  }, [cyclesEnabled, navigate, orgId, projectId]);
+
+  if (!cyclesEnabled) return null;
 
   const handleSubmit = async (sprint) => {
     return await addCycle(orgId, projectId, sprint);

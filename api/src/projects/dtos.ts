@@ -3,6 +3,7 @@ export interface ProjectDto {
   name: string;
   description: string;
   isBuildInPublicEnabled: boolean;
+  cyclesEnabled: boolean;
   gitlabProjectUrl: string;
   githubRepositoryUrl: string;
   createdAt: Date;

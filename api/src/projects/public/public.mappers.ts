@@ -7,6 +7,7 @@ export class ProjectMapper {
     return {
       id: project.id,
       name: project.name,
+      cyclesEnabled: project.cyclesEnabled,
       bipSettings: BipSettingsMapper.toDto(bipSettings),
     };
   }

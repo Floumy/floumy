@@ -67,12 +67,15 @@ function PublicSidebar({
     );
   }
 
+  const cyclesEnabled = project?.cyclesEnabled ?? false;
+
   function isProjectEnabled() {
     return (
       buildingInPublicSettings.isObjectivesPagePublic ||
       buildingInPublicSettings.isRoadmapPagePublic ||
-      buildingInPublicSettings.isCyclesPagePublic ||
-      buildingInPublicSettings.isActiveCyclesPagePublic
+      (cyclesEnabled &&
+        (buildingInPublicSettings.isCyclesPagePublic ||
+          buildingInPublicSettings.isActiveCyclesPagePublic))
     );
   }
 
@@ -132,19 +135,20 @@ function PublicSidebar({
                 </NavLink>
               </NavItem>
             )}
-            {buildingInPublicSettings.isActiveCyclesPagePublic && (
-              <NavItem>
-                <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/active-cycle`}
-                  onClick={closeSidenav}
-                  tag={NavLinkRRD}
-                >
-                  <i className="fa fa-rocket" />
-                  <span className="nav-link-text">Active Cycle</span>
-                </NavLink>
-              </NavItem>
-            )}
-            {buildingInPublicSettings.isCyclesPagePublic && (
+            {cyclesEnabled &&
+              buildingInPublicSettings.isActiveCyclesPagePublic && (
+                <NavItem>
+                  <NavLink
+                    to={`/public/orgs/${orgId}/projects/${project.id}/active-cycle`}
+                    onClick={closeSidenav}
+                    tag={NavLinkRRD}
+                  >
+                    <i className="fa fa-rocket" />
+                    <span className="nav-link-text">Active Cycle</span>
+                  </NavLink>
+                </NavItem>
+              )}
+            {cyclesEnabled && buildingInPublicSettings.isCyclesPagePublic && (
               <NavItem>
                 <NavLink
                   to={`/public/orgs/${orgId}/projects/${project.id}/cycles`}
