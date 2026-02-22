@@ -70,17 +70,17 @@ function Admin() {
   );
   useNavigationHotKey(
     '3',
-    `/admin/orgs/${orgId}/projects/${projectId}/active-sprint`,
+    `/admin/orgs/${orgId}/projects/${projectId}/active-cycle`,
   );
   useNavigationHotKey(
     '4',
-    `/admin/orgs/${orgId}/projects/${projectId}/sprints`,
+    `/admin/orgs/${orgId}/projects/${projectId}/cycles`,
   );
   useNavigationHotKey('5', `/admin/orgs/${orgId}/projects/${projectId}/pages`);
   useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/issues`);
   useNavigationHotKey(
     '8',
-    `/admin/orgs/${orgId}/projects/${projectId}/feature-requests`,
+    `/admin/orgs/${orgId}/projects/${projectId}/requests`,
   );
   useNavigationHotKey(
     'w',
@@ -98,7 +98,7 @@ function Admin() {
   );
   useNavigationHotKey(
     's',
-    `/admin/orgs/${orgId}/projects/${projectId}/sprints/new`,
+    `/admin/orgs/${orgId}/projects/${projectId}/cycles/new`,
     isNavigationReplace(),
   );
   useNavigationHotKey(
@@ -108,7 +108,7 @@ function Admin() {
   );
   useNavigationHotKey(
     'r',
-    `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/new`,
+    `/admin/orgs/${orgId}/projects/${projectId}/requests/new`,
     isNavigationReplace(),
   );
   useNavigationHotKey(

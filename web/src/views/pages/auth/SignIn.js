@@ -70,7 +70,7 @@ function SignIn() {
         )
       ) {
         return navigate(
-          `/admin/orgs/${currentOrgId}/projects/${lastVisitedProjectId}/active-sprint`,
+          `/admin/orgs/${currentOrgId}/projects/${lastVisitedProjectId}/active-cycle`,
         );
       }
 
@@ -107,7 +107,7 @@ function SignIn() {
           )
         ) {
           return navigate(
-            `/admin/orgs/${currentOrg.id}/projects/${lastVisitedProjectId}/active-sprint`,
+            `/admin/orgs/${currentOrg.id}/projects/${lastVisitedProjectId}/active-cycle`,
           );
         }
 

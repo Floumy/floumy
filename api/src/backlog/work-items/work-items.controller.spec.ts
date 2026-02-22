@@ -155,7 +155,7 @@ describe('WorkItemsController', () => {
       expect(workItemResponse.title).toEqual('my work item');
       expect(workItemResponse.description).toEqual('my work item description');
       expect(workItemResponse.priority).toEqual('high');
-      expect(workItemResponse.type).toEqual('technical-debt');
+      expect(workItemResponse.type).toEqual('improvement');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -212,7 +212,7 @@ describe('WorkItemsController', () => {
       expect(workItemResponse.title).toEqual('my work item');
       expect(workItemResponse.description).toEqual('my work item description');
       expect(workItemResponse.priority).toEqual('high');
-      expect(workItemResponse.type).toEqual('technical-debt');
+      expect(workItemResponse.type).toEqual('improvement');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -264,7 +264,7 @@ describe('WorkItemsController', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual('high');
-      expect(workItems[0].type).toEqual('technical-debt');
+      expect(workItems[0].type).toEqual('improvement');
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
       expect(workItems[0].status).toEqual('planned');
@@ -316,7 +316,7 @@ describe('WorkItemsController', () => {
       expect(workItemResponse.title).toEqual('my work item');
       expect(workItemResponse.description).toEqual('my work item description');
       expect(workItemResponse.priority).toEqual('high');
-      expect(workItemResponse.type).toEqual('technical-debt');
+      expect(workItemResponse.type).toEqual('improvement');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -574,7 +574,7 @@ describe('WorkItemsController', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual('high');
-      expect(workItems[0].type).toEqual('technical-debt');
+      expect(workItems[0].type).toEqual('improvement');
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
       expect(workItems[0].status).toEqual('planned');
@@ -702,7 +702,7 @@ describe('WorkItemsController', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual('high');
-      expect(workItems[0].type).toEqual('technical-debt');
+      expect(workItems[0].type).toEqual('improvement');
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
       expect(workItems[0].status).toEqual('planned');

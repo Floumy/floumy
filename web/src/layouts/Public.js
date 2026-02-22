@@ -36,12 +36,12 @@ function PublicLayout() {
 
   useNavigationHotKey(
     'r',
-    `/public/orgs/${orgId}/projects/${projectId}/feature-requests/new`,
+    `/public/orgs/${orgId}/projects/${projectId}/requests/new`,
     isNavigationReplace(),
   );
   useNavigationHotKey(
     'f',
-    `/public/orgs/${orgId}/projects/${projectId}/feature-requests`,
+    `/public/orgs/${orgId}/projects/${projectId}/requests`,
     false,
   );
   useNavigationHotKey('left', -1);

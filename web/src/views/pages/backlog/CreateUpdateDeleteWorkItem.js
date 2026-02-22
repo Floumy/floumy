@@ -348,14 +348,11 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                             { id: 'ready-to-start', text: 'Ready to Start' },
                             { id: 'in-progress', text: 'In Progress' },
                             { id: 'blocked', text: 'Blocked' },
-                            { id: 'code-review', text: 'Code Review' },
+                            { id: 'review', text: 'Review' },
                             { id: 'testing', text: 'Testing' },
                             { id: 'revisions', text: 'Revisions' },
-                            {
-                              id: 'ready-for-deployment',
-                              text: 'Ready for Deployment',
-                            },
-                            { id: 'deployed', text: 'Deployed' },
+                            { id: 'ready-to-ship', text: 'Ready to Ship' },
+                            { id: 'shipped', text: 'Shipped' },
                             { id: 'done', text: 'Done' },
                             { id: 'closed', text: 'Closed' },
                           ]}
@@ -374,11 +371,11 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           defaultValue={type}
                           name="type"
                           data={[
-                            { id: 'user-story', text: 'User Story' },
+                            { id: 'deliverable', text: 'Deliverable' },
                             { id: 'task', text: 'Task' },
-                            { id: 'bug', text: 'Bug' },
-                            { id: 'spike', text: 'Spike' },
-                            { id: 'technical-debt', text: 'Technical Debt' },
+                            { id: 'defect', text: 'Defect' },
+                            { id: 'research', text: 'Research' },
+                            { id: 'improvement', text: 'Improvement' },
                           ]}
                           onChange={(e) => setType(e.target.value)}
                         ></Select2>
@@ -700,7 +697,7 @@ const defaultWorkItem = {
   title: '',
   description: '',
   priority: 'medium',
-  type: 'user-story',
+  type: 'deliverable',
   estimation: null,
   status: 'planned',
   initiative: { id: '' },

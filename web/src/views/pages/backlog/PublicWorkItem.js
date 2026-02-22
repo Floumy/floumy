@@ -162,23 +162,23 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                 <Row className="mb-3">
                   <Col>
                     <label className="form-control-label">
-                      {workItem && workItem.sprint ? (
+                      {workItem && (workItem.cycle || workItem.sprint) ? (
                         <Link
-                          to={`/public/orgs/${orgId}/projects/${projectId}/sprints/detail/${workItem.sprint.id}`}
+                          to={`/public/orgs/${orgId}/projects/${projectId}/cycles/detail/${(workItem.cycle || workItem.sprint).id}`}
                         >
-                          Sprint
+                          Cycle
                           <i className="fa fa-link ml-2" />
                         </Link>
                       ) : (
-                        'Sprint'
+                        'Cycle'
                       )}
                     </label>
                     <Input
                       type="text"
                       disabled={true}
                       className="bg-white"
-                      defaultValue={workItem.sprint?.title || 'None'}
-                      placeholder="Select a sprint"
+                      defaultValue={(workItem.cycle || workItem.sprint)?.title || 'None'}
+                      placeholder="Select a cycle"
                     />
                   </Col>
                 </Row>
@@ -238,7 +238,7 @@ const defaultWorkItem = {
   title: '',
   description: '',
   priority: 'medium',
-  type: 'user-story',
+  type: 'deliverable',
   estimation: '',
   status: 'planned',
   initiative: { id: '' },

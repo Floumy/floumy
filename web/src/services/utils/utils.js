@@ -41,11 +41,11 @@ export function displayDateDifferenceFromNow(date) {
 
 export function workItemTypeIcon(type) {
   const typeMap = {
-    'user-story': <i className="fas fa-user text-green pl-0 mr-2" />,
-    bug: <i className="fas fa-bug text-red pl-0 mr-2" />,
+    deliverable: <i className="fas fa-user text-green pl-0 mr-2" />,
+    defect: <i className="fas fa-bug text-red pl-0 mr-2" />,
     task: <i className="fas fa-tasks text-blue pl-0 mr-2" />,
-    'technical-debt': <i className="fas fa-code text-warning pl-0 mr-2" />,
-    spike: <i className="fas fa-bolt text-info pl-0 mr-2" />,
+    improvement: <i className="fas fa-code text-warning pl-0 mr-2" />,
+    research: <i className="fas fa-bolt text-info pl-0 mr-2" />,
   };
   return typeMap[type];
 }
@@ -56,11 +56,11 @@ export function workItemStatusColorClassName(status) {
     'ready-to-start': 'bg-info',
     'in-progress': 'bg-primary',
     blocked: 'bg-danger',
-    'code-review': 'bg-purple',
+    review: 'bg-purple',
     testing: 'bg-purple',
     revisions: 'bg-purple',
-    'ready-for-deployment': 'bg-purple',
-    deployed: 'bg-purple',
+    'ready-to-ship': 'bg-purple',
+    shipped: 'bg-purple',
     done: 'bg-success',
     closed: 'bg-gray',
   };
@@ -73,11 +73,11 @@ export function workItemsColorVariable(status) {
     'ready-to-start': colors.theme.info,
     'in-progress': colors.theme.primary,
     blocked: colors.theme.danger,
-    'code-review': colors.purple['900'],
+    review: colors.purple['900'],
     testing: colors.purple['900'],
     revisions: colors.purple['900'],
-    'ready-for-deployment': colors.purple['900'],
-    deployed: colors.purple['900'],
+    'ready-to-ship': colors.purple['900'],
+    shipped: colors.purple['900'],
     done: colors.theme.success,
     closed: colors.gray['600'],
   };
@@ -86,22 +86,22 @@ export function workItemsColorVariable(status) {
 
 export function workItemsTypeColorVariable(type) {
   const typeMap = {
-    'user-story': colors.theme.success,
-    bug: colors.theme.danger,
+    deliverable: colors.theme.success,
+    defect: colors.theme.danger,
     task: colors.theme.info,
-    'technical-debt': colors.theme.warning,
-    spike: colors.theme.primary,
+    improvement: colors.theme.warning,
+    research: colors.theme.primary,
   };
   return typeMap[type];
 }
 
 export function formatWorkItemTypeName(type) {
   const typeMap = {
-    'user-story': 'User Story',
-    bug: 'Bug',
+    deliverable: 'Deliverable',
+    defect: 'Defect',
     task: 'Task',
-    'technical-debt': 'Technical Debt',
-    spike: 'Spike',
+    improvement: 'Improvement',
+    research: 'Research',
   };
   return typeMap[type];
 }
@@ -112,11 +112,11 @@ export function formatWorkItemStatusName(status) {
     'ready-to-start': 'Ready to Start',
     'in-progress': 'In Progress',
     blocked: 'Blocked',
-    'code-review': 'Code Review',
+    review: 'Review',
     testing: 'Testing',
     revisions: 'Revisions',
-    'ready-for-deployment': 'Ready for Deployment',
-    deployed: 'Deployed',
+    'ready-to-ship': 'Ready to Ship',
+    shipped: 'Shipped',
     done: 'Done',
     closed: 'Closed',
   };
