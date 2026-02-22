@@ -10,7 +10,10 @@ import useLayoutHandler from './useLayoutHandler';
 import useNavigationHotKey from './useNavigationHotKey';
 import Footer from '../components/Footers/Footer';
 import { BuildInPublicProvider } from '../contexts/BuidInPublicContext';
-import { ProjectsProvider } from '../contexts/ProjectsContext';
+import {
+  ProjectsProvider,
+  useProjects,
+} from '../contexts/ProjectsContext';
 import { OrgProvider } from '../contexts/OrgContext';
 import NotFound from '../views/pages/errors/NotFound';
 import AiChatSlideIn from '../components/SlideIn/AiChatSlideIn';
@@ -74,7 +77,6 @@ function Admin() {
     `/admin/orgs/${orgId}/projects/${projectId}/sprints`,
   );
   useNavigationHotKey('5', `/admin/orgs/${orgId}/projects/${projectId}/pages`);
-  useNavigationHotKey('6', `/admin/orgs/${orgId}/projects/${projectId}/code`);
   useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/issues`);
   useNavigationHotKey(
     '8',
@@ -135,6 +137,7 @@ function Admin() {
       <BuildInPublicProvider orgId={orgId} projectId={projectId}>
         <OrgProvider orgId={orgId}>
           <ProjectsProvider orgId={orgId} projectId={projectId}>
+            <AdminCodeHotkey orgId={orgId} projectId={projectId} />
             <Sidebar
               toggleSidenav={toggleSidenav}
               logo={{
@@ -187,6 +190,20 @@ function Admin() {
       </BuildInPublicProvider>
     </>
   );
+}
+
+function AdminCodeHotkey({ orgId, projectId }) {
+  const { currentProject } = useProjects();
+  const codeEnabled = currentProject?.codeEnabled ?? false;
+
+  useNavigationHotKey(
+    '6',
+    `/admin/orgs/${orgId}/projects/${projectId}/code`,
+    false,
+    codeEnabled,
+  );
+
+  return null;
 }
 
 export default Admin;

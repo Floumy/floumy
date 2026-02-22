@@ -63,6 +63,8 @@ export class Project {
   gitlabProjectWebhookId: number;
   @Column({ default: false })
   cyclesEnabled: boolean = false;
+  @Column({ default: false })
+  codeEnabled: boolean = false;
   @ManyToMany(() => User, (user) => user.projects, { lazy: true })
   @JoinTable({
     name: 'project_user',

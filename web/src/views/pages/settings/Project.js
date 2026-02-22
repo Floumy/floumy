@@ -64,6 +64,7 @@ function Project() {
     const projectName = values.projectName;
     const projectDescription = values.projectDescription;
     const cyclesEnabled = values.cyclesEnabled;
+    const codeEnabled = values.codeEnabled;
     try {
       setIsSubmitting(true);
       const updatedProject = await updateProject(
@@ -72,6 +73,7 @@ function Project() {
         projectName,
         projectDescription,
         cyclesEnabled,
+        codeEnabled,
       );
       setProjects(
         projects.map((p) => {
@@ -137,6 +139,7 @@ function Project() {
                     projectName: project.name,
                     projectDescription: project.description,
                     cyclesEnabled: project.cyclesEnabled ?? false,
+                    codeEnabled: project.codeEnabled ?? false,
                   }}
                   validationSchema={validationSchema}
                   onSubmit={async (values, { setErrors }) => {
@@ -222,6 +225,21 @@ function Project() {
                         <small className="form-text text-muted d-block">
                           When enabled, you can plan work in time-boxed cycles.
                           When disabled, use Active Work to track all open items.
+                        </small>
+                      </FormGroup>
+                      <h4>Code</h4>
+                      <FormGroup check>
+                        <Label check>
+                          <Field
+                            name="codeEnabled"
+                            type="checkbox"
+                            as={Input}
+                          />
+                          Enable code integration (GitHub/GitLab) for this project
+                        </Label>
+                        <small className="form-text text-muted d-block">
+                          When enabled, you can connect to GitHub or GitLab to
+                          sync pull requests and merge requests.
                         </small>
                       </FormGroup>
                       <div>

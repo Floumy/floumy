@@ -77,6 +77,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
   };
 
   const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
+  const codeEnabled = currentProject?.codeEnabled ?? false;
   const shortcutsItems = [
     { description: 'Go to OKRs', keys: ['1'], id: 'okrs' },
     { description: 'Go to Roadmap', keys: ['2'], id: 'roadmap' },
@@ -89,7 +90,9 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
       ? [{ description: 'Go to Cycles', keys: ['4'], id: 'cycles' }]
       : []),
     { description: 'Go to Pages', keys: ['5'], id: 'pages' },
-    { description: 'Go to Code', keys: ['6'], id: 'code' },
+    ...(codeEnabled
+      ? [{ description: 'Go to Code', keys: ['6'], id: 'code' }]
+      : []),
     { description: 'Go to Issues', keys: ['7'], id: 'issues' },
     {
       description: 'Go to Requests',
@@ -502,35 +505,37 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     </Col>
                   </Row>
                 </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={10}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/code`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-code-pull-request" />
-                        <span className="nav-link-text">Code</span>
-                      </NavLink>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <span
-                        id="shortcut-code"
-                        role="button"
-                        onClick={toggleShortcutsModal}
-                      >
-                        <KeyShortcut keys={['6']} />
-                      </span>
-                      <UncontrolledTooltip
-                        target="shortcut-code"
-                        placement="top"
-                      >
-                        Press 6 to go to Code. Click to see all shortcuts.
-                      </UncontrolledTooltip>
-                    </Col>
-                  </Row>
-                </NavItem>
+                {codeEnabled && (
+                  <NavItem>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={10}>
+                        <NavLink
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/code`}
+                          onClick={closeSidenav}
+                          tag={NavLinkRRD}
+                        >
+                          <i className="fa fa-code-pull-request" />
+                          <span className="nav-link-text">Code</span>
+                        </NavLink>
+                      </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <span
+                          id="shortcut-code"
+                          role="button"
+                          onClick={toggleShortcutsModal}
+                        >
+                          <KeyShortcut keys={['6']} />
+                        </span>
+                        <UncontrolledTooltip
+                          target="shortcut-code"
+                          placement="top"
+                        >
+                          Press 6 to go to Code. Click to see all shortcuts.
+                        </UncontrolledTooltip>
+                      </Col>
+                    </Row>
+                  </NavItem>
+                )}
               </Nav>
               <div className="mb-3">
                 <h6 className="navbar-heading p-0 text-muted">

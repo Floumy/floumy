@@ -29,11 +29,15 @@ export async function updateProject(
   projectName,
   projectDescription,
   cyclesEnabled,
+  codeEnabled,
 ) {
   try {
     const body = { name: projectName, description: projectDescription };
     if (cyclesEnabled !== undefined) {
       body.cyclesEnabled = cyclesEnabled;
+    }
+    if (codeEnabled !== undefined) {
+      body.codeEnabled = codeEnabled;
     }
     const response = await api.put(
       `${apiUrl}/orgs/${orgId}/my-projects/${projectId}`,

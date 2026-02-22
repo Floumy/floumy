@@ -12,6 +12,7 @@ import {
 } from 'reactstrap';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useProjects } from '../../../contexts/ProjectsContext';
 import {
   disconnectProject,
   getIsGitLabConnected,
@@ -34,6 +35,8 @@ import { FirstReviewTime } from './charts/FirstReviewTime';
 
 function GitLab() {
   const { orgId, projectId } = useParams();
+  const { currentProject } = useProjects();
+  const codeEnabled = currentProject?.codeEnabled ?? false;
   const [isLoading, setIsLoading] = React.useState(false);
   const [disconnectWarning, setDisconnectWarning] = React.useState(false);
   const [accessToken, setAccessToken] = React.useState('');
@@ -44,6 +47,15 @@ function GitLab() {
   const [gitlabProjectId, setGitlabProjectId] = React.useState('');
   const [isEditing, setIsEditing] = React.useState(false);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!codeEnabled && orgId && projectId) {
+      navigate(
+        `/admin/orgs/${orgId}/projects/${projectId}/dashboard`,
+      );
+      return;
+    }
+  }, [codeEnabled, navigate, orgId, projectId]);
 
   const saveToken = async (e) => {
     e.preventDefault();
@@ -85,6 +97,8 @@ function GitLab() {
   };
 
   useEffect(() => {
+    if (!codeEnabled) return;
+
     async function fetchIsConnected() {
       setIsLoading(true);
       try {
@@ -110,7 +124,7 @@ function GitLab() {
     }
 
     fetchIsConnected();
-  }, [orgId, projectId]);
+  }, [orgId, projectId, codeEnabled]);
 
   const handleGitlabProjectDisconnect = async () => {
     try {
@@ -140,6 +154,8 @@ function GitLab() {
     setProjects([]);
     setIsEditing(false);
   };
+
+  if (!codeEnabled) return null;
 
   return (
     <>

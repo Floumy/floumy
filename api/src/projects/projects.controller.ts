@@ -66,6 +66,7 @@ export class ProjectsController {
       name: string;
       description?: string;
       cyclesEnabled?: boolean;
+      codeEnabled?: boolean;
     },
   ) {
     if (orgId !== request.user.org) {

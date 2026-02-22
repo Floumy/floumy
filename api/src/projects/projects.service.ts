@@ -72,6 +72,7 @@ export class ProjectsService {
       name: string;
       description?: string;
       cyclesEnabled?: boolean;
+      codeEnabled?: boolean;
     },
   ) {
     const project = await this.projectsRepository.findOneByOrFail({
@@ -87,6 +88,9 @@ export class ProjectsService {
     project.description = updateProjectDto?.description;
     if (updateProjectDto.cyclesEnabled !== undefined) {
       project.cyclesEnabled = updateProjectDto.cyclesEnabled;
+    }
+    if (updateProjectDto.codeEnabled !== undefined) {
+      project.codeEnabled = updateProjectDto.codeEnabled;
     }
     await this.projectsRepository.save(project);
     return await ProjectMapper.toDto(project);
