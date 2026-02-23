@@ -5,7 +5,7 @@ import { apiUrl } from '../../config';
 export async function addFeatureRequest(orgId, projectId, featureRequest) {
   try {
     const response = await api.post(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests`,
       featureRequest,
     );
     return response.data;
@@ -22,7 +22,7 @@ export async function listFeatureRequests(
 ) {
   try {
     const response = await api.get(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests?page=${page}&limit=${limit}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests?page=${page}&limit=${limit}`,
     );
     return response.data;
   } catch (e) {
@@ -33,7 +33,7 @@ export async function listFeatureRequests(
 export async function getFeatureRequest(orgId, projectId, featureRequestId) {
   try {
     const response = await api.get(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/${featureRequestId}`,
     );
     return response.data;
   } catch (e) {
@@ -49,7 +49,7 @@ export async function updateFeatureRequest(
 ) {
   try {
     await api.put(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/${featureRequestId}`,
       featureRequest,
     );
   } catch (e) {
@@ -60,7 +60,7 @@ export async function updateFeatureRequest(
 export async function deleteFeatureRequest(orgId, projectId, featureRequestId) {
   try {
     await api.delete(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/${featureRequestId}`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -69,12 +69,12 @@ export async function deleteFeatureRequest(orgId, projectId, featureRequestId) {
 
 export async function upvoteFeatureRequest(orgId, projectId, featureRequestId) {
   if (!(await isAuthenticated())) {
-    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/feature-requests`;
+    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/requests`;
   }
 
   try {
     await api.post(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/upvote`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/${featureRequestId}/upvote`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -87,12 +87,12 @@ export async function downvoteFeatureRequest(
   featureRequestId,
 ) {
   if (!(await isAuthenticated())) {
-    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/feature-requests`;
+    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/requests`;
   }
 
   try {
     await api.post(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/downvote`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/${featureRequestId}/downvote`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -101,12 +101,12 @@ export async function downvoteFeatureRequest(
 
 export async function listCurrentUserFeatureRequestVotes(orgId, projectId) {
   if (!(await isAuthenticated())) {
-    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/feature-requests`;
+    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/requests`;
   }
 
   try {
     const response = await api.get(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/my-votes`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/my-votes`,
     );
     return response.data;
   } catch (e) {
@@ -121,12 +121,12 @@ export async function addFeatureRequestComment(
   comment,
 ) {
   if (!(await isAuthenticated())) {
-    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/feature-requests`;
+    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/requests`;
   }
 
   try {
     const response = await api.post(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/${featureRequestId}/comments`,
       {
         content: comment.content,
         mentions: comment.mentions,
@@ -146,12 +146,12 @@ export async function updateFeatureRequestComment(
   comment,
 ) {
   if (!(await isAuthenticated())) {
-    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/feature-requests`;
+    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/requests`;
   }
 
   try {
     const response = await api.put(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments/${commentId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/${featureRequestId}/comments/${commentId}`,
       {
         content: comment.content,
         mentions: comment.mentions,
@@ -170,12 +170,12 @@ export async function deleteFeatureRequestComment(
   commentId,
 ) {
   if (!(await isAuthenticated())) {
-    window.location.href = `/auth/sign-in?redirectTo=/admin/org/${orgId}/feature-requests`;
+    window.location.href = `/auth/sign-in?redirectTo=/admin/org/${orgId}/requests`;
   }
 
   try {
     await api.delete(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/${featureRequestId}/comments/${commentId}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/${featureRequestId}/comments/${commentId}`,
     );
   } catch (e) {
     throw new Error(e.message);
@@ -190,12 +190,12 @@ export async function searchFeatureRequests(
   limit = 10,
 ) {
   if (!(await isAuthenticated())) {
-    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/feature-requests`;
+    window.location.href = `/auth/sign-in?redirectTo=/admin/orgs/${orgId}/projects/${projectId}/requests`;
   }
 
   try {
     const response = await api.get(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/feature-requests/search?q=${searchText}&page=${page}&limit=${limit}`,
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/requests/search?q=${searchText}&page=${page}&limit=${limit}`,
     );
     return response.data;
   } catch (e) {
