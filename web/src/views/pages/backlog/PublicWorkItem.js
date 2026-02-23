@@ -177,7 +177,9 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                       type="text"
                       disabled={true}
                       className="bg-white"
-                      defaultValue={(workItem.cycle || workItem.sprint)?.title || 'None'}
+                      defaultValue={
+                        (workItem.cycle || workItem.sprint)?.title || 'None'
+                      }
                       placeholder="Select a cycle"
                     />
                   </Col>

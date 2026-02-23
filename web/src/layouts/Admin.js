@@ -10,10 +10,7 @@ import useLayoutHandler from './useLayoutHandler';
 import useNavigationHotKey from './useNavigationHotKey';
 import Footer from '../components/Footers/Footer';
 import { BuildInPublicProvider } from '../contexts/BuidInPublicContext';
-import {
-  ProjectsProvider,
-  useProjects,
-} from '../contexts/ProjectsContext';
+import { ProjectsProvider, useProjects } from '../contexts/ProjectsContext';
 import { OrgProvider } from '../contexts/OrgContext';
 import NotFound from '../views/pages/errors/NotFound';
 import AiChatSlideIn from '../components/SlideIn/AiChatSlideIn';
@@ -72,10 +69,7 @@ function Admin() {
     '3',
     `/admin/orgs/${orgId}/projects/${projectId}/active-cycle`,
   );
-  useNavigationHotKey(
-    '4',
-    `/admin/orgs/${orgId}/projects/${projectId}/cycles`,
-  );
+  useNavigationHotKey('4', `/admin/orgs/${orgId}/projects/${projectId}/cycles`);
   useNavigationHotKey('5', `/admin/orgs/${orgId}/projects/${projectId}/pages`);
   useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/issues`);
   useNavigationHotKey(

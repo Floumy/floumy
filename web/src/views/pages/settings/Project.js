@@ -224,7 +224,8 @@ function Project() {
                         </Label>
                         <small className="form-text text-muted d-block">
                           When enabled, you can plan work in time-boxed cycles.
-                          When disabled, use Active Work to track all open items.
+                          When disabled, use Active Work to track all open
+                          items.
                         </small>
                       </FormGroup>
                       <h4>Code</h4>
@@ -235,7 +236,8 @@ function Project() {
                             type="checkbox"
                             as={Input}
                           />
-                          Enable code integration (GitHub/GitLab) for this project
+                          Enable code integration (GitHub/GitLab) for this
+                          project
                         </Label>
                         <small className="form-text text-muted d-block">
                           When enabled, you can connect to GitHub or GitLab to

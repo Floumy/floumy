@@ -51,8 +51,7 @@ function WorkItemsContextMenu({
         const cycles = await listCycles(orgId, projectId);
         setSprints(
           cycles.filter(
-            (cycle) =>
-              cycle.status === 'active' || cycle.status === 'planned',
+            (cycle) => cycle.status === 'active' || cycle.status === 'planned',
           ),
         );
       } catch (e) {

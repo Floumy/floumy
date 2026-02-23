@@ -53,9 +53,7 @@ function GitHub() {
 
   useEffect(() => {
     if (!codeEnabled && orgId && currentProject?.id) {
-      navigate(
-        `/admin/orgs/${orgId}/projects/${currentProject.id}/dashboard`,
-      );
+      navigate(`/admin/orgs/${orgId}/projects/${currentProject.id}/dashboard`);
       return;
     }
   }, [codeEnabled, navigate, orgId, currentProject?.id]);

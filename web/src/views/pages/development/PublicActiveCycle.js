@@ -96,7 +96,9 @@ function PublicActiveSprint() {
                 <div className="p-5 text-center">
                   <div className="mx-auto" style={{ maxWidth: '680px' }}>
                     {!cyclesEnabled ? (
-                      <h3 className="mb-3">Cycles are disabled for this project</h3>
+                      <h3 className="mb-3">
+                        Cycles are disabled for this project
+                      </h3>
                     ) : (
                       <h3 className="mb-3">No active cycle yet</h3>
                     )}

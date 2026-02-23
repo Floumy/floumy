@@ -50,9 +50,7 @@ function GitLab() {
 
   React.useEffect(() => {
     if (!codeEnabled && orgId && projectId) {
-      navigate(
-        `/admin/orgs/${orgId}/projects/${projectId}/dashboard`,
-      );
+      navigate(`/admin/orgs/${orgId}/projects/${projectId}/dashboard`);
       return;
     }
   }, [codeEnabled, navigate, orgId, projectId]);

@@ -46,7 +46,9 @@ function ActiveSprint() {
   }, []);
 
   useEffect(() => {
-    document.title = cyclesEnabled ? 'Floumy | Development' : 'Floumy | Active Work';
+    document.title = cyclesEnabled
+      ? 'Floumy | Development'
+      : 'Floumy | Active Work';
 
     async function fetchData() {
       try {
@@ -74,7 +76,7 @@ function ActiveSprint() {
   }, [orgId, projectId, cyclesEnabled, setWorkItemsGroupedByStatus]);
 
   const currentWorkItems = cyclesEnabled
-    ? activeCycle?.workItems ?? []
+    ? (activeCycle?.workItems ?? [])
     : activeWorkItems;
 
   function removeWorkItemsFromActiveSprint(workItemsToRemove) {
@@ -188,84 +190,85 @@ function ActiveSprint() {
             {!isLoading &&
               ((cyclesEnabled && !activeCycle) ||
                 (!cyclesEnabled && activeWorkItems.length === 0)) && (
-              <Card>
-                <CardHeader>
-                  <Row>
-                    <Col sm={6}>
-                      <h2 className="mb-0">
-                        {cyclesEnabled ? 'Active Sprint' : 'Active Work'}
-                      </h2>
-                    </Col>
-                  </Row>
-                </CardHeader>
-                <CardBody>
-                  <div className="p-5 text-center">
-                    <div className="mx-auto" style={{ maxWidth: '680px' }}>
-                      {cyclesEnabled ? (
-                        <>
-                          <h3 className="mb-3">No active sprint</h3>
-                          <p className="text-muted">
-                            Start a sprint to begin tracking work in the current
-                            cycle and keep your team focused on the highest
-                            priorities.
-                          </p>
-                          <div className="my-4">
-                            <Link
-                              to={`/admin/orgs/${orgId}/projects/${projectId}/cycles/new`}
-                              className="btn btn-primary"
-                            >
-                              Plan a Cycle
-                            </Link>
-                          </div>
-                          <Row className="mt-4 text-left">
-                            <Col md="6" className="mb-3">
-                              <Card>
-                                <CardBody>
-                                  <h5 className="mb-2">What is a Cycle?</h5>
-                                  <p className="mb-0 text-sm text-muted">
-                                    A short, time-boxed period to deliver
-                                    prioritized work and maintain momentum.
-                                  </p>
-                                </CardBody>
-                              </Card>
-                            </Col>
-                            <Col md="6" className="mb-3">
-                              <Card>
-                                <CardBody>
-                                  <h5 className="mb-2">
-                                    What is an Active Cycle?
-                                  </h5>
-                                  <p className="mb-0 text-sm text-muted">
-                                    The currently running cycle where your team
-                                    executes planned work and tracks daily
-                                    progress.
-                                  </p>
-                                </CardBody>
-                              </Card>
-                            </Col>
-                          </Row>
-                        </>
-                      ) : (
-                        <>
-                          <h3 className="mb-3">No open work items</h3>
-                          <p className="text-muted">
-                            Create work items to track your team&apos;s progress.
-                          </p>
-                          <div className="my-4">
-                            <Link
-                              to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/new`}
-                              className="btn btn-primary"
-                            >
-                              New Work Item
-                            </Link>
-                          </div>
-                        </>
-                      )}
+                <Card>
+                  <CardHeader>
+                    <Row>
+                      <Col sm={6}>
+                        <h2 className="mb-0">
+                          {cyclesEnabled ? 'Active Sprint' : 'Active Work'}
+                        </h2>
+                      </Col>
+                    </Row>
+                  </CardHeader>
+                  <CardBody>
+                    <div className="p-5 text-center">
+                      <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                        {cyclesEnabled ? (
+                          <>
+                            <h3 className="mb-3">No active sprint</h3>
+                            <p className="text-muted">
+                              Start a sprint to begin tracking work in the
+                              current cycle and keep your team focused on the
+                              highest priorities.
+                            </p>
+                            <div className="my-4">
+                              <Link
+                                to={`/admin/orgs/${orgId}/projects/${projectId}/cycles/new`}
+                                className="btn btn-primary"
+                              >
+                                Plan a Cycle
+                              </Link>
+                            </div>
+                            <Row className="mt-4 text-left">
+                              <Col md="6" className="mb-3">
+                                <Card>
+                                  <CardBody>
+                                    <h5 className="mb-2">What is a Cycle?</h5>
+                                    <p className="mb-0 text-sm text-muted">
+                                      A short, time-boxed period to deliver
+                                      prioritized work and maintain momentum.
+                                    </p>
+                                  </CardBody>
+                                </Card>
+                              </Col>
+                              <Col md="6" className="mb-3">
+                                <Card>
+                                  <CardBody>
+                                    <h5 className="mb-2">
+                                      What is an Active Cycle?
+                                    </h5>
+                                    <p className="mb-0 text-sm text-muted">
+                                      The currently running cycle where your
+                                      team executes planned work and tracks
+                                      daily progress.
+                                    </p>
+                                  </CardBody>
+                                </Card>
+                              </Col>
+                            </Row>
+                          </>
+                        ) : (
+                          <>
+                            <h3 className="mb-3">No open work items</h3>
+                            <p className="text-muted">
+                              Create work items to track your team&apos;s
+                              progress.
+                            </p>
+                            <div className="my-4">
+                              <Link
+                                to={`/admin/orgs/${orgId}/projects/${projectId}/work-item/new`}
+                                className="btn btn-primary"
+                              >
+                                New Work Item
+                              </Link>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </CardBody>
-              </Card>
-            )}
+                  </CardBody>
+                </Card>
+              )}
             {((cyclesEnabled && activeCycle) ||
               (!cyclesEnabled && currentWorkItems.length > 0)) && (
               <Card>

@@ -141,7 +141,9 @@ function BuildInPublic() {
         isObjectivesPagePublic: !isBuildInPublicEnabled,
         isRoadmapPagePublic: !isBuildInPublicEnabled,
         isCyclesPagePublic: cyclesEnabled ? !isBuildInPublicEnabled : false,
-        isActiveCyclesPagePublic: cyclesEnabled ? !isBuildInPublicEnabled : false,
+        isActiveCyclesPagePublic: cyclesEnabled
+          ? !isBuildInPublicEnabled
+          : false,
         isIssuesPagePublic: !isBuildInPublicEnabled,
         isRequestsPagePublic: !isBuildInPublicEnabled,
       };
