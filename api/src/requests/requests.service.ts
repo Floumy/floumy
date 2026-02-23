@@ -170,8 +170,8 @@ export class RequestsService {
     const initiatives = await request.initiatives;
     for (const initiative of initiatives) {
       await this.initiativesRepository.update(initiative.id, {
-        requestId: null,
-      } as any);
+        request: null,
+      });
     }
 
     await this.requestsRepository.remove(request);

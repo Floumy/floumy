@@ -213,7 +213,7 @@ function Project() {
                         />
                       </FormGroup>
                       <h4>Cycles</h4>
-                      <FormGroup check>
+                      <FormGroup check className="mb-3">
                         <Label check>
                           <Field
                             name="cyclesEnabled"
@@ -229,7 +229,7 @@ function Project() {
                         </small>
                       </FormGroup>
                       <h4>Code</h4>
-                      <FormGroup check>
+                      <FormGroup check className="mb-3">
                         <Label check>
                           <Field
                             name="codeEnabled"
