@@ -17,7 +17,7 @@ import { IssuesService } from './issues.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { IssueDto, UpdateIssueDto } from './dtos';
 import { Public } from '../auth/public.guard';
-import { CreateUpdateCommentDto } from '../comments/dtos';
+import type { CreateUpdateCommentDto } from '../comments/dtos';
 
 @Controller('/orgs/:orgId/projects/:projectId/issues')
 export class IssuesController {

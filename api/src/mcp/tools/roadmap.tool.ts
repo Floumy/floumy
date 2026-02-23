@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from 'src/projects/project.entity';
 import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { McpService } from '../services/mcp.service';
 import { entityNotFound } from '../utils';
 import { Milestone } from '../../roadmap/milestones/milestone.entity';

@@ -1,5 +1,5 @@
 import { OnEvent } from '@nestjs/event-emitter';
-import { CreateNotificationDto } from './dtos';
+import type { CreateNotificationDto } from './dtos';
 import { Injectable } from '@nestjs/common';
 import { Notification } from './notification.entity';
 import { InjectRepository } from '@nestjs/typeorm';

@@ -141,11 +141,11 @@ function PublicInitiative({ initiative }) {
                       <Link
                         to={`/public/orgs/${orgId}/projects/${projectId}/feature-requests/${initiative.featureRequest.id}`}
                       >
-                        Feature Request
+                        Request
                         <i className="fa fa-link ml-2" />
                       </Link>
                     ) : (
-                      'Feature Request'
+                      'Request'
                     )}
                   </label>
                   <Input

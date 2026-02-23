@@ -18,7 +18,7 @@ import { RequestsService } from './requests.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Public } from '../auth/public.guard';
 import { RequestVoteService } from './request-votes.service';
-import { CreateUpdateCommentDto } from '../comments/dtos';
+import type { CreateUpdateCommentDto } from '../comments/dtos';
 
 @Controller('orgs/:orgId/projects/:projectId/requests')
 export class RequestsController {

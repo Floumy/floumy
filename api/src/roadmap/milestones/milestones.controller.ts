@@ -15,9 +15,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MilestonesService } from './milestones.service';
-import { CreateUpdateMilestoneDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
 import { Timeline } from '../../common/timeline.enum';
+import type { CreateUpdateMilestoneDto } from './dtos';
 
 @Controller('/orgs/:orgId/projects/:projectId/milestones')
 @UseGuards(AuthGuard)

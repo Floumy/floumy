@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { WorkItemType } from 'src/backlog/work-items/work-item-type.enum';
 import { Project } from 'src/projects/project.entity';
 import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { McpService } from '../services/mcp.service';
 import { entityNotFound } from '../utils';
 import { WorkItemStatus } from '../../backlog/work-items/work-item-status.enum';

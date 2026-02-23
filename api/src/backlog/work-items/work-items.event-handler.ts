@@ -6,7 +6,7 @@ import { WorkItemStatus } from './work-item-status.enum';
 import { WorkItemsStatusStats } from './work-items-status-stats.entity';
 import { WorkItem } from './work-item.entity';
 import { Injectable } from '@nestjs/common';
-import { WorkItemDto } from './dtos';
+import type { WorkItemDto } from './dtos';
 
 @Injectable()
 export class WorkItemsEventHandler {

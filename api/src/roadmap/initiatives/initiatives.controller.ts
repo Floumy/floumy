@@ -16,10 +16,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { InitiativesService } from './initiatives.service';
-import { CreateUpdateInitiativeDto, PatchInitiativeDto } from './dtos';
 import { AuthGuard } from '../../auth/auth.guard';
-import { CreateUpdateCommentDto } from '../../comments/dtos';
+import type { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
+import type { CreateUpdateInitiativeDto, PatchInitiativeDto } from './dtos';
 
 @Controller('/orgs/:orgId/projects/:projectId/initiatives')
 @UseGuards(AuthGuard)

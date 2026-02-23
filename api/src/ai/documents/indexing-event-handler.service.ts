@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { InitiativeDto, KeyResultDto, OKRDto } from '../../okrs/dtos';
+import type { InitiativeDto, KeyResultDto, OKRDto } from '../../okrs/dtos';
 import { IndexingService } from './indexing.service';
 import { Repository } from 'typeorm';
 import { Objective } from '../../okrs/objective.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { KeyResult } from '../../okrs/key-result.entity';
 import { Initiative } from '../../roadmap/initiatives/initiative.entity';
-import { WorkItemDto } from '../../backlog/work-items/dtos';
+import type { WorkItemDto } from '../../backlog/work-items/dtos';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
-import { RequestDto } from '../../requests/dtos';
+import type { RequestDto } from '../../requests/dtos';
 import { Request } from '../../requests/request.entity';
 import { Issue } from '../../issues/issue.entity';
 

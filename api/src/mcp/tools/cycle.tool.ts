@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { McpService } from '../services/mcp.service';
 import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { Tool } from '@rekog/mcp-nest';
 import { entityNotFound } from '../utils';
 import z from 'zod';

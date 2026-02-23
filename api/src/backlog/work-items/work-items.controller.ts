@@ -18,8 +18,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '../../auth/auth.guard';
 import { WorkItemsService } from './work-items.service';
-import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from './dtos';
-import { CreateUpdateCommentDto } from '../../comments/dtos';
+import type {
+  CreateUpdateWorkItemDto,
+  WorkItemDto,
+  WorkItemPatchDto,
+} from './dtos';
+import type { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
 
 @Controller('/orgs/:orgId/projects/:projectId/work-items')

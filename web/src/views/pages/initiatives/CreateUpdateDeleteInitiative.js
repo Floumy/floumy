@@ -24,7 +24,7 @@ import { toast } from 'react-toastify';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CardHeaderDetails from '../components/CardHeaderDetails';
 import { getOrg } from '../../../services/org/orgs.service';
-import { listFeatureRequests } from '../../../services/feature-requests/feature-requests.service';
+import { listRequests } from '../../../services/requests/requests.service';
 import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
 import AIButton from '../../../components/AI/AIButton';
 import { getInitiativeDescription } from '../../../services/ai/ai.service';
@@ -49,7 +49,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
   const [members, setMembers] = useState([{ id: '', text: 'None' }]);
   const [assignedTo, setAssignedTo] = useState('');
   const [featureRequests, setFeatureRequests] = useState([]);
-  const [featureRequest, setFeatureRequest] = useState('');
+  const [request, setRequest] = useState('');
 
   const fetchAndSetKeyResults = useCallback(async () => {
     const keyResults = await listKeyResults(orgId, projectId);
@@ -85,11 +85,11 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
   }, [initiative?.assignedTo?.id]);
 
   const fetchAndSetFeatureRequests = useCallback(async () => {
-    const featureRequests = await listFeatureRequests(orgId, projectId, 1, 0);
+    const featureRequests = await listRequests(orgId, projectId, 1, 0);
     featureRequests.push({ id: '', title: 'None' });
     setFeatureRequests(featureRequests);
     if (initiative?.featureRequest?.id) {
-      setFeatureRequest(initiative.featureRequest.id);
+      setRequest(initiative.featureRequest.id);
     }
   }, [initiative?.featureRequest?.id, orgId, projectId]);
 
@@ -173,7 +173,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
         status: status,
         files: files,
         assignedTo: assignedTo,
-        featureRequest: featureRequest,
+        request: request,
       };
       if (keyResult !== '') {
         initiativeToBeSaved.keyResult = keyResult;
@@ -381,28 +381,28 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                       className="form-control-label"
                       htmlFor="validationCustom01"
                     >
-                      {featureRequest ? (
+                      {request ? (
                         <Link
-                          to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${featureRequest}`}
+                          to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${request}`}
                         >
-                          Feature Request
+                          Request
                           <i className="fa fa-link ml-2" />
                         </Link>
                       ) : (
-                        'Feature Request'
+                        'Request'
                       )}
                     </label>
                     <Select2
                       className="react-select-container"
-                      defaultValue={featureRequest}
-                      placeholder="Select a feature request"
+                      defaultValue={request}
+                      placeholder="Select a Request"
                       data={featureRequests.map((featureRequest) => {
                         return {
                           id: featureRequest.id,
                           text: featureRequest.title,
                         };
                       })}
-                      onChange={(e) => setFeatureRequest(e.target.value)}
+                      onChange={(e) => setRequest(e.target.value)}
                     ></Select2>
                   </Col>
                 </Row>
@@ -423,7 +423,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                             values.title,
                             keyResult,
                             milestone,
-                            featureRequest,
+                            request,
                           );
                           setDescriptionText(response);
                         }}

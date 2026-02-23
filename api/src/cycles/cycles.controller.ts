@@ -15,7 +15,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
-import { CreateOrUpdateCycleDto } from './dtos';
+import type { CreateOrUpdateCycleDto } from './dtos';
 import { CyclesService } from './cycles.service';
 import { Timeline } from '../common/timeline.enum';
 

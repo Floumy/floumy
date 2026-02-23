@@ -236,7 +236,7 @@ export class InitiativesService {
       initiative,
     );
 
-    await this.updateInitiativeFeatureRequest(
+    await this.updateInitiativeRequest(
       updateInitiativeDto,
       orgId,
       projectId,
@@ -690,7 +690,7 @@ export class InitiativesService {
     return /^[iI]-\d+$/.test(search);
   }
 
-  private async updateInitiativeFeatureRequest(
+  private async updateInitiativeRequest(
     updateInitiativeDto: CreateUpdateInitiativeDto,
     orgId: string,
     projectId: string,

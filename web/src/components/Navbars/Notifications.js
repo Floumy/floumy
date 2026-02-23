@@ -37,7 +37,7 @@ const notificationTextActions = {
   },
   feature_request_comment: {
     create: (notification) =>
-      `${notification.createdBy.name} commented on a feature request`,
+      `${notification.createdBy.name} commented on a request`,
     update: (notification) =>
       `${notification.createdBy.name} updated a comment`,
   },
