@@ -50,10 +50,10 @@ describe('BipService', () => {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
+        isRequestsPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
       const updatedSettings = await service.getSettings(org.id, project.id);
@@ -65,10 +65,10 @@ describe('BipService', () => {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
+        isRequestsPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
       const updatedSettings = await service.getSettings(org.id, project.id);
@@ -84,10 +84,10 @@ describe('BipService', () => {
         isBuildInPublicEnabled: false,
         isObjectivesPagePublic: false,
         isRoadmapPagePublic: false,
-        isSprintsPagePublic: false,
-        isActiveSprintsPagePublic: false,
+        isCyclesPagePublic: false,
+        isActiveCyclesPagePublic: false,
         isIssuesPagePublic: false,
-        isFeatureRequestsPagePublic: false,
+        isRequestsPagePublic: false,
       });
     });
     it('should create the default building in public settings on org created event when the org is premium', async () => {
@@ -98,10 +98,10 @@ describe('BipService', () => {
         isBuildInPublicEnabled: false,
         isObjectivesPagePublic: false,
         isRoadmapPagePublic: false,
-        isSprintsPagePublic: false,
-        isActiveSprintsPagePublic: false,
+        isCyclesPagePublic: false,
+        isActiveCyclesPagePublic: false,
+        isRequestsPagePublic: false,
         isIssuesPagePublic: false,
-        isFeatureRequestsPagePublic: false,
       });
     });
     it('should not override existing settings', async () => {
@@ -109,10 +109,10 @@ describe('BipService', () => {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
+        isRequestsPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
       await service.createSettings(project);
@@ -124,10 +124,10 @@ describe('BipService', () => {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
+        isRequestsPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
       await expect(service.createSettings(project)).resolves.not.toThrow();

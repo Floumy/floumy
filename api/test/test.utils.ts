@@ -35,6 +35,7 @@ import { Milestone } from '../src/roadmap/milestones/milestone.entity';
 import { WorkItem } from '../src/backlog/work-items/work-item.entity';
 import { Initiative } from '../src/roadmap/initiatives/initiative.entity';
 import { githubClientMock } from './github-client.mock';
+import { Cycle } from '../src/cycles/cycle.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -108,6 +109,8 @@ export async function setupTestingModule(
         Issue,
         Milestone,
         Project,
+        BipSettings,
+        Cycle,
       ]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],
@@ -144,6 +147,12 @@ export async function setupTestingModule(
 
   return {
     module,
-    cleanup: async () => await clearDatabase(dataSource),
+    cleanup: async () => {
+      await clearDatabase(dataSource);
+      await module.close();
+      if (dataSource.isInitialized) {
+        await dataSource.destroy();
+      }
+    },
   };
 }

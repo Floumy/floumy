@@ -1099,7 +1099,7 @@ describe('FeaturesService', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.USER_STORY,
+          type: WorkItemType.DELIVERABLE,
           initiative: initiative.id,
           status: WorkItemStatus.PLANNED,
         },

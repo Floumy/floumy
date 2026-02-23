@@ -382,7 +382,7 @@ describe('WorkItemsController', () => {
         'my work item description updated',
       );
       expect(workItemResponse.priority).toEqual('low');
-      expect(workItemResponse.type).toEqual('bug');
+      expect(workItemResponse.type).toEqual('defect');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -471,7 +471,7 @@ describe('WorkItemsController', () => {
         'my work item description updated',
       );
       expect(workItemResponse.priority).toEqual('low');
-      expect(workItemResponse.type).toEqual('bug');
+      expect(workItemResponse.type).toEqual('defect');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -559,7 +559,7 @@ describe('WorkItemsController', () => {
           status: WorkItemStatus.PLANNED,
         },
       );
-      const workItems = await controller.listOpenWithoutSprints(
+      const workItems = await controller.listOpenWithoutCycles(
         org.id,
         project.id,
         {
@@ -599,8 +599,8 @@ describe('WorkItemsController', () => {
           status: WorkItemStatus.PLANNED,
         },
       );
-      const sprint = await cyclesService.create(org.id, project.id, {
-        goal: 'my sprint description',
+      const cycle = await cyclesService.create(org.id, project.id, {
+        goal: 'my cycle description',
         startDate: '2019-01-01',
         duration: 2,
       });
@@ -614,11 +614,11 @@ describe('WorkItemsController', () => {
         },
         workItem.id,
         {
-          sprint: sprint.id,
+          cycle: cycle.id,
         },
       );
       expect(updatedWorkItem.id).toEqual(workItem.id);
-      expect(updatedWorkItem.sprint.id).toEqual(sprint.id);
+      expect(updatedWorkItem.cycle?.id).toEqual(cycle.id);
     });
     it('should update the status', async () => {
       const workItem = await controller.create(

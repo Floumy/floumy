@@ -965,9 +965,9 @@ describe('WorkItemsService', () => {
         ]),
       );
     });
-    it('should return the open work items that are not associated with an sprint', async () => {
-      const sprint = await cycleService.create(org.id, project.id, {
-        goal: 'my sprint description',
+    it('should return the open work items that are not associated with an cycle', async () => {
+      const cycle = await cycleService.create(org.id, project.id, {
+        goal: 'my cycle description',
         startDate: '2020-01-01',
         duration: 7,
       });
@@ -1000,7 +1000,7 @@ describe('WorkItemsService', () => {
         type: WorkItemType.DELIVERABLE,
         initiative: feature1.id,
         status: WorkItemStatus.PLANNED,
-        sprint: sprint.id,
+        cycle: cycle.id,
       });
       await service.createWorkItem(org.id, project.id, user.id, {
         title: 'my other work item',
@@ -1471,14 +1471,14 @@ describe('WorkItemsService', () => {
     });
   });
   describe('when patching a work item', () => {
-    it('should allow to patch the sprint', async () => {
+    it('should allow to patch the cycle', async () => {
       await cycleService.create(org.id, project.id, {
-        goal: 'my sprint description',
+        goal: 'my cycle description',
         startDate: '2020-01-01',
         duration: 7,
       });
-      const sprint2 = await cycleService.create(org.id, project.id, {
-        goal: 'my sprint description',
+      const cycle2 = await cycleService.create(org.id, project.id, {
+        goal: 'my cycle description',
         startDate: '2020-01-01',
         duration: 7,
       });
@@ -1496,14 +1496,14 @@ describe('WorkItemsService', () => {
         },
       );
       await service.patchWorkItem(org.id, project.id, workItem.id, {
-        sprint: sprint2.id,
+        cycle: cycle2.id,
       });
       const foundWorkItem = await service.getWorkItem(
         org.id,
         project.id,
         workItem.id,
       );
-      expect(foundWorkItem.sprint.id).toEqual(sprint2.id);
+      expect(foundWorkItem.cycle?.id).toEqual(cycle2.id);
     });
     it('should allow to patch the status', async () => {
       const workItem = await service.createWorkItem(
