@@ -48,7 +48,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
   const navigate = useNavigate();
   const [members, setMembers] = useState([{ id: '', text: 'None' }]);
   const [assignedTo, setAssignedTo] = useState('');
-  const [featureRequests, setFeatureRequests] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [request, setRequest] = useState('');
 
   const fetchAndSetKeyResults = useCallback(async () => {
@@ -84,14 +84,14 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
     setMembers(mappedUsers);
   }, [initiative?.assignedTo?.id]);
 
-  const fetchAndSetFeatureRequests = useCallback(async () => {
-    const featureRequests = await listRequests(orgId, projectId, 1, 0);
-    featureRequests.push({ id: '', title: 'None' });
-    setFeatureRequests(featureRequests);
-    if (initiative?.featureRequest?.id) {
-      setRequest(initiative.featureRequest.id);
+  const fetchAndSetRequests = useCallback(async () => {
+    const requests = await listRequests(orgId, projectId, 1, 0);
+    requests.push({ id: '', title: 'None' });
+    setRequests(requests);
+    if (initiative?.request?.id) {
+      setRequest(initiative.request.id);
     }
-  }, [initiative?.featureRequest?.id, orgId, projectId]);
+  }, [initiative?.request?.id, orgId, projectId]);
 
   useEffect(() => {
     document.title = 'Floumy | Initiative';
@@ -103,7 +103,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
           fetchAndSetKeyResults(),
           fetchAndSetMilestones(),
           fetchAndSetMembers(),
-          fetchAndSetFeatureRequests(),
+          fetchAndSetRequests(),
         ]);
       } catch (e) {
         toast.error('The key results and milestones could not be loaded');
@@ -117,7 +117,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
     fetchAndSetKeyResults,
     fetchAndSetMilestones,
     fetchAndSetMembers,
-    fetchAndSetFeatureRequests,
+    fetchAndSetRequests,
   ]);
 
   useEffect(() => {
@@ -381,9 +381,9 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                       className="form-control-label"
                       htmlFor="validationCustom01"
                     >
-                      {request ? (
+                      {requests ? (
                         <Link
-                          to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${request}`}
+                          to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${requests}`}
                         >
                           Request
                           <i className="fa fa-link ml-2" />
@@ -396,10 +396,10 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                       className="react-select-container"
                       defaultValue={request}
                       placeholder="Select a Request"
-                      data={featureRequests.map((featureRequest) => {
+                      data={requests.map((request) => {
                         return {
-                          id: featureRequest.id,
-                          text: featureRequest.title,
+                          id: request.id,
+                          text: request.title,
                         };
                       })}
                       onChange={(e) => setRequest(e.target.value)}
