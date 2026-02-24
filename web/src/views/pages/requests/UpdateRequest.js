@@ -169,7 +169,7 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
       <Card>
         <CardHeader>
           <h3 className="mb-0">
-            <span className="mr-2">Edit Feature Request</span>
+            <span className="mr-2">Edit Request</span>
           </h3>
         </CardHeader>
         <CardBody>

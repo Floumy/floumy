@@ -66,7 +66,7 @@ export default function CreateRequest({ onSubmit }) {
       {isLoading && <InfiniteLoadingBar />}
       <Card>
         <CardHeader>
-          <h3 className="mb-0">New Feature Request</h3>
+          <h3 className="mb-0">New Request</h3>
         </CardHeader>
         <CardBody>
           <Formik

@@ -106,7 +106,7 @@ export default function RequestDetails() {
                   {isLoading && (
                     <Card>
                       <CardHeader>
-                        <h2>Feature Request</h2>
+                        <h2>Request</h2>
                       </CardHeader>
                       <LoadingSpinnerBox />
                     </Card>

@@ -17,7 +17,7 @@ export default function PublicRequestDetails({ featureRequest }) {
     <>
       <Card>
         <CardHeader>
-          <h3 className="mb-0">Feature Request</h3>
+          <h3 className="mb-0">Request</h3>
           <CardHeaderDetails
             createdAt={featureRequest.createdAt}
             updatedAt={featureRequest.updatedAt}
