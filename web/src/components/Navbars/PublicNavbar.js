@@ -1,8 +1,5 @@
 import React from 'react';
-// nodejs library that concatenates classes
 import classnames from 'classnames';
-// nodejs library to set properties for components
-// reactstrap components
 import { Collapse, Container, Nav, Navbar, NavItem } from 'reactstrap';
 import CurrentUserNav from './CurrentUserNav';
 

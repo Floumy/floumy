@@ -63,7 +63,7 @@ function PublicSidebar({
   function isFeedbackEnabled() {
     return (
       buildingInPublicSettings.isIssuesPagePublic ||
-      buildingInPublicSettings.isFeatureRequestsPagePublic
+      buildingInPublicSettings.isRequestsPagePublic
     );
   }
 
@@ -182,7 +182,7 @@ function PublicSidebar({
                   </NavLink>
                 </NavItem>
               )}
-              {buildingInPublicSettings.isFeatureRequestsPagePublic && (
+              {buildingInPublicSettings.isRequestsPagePublic && (
                 <NavItem>
                   <Row style={{ maxWidth: '100%' }}>
                     <Col xs={7}>

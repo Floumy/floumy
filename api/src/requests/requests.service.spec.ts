@@ -141,15 +141,15 @@ describe('RequestsService', () => {
         description: 'Test Description',
       });
 
-      const foundFeatureRequest = await service.getRequestById(
+      const foundRequest = await service.getRequestById(
         org.id,
         project.id,
         request.id,
       );
-      expect(foundFeatureRequest).toBeDefined();
-      expect(foundFeatureRequest.id).toEqual(request.id);
-      expect(foundFeatureRequest.title).toEqual('Test Feature Request');
-      expect(foundFeatureRequest.description).toEqual('Test Description');
+      expect(foundRequest).toBeDefined();
+      expect(foundRequest.id).toEqual(request.id);
+      expect(foundRequest.title).toEqual('Test Feature Request');
+      expect(foundRequest.description).toEqual('Test Description');
     });
     it('should throw an error if the feature request does not exist', async () => {
       await expect(
@@ -182,7 +182,7 @@ describe('RequestsService', () => {
         description: 'Test Description',
       });
 
-      const updatedFeatureRequest = await service.updateRequest(
+      const updatedRequest = await service.updateRequest(
         user.id,
         org.id,
         project.id,
@@ -195,12 +195,12 @@ describe('RequestsService', () => {
         },
       );
 
-      expect(updatedFeatureRequest).toBeDefined();
-      expect(updatedFeatureRequest.id).toEqual(request.id);
-      expect(updatedFeatureRequest.title).toEqual('Updated Feature Request');
-      expect(updatedFeatureRequest.description).toEqual('Updated Description');
-      expect(updatedFeatureRequest.status).toEqual(RequestStatus.IN_PROGRESS);
-      expect(updatedFeatureRequest.estimation).toEqual(5);
+      expect(updatedRequest).toBeDefined();
+      expect(updatedRequest.id).toEqual(request.id);
+      expect(updatedRequest.title).toEqual('Updated Feature Request');
+      expect(updatedRequest.description).toEqual('Updated Description');
+      expect(updatedRequest.status).toEqual(RequestStatus.IN_PROGRESS);
+      expect(updatedRequest.estimation).toEqual(5);
     });
     it('should throw an error if the feature request does not exist', async () => {
       await expect(

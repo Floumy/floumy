@@ -12,15 +12,15 @@ import {
 import CardHeaderDetails from '../components/CardHeaderDetails';
 import { formatHyphenatedString } from '../../../services/utils/utils';
 
-export default function PublicRequestDetails({ featureRequest }) {
+export default function PublicRequestDetails({ request }) {
   return (
     <>
       <Card>
         <CardHeader>
           <h3 className="mb-0">Request</h3>
           <CardHeaderDetails
-            createdAt={featureRequest.createdAt}
-            updatedAt={featureRequest.updatedAt}
+            createdAt={request.createdAt}
+            updatedAt={request.updatedAt}
           />
         </CardHeader>
         <CardBody>
@@ -33,7 +33,7 @@ export default function PublicRequestDetails({ featureRequest }) {
                     id="title"
                     name="title"
                     type="text"
-                    value={featureRequest.title}
+                    value={request.title}
                     className="bg-white"
                     disabled={true}
                     readOnly={true}
@@ -50,7 +50,7 @@ export default function PublicRequestDetails({ featureRequest }) {
                     name="status"
                     type="text"
                     className="bg-white"
-                    value={formatHyphenatedString(featureRequest.status)}
+                    value={formatHyphenatedString(request.status)}
                     disabled={true}
                     readOnly={true}
                   />
@@ -64,7 +64,7 @@ export default function PublicRequestDetails({ featureRequest }) {
                     name="estimation"
                     type="text"
                     className="bg-white"
-                    value={featureRequest.estimation}
+                    value={request.estimation}
                     disabled={true}
                     readOnly={true}
                   />
@@ -81,7 +81,7 @@ export default function PublicRequestDetails({ featureRequest }) {
                     type="textarea"
                     rows={5}
                     className="bg-white"
-                    value={featureRequest.description}
+                    value={request.description}
                     disabled={true}
                     readOnly={true}
                   />

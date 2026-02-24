@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState, } from 'react';
 import { getBuildInPublicSettings } from '../services/bip/build-in-public.service';
 
 const BuildInPublicContext = createContext({});
@@ -16,7 +10,7 @@ export const BuildInPublicProvider = ({ children, orgId, projectId }) => {
     isSprintsPagePublic: false,
     isActiveSprintsPagePublic: false,
     isIssuesPagePublic: false,
-    isFeatureRequestsPagePublic: false,
+    isRequestsPagePublic: false,
     isBuildInPublicEnabled: false,
   });
 

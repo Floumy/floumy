@@ -111,7 +111,7 @@ export default function EditRequest() {
               )}
               {!isLoading && request && (
                 <UpdateRequest
-                  featureRequest={request}
+                  request={request}
                   onUpdate={handleUpdate}
                   onDelete={handleDelete}
                 />

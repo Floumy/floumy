@@ -18,7 +18,7 @@ import PublicInitiativesList from '../initiatives/PublicInitiativesList';
 export default function RequestDetails() {
   const { orgId, projectId, requestId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [featureRequest, setFeatureRequest] = useState(null);
+  const [request, setRequest] = useState(null);
 
   useEffect(() => {
     document.title = 'Floumy | Request';
@@ -27,7 +27,7 @@ export default function RequestDetails() {
       try {
         setIsLoading(true);
         const request = await getRequest(orgId, projectId, requestId);
-        setFeatureRequest(request);
+        setRequest(request);
       } catch (e) {
         console.error(e);
       } finally {
@@ -43,11 +43,11 @@ export default function RequestDetails() {
       const addedComment = await addRequestComment(
         orgId,
         projectId,
-        featureRequest.id,
+        request.id,
         comment,
       );
-      featureRequest.comments.push(addedComment);
-      setFeatureRequest({ ...featureRequest });
+      request.comments.push(addedComment);
+      setRequest({ ...request });
       toast.success('Comment added successfully');
     } catch (e) {
       toast.error('Failed to add comment');
@@ -59,15 +59,15 @@ export default function RequestDetails() {
       const updatedComment = await updateRequestComment(
         orgId,
         projectId,
-        featureRequest.id,
+        request.id,
         commentId,
         content,
       );
-      const index = featureRequest.comments.findIndex(
+      const index = request.comments.findIndex(
         (c) => c.id === updatedComment.id,
       );
-      featureRequest.comments[index] = updatedComment;
-      setFeatureRequest({ ...featureRequest });
+      request.comments[index] = updatedComment;
+      setRequest({ ...request });
       toast.success('Comment updated successfully');
     } catch (e) {
       toast.error('Failed to update comment');
@@ -76,17 +76,10 @@ export default function RequestDetails() {
 
   async function handleCommentDelete(commentId) {
     try {
-      await deleteRequestComment(
-        orgId,
-        projectId,
-        featureRequest.id,
-        commentId,
-      );
-      const index = featureRequest.comments.findIndex(
-        (c) => c.id === commentId,
-      );
-      featureRequest.comments.splice(index, 1);
-      setFeatureRequest({ ...featureRequest });
+      await deleteRequestComment(orgId, projectId, request.id, commentId);
+      const index = request.comments.findIndex((c) => c.id === commentId);
+      request.comments.splice(index, 1);
+      setRequest({ ...request });
       toast.success('Comment deleted successfully');
     } catch (e) {
       toast.error('Failed to delete comment');
@@ -111,13 +104,13 @@ export default function RequestDetails() {
                       <LoadingSpinnerBox />
                     </Card>
                   )}
-                  {!isLoading && featureRequest && (
-                    <PublicRequestDetails featureRequest={featureRequest} />
+                  {!isLoading && request && (
+                    <PublicRequestDetails request={request} />
                   )}
                 </div>
               </Col>
             </Row>
-            {featureRequest?.initiatives && (
+            {request?.initiatives && (
               <Row>
                 <Col>
                   <Card>
@@ -128,7 +121,7 @@ export default function RequestDetails() {
                       showAssignedTo={false}
                       orgId={orgId}
                       projectId={projectId}
-                      initiatives={featureRequest?.initiatives}
+                      initiatives={request?.initiatives}
                       headerClassName={'thead'}
                     />
                   </Card>
@@ -138,7 +131,7 @@ export default function RequestDetails() {
           </Col>
           <Col lg={4} md={12}>
             <Comments
-              comments={featureRequest?.comments}
+              comments={request?.comments}
               onCommentAdd={handleCommentAdd}
               onCommentEdit={handleCommentUpdate}
               onCommentDelete={handleCommentDelete}

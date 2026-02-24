@@ -138,7 +138,7 @@ describe('RequestsController', () => {
         project.id,
         createRequestDto,
       );
-      const updateFeatureRequestDto = {
+      const updateRequestDto = {
         title: 'Updated Feature Request',
         description: 'This is an updated feature request',
         status: RequestStatus.IN_PROGRESS,
@@ -151,10 +151,10 @@ describe('RequestsController', () => {
         org.id,
         project.id,
         id,
-        updateFeatureRequestDto,
+        updateRequestDto,
       );
-      expect(result.title).toBe(updateFeatureRequestDto.title);
-      expect(result.description).toBe(updateFeatureRequestDto.description);
+      expect(result.title).toBe(updateRequestDto.title);
+      expect(result.description).toBe(updateRequestDto.description);
     });
   });
   describe('when deleting a feature request', () => {
@@ -210,12 +210,8 @@ describe('RequestsController', () => {
         project.id,
         id,
       );
-      const featureRequest = await controller.getRequestById(
-        org.id,
-        project.id,
-        id,
-      );
-      expect(featureRequest.votesCount).toEqual(1);
+      const request = await controller.getRequestById(org.id, project.id, id);
+      expect(request.votesCount).toEqual(1);
     });
   });
   describe('when downvoting a feature request', () => {
@@ -244,12 +240,8 @@ describe('RequestsController', () => {
         project.id,
         id,
       );
-      const featureRequest = await controller.getRequestById(
-        org.id,
-        project.id,
-        id,
-      );
-      expect(featureRequest.votesCount).toEqual(0);
+      const request = await controller.getRequestById(org.id, project.id, id);
+      expect(request.votesCount).toEqual(0);
     });
   });
   describe('when adding a comment', () => {
@@ -362,13 +354,13 @@ describe('RequestsController', () => {
         id,
         comment.id,
       );
-      const featureRequestDto = await controller.getRequestById(
+      const requestDto = await controller.getRequestById(
         org.id,
         project.id,
         id,
       );
-      expect(featureRequestDto.comments).toBeDefined();
-      expect(featureRequestDto.comments.length).toEqual(0);
+      expect(requestDto.comments).toBeDefined();
+      expect(requestDto.comments.length).toEqual(0);
     });
   });
   describe('when updating a comment', () => {
@@ -500,16 +492,14 @@ describe('RequestsController', () => {
         },
       );
 
-      const featureRequests = await controller.search(
+      const requests = await controller.search(
         org.id,
         project.id,
         'my feature request',
       );
-      expect(featureRequests).toHaveLength(1);
-      expect(featureRequests[0].title).toEqual('My Feature Request');
-      expect(featureRequests[0].description).toEqual(
-        'My Feature Request Description',
-      );
+      expect(requests).toHaveLength(1);
+      expect(requests[0].title).toEqual('My Feature Request');
+      expect(requests[0].description).toEqual('My Feature Request Description');
     });
   });
 });

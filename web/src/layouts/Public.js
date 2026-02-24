@@ -23,7 +23,7 @@ function PublicLayout() {
     isSprintsPagePublic: false,
     isActiveSprintsPagePublic: false,
     isIssuesPagePublic: false,
-    isFeatureRequestsPagePublic: false,
+    isRequestsPagePublic: false,
   });
 
   function isNavigationReplace() {

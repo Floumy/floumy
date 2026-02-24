@@ -339,7 +339,7 @@ export class InitiativesService {
       projectId,
       initiative,
     );
-    await this.patchInitiativeFeatureRequest(
+    await this.patchInitiativeRequest(
       patchInitiativeDto,
       orgId,
       projectId,
@@ -708,7 +708,7 @@ export class InitiativesService {
     }
   }
 
-  private async patchInitiativeFeatureRequest(
+  private async patchInitiativeRequest(
     patchInitiativeDto: PatchInitiativeDto,
     orgId: string,
     projectId: string,

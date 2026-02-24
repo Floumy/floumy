@@ -3,16 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import DeleteWarning from '../components/DeleteWarning';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  FormGroup,
-  Input,
-  Row,
-} from 'reactstrap';
+import { Button, Card, CardBody, CardHeader, Col, FormGroup, Input, Row, } from 'reactstrap';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import InputError from '../../../components/Errors/InputError';
@@ -22,27 +13,27 @@ import { addInitiative } from '../../../services/roadmap/roadmap.service';
 import AIButton from '../../../components/AI/AIButton';
 import { generateInitiativesForRequest } from '../../../services/ai/ai.service';
 
-export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
+export default function UpdateRequest({ request, onUpdate, onDelete }) {
   const { orgId, projectId } = useParams();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
-  const [status, setStatus] = useState(featureRequest.status);
-  const [initiatives, setInitiatives] = useState(featureRequest.initiatives);
+  const [status, setStatus] = useState(request.status);
+  const [initiatives, setInitiatives] = useState(request.initiatives);
 
   const navigate = useNavigate();
 
   const handleUpdate = async (values) => {
     try {
       setIsLoading(true);
-      const updatedFeatureRequest = {
+      const updatedRequest = {
         title: values.title,
         description: values.description,
         status: status,
         estimation: values.estimation || null,
       };
-      await onUpdate(updatedFeatureRequest);
+      await onUpdate(updatedRequest);
       toast.success('The feature request has been saved');
     } catch (e) {
       toast.error('The feature request could not be saved');
@@ -80,8 +71,8 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
       .typeError('The estimation must be a number'),
   });
 
-  async function handleAddFeature(featureRequestId, initiative) {
-    initiative.featureRequest = featureRequestId;
+  async function handleAddFeature(requestId, initiative) {
+    initiative.request = requestId;
     const savedFeature = await addInitiative(orgId, projectId, initiative);
     initiatives.push(savedFeature);
     initiatives.sort(sortFeatures);
@@ -92,13 +83,13 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
     const updatedFeaturesIds = updatedFeatures.map(
       (initiative) => initiative.id,
     );
-    const featureRequestFeatures = initiatives.map((initiative) => {
+    const requestFeatures = initiatives.map((initiative) => {
       if (updatedFeaturesIds.includes(initiative.id)) {
         initiative.status = status;
       }
       return initiative;
     });
-    setInitiatives([...featureRequestFeatures]);
+    setInitiatives([...requestFeatures]);
   }
 
   function sortFeatures(a, b) {
@@ -110,7 +101,7 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
     const updatedFeaturesIds = updatedFeatures.map(
       (initiative) => initiative.id,
     );
-    const featureRequestFeatures = initiatives
+    const requestFeatures = initiatives
       .map((initiative) => {
         if (updatedFeaturesIds.includes(initiative.id)) {
           initiative.priority = priority;
@@ -118,12 +109,12 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
         return initiative;
       })
       .sort(sortFeatures);
-    setInitiatives([...featureRequestFeatures]);
+    setInitiatives([...requestFeatures]);
   }
 
   function isPlaceholderInitiativeOnly() {
     return (
-      featureRequest &&
+      request &&
       (!initiatives || initiatives.length === 1 || !initiatives[0]?.title)
     );
   }
@@ -131,10 +122,7 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
   const addInitiativesWithAi = async () => {
     try {
       const initiativesToAdd = (
-        await generateInitiativesForRequest(
-          featureRequest.title,
-          featureRequest.description,
-        )
+        await generateInitiativesForRequest(request.title, request.description)
       ).map((initiative) => {
         return {
           title: initiative.title,
@@ -145,7 +133,7 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
       });
       const savedInitiatives = [];
       for (const initiative of initiativesToAdd) {
-        initiative.featureRequest = featureRequest.id;
+        initiative.request = request.id;
         savedInitiatives.push(
           await addInitiative(orgId, projectId, initiative),
         );
@@ -163,7 +151,7 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
         isOpen={isDeleteWarningOpen}
         entity={'feature request'}
         toggle={() => setIsDeleteWarningOpen(!isDeleteWarningOpen)}
-        onDelete={() => handleDelete(featureRequest.id)}
+        onDelete={() => handleDelete(request.id)}
       />
       {isLoading && <InfiniteLoadingBar />}
       <Card>
@@ -175,10 +163,10 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
         <CardBody>
           <Formik
             initialValues={{
-              title: featureRequest?.title || '',
-              description: featureRequest?.description || '',
-              status: featureRequest?.status || '',
-              estimation: featureRequest?.estimation || '',
+              title: request?.title || '',
+              description: request?.description || '',
+              status: request?.status || '',
+              estimation: request?.estimation || '',
             }}
             validationSchema={validationSchema}
             onSubmit={handleUpdate}
@@ -293,7 +281,7 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
           </Formik>
         </CardBody>
       </Card>
-      {!isLoading && featureRequest && initiatives && (
+      {!isLoading && request && initiatives && (
         <>
           <Card>
             <CardHeader className="border-1">
@@ -304,8 +292,8 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
                     {isPlaceholderInitiativeOnly() && (
                       <AIButton
                         disabled={
-                          featureRequest?.title?.length === 0 ||
-                          featureRequest?.description?.length === 0
+                          request?.title?.length === 0 ||
+                          request?.description?.length === 0
                         }
                         onClick={addInitiativesWithAi}
                       />
@@ -317,7 +305,7 @@ export default function UpdateRequest({ featureRequest, onUpdate, onDelete }) {
             <InitiativesList
               initiatives={initiatives}
               onAddInitiative={async (initiative) => {
-                await handleAddFeature(featureRequest.id, initiative);
+                await handleAddFeature(request.id, initiative);
               }}
               onChangeStatus={updateFeaturesStatus}
               onChangePriority={updateFeaturesPriority}

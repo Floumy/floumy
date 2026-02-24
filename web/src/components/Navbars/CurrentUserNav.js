@@ -26,7 +26,7 @@ export default function CurrentUserNav() {
             href={`/auth/sign-in?redirectTo=${encodeURI(window.location.pathname)}`}
             className="nav-link"
           >
-            <span className="nav-link-inner--text text-white">Sign In</span>
+            <span className="font-weight-bold text-body">Sign In</span>
           </a>
         </NavItem>
       </Nav>

@@ -383,7 +383,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                     >
                       {requests ? (
                         <Link
-                          to={`/admin/orgs/${orgId}/projects/${projectId}/feature-requests/edit/${requests}`}
+                          to={`/admin/orgs/${orgId}/projects/${projectId}/requests/edit/${request}`}
                         >
                           Request
                           <i className="fa fa-link ml-2" />

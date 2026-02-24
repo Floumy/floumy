@@ -110,7 +110,7 @@ function BuildInPublic() {
 
     if (buildInPublicSettings.isObjectivesPagePublic) {
       setPublicLink(
-        createUrl(`/public/orgs/${orgId}/projects/${projectId}/okrs`),
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/objectives`),
       );
     } else if (buildInPublicSettings.isRoadmapPagePublic) {
       setPublicLink(
@@ -375,44 +375,6 @@ function BuildInPublic() {
                         </Row>
                       </>
                     )}
-                    <Row className="mb-3">
-                      <Col xs={6} sm={3} md={2}>
-                        Issues
-                      </Col>
-                      <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle mr-1">
-                          <input
-                            checked={buildInPublicSettings.isIssuesPagePublic}
-                            onChange={togglePublicPage('isIssuesPagePublic')}
-                            type="checkbox"
-                          />
-                          <span
-                            className="custom-toggle-slider"
-                            data-label-off="No"
-                            data-label-on="Yes"
-                          />
-                        </label>
-                      </Col>
-                    </Row>
-                    <Row className="mb-3">
-                      <Col xs={6} sm={3} md={2}>
-                        Requests
-                      </Col>
-                      <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle mr-1">
-                          <input
-                            checked={buildInPublicSettings.isRequestsPagePublic}
-                            onChange={togglePublicPage('isRequestsPagePublic')}
-                            type="checkbox"
-                          />
-                          <span
-                            className="custom-toggle-slider"
-                            data-label-off="No"
-                            data-label-on="Yes"
-                          />
-                        </label>
-                      </Col>
-                    </Row>
                   </>
                 )}
               </CardBody>
