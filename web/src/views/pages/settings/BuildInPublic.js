@@ -1,20 +1,9 @@
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Container,
-  Row,
-} from 'reactstrap';
+import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row, } from 'reactstrap';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import {
-  getBuildInPublicSettings,
-  updateBuildInPublicSettings,
-} from '../../../services/bip/build-in-public.service';
+import { getBuildInPublicSettings, updateBuildInPublicSettings, } from '../../../services/bip/build-in-public.service';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { Link, useParams } from 'react-router-dom';
 import { useBuildInPublic } from '../../../contexts/BuidInPublicContext';
@@ -54,6 +43,8 @@ function BuildInPublic() {
           isCyclesPagePublic: buildInPublicSettings.isCyclesPagePublic,
           isActiveCyclesPagePublic:
             buildInPublicSettings.isActiveCyclesPagePublic,
+          isActiveWorkPagePublic:
+            buildInPublicSettings.isActiveWorkPagePublic ?? false,
           isIssuesPagePublic: buildInPublicSettings.isIssuesPagePublic,
           isRequestsPagePublic: buildInPublicSettings.isRequestsPagePublic,
           isBuildInPublicEnabled: buildInPublicSettings.isBuildInPublicEnabled,
@@ -75,6 +66,7 @@ function BuildInPublic() {
       settings.isRoadmapPagePublic ||
       (cyclesEnabled &&
         (settings.isActiveCyclesPagePublic || settings.isCyclesPagePublic)) ||
+      (!cyclesEnabled && settings.isActiveWorkPagePublic) ||
       settings.isIssuesPagePublic ||
       settings.isRequestsPagePublic
     );
@@ -124,6 +116,10 @@ function BuildInPublic() {
       setPublicLink(
         createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-cycle`),
       );
+    } else if (!cyclesEnabled && buildInPublicSettings.isActiveWorkPagePublic) {
+      setPublicLink(
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-cycle`),
+      );
     } else if (buildInPublicSettings.isIssuesPagePublic) {
       setPublicLink(
         createUrl(`/public/orgs/${orgId}/projects/${projectId}/issues`),
@@ -133,7 +129,7 @@ function BuildInPublic() {
         createUrl(`/public/orgs/${orgId}/projects/${projectId}/requests`),
       );
     }
-  }, [buildInPublicSettings, orgId]);
+  }, [buildInPublicSettings, orgId, projectId, cyclesEnabled]);
 
   async function toggleBuildInPublic() {
     try {
@@ -142,6 +138,9 @@ function BuildInPublic() {
         isRoadmapPagePublic: !isBuildInPublicEnabled,
         isCyclesPagePublic: cyclesEnabled ? !isBuildInPublicEnabled : false,
         isActiveCyclesPagePublic: cyclesEnabled
+          ? !isBuildInPublicEnabled
+          : false,
+        isActiveWorkPagePublic: !cyclesEnabled
           ? !isBuildInPublicEnabled
           : false,
         isIssuesPagePublic: !isBuildInPublicEnabled,
@@ -325,6 +324,31 @@ function BuildInPublic() {
                         </label>
                       </Col>
                     </Row>
+                    {!cyclesEnabled && (
+                      <Row className="mb-3">
+                        <Col xs={6} sm={3} md={2}>
+                          Active Work
+                        </Col>
+                        <Col xs={6} sm={9} md={10}>
+                          <label className="custom-toggle">
+                            <input
+                              checked={
+                                buildInPublicSettings.isActiveWorkPagePublic
+                              }
+                              onChange={togglePublicPage(
+                                'isActiveWorkPagePublic',
+                              )}
+                              type="checkbox"
+                            />
+                            <span
+                              className="custom-toggle-slider"
+                              data-label-off="No"
+                              data-label-on="Yes"
+                            />
+                          </label>
+                        </Col>
+                      </Row>
+                    )}
                     {cyclesEnabled && (
                       <>
                         <Row className="mb-3">

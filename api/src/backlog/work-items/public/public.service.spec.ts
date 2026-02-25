@@ -26,6 +26,7 @@ import { BipSettings } from '../../../bip/bip-settings.entity';
 import { WorkItemStatus } from '../work-item-status.enum';
 import { Priority } from '../../../common/priority.enum';
 import { Project } from '../../../projects/project.entity';
+import { WorkItemType } from '../work-item-type.enum';
 
 describe('PublicService', () => {
   let usersService: UsersService;
@@ -37,11 +38,12 @@ describe('PublicService', () => {
   let user: User;
   let project: Project;
   let service: PublicService;
+  let module: { get: (type: unknown) => unknown };
 
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
-    const { module, cleanup: dbCleanup } = await setupTestingModule(
+    const { module: testModule, cleanup: dbCleanup } = await setupTestingModule(
       [
         TypeOrmModule.forFeature([
           Objective,
@@ -72,6 +74,7 @@ describe('PublicService', () => {
         PublicService,
       ],
     );
+    module = testModule;
     cleanup = dbCleanup;
     service = module.get<PublicService>(PublicService);
     orgsService = module.get<OrgsService>(OrgsService);
@@ -92,6 +95,7 @@ describe('PublicService', () => {
     project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
+    bipSettings.isActiveWorkPagePublic = true;
     bipSettings.org = Promise.resolve(org);
     bipSettings.project = Promise.resolve(project);
     await bipSettingsRepository.save(bipSettings);
@@ -126,6 +130,49 @@ describe('PublicService', () => {
       await orgsRepository.save(org);
       await expect(
         service.getWorkItem(org.id, project.id, 'invalid_id'),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('list open work items', () => {
+    it('should return open work items when isActiveWorkPagePublic is true', async () => {
+      const workItemsService = module.get<WorkItemsService>(WorkItemsService);
+      await workItemsService.createWorkItem(org.id, project.id, user.id, {
+        title: 'Open work item',
+        description: 'Description',
+        priority: Priority.HIGH,
+        type: WorkItemType.DELIVERABLE,
+        status: WorkItemStatus.PLANNED,
+      });
+      const result = await service.listOpenWorkItems(org.id, project.id);
+      expect(result).toBeDefined();
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toEqual('Open work item');
+    });
+
+    it('should throw when isActiveWorkPagePublic is false', async () => {
+      const bipSettings = await bipSettingsRepository.findOneBy({
+        org: { id: org.id },
+        project: { id: project.id },
+      });
+      bipSettings.isActiveWorkPagePublic = false;
+      await bipSettingsRepository.save(bipSettings);
+
+      await expect(
+        service.listOpenWorkItems(org.id, project.id),
+      ).rejects.toThrow();
+    });
+
+    it('should throw when isBuildInPublicEnabled is false', async () => {
+      const bipSettings = await bipSettingsRepository.findOneBy({
+        org: { id: org.id },
+        project: { id: project.id },
+      });
+      bipSettings.isBuildInPublicEnabled = false;
+      await bipSettingsRepository.save(bipSettings);
+
+      await expect(
+        service.listOpenWorkItems(org.id, project.id),
       ).rejects.toThrow();
     });
   });

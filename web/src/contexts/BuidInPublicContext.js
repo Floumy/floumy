@@ -15,6 +15,7 @@ export const BuildInPublicProvider = ({ children, orgId, projectId }) => {
     isRoadmapPagePublic: false,
     isSprintsPagePublic: false,
     isActiveSprintsPagePublic: false,
+    isActiveWorkPagePublic: false,
     isIssuesPagePublic: false,
     isRequestsPagePublic: false,
     isBuildInPublicEnabled: false,

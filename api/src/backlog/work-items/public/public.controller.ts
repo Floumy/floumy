@@ -15,6 +15,21 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 export class PublicController {
   constructor(private workItemsPublicService: PublicService) {}
 
+  @Get('open')
+  async listOpenWorkItems(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    try {
+      return await this.workItemsPublicService.listOpenWorkItems(
+        orgId,
+        projectId,
+      );
+    } catch (e) {
+      throw new NotFoundException();
+    }
+  }
+
   @Get('/:workItemId')
   async getWorkItem(
     @Param('orgId') orgId: string,

@@ -88,6 +88,7 @@ export class BipService {
     bipSettings.isRoadmapPagePublic = settings.isRoadmapPagePublic;
     bipSettings.isCyclesPagePublic = settings.isCyclesPagePublic;
     bipSettings.isActiveCyclesPagePublic = settings.isActiveCyclesPagePublic;
+    bipSettings.isActiveWorkPagePublic = settings.isActiveWorkPagePublic;
     bipSettings.isRequestsPagePublic = settings.isRequestsPagePublic;
     bipSettings.isIssuesPagePublic = settings.isIssuesPagePublic;
     const updatedSettings = await this.bipSettingsRepository.save(bipSettings);

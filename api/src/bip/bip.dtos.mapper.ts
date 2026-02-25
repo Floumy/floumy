@@ -8,6 +8,7 @@ export class BipSettingsMapper {
       isRoadmapPagePublic: bipSettings.isRoadmapPagePublic,
       isCyclesPagePublic: bipSettings.isCyclesPagePublic,
       isActiveCyclesPagePublic: bipSettings.isActiveCyclesPagePublic,
+      isActiveWorkPagePublic: bipSettings.isActiveWorkPagePublic,
       isIssuesPagePublic: bipSettings.isIssuesPagePublic,
       isRequestsPagePublic: bipSettings.isRequestsPagePublic,
     };

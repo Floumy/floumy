@@ -67,6 +67,7 @@ describe('PublicService', () => {
       expect(projectResult.bipSettings.isRoadmapPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isCyclesPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isActiveCyclesPagePublic).toBeDefined();
+      expect(projectResult.bipSettings.isActiveWorkPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isIssuesPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isRequestsPagePublic).toBeDefined();
     });

@@ -21,6 +21,7 @@ import {
 } from '../../../services/utils/utils';
 import { getPublicActiveCycle } from '../../../services/cycles/cycles.service';
 import { getPublicProject } from '../../../services/projects/projects.service';
+import { listPublicOpenWorkItems } from '../../../services/backlog/backlog.service';
 import DevelopmentStats from './DevelopmentStats';
 import PublicWorkItemsList from '../backlog/PublicWorkItemsList';
 import { getWorkItemsGroupedByStatus } from '../../../services/utils/workItemUtils';
@@ -28,6 +29,7 @@ import { getWorkItemsGroupedByStatus } from '../../../services/utils/workItemUti
 function PublicActiveSprint() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeCycle, setActiveSprint] = useState(null);
+  const [activeWorkItems, setActiveWorkItems] = useState([]);
   const [workItemsByStatus, setWorkItemsByStatus] = useState({});
   const [cyclesEnabled, setCyclesEnabled] = useState(true);
   const { orgId, projectId } = useParams();
@@ -38,21 +40,35 @@ function PublicActiveSprint() {
   }, []);
 
   useEffect(() => {
-    document.title = 'Floumy | Development';
-
     async function fetchData() {
       try {
         setIsLoading(true);
-        const [project, activeCycleData] = await Promise.all([
-          getPublicProject(orgId, projectId).catch(() => null),
-          getPublicActiveCycle(orgId, projectId).catch(() => null),
-        ]);
-        setCyclesEnabled(project?.cyclesEnabled ?? true);
-        setActiveSprint(activeCycleData);
-        if (activeCycleData && activeCycleData.workItems?.length > 0) {
-          setWorkItemsGroupedByStatus(activeCycleData.workItems);
+        const project = await getPublicProject(orgId, projectId).catch(
+          () => null,
+        );
+        const cyclesEnabledForProject = project?.cyclesEnabled ?? true;
+        setCyclesEnabled(cyclesEnabledForProject);
+        document.title = cyclesEnabledForProject
+          ? 'Floumy | Development'
+          : 'Floumy | Active Work';
+
+        if (cyclesEnabledForProject) {
+          const activeCycleData = await getPublicActiveCycle(
+            orgId,
+            projectId,
+          ).catch(() => null);
+          setActiveSprint(activeCycleData);
+          if (activeCycleData && activeCycleData.workItems?.length > 0) {
+            setWorkItemsGroupedByStatus(activeCycleData.workItems);
+          }
+        } else {
+          const workItems = await listPublicOpenWorkItems(
+            orgId,
+            projectId,
+          ).catch(() => []);
+          setActiveWorkItems(workItems);
+          setWorkItemsGroupedByStatus(workItems);
         }
-        setIsLoading(false);
       } catch (e) {
         console.error(e.message);
       } finally {
@@ -71,12 +87,13 @@ function PublicActiveSprint() {
         {isLoading && (
           <Card>
             <CardHeader>
-              <h3>Active Sprint</h3>
+              <h3>{cyclesEnabled ? 'Active Cycle' : 'Active Work'}</h3>
             </CardHeader>
             <LoadingSpinnerBox />
           </Card>
         )}
         {!isLoading &&
+          cyclesEnabled &&
           activeCycle &&
           activeCycle.workItems &&
           activeCycle.workItems.length > 0 && (
@@ -84,70 +101,83 @@ function PublicActiveSprint() {
           )}
         <Row>
           <Col>
-            {!isLoading && !activeCycle && (
-              <Card>
-                <CardHeader>
-                  <Row>
-                    <Col sm={6}>
-                      <h3 className="mb-0">Active Cycle</h3>
-                    </Col>
-                  </Row>
-                </CardHeader>
-                <div className="p-5 text-center">
-                  <div className="mx-auto" style={{ maxWidth: '680px' }}>
-                    {!cyclesEnabled ? (
-                      <h3 className="mb-3">
-                        Cycles are disabled for this project
-                      </h3>
-                    ) : (
-                      <h3 className="mb-3">No active cycle yet</h3>
-                    )}
-                    <p className="text-muted">
-                      {!cyclesEnabled
-                        ? 'This project does not use cycles. Active work is tracked differently.'
-                        : 'The active cycle will appear here once it starts.'}
-                    </p>
-                    <Row className="mt-4 text-left">
-                      <Col md="6" className="mb-3">
-                        <Card>
-                          <CardBody>
-                            <h5 className="mb-2">What is a Sprint?</h5>
-                            <p className="mb-0 text-sm text-muted">
-                              A fixed timeframe where the team focuses on a set
-                              of prioritized work items.
-                            </p>
-                          </CardBody>
-                        </Card>
-                      </Col>
-                      <Col md="6" className="mb-3">
-                        <Card>
-                          <CardBody>
-                            <h5 className="mb-2">What is a Work Item?</h5>
-                            <p className="mb-0 text-sm text-muted">
-                              A task, bug, or story tracked within a sprint to
-                              deliver value incrementally.
-                            </p>
-                          </CardBody>
-                        </Card>
+            {!isLoading &&
+              (cyclesEnabled ? !activeCycle : activeWorkItems.length === 0) && (
+                <Card>
+                  <CardHeader>
+                    <Row>
+                      <Col sm={6}>
+                        <h3 className="mb-0">
+                          {cyclesEnabled ? 'Active Cycle' : 'Active Work'}
+                        </h3>
                       </Col>
                     </Row>
+                  </CardHeader>
+                  <div className="p-5 text-center">
+                    <div className="mx-auto" style={{ maxWidth: '680px' }}>
+                      {cyclesEnabled ? (
+                        <>
+                          <h3 className="mb-3">No active cycle yet</h3>
+                          <p className="text-muted">
+                            The active cycle will appear here once it starts.
+                          </p>
+                          <Row className="mt-4 text-left">
+                            <Col md="6" className="mb-3">
+                              <Card>
+                                <CardBody>
+                                  <h5 className="mb-2">What is a Sprint?</h5>
+                                  <p className="mb-0 text-sm text-muted">
+                                    A fixed timeframe where the team focuses on
+                                    a set of prioritized work items.
+                                  </p>
+                                </CardBody>
+                              </Card>
+                            </Col>
+                            <Col md="6" className="mb-3">
+                              <Card>
+                                <CardBody>
+                                  <h5 className="mb-2">What is a Work Item?</h5>
+                                  <p className="mb-0 text-sm text-muted">
+                                    A task, bug, or story tracked within a
+                                    sprint to deliver value incrementally.
+                                  </p>
+                                </CardBody>
+                              </Card>
+                            </Col>
+                          </Row>
+                        </>
+                      ) : (
+                        <>
+                          <h3 className="mb-3">No open work items</h3>
+                          <p className="text-muted">
+                            There are no open work items to display.
+                          </p>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Card>
-            )}
-            {activeCycle && (
+                </Card>
+              )}
+            {((cyclesEnabled && activeCycle) ||
+              (!cyclesEnabled && activeWorkItems.length > 0)) && (
               <Card>
                 <CardHeader>
                   <Row>
                     <Col xs={12}>
-                      <h3>
-                        <span className="text-muted">
-                          {formatDate(getSprintStartDate(activeCycle))} -{' '}
-                          {formatDate(getSprintEndDate(activeCycle))}
-                        </span>{' '}
-                        | {activeCycle.title}
-                      </h3>
-                      <p className="text-muted mb-0">{activeCycle.goal}</p>
+                      {cyclesEnabled ? (
+                        <>
+                          <h3>
+                            <span className="text-muted">
+                              {formatDate(getSprintStartDate(activeCycle))} -{' '}
+                              {formatDate(getSprintEndDate(activeCycle))}
+                            </span>{' '}
+                            | {activeCycle.title}
+                          </h3>
+                          <p className="text-muted mb-0">{activeCycle.goal}</p>
+                        </>
+                      ) : (
+                        <h3 className="mb-0">Active Work</h3>
+                      )}
                     </Col>
                   </Row>
                 </CardHeader>
@@ -155,7 +185,9 @@ function PublicActiveSprint() {
                   {Object.keys(workItemsByStatus).length === 0 &&
                     !isLoading && (
                       <div className="text-center mb-3">
-                        No work items found in this sprint.
+                        {cyclesEnabled
+                          ? 'No work items found in this sprint.'
+                          : 'No open work items.'}
                       </div>
                     )}
 

@@ -75,7 +75,8 @@ function PublicSidebar({
       buildingInPublicSettings.isRoadmapPagePublic ||
       (cyclesEnabled &&
         (buildingInPublicSettings.isCyclesPagePublic ||
-          buildingInPublicSettings.isActiveCyclesPagePublic))
+          buildingInPublicSettings.isActiveCyclesPagePublic)) ||
+      (!cyclesEnabled && buildingInPublicSettings.isActiveWorkPagePublic)
     );
   }
 
@@ -145,6 +146,19 @@ function PublicSidebar({
                   >
                     <i className="fa fa-rocket" />
                     <span className="nav-link-text">Active Cycle</span>
+                  </NavLink>
+                </NavItem>
+              )}
+            {!cyclesEnabled &&
+              buildingInPublicSettings.isActiveWorkPagePublic && (
+                <NavItem>
+                  <NavLink
+                    to={`/public/orgs/${orgId}/projects/${project.id}/active-cycle`}
+                    onClick={closeSidenav}
+                    tag={NavLinkRRD}
+                  >
+                    <i className="fa fa-rocket" />
+                    <span className="nav-link-text">Active Work</span>
                   </NavLink>
                 </NavItem>
               )}

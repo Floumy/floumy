@@ -112,6 +112,17 @@ export async function getPublicWorkItem(orgId, projectId, workItemId) {
   }
 }
 
+export async function listPublicOpenWorkItems(orgId, projectId) {
+  try {
+    const response = await api.get(
+      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/work-items/open`,
+    );
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
 export async function updateWorkItem(orgId, projectId, id, workItem) {
   try {
     const response = await api.put(

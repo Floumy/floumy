@@ -322,7 +322,9 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     >
                       <div
                         className={
-                          cyclesEnabled && bipSettings.isActiveCyclesPagePublic
+                          (cyclesEnabled &&
+                            bipSettings.isActiveCyclesPagePublic) ||
+                          (!cyclesEnabled && bipSettings.isActiveWorkPagePublic)
                             ? ''
                             : 'd-none'
                         }

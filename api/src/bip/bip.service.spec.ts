@@ -52,6 +52,7 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isCyclesPagePublic: true,
         isActiveCyclesPagePublic: true,
+        isActiveWorkPagePublic: true,
         isRequestsPagePublic: true,
         isIssuesPagePublic: true,
       };
@@ -67,6 +68,7 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isCyclesPagePublic: true,
         isActiveCyclesPagePublic: true,
+        isActiveWorkPagePublic: true,
         isRequestsPagePublic: true,
         isIssuesPagePublic: true,
       };
@@ -86,6 +88,7 @@ describe('BipService', () => {
         isRoadmapPagePublic: false,
         isCyclesPagePublic: false,
         isActiveCyclesPagePublic: false,
+        isActiveWorkPagePublic: false,
         isIssuesPagePublic: false,
         isRequestsPagePublic: false,
       });
@@ -100,8 +103,9 @@ describe('BipService', () => {
         isRoadmapPagePublic: false,
         isCyclesPagePublic: false,
         isActiveCyclesPagePublic: false,
-        isRequestsPagePublic: false,
+        isActiveWorkPagePublic: false,
         isIssuesPagePublic: false,
+        isRequestsPagePublic: false,
       });
     });
     it('should not override existing settings', async () => {
@@ -111,6 +115,7 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isCyclesPagePublic: true,
         isActiveCyclesPagePublic: true,
+        isActiveWorkPagePublic: true,
         isRequestsPagePublic: true,
         isIssuesPagePublic: true,
       };
@@ -126,6 +131,7 @@ describe('BipService', () => {
         isRoadmapPagePublic: true,
         isCyclesPagePublic: true,
         isActiveCyclesPagePublic: true,
+        isActiveWorkPagePublic: true,
         isRequestsPagePublic: true,
         isIssuesPagePublic: true,
       };
