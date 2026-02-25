@@ -62,10 +62,9 @@ function PublicActiveSprint() {
             setWorkItemsGroupedByStatus(activeCycleData.workItems);
           }
         } else {
-          const workItems = await listPublicOpenWorkItems(
-            orgId,
-            projectId,
-          ).catch(() => []);
+          const workItems = await listPublicOpenWorkItems(orgId, projectId, {
+            includeRecentCompleted: true,
+          }).catch(() => []);
           setActiveWorkItems(workItems);
           setWorkItemsGroupedByStatus(workItems);
         }
@@ -191,29 +190,40 @@ function PublicActiveSprint() {
                       </div>
                     )}
 
-                  {Object.keys(workItemsByStatus).map((status) => (
-                    <div key={status} className="mb-5">
-                      <Row className="pl-4 pt-2 pr-4 mb-1">
-                        <Col>
-                          <Badge color="" className="badge-dot mb-2">
-                            <h4 className="mb-0">
-                              <i
-                                className={workItemStatusColorClassName(status)}
-                              />{' '}
-                              {formatHyphenatedString(status)}
-                            </h4>
-                          </Badge>
-                        </Col>
-                      </Row>
-                      <PublicWorkItemsList
-                        orgId={orgId}
-                        workItems={workItemsByStatus[status]}
-                        showInitiative={true}
-                        headerClassName={'thead'}
-                        showStatus={false}
-                      />
-                    </div>
-                  ))}
+                  {Object.keys(workItemsByStatus).map((status) => {
+                    const showLast30DaysLabel =
+                      !cyclesEnabled &&
+                      (status === 'done' || status === 'closed');
+                    const statusLabel = showLast30DaysLabel
+                      ? `${formatHyphenatedString(status)} (last 30 days)`
+                      : formatHyphenatedString(status);
+
+                    return (
+                      <div key={status} className="mb-5">
+                        <Row className="pl-4 pt-2 pr-4 mb-1">
+                          <Col>
+                            <Badge color="" className="badge-dot mb-2">
+                              <h4 className="mb-0">
+                                <i
+                                  className={workItemStatusColorClassName(
+                                    status,
+                                  )}
+                                />{' '}
+                                {statusLabel}
+                              </h4>
+                            </Badge>
+                          </Col>
+                        </Row>
+                        <PublicWorkItemsList
+                          orgId={orgId}
+                          workItems={workItemsByStatus[status]}
+                          showInitiative={true}
+                          headerClassName={'thead'}
+                          showStatus={false}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
                 {isLoading && <LoadingSpinnerBox />}
               </Card>

@@ -3,6 +3,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { PublicService } from './public.service';
@@ -19,11 +20,13 @@ export class PublicController {
   async listOpenWorkItems(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
+    @Query('includeRecentCompleted') includeRecentCompleted?: string,
   ) {
     try {
       return await this.workItemsPublicService.listOpenWorkItems(
         orgId,
         projectId,
+        includeRecentCompleted === 'true',
       );
     } catch (e) {
       throw new NotFoundException();

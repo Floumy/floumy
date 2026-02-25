@@ -115,6 +115,7 @@ export class WorkItemsController {
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Request() request,
+    @Query('includeRecentCompleted') includeRecentCompleted?: string,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
@@ -123,6 +124,7 @@ export class WorkItemsController {
     return await this.workItemsService.listOpenWorkItemsWithoutCycles(
       orgId,
       projectId,
+      includeRecentCompleted === 'true',
     );
   }
 

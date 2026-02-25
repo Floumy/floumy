@@ -60,7 +60,9 @@ function ActiveSprint() {
             setWorkItemsGroupedByStatus(activeCycle.workItems);
           }
         } else {
-          const workItems = await listOpenWorkItems(orgId, projectId);
+          const workItems = await listOpenWorkItems(orgId, projectId, {
+            includeRecentCompleted: true,
+          });
           setActiveWorkItems(workItems);
           setWorkItemsGroupedByStatus(workItems);
         }
@@ -195,7 +197,19 @@ function ActiveSprint() {
                     <Row>
                       <Col sm={6}>
                         <h2 className="mb-0">
-                          {cyclesEnabled ? 'Active Sprint' : 'Active Work'}
+                          {cyclesEnabled ? (
+                            'Active Sprint'
+                          ) : (
+                            <>
+                              Active Work{' '}
+                              <Link
+                                to={`/admin/orgs/${orgId}/projects/${projectId}/work-items`}
+                                className="btn btn-sm btn-outline-primary ml-2"
+                              >
+                                All Work Items
+                              </Link>
+                            </>
+                          )}
                         </h2>
                       </Col>
                     </Row>
@@ -291,7 +305,15 @@ function ActiveSprint() {
                           <p className="text-muted mb-0">{activeCycle.goal}</p>
                         </>
                       ) : (
-                        <h3 className="mb-0">Active Work</h3>
+                        <h3 className="mb-0">
+                          Active Work{' '}
+                          <Link
+                            to={`/admin/orgs/${orgId}/projects/${projectId}/work-items`}
+                            className="btn btn-sm btn-outline-primary ml-2"
+                          >
+                            All Work Items
+                          </Link>
+                        </h3>
                       )}
                     </Col>
                     {cyclesEnabled && (
@@ -343,39 +365,50 @@ function ActiveSprint() {
                       </div>
                     )}
 
-                  {Object.keys(workItemsByStatus).map((status) => (
-                    <div key={status} className="mb-5">
-                      <Row className="pl-4 pt-2 pr-4 mb-1">
-                        <Col>
-                          <Badge color="" className="badge-dot mb-2">
-                            <h4 className="mb-0">
-                              <i
-                                className={workItemStatusColorClassName(status)}
-                              />{' '}
-                              {formatHyphenatedString(status)}
-                            </h4>
-                          </Badge>
-                        </Col>
-                      </Row>
-                      <WorkItemsList
-                        workItems={workItemsByStatus[status]}
-                        showInitiative={true}
-                        showAssignedTo={true}
-                        showStatus={false}
-                        onChangeSprint={
-                          cyclesEnabled ? handleChangeSprint : undefined
-                        }
-                        onChangeCycle={
-                          cyclesEnabled ? handleChangeSprint : undefined
-                        }
-                        onChangeStatus={updateWorkItemsStatus}
-                        onChangePriority={updateWorkItemsPriority}
-                        onChangeAssignee={updateWorkItemAssignee}
-                        onDelete={removeWorkItemsFromActiveSprint}
-                        headerClassName={'thead'}
-                      />
-                    </div>
-                  ))}
+                  {Object.keys(workItemsByStatus).map((status) => {
+                    const showLast30DaysLabel =
+                      !cyclesEnabled &&
+                      (status === 'done' || status === 'closed');
+                    const statusLabel = showLast30DaysLabel
+                      ? `${formatHyphenatedString(status)} (last 30 days)`
+                      : formatHyphenatedString(status);
+
+                    return (
+                      <div key={status} className="mb-5">
+                        <Row className="pl-4 pt-2 pr-4 mb-1">
+                          <Col>
+                            <Badge color="" className="badge-dot mb-2">
+                              <h4 className="mb-0">
+                                <i
+                                  className={workItemStatusColorClassName(
+                                    status,
+                                  )}
+                                />{' '}
+                                {statusLabel}
+                              </h4>
+                            </Badge>
+                          </Col>
+                        </Row>
+                        <WorkItemsList
+                          workItems={workItemsByStatus[status]}
+                          showInitiative={true}
+                          showAssignedTo={true}
+                          showStatus={false}
+                          onChangeSprint={
+                            cyclesEnabled ? handleChangeSprint : undefined
+                          }
+                          onChangeCycle={
+                            cyclesEnabled ? handleChangeSprint : undefined
+                          }
+                          onChangeStatus={updateWorkItemsStatus}
+                          onChangePriority={updateWorkItemsPriority}
+                          onChangeAssignee={updateWorkItemAssignee}
+                          onDelete={removeWorkItemsFromActiveSprint}
+                          headerClassName={'thead'}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
                 {isLoading && <LoadingSpinnerBox />}
               </Card>

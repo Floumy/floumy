@@ -79,11 +79,21 @@ export async function searchWorkItemsWithOptions(
   }
 }
 
-export async function listOpenWorkItems(orgId, projectId) {
+export async function listOpenWorkItems(
+  orgId,
+  projectId,
+  options = { includeRecentCompleted: false },
+) {
   try {
-    const response = await api.get(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/open`,
-    );
+    const params = new URLSearchParams();
+    if (options.includeRecentCompleted) {
+      params.set('includeRecentCompleted', 'true');
+    }
+    const queryString = params.toString();
+    const url = `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/open${
+      queryString ? `?${queryString}` : ''
+    }`;
+    const response = await api.get(url);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -112,11 +122,21 @@ export async function getPublicWorkItem(orgId, projectId, workItemId) {
   }
 }
 
-export async function listPublicOpenWorkItems(orgId, projectId) {
+export async function listPublicOpenWorkItems(
+  orgId,
+  projectId,
+  options = { includeRecentCompleted: false },
+) {
   try {
-    const response = await api.get(
-      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/work-items/open`,
-    );
+    const params = new URLSearchParams();
+    if (options.includeRecentCompleted) {
+      params.set('includeRecentCompleted', 'true');
+    }
+    const queryString = params.toString();
+    const url = `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/work-items/open${
+      queryString ? `?${queryString}` : ''
+    }`;
+    const response = await api.get(url);
     return response.data;
   } catch (e) {
     throw new Error(e.message);

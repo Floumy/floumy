@@ -1,9 +1,20 @@
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
 import SimpleHeader from '../../../components/Headers/SimpleHeader';
-import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row, } from 'reactstrap';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Container,
+  Row,
+} from 'reactstrap';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { getBuildInPublicSettings, updateBuildInPublicSettings, } from '../../../services/bip/build-in-public.service';
+import {
+  getBuildInPublicSettings,
+  updateBuildInPublicSettings,
+} from '../../../services/bip/build-in-public.service';
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { Link, useParams } from 'react-router-dom';
 import { useBuildInPublic } from '../../../contexts/BuidInPublicContext';

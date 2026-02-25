@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUpdateWorkItemDto, WorkItemPatchDto } from './dtos';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Initiative } from '../../roadmap/initiatives/initiative.entity';
-import { In, Repository } from 'typeorm';
+import { Brackets, In, Repository } from 'typeorm';
 import { WorkItem } from './work-item.entity';
 import WorkItemMapper from './work-item.mapper';
 import { WorkItemStatus } from './work-item-status.enum';
@@ -19,11 +19,7 @@ import { Issue } from '../../issues/issue.entity';
 import { Project } from '../../projects/project.entity';
 import { FilterOptions, WorkItemQueryBuilder } from './work-item.query-builder';
 import { CreateNotificationDto } from '../../notifications/dtos';
-import {
-  ActionType,
-  EntityType,
-  StatusType,
-} from '../../notifications/notification.entity';
+import { ActionType, EntityType, StatusType, } from '../../notifications/notification.entity';
 
 @Injectable()
 export class WorkItemsService {
@@ -201,19 +197,47 @@ export class WorkItemsService {
     );
   }
 
-  async listOpenWorkItemsWithoutCycles(orgId: string, projectId: string) {
-    const workItems = await this.workItemsRepository
+  async listOpenWorkItemsWithoutCycles(
+    orgId: string,
+    projectId: string,
+    includeRecentCompleted = false,
+  ) {
+    const qb = this.workItemsRepository
       .createQueryBuilder('workItem')
       .leftJoinAndSelect('workItem.initiative', 'initiative')
       .leftJoinAndSelect('workItem.assignedTo', 'assignedTo')
       .where('workItem.orgId = :orgId', { orgId })
       .andWhere('workItem.projectId = :projectId', { projectId })
-      .andWhere('workItem.status NOT IN (:closedStatus, :doneStatus)', {
+      .andWhere('workItem.cycleId IS NULL');
+
+    if (includeRecentCompleted) {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      qb.andWhere(
+        new Brackets((subQb) => {
+          subQb
+            .where('workItem.status NOT IN (:closedStatus, :doneStatus)', {
+              closedStatus: WorkItemStatus.CLOSED,
+              doneStatus: WorkItemStatus.DONE,
+            })
+            .orWhere(
+              'workItem.status IN (:closedStatus, :doneStatus) AND workItem.completedAt >= :oneMonthAgo',
+              {
+                closedStatus: WorkItemStatus.CLOSED,
+                doneStatus: WorkItemStatus.DONE,
+                oneMonthAgo,
+              },
+            );
+        }),
+      );
+    } else {
+      qb.andWhere('workItem.status NOT IN (:closedStatus, :doneStatus)', {
         closedStatus: WorkItemStatus.CLOSED,
         doneStatus: WorkItemStatus.DONE,
-      })
-      .andWhere('workItem.cycleId IS NULL')
-      .getMany();
+      });
+    }
+
+    const workItems = await qb.getMany();
     return await WorkItemMapper.toListDto(workItems);
   }
 
@@ -570,74 +594,5 @@ export class WorkItemsService {
 
   private isReference(search: string) {
     return /^[Ww][Ii]-\d+$/.test(search);
-  }
-
-  private async searchWorkItemsByTitleOrDescription(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-            SELECT *
-            FROM work_item
-            WHERE work_item."orgId" = $1
-              AND work_item."projectId" = $2
-              AND (work_item.title ILIKE $3 OR work_item.description ILIKE $3)
-            ORDER BY CASE
-                         WHEN work_item."priority" = 'high' THEN 1
-                         WHEN work_item."priority" = 'medium' THEN 2
-                         WHEN work_item."priority" = 'low' THEN 3
-                         ELSE 4
-                         END,
-                     work_item."createdAt" DESC
-        `;
-    let params = [orgId, projectId, `%${search}%`] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, `%${search}%`, offset, limit];
-    }
-
-    const workItems = await this.workItemsRepository.query(query, params);
-
-    return WorkItemMapper.toSimpleListDto(workItems);
-  }
-
-  private async searchWorkItemsByReference(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-            SELECT *
-            FROM work_item
-            WHERE work_item."orgId" = $1
-              AND work_item."projectId" = $2
-              AND LOWER(work_item."reference") = LOWER($3)
-            ORDER BY CASE
-                         WHEN work_item."priority" = 'high' THEN 1
-                         WHEN work_item."priority" = 'medium' THEN 2
-                         WHEN work_item."priority" = 'low' THEN 3
-                         ELSE 4
-                         END,
-                     work_item."createdAt" DESC
-        `;
-
-    let params = [orgId, projectId, search] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, search, offset, limit];
-    }
-
-    const workItems = await this.workItemsRepository.query(query, params);
-
-    return WorkItemMapper.toSimpleListDto(workItems);
   }
 }
