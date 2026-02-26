@@ -24,6 +24,7 @@ import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
 import { useOrg } from '../../contexts/OrgContext';
 import { KeyShortcut, ShortcutsModal } from '../Shortcuts';
+import { getNavigationItems, getNavKey } from '../../utils/sidebarNavigation';
 
 function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
@@ -78,27 +79,13 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
 
   const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
   const codeEnabled = currentProject?.codeEnabled ?? false;
+  const navItems = getNavigationItems(cyclesEnabled, codeEnabled);
   const shortcutsItems = [
-    { description: 'Go to OKRs', keys: ['1'], id: 'okrs' },
-    { description: 'Go to Roadmap', keys: ['2'], id: 'roadmap' },
-    {
-      description: cyclesEnabled ? 'Go to Active Cycle' : 'Go to Active Work',
-      keys: ['3'],
-      id: 'active-cycle',
-    },
-    ...(cyclesEnabled
-      ? [{ description: 'Go to Cycles', keys: ['4'], id: 'cycles' }]
-      : []),
-    { description: 'Go to Pages', keys: ['5'], id: 'pages' },
-    ...(codeEnabled
-      ? [{ description: 'Go to Code', keys: ['6'], id: 'code' }]
-      : []),
-    { description: 'Go to Issues', keys: ['7'], id: 'issues' },
-    {
-      description: 'Go to Requests',
-      keys: ['8'],
-      id: 'requests',
-    },
+    ...navItems.map((item) => ({
+      description: item.description,
+      keys: [item.key],
+      id: item.id,
+    })),
     {
       description: 'Create a Work Item',
       keys: ['w'],
@@ -230,13 +217,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         role="button"
                         onClick={toggleShortcutsModal}
                       >
-                        <KeyShortcut keys={['1']} />
+                        <KeyShortcut
+                          keys={[getNavKey(cyclesEnabled, codeEnabled, 'okrs')]}
+                        />
                       </span>
                       <UncontrolledTooltip
                         target="shortcut-okrs"
                         placement="top"
                       >
-                        Press 1 to go to OKRs. Click to see all shortcuts.
+                        Press {getNavKey(cyclesEnabled, codeEnabled, 'okrs')} to
+                        go to OKRs. Click to see all shortcuts.
                       </UncontrolledTooltip>
                     </Col>
                   </Row>
@@ -290,13 +280,18 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         role="button"
                         onClick={toggleShortcutsModal}
                       >
-                        <KeyShortcut keys={['2']} />
+                        <KeyShortcut
+                          keys={[
+                            getNavKey(cyclesEnabled, codeEnabled, 'roadmap'),
+                          ]}
+                        />
                       </span>
                       <UncontrolledTooltip
                         target="shortcut-roadmap"
                         placement="top"
                       >
-                        Press 2 to go to Roadmap. Click to see all shortcuts.
+                        Press {getNavKey(cyclesEnabled, codeEnabled, 'roadmap')}{' '}
+                        to go to Roadmap. Click to see all shortcuts.
                       </UncontrolledTooltip>
                     </Col>
                   </Row>
@@ -357,13 +352,23 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         role="button"
                         onClick={toggleShortcutsModal}
                       >
-                        <KeyShortcut keys={['3']} />
+                        <KeyShortcut
+                          keys={[
+                            getNavKey(
+                              cyclesEnabled,
+                              codeEnabled,
+                              'active-cycle',
+                            ),
+                          ]}
+                        />
                       </span>
                       <UncontrolledTooltip
                         target="shortcut-active-sprint"
                         placement="top"
                       >
-                        Press 3 to go to{' '}
+                        Press{' '}
+                        {getNavKey(cyclesEnabled, codeEnabled, 'active-cycle')}{' '}
+                        to go to{' '}
                         {cyclesEnabled ? 'Active Cycle' : 'Active Work'}. Click
                         to see all shortcuts.
                       </UncontrolledTooltip>
@@ -420,13 +425,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           role="button"
                           onClick={toggleShortcutsModal}
                         >
-                          <KeyShortcut keys={['4']} />
+                          <KeyShortcut
+                            keys={[
+                              getNavKey(cyclesEnabled, codeEnabled, 'cycles'),
+                            ]}
+                          />
                         </span>
                         <UncontrolledTooltip
                           target="shortcut-sprints"
                           placement="top"
                         >
-                          Press 4 to go to Cycles. Click to see all shortcuts.
+                          Press{' '}
+                          {getNavKey(cyclesEnabled, codeEnabled, 'cycles')} to
+                          go to Cycles. Click to see all shortcuts.
                         </UncontrolledTooltip>
                       </Col>
                     </Row>
@@ -495,13 +506,18 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         role="button"
                         onClick={toggleShortcutsModal}
                       >
-                        <KeyShortcut keys={['5']} />
+                        <KeyShortcut
+                          keys={[
+                            getNavKey(cyclesEnabled, codeEnabled, 'pages'),
+                          ]}
+                        />
                       </span>
                       <UncontrolledTooltip
                         target="shortcut-pages"
                         placement="top"
                       >
-                        Press 5 to go to Pages. Click to see all shortcuts.
+                        Press {getNavKey(cyclesEnabled, codeEnabled, 'pages')}{' '}
+                        to go to Pages. Click to see all shortcuts.
                       </UncontrolledTooltip>
                     </Col>
                   </Row>
@@ -525,13 +541,18 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           role="button"
                           onClick={toggleShortcutsModal}
                         >
-                          <KeyShortcut keys={['6']} />
+                          <KeyShortcut
+                            keys={[
+                              getNavKey(cyclesEnabled, codeEnabled, 'code'),
+                            ]}
+                          />
                         </span>
                         <UncontrolledTooltip
                           target="shortcut-code"
                           placement="top"
                         >
-                          Press 6 to go to Code. Click to see all shortcuts.
+                          Press {getNavKey(cyclesEnabled, codeEnabled, 'code')}{' '}
+                          to go to Code. Click to see all shortcuts.
                         </UncontrolledTooltip>
                       </Col>
                     </Row>
@@ -597,13 +618,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           role="button"
                           onClick={toggleShortcutsModal}
                         >
-                          <KeyShortcut keys={['7']} />
+                          <KeyShortcut
+                            keys={[
+                              getNavKey(cyclesEnabled, codeEnabled, 'issues'),
+                            ]}
+                          />
                         </span>
                         <UncontrolledTooltip
                           target="shortcut-issues"
                           placement="top"
                         >
-                          Press 7 to go to Issues. Click to see all shortcuts.
+                          Press{' '}
+                          {getNavKey(cyclesEnabled, codeEnabled, 'issues')} to
+                          go to Issues. Click to see all shortcuts.
                         </UncontrolledTooltip>
                       </Col>
                     </Row>
@@ -657,13 +684,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           role="button"
                           onClick={toggleShortcutsModal}
                         >
-                          <KeyShortcut keys={['8']} />
+                          <KeyShortcut
+                            keys={[
+                              getNavKey(cyclesEnabled, codeEnabled, 'requests'),
+                            ]}
+                          />
                         </span>
                         <UncontrolledTooltip
                           target="shortcut-feature-requests"
                           placement="top"
                         >
-                          Press 8 to go to Requests. Click to see all shortcuts.
+                          Press{' '}
+                          {getNavKey(cyclesEnabled, codeEnabled, 'requests')} to
+                          go to Requests. Click to see all shortcuts.
                         </UncontrolledTooltip>
                       </Col>
                     </Row>
