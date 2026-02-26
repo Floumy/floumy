@@ -52,6 +52,7 @@ describe('BipController', () => {
           },
         },
         {
+          isActiveWorkPagePublic: false,
           isBuildInPublicEnabled: true,
           isObjectivesPagePublic: true,
           isRoadmapPagePublic: true,
@@ -62,6 +63,7 @@ describe('BipController', () => {
         },
       );
       expect(updatedSettings).toEqual({
+        isActiveWorkPagePublic: false,
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
@@ -84,6 +86,7 @@ describe('BipController', () => {
           },
         },
         {
+          isActiveWorkPagePublic: false,
           isBuildInPublicEnabled: true,
           isObjectivesPagePublic: true,
           isRoadmapPagePublic: true,
@@ -99,6 +102,7 @@ describe('BipController', () => {
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
         isCyclesPagePublic: true,
+        isActiveWorkPagePublic: false,
         isActiveCyclesPagePublic: true,
         isIssuesPagePublic: true,
         isRequestsPagePublic: true,
