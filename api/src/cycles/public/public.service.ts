@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Timeline } from '../../common/timeline.enum';
 import { CyclesService } from '../cycles.service';
 import { CycleMapper } from './public.mapper';
@@ -51,7 +51,7 @@ export class PublicService {
       bipSettings.isBuildInPublicEnabled === false ||
       bipSettings.isActiveCyclesPagePublic === false
     ) {
-      throw new Error('Building in public is not enabled');
+      throw new NotFoundException();
     }
 
     const cycle = await this.cyclesService.findActiveCycle(orgId, projectId);
@@ -69,8 +69,12 @@ export class PublicService {
 
     const bipSettings = await project.bipSettings;
 
-    if (!bipSettings || bipSettings.isBuildInPublicEnabled === false) {
-      throw new Error('Building in public is not enabled');
+    if (
+      !bipSettings ||
+      bipSettings.isBuildInPublicEnabled === false ||
+      bipSettings.isCyclesPagePublic === false
+    ) {
+      throw new NotFoundException();
     }
   }
 }

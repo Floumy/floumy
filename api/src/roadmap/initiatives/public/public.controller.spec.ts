@@ -89,6 +89,7 @@ describe('PublicController', () => {
     project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
+    bipSettings.isRoadmapPagePublic = true;
     bipSettings.org = Promise.resolve(org);
     bipSettings.project = Promise.resolve(project);
     await bipRepository.save(bipSettings);
@@ -120,10 +121,11 @@ describe('PublicController', () => {
         'testtesttest',
       );
       const newOrg = await orgsService.createForUser(newUser);
+      const newProject = (await newOrg.projects)[0];
       const initiative = new Initiative();
       initiative.title = 'Test Feature';
       initiative.org = Promise.resolve(newOrg);
-      initiative.project = Promise.resolve(project);
+      initiative.project = Promise.resolve(newProject);
       await initiativesRepository.save(initiative);
       await expect(
         controller.getFeature(org.id, project.id, initiative.id),

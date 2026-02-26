@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   Get,
+  NotFoundException,
   Param,
   UseInterceptors,
 } from '@nestjs/common';
@@ -29,6 +30,7 @@ export class PublicController {
         timeline,
       );
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException();
     }
   }
@@ -41,6 +43,7 @@ export class PublicController {
     try {
       return await this.publicCyclesService.getActiveCycle(orgId, projectId);
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException();
     }
   }
@@ -58,6 +61,7 @@ export class PublicController {
         cycleId,
       );
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException();
     }
   }

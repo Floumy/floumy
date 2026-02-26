@@ -13,6 +13,8 @@ import { IssueComment } from './issue-comment.entity';
 import { IssueStatus } from './issue-status.enum';
 import { Priority } from '../common/priority.enum';
 import { Project } from '../projects/project.entity';
+import { BipSettings } from '../bip/bip-settings.entity';
+import { BipModule } from '../bip/bip.module';
 
 describe('IssuesController', () => {
   let controller: IssuesController;
@@ -25,7 +27,18 @@ describe('IssuesController', () => {
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
-      [TypeOrmModule.forFeature([Org, User, Issue, IssueComment]), UsersModule],
+      [
+        TypeOrmModule.forFeature([
+          Org,
+          User,
+          Issue,
+          IssueComment,
+          Project,
+          BipSettings,
+        ]),
+        UsersModule,
+        BipModule,
+      ],
       [IssuesService],
       [IssuesController],
     );
@@ -49,6 +62,16 @@ describe('IssuesController', () => {
     project.name = 'Test Project';
     project.org = Promise.resolve(org);
     await projectsRepository.save(project);
+
+    const bipSettingsRepository = module.get<Repository<BipSettings>>(
+      getRepositoryToken(BipSettings),
+    );
+    const bipSettings = new BipSettings();
+    bipSettings.isBuildInPublicEnabled = true;
+    bipSettings.isIssuesPagePublic = true;
+    bipSettings.org = Promise.resolve(org);
+    bipSettings.project = Promise.resolve(project);
+    await bipSettingsRepository.save(bipSettings);
   });
 
   afterEach(async () => {

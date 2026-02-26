@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BipSettingsDto } from './bip.dtos';
 import { Repository } from 'typeorm';
 import { BipSettings } from './bip-settings.entity';
@@ -43,6 +43,80 @@ export class BipService {
       org: { id: orgId },
       project: { id: projectId },
     });
+    return BipSettingsMapper.toDto(bipSettings);
+  }
+
+  async validatePageAccess(
+    orgId: string,
+    projectId: string,
+    page:
+      | 'objectives'
+      | 'roadmap'
+      | 'cycles'
+      | 'activeCycles'
+      | 'activeWork'
+      | 'issues'
+      | 'requests',
+  ): Promise<void> {
+    const project = await this.projectsRepository.findOneByOrFail({
+      id: projectId,
+      org: { id: orgId },
+    });
+    const bipSettings = await project.bipSettings;
+
+    if (!bipSettings?.isBuildInPublicEnabled) {
+      throw new NotFoundException();
+    }
+
+    const cyclesEnabled = project.cyclesEnabled ?? false;
+    let allowed = false;
+
+    switch (page) {
+      case 'objectives':
+        allowed = !!bipSettings.isObjectivesPagePublic;
+        break;
+      case 'roadmap':
+        allowed = !!bipSettings.isRoadmapPagePublic;
+        break;
+      case 'cycles':
+        allowed = !!bipSettings.isCyclesPagePublic;
+        break;
+      case 'activeCycles':
+        allowed = cyclesEnabled && !!bipSettings.isActiveCyclesPagePublic;
+        break;
+      case 'activeWork':
+        allowed = !cyclesEnabled && !!bipSettings.isActiveWorkPagePublic;
+        break;
+      case 'issues':
+        allowed = !!bipSettings.isIssuesPagePublic;
+        break;
+      case 'requests':
+        allowed = !!bipSettings.isRequestsPagePublic;
+        break;
+    }
+
+    if (!allowed) {
+      throw new NotFoundException();
+    }
+  }
+
+  async getSettingsOrDefaults(orgId: string, projectId: string) {
+    const bipSettings = await this.bipSettingsRepository.findOneBy({
+      org: { id: orgId },
+      project: { id: projectId },
+    });
+    if (!bipSettings) {
+      return {
+        isBuildInPublicEnabled: false,
+        isObjectivesPagePublic: false,
+        isRoadmapPagePublic: false,
+        isCyclesPagePublic: false,
+        isActiveCyclesPagePublic: false,
+        isActiveWorkPagePublic: false,
+        isIssuesPagePublic: false,
+        isRequestsPagePublic: false,
+      } as BipSettingsDto;
+    }
     return BipSettingsMapper.toDto(bipSettings);
   }
 

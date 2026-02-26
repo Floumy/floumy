@@ -89,6 +89,7 @@ describe('PublicController', () => {
     project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
+    bipSettings.isCyclesPagePublic = true;
     bipSettings.org = Promise.resolve(org);
     bipSettings.project = Promise.resolve(project);
     await bipSettingsRepository.save(bipSettings);

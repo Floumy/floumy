@@ -14,6 +14,8 @@ import { RequestVote } from './request-vote.entity';
 import { RequestComment } from './request-comment.entity';
 import { Project } from '../projects/project.entity';
 import { RequestStatus } from './request-status.enum';
+import { BipSettings } from '../bip/bip-settings.entity';
+import { BipModule } from '../bip/bip.module';
 
 describe('RequestsController', () => {
   let controller: RequestsController;
@@ -32,8 +34,11 @@ describe('RequestsController', () => {
           Request,
           RequestVote,
           RequestComment,
+          Project,
+          BipSettings,
         ]),
         UsersModule,
+        BipModule,
       ],
       [RequestsService, RequestVoteService],
       [RequestsController],
@@ -52,6 +57,16 @@ describe('RequestsController', () => {
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
 
     await orgsRepository.save(org);
+
+    const bipSettingsRepository = module.get<Repository<BipSettings>>(
+      getRepositoryToken(BipSettings),
+    );
+    const bipSettings = new BipSettings();
+    bipSettings.isBuildInPublicEnabled = true;
+    bipSettings.isRequestsPagePublic = true;
+    bipSettings.org = Promise.resolve(org);
+    bipSettings.project = Promise.resolve(project);
+    await bipSettingsRepository.save(bipSettings);
   });
 
   afterEach(async () => {

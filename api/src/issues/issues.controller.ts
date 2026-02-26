@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -18,10 +19,14 @@ import { AuthGuard } from '../auth/auth.guard';
 import { IssueDto, UpdateIssueDto } from './dtos';
 import { Public } from '../auth/public.guard';
 import type { CreateUpdateCommentDto } from '../comments/dtos';
+import { BipService } from '../bip/bip.service';
 
 @Controller('/orgs/:orgId/projects/:projectId/issues')
 export class IssuesController {
-  constructor(private issuesService: IssuesService) {}
+  constructor(
+    private issuesService: IssuesService,
+    private bipService: BipService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -54,8 +59,10 @@ export class IssuesController {
     @Query('limit') limit: number = 0,
   ) {
     try {
+      await this.bipService.validatePageAccess(orgId, projectId, 'issues');
       return await this.issuesService.listIssues(orgId, projectId, page, limit);
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException(e.message);
     }
   }
@@ -91,8 +98,10 @@ export class IssuesController {
     @Param('issueId') issueId: string,
   ) {
     try {
+      await this.bipService.validatePageAccess(orgId, projectId, 'issues');
       return await this.issuesService.getIssueById(orgId, projectId, issueId);
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException(e.message);
     }
   }

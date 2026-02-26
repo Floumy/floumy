@@ -11,6 +11,7 @@ import { PublicController } from './public/public.controller';
 import { CacheModule } from '@nestjs/cache-manager';
 import { PublicService } from './public/public.service';
 import { FilesModule } from '../files/files.module';
+import { BipModule } from '../bip/bip.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { FilesModule } from '../files/files.module';
     UsersModule,
     AuthModule,
     FilesModule,
+    BipModule,
   ],
   providers: [ProjectsService, PublicService],
   controllers: [ProjectsController, PublicController],

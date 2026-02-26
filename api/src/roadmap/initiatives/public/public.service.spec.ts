@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { PublicService } from './public.service';
 import { UsersService } from '../../../users/users.service';
 import { InitiativesService } from '../initiatives.service';
@@ -92,6 +93,7 @@ describe('PublicService', () => {
     project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
+    bipSettings.isRoadmapPagePublic = true;
     bipSettings.org = Promise.resolve(org);
     bipSettings.project = Promise.resolve(project);
     await bipRepository.save(bipSettings);
@@ -139,7 +141,7 @@ describe('PublicService', () => {
       await initiativesRepository.save(initiative);
       await expect(
         service.getInitiative(newOrg.id, newProject.id, initiative.id),
-      ).rejects.toThrow('Roadmap page is not public');
+      ).rejects.toThrow(NotFoundException);
     });
     it('should throw an error if the initiative does not belong to the org', async () => {
       const newUser = await usersService.createUserWithOrg(

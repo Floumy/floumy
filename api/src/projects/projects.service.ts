@@ -7,6 +7,7 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FilesService } from '../files/files.service';
+import { BipService } from '../bip/bip.service';
 
 @Injectable()
 export class ProjectsService {
@@ -17,6 +18,7 @@ export class ProjectsService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly eventEmitter: EventEmitter2,
     private readonly fileService: FilesService,
+    private readonly bipService: BipService,
   ) {}
 
   async listProjects(orgId: string) {
@@ -84,6 +86,11 @@ export class ProjectsService {
       await this.validateProjectName(orgId, updateProjectDto.name);
     }
 
+    const cyclesEnabledChanged =
+      updateProjectDto.cyclesEnabled !== undefined &&
+      project.cyclesEnabled !== updateProjectDto.cyclesEnabled;
+    const newCyclesEnabled = updateProjectDto.cyclesEnabled;
+
     project.name = updateProjectDto.name;
     project.description = updateProjectDto?.description;
     if (updateProjectDto.cyclesEnabled !== undefined) {
@@ -93,7 +100,40 @@ export class ProjectsService {
       project.codeEnabled = updateProjectDto.codeEnabled;
     }
     await this.projectsRepository.save(project);
+
+    if (cyclesEnabledChanged) {
+      await this.syncBipSettingsForCyclesToggle(
+        orgId,
+        projectId,
+        newCyclesEnabled,
+      );
+    }
+
     return await ProjectMapper.toDto(project);
+  }
+
+  private async syncBipSettingsForCyclesToggle(
+    orgId: string,
+    projectId: string,
+    cyclesEnabled: boolean,
+  ) {
+    const bipSettings = await this.bipService.getSettingsOrDefaults(
+      orgId,
+      projectId,
+    );
+
+    if (cyclesEnabled) {
+      await this.bipService.createOrUpdateSettings(orgId, projectId, {
+        ...bipSettings,
+        isActiveWorkPagePublic: false,
+      });
+    } else {
+      await this.bipService.createOrUpdateSettings(orgId, projectId, {
+        ...bipSettings,
+        isCyclesPagePublic: false,
+        isActiveCyclesPagePublic: false,
+      });
+    }
   }
 
   async deleteProject(orgId: string, projectId: string) {

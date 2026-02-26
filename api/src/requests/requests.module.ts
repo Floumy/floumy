@@ -12,6 +12,7 @@ import { RequestVote } from './request-vote.entity';
 import { RequestComment } from './request-comment.entity';
 import { Project } from '../projects/project.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
+import { BipModule } from '../bip/bip.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Initiative } from '../roadmap/initiatives/initiative.entity';
     ]),
     OrgsModule,
     AuthModule,
+    BipModule,
   ],
   providers: [RequestsService, RequestVoteService],
   controllers: [RequestsController],

@@ -10,6 +10,7 @@ import { Issue } from './issue.entity';
 import { IssueComment } from './issue-comment.entity';
 import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { BipModule } from '../bip/bip.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
     ]),
     OrgsModule,
     AuthModule,
+    BipModule,
   ],
   controllers: [IssuesController],
   providers: [IssuesService],

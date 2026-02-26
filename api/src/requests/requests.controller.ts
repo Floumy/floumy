@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -19,12 +20,14 @@ import { AuthGuard } from '../auth/auth.guard';
 import { Public } from '../auth/public.guard';
 import { RequestVoteService } from './request-votes.service';
 import type { CreateUpdateCommentDto } from '../comments/dtos';
+import { BipService } from '../bip/bip.service';
 
 @Controller('orgs/:orgId/projects/:projectId/requests')
 export class RequestsController {
   constructor(
     private requestsService: RequestsService,
     private requestVoteService: RequestVoteService,
+    private bipService: BipService,
   ) {}
 
   @Get('/search')
@@ -96,6 +99,7 @@ export class RequestsController {
     @Query('limit') limit: number = 0,
   ) {
     try {
+      await this.bipService.validatePageAccess(orgId, projectId, 'requests');
       return await this.requestsService.listRequests(
         orgId,
         projectId,
@@ -103,6 +107,7 @@ export class RequestsController {
         limit,
       );
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException(e.message);
     }
   }
@@ -115,12 +120,14 @@ export class RequestsController {
     @Param('requestId') requestId: string,
   ) {
     try {
+      await this.bipService.validatePageAccess(orgId, projectId, 'requests');
       return await this.requestsService.getRequestById(
         orgId,
         projectId,
         requestId,
       );
     } catch (e) {
+      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException(e.message);
     }
   }

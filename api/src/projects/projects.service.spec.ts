@@ -8,6 +8,7 @@ import { UsersService } from '../users/users.service';
 import { Repository } from 'typeorm';
 import { OrgsService } from '../orgs/orgs.service';
 import { FilesModule } from '../files/files.module';
+import { BipService } from '../bip/bip.service';
 
 describe('ProjectsService', () => {
   let service: ProjectsService;
@@ -17,6 +18,7 @@ describe('ProjectsService', () => {
   let projectsRepository: Repository<Project>;
   let usersService: UsersService;
   let orgsService: OrgsService;
+  let bipService: BipService;
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
@@ -27,6 +29,7 @@ describe('ProjectsService', () => {
     service = module.get<ProjectsService>(ProjectsService);
     usersService = module.get<UsersService>(UsersService);
     orgsService = module.get<OrgsService>(OrgsService);
+    bipService = module.get<BipService>(BipService);
     projectsRepository = module.get<Repository<Project>>(
       getRepositoryToken(Project),
     );
@@ -247,6 +250,53 @@ describe('ProjectsService', () => {
       await expect(
         service.updateProject(org.id, project.id, { name: 'Test Project' }),
       ).rejects.toThrow();
+    });
+    it('should set isActiveWorkPagePublic to false when enabling cycles', async () => {
+      await bipService.createOrUpdateSettings(org.id, project.id, {
+        isBuildInPublicEnabled: false,
+        isObjectivesPagePublic: false,
+        isRoadmapPagePublic: false,
+        isCyclesPagePublic: false,
+        isActiveCyclesPagePublic: false,
+        isActiveWorkPagePublic: true,
+        isIssuesPagePublic: false,
+        isRequestsPagePublic: false,
+      });
+      await service.updateProject(org.id, project.id, {
+        name: project.name,
+        cyclesEnabled: true,
+      });
+      const bipSettings = await bipService.getSettingsOrDefaults(
+        org.id,
+        project.id,
+      );
+      expect(bipSettings.isActiveWorkPagePublic).toBe(false);
+    });
+    it('should set isCyclesPagePublic and isActiveCyclesPagePublic to false when disabling cycles', async () => {
+      await service.updateProject(org.id, project.id, {
+        name: project.name,
+        cyclesEnabled: true,
+      });
+      await bipService.createOrUpdateSettings(org.id, project.id, {
+        isBuildInPublicEnabled: false,
+        isObjectivesPagePublic: false,
+        isRoadmapPagePublic: false,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
+        isActiveWorkPagePublic: false,
+        isIssuesPagePublic: false,
+        isRequestsPagePublic: false,
+      });
+      await service.updateProject(org.id, project.id, {
+        name: project.name,
+        cyclesEnabled: false,
+      });
+      const bipSettings = await bipService.getSettingsOrDefaults(
+        org.id,
+        project.id,
+      );
+      expect(bipSettings.isCyclesPagePublic).toBe(false);
+      expect(bipSettings.isActiveCyclesPagePublic).toBe(false);
     });
   });
   describe('when getting a project', () => {
