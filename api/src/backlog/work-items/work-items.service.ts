@@ -19,7 +19,11 @@ import { Issue } from '../../issues/issue.entity';
 import { Project } from '../../projects/project.entity';
 import { FilterOptions, WorkItemQueryBuilder } from './work-item.query-builder';
 import { CreateNotificationDto } from '../../notifications/dtos';
-import { ActionType, EntityType, StatusType, } from '../../notifications/notification.entity';
+import {
+  ActionType,
+  EntityType,
+  StatusType,
+} from '../../notifications/notification.entity';
 
 @Injectable()
 export class WorkItemsService {
