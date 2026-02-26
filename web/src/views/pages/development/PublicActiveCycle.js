@@ -124,7 +124,7 @@ function PublicActiveSprint() {
                             <Col md="6" className="mb-3">
                               <Card>
                                 <CardBody>
-                                  <h5 className="mb-2">What is a Sprint?</h5>
+                                  <h5 className="mb-2">What is a Cycle?</h5>
                                   <p className="mb-0 text-sm text-muted">
                                     A fixed timeframe where the team focuses on
                                     a set of prioritized work items.

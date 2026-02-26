@@ -175,7 +175,7 @@ function ActiveSprint() {
         {isLoading && (
           <Card>
             <CardHeader>
-              <h2>{cyclesEnabled ? 'Active Sprint' : 'Active Work'}</h2>
+              <h2>{cyclesEnabled ? 'Active Cycle' : 'Active Work'}</h2>
             </CardHeader>
             <LoadingSpinnerBox />
           </Card>
@@ -198,7 +198,7 @@ function ActiveSprint() {
                       <Col sm={6}>
                         <h2 className="mb-0">
                           {cyclesEnabled ? (
-                            'Active Sprint'
+                            'Active Cycle'
                           ) : (
                             <>
                               Active Work{' '}
@@ -219,9 +219,9 @@ function ActiveSprint() {
                       <div className="mx-auto" style={{ maxWidth: '680px' }}>
                         {cyclesEnabled ? (
                           <>
-                            <h3 className="mb-3">No active sprint</h3>
+                            <h3 className="mb-3">No active cycle</h3>
                             <p className="text-muted">
-                              Start a sprint to begin tracking work in the
+                              Start a cycle to begin tracking work in the
                               current cycle and keep your team focused on the
                               highest priorities.
                             </p>

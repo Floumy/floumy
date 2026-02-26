@@ -44,7 +44,7 @@ function PublicSprint() {
               )}
               {sprint && <PublicCycleDetail orgId={orgId} sprint={sprint} />}
               {!sprint && !isLoading && (
-                <NotFoundCard message={'Sprint not found'} />
+                <NotFoundCard message={'Cycle not found'} />
               )}
             </div>
           </Col>

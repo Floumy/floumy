@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  FormGroup,
-  Input,
-  Row,
-} from 'reactstrap';
+import { Card, CardBody, CardHeader, Col, FormGroup, Input, Row, } from 'reactstrap';
 import { sortByPriority } from '../../../services/utils/utils';
 import ExecutionStats from '../components/stats/ExecutionStats';
 import PublicWorkItemsListCard from '../backlog/PublicWorkItemsListCard';
@@ -24,7 +16,7 @@ function PublicSprintDetail({
   const [workItems, setWorkItems] = useState([]);
 
   useEffect(() => {
-    document.title = 'Floumy | Sprint';
+    document.title = 'Floumy | Cycle';
 
     if (sprint.id) {
       setWorkItems(sortByPriority(sprint.workItems));
