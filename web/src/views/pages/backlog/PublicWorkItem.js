@@ -16,7 +16,7 @@ import { toast } from 'react-toastify';
 import Comments from '../../../components/Comments/Comments';
 import { Link, useParams } from 'react-router-dom';
 
-function PublicWorkItem({ workItem = defaultWorkItem }) {
+function PublicWorkItem({ workItem = defaultWorkItem, cyclesEnabled = false }) {
   const [comments, setComments] = React.useState(workItem.comments || []);
   const { orgId, projectId } = useParams();
 
@@ -159,31 +159,33 @@ function PublicWorkItem({ workItem = defaultWorkItem }) {
                     />
                   </Col>
                 </Row>
-                <Row className="mb-3">
-                  <Col>
-                    <label className="form-control-label">
-                      {workItem && (workItem.cycle || workItem.sprint) ? (
-                        <Link
-                          to={`/public/orgs/${orgId}/projects/${projectId}/cycles/detail/${(workItem.cycle || workItem.sprint).id}`}
-                        >
-                          Cycle
-                          <i className="fa fa-link ml-2" />
-                        </Link>
-                      ) : (
-                        'Cycle'
-                      )}
-                    </label>
-                    <Input
-                      type="text"
-                      disabled={true}
-                      className="bg-white"
-                      defaultValue={
-                        (workItem.cycle || workItem.sprint)?.title || 'None'
-                      }
-                      placeholder="Select a cycle"
-                    />
-                  </Col>
-                </Row>
+                {cyclesEnabled && (
+                  <Row className="mb-3">
+                    <Col>
+                      <label className="form-control-label">
+                        {workItem && (workItem.cycle || workItem.sprint) ? (
+                          <Link
+                            to={`/public/orgs/${orgId}/projects/${projectId}/cycles/detail/${(workItem.cycle || workItem.sprint).id}`}
+                          >
+                            Cycle
+                            <i className="fa fa-link ml-2" />
+                          </Link>
+                        ) : (
+                          'Cycle'
+                        )}
+                      </label>
+                      <Input
+                        type="text"
+                        disabled={true}
+                        className="bg-white"
+                        defaultValue={
+                          (workItem.cycle || workItem.sprint)?.title || 'None'
+                        }
+                        placeholder="Select a cycle"
+                      />
+                    </Col>
+                  </Row>
+                )}
                 <Row className="mb-3">
                   <Col>
                     <label className="form-control-label">
