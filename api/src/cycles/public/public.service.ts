@@ -3,14 +3,12 @@ import { Timeline } from '../../common/timeline.enum';
 import { CyclesService } from '../cycles.service';
 import { CycleMapper } from './public.mapper';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Org } from '../../orgs/org.entity';
 import { Repository } from 'typeorm';
 import { Project } from '../../projects/project.entity';
 
 @Injectable()
 export class PublicService {
   constructor(
-    @InjectRepository(Org) private orgsRepository: Repository<Org>,
     private cyclesService: CyclesService,
     @InjectRepository(Project)
     private projectsRepository: Repository<Project>,
@@ -47,6 +45,7 @@ export class PublicService {
 
     const bipSettings = await project.bipSettings;
     if (
+      project.cyclesEnabled === false ||
       !bipSettings ||
       bipSettings.isBuildInPublicEnabled === false ||
       bipSettings.isActiveCyclesPagePublic === false
@@ -70,6 +69,7 @@ export class PublicService {
     const bipSettings = await project.bipSettings;
 
     if (
+      project.cyclesEnabled === false ||
       !bipSettings ||
       bipSettings.isBuildInPublicEnabled === false ||
       bipSettings.isCyclesPagePublic === false

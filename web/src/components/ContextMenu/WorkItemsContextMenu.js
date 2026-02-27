@@ -5,16 +5,12 @@ import { listCycles } from '../../services/cycles/cycles.service';
 import { Badge, Spinner } from 'reactstrap';
 import {
   changeWorkItemAssignee,
-  updateWorkItemSprint,
-  updateWorkItemPriority,
-  updateWorkItemStatus,
   deleteWorkItem,
+  updateWorkItemPriority,
+  updateWorkItemSprint,
+  updateWorkItemStatus,
 } from '../../services/backlog/backlog.service';
-import {
-  formatHyphenatedString,
-  priorityColor,
-  workItemStatusColorClassName,
-} from '../../services/utils/utils';
+import { formatHyphenatedString, priorityColor, workItemStatusColorClassName, } from '../../services/utils/utils';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
@@ -90,9 +86,9 @@ function WorkItemsContextMenu({
         await updateWorkItemSprint(orgId, projectId, workItem.id, sprintId);
       }
       callChangeSprintCallbacks(sprintId, props.workItems);
-      toast.success('The work items have been moved to the sprint');
+      toast.success('The work items have been moved to the cycle');
     } catch (e) {
-      toast.error('The work items could not be moved to the sprint');
+      toast.error('The work items could not be moved to the cycle');
     }
   };
 

@@ -78,7 +78,7 @@ function PublicSprints() {
               <CardHeader>
                 <Row>
                   <Col xs={12} sm={8}>
-                    <h2>Sprints</h2>
+                    <h2>Cycles</h2>
                   </Col>
                   <Col xs={12} sm={4}>
                     <Select2
@@ -109,12 +109,12 @@ function PublicSprints() {
                     <div className="p-5 text-center">
                       <div className="mx-auto" style={{ maxWidth: '680px' }}>
                         <h3 className="mb-3">
-                          No sprints for{' '}
+                          No cycles for{' '}
                           {formatTimeline(timelineFilterValue).toLowerCase()}{' '}
                           yet
                         </h3>
                         <p className="text-muted">
-                          Planned sprints and their work items will appear here
+                          Planned cycles and their work items will appear here
                           once they are published for this timeline.
                         </p>
                         <Row className="mt-4 text-left">
@@ -134,7 +134,7 @@ function PublicSprints() {
                               <CardBody>
                                 <h5 className="mb-2">What is a Work Item?</h5>
                                 <p className="mb-0 text-sm text-muted">
-                                  A task, bug, or story tracked within a sprint
+                                  A task, bug, or story tracked within a cycle
                                   to deliver value incrementally.
                                 </p>
                               </CardBody>
@@ -149,9 +149,9 @@ function PublicSprints() {
                   timelineFilterValue === 'past' && (
                     <div className="p-5 text-center">
                       <div className="mx-auto" style={{ maxWidth: '680px' }}>
-                        <h3 className="mb-3">No sprints in the past</h3>
+                        <h3 className="mb-3">No cycles in the past</h3>
                         <p className="text-muted mb-0">
-                          There are no sprints recorded for past timelines.
+                          There are no cycles recorded for past timelines.
                         </p>
                       </div>
                     </div>

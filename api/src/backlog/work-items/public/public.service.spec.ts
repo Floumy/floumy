@@ -35,6 +35,7 @@ describe('PublicService', () => {
   let bipSettingsRepository: Repository<BipSettings>;
   let orgsRepository: Repository<Org>;
   let workItemsRepository: Repository<WorkItem>;
+  let projectsRepository: Repository<Project>;
   let user: User;
   let project: Project;
   let service: PublicService;
@@ -86,6 +87,9 @@ describe('PublicService', () => {
     workItemsRepository = module.get<Repository<WorkItem>>(
       getRepositoryToken(WorkItem),
     );
+    projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
+    );
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -93,6 +97,8 @@ describe('PublicService', () => {
     );
     org = await orgsService.createForUser(user);
     project = (await org.projects)[0];
+    project.cyclesEnabled = false;
+    await projectsRepository.save(project);
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.isActiveWorkPagePublic = true;
@@ -170,6 +176,15 @@ describe('PublicService', () => {
       });
       bipSettings.isBuildInPublicEnabled = false;
       await bipSettingsRepository.save(bipSettings);
+
+      await expect(
+        service.listOpenWorkItems(org.id, project.id),
+      ).rejects.toThrow();
+    });
+
+    it('should throw when cycles are enabled for the project', async () => {
+      project.cyclesEnabled = true;
+      await projectsRepository.save(project);
 
       await expect(
         service.listOpenWorkItems(org.id, project.id),

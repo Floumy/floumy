@@ -20,8 +20,9 @@ function PublicLayout() {
   const [buildInPublicSettings, setBuildInPublicSettings] = useState({
     isObjectivesPagePublic: false,
     isRoadmapPagePublic: false,
-    isSprintsPagePublic: false,
-    isActiveSprintsPagePublic: false,
+    isCyclesPagePublic: false,
+    isActiveCyclesPagePublic: false,
+    isActiveWorkPagePublic: false,
     isIssuesPagePublic: false,
     isRequestsPagePublic: false,
   });

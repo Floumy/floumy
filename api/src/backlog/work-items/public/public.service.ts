@@ -27,6 +27,7 @@ export class PublicService {
 
     const bipSettings = await project.bipSettings;
     if (
+      project.cyclesEnabled === true ||
       !bipSettings ||
       bipSettings.isBuildInPublicEnabled === false ||
       bipSettings.isActiveWorkPagePublic === false

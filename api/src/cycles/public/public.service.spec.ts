@@ -93,6 +93,8 @@ describe('PublicService', () => {
     );
     org = await orgsService.createForUser(user);
     project = (await org.projects)[0];
+    project.cyclesEnabled = true;
+    await projectsRepository.save(project);
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
     bipSettings.isCyclesPagePublic = true;
@@ -133,6 +135,19 @@ describe('PublicService', () => {
       expect(result.length).toEqual(1);
       expect(result[0].goal).toEqual('Test Goal');
     });
+
+    it('should throw an error if cycles are disabled for the project', async () => {
+      project.cyclesEnabled = false;
+      await projectsRepository.save(project);
+
+      await expect(
+        service.listCyclesForTimeline(
+          org.id,
+          project.id,
+          Timeline.THIS_QUARTER,
+        ),
+      ).rejects.toThrow();
+    });
   });
 
   describe('when getting a cycle by id', () => {
@@ -162,6 +177,15 @@ describe('PublicService', () => {
         service.getCycleById(org.id, project.id, nonExistentUUID),
       ).rejects.toThrow();
     });
+    it('should throw an error if cycles are disabled for the project', async () => {
+      project.cyclesEnabled = false;
+      await projectsRepository.save(project);
+
+      const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
+      await expect(
+        service.getCycleById(org.id, project.id, nonExistentUUID),
+      ).rejects.toThrow();
+    });
     it('should throw an error if the org does not exist', async () => {
       const nonExistentUUID = '00000000-0000-0000-0000-000000000000';
       await expect(
@@ -175,6 +199,7 @@ describe('PublicService', () => {
         await orgsService.getOrCreateOrg('Test Project');
       const projectWithActiveCycles = new Project();
       projectWithActiveCycles.name = 'Test Project';
+      projectWithActiveCycles.cyclesEnabled = true;
       projectWithActiveCycles.org = Promise.resolve(orgWithActiveCycles);
       await projectsRepository.save(projectWithActiveCycles);
       const bipSettings = new BipSettings();
@@ -210,6 +235,7 @@ describe('PublicService', () => {
         await orgsService.getOrCreateOrg('Test Project');
       const projectWithActiveCycles = new Project();
       projectWithActiveCycles.name = 'Test Project';
+      projectWithActiveCycles.cyclesEnabled = true;
       projectWithActiveCycles.org = Promise.resolve(orgWithActiveCycles);
       await projectsRepository.save(projectWithActiveCycles);
       const bipSettings = new BipSettings();
@@ -239,6 +265,8 @@ describe('PublicService', () => {
     it('should throw an error if the org does not have build in public enabled', async () => {
       const newOrg = await orgsService.createForUser(user);
       const newProject = (await newOrg.projects)[0];
+      newProject.cyclesEnabled = true;
+      await projectsRepository.save(newProject);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = false;
       bipSettings.isCyclesPagePublic = true;
@@ -258,12 +286,29 @@ describe('PublicService', () => {
     it('should throw an error if the org does not have active cycles page public enabled', async () => {
       const newOrg = await orgsService.createForUser(user);
       const newProject = (await newOrg.projects)[0];
+      newProject.cyclesEnabled = true;
+      await projectsRepository.save(newProject);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveCyclesPagePublic = false;
       bipSettings.org = Promise.resolve(newOrg);
       bipSettings.project = Promise.resolve(newProject);
       await bipSettingsRepository.save(bipSettings);
+      await expect(
+        service.getActiveCycle(newOrg.id, newProject.id),
+      ).rejects.toThrow();
+    });
+
+    it('should throw an error if cycles are disabled for the project', async () => {
+      const newOrg = await orgsService.createForUser(user);
+      const newProject = (await newOrg.projects)[0];
+      const bipSettings = new BipSettings();
+      bipSettings.isBuildInPublicEnabled = true;
+      bipSettings.isActiveCyclesPagePublic = true;
+      bipSettings.org = Promise.resolve(newOrg);
+      bipSettings.project = Promise.resolve(newProject);
+      await bipSettingsRepository.save(bipSettings);
+
       await expect(
         service.getActiveCycle(newOrg.id, newProject.id),
       ).rejects.toThrow();

@@ -185,7 +185,7 @@ function PublicActiveSprint() {
                     !isLoading && (
                       <div className="text-center mb-3">
                         {cyclesEnabled
-                          ? 'No work items found in this sprint.'
+                          ? 'No work items found in this cycle.'
                           : 'No open work items.'}
                       </div>
                     )}

@@ -10,12 +10,12 @@ import {
 } from '../../services/utils/utils';
 import {
   changeAssignee,
+  deleteInitiative,
   listMilestones,
   updateInitiativeKeyResult,
   updateInitiativeMilestone,
   updateInitiativePriority,
   updateInitiativeStatus,
-  deleteInitiative,
 } from '../../services/roadmap/roadmap.service';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
@@ -373,7 +373,7 @@ function InitiativesContextMenu({
           </Item>
         )}
         {!isLoadingMilestones && milestones.length === 0 && (
-          <Item disabled>Move to sprint</Item>
+          <Item disabled>Move to cycle</Item>
         )}
         {!isLoadingMilestones && milestones.length > 0 && (
           <Submenu
