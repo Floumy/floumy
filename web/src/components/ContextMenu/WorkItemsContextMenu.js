@@ -10,7 +10,11 @@ import {
   updateWorkItemSprint,
   updateWorkItemStatus,
 } from '../../services/backlog/backlog.service';
-import { formatHyphenatedString, priorityColor, workItemStatusColorClassName, } from '../../services/utils/utils';
+import {
+  formatHyphenatedString,
+  priorityColor,
+  workItemStatusColorClassName,
+} from '../../services/utils/utils';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
