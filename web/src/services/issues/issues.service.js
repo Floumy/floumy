@@ -24,10 +24,32 @@ export async function listIssues(orgId, projectId, page = 1, limit = 10) {
   }
 }
 
+export async function listPublicIssues(orgId, projectId, page = 1, limit = 10) {
+  try {
+    const response = await api.get(
+      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/issues?page=${page}&limit=${limit}`,
+    );
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
 export async function getIssue(orgId, projectId, issueId) {
   try {
     const response = await api.get(
       `${apiUrl}/orgs/${orgId}/projects/${projectId}/issues/${issueId}`,
+    );
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
+export async function getPublicIssue(orgId, projectId, issueId) {
+  try {
+    const response = await api.get(
+      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/issues/${issueId}`,
     );
     return response.data;
   } catch (e) {
@@ -112,6 +134,23 @@ export async function searchIssues(
   try {
     const response = await api.get(
       `${apiUrl}/orgs/${orgId}/projects/${projectId}/issues/search?q=${searchText}&page=${page}&limit=${limit}`,
+    );
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
+export async function searchPublicIssues(
+  orgId,
+  projectId,
+  searchText,
+  page = 1,
+  limit = 10,
+) {
+  try {
+    const response = await api.get(
+      `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/issues/search?q=${searchText}&page=${page}&limit=${limit}`,
     );
     return response.data;
   } catch (e) {

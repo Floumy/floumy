@@ -13,9 +13,12 @@ import { RequestComment } from './request-comment.entity';
 import { Project } from '../projects/project.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { BipModule } from '../bip/bip.module';
+import { PublicController as RequestsPublicController } from './public/public.controller';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.register(),
     TypeOrmModule.forFeature([
       User,
       Org,
@@ -30,6 +33,6 @@ import { BipModule } from '../bip/bip.module';
     BipModule,
   ],
   providers: [RequestsService, RequestVoteService],
-  controllers: [RequestsController],
+  controllers: [RequestsController, RequestsPublicController],
 })
 export class RequestsModule {}

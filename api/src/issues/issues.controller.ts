@@ -6,27 +6,22 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
   Query,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { IssuesService } from './issues.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { IssueDto, UpdateIssueDto } from './dtos';
-import { Public } from '../auth/public.guard';
 import type { CreateUpdateCommentDto } from '../comments/dtos';
-import { BipService } from '../bip/bip.service';
 
 @Controller('/orgs/:orgId/projects/:projectId/issues')
 export class IssuesController {
-  constructor(
-    private issuesService: IssuesService,
-    private bipService: BipService,
-  ) {}
+  constructor(private issuesService: IssuesService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -51,31 +46,40 @@ export class IssuesController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @Public()
+  @UseGuards(AuthGuard)
   async listIssues(
+    @Request() request,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      await this.bipService.validatePageAccess(orgId, projectId, 'issues');
       return await this.issuesService.listIssues(orgId, projectId, page, limit);
     } catch (e) {
-      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException(e.message);
     }
   }
 
   @Get('search')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
   async search(
+    @Request() request,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Query('q') query: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.issuesService.searchIssues(
         orgId,
@@ -91,17 +95,20 @@ export class IssuesController {
 
   @Get(':issueId')
   @HttpCode(HttpStatus.OK)
-  @Public()
+  @UseGuards(AuthGuard)
   async getIssueById(
+    @Request() request,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Param('issueId') issueId: string,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      await this.bipService.validatePageAccess(orgId, projectId, 'issues');
       return await this.issuesService.getIssueById(orgId, projectId, issueId);
     } catch (e) {
-      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException(e.message);
     }
   }

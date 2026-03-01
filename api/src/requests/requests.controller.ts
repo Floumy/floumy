@@ -6,39 +6,42 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
   Query,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { CreateRequestDto, UpdateRequestDto } from './dtos';
 import { RequestsService } from './requests.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { Public } from '../auth/public.guard';
 import { RequestVoteService } from './request-votes.service';
 import type { CreateUpdateCommentDto } from '../comments/dtos';
-import { BipService } from '../bip/bip.service';
 
 @Controller('orgs/:orgId/projects/:projectId/requests')
 export class RequestsController {
   constructor(
     private requestsService: RequestsService,
     private requestVoteService: RequestVoteService,
-    private bipService: BipService,
   ) {}
 
   @Get('/search')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
   async search(
+    @Request() request,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Query('q') query: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.requestsService.searchRequestsByTitleOrDescription(
         orgId,
@@ -91,15 +94,19 @@ export class RequestsController {
   }
 
   @Get()
-  @Public()
+  @UseGuards(AuthGuard)
   async listRequests(
+    @Request() request,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      await this.bipService.validatePageAccess(orgId, projectId, 'requests');
       return await this.requestsService.listRequests(
         orgId,
         projectId,
@@ -107,27 +114,29 @@ export class RequestsController {
         limit,
       );
     } catch (e) {
-      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException(e.message);
     }
   }
 
   @Get(':requestId')
-  @Public()
+  @UseGuards(AuthGuard)
   async getRequestById(
+    @Request() request,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Param('requestId') requestId: string,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
-      await this.bipService.validatePageAccess(orgId, projectId, 'requests');
       return await this.requestsService.getRequestById(
         orgId,
         projectId,
         requestId,
       );
     } catch (e) {
-      if (e instanceof NotFoundException) throw e;
       throw new BadRequestException(e.message);
     }
   }

@@ -24,6 +24,7 @@ describe('IssuesController', () => {
   let user: User;
   let orgsRepository: Repository<Org>;
   let projectsRepository: Repository<Project>;
+  let bipSettingsRepository: Repository<BipSettings>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -63,7 +64,7 @@ describe('IssuesController', () => {
     project.org = Promise.resolve(org);
     await projectsRepository.save(project);
 
-    const bipSettingsRepository = module.get<Repository<BipSettings>>(
+    bipSettingsRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
     const bipSettings = new BipSettings();
@@ -115,10 +116,41 @@ describe('IssuesController', () => {
         project.id,
         createIssueDto,
       );
-      const result = await controller.listIssues(org.id, project.id);
+      const result = await controller.listIssues(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+      );
       expect(result.length).toBe(1);
       expect(result[0].title).toBe(createIssueDto.title);
       expect(result[0].description).toBe(createIssueDto.description);
+    });
+
+    it('should return a list of issues when build in public is disabled', async () => {
+      const createIssueDto = {
+        title: 'Test Issue',
+        description: 'This is a test issue',
+      };
+      await bipSettingsRepository.clear();
+      await controller.addIssue(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        project.id,
+        createIssueDto,
+      );
+      const result = await controller.listIssues(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+      );
+      expect(result.length).toBe(1);
+      expect(result[0].title).toBe(createIssueDto.title);
     });
   });
 
@@ -136,14 +168,28 @@ describe('IssuesController', () => {
         project.id,
         createIssueDto,
       );
-      const result = await controller.getIssueById(org.id, project.id, id);
+      const result = await controller.getIssueById(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+        id,
+      );
       expect(result.title).toBe(createIssueDto.title);
       expect(result.description).toBe(createIssueDto.description);
     });
 
     it('should throw an error if the org does not exist', async () => {
       await expect(
-        controller.getIssueById(org.id, project.id, 'non-existent-id'),
+        controller.getIssueById(
+          {
+            user: { org: org.id },
+          },
+          org.id,
+          project.id,
+          'non-existent-id',
+        ),
       ).rejects.toThrow();
     });
   });
@@ -207,7 +253,14 @@ describe('IssuesController', () => {
         id,
       );
       await expect(
-        controller.getIssueById(org.id, project.id, id),
+        controller.getIssueById(
+          {
+            user: { org: org.id },
+          },
+          org.id,
+          project.id,
+          id,
+        ),
       ).rejects.toThrow();
     });
   });
@@ -313,7 +366,14 @@ describe('IssuesController', () => {
         id,
         comment.id,
       );
-      const result = await controller.getIssueById(org.id, project.id, id);
+      const result = await controller.getIssueById(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+        id,
+      );
       expect(result.comments.length).toEqual(0);
     });
   });
@@ -343,6 +403,9 @@ describe('IssuesController', () => {
       );
 
       const issues = await controller.search(
+        {
+          user: { org: org.id },
+        },
         org.id,
         project.id,
         'my issue',

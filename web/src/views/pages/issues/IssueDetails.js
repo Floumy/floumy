@@ -16,6 +16,7 @@ import {
   addIssueComment,
   deleteIssueComment,
   getIssue,
+  getPublicIssue,
   updateIssueComment,
 } from '../../../services/issues/issues.service';
 import InfiniteLoadingBar from '../components/InfiniteLoadingBar';
@@ -38,7 +39,9 @@ export default function IssueDetails() {
     async function fetchIssue(orgId, projectId, issueId) {
       try {
         setIsLoading(true);
-        const issue = await getIssue(orgId, projectId, issueId);
+        const issue = isPublicPage
+          ? await getPublicIssue(orgId, projectId, issueId)
+          : await getIssue(orgId, projectId, issueId);
         setIssue(issue);
       } catch (e) {
         console.error(e);
@@ -49,7 +52,7 @@ export default function IssueDetails() {
     }
 
     fetchIssue(orgId, projectId, issueId);
-  }, [orgId, projectId, issueId]);
+  }, [isPublicPage, orgId, projectId, issueId]);
 
   async function handleCommentAdd(comment) {
     try {

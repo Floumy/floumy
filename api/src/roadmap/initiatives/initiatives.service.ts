@@ -723,8 +723,6 @@ export class InitiativesService {
         id: patchInitiativeDto.request,
       });
       initiative.request = Promise.resolve(request);
-    } else {
-      initiative.request = Promise.resolve(null);
     }
   }
 }

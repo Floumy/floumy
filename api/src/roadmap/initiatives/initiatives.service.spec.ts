@@ -1228,6 +1228,52 @@ describe('FeaturesService', () => {
       expect(updatedFeature.createdAt).toBeDefined();
       expect(updatedFeature.updatedAt).toBeDefined();
     });
+    it('should keep the request when patching only the milestone', async () => {
+      await orgsRepository.save(org);
+      const request = await requestsService.addRequest(
+        user.id,
+        org.id,
+        project.id,
+        {
+          title: 'My Feature Request',
+          description: 'My Feature Request Description',
+        },
+      );
+      const milestone = await milestonesService.createMilestone(
+        org.id,
+        project.id,
+        {
+          title: 'my milestone',
+          description: 'my milestone description',
+          dueDate: '2020-01-01',
+        },
+      );
+      const initiative = await service.createInitiative(
+        org.id,
+        project.id,
+        user.id,
+        {
+          title: 'my initiative',
+          description: 'my initiative description',
+          priority: Priority.LOW,
+          status: InitiativeStatus.PLANNED,
+          request: request.id,
+        },
+      );
+      const updatedFeature = await service.patchInitiative(
+        org.id,
+        project.id,
+        initiative.id,
+        {
+          milestone: milestone.id,
+        },
+      );
+      expect(updatedFeature.request).toBeDefined();
+      expect(updatedFeature.request.id).toEqual(request.id);
+      expect(updatedFeature.request.title).toEqual(request.title);
+      expect(updatedFeature.milestone).toBeDefined();
+      expect(updatedFeature.milestone.id).toEqual(milestone.id);
+    });
     it('should throw an error if the milestone does not exist', async () => {
       const initiative = await service.createInitiative(
         org.id,
