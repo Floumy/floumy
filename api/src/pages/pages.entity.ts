@@ -16,6 +16,8 @@ export class Page {
   id: string;
   @Column({ default: null, nullable: true })
   title: string;
+  @Column({ default: 'untitled' })
+  slug: string;
   @Column({ default: null, nullable: true })
   content: string;
   @CreateDateColumn()

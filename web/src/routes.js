@@ -325,6 +325,18 @@ const routes = [
   },
   {
     redirect: true,
+    path: '/pages/:pageId',
+    component: <Pages />,
+    layout: '/admin',
+  },
+  {
+    redirect: true,
+    path: '/pages/:pageId/:slug',
+    component: <Pages />,
+    layout: '/admin',
+  },
+  {
+    redirect: true,
     path: '/code/github',
     component: <GitHub />,
     layout: '/admin',

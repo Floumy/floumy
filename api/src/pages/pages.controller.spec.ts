@@ -92,6 +92,35 @@ describe('PagesController', () => {
     });
     expect(result).toBeInstanceOf(Array);
     expect(result[0]).toHaveProperty('id', childPage.id);
+    expect(result[0]).toHaveProperty('hasChildren', false);
+  });
+
+  it('should expose when a root page has children', async () => {
+    const parentPage = await controller.createPage(
+      org.id,
+      project.id,
+      { parentId: null },
+      {
+        user: { org: org.id, id: user.id },
+      },
+    );
+
+    await controller.createPage(
+      org.id,
+      project.id,
+      { parentId: parentPage.id },
+      {
+        user: { org: org.id, id: user.id },
+      },
+    );
+
+    const result = await controller.getPagesByParent(org.id, project.id, {
+      user: { org: org.id, id: user.id },
+      query: { parentId: null },
+    });
+
+    expect(result[0]).toHaveProperty('id', parentPage.id);
+    expect(result[0]).toHaveProperty('hasChildren', true);
   });
 
   it('should search pages by title', async () => {
@@ -105,6 +134,7 @@ describe('PagesController', () => {
 
     await controller.updatePage(
       org.id,
+      project.id,
       secondPage.id,
       {
         user: { org: org.id, id: user.id },
@@ -128,6 +158,7 @@ describe('PagesController', () => {
     const updateDto = { title: 'Updated Title', content: 'Updated Content' };
     await controller.updatePage(
       org.id,
+      project.id,
       page.id,
       {
         user: { org: org.id, id: user.id },
@@ -142,12 +173,118 @@ describe('PagesController', () => {
     expect(result[0]).toHaveProperty('title', 'Updated Title');
     expect(result[0]).toHaveProperty('content', 'Updated Content');
   });
+  it('should get a page with ancestor ids and slug', async () => {
+    const rootPage = await controller.createPage(
+      org.id,
+      project.id,
+      { parentId: null },
+      {
+        user: { org: org.id, id: user.id },
+      },
+    );
+
+    const childPage = await controller.createPage(
+      org.id,
+      project.id,
+      { parentId: rootPage.id },
+      {
+        user: { org: org.id, id: user.id },
+      },
+    );
+
+    await controller.updatePage(
+      org.id,
+      project.id,
+      rootPage.id,
+      {
+        user: { org: org.id, id: user.id },
+      },
+      { title: 'Root Page' },
+    );
+
+    const result = await controller.getPage(org.id, project.id, childPage.id, {
+      user: { org: org.id, id: user.id },
+    });
+
+    expect(result).toHaveProperty('id', childPage.id);
+    expect(result).toHaveProperty('slug', 'untitled');
+    expect(result).toHaveProperty('hasChildren', false);
+    expect(result).toHaveProperty('ancestorIds', [rootPage.id]);
+  });
+
+  it('should persist empty title and content updates', async () => {
+    const page = await controller.createPage(
+      org.id,
+      project.id,
+      { parentId: null },
+      {
+        user: { org: org.id, id: user.id },
+      },
+    );
+
+    await controller.updatePage(
+      org.id,
+      project.id,
+      page.id,
+      {
+        user: { org: org.id, id: user.id },
+      },
+      { title: 'Temporary title', content: 'Temporary content' },
+    );
+
+    await controller.updatePage(
+      org.id,
+      project.id,
+      page.id,
+      {
+        user: { org: org.id, id: user.id },
+      },
+      { title: '', content: '' },
+    );
+
+    const result = await controller.getPage(org.id, project.id, page.id, {
+      user: { org: org.id, id: user.id },
+    });
+
+    expect(result).toHaveProperty('title', null);
+    expect(result).toHaveProperty('content', '');
+    expect(result).toHaveProperty('slug', 'untitled');
+  });
+
+  it('should normalize whitespace-only titles to null', async () => {
+    const page = await controller.createPage(
+      org.id,
+      project.id,
+      { parentId: null },
+      {
+        user: { org: org.id, id: user.id },
+      },
+    );
+
+    await controller.updatePage(
+      org.id,
+      project.id,
+      page.id,
+      {
+        user: { org: org.id, id: user.id },
+      },
+      { title: '   ' },
+    );
+
+    const result = await controller.getPage(org.id, project.id, page.id, {
+      user: { org: org.id, id: user.id },
+    });
+
+    expect(result).toHaveProperty('title', null);
+    expect(result).toHaveProperty('slug', 'untitled');
+  });
+
   it('should delete a page', async () => {
     const dto: CreatePageDto = { parentId: null };
     const page = await controller.createPage(org.id, project.id, dto, {
       user: { org: org.id, id: user.id },
     });
-    await controller.deletePage(org.id, page.id, {
+    await controller.deletePage(org.id, project.id, page.id, {
       user: { org: org.id, id: user.id },
     });
     const result = await controller.getPagesByParent(org.id, project.id, {
@@ -167,6 +304,7 @@ describe('PagesController', () => {
     const updateDto = { parentId: secondPage.id };
     await controller.updatePage(
       org.id,
+      project.id,
       page.id,
       {
         user: { org: org.id, id: user.id },
@@ -179,5 +317,36 @@ describe('PagesController', () => {
     });
     expect(result).toBeInstanceOf(Array);
     expect(result[0]).toHaveProperty('id', page.id);
+  });
+
+  it('should reject moving a page into its own descendant', async () => {
+    const rootPage = await controller.createPage(
+      org.id,
+      project.id,
+      { parentId: null },
+      {
+        user: { org: org.id, id: user.id },
+      },
+    );
+    const childPage = await controller.createPage(
+      org.id,
+      project.id,
+      { parentId: rootPage.id },
+      {
+        user: { org: org.id, id: user.id },
+      },
+    );
+
+    await expect(
+      controller.updatePage(
+        org.id,
+        project.id,
+        rootPage.id,
+        {
+          user: { org: org.id, id: user.id },
+        },
+        { parentId: childPage.id },
+      ),
+    ).rejects.toThrow();
   });
 });

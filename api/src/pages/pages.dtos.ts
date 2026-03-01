@@ -1,9 +1,9 @@
 export class UpdatePageDto {
-  title?: string;
-  content?: string;
-  parentId?: string;
+  title?: string | null;
+  content?: string | null;
+  parentId?: string | null;
 }
 
 export class CreatePageDto {
-  parentId?: string;
+  parentId?: string | null;
 }

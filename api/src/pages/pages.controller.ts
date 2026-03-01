@@ -34,7 +34,7 @@ export class PagesController {
     if (orgId !== userOrgId) {
       throw new UnauthorizedException();
     }
-    return await this.pagesService.createPage(projectId, body);
+    return await this.pagesService.createPage(orgId, projectId, body);
   }
 
   @Get()
@@ -50,15 +50,34 @@ export class PagesController {
       throw new UnauthorizedException();
     }
     return this.pagesService.getPagesByParent(
+      orgId,
       projectId,
       request.query.parentId,
       request.query.search,
     );
   }
 
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async getPage(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Param('id') id: string,
+    @Request() request,
+  ) {
+    const { org: userOrgId } = request.user;
+
+    if (orgId !== userOrgId) {
+      throw new UnauthorizedException();
+    }
+
+    return this.pagesService.getPage(orgId, projectId, id);
+  }
+
   @Patch(':id')
   async updatePage(
     @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
     @Param('id') id: string,
     @Request() request,
     @Body() body: UpdatePageDto,
@@ -68,12 +87,13 @@ export class PagesController {
     if (orgId !== userOrgId) {
       throw new UnauthorizedException();
     }
-    return this.pagesService.updatePage(id, body);
+    return this.pagesService.updatePage(orgId, projectId, id, body);
   }
 
   @Delete(':id')
   async deletePage(
     @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
     @Param('id') id: string,
     @Request() request,
   ) {
@@ -82,6 +102,6 @@ export class PagesController {
     if (orgId !== userOrgId) {
       throw new UnauthorizedException();
     }
-    return this.pagesService.deletePage(id);
+    return this.pagesService.deletePage(orgId, projectId, id);
   }
 }

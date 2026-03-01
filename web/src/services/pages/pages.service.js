@@ -27,6 +27,17 @@ export async function getPagesByParentId(orgId, projectId, parentId, search) {
   }
 }
 
+export async function getPage(orgId, projectId, id) {
+  try {
+    const response = await api.get(
+      `${apiUrl}/orgs/${orgId}/projects/${projectId}/pages/${id}`,
+    );
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
 export async function updatePage(orgId, projectId, id, data) {
   try {
     const response = await api.patch(
