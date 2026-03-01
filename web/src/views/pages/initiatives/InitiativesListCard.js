@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import InitiativesList from './InitiativesList';
 import { sortByPriority } from '../../../services/utils/utils';
 import PropTypes from 'prop-types';
@@ -11,6 +11,7 @@ function InitiativesListCard({
   enableContextMenu,
   onAddInitiative,
   onChangeMilestone,
+  onChangePriority,
   onChangeStatus,
   onChangeAssignedTo,
   onDelete,
@@ -22,43 +23,84 @@ function InitiativesListCard({
   extraButtonId,
   onExtraButtonClick,
 }) {
-  const [filteredInitiatives, setFilteredInitiatives] = useState([]);
+  const [localInitiatives, setLocalInitiatives] = useState(
+    sortByPriority(initiatives),
+  );
+
+  useEffect(() => {
+    setLocalInitiatives(sortByPriority(initiatives));
+  }, [initiatives]);
 
   function updateInitiativesStatus(updatedInitiatives, status) {
     const updatedInitiativesIds = updatedInitiatives.map(
       (initiative) => initiative.id,
     );
-    const updatedInitiativesStatus = filteredInitiatives.map((initiative) => {
-      if (updatedInitiativesIds.includes(initiative.id)) {
-        initiative.status = status;
-      }
-      return initiative;
-    });
-    setFilteredInitiatives(sortByPriority(updatedInitiativesStatus));
+    setLocalInitiatives((currentInitiatives) =>
+      sortByPriority(
+        currentInitiatives.map((initiative) =>
+          updatedInitiativesIds.includes(initiative.id)
+            ? { ...initiative, status }
+            : initiative,
+        ),
+      ),
+    );
     if (onChangeStatus) {
       onChangeStatus(updatedInitiatives, status);
     }
   }
 
-  function handleBacklogInitiativeChangePriority(initiatives, priority) {
-    const updatedInitiatives = initiatives.map((initiative) => {
-      if (initiative.priority !== priority) {
-        initiative.priority = priority;
-      }
-      return initiative;
-    });
-    setFilteredInitiatives(sortByPriority(updatedInitiatives));
-    if (onChangeStatus) {
-      onChangeStatus(updatedInitiatives, priority);
+  function handleBacklogInitiativeChangePriority(updatedInitiatives, priority) {
+    const updatedInitiativesIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    setLocalInitiatives((currentInitiatives) =>
+      sortByPriority(
+        currentInitiatives.map((initiative) =>
+          updatedInitiativesIds.includes(initiative.id)
+            ? { ...initiative, priority }
+            : initiative,
+        ),
+      ),
+    );
+    if (onChangePriority) {
+      onChangePriority(updatedInitiatives, priority);
     }
+  }
+
+  async function handleInitiativesAssignedTo(updatedInitiatives, assignedTo) {
+    let resolvedAssignedTo = assignedTo;
+
+    if (onChangeAssignedTo) {
+      const callbackResult = await onChangeAssignedTo(
+        updatedInitiatives,
+        assignedTo,
+      );
+      if (callbackResult !== undefined) {
+        resolvedAssignedTo = callbackResult;
+      }
+    }
+
+    const updatedInitiativesIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    setLocalInitiatives((currentInitiatives) =>
+      sortByPriority(
+        currentInitiatives.map((initiative) =>
+          updatedInitiativesIds.includes(initiative.id)
+            ? { ...initiative, assignedTo: resolvedAssignedTo }
+            : initiative,
+        ),
+      ),
+    );
   }
 
   function handleDelete(deletedInitiatives) {
     const deletedIds = deletedInitiatives.map((initiative) => initiative.id);
-    const remainingInitiatives = filteredInitiatives.filter(
-      (initiative) => !deletedIds.includes(initiative.id),
+    setLocalInitiatives((currentInitiatives) =>
+      currentInitiatives.filter(
+        (initiative) => !deletedIds.includes(initiative.id),
+      ),
     );
-    setFilteredInitiatives(remainingInitiatives);
     if (onDelete) {
       onDelete(deletedInitiatives);
     }
@@ -73,7 +115,7 @@ function InitiativesListCard({
         showAssignedTo={showAssignedTo}
         enableContextMenu={enableContextMenu}
         onChangeMilestone={onChangeMilestone}
-        onChangeAssignedTo={onChangeAssignedTo}
+        onChangeAssignedTo={handleInitiativesAssignedTo}
         onChangeStatus={updateInitiativesStatus}
         onChangePriority={handleBacklogInitiativeChangePriority}
         onDelete={handleDelete}
@@ -84,7 +126,7 @@ function InitiativesListCard({
   return (
     <BaseInitiativeListCard
       title={title}
-      initiatives={initiatives}
+      initiatives={localInitiatives}
       isLoading={isLoading}
       showFilters={showFilters}
       onSearch={onSearch}
@@ -109,6 +151,7 @@ InitiativesListCard.propTypes = {
   onSearch: PropTypes.func,
   onAddInitiative: PropTypes.func,
   onChangeMilestone: PropTypes.func,
+  onChangePriority: PropTypes.func,
   onChangeStatus: PropTypes.func,
   onChangeAssignedTo: PropTypes.func,
   onDelete: PropTypes.func,

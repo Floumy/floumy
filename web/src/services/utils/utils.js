@@ -158,8 +158,14 @@ export function sortByPriority(arr) {
     medium: 2,
     low: 3,
   };
-  return arr.sort((a, b) => {
-    return priorityMap[a.priority] < priorityMap[b.priority] ? -1 : 1;
+  if (!Array.isArray(arr)) {
+    return [];
+  }
+  return [...arr].sort((a, b) => {
+    return (
+      (priorityMap[a.priority] || Number.MAX_SAFE_INTEGER) -
+      (priorityMap[b.priority] || Number.MAX_SAFE_INTEGER)
+    );
   });
 }
 
