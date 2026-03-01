@@ -205,14 +205,18 @@ export class WorkItemsService {
     orgId: string,
     projectId: string,
     includeRecentCompleted = false,
+    includeWithCycles = false,
   ) {
     const qb = this.workItemsRepository
       .createQueryBuilder('workItem')
       .leftJoinAndSelect('workItem.initiative', 'initiative')
       .leftJoinAndSelect('workItem.assignedTo', 'assignedTo')
       .where('workItem.orgId = :orgId', { orgId })
-      .andWhere('workItem.projectId = :projectId', { projectId })
-      .andWhere('workItem.cycleId IS NULL');
+      .andWhere('workItem.projectId = :projectId', { projectId });
+
+    if (!includeWithCycles) {
+      qb.andWhere('workItem.cycleId IS NULL');
+    }
 
     if (includeRecentCompleted) {
       const oneMonthAgo = new Date();
