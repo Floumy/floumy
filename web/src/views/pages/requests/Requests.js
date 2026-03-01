@@ -65,13 +65,7 @@ export default function Requests({ isPublic = false }) {
       let requestsData;
       if (searchTerm) {
         requestsData = isPublic
-          ? await searchPublicRequests(
-              orgId,
-              projectId,
-              searchTerm,
-              page,
-              50,
-            )
+          ? await searchPublicRequests(orgId, projectId, searchTerm, page, 50)
           : await searchRequests(orgId, projectId, searchTerm, page, 50);
       } else {
         requestsData = isPublic
