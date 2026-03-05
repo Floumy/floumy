@@ -252,6 +252,8 @@ describe('ProjectsService', () => {
       ).rejects.toThrow();
     });
     it('should set isActiveWorkPagePublic to false when enabling cycles', async () => {
+      project.cyclesEnabled = false;
+      await projectsRepository.save(project);
       await bipService.createOrUpdateSettings(org.id, project.id, {
         isBuildInPublicEnabled: false,
         isObjectivesPagePublic: false,

@@ -302,6 +302,8 @@ describe('PublicService', () => {
     it('should throw an error if cycles are disabled for the project', async () => {
       const newOrg = await orgsService.createForUser(user);
       const newProject = (await newOrg.projects)[0];
+      newProject.cyclesEnabled = false;
+      await projectsRepository.save(newProject);
       const bipSettings = new BipSettings();
       bipSettings.isBuildInPublicEnabled = true;
       bipSettings.isActiveCyclesPagePublic = true;
