@@ -40,7 +40,7 @@ export class OpenaiService {
         },
         { role: 'user', content: prompt },
       ],
-      model: options.model || 'gpt-4o-mini',
+      model: options.model || 'gpt-4.1-mini',
       temperature: options.temperature || 0.1,
       response_format: {
         type: 'json_schema',
