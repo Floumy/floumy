@@ -116,6 +116,7 @@ export class WorkItemsController {
     @Param('projectId') projectId: string,
     @Request() request,
     @Query('includeRecentCompleted') includeRecentCompleted?: string,
+    @Query('includeWithCycles') includeWithCycles?: string,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
@@ -125,6 +126,7 @@ export class WorkItemsController {
       orgId,
       projectId,
       includeRecentCompleted === 'true',
+      includeWithCycles === 'true',
     );
   }
 

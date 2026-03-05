@@ -24,6 +24,7 @@ describe('RequestsController', () => {
   let user: User;
   let project: Project;
   let orgsRepository: Repository<Org>;
+  let bipSettingsRepository: Repository<BipSettings>;
 
   beforeEach(async () => {
     const { module, cleanup: dbCleanup } = await setupTestingModule(
@@ -58,7 +59,7 @@ describe('RequestsController', () => {
 
     await orgsRepository.save(org);
 
-    const bipSettingsRepository = module.get<Repository<BipSettings>>(
+    bipSettingsRepository = module.get<Repository<BipSettings>>(
       getRepositoryToken(BipSettings),
     );
     const bipSettings = new BipSettings();
@@ -109,10 +110,41 @@ describe('RequestsController', () => {
         project.id,
         createRequestDto,
       );
-      const result = await controller.listRequests(org.id, project.id);
+      const result = await controller.listRequests(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+      );
       expect(result.length).toBe(1);
       expect(result[0].title).toBe(createRequestDto.title);
       expect(result[0].description).toBe(createRequestDto.description);
+    });
+
+    it('should return a list of feature requests when build in public is disabled', async () => {
+      const createRequestDto = {
+        title: 'Test Feature Request',
+        description: 'This is a test feature request',
+      };
+      await bipSettingsRepository.clear();
+      await controller.addRequest(
+        {
+          user: { sub: user.id },
+        },
+        org.id,
+        project.id,
+        createRequestDto,
+      );
+      const result = await controller.listRequests(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+      );
+      expect(result.length).toBe(1);
+      expect(result[0].title).toBe(createRequestDto.title);
     });
   });
   describe('when getting a feature request by id', () => {
@@ -129,14 +161,28 @@ describe('RequestsController', () => {
         project.id,
         createRequestDto,
       );
-      const result = await controller.getRequestById(org.id, project.id, id);
+      const result = await controller.getRequestById(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+        id,
+      );
       expect(result.title).toBe(createRequestDto.title);
       expect(result.description).toBe(createRequestDto.description);
     });
   });
   it('should throw an error if the org does not exist', async () => {
     await expect(
-      controller.getRequestById(org.id, project.id, 'non-existent-id'),
+      controller.getRequestById(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+        'non-existent-id',
+      ),
     ).rejects.toThrow();
   });
   describe('when updating a feature request', () => {
@@ -195,7 +241,14 @@ describe('RequestsController', () => {
         id,
       );
       await expect(
-        controller.getRequestById(org.id, project.id, id),
+        controller.getRequestById(
+          {
+            user: { org: org.id },
+          },
+          org.id,
+          project.id,
+          id,
+        ),
       ).rejects.toThrow();
     });
   });
@@ -225,7 +278,14 @@ describe('RequestsController', () => {
         project.id,
         id,
       );
-      const request = await controller.getRequestById(org.id, project.id, id);
+      const request = await controller.getRequestById(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+        id,
+      );
       expect(request.votesCount).toEqual(1);
     });
   });
@@ -255,7 +315,14 @@ describe('RequestsController', () => {
         project.id,
         id,
       );
-      const request = await controller.getRequestById(org.id, project.id, id);
+      const request = await controller.getRequestById(
+        {
+          user: { org: org.id },
+        },
+        org.id,
+        project.id,
+        id,
+      );
       expect(request.votesCount).toEqual(0);
     });
   });
@@ -370,6 +437,9 @@ describe('RequestsController', () => {
         comment.id,
       );
       const requestDto = await controller.getRequestById(
+        {
+          user: { org: org.id },
+        },
         org.id,
         project.id,
         id,
@@ -508,6 +578,9 @@ describe('RequestsController', () => {
       );
 
       const requests = await controller.search(
+        {
+          user: { org: org.id },
+        },
         org.id,
         project.id,
         'my feature request',

@@ -10,11 +10,7 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
   const [initiatives, setInitiatives] = useState([]);
   const [showInitiatives, setShowInitiatives] = useState(true);
   useEffect(() => {
-    const priority = ['high', 'medium', 'low'];
-    const initiatives = milestone.initiatives.sort((a, b) => {
-      return priority.indexOf(a.priority) - priority.indexOf(b.priority);
-    });
-    setInitiatives(initiatives);
+    setInitiatives(sortByPriority(milestone?.initiatives || []));
   }, [milestone?.initiatives]);
 
   function getMilestoneHeader() {
@@ -54,37 +50,43 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
     const updatedInitiativesIds = updatedInitiatives.map(
       (initiative) => initiative.id,
     );
-    const updatedInitiativesStatus = initiatives.map((initiative) => {
-      if (updatedInitiativesIds.includes(initiative.id)) {
-        initiative.status = status;
-      }
-      return initiative;
-    });
-    setInitiatives(updatedInitiativesStatus);
+    setInitiatives((currentInitiatives) =>
+      sortByPriority(
+        currentInitiatives.map((initiative) =>
+          updatedInitiativesIds.includes(initiative.id)
+            ? { ...initiative, status }
+            : initiative,
+        ),
+      ),
+    );
   }
 
   function updateInitiativesPriority(updatedInitiatives, priority) {
     const updatedInitiativesIds = updatedInitiatives.map(
       (initiative) => initiative.id,
     );
-    const updatedInitiativesPriority = initiatives.map((initiative) => {
-      if (updatedInitiativesIds.includes(initiative.id)) {
-        initiative.priority = priority;
-      }
-      return initiative;
-    });
-    setInitiatives(updatedInitiativesPriority);
+    setInitiatives((currentInitiatives) =>
+      sortByPriority(
+        currentInitiatives.map((initiative) =>
+          updatedInitiativesIds.includes(initiative.id)
+            ? { ...initiative, priority }
+            : initiative,
+        ),
+      ),
+    );
   }
 
   function updateInitiativesUser(updatedInitiatives, newAssignedTo) {
     const updatedInitiativesIds = updatedInitiatives.map((f) => f.id);
-    const updatedInitiativesList = initiatives.map((initiative) => {
-      if (updatedInitiativesIds.includes(initiative.id)) {
-        initiative.assignedTo = newAssignedTo;
-      }
-      return initiative;
-    });
-    setInitiatives([...sortByPriority(updatedInitiativesList)]);
+    setInitiatives((currentInitiatives) =>
+      sortByPriority(
+        currentInitiatives.map((initiative) =>
+          updatedInitiativesIds.includes(initiative.id)
+            ? { ...initiative, assignedTo: newAssignedTo }
+            : initiative,
+        ),
+      ),
+    );
   }
 
   async function updateInitiativesAssignedTo(
@@ -97,6 +99,17 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
     }
     const user = await getUser(orgId, newAssignedTo);
     updateInitiativesUser(updatedInitiatives, user);
+  }
+
+  function deleteInitiatives(deletedInitiatives) {
+    const deletedInitiativesIds = deletedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    setInitiatives((currentInitiatives) =>
+      currentInitiatives.filter(
+        (initiative) => !deletedInitiativesIds.includes(initiative.id),
+      ),
+    );
   }
 
   return (
@@ -117,6 +130,7 @@ function Milestone({ milestone, onInitiativeChangeMilestone }) {
                 onChangePriority={updateInitiativesPriority}
                 onChangeStatus={updateInitiativesStatus}
                 onChangeMilestone={onInitiativeChangeMilestone}
+                onDelete={deleteInitiatives}
               />
             </div>
           </Col>

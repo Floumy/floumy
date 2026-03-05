@@ -62,6 +62,7 @@ function ActiveSprint() {
         } else {
           const workItems = await listOpenWorkItems(orgId, projectId, {
             includeRecentCompleted: true,
+            includeWithCycles: true,
           });
           setActiveWorkItems(workItems);
           setWorkItemsGroupedByStatus(workItems);

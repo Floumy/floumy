@@ -26,7 +26,7 @@ export class AiAgentService {
 
   getChatAgent(orgId: string, projectId: string, userId: string) {
     const model = new ChatOpenAI({
-      model: 'gpt-4o',
+      model: 'gpt-4.1-mini',
       openAIApiKey: this.apiKey,
       streaming: true,
       // callbacks: [new ConsoleCallbackHandler()],

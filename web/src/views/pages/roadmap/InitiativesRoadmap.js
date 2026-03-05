@@ -175,10 +175,11 @@ function InitiativesRoadmap() {
   ) {
     if (!newAssignedTo) {
       updateInitiativesUser(updatedInitiatives, newAssignedTo);
-      return;
+      return newAssignedTo;
     }
     const user = await getUser(orgId, newAssignedTo);
     updateInitiativesUser(updatedInitiatives, user);
+    return user;
   }
 
   async function onAddInitiative(initiative) {

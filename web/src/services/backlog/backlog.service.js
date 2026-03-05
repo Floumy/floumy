@@ -82,13 +82,17 @@ export async function searchWorkItemsWithOptions(
 export async function listOpenWorkItems(
   orgId,
   projectId,
-  options = { includeRecentCompleted: false },
+  options = { includeRecentCompleted: false, includeWithCycles: false },
 ) {
   try {
     const params = new URLSearchParams();
     if (options.includeRecentCompleted) {
       params.set('includeRecentCompleted', 'true');
     }
+    if (options.includeWithCycles) {
+      params.set('includeWithCycles', 'true');
+    }
+
     const queryString = params.toString();
     const url = `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/open${
       queryString ? `?${queryString}` : ''

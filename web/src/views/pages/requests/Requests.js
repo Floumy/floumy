@@ -23,7 +23,9 @@ import {
 import {
   downvoteRequest,
   listCurrentUserRequestVotes,
+  listPublicRequests,
   listRequests,
+  searchPublicRequests,
   searchRequests,
   upvoteRequest,
 } from '../../../services/requests/requests.service';
@@ -62,15 +64,13 @@ export default function Requests({ isPublic = false }) {
     try {
       let requestsData;
       if (searchTerm) {
-        requestsData = await searchRequests(
-          orgId,
-          projectId,
-          searchTerm,
-          page,
-          50,
-        );
+        requestsData = isPublic
+          ? await searchPublicRequests(orgId, projectId, searchTerm, page, 50)
+          : await searchRequests(orgId, projectId, searchTerm, page, 50);
       } else {
-        requestsData = await listRequests(orgId, projectId, page, 50);
+        requestsData = isPublic
+          ? await listPublicRequests(orgId, projectId, page, 50)
+          : await listRequests(orgId, projectId, page, 50);
       }
       if (requestsData.length === 0) {
         setHasMoreRequests(false);
@@ -107,7 +107,7 @@ export default function Requests({ isPublic = false }) {
     document.title = 'Floumy | Requests';
     fetchRequests(1);
     fetchCurrentUserRequestVotes();
-  }, []);
+  }, [isPublic]);
 
   async function loadNextPage() {
     await fetchRequests(page + 1, search);

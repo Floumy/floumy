@@ -22,6 +22,8 @@ import DeleteWarning from '../components/DeleteWarning';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import InitiativesListCard from '../initiatives/InitiativesListCard';
+import { sortByPriority } from '../../../services/utils/utils';
+import { getUser } from '../../../services/okrs/okrs.service';
 
 function CreateUpdateDeleteMilestone({
   onSubmit,
@@ -34,7 +36,9 @@ function CreateUpdateDeleteMilestone({
   const [isDueDateTouched, setIsDueDateTouched] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isDeleteWarningOpen, setIsDeleteWarningOpen] = useState(false);
-  const [initiatives, setInitiatives] = useState(milestone?.initiatives);
+  const [initiatives, setInitiatives] = useState(
+    sortByPriority(milestone?.initiatives || []),
+  );
   const navigate = useNavigate();
 
   const validationSchema = Yup.object({
@@ -77,6 +81,10 @@ function CreateUpdateDeleteMilestone({
     }
   }, [milestone]);
 
+  useEffect(() => {
+    setInitiatives(sortByPriority(milestone?.initiatives || []));
+  }, [milestone?.initiatives]);
+
   function getDueDateClassName() {
     if (isDueDateInvalid) {
       return 'form-control is-invalid';
@@ -103,23 +111,87 @@ function CreateUpdateDeleteMilestone({
     if (milestone.id === newMilestoneId) {
       return;
     }
-    const newInitiatives = [];
-    for (const initiative of initiatives) {
-      if (!updatedInitiatives.some((f) => f.id === initiative.id)) {
-        initiative.milestone = newMilestoneId;
-        newInitiatives.push(initiative);
-      }
-    }
+    const updatedInitiativeIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    setInitiatives((currentInitiatives) =>
+      currentInitiatives.filter(
+        (initiative) => !updatedInitiativeIds.includes(initiative.id),
+      ),
+    );
+  }
 
-    setInitiatives(newInitiatives);
+  function updateInitiativesStatus(updatedInitiatives, status) {
+    const updatedInitiativeIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    setInitiatives((currentInitiatives) =>
+      sortByPriority(
+        currentInitiatives.map((initiative) =>
+          updatedInitiativeIds.includes(initiative.id)
+            ? { ...initiative, status }
+            : initiative,
+        ),
+      ),
+    );
+  }
+
+  function updateInitiativesPriority(updatedInitiatives, priority) {
+    const updatedInitiativeIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    setInitiatives((currentInitiatives) =>
+      sortByPriority(
+        currentInitiatives.map((initiative) =>
+          updatedInitiativeIds.includes(initiative.id)
+            ? { ...initiative, priority }
+            : initiative,
+        ),
+      ),
+    );
+  }
+
+  async function updateInitiativesAssignedTo(updatedInitiatives, assignedTo) {
+    let resolvedAssignedTo = assignedTo;
+    if (assignedTo) {
+      resolvedAssignedTo = await getUser(orgId, assignedTo);
+    }
+    const updatedInitiativeIds = updatedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    setInitiatives((currentInitiatives) =>
+      sortByPriority(
+        currentInitiatives.map((initiative) =>
+          updatedInitiativeIds.includes(initiative.id)
+            ? { ...initiative, assignedTo: resolvedAssignedTo }
+            : initiative,
+        ),
+      ),
+    );
+    return resolvedAssignedTo;
+  }
+
+  function deleteInitiatives(deletedInitiatives) {
+    const deletedInitiativeIds = deletedInitiatives.map(
+      (initiative) => initiative.id,
+    );
+    setInitiatives((currentInitiatives) =>
+      currentInitiatives.filter(
+        (initiative) => !deletedInitiativeIds.includes(initiative.id),
+      ),
+    );
   }
 
   function onAddInitiative() {
     return async (initiative) => {
-      initiative.milestone = milestone.id;
-      const savedInitiative = await addInitiative(orgId, projectId, initiative);
-      initiatives.push(savedInitiative);
-      setInitiatives([...initiatives]);
+      const savedInitiative = await addInitiative(orgId, projectId, {
+        ...initiative,
+        milestone: milestone.id,
+      });
+      setInitiatives((currentInitiatives) =>
+        sortByPriority([...currentInitiatives, savedInitiative]),
+      );
+      return savedInitiative;
     };
   }
 
@@ -259,6 +331,10 @@ function CreateUpdateDeleteMilestone({
           showAssignedTo={true}
           onAddInitiative={onAddInitiative()}
           onChangeMilestone={updateInitiativesMilestone}
+          onChangeStatus={updateInitiativesStatus}
+          onChangePriority={updateInitiativesPriority}
+          onChangeAssignedTo={updateInitiativesAssignedTo}
+          onDelete={deleteInitiatives}
         />
       )}
     </>

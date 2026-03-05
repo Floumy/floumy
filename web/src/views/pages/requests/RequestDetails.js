@@ -6,6 +6,7 @@ import {
   addRequestComment,
   deleteRequestComment,
   getRequest,
+  getPublicRequest,
   updateRequestComment,
 } from '../../../services/requests/requests.service';
 import PublicRequestDetails from './PublicRequestDetails';
@@ -19,6 +20,7 @@ export default function RequestDetails() {
   const { orgId, projectId, requestId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [request, setRequest] = useState(null);
+  const isPublicPage = window.location.pathname.startsWith('/public');
 
   useEffect(() => {
     document.title = 'Floumy | Request';
@@ -26,7 +28,9 @@ export default function RequestDetails() {
     async function fetchRequest(orgId, projectId, requestId) {
       try {
         setIsLoading(true);
-        const request = await getRequest(orgId, projectId, requestId);
+        const request = isPublicPage
+          ? await getPublicRequest(orgId, projectId, requestId)
+          : await getRequest(orgId, projectId, requestId);
         setRequest(request);
       } catch (e) {
         console.error(e);
@@ -36,7 +40,7 @@ export default function RequestDetails() {
     }
 
     fetchRequest(orgId, projectId, requestId);
-  }, [orgId, projectId, requestId]);
+  }, [isPublicPage, orgId, projectId, requestId]);
 
   async function handleCommentAdd(comment) {
     try {

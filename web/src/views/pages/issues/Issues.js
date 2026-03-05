@@ -19,7 +19,9 @@ import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   listIssues,
+  listPublicIssues,
   searchIssues,
+  searchPublicIssues,
 } from '../../../services/issues/issues.service';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {
@@ -60,15 +62,19 @@ export default function Issues({ isPublic = false }) {
       try {
         let newIssues;
         if (searchTerm) {
-          newIssues = await searchIssues(
-            orgId,
-            projectId,
-            searchTerm,
-            pageNum,
-            50,
-          );
+          newIssues = isPublic
+            ? await searchPublicIssues(
+                orgId,
+                projectId,
+                searchTerm,
+                pageNum,
+                50,
+              )
+            : await searchIssues(orgId, projectId, searchTerm, pageNum, 50);
         } else {
-          newIssues = await listIssues(orgId, projectId, pageNum, 50);
+          newIssues = isPublic
+            ? await listPublicIssues(orgId, projectId, pageNum, 50)
+            : await listIssues(orgId, projectId, pageNum, 50);
         }
         setIssues((prevIssues) =>
           isInitial ? newIssues : [...prevIssues, ...newIssues],
@@ -85,7 +91,7 @@ export default function Issues({ isPublic = false }) {
         }
       }
     },
-    [orgId, projectId],
+    [isPublic, orgId, projectId],
   );
 
   function doSearch(event) {
