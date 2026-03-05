@@ -31,6 +31,7 @@ export class OrgsService {
     project.name = 'Default Project';
     project.org = Promise.resolve(savedOrg);
     project.users = Promise.resolve([user]);
+    project.cyclesEnabled = true;
     await this.projectRepository.save(project);
 
     this.eventEmitter.emit('org.created', savedOrg);
