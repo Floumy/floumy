@@ -98,9 +98,9 @@ function WorkItemsContextMenu({
 
   const callChangeSprintCallbacks = (sprintId, workItems) => {
     try {
-      const onChange = onChangeSprint || onChangeCycle;
-      if (onChange) {
-        onChange(workItems, sprintId);
+      const onChangeCycleOrSprint = onChangeSprint || onChangeCycle;
+      if (onChangeCycleOrSprint) {
+        onChangeCycleOrSprint(workItems, sprintId);
       }
       if (onChange) {
         onChange(
