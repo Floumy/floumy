@@ -12,6 +12,8 @@ import { OrgsService } from '../orgs/orgs.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Org } from '../orgs/org.entity';
 import { UserRole } from '../users/enums';
+import { ConfigService } from '@nestjs/config';
+import { OAuth2Client } from 'google-auth-library';
 
 export type AuthDto = {
   accessToken: string;
@@ -22,6 +24,7 @@ export type AuthDto = {
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+  private readonly googleOauthClient = new OAuth2Client();
 
   constructor(
     private usersService: UsersService,
@@ -32,6 +35,7 @@ export class AuthService {
     private orgsService: OrgsService,
     private eventEmitter: EventEmitter2,
     private dataSource: DataSource,
+    private configService: ConfigService,
   ) {}
 
   async signIn(email: string, password: string): Promise<AuthDto> {
@@ -92,6 +96,52 @@ export class AuthService {
       signUpDto.email,
       signUpDto.password,
     );
+  }
+
+  async signInWithGoogle(
+    credential: string,
+    invitationToken?: string,
+  ): Promise<AuthDto> {
+    if (!credential) {
+      this.logger.error('Google credential was not provided');
+      throw new UnauthorizedException('Invalid Google sign-in request.');
+    }
+
+    const googleClientId =
+      this.configService.get<string>('google.clientId') ||
+      process.env.GOOGLE_CLIENT_ID;
+    if (!googleClientId) {
+      this.logger.error('Google sign in is not configured');
+      throw new UnauthorizedException('Google sign in is not configured.');
+    }
+
+    const googleUserData = await this.verifyGoogleCredential(
+      credential,
+      googleClientId,
+    );
+    let user = await this.usersService.findOneByEmail(googleUserData.email);
+
+    if (!user) {
+      user = await this.createUserForGoogleSignIn(
+        googleUserData.name,
+        googleUserData.email,
+        invitationToken,
+      );
+    }
+
+    if (!user.isActive) {
+      this.logger.error('The user is not active');
+      throw new UnauthorizedException('Your account is not yet active.');
+    }
+
+    const refreshToken = await this.getOrCreateRefreshToken(user);
+    const authData = {
+      accessToken: await this.tokensService.generateAccessToken(user),
+      refreshToken,
+      lastSignedIn: user.lastSignedIn,
+    };
+    await this.updateLastSignedIn(user);
+    return authData;
   }
 
   async refreshToken(refreshToken: string) {
@@ -246,5 +296,91 @@ export class AuthService {
   private async updateLastSignedIn(user: User) {
     user.lastSignedIn = new Date();
     await this.usersService.save(user);
+  }
+
+  private async verifyGoogleCredential(
+    credential: string,
+    googleClientId: string,
+  ) {
+    try {
+      const ticket = await this.googleOauthClient.verifyIdToken({
+        idToken: credential,
+        audience: googleClientId,
+      });
+      const payload = ticket.getPayload();
+      const email = payload?.email;
+      const name = payload?.name;
+
+      if (!payload || !payload.email_verified || !email) {
+        this.logger.error('Invalid Google token payload');
+        throw new UnauthorizedException('Google sign in failed.');
+      }
+
+      return { email, name };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+
+      this.logger.error('Google token verification failed');
+      throw new UnauthorizedException('Google sign in failed.');
+    }
+  }
+
+  private async createUserForGoogleSignIn(
+    name: string,
+    email: string,
+    invitationToken?: string,
+  ) {
+    const userName = this.getGoogleUserDisplayName(name, email);
+    const generatedPassword = `${uuid()}-google`;
+    const role = invitationToken ? UserRole.CONTRIBUTOR : UserRole.ADMIN;
+    const orgName = invitationToken ? undefined : `${userName}'s Workspace`;
+
+    try {
+      const org = await this.orgsService.getOrCreateOrg(
+        orgName,
+        invitationToken,
+      );
+
+      if (!org) {
+        throw new Error('Invalid invitation token');
+      }
+
+      const createdUser = await this.usersService.createUser(
+        userName,
+        email,
+        generatedPassword,
+        org,
+      );
+      createdUser.role = role;
+      createdUser.isActive = true;
+      createdUser.activationToken = null;
+      return await this.usersService.save(createdUser);
+    } catch (e) {
+      const existingUser = await this.usersService.findOneByEmail(email);
+      if (existingUser) {
+        return existingUser;
+      }
+
+      this.logger.error(e.message);
+      if (e.message === 'Invalid invitation token') {
+        throw new UnauthorizedException('Invalid invitation token.');
+      }
+      throw new UnauthorizedException('Google account provisioning failed.');
+    }
+  }
+
+  private getGoogleUserDisplayName(name: string, email: string) {
+    if (name && name.trim().length >= 2) {
+      return name.trim();
+    }
+
+    const emailLocalPart = email.split('@')[0]?.trim() || 'User';
+    if (emailLocalPart.length >= 2) {
+      return emailLocalPart;
+    }
+
+    return `${emailLocalPart} user`;
   }
 }

@@ -16,7 +16,12 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { Public } from './public.guard';
 import * as process from 'node:process';
-import type { OrgSignUpDto, SignInDto, SignUpDto } from './auth.dtos';
+import type {
+  GoogleSignInDto,
+  OrgSignUpDto,
+  SignInDto,
+  SignUpDto,
+} from './auth.dtos';
 
 @Controller('auth')
 export class AuthController {
@@ -36,17 +41,24 @@ export class AuthController {
       signInDto.password,
     );
 
-    response.cookie('accessToken', authData.accessToken, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
+    this.setAuthCookies(response, authData.accessToken, authData.refreshToken);
 
-    response.cookie('refreshToken', authData.refreshToken, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
+    return { lastSignedIn: authData.lastSignedIn };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('google-sign-in')
+  @Public()
+  async googleSignIn(
+    @Body() googleSignInDto: GoogleSignInDto,
+    @Res({ passthrough: true }) response,
+  ): Promise<{ lastSignedIn: Date }> {
+    const authData = await this.authService.signInWithGoogle(
+      googleSignInDto.credential,
+      googleSignInDto.invitationToken,
+    );
+
+    this.setAuthCookies(response, authData.accessToken, authData.refreshToken);
 
     return { lastSignedIn: authData.lastSignedIn };
   }
@@ -89,17 +101,7 @@ export class AuthController {
       request.cookies?.refreshToken,
     );
 
-    response.cookie('accessToken', res.accessToken, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
-
-    response.cookie('refreshToken', res.refreshToken, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
+    this.setAuthCookies(response, res.accessToken, res.refreshToken);
   }
 
   @Public()
@@ -179,5 +181,19 @@ export class AuthController {
       this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  private setAuthCookies(response, accessToken: string, refreshToken: string) {
+    response.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    });
+
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    });
   }
 }

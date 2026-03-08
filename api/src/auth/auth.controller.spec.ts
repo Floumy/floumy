@@ -19,6 +19,7 @@ describe('AuthController', () => {
   let response: any;
 
   beforeEach(async () => {
+    process.env.GOOGLE_CLIENT_ID = 'test-google-client-id';
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, TypeOrmModule.forFeature([RefreshToken, User, Org])],
       [
@@ -82,6 +83,71 @@ describe('AuthController', () => {
           response,
         ),
       ).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('when signing in with Google', () => {
+    it('should return last signed in and set auth cookies', async () => {
+      await controller.orgSignUp({
+        orgName: 'Test project',
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'testtesttest',
+      });
+
+      const user = await usersService.findOneByEmail('john@example.com');
+      user.isActive = true;
+      await usersService.save(user);
+
+      const authService = (controller as any).authService;
+      jest
+        .spyOn(authService.googleOauthClient, 'verifyIdToken')
+        .mockResolvedValue({
+          getPayload: () => ({
+            email: 'john@example.com',
+            email_verified: true,
+          }),
+        } as any);
+
+      const { lastSignedIn } = await controller.googleSignIn(
+        {
+          credential: 'test-credential',
+        },
+        response,
+      );
+
+      expect(lastSignedIn).toBeDefined();
+      expect(response.cookie.mock.calls[0][0]).toEqual('accessToken');
+      expect(response.cookie.mock.calls[1][0]).toEqual('refreshToken');
+    });
+
+    it('should auto-create a user on first Google sign in', async () => {
+      const authService = (controller as any).authService;
+      jest
+        .spyOn(authService.googleOauthClient, 'verifyIdToken')
+        .mockResolvedValue({
+          getPayload: () => ({
+            email: 'new.google.user@example.com',
+            name: 'New Google User',
+            email_verified: true,
+          }),
+        } as any);
+
+      await controller.googleSignIn(
+        {
+          credential: 'test-credential',
+        },
+        response,
+      );
+
+      const createdUser = await usersService.findOneByEmail(
+        'new.google.user@example.com',
+      );
+
+      expect(createdUser).toBeDefined();
+      expect(createdUser.isActive).toBe(true);
+      expect(response.cookie.mock.calls[0][0]).toEqual('accessToken');
+      expect(response.cookie.mock.calls[1][0]).toEqual('refreshToken');
     });
   });
 

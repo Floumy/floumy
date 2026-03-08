@@ -379,6 +379,28 @@
     height: 78px;
 }
 
+.sidebar-org-link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding-right: 1rem;
+}
+
+.sidebar-org-link-label {
+    display: inline-flex;
+    align-items: center;
+    font-size: .72rem;
+    line-height: 1.2;
+}
+
+.sidebar-org-link-name {
+    font-size: .9rem;
+    line-height: 1.25;
+    white-space: normal;
+    word-break: break-word;
+}
+
 
 // Sidenav states
 

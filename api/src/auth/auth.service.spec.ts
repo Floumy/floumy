@@ -11,6 +11,7 @@ import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { OrgsService } from '../orgs/orgs.service';
+import { UserRole } from '../users/enums';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -20,6 +21,7 @@ describe('AuthService', () => {
   let usersService: UsersService;
 
   beforeEach(async () => {
+    process.env.GOOGLE_CLIENT_ID = 'test-google-client-id';
     const { module, cleanup: dbCleanup } = await setupTestingModule(
       [UsersModule, TypeOrmModule.forFeature([RefreshToken, User, Org])],
       [
@@ -101,6 +103,61 @@ describe('AuthService', () => {
       await expect(service.signIn('john', 'wrongpassword')).rejects.toThrow(
         UnauthorizedException,
       );
+    });
+  });
+
+  describe('when signing in with Google', () => {
+    it('should return auth tokens for an active user', async () => {
+      const signUpDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'testtesttest',
+        projectName: 'Test project',
+      };
+      await service.orgSignUp(signUpDto);
+      const user = await usersService.findOneByEmail('john@example.com');
+      user.isActive = true;
+      await usersService.save(user);
+
+      jest
+        .spyOn((service as any).googleOauthClient, 'verifyIdToken')
+        .mockResolvedValue({
+          getPayload: () => ({
+            email: 'john@example.com',
+            email_verified: true,
+          }),
+        } as any);
+
+      const { accessToken, refreshToken } =
+        await service.signInWithGoogle('test-credential');
+
+      expect(accessToken).toBeDefined();
+      expect(refreshToken).toBeDefined();
+    });
+
+    it('should auto-create an active user if no user exists for the Google email', async () => {
+      jest
+        .spyOn((service as any).googleOauthClient, 'verifyIdToken')
+        .mockResolvedValue({
+          getPayload: () => ({
+            email: 'missing@example.com',
+            name: 'Missing User',
+            email_verified: true,
+          }),
+        } as any);
+
+      const { accessToken, refreshToken } =
+        await service.signInWithGoogle('test-credential');
+      const createdUser = await usersService.findOneByEmail(
+        'missing@example.com',
+      );
+
+      expect(accessToken).toBeDefined();
+      expect(refreshToken).toBeDefined();
+      expect(createdUser).toBeDefined();
+      expect(createdUser.isActive).toBe(true);
+      expect(createdUser.role).toEqual(UserRole.ADMIN);
+      expect(await createdUser.org).toBeDefined();
     });
   });
 

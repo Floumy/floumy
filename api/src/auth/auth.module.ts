@@ -14,6 +14,7 @@ import { User } from '../users/user.entity';
 import { RefreshTokensCleanerService } from './referesh-tokens-cleaner.service';
 import { OrgsModule } from '../orgs/orgs.module';
 import { BasicAuthGuard } from './basic-auth.guard';
+import { Org } from '../orgs/org.entity';
 
 @Module({
   controllers: [AuthController],
@@ -33,7 +34,7 @@ import { BasicAuthGuard } from './basic-auth.guard';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '60s' },
     }),
-    TypeOrmModule.forFeature([RefreshToken, User]),
+    TypeOrmModule.forFeature([RefreshToken, User, Org]),
     OrgsModule,
   ],
   exports: [AuthService, TokensService, BasicAuthGuard],

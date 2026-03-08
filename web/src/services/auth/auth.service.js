@@ -41,6 +41,23 @@ export async function signIn(email, password) {
   }
 }
 
+export async function signInWithGoogle(credential, invitationToken) {
+  const requestData = { credential, invitationToken };
+
+  try {
+    const response = await axios.post(
+      `${apiUrl}/auth/google-sign-in`,
+      requestData,
+    );
+    return handleAuthentication(response);
+  } catch (e) {
+    throw new Error(
+      e?.response?.data?.message ||
+        'You could not be authenticated with Google',
+    );
+  }
+}
+
 export async function activateAccount(activationToken) {
   try {
     await axios.post(`${apiUrl}/auth/activate`, {

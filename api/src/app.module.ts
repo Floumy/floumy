@@ -32,6 +32,7 @@ import { EncryptionModule } from './encryption/encryption.module';
 import { GitlabModule } from './gitlab/gitlab.module';
 import githubConfig from './config/github.config';
 import gitlabConfig from './config/gitlab.config';
+import googleConfig from './config/google.config';
 import { PagesModule } from './pages/pages.module';
 import { FloumyMcpModule } from './mcp/mcp.module';
 
@@ -49,6 +50,7 @@ import { FloumyMcpModule } from './mcp/mcp.module';
         aiConfig,
         githubConfig,
         gitlabConfig,
+        googleConfig,
       ],
     }),
     TypeOrmModule.forRootAsync({

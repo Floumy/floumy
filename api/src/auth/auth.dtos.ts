@@ -3,6 +3,11 @@ export interface SignInDto {
   password: string;
 }
 
+export interface GoogleSignInDto {
+  credential: string;
+  invitationToken?: string;
+}
+
 export interface OrgSignUpDto {
   name: string;
   email: string;

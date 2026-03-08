@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 // nodejs library that concatenates classes
@@ -23,21 +23,28 @@ import AuthHeader from '../../../components/Headers/AuthHeader.js';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import InputError from '../../../components/Errors/InputError';
 import { setCurrentUser } from '../../../services/users/users.service';
-import { signIn } from '../../../services/auth/auth.service';
+import { signIn, signInWithGoogle } from '../../../services/auth/auth.service';
 import { getInputGroupErrorClass } from './form-input-utils';
 import { getOrg } from '../../../services/org/orgs.service';
 import { logoutUser } from '../../../services/api/api.service';
+
+const GOOGLE_SCRIPT_ID = 'google-identity-services';
 
 function SignIn() {
   const [focusedEmail, setFocusedEmail] = useState(false);
   const [focusedPassword, setFocusedPassword] = useState(false);
   const [error, setError] = useState(null);
+  const googleButtonRef = useRef(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   let redirectTo;
+  let invitationToken;
   if (searchParams.has('redirectTo')) {
     redirectTo = decodeURI(searchParams.get('redirectTo'));
+  }
+  if (searchParams.has('invitationToken')) {
+    invitationToken = decodeURI(searchParams.get('invitationToken'));
   }
 
   const validationSchema = Yup.object({
@@ -80,45 +87,120 @@ function SignIn() {
     redirectIfLoggedIn();
   });
 
+  const handleSuccessfulSignIn = useCallback(async () => {
+    await setCurrentUser();
+
+    const currentOrg = await getOrg();
+
+    if (currentOrg.id) {
+      if (redirectTo) {
+        return navigate(redirectTo);
+      }
+
+      const lastVisitedProjectId = localStorage.getItem('lastVisitedProjectId');
+      if (
+        lastVisitedProjectId &&
+        currentOrg.projects.some(
+          (project) => project.id === lastVisitedProjectId,
+        )
+      ) {
+        return navigate(
+          `/admin/orgs/${currentOrg.id}/projects/${lastVisitedProjectId}/active-cycle`,
+        );
+      }
+
+      return navigate(`/orgs/${currentOrg.id}/objectives/`);
+    }
+
+    // TODO: Remove this when we have a proper way to handle it
+    await logoutUser();
+    throw new Error('You are not a member of any organization.');
+  }, [navigate, redirectTo]);
+
+  const handleGoogleLogin = useCallback(
+    async (response) => {
+      try {
+        setError(null);
+        const credential = response?.credential;
+        if (!credential) {
+          throw new Error('Google sign in failed.');
+        }
+
+        await signInWithGoogle(credential, invitationToken);
+        await handleSuccessfulSignIn();
+      } catch (e) {
+        setError(
+          e?.message || 'Google sign in failed. Please try another method.',
+        );
+      }
+    },
+    [handleSuccessfulSignIn, invitationToken],
+  );
+
+  useEffect(() => {
+    const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+    if (!googleClientId || !googleButtonRef.current) {
+      return;
+    }
+
+    let didUnmount = false;
+    let existingScript;
+
+    const initializeGoogleButton = () => {
+      if (
+        didUnmount ||
+        !window.google?.accounts?.id ||
+        !googleButtonRef.current
+      )
+        return;
+
+      googleButtonRef.current.innerHTML = '';
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleGoogleLogin,
+      });
+      window.google.accounts.id.renderButton(googleButtonRef.current, {
+        theme: 'outline',
+        size: 'large',
+        text: 'signin_with',
+        shape: 'rectangular',
+      });
+    };
+
+    if (window.google?.accounts?.id) {
+      initializeGoogleButton();
+      return () => {
+        didUnmount = true;
+      };
+    }
+
+    existingScript = document.getElementById(GOOGLE_SCRIPT_ID);
+    if (!existingScript) {
+      existingScript = document.createElement('script');
+      existingScript.id = GOOGLE_SCRIPT_ID;
+      existingScript.src = 'https://accounts.google.com/gsi/client';
+      existingScript.async = true;
+      existingScript.defer = true;
+      document.body.appendChild(existingScript);
+    }
+
+    existingScript.addEventListener('load', initializeGoogleButton);
+
+    return () => {
+      didUnmount = true;
+      existingScript?.removeEventListener('load', initializeGoogleButton);
+    };
+  }, [handleGoogleLogin]);
+
   const onLogin = async (values, { setSubmitting }) => {
     try {
       setError(null);
       setSubmitting(true);
 
       await signIn(values.email, values.password);
-      await setCurrentUser();
-
-      const currentOrg = await getOrg();
-
-      if (currentOrg.id) {
-        setSubmitting(false);
-
-        if (redirectTo) {
-          return navigate(redirectTo);
-        }
-
-        const lastVisitedProjectId = localStorage.getItem(
-          'lastVisitedProjectId',
-        );
-        if (
-          lastVisitedProjectId &&
-          currentOrg.projects.some(
-            (project) => project.id === lastVisitedProjectId,
-          )
-        ) {
-          return navigate(
-            `/admin/orgs/${currentOrg.id}/projects/${lastVisitedProjectId}/active-cycle`,
-          );
-        }
-
-        return navigate(`/orgs/${currentOrg.id}/objectives/`);
-      }
-
-      // TODO: Remove this when we have a proper way to handle it
-      await logoutUser();
-      setError('You are not a member of any organization.');
+      await handleSuccessfulSignIn();
     } catch (e) {
-      setError('The email or password is incorrect.');
+      setError(e?.message || 'The email or password is incorrect.');
     } finally {
       setSubmitting(false);
     }
@@ -219,6 +301,10 @@ function SignIn() {
                           Sign in
                         </Button>
                       </div>
+                      <div
+                        className="d-flex justify-content-center mt-3"
+                        ref={googleButtonRef}
+                      />
                     </Form>
                   )}
                 </Formik>
