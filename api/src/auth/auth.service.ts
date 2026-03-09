@@ -108,8 +108,7 @@ export class AuthService {
     }
 
     const googleClientId =
-      this.configService.get<string>('google.clientId') ||
-      process.env.GOOGLE_CLIENT_ID;
+      this.configService.get<string>('google.clientId');
     if (!googleClientId) {
       this.logger.error('Google sign in is not configured');
       throw new UnauthorizedException('Google sign in is not configured.');
