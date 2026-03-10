@@ -381,7 +381,7 @@ function CreateUpdateDeleteInitiative({ onSubmit, initiative }) {
                       className="form-control-label"
                       htmlFor="validationCustom01"
                     >
-                      {requests ? (
+                      {request ? (
                         <Link
                           to={`/admin/orgs/${orgId}/projects/${projectId}/requests/edit/${request}`}
                         >
