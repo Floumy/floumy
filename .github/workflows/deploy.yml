@@ -47,6 +47,7 @@ jobs:
             -e STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }} \
             -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
             -e ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }} \
+            -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
             -e GITHUB_CLIENT_ID=${{ secrets.GHUB_CLIENT_ID }} \
             -e GITHUB_CLIENT_SECRET=${{ secrets.GHUB_CLIENT_SECRET }} \
             -e GITHUB_REDIRECT_URI=${{ secrets.GHUB_REDIRECT_URI }} \
@@ -77,5 +78,6 @@ jobs:
             docker rm web-app || true
             docker run -d --restart=always --name web-app \
             -e REACT_APP_API_URL=https://api.floumy.com \
+            -e REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }} \
             -p 3000:80 docker.io/floumy/web:${VERSION}
             docker image prune -f

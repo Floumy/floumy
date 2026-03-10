@@ -138,7 +138,9 @@ function SignIn() {
   );
 
   useEffect(() => {
-    const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+    const googleClientId =
+      window.REACT_APP_GOOGLE_CLIENT_ID ||
+      process.env.REACT_APP_GOOGLE_CLIENT_ID;
     if (!googleClientId || !googleButtonRef.current) {
       return;
     }
@@ -184,11 +186,18 @@ function SignIn() {
       document.body.appendChild(existingScript);
     }
 
-    existingScript.addEventListener('load', initializeGoogleButton);
+    const handleScriptLoad = () => {
+      if (!didUnmount) {
+        initializeGoogleButton();
+      }
+    };
+
+    existingScript.addEventListener('load', handleScriptLoad);
+    initializeGoogleButton();
 
     return () => {
       didUnmount = true;
-      existingScript?.removeEventListener('load', initializeGoogleButton);
+      existingScript?.removeEventListener('load', handleScriptLoad);
     };
   }, [handleGoogleLogin]);
 

@@ -135,6 +135,29 @@ describe('AuthService', () => {
       expect(refreshToken).toBeDefined();
     });
 
+    it('should not allow to sign in with an inactive account', async () => {
+      const signUpDto = {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'testtesttest',
+        projectName: 'Test project',
+      };
+      await service.orgSignUp(signUpDto);
+
+      jest
+        .spyOn((service as any).googleOauthClient, 'verifyIdToken')
+        .mockResolvedValue({
+          getPayload: () => ({
+            email: 'john@example.com',
+            email_verified: true,
+          }),
+        } as any);
+
+      await expect(service.signInWithGoogle('test-credential')).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
     it('should auto-create an active user if no user exists for the Google email', async () => {
       jest
         .spyOn((service as any).googleOauthClient, 'verifyIdToken')

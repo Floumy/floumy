@@ -107,8 +107,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid Google sign-in request.');
     }
 
-    const googleClientId =
-      this.configService.get<string>('google.clientId');
+    const googleClientId = this.configService.get<string>('google.clientId');
     if (!googleClientId) {
       this.logger.error('Google sign in is not configured');
       throw new UnauthorizedException('Google sign in is not configured.');
@@ -356,18 +355,41 @@ export class AuthService {
       createdUser.isActive = true;
       createdUser.activationToken = null;
       return await this.usersService.save(createdUser);
-    } catch (e) {
-      const existingUser = await this.usersService.findOneByEmail(email);
-      if (existingUser) {
-        return existingUser;
-      }
-
-      this.logger.error(e.message);
-      if (e.message === 'Invalid invitation token') {
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === 'Invalid invitation token'
+      ) {
         throw new UnauthorizedException('Invalid invitation token.');
       }
+
+      if (this.isDuplicateEmailError(error)) {
+        const existingUser = await this.usersService.findOneByEmail(email);
+        if (existingUser) {
+          return existingUser;
+        }
+      }
+
+      this.logger.error(
+        error instanceof Error ? error.message : 'Unknown provisioning error',
+      );
       throw new UnauthorizedException('Google account provisioning failed.');
     }
+  }
+
+  private isDuplicateEmailError(error: unknown) {
+    if (!error || typeof error !== 'object') {
+      return false;
+    }
+
+    const dbError = error as { code?: string; message?: string };
+    const message = dbError.message?.toLowerCase() || '';
+    return (
+      dbError.code === '23505' ||
+      message.includes('email already exists') ||
+      message.includes('duplicate key value') ||
+      message.includes('unique constraint')
+    );
   }
 
   private getGoogleUserDisplayName(name: string, email: string) {

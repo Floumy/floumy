@@ -4,6 +4,8 @@ services:
   api:
     image: node:20.11.1
     container_name: floumy-api
+    environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     ports:
       - "8080:8080"
     volumes:
@@ -14,6 +16,8 @@ services:
   web:
     image: node:20.11.1
     container_name: floumy-web
+    environment:
+      REACT_APP_GOOGLE_CLIENT_ID: ${REACT_APP_GOOGLE_CLIENT_ID:-}
     ports:
       - "80:3000"
     volumes:
