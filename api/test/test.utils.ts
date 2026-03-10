@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import databaseConfig from '../src/config/database.config';
 import encryptionConfig from '../src/config/encryption.config';
+import googleConfig from '../src/config/google.config';
 import jwtConfig from '../src/config/jwt.config';
 import { testDbOptions } from './test-db.options';
 import { MailNotificationsService } from '../src/mail-notifications/mail-notifications.service';
@@ -113,7 +114,7 @@ export async function setupTestingModule(
         Cycle,
       ]),
       ConfigModule.forRoot({
-        load: [databaseConfig, encryptionConfig, jwtConfig],
+        load: [databaseConfig, encryptionConfig, googleConfig, jwtConfig],
       }),
       EventEmitterModule.forRoot(),
       ...imports,
