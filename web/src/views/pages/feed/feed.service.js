@@ -53,7 +53,9 @@ export function getWorkItemUpdates(item) {
   }
 
   if (current?.sprint?.id !== previous?.sprint?.id) {
-    updates.push(`Cycle changed to "${current?.cycle?.title || current?.sprint?.title || 'None'}"`);
+    updates.push(
+      `Cycle changed to "${current?.cycle?.title || current?.sprint?.title || 'None'}"`,
+    );
   }
 
   if (current?.initiative?.id !== previous?.initiative?.id) {

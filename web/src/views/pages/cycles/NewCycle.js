@@ -6,7 +6,7 @@ import { addCycle } from '../../../services/cycles/cycles.service';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProjects } from '../../../contexts/ProjectsContext';
 
-function NewSprint() {
+function NewCycle() {
   const { orgId, projectId } = useParams();
   const navigate = useNavigate();
   const { currentProject } = useProjects();
@@ -20,8 +20,8 @@ function NewSprint() {
 
   if (!cyclesEnabled) return null;
 
-  const handleSubmit = async (sprint) => {
-    return await addCycle(orgId, projectId, sprint);
+  const handleSubmit = async (cycle) => {
+    return await addCycle(orgId, projectId, cycle);
   };
 
   return (
@@ -40,4 +40,4 @@ function NewSprint() {
   );
 }
 
-export default NewSprint;
+export default NewCycle;

@@ -50,8 +50,10 @@ export default function RequestDetails() {
         request.id,
         comment,
       );
-      request.comments.push(addedComment);
-      setRequest({ ...request });
+      setRequest((currentRequest) => ({
+        ...currentRequest,
+        comments: [...currentRequest.comments, addedComment],
+      }));
       toast.success('Comment added successfully');
     } catch (e) {
       toast.error('Failed to add comment');
@@ -67,11 +69,14 @@ export default function RequestDetails() {
         commentId,
         content,
       );
-      const index = request.comments.findIndex(
-        (c) => c.id === updatedComment.id,
-      );
-      request.comments[index] = updatedComment;
-      setRequest({ ...request });
+      setRequest((currentRequest) => ({
+        ...currentRequest,
+        comments: currentRequest.comments.map((currentComment) =>
+          currentComment.id === updatedComment.id
+            ? updatedComment
+            : currentComment,
+        ),
+      }));
       toast.success('Comment updated successfully');
     } catch (e) {
       toast.error('Failed to update comment');
@@ -81,9 +86,10 @@ export default function RequestDetails() {
   async function handleCommentDelete(commentId) {
     try {
       await deleteRequestComment(orgId, projectId, request.id, commentId);
-      const index = request.comments.findIndex((c) => c.id === commentId);
-      request.comments.splice(index, 1);
-      setRequest({ ...request });
+      setRequest((currentRequest) => ({
+        ...currentRequest,
+        comments: currentRequest.comments.filter((c) => c.id !== commentId),
+      }));
       toast.success('Comment deleted successfully');
     } catch (e) {
       toast.error('Failed to delete comment');
