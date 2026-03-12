@@ -18,14 +18,14 @@ import {
 import { OkrsService } from './okrs.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Timeline } from '../common/timeline.enum';
-import {
+import type {
   CreateOrUpdateKeyResultDto,
   CreateOrUpdateOKRDto,
   PatchKeyResultDto,
   UpdateObjectiveDto,
 } from './dtos';
 import { CommentsService } from './comments/comments.service';
-import { CreateUpdateCommentDto } from '../comments/dtos';
+import type { CreateUpdateCommentDto } from '../comments/dtos';
 
 @Controller('/orgs/:orgId/projects/:projectId')
 @UseGuards(AuthGuard)

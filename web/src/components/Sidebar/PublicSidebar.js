@@ -63,16 +63,20 @@ function PublicSidebar({
   function isFeedbackEnabled() {
     return (
       buildingInPublicSettings.isIssuesPagePublic ||
-      buildingInPublicSettings.isFeatureRequestsPagePublic
+      buildingInPublicSettings.isRequestsPagePublic
     );
   }
+
+  const cyclesEnabled = project?.cyclesEnabled ?? false;
 
   function isProjectEnabled() {
     return (
       buildingInPublicSettings.isObjectivesPagePublic ||
       buildingInPublicSettings.isRoadmapPagePublic ||
-      buildingInPublicSettings.isSprintsPagePublic ||
-      buildingInPublicSettings.isActiveSprintsPagePublic
+      (cyclesEnabled &&
+        (buildingInPublicSettings.isCyclesPagePublic ||
+          buildingInPublicSettings.isActiveCyclesPagePublic)) ||
+      (!cyclesEnabled && buildingInPublicSettings.isActiveWorkPagePublic)
     );
   }
 
@@ -132,27 +136,41 @@ function PublicSidebar({
                 </NavLink>
               </NavItem>
             )}
-            {buildingInPublicSettings.isActiveSprintsPagePublic && (
+            {cyclesEnabled &&
+              buildingInPublicSettings.isActiveCyclesPagePublic && (
+                <NavItem>
+                  <NavLink
+                    to={`/public/orgs/${orgId}/projects/${project.id}/active-cycle`}
+                    onClick={closeSidenav}
+                    tag={NavLinkRRD}
+                  >
+                    <i className="fa fa-rocket" />
+                    <span className="nav-link-text">Active Cycle</span>
+                  </NavLink>
+                </NavItem>
+              )}
+            {!cyclesEnabled &&
+              buildingInPublicSettings.isActiveWorkPagePublic && (
+                <NavItem>
+                  <NavLink
+                    to={`/public/orgs/${orgId}/projects/${project.id}/active-cycle`}
+                    onClick={closeSidenav}
+                    tag={NavLinkRRD}
+                  >
+                    <i className="fa fa-rocket" />
+                    <span className="nav-link-text">Active Work</span>
+                  </NavLink>
+                </NavItem>
+              )}
+            {cyclesEnabled && buildingInPublicSettings.isCyclesPagePublic && (
               <NavItem>
                 <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/active-sprint`}
-                  onClick={closeSidenav}
-                  tag={NavLinkRRD}
-                >
-                  <i className="fa fa-rocket" />
-                  <span className="nav-link-text">Active Sprint</span>
-                </NavLink>
-              </NavItem>
-            )}
-            {buildingInPublicSettings.isSprintsPagePublic && (
-              <NavItem>
-                <NavLink
-                  to={`/public/orgs/${orgId}/projects/${project.id}/sprints`}
+                  to={`/public/orgs/${orgId}/projects/${project.id}/cycles`}
                   onClick={closeSidenav}
                   tag={NavLinkRRD}
                 >
                   <i className="fa fa-refresh" />
-                  <span className="nav-link-text">Sprints</span>
+                  <span className="nav-link-text">Cycles</span>
                 </NavLink>
               </NavItem>
             )}
@@ -178,17 +196,17 @@ function PublicSidebar({
                   </NavLink>
                 </NavItem>
               )}
-              {buildingInPublicSettings.isFeatureRequestsPagePublic && (
+              {buildingInPublicSettings.isRequestsPagePublic && (
                 <NavItem>
                   <Row style={{ maxWidth: '100%' }}>
                     <Col xs={7}>
                       <NavLink
-                        to={`/public/orgs/${orgId}/projects/${project.id}/feature-requests`}
+                        to={`/public/orgs/${orgId}/projects/${project.id}/requests`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
                         <i className="fa fa-pen-to-square" />
-                        <span className="nav-link-text">Feature Requests</span>
+                        <span className="nav-link-text">Requests</span>
                       </NavLink>
                     </Col>
                     {sidenavOpen && (

@@ -4,17 +4,17 @@ import DetailOKR from './views/pages/okrs/DetailOKR';
 import SignIn from './views/pages/auth/SignIn';
 import OrgSignUp from './views/pages/auth/OrgSignUp';
 import InitiativesRoadmap from './views/pages/roadmap/InitiativesRoadmap';
-import ActiveSprint from './views/pages/development/ActiveSprint';
+import ActiveCycle from './views/pages/development/ActiveCycle';
 import NewInitiative from './views/pages/roadmap/NewInitiative';
 import NewMilestone from './views/pages/roadmap/NewMilestone';
 import EditMilestone from './views/pages/roadmap/EditMilestone';
 import NewWorkItem from './views/pages/backlog/NewWorkItem';
 import EditWorkItem from './views/pages/backlog/EditWorkItem';
 import { DetailInitiative } from './views/pages/initiatives/DetailInitiative';
-import Sprints from './views/pages/sprints/Sprints';
+import Cycles from './views/pages/cycles/Cycles';
 import WorkItems from './views/pages/backlog/WorkItems';
-import NewSprint from './views/pages/sprints/NewSprint';
-import EditSprint from './views/pages/sprints/EditSprint';
+import NewCycle from './views/pages/cycles/NewCycle';
+import EditCycle from './views/pages/cycles/EditCycle';
 import Initiatives from './views/pages/initiatives/Initiatives';
 import DetailKeyResult from './views/pages/okrs/DetailKeyResult';
 import Members from './views/pages/settings/Members';
@@ -31,18 +31,18 @@ import PublicDetailWorkItem from './views/pages/backlog/PublicDetailWorkItem';
 import PublicOKRs from './views/pages/okrs/PublicOKRs';
 import PublicDetailOKR from './views/pages/okrs/PublicDetailOKR';
 import PublicDetailKeyResult from './views/pages/okrs/PublicDetailKeyResult';
-import PublicSprints from './views/pages/sprints/PublicSprints';
-import PublicSprint from './views/pages/sprints/PublicSprint';
+import PublicCycles from './views/pages/cycles/PublicCycles';
+import PublicCycle from './views/pages/cycles/PublicCycle';
 import PublicMilestone from './views/pages/roadmap/PublicMilestone';
-import PublicActiveSprint from './views/pages/development/PublicActiveSprint';
+import PublicActiveCycle from './views/pages/development/PublicActiveCycle';
 import Project from './views/pages/settings/Project';
 import MyProfile from './views/pages/users/MyProfile';
 import PrivateFeed from './views/pages/feed/PrivateFeed';
 import SignUp from './views/pages/auth/SignUp';
-import FeatureRequests from './views/pages/feature-requests/FeatureRequests';
-import NewFeatureRequest from './views/pages/feature-requests/NewFeatureRequest';
-import EditFeatureRequest from './views/pages/feature-requests/EditFeatureRequest';
-import FeatureRequestDetails from './views/pages/feature-requests/FeatureRequestDetails';
+import Requests from './views/pages/requests/Requests';
+import NewRequest from './views/pages/requests/NewRequest';
+import EditRequest from './views/pages/requests/EditRequest';
+import RequestDetails from './views/pages/requests/RequestDetails';
 import Issues from './views/pages/issues/Issues';
 import NewIssue from './views/pages/issues/NewIssue';
 import EditIssue from './views/pages/issues/EditIssue';
@@ -70,20 +70,20 @@ const routes = [
   },
   {
     redirect: true,
-    path: '/feature-requests',
-    component: <FeatureRequests />,
+    path: '/requests',
+    component: <Requests />,
     layout: '/admin',
   },
   {
     redirect: true,
-    path: '/feature-requests/new',
-    component: <NewFeatureRequest />,
+    path: '/requests/new',
+    component: <NewRequest />,
     layout: '/admin',
   },
   {
     redirect: true,
-    path: '/feature-requests/edit/:featureRequestId',
-    component: <EditFeatureRequest />,
+    path: '/requests/edit/:requestId',
+    component: <EditRequest />,
     layout: '/admin',
   },
   {
@@ -169,31 +169,31 @@ const routes = [
   },
   {
     collapse: false,
-    name: 'Sprints',
+    name: 'Cycles',
     icon: 'fa fa-refresh',
-    path: '/sprints',
-    component: <Sprints />,
+    path: '/cycles',
+    component: <Cycles />,
     layout: '/admin',
     shortcut: '4',
   },
   {
     redirect: true,
-    path: '/sprints/new',
-    component: <NewSprint />,
+    path: '/cycles/new',
+    component: <NewCycle />,
     layout: '/admin',
   },
   {
     redirect: true,
-    path: '/sprints/edit/:id',
-    component: <EditSprint />,
+    path: '/cycles/edit/:id',
+    component: <EditCycle />,
     layout: '/admin',
   },
   {
     collapse: false,
-    name: 'Active Sprint',
+    name: 'Active Cycle',
     icon: 'fa fa-rocket',
-    path: '/active-sprint',
-    component: <ActiveSprint />,
+    path: '/active-cycle',
+    component: <ActiveCycle />,
     layout: '/admin',
     shortcut: '5',
   },
@@ -391,14 +391,14 @@ export const publicRoutes = [
   },
   {
     redirect: true,
-    path: '/sprints',
-    component: <PublicSprints />,
+    path: '/cycles',
+    component: <PublicCycles />,
     layout: '/public',
   },
   {
     redirect: true,
-    path: '/sprints/detail/:sprintId',
-    component: <PublicSprint />,
+    path: '/cycles/detail/:cycleId',
+    component: <PublicCycle />,
     layout: '/public',
   },
   {
@@ -409,14 +409,14 @@ export const publicRoutes = [
   },
   {
     redirect: true,
-    path: '/active-sprint',
-    component: <PublicActiveSprint />,
+    path: '/active-cycle',
+    component: <PublicActiveCycle />,
     layout: '/public',
   },
   {
     redirect: true,
-    path: '/feature-requests',
-    component: <FeatureRequests isPublic={true} />,
+    path: '/requests',
+    component: <Requests isPublic={true} />,
     layout: '/public',
   },
   {
@@ -433,14 +433,14 @@ export const publicRoutes = [
   },
   {
     redirect: true,
-    path: '/feature-requests/new',
-    component: <NewFeatureRequest />,
+    path: '/requests/new',
+    component: <NewRequest />,
     layout: '/public',
   },
   {
     redirect: true,
-    path: '/feature-requests/:featureRequestId',
-    component: <FeatureRequestDetails />,
+    path: '/requests/:requestId',
+    component: <RequestDetails />,
     layout: '/public',
   },
   {

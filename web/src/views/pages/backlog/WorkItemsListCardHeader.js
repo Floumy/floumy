@@ -60,11 +60,11 @@ export default function WorkItemsListCardHeader({
               defaultValue={filterByType}
               data={[
                 { id: 'all', text: 'All Types' },
-                { id: 'user-story', text: 'User Story' },
-                { id: 'bug', text: 'Bug' },
+                { id: 'deliverable', text: 'Deliverable' },
+                { id: 'defect', text: 'Defect' },
                 { id: 'task', text: 'Task' },
-                { id: 'technical-debt', text: 'Technical Debt' },
-                { id: 'spike', text: 'Spike' },
+                { id: 'improvement', text: 'Improvement' },
+                { id: 'research', text: 'Research' },
               ]}
               options={{
                 placeholder: 'Filter by type',
@@ -84,11 +84,11 @@ export default function WorkItemsListCardHeader({
                 { id: 'ready-to-start', text: 'Ready to Start' },
                 { id: 'in-progress', text: 'In Progress' },
                 { id: 'blocked', text: 'Blocked' },
-                { id: 'code-review', text: 'Code Review' },
+                { id: 'review', text: 'Review' },
                 { id: 'testing', text: 'Testing' },
                 { id: 'revisions', text: 'Revisions' },
-                { id: 'ready-for-deployment', text: 'Ready for Deployment' },
-                { id: 'deployed', text: 'Deployed' },
+                { id: 'ready-to-ship', text: 'Ready to Ship' },
+                { id: 'shipped', text: 'Shipped' },
                 { id: 'done', text: 'Done' },
                 { id: 'closed', text: 'Closed' },
               ]}

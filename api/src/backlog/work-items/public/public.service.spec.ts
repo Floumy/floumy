@@ -2,7 +2,7 @@ import { PublicService } from './public.service';
 import { UsersService } from '../../../users/users.service';
 import { OrgsService } from '../../../orgs/orgs.service';
 import { InitiativesService } from '../../../roadmap/initiatives/initiatives.service';
-import { SprintsService } from '../../../sprints/sprints.service';
+import { CyclesService } from '../../../cycles/cycles.service';
 import { Repository } from 'typeorm';
 import { File } from '../../../files/file.entity';
 import { WorkItemsService } from '../work-items.service';
@@ -14,7 +14,7 @@ import { Objective } from '../../../okrs/objective.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
 import { Initiative } from '../../../roadmap/initiatives/initiative.entity';
 import { Milestone } from '../../../roadmap/milestones/milestone.entity';
-import { Sprint } from '../../../sprints/sprint.entity';
+import { Cycle } from '../../../cycles/cycle.entity';
 import { WorkItem } from '../work-item.entity';
 import { InitiativeFile } from '../../../roadmap/initiatives/initiative-file.entity';
 import { WorkItemFile } from '../work-item-file.entity';
@@ -26,6 +26,7 @@ import { BipSettings } from '../../../bip/bip-settings.entity';
 import { WorkItemStatus } from '../work-item-status.enum';
 import { Priority } from '../../../common/priority.enum';
 import { Project } from '../../../projects/project.entity';
+import { WorkItemType } from '../work-item-type.enum';
 
 describe('PublicService', () => {
   let usersService: UsersService;
@@ -34,14 +35,16 @@ describe('PublicService', () => {
   let bipSettingsRepository: Repository<BipSettings>;
   let orgsRepository: Repository<Org>;
   let workItemsRepository: Repository<WorkItem>;
+  let projectsRepository: Repository<Project>;
   let user: User;
   let project: Project;
   let service: PublicService;
+  let module: { get: (type: unknown) => unknown };
 
   let cleanup: () => Promise<void>;
 
   beforeEach(async () => {
-    const { module, cleanup: dbCleanup } = await setupTestingModule(
+    const { module: testModule, cleanup: dbCleanup } = await setupTestingModule(
       [
         TypeOrmModule.forFeature([
           Objective,
@@ -50,7 +53,7 @@ describe('PublicService', () => {
           Initiative,
           User,
           Milestone,
-          Sprint,
+          Cycle,
           WorkItem,
           File,
           InitiativeFile,
@@ -66,12 +69,13 @@ describe('PublicService', () => {
         UsersService,
         MilestonesService,
         WorkItemsService,
-        SprintsService,
+        CyclesService,
         FilesService,
         FilesStorageRepository,
         PublicService,
       ],
     );
+    module = testModule;
     cleanup = dbCleanup;
     service = module.get<PublicService>(PublicService);
     orgsService = module.get<OrgsService>(OrgsService);
@@ -83,6 +87,9 @@ describe('PublicService', () => {
     workItemsRepository = module.get<Repository<WorkItem>>(
       getRepositoryToken(WorkItem),
     );
+    projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
+    );
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -90,8 +97,11 @@ describe('PublicService', () => {
     );
     org = await orgsService.createForUser(user);
     project = (await org.projects)[0];
+    project.cyclesEnabled = false;
+    await projectsRepository.save(project);
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
+    bipSettings.isActiveWorkPagePublic = true;
     bipSettings.org = Promise.resolve(org);
     bipSettings.project = Promise.resolve(project);
     await bipSettingsRepository.save(bipSettings);
@@ -126,6 +136,58 @@ describe('PublicService', () => {
       await orgsRepository.save(org);
       await expect(
         service.getWorkItem(org.id, project.id, 'invalid_id'),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('list open work items', () => {
+    it('should return open work items when isActiveWorkPagePublic is true', async () => {
+      const workItemsService = module.get<WorkItemsService>(WorkItemsService);
+      await workItemsService.createWorkItem(org.id, project.id, user.id, {
+        title: 'Open work item',
+        description: 'Description',
+        priority: Priority.HIGH,
+        type: WorkItemType.DELIVERABLE,
+        status: WorkItemStatus.PLANNED,
+      });
+      const result = await service.listOpenWorkItems(org.id, project.id);
+      expect(result).toBeDefined();
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toEqual('Open work item');
+    });
+
+    it('should throw when isActiveWorkPagePublic is false', async () => {
+      const bipSettings = await bipSettingsRepository.findOneBy({
+        org: { id: org.id },
+        project: { id: project.id },
+      });
+      bipSettings.isActiveWorkPagePublic = false;
+      await bipSettingsRepository.save(bipSettings);
+
+      await expect(
+        service.listOpenWorkItems(org.id, project.id),
+      ).rejects.toThrow();
+    });
+
+    it('should throw when isBuildInPublicEnabled is false', async () => {
+      const bipSettings = await bipSettingsRepository.findOneBy({
+        org: { id: org.id },
+        project: { id: project.id },
+      });
+      bipSettings.isBuildInPublicEnabled = false;
+      await bipSettingsRepository.save(bipSettings);
+
+      await expect(
+        service.listOpenWorkItems(org.id, project.id),
+      ).rejects.toThrow();
+    });
+
+    it('should throw when cycles are enabled for the project', async () => {
+      project.cyclesEnabled = true;
+      await projectsRepository.save(project);
+
+      await expect(
+        service.listOpenWorkItems(org.id, project.id),
       ).rejects.toThrow();
     });
   });

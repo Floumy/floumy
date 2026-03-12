@@ -16,9 +16,9 @@ import { Priority } from '../../common/priority.enum';
 import { WorkItemType } from './work-item-type.enum';
 import { Repository } from 'typeorm';
 import { WorkItemStatus } from './work-item-status.enum';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 import { WorkItem } from './work-item.entity';
-import { SprintsService } from '../../sprints/sprints.service';
+import { CyclesService } from '../../cycles/cycles.service';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { InitiativeFile } from '../../roadmap/initiatives/initiative-file.entity';
@@ -47,7 +47,7 @@ describe('WorkItemQueryBuilder', () => {
           Initiative,
           User,
           Milestone,
-          Sprint,
+          Cycle,
           WorkItem,
           File,
           InitiativeFile,
@@ -62,7 +62,7 @@ describe('WorkItemQueryBuilder', () => {
         UsersService,
         MilestonesService,
         WorkItemsService,
-        SprintsService,
+        CyclesService,
         FilesService,
         FilesStorageRepository,
         IssuesService,
@@ -110,7 +110,7 @@ describe('WorkItemQueryBuilder', () => {
       workItem.title = 'my work item';
       workItem.description = 'my work item description';
       workItem.priority = Priority.HIGH;
-      workItem.type = WorkItemType.USER_STORY;
+      workItem.type = WorkItemType.DELIVERABLE;
       workItem.status = WorkItemStatus.DONE;
       workItem.org = Promise.resolve(org);
       workItem.createdBy = Promise.resolve(user);
@@ -129,7 +129,7 @@ describe('WorkItemQueryBuilder', () => {
         {
           status: [WorkItemStatus.DONE],
           priority: [Priority.HIGH],
-          type: [WorkItemType.USER_STORY],
+          type: [WorkItemType.DELIVERABLE],
           assigneeIds: [user.id],
           completedAt: {
             start: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
@@ -163,7 +163,7 @@ describe('WorkItemQueryBuilder', () => {
       workItem.title = 'my work item';
       workItem.description = 'my work item description';
       workItem.priority = Priority.HIGH;
-      workItem.type = WorkItemType.USER_STORY;
+      workItem.type = WorkItemType.DELIVERABLE;
       workItem.status = WorkItemStatus.DONE;
       workItem.org = Promise.resolve(org);
       workItem.createdBy = Promise.resolve(user);
@@ -184,7 +184,7 @@ describe('WorkItemQueryBuilder', () => {
         {
           status: [WorkItemStatus.DONE],
           priority: [Priority.HIGH],
-          type: [WorkItemType.USER_STORY],
+          type: [WorkItemType.DELIVERABLE],
           assigneeIds: [user.id],
           completedAt: {
             start: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
@@ -216,7 +216,7 @@ describe('WorkItemQueryBuilder', () => {
       workItem.title = 'my work item';
       workItem.description = 'my work item description';
       workItem.priority = Priority.HIGH;
-      workItem.type = WorkItemType.USER_STORY;
+      workItem.type = WorkItemType.DELIVERABLE;
       workItem.status = WorkItemStatus.DONE;
       workItem.org = Promise.resolve(org);
       workItem.createdBy = Promise.resolve(user);
@@ -235,7 +235,7 @@ describe('WorkItemQueryBuilder', () => {
         {
           status: [WorkItemStatus.DONE],
           priority: [Priority.HIGH],
-          type: [WorkItemType.USER_STORY],
+          type: [WorkItemType.DELIVERABLE],
           assigneeIds: [user.id],
           completedAt: {
             start: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),

@@ -16,14 +16,14 @@ import { Org } from '../orgs/org.entity';
 import { Project } from '../projects/project.entity';
 import { Issue } from '../issues/issue.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
-import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Request } from '../requests/request.entity';
 import { Objective } from '../okrs/objective.entity';
 import { ChatController } from './chat/chat.controller';
 import { ChatService } from './chat/chat.service';
 import { DocumentVectorStoreService } from './documents/document-vector-store.service';
 import { IndexingController } from './documents/indexing.controller';
 import { IndexingService } from './documents/indexing.service';
-import { Sprint } from '../sprints/sprint.entity';
+import { Cycle } from '../cycles/cycle.entity';
 import { WorkItemsToolsService } from './chat/tools/work-items-tools.service';
 import { Page } from 'src/pages/pages.entity';
 import { IndexingEventHandlerService } from './documents/indexing-event-handler.service';
@@ -32,8 +32,8 @@ import { InitiativesToolsService } from './chat/tools/initiatives-tools.service'
 import { MilestonesToolsService } from './chat/tools/milestones-tools.service';
 import { OkrsToolsService } from './chat/tools/okrs-tools.service';
 import { OkrsModule } from '../okrs/okrs.module';
-import { SprintsModule } from '../sprints/sprints.module';
-import { SprintsToolsService } from './chat/tools/sprints-tools.service';
+import { CyclesModule } from '../cycles/cycles.module';
+import { CyclesToolsService } from './chat/tools/cycles-tools.service';
 import { ChatHistory } from './chat/chat-history.entity';
 import { ChatMessageHistoryStoreService } from './chat/chat-message-history-store.service';
 import { AiAgentService } from './chat/ai-agent.service';
@@ -48,7 +48,7 @@ import { ChatHistoryService } from './chat/chat-history.service';
     AuthModule,
     BacklogModule,
     OkrsModule,
-    SprintsModule,
+    CyclesModule,
     CacheModule.register(),
     TypeOrmModule.forFeature([
       Org,
@@ -59,9 +59,9 @@ import { ChatHistoryService } from './chat/chat-history.service';
       KeyResult,
       Issue,
       Milestone,
-      FeatureRequest,
+      Request,
       Objective,
-      Sprint,
+      Cycle,
       Page,
       ChatHistory,
     ]),
@@ -77,7 +77,7 @@ import { ChatHistoryService } from './chat/chat-history.service';
     InitiativesToolsService,
     MilestonesToolsService,
     OkrsToolsService,
-    SprintsToolsService,
+    CyclesToolsService,
     IndexingEventHandlerService,
     ChatMessageHistoryStoreService,
     AiAgentService,

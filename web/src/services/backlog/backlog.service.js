@@ -79,11 +79,25 @@ export async function searchWorkItemsWithOptions(
   }
 }
 
-export async function listOpenWorkItems(orgId, projectId) {
+export async function listOpenWorkItems(
+  orgId,
+  projectId,
+  options = { includeRecentCompleted: false, includeWithCycles: false },
+) {
   try {
-    const response = await api.get(
-      `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/open`,
-    );
+    const params = new URLSearchParams();
+    if (options.includeRecentCompleted) {
+      params.set('includeRecentCompleted', 'true');
+    }
+    if (options.includeWithCycles) {
+      params.set('includeWithCycles', 'true');
+    }
+
+    const queryString = params.toString();
+    const url = `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/open${
+      queryString ? `?${queryString}` : ''
+    }`;
+    const response = await api.get(url);
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -112,6 +126,27 @@ export async function getPublicWorkItem(orgId, projectId, workItemId) {
   }
 }
 
+export async function listPublicOpenWorkItems(
+  orgId,
+  projectId,
+  options = { includeRecentCompleted: false },
+) {
+  try {
+    const params = new URLSearchParams();
+    if (options.includeRecentCompleted) {
+      params.set('includeRecentCompleted', 'true');
+    }
+    const queryString = params.toString();
+    const url = `${apiUrl}/public/orgs/${orgId}/projects/${projectId}/work-items/open${
+      queryString ? `?${queryString}` : ''
+    }`;
+    const response = await api.get(url);
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
 export async function updateWorkItem(orgId, projectId, id, workItem) {
   try {
     const response = await api.put(
@@ -134,11 +169,11 @@ export async function deleteWorkItem(orgId, projectId, id) {
   }
 }
 
-export async function updateWorkItemSprint(orgId, projectId, id, sprintId) {
+export async function updateWorkItemSprint(orgId, projectId, id, cycleId) {
   try {
     await api.patch(
       `${apiUrl}/orgs/${orgId}/projects/${projectId}/work-items/${id}`,
-      { sprint: sprintId },
+      { cycle: cycleId },
     );
   } catch (e) {
     throw new Error(e.message);

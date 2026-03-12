@@ -18,9 +18,12 @@ import {
 import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 import { Link, useParams } from 'react-router-dom';
 import { useBuildInPublic } from '../../../contexts/BuidInPublicContext';
+import { useProjects } from '../../../contexts/ProjectsContext';
 
 function BuildInPublic() {
   const { orgId, projectId } = useParams();
+  const { currentProject } = useProjects();
+  const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
   const [isLoadingBuildInPublicSettings, setIsLoadingBuildInPublicSettings] =
     useState(false);
   const [isBuildInPublicEnabled, setIsBuildInPublicEnabled] = useState(false);
@@ -48,12 +51,13 @@ function BuildInPublic() {
         setBuildInPublicSettings({
           isObjectivesPagePublic: buildInPublicSettings.isObjectivesPagePublic,
           isRoadmapPagePublic: buildInPublicSettings.isRoadmapPagePublic,
-          isSprintsPagePublic: buildInPublicSettings.isSprintsPagePublic,
-          isActiveSprintsPagePublic:
-            buildInPublicSettings.isActiveSprintsPagePublic,
+          isCyclesPagePublic: buildInPublicSettings.isCyclesPagePublic,
+          isActiveCyclesPagePublic:
+            buildInPublicSettings.isActiveCyclesPagePublic,
+          isActiveWorkPagePublic:
+            buildInPublicSettings.isActiveWorkPagePublic ?? false,
           isIssuesPagePublic: buildInPublicSettings.isIssuesPagePublic,
-          isFeatureRequestsPagePublic:
-            buildInPublicSettings.isFeatureRequestsPagePublic,
+          isRequestsPagePublic: buildInPublicSettings.isRequestsPagePublic,
           isBuildInPublicEnabled: buildInPublicSettings.isBuildInPublicEnabled,
         });
         setIsBuildInPublicEnabled(buildInPublicSettings.isBuildInPublicEnabled);
@@ -71,10 +75,11 @@ function BuildInPublic() {
     return (
       settings.isObjectivesPagePublic ||
       settings.isRoadmapPagePublic ||
-      settings.isActiveSprintsPagePublic ||
-      settings.isSprintsPagePublic ||
+      (cyclesEnabled &&
+        (settings.isActiveCyclesPagePublic || settings.isCyclesPagePublic)) ||
+      (!cyclesEnabled && settings.isActiveWorkPagePublic) ||
       settings.isIssuesPagePublic ||
-      settings.isFeatureRequestsPagePublic
+      settings.isRequestsPagePublic
     );
   }
 
@@ -108,42 +113,49 @@ function BuildInPublic() {
 
     if (buildInPublicSettings.isObjectivesPagePublic) {
       setPublicLink(
-        createUrl(`/public/orgs/${orgId}/projects/${projectId}/okrs`),
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/objectives`),
       );
     } else if (buildInPublicSettings.isRoadmapPagePublic) {
       setPublicLink(
         createUrl(`/public/orgs/${orgId}/projects/${projectId}/roadmap`),
       );
-    } else if (buildInPublicSettings.isSprintsPagePublic) {
+    } else if (buildInPublicSettings.isCyclesPagePublic) {
       setPublicLink(
-        createUrl(`/public/orgs/${orgId}/projects/${projectId}/sprints`),
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/cycles`),
       );
-    } else if (buildInPublicSettings.isActiveSprintsPagePublic) {
+    } else if (buildInPublicSettings.isActiveCyclesPagePublic) {
       setPublicLink(
-        createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-sprint`),
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-cycle`),
+      );
+    } else if (!cyclesEnabled && buildInPublicSettings.isActiveWorkPagePublic) {
+      setPublicLink(
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/active-cycle`),
       );
     } else if (buildInPublicSettings.isIssuesPagePublic) {
       setPublicLink(
         createUrl(`/public/orgs/${orgId}/projects/${projectId}/issues`),
       );
-    } else if (buildInPublicSettings.isFeatureRequestsPagePublic) {
+    } else if (buildInPublicSettings.isRequestsPagePublic) {
       setPublicLink(
-        createUrl(
-          `/public/orgs/${orgId}/projects/${projectId}/feature-requests`,
-        ),
+        createUrl(`/public/orgs/${orgId}/projects/${projectId}/requests`),
       );
     }
-  }, [buildInPublicSettings, orgId]);
+  }, [buildInPublicSettings, orgId, projectId, cyclesEnabled]);
 
   async function toggleBuildInPublic() {
     try {
       const settings = {
         isObjectivesPagePublic: !isBuildInPublicEnabled,
         isRoadmapPagePublic: !isBuildInPublicEnabled,
-        isSprintsPagePublic: !isBuildInPublicEnabled,
-        isActiveSprintsPagePublic: !isBuildInPublicEnabled,
+        isCyclesPagePublic: cyclesEnabled ? !isBuildInPublicEnabled : false,
+        isActiveCyclesPagePublic: cyclesEnabled
+          ? !isBuildInPublicEnabled
+          : false,
+        isActiveWorkPagePublic: !cyclesEnabled
+          ? !isBuildInPublicEnabled
+          : false,
         isIssuesPagePublic: !isBuildInPublicEnabled,
-        isFeatureRequestsPagePublic: !isBuildInPublicEnabled,
+        isRequestsPagePublic: !isBuildInPublicEnabled,
       };
       await updateBuildInPublicSettings(orgId, projectId, {
         ...settings,
@@ -264,17 +276,13 @@ function BuildInPublic() {
                     </Row>
                     <Row className="mb-3">
                       <Col xs={6} sm={3} md={2}>
-                        Feature Requests
+                        Requests
                       </Col>
                       <Col xs={6} sm={9} md={10}>
                         <label className="custom-toggle">
                           <input
-                            checked={
-                              buildInPublicSettings.isFeatureRequestsPagePublic
-                            }
-                            onChange={togglePublicPage(
-                              'isFeatureRequestsPagePublic',
-                            )}
+                            checked={buildInPublicSettings.isRequestsPagePublic}
+                            onChange={togglePublicPage('isRequestsPagePublic')}
                             type="checkbox"
                           />
                           <span
@@ -327,90 +335,81 @@ function BuildInPublic() {
                         </label>
                       </Col>
                     </Row>
-                    <Row className="mb-3">
-                      <Col xs={6} sm={3} md={2}>
-                        Active Sprint
-                      </Col>
-                      <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle">
-                          <input
-                            checked={
-                              buildInPublicSettings.isActiveSprintsPagePublic
-                            }
-                            onChange={togglePublicPage(
-                              'isActiveSprintsPagePublic',
-                            )}
-                            type="checkbox"
-                          />
-                          <span
-                            className="custom-toggle-slider"
-                            data-label-off="No"
-                            data-label-on="Yes"
-                          />
-                        </label>
-                      </Col>
-                    </Row>
-                    <Row className="mb-3">
-                      <Col xs={6} sm={3} md={2}>
-                        Sprints
-                      </Col>
-                      <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle mr-1">
-                          <input
-                            checked={buildInPublicSettings.isSprintsPagePublic}
-                            onChange={togglePublicPage('isSprintsPagePublic')}
-                            type="checkbox"
-                          />
-                          <span
-                            className="custom-toggle-slider"
-                            data-label-off="No"
-                            data-label-on="Yes"
-                          />
-                        </label>
-                      </Col>
-                    </Row>
-                    <Row className="mb-3">
-                      <Col xs={6} sm={3} md={2}>
-                        Issues
-                      </Col>
-                      <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle mr-1">
-                          <input
-                            checked={buildInPublicSettings.isIssuesPagePublic}
-                            onChange={togglePublicPage('isIssuesPagePublic')}
-                            type="checkbox"
-                          />
-                          <span
-                            className="custom-toggle-slider"
-                            data-label-off="No"
-                            data-label-on="Yes"
-                          />
-                        </label>
-                      </Col>
-                    </Row>
-                    <Row className="mb-3">
-                      <Col xs={6} sm={3} md={2}>
-                        Feature Requests
-                      </Col>
-                      <Col xs={6} sm={9} md={10}>
-                        <label className="custom-toggle mr-1">
-                          <input
-                            checked={
-                              buildInPublicSettings.isFeatureRequestsPagePublic
-                            }
-                            onChange={togglePublicPage(
-                              'isFeatureRequestsPagePublic',
-                            )}
-                            type="checkbox"
-                          />
-                          <span
-                            className="custom-toggle-slider"
-                            data-label-off="No"
-                            data-label-on="Yes"
-                          />
-                        </label>
-                      </Col>
-                    </Row>
+                    {!cyclesEnabled && (
+                      <Row className="mb-3">
+                        <Col xs={6} sm={3} md={2}>
+                          Active Work
+                        </Col>
+                        <Col xs={6} sm={9} md={10}>
+                          <label className="custom-toggle">
+                            <input
+                              checked={
+                                buildInPublicSettings.isActiveWorkPagePublic
+                              }
+                              onChange={togglePublicPage(
+                                'isActiveWorkPagePublic',
+                              )}
+                              type="checkbox"
+                            />
+                            <span
+                              className="custom-toggle-slider"
+                              data-label-off="No"
+                              data-label-on="Yes"
+                            />
+                          </label>
+                        </Col>
+                      </Row>
+                    )}
+                    {cyclesEnabled && (
+                      <>
+                        <Row className="mb-3">
+                          <Col xs={6} sm={3} md={2}>
+                            Active Cycle
+                          </Col>
+                          <Col xs={6} sm={9} md={10}>
+                            <label className="custom-toggle">
+                              <input
+                                checked={
+                                  buildInPublicSettings.isActiveCyclesPagePublic
+                                }
+                                onChange={togglePublicPage(
+                                  'isActiveCyclesPagePublic',
+                                )}
+                                type="checkbox"
+                              />
+                              <span
+                                className="custom-toggle-slider"
+                                data-label-off="No"
+                                data-label-on="Yes"
+                              />
+                            </label>
+                          </Col>
+                        </Row>
+                        <Row className="mb-3">
+                          <Col xs={6} sm={3} md={2}>
+                            Cycles
+                          </Col>
+                          <Col xs={6} sm={9} md={10}>
+                            <label className="custom-toggle mr-1">
+                              <input
+                                checked={
+                                  buildInPublicSettings.isCyclesPagePublic
+                                }
+                                onChange={togglePublicPage(
+                                  'isCyclesPagePublic',
+                                )}
+                                type="checkbox"
+                              />
+                              <span
+                                className="custom-toggle-slider"
+                                data-label-off="No"
+                                data-label-on="Yes"
+                              />
+                            </label>
+                          </Col>
+                        </Row>
+                      </>
+                    )}
                   </>
                 )}
               </CardBody>

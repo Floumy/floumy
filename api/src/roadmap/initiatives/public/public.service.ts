@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Org } from '../../../orgs/org.entity';
 import { Repository } from 'typeorm';
@@ -24,8 +24,11 @@ export class PublicService {
 
     const bipSettings = await project.bipSettings;
 
-    if (!bipSettings?.isBuildInPublicEnabled) {
-      throw new Error('Roadmap page is not public');
+    if (
+      !bipSettings?.isBuildInPublicEnabled ||
+      !bipSettings?.isRoadmapPagePublic
+    ) {
+      throw new NotFoundException();
     }
     const initiative = await this.initiativesRepository.findOneByOrFail({
       org: { id: orgId },

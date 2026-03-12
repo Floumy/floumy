@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Item, Menu, Submenu } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
-import { listSprints } from '../../services/sprints/sprints.service';
+import { listCycles } from '../../services/cycles/cycles.service';
 import { Badge, Spinner } from 'reactstrap';
 import {
   changeWorkItemAssignee,
-  updateWorkItemSprint,
-  updateWorkItemPriority,
-  updateWorkItemStatus,
   deleteWorkItem,
+  updateWorkItemPriority,
+  updateWorkItemSprint,
+  updateWorkItemStatus,
 } from '../../services/backlog/backlog.service';
 import {
   formatHyphenatedString,
@@ -20,10 +20,12 @@ import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { getOrg } from '../../services/org/orgs.service';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
+import { useProjects } from '../../contexts/ProjectsContext';
 
 function WorkItemsContextMenu({
   menuId,
   onChangeSprint,
+  onChangeCycle,
   onChangeStatus,
   onChangePriority,
   onChange,
@@ -38,20 +40,22 @@ function WorkItemsContextMenu({
   const [isDeleting, setIsDeleting] = useState(false);
   const [itemsToDelete, setItemsToDelete] = useState([]);
   const { orgId, projectId } = useParams();
+  const { currentProject } = useProjects();
+  const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
 
   useEffect(() => {
-    async function fetchSprints() {
+    async function fetchCycles() {
+      if (!cyclesEnabled) return;
       try {
         setIsLoadingSprints(true);
-        const sprints = await listSprints(orgId, projectId);
+        const cycles = await listCycles(orgId, projectId);
         setSprints(
-          sprints.filter(
-            (sprint) =>
-              sprint.status === 'active' || sprint.status === 'planned',
+          cycles.filter(
+            (cycle) => cycle.status === 'active' || cycle.status === 'planned',
           ),
         );
       } catch (e) {
-        console.error('The sprints could not be loaded');
+        console.error('The cycles could not be loaded');
       } finally {
         setIsLoadingSprints(false);
       }
@@ -76,8 +80,8 @@ function WorkItemsContextMenu({
     }
 
     fetchUsers();
-    fetchSprints();
-  }, [orgId, projectId]);
+    fetchCycles();
+  }, [orgId, projectId, cyclesEnabled]);
 
   const handleChangeSprint = async ({ id: sprintId, event, props }) => {
     try {
@@ -86,16 +90,17 @@ function WorkItemsContextMenu({
         await updateWorkItemSprint(orgId, projectId, workItem.id, sprintId);
       }
       callChangeSprintCallbacks(sprintId, props.workItems);
-      toast.success('The work items have been moved to the sprint');
+      toast.success('The work items have been moved to the cycle');
     } catch (e) {
-      toast.error('The work items could not be moved to the sprint');
+      toast.error('The work items could not be moved to the cycle');
     }
   };
 
   const callChangeSprintCallbacks = (sprintId, workItems) => {
     try {
-      if (onChangeSprint) {
-        onChangeSprint(workItems, sprintId);
+      const onChangeCycleOrSprint = onChangeSprint || onChangeCycle;
+      if (onChangeCycleOrSprint) {
+        onChangeCycleOrSprint(workItems, sprintId);
       }
       if (onChange) {
         onChange(
@@ -241,11 +246,11 @@ function WorkItemsContextMenu({
     'ready-to-start',
     'in-progress',
     'blocked',
-    'code-review',
+    'review',
     'testing',
     'revisions',
-    'ready-for-deployment',
-    'deployed',
+    'ready-to-ship',
+    'shipped',
     'done',
     'closed',
   ];
@@ -309,17 +314,17 @@ function WorkItemsContextMenu({
             </Item>
           ))}
         </Submenu>
-        {isLoadingSprints && (
+        {cyclesEnabled && isLoadingSprints && (
           <Item disabled className="text-center">
             <Spinner className="m-auto" color="primary" />
           </Item>
         )}
-        {!isLoadingSprints && sprints.length === 0 && (
-          <Item disabled>Move to sprint</Item>
+        {cyclesEnabled && !isLoadingSprints && sprints.length === 0 && (
+          <Item disabled>Move to cycle</Item>
         )}
-        {!isLoadingSprints && sprints.length > 0 && (
+        {cyclesEnabled && !isLoadingSprints && sprints.length > 0 && (
           <Submenu
-            label={'Move to sprint'}
+            label={'Move to cycle'}
             style={{ maxHeight: '200px', overflowY: 'scroll' }}
           >
             {sprints.map((sprint) => (
@@ -361,6 +366,7 @@ function WorkItemsContextMenu({
 WorkItemsContextMenu.propTypes = {
   menuId: PropTypes.string.isRequired,
   onChangeSprint: PropTypes.func,
+  onChangeCycle: PropTypes.func,
   onChangePriority: PropTypes.func,
   onChangeStatus: PropTypes.func,
   onChange: PropTypes.func,

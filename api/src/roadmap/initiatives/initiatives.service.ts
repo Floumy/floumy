@@ -17,7 +17,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CommentMapper } from '../../comments/mappers';
 import { CreateUpdateCommentDto } from '../../comments/dtos';
 import { InitiativeComment } from './initiative-comment.entity';
-import { FeatureRequest } from '../../feature-requests/feature-request.entity';
+import { Request } from '../../requests/request.entity';
 import { Project } from '../../projects/project.entity';
 import {
   FilterOptions,
@@ -48,8 +48,8 @@ export class InitiativesService {
     @InjectRepository(InitiativeComment)
     private initiativeCommentRepository: Repository<InitiativeComment>,
     @InjectRepository(User) private usersRepository: Repository<User>,
-    @InjectRepository(FeatureRequest)
-    private featureRequestsRepository: Repository<FeatureRequest>,
+    @InjectRepository(Request)
+    private requestsRepository: Repository<Request>,
     @InjectRepository(Project) private projectsRepository: Repository<Project>,
   ) {}
 
@@ -107,14 +107,13 @@ export class InitiativesService {
       initiative.milestone = Promise.resolve(milestone);
     }
 
-    if (initiativeDto.featureRequest) {
-      const featureRequest =
-        await this.featureRequestsRepository.findOneByOrFail({
-          org: { id: org.id },
-          project: { id: projectId },
-          id: initiativeDto.featureRequest,
-        });
-      initiative.featureRequest = Promise.resolve(featureRequest);
+    if (initiativeDto.request) {
+      const request = await this.requestsRepository.findOneByOrFail({
+        org: { id: org.id },
+        project: { id: projectId },
+        id: initiativeDto.request,
+      });
+      initiative.request = Promise.resolve(request);
     }
 
     await this.initiativeRepository.save(initiative);
@@ -237,7 +236,7 @@ export class InitiativesService {
       initiative,
     );
 
-    await this.updateInitiativeFeatureRequest(
+    await this.updateInitiativeRequest(
       updateInitiativeDto,
       orgId,
       projectId,
@@ -340,7 +339,7 @@ export class InitiativesService {
       projectId,
       initiative,
     );
-    await this.patchInitiativeFeatureRequest(
+    await this.patchInitiativeRequest(
       patchInitiativeDto,
       orgId,
       projectId,
@@ -691,43 +690,39 @@ export class InitiativesService {
     return /^[iI]-\d+$/.test(search);
   }
 
-  private async updateInitiativeFeatureRequest(
+  private async updateInitiativeRequest(
     updateInitiativeDto: CreateUpdateInitiativeDto,
     orgId: string,
     projectId: string,
     initiative: Initiative,
   ) {
-    if (updateInitiativeDto.featureRequest) {
-      const featureRequest =
-        await this.featureRequestsRepository.findOneByOrFail({
-          org: { id: orgId },
-          project: { id: projectId },
-          id: updateInitiativeDto.featureRequest,
-        });
-      initiative.featureRequest = Promise.resolve(featureRequest);
+    if (updateInitiativeDto.request) {
+      const request = await this.requestsRepository.findOneByOrFail({
+        org: { id: orgId },
+        project: { id: projectId },
+        id: updateInitiativeDto.request,
+      });
+      initiative.request = Promise.resolve(request);
     } else {
-      initiative.featureRequest = Promise.resolve(null);
+      initiative.request = Promise.resolve(null);
     }
   }
 
-  private async patchInitiativeFeatureRequest(
+  private async patchInitiativeRequest(
     patchInitiativeDto: PatchInitiativeDto,
     orgId: string,
     projectId: string,
     initiative: Initiative,
   ) {
-    if (patchInitiativeDto.featureRequest === null) {
-      initiative.featureRequest = Promise.resolve(null);
-    } else if (patchInitiativeDto.featureRequest) {
-      const featureRequest =
-        await this.featureRequestsRepository.findOneByOrFail({
-          org: { id: orgId },
-          project: { id: projectId },
-          id: patchInitiativeDto.featureRequest,
-        });
-      initiative.featureRequest = Promise.resolve(featureRequest);
-    } else {
-      initiative.featureRequest = Promise.resolve(null);
+    if (patchInitiativeDto.request === null) {
+      initiative.request = Promise.resolve(null);
+    } else if (patchInitiativeDto.request) {
+      const request = await this.requestsRepository.findOneByOrFail({
+        org: { id: orgId },
+        project: { id: projectId },
+        id: patchInitiativeDto.request,
+      });
+      initiative.request = Promise.resolve(request);
     }
   }
 }

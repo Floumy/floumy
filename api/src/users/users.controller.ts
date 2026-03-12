@@ -15,9 +15,9 @@ import {
 import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { BasicAuthGuard } from '../auth/basic-auth.guard';
-import { PatchUserDto } from './dtos';
 import { Roles } from '../auth/roles.guard';
 import { UserRole } from './enums';
+import type { PatchUserDto } from './dtos';
 
 @Controller('users')
 export class UsersController {

@@ -10,7 +10,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { BipSettingsDto } from './bip.dtos';
+import type { BipSettingsDto } from './bip.dtos';
 import { AuthGuard } from '../auth/auth.guard';
 import { BipService } from './bip.service';
 import { Public } from '../auth/public.guard';

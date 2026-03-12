@@ -7,13 +7,13 @@ import { Repository } from 'typeorm';
 import { WorkItemType } from 'src/backlog/work-items/work-item-type.enum';
 import { Project } from 'src/projects/project.entity';
 import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { McpService } from '../services/mcp.service';
 import { entityNotFound } from '../utils';
 import { WorkItemStatus } from '../../backlog/work-items/work-item-status.enum';
 import { WorkItemsService } from '../../backlog/work-items/work-items.service';
 import { Priority } from '../../common/priority.enum';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 
 @Injectable({
   scope: Scope.REQUEST,
@@ -26,8 +26,8 @@ export class WorkItemsTool {
     private projectRepository: Repository<Project>,
     private mcpService: McpService,
     private workItemsService: WorkItemsService,
-    @InjectRepository(Sprint)
-    private sprintRepository: Repository<Sprint>,
+    @InjectRepository(Cycle)
+    private cycleRepository: Repository<Cycle>,
     @Inject(REQUEST) private request: Request,
   ) {}
 
@@ -114,7 +114,7 @@ export class WorkItemsTool {
       title: z.string().describe('The work item title.'),
       description: z.string().describe('The work item description.'),
       type: z
-        .enum(['user-story', 'task', 'bug', 'spike', 'technical-debt'])
+        .enum(['deliverable', 'task', 'defect', 'research', 'improvement'])
         .describe('The work item type.'),
     }),
   })
@@ -187,7 +187,7 @@ export class WorkItemsTool {
       title: z.string().optional().describe('The work item title.'),
       description: z.string().optional().describe('The work item description.'),
       type: z
-        .enum(['user-story', 'task', 'bug', 'spike', 'technical-debt'])
+        .enum(['deliverable', 'task', 'defect', 'research', 'improvement'])
         .describe('The work item type.'),
       status: z
         .enum([
@@ -195,11 +195,11 @@ export class WorkItemsTool {
           'ready-to-start',
           'in-progress',
           'blocked',
-          'code-review',
+          'review',
           'testing',
           'revisions',
-          'ready-for-deployment',
-          'deployed',
+          'ready-to-ship',
+          'shipped',
           'done',
           'closed',
         ])
@@ -267,20 +267,20 @@ export class WorkItemsTool {
     };
   }
   @Tool({
-    name: 'list-work-items-for-sprint',
-    description: 'List all work items for a given sprint.',
+    name: 'list-work-items-for-cycle',
+    description: 'List all work items for a given cycle.',
     parameters: z.object({
-      sprintId: z.string().describe('The ID of the sprint.'),
+      cycleId: z.string().describe('The ID of the cycle.'),
     }),
   })
-  async listWorkItemsForSprint({ sprintId }: { sprintId: string }) {
+  async listWorkItemsForCycle({ cycleId }: { cycleId: string }) {
     const user = await this.mcpService.getUserFromRequest(this.request);
     if (!user) {
       return entityNotFound('work item');
     }
     const org = await user.org;
     const workItems = await this.workItemsRepository.find({
-      where: { sprint: { id: sprintId }, org: { id: org.id } },
+      where: { cycle: { id: cycleId }, org: { id: org.id } },
       order: { updatedAt: 'DESC' },
     });
     if (!workItems.length) {
@@ -288,7 +288,7 @@ export class WorkItemsTool {
         content: [
           {
             type: 'text',
-            text: 'No work items found for this sprint.',
+            text: 'No work items found for this cycle.',
           },
         ],
       };
@@ -308,21 +308,21 @@ export class WorkItemsTool {
     };
   }
   @Tool({
-    name: 'add-work-item-to-sprint',
-    description: 'Add a work item to a sprint.',
+    name: 'add-work-item-to-cycle',
+    description: 'Add a work item to a cycle.',
     parameters: z.object({
       workItemReference: z
         .string()
         .describe('The reference of the work item (e.g. WI-123).'),
-      sprintId: z.string().describe('The ID of the sprint.'),
+      cycleId: z.string().describe('The ID of the cycle.'),
     }),
   })
-  async addWorkItemToSprint({
+  async addWorkItemToCycle({
     workItemReference,
-    sprintId,
+    cycleId,
   }: {
     workItemReference: string;
-    sprintId: string;
+    cycleId: string;
   }) {
     const user = await this.mcpService.getUserFromRequest(this.request);
     if (!user) {
@@ -334,17 +334,17 @@ export class WorkItemsTool {
         reference: workItemReference,
         org: { id: org.id },
       });
-      const sprint = await this.sprintRepository.findOneByOrFail({
-        id: sprintId,
+      const cycle = await this.cycleRepository.findOneByOrFail({
+        id: cycleId,
         org: { id: org.id },
       });
-      workItem.sprint = Promise.resolve(sprint);
+      workItem.cycle = Promise.resolve(cycle);
       await this.workItemsRepository.save(workItem);
       return {
         content: [
           {
             type: 'text',
-            text: `Successfully added work item ${workItem.reference} to sprint.`,
+            text: `Successfully added work item ${workItem.reference} to cycle.`,
           },
         ],
       };

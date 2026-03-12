@@ -15,7 +15,7 @@ import { WorkItemsService } from '../../backlog/work-items/work-items.service';
 import { InitiativeFile } from './initiative-file.entity';
 import { File } from '../../files/file.entity';
 import { FilesService } from '../../files/files.service';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { FilesStorageRepository } from '../../files/files-storage.repository';
@@ -40,7 +40,7 @@ describe('FeatureQueryBuilder', () => {
           Project,
           InitiativeFile,
           File,
-          Sprint,
+          Cycle,
           WorkItem,
           WorkItemFile,
         ]),

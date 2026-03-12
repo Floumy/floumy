@@ -8,6 +8,7 @@ import {
   FormGroup,
   Input,
   InputGroup,
+  Label,
   Row,
 } from 'reactstrap';
 import React, { useState } from 'react';
@@ -62,6 +63,8 @@ function Project() {
   async function handleSubmit(values, setErrors) {
     const projectName = values.projectName;
     const projectDescription = values.projectDescription;
+    const cyclesEnabled = values.cyclesEnabled;
+    const codeEnabled = values.codeEnabled;
     try {
       setIsSubmitting(true);
       const updatedProject = await updateProject(
@@ -69,6 +72,8 @@ function Project() {
         project.id,
         projectName,
         projectDescription,
+        cyclesEnabled,
+        codeEnabled,
       );
       setProjects(
         projects.map((p) => {
@@ -133,6 +138,8 @@ function Project() {
                   initialValues={{
                     projectName: project.name,
                     projectDescription: project.description,
+                    cyclesEnabled: project.cyclesEnabled ?? false,
+                    codeEnabled: project.codeEnabled ?? false,
                   }}
                   validationSchema={validationSchema}
                   onSubmit={async (values, { setErrors }) => {
@@ -204,6 +211,38 @@ function Project() {
                           name="projectDescription"
                           component={InputError}
                         />
+                      </FormGroup>
+                      <h4>Cycles</h4>
+                      <FormGroup check className="mb-3">
+                        <Label check>
+                          <Field
+                            name="cyclesEnabled"
+                            type="checkbox"
+                            as={Input}
+                          />
+                          Enable cycles (sprints) for this project
+                        </Label>
+                        <small className="form-text text-muted d-block">
+                          When enabled, you can plan work in time-boxed cycles.
+                          When disabled, use Active Work to track all open
+                          items.
+                        </small>
+                      </FormGroup>
+                      <h4>Code</h4>
+                      <FormGroup check className="mb-3">
+                        <Label check>
+                          <Field
+                            name="codeEnabled"
+                            type="checkbox"
+                            as={Input}
+                          />
+                          Enable code integration (GitHub/GitLab) for this
+                          project
+                        </Label>
+                        <small className="form-text text-muted d-block">
+                          When enabled, you can connect to GitHub or GitLab to
+                          sync pull requests and merge requests.
+                        </small>
                       </FormGroup>
                       <div>
                         <Button

@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { PublicService } from './public.service';
 import { OkrsService } from '../okrs.service';
 import { OrgsService } from '../../orgs/orgs.service';
@@ -57,6 +58,7 @@ describe('PublicService', () => {
     await projectsRepository.save(project);
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
+    bipSettings.isObjectivesPagePublic = true;
     bipSettings.org = Promise.resolve(org);
     bipSettings.project = Promise.resolve(project);
     await bipSettingsRepository.save(bipSettings);
@@ -125,7 +127,7 @@ describe('PublicService', () => {
       await bipSettingsRepository.save(newOrgBipSettings);
       await expect(
         service.listObjectives(newOrg.id, newProject.id, Timeline.THIS_QUARTER),
-      ).rejects.toThrow('Building in public is not enabled');
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -169,7 +171,7 @@ describe('PublicService', () => {
       });
       await expect(
         service.getObjective(newOrg.id, newOrgProject.id, okr.objective.id),
-      ).rejects.toThrow('Building in public is not enabled');
+      ).rejects.toThrow(NotFoundException);
     });
     it('should throw an error if the objective does not exist', async () => {
       const invalidUUID = '00000000-0000-0000-0000-000000000000';
@@ -232,7 +234,7 @@ describe('PublicService', () => {
           okr.objective.id,
           keyResult.id,
         ),
-      ).rejects.toThrow('Building in public is not enabled');
+      ).rejects.toThrow(NotFoundException);
     });
     it('should throw an error if the key result does not exist', async () => {
       const okr = await okrsService.create(org.id, project.id, {
@@ -281,7 +283,7 @@ describe('PublicService', () => {
       await bipSettingsRepository.save(newOrgBipSettings);
       await expect(
         service.getStats(newOrg.id, newOrgProject.id, Timeline.THIS_QUARTER),
-      ).rejects.toThrow('Building in public is not enabled');
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

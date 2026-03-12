@@ -44,7 +44,7 @@ export class FeatureMapper {
   static async toDto(initiative: Initiative) {
     const workItems = (await initiative.workItems) || [];
     const comments = await initiative.comments;
-    const featureRequest = await initiative.featureRequest;
+    const request = await initiative.request;
     const mappedFeature = {
       id: initiative.id,
       reference: initiative.reference,
@@ -62,13 +62,13 @@ export class FeatureMapper {
       updatedAt: initiative.updatedAt,
       keyResult: this.mapKeyResultToKeyResultDto(await initiative.keyResult),
       milestone: this.mapMilestoneToMilestoneDto(await initiative.milestone),
-      featureRequest: undefined,
+      request: undefined,
       breadcrumbs: await BreadcrumbMapper.toDto(initiative),
     };
-    mappedFeature.featureRequest = featureRequest
+    mappedFeature.request = request
       ? {
-          id: featureRequest.id,
-          title: featureRequest.title,
+          id: request.id,
+          title: request.title,
         }
       : null;
 

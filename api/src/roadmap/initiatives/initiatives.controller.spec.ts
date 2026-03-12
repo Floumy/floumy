@@ -16,7 +16,7 @@ import { MilestonesService } from '../milestones/milestones.service';
 import { Milestone } from '../milestones/milestone.entity';
 import { BacklogModule } from '../../backlog/backlog.module';
 import { InitiativeStatus } from './initiativestatus.enum';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 import { File } from '../../files/file.entity';
 import { InitiativeFile } from './initiative-file.entity';
 import { User } from '../../users/user.entity';
@@ -26,9 +26,9 @@ import { WorkItem } from '../../backlog/work-items/work-item.entity';
 import { WorkItemFile } from '../../backlog/work-items/work-item-file.entity';
 import { InitiativeComment } from './initiative-comment.entity';
 import { Repository } from 'typeorm';
-import { FeatureRequest } from '../../feature-requests/feature-request.entity';
-import { FeatureRequestComment } from '../../feature-requests/feature-request-comment.entity';
-import { FeatureRequestVote } from '../../feature-requests/feature-request-vote.entity';
+import { Request } from '../../requests/request.entity';
+import { RequestComment } from '../../requests/request-comment.entity';
+import { RequestVote } from '../../requests/request-vote.entity';
 import { Project } from '../../projects/project.entity';
 
 describe('InitiativesController', () => {
@@ -50,15 +50,15 @@ describe('InitiativesController', () => {
           KeyResult,
           Initiative,
           Milestone,
-          Sprint,
+          Cycle,
           File,
           InitiativeFile,
           WorkItem,
           WorkItemFile,
           InitiativeComment,
-          FeatureRequest,
-          FeatureRequestComment,
-          FeatureRequestVote,
+          Request,
+          RequestComment,
+          RequestVote,
           Project,
         ]),
         UsersModule,

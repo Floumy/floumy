@@ -8,9 +8,10 @@ import routes from 'routes.js';
 import AdminNavbar from '../components/Navbars/AdminNavbar';
 import useLayoutHandler from './useLayoutHandler';
 import useNavigationHotKey from './useNavigationHotKey';
+import { getNavigationItems } from '../utils/sidebarNavigation';
 import Footer from '../components/Footers/Footer';
 import { BuildInPublicProvider } from '../contexts/BuidInPublicContext';
-import { ProjectsProvider } from '../contexts/ProjectsContext';
+import { ProjectsProvider, useProjects } from '../contexts/ProjectsContext';
 import { OrgProvider } from '../contexts/OrgContext';
 import NotFound from '../views/pages/errors/NotFound';
 import AiChatSlideIn from '../components/SlideIn/AiChatSlideIn';
@@ -60,26 +61,6 @@ function Admin() {
     setSidenavOpen(!sidenavOpen);
   };
 
-  useNavigationHotKey('1', `/admin/orgs/${orgId}/projects/${projectId}/okrs`);
-  useNavigationHotKey(
-    '2',
-    `/admin/orgs/${orgId}/projects/${projectId}/roadmap`,
-  );
-  useNavigationHotKey(
-    '3',
-    `/admin/orgs/${orgId}/projects/${projectId}/active-sprint`,
-  );
-  useNavigationHotKey(
-    '4',
-    `/admin/orgs/${orgId}/projects/${projectId}/sprints`,
-  );
-  useNavigationHotKey('5', `/admin/orgs/${orgId}/projects/${projectId}/pages`);
-  useNavigationHotKey('6', `/admin/orgs/${orgId}/projects/${projectId}/code`);
-  useNavigationHotKey('7', `/admin/orgs/${orgId}/projects/${projectId}/issues`);
-  useNavigationHotKey(
-    '8',
-    `/admin/orgs/${orgId}/projects/${projectId}/feature-requests`,
-  );
   useNavigationHotKey(
     'w',
     `/admin/orgs/${orgId}/projects/${projectId}/work-item/new`,
@@ -96,7 +77,7 @@ function Admin() {
   );
   useNavigationHotKey(
     's',
-    `/admin/orgs/${orgId}/projects/${projectId}/sprints/new`,
+    `/admin/orgs/${orgId}/projects/${projectId}/cycles/new`,
     isNavigationReplace(),
   );
   useNavigationHotKey(
@@ -106,7 +87,7 @@ function Admin() {
   );
   useNavigationHotKey(
     'r',
-    `/admin/orgs/${orgId}/projects/${projectId}/feature-requests/new`,
+    `/admin/orgs/${orgId}/projects/${projectId}/requests/new`,
     isNavigationReplace(),
   );
   useNavigationHotKey(
@@ -135,6 +116,7 @@ function Admin() {
       <BuildInPublicProvider orgId={orgId} projectId={projectId}>
         <OrgProvider orgId={orgId}>
           <ProjectsProvider orgId={orgId} projectId={projectId}>
+            <AdminNavigationHotkeys orgId={orgId} projectId={projectId} />
             <Sidebar
               toggleSidenav={toggleSidenav}
               logo={{
@@ -187,6 +169,66 @@ function Admin() {
       </BuildInPublicProvider>
     </>
   );
+}
+
+function AdminNavigationHotkeys({ orgId, projectId }) {
+  const { currentProject } = useProjects();
+  const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
+  const codeEnabled = currentProject?.codeEnabled ?? false;
+  const navItems = getNavigationItems(cyclesEnabled, codeEnabled);
+
+  const basePath = `/admin/orgs/${orgId}/projects/${projectId}`;
+
+  useNavigationHotKey(
+    '1',
+    `${basePath}/${navItems[0]?.route ?? 'okrs'}`,
+    false,
+    navItems.length >= 1,
+  );
+  useNavigationHotKey(
+    '2',
+    `${basePath}/${navItems[1]?.route ?? 'roadmap'}`,
+    false,
+    navItems.length >= 2,
+  );
+  useNavigationHotKey(
+    '3',
+    `${basePath}/${navItems[2]?.route ?? 'active-cycle'}`,
+    false,
+    navItems.length >= 3,
+  );
+  useNavigationHotKey(
+    '4',
+    `${basePath}/${navItems[3]?.route ?? 'cycles'}`,
+    false,
+    navItems.length >= 4,
+  );
+  useNavigationHotKey(
+    '5',
+    `${basePath}/${navItems[4]?.route ?? 'pages'}`,
+    false,
+    navItems.length >= 5,
+  );
+  useNavigationHotKey(
+    '6',
+    `${basePath}/${navItems[5]?.route ?? 'code'}`,
+    false,
+    navItems.length >= 6,
+  );
+  useNavigationHotKey(
+    '7',
+    `${basePath}/${navItems[6]?.route ?? 'issues'}`,
+    false,
+    navItems.length >= 7,
+  );
+  useNavigationHotKey(
+    '8',
+    `${basePath}/${navItems[7]?.route ?? 'requests'}`,
+    false,
+    navItems.length >= 8,
+  );
+
+  return null;
 }
 
 export default Admin;

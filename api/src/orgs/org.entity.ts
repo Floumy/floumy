@@ -13,11 +13,11 @@ import { KeyResult } from '../okrs/key-result.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { Sprint } from '../sprints/sprint.entity';
+import { Cycle } from '../cycles/cycle.entity';
 import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
 import { FeedItem } from '../feed/feed-item.entity';
-import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Request } from '../requests/request.entity';
 import { Issue } from '../issues/issue.entity';
 import { Project } from '../projects/project.entity';
 import { Notification } from '../notifications/notification.entity';
@@ -50,12 +50,12 @@ export class Org {
   milestones: Promise<Milestone[]>;
   @OneToMany(() => WorkItem, (workItem) => workItem.org, { lazy: true })
   workItems: Promise<WorkItem[]>;
-  @OneToMany(() => FeatureRequest, (featureRequest) => featureRequest.org, {
+  @OneToMany(() => Request, (request) => request.org, {
     lazy: true,
   })
-  featureRequests: Promise<FeatureRequest[]>;
-  @OneToMany(() => Sprint, (sprint) => sprint.org, { lazy: true })
-  sprints: Promise<Sprint[]>;
+  requests: Promise<Request[]>;
+  @OneToMany(() => Cycle, (cycle) => cycle.org, { lazy: true })
+  cycles: Promise<Cycle[]>;
   @OneToMany(() => File, (file) => file.org, { lazy: true })
   files: Promise<File[]>;
 

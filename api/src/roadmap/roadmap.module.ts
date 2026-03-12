@@ -24,7 +24,7 @@ import { PublicService as MilestonesPublicService } from './milestones/public/pu
 import { PublicController as FeaturesPublicController } from './initiatives/public/public.controller';
 import { PublicService as FeaturesPublicService } from './initiatives/public/public.service';
 import { InitiativeComment } from './initiatives/initiative-comment.entity';
-import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Request } from '../requests/request.entity';
 import { Project } from '../projects/project.entity';
 import { NotificationListener } from '../notifications/notification.listener';
 import { Notification } from '../notifications/notification.entity';
@@ -43,7 +43,7 @@ import { Notification } from '../notifications/notification.entity';
       User,
       Initiative,
       InitiativeComment,
-      FeatureRequest,
+      Request,
       Project,
       Notification,
     ]),

@@ -1,7 +1,7 @@
 import { WorkItem } from './work-item.entity';
 import { SearchWorkItem, SearchWorkItemDto, WorkItemDto } from './dtos';
 import { Initiative } from '../../roadmap/initiatives/initiative.entity';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 import { User } from '../../users/user.entity';
 import { GithubPullRequest } from '../../github/github-pull-request.entity';
 import { GithubBranch } from '../../github/github-branch.entity';
@@ -17,11 +17,11 @@ class FeatureMapper {
   }
 }
 
-class SprintMapper {
-  static toDto(sprint: Sprint) {
+class CycleMapper {
+  static toDto(cycle: Cycle) {
     return {
-      id: sprint.id,
-      title: sprint.title,
+      id: cycle.id,
+      title: cycle.title,
     };
   }
 }
@@ -80,7 +80,7 @@ class BreadcrumbMapper {
 export default class WorkItemMapper {
   static async toDto(workItem: WorkItem): Promise<WorkItemDto> {
     const initiative = await workItem.initiative;
-    const sprint = await workItem.sprint;
+    const cycle = await workItem.cycle;
     const createdBy = await workItem.createdBy;
     const assignedTo = await workItem.assignedTo;
     const issue = await workItem.issue;
@@ -107,7 +107,7 @@ export default class WorkItemMapper {
       status: workItem.status,
       estimation: workItem.estimation,
       initiative: initiative ? FeatureMapper.toDto(initiative) : undefined,
-      sprint: sprint ? SprintMapper.toDto(sprint) : undefined,
+      cycle: cycle ? CycleMapper.toDto(cycle) : undefined,
       files: await Promise.all(
         (await workItem.workItemFiles).map(async (workItemFile) => {
           const file = await workItemFile.file;

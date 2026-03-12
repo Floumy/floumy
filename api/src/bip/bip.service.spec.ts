@@ -9,6 +9,7 @@ import { TokensService } from '../auth/tokens.service';
 import { BipSettings } from './bip-settings.entity';
 import { Repository } from 'typeorm';
 import { Project } from '../projects/project.entity';
+import { NotFoundException } from '@nestjs/common';
 
 describe('BipService', () => {
   let service: BipService;
@@ -18,6 +19,7 @@ describe('BipService', () => {
   let org: Org;
   let project: Project;
   let orgsRepository: Repository<Org>;
+  let projectsRepository: Repository<Project>;
 
   let cleanup: () => Promise<void>;
 
@@ -31,6 +33,9 @@ describe('BipService', () => {
     orgsService = module.get<OrgsService>(OrgsService);
     usersService = module.get<UsersService>(UsersService);
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
+    projectsRepository = module.get<Repository<Project>>(
+      getRepositoryToken(Project),
+    );
     user = await usersService.createUserWithOrg(
       'Test User',
       'test@example.com',
@@ -50,10 +55,11 @@ describe('BipService', () => {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
+        isActiveWorkPagePublic: true,
+        isRequestsPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
       const updatedSettings = await service.getSettings(org.id, project.id);
@@ -65,10 +71,11 @@ describe('BipService', () => {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
+        isActiveWorkPagePublic: true,
+        isRequestsPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
       const updatedSettings = await service.getSettings(org.id, project.id);
@@ -84,10 +91,11 @@ describe('BipService', () => {
         isBuildInPublicEnabled: false,
         isObjectivesPagePublic: false,
         isRoadmapPagePublic: false,
-        isSprintsPagePublic: false,
-        isActiveSprintsPagePublic: false,
+        isCyclesPagePublic: false,
+        isActiveCyclesPagePublic: false,
+        isActiveWorkPagePublic: false,
         isIssuesPagePublic: false,
-        isFeatureRequestsPagePublic: false,
+        isRequestsPagePublic: false,
       });
     });
     it('should create the default building in public settings on org created event when the org is premium', async () => {
@@ -98,10 +106,11 @@ describe('BipService', () => {
         isBuildInPublicEnabled: false,
         isObjectivesPagePublic: false,
         isRoadmapPagePublic: false,
-        isSprintsPagePublic: false,
-        isActiveSprintsPagePublic: false,
+        isCyclesPagePublic: false,
+        isActiveCyclesPagePublic: false,
+        isActiveWorkPagePublic: false,
         isIssuesPagePublic: false,
-        isFeatureRequestsPagePublic: false,
+        isRequestsPagePublic: false,
       });
     });
     it('should not override existing settings', async () => {
@@ -109,10 +118,11 @@ describe('BipService', () => {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
+        isActiveWorkPagePublic: true,
+        isRequestsPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
       await service.createSettings(project);
@@ -124,10 +134,11 @@ describe('BipService', () => {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
+        isActiveWorkPagePublic: true,
+        isRequestsPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
       };
       await service.createOrUpdateSettings(org.id, project.id, settings);
       await expect(service.createSettings(project)).resolves.not.toThrow();
@@ -136,6 +147,122 @@ describe('BipService', () => {
       await expect(
         service.createSettings(new Project()),
       ).resolves.not.toThrow();
+    });
+  });
+
+  describe('validatePageAccess', () => {
+    const publicEnabledSettings = {
+      isBuildInPublicEnabled: true,
+      isObjectivesPagePublic: true,
+      isRoadmapPagePublic: true,
+      isCyclesPagePublic: true,
+      isActiveCyclesPagePublic: true,
+      isActiveWorkPagePublic: true,
+      isRequestsPagePublic: true,
+      isIssuesPagePublic: true,
+    };
+
+    const standardPages: Array<
+      'objectives' | 'roadmap' | 'cycles' | 'issues' | 'requests'
+    > = ['objectives', 'roadmap', 'cycles', 'issues', 'requests'];
+
+    const pageFlagByPage = {
+      objectives: 'isObjectivesPagePublic',
+      roadmap: 'isRoadmapPagePublic',
+      cycles: 'isCyclesPagePublic',
+      issues: 'isIssuesPagePublic',
+      requests: 'isRequestsPagePublic',
+    } as const;
+
+    const setCyclesEnabled = async (cyclesEnabled: boolean) => {
+      project.cyclesEnabled = cyclesEnabled;
+      await projectsRepository.save(project);
+    };
+
+    it('should deny all pages when build in public is disabled', async () => {
+      await setCyclesEnabled(true);
+      await service.createOrUpdateSettings(org.id, project.id, {
+        ...publicEnabledSettings,
+        isBuildInPublicEnabled: false,
+      });
+
+      await expect(
+        service.validatePageAccess(org.id, project.id, 'objectives'),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it.each(standardPages)(
+      'should allow and deny %s page based on its flag',
+      async (page) => {
+        await setCyclesEnabled(true);
+        const pageFlag = pageFlagByPage[page];
+
+        await service.createOrUpdateSettings(org.id, project.id, {
+          ...publicEnabledSettings,
+          [pageFlag]: true,
+        });
+
+        await expect(
+          service.validatePageAccess(org.id, project.id, page),
+        ).resolves.toBeUndefined();
+
+        await service.createOrUpdateSettings(org.id, project.id, {
+          ...publicEnabledSettings,
+          [pageFlag]: false,
+        });
+
+        await expect(
+          service.validatePageAccess(org.id, project.id, page),
+        ).rejects.toBeInstanceOf(NotFoundException);
+      },
+    );
+
+    it('should allow activeCycles only when cycles are enabled', async () => {
+      await setCyclesEnabled(true);
+      await service.createOrUpdateSettings(org.id, project.id, {
+        ...publicEnabledSettings,
+        isActiveCyclesPagePublic: true,
+      });
+
+      await expect(
+        service.validatePageAccess(org.id, project.id, 'activeCycles'),
+      ).resolves.toBeUndefined();
+    });
+
+    it('should deny activeCycles when cycles are disabled', async () => {
+      await setCyclesEnabled(false);
+      await service.createOrUpdateSettings(org.id, project.id, {
+        ...publicEnabledSettings,
+        isActiveCyclesPagePublic: true,
+      });
+
+      await expect(
+        service.validatePageAccess(org.id, project.id, 'activeCycles'),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('should allow activeWork only when cycles are disabled', async () => {
+      await setCyclesEnabled(false);
+      await service.createOrUpdateSettings(org.id, project.id, {
+        ...publicEnabledSettings,
+        isActiveWorkPagePublic: true,
+      });
+
+      await expect(
+        service.validatePageAccess(org.id, project.id, 'activeWork'),
+      ).resolves.toBeUndefined();
+    });
+
+    it('should deny activeWork when cycles are enabled', async () => {
+      await setCyclesEnabled(true);
+      await service.createOrUpdateSettings(org.id, project.id, {
+        ...publicEnabledSettings,
+        isActiveWorkPagePublic: true,
+      });
+
+      await expect(
+        service.validatePageAccess(org.id, project.id, 'activeWork'),
+      ).rejects.toBeInstanceOf(NotFoundException);
     });
   });
 });

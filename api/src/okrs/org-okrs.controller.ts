@@ -17,14 +17,14 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CommentsService } from './comments/comments.service';
-import {
+import type {
   CreateOrUpdateKeyResultDto,
   CreateOrUpdateOKRDto,
   PatchKeyResultDto,
   UpdateObjectiveDto,
 } from './dtos';
 import { Timeline } from '../common/timeline.enum';
-import { CreateUpdateCommentDto } from '../comments/dtos';
+import type { CreateUpdateCommentDto } from '../comments/dtos';
 import { OrgOkrsService } from './org-okrs.service';
 
 @Controller('/orgs/:orgId/')

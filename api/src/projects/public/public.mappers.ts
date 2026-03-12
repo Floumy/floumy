@@ -7,6 +7,7 @@ export class ProjectMapper {
     return {
       id: project.id,
       name: project.name,
+      cyclesEnabled: project.cyclesEnabled,
       bipSettings: BipSettingsMapper.toDto(bipSettings),
     };
   }
@@ -18,10 +19,11 @@ export class BipSettingsMapper {
       isBuildInPublicEnabled: bipSettings.isBuildInPublicEnabled,
       isObjectivesPagePublic: bipSettings.isObjectivesPagePublic,
       isRoadmapPagePublic: bipSettings.isRoadmapPagePublic,
-      isSprintsPagePublic: bipSettings.isSprintsPagePublic,
-      isActiveSprintsPagePublic: bipSettings.isActiveSprintsPagePublic,
+      isCyclesPagePublic: bipSettings.isCyclesPagePublic,
+      isActiveCyclesPagePublic: bipSettings.isActiveCyclesPagePublic,
+      isActiveWorkPagePublic: bipSettings.isActiveWorkPagePublic,
       isIssuesPagePublic: bipSettings.isIssuesPagePublic,
-      isFeatureRequestsPagePublic: bipSettings.isFeatureRequestsPagePublic,
+      isRequestsPagePublic: bipSettings.isRequestsPagePublic,
     };
   }
 }

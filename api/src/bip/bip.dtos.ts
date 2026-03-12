@@ -2,8 +2,9 @@ export interface BipSettingsDto {
   isBuildInPublicEnabled: boolean;
   isObjectivesPagePublic: boolean;
   isRoadmapPagePublic: boolean;
-  isSprintsPagePublic: boolean;
-  isActiveSprintsPagePublic: boolean;
+  isCyclesPagePublic: boolean;
+  isActiveCyclesPagePublic: boolean;
+  isActiveWorkPagePublic: boolean;
   isIssuesPagePublic: boolean;
-  isFeatureRequestsPagePublic: boolean;
+  isRequestsPagePublic: boolean;
 }

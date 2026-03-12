@@ -1,0 +1,197 @@
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Request,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '../auth/auth.guard';
+import type { CreateOrUpdateCycleDto } from './dtos';
+import { CyclesService } from './cycles.service';
+import { Timeline } from '../common/timeline.enum';
+
+@Controller('/orgs/:orgId/projects/:projectId/cycles')
+@UseGuards(AuthGuard)
+export class CyclesController {
+  constructor(private cyclesService: CyclesService) {}
+
+  @Post()
+  @HttpCode(201)
+  async create(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+    @Body() body: CreateOrUpdateCycleDto,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.cyclesService.create(orgId, projectId, body);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Get('with-work-items')
+  @HttpCode(200)
+  async listWithWorkItems(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.cyclesService.listWithWorkItems(orgId, projectId);
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async list(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.cyclesService.list(orgId, projectId);
+  }
+
+  @Post(':id/start')
+  @HttpCode(200)
+  async startCycle(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.cyclesService.startCycle(orgId, projectId, id);
+    } catch (e) {
+      throw new NotFoundException(e.message);
+    }
+  }
+
+  @Get('active')
+  @HttpCode(200)
+  async getActiveCycle(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.cyclesService.getActiveCycle(orgId, projectId);
+  }
+
+  @Post(':id/complete')
+  @HttpCode(200)
+  async completeCycle(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.cyclesService.completeCycle(orgId, projectId, id);
+    } catch (e) {
+      throw new NotFoundException(e.message);
+    }
+  }
+
+  @Get(':id')
+  @HttpCode(200)
+  async get(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.cyclesService.get(orgId, projectId, id);
+    } catch (e) {
+      throw new NotFoundException(e.message);
+    }
+  }
+
+  @Put(':id')
+  @HttpCode(200)
+  async update(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+    @Param('id') id: string,
+    @Body() body: CreateOrUpdateCycleDto,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.cyclesService.update(orgId, projectId, id, body);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Delete(':id')
+  @HttpCode(200)
+  async delete(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+    @Param('id') id: string,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      return await this.cyclesService.delete(orgId, projectId, id);
+    } catch (e) {
+      throw new NotFoundException(e.message);
+    }
+  }
+
+  @Get('timeline/:timeline')
+  async listForTimeline(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Request() request,
+    @Param('timeline') timeline: Timeline,
+  ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
+    return await this.cyclesService.listForTimeline(orgId, projectId, timeline);
+  }
+}

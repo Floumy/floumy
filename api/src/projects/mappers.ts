@@ -10,6 +10,8 @@ export class ProjectMapper {
       name: project.name,
       description: project.description,
       isBuildInPublicEnabled: bipSettings?.isBuildInPublicEnabled,
+      cyclesEnabled: project.cyclesEnabled,
+      codeEnabled: project.codeEnabled,
       gitlabProjectUrl: project.gitlabProjectUrl,
       githubRepositoryUrl: project.githubRepositoryUrl,
       createdAt: project.createdAt,

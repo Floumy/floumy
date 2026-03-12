@@ -16,11 +16,11 @@ import { KeyResult } from '../okrs/key-result.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
-import { Sprint } from '../sprints/sprint.entity';
+import { Cycle } from '../cycles/cycle.entity';
 import { File } from '../files/file.entity';
 import { BipSettings } from '../bip/bip-settings.entity';
 import { FeedItem } from '../feed/feed-item.entity';
-import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Request } from '../requests/request.entity';
 import { Issue } from '../issues/issue.entity';
 import { Org } from '../orgs/org.entity';
 import { Notification } from '../notifications/notification.entity';
@@ -61,6 +61,10 @@ export class Project {
   gitlabProjectName: string;
   @Column({ nullable: true })
   gitlabProjectWebhookId: number;
+  @Column({ default: false })
+  cyclesEnabled: boolean = false;
+  @Column({ default: false })
+  codeEnabled: boolean = false;
   @ManyToMany(() => User, (user) => user.projects, { lazy: true })
   @JoinTable({
     name: 'project_user',
@@ -88,12 +92,12 @@ export class Project {
   milestones: Promise<Milestone[]>;
   @OneToMany(() => WorkItem, (workItem) => workItem.project, { lazy: true })
   workItems: Promise<WorkItem[]>;
-  @OneToMany(() => FeatureRequest, (featureRequest) => featureRequest.project, {
+  @OneToMany(() => Request, (request) => request.project, {
     lazy: true,
   })
-  featureRequests: Promise<FeatureRequest[]>;
-  @OneToMany(() => Sprint, (sprint) => sprint.project, { lazy: true })
-  sprints: Promise<Sprint[]>;
+  requests: Promise<Request[]>;
+  @OneToMany(() => Cycle, (cycle) => cycle.project, { lazy: true })
+  cycles: Promise<Cycle[]>;
   @OneToMany(() => File, (file) => file.project, { lazy: true })
   files: Promise<File[]>;
   @OneToMany(() => FeedItem, (feedItem) => feedItem.project, { lazy: true })

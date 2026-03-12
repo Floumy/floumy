@@ -7,7 +7,7 @@ import { OkrsModule } from './okrs/okrs.module';
 import { OrgsModule } from './orgs/orgs.module';
 import { RoadmapModule } from './roadmap/roadmap.module';
 import { BacklogModule } from './backlog/backlog.module';
-import { SprintsModule } from './sprints/sprints.module';
+import { CyclesModule } from './cycles/cycles.module';
 import { FilesModule } from './files/files.module';
 import { MailNotificationsModule } from './mail-notifications/mail-notifications.module';
 import databaseConfig from './config/database.config';
@@ -22,7 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BipModule } from './bip/bip.module';
 import { FeedModule } from './feed/feed.module';
-import { FeatureRequestsModule } from './feature-requests/feature-requests.module';
+import { RequestsModule } from './requests/requests.module';
 import { IssuesModule } from './issues/issues.module';
 import { ProjectsModule } from './projects/projects.module';
 import { AiModule } from './ai/ai.module';
@@ -91,12 +91,12 @@ import { FloumyMcpModule } from './mcp/mcp.module';
     OrgsModule,
     RoadmapModule,
     BacklogModule,
-    SprintsModule,
+    CyclesModule,
     FilesModule,
     MailNotificationsModule,
     BipModule,
     FeedModule,
-    FeatureRequestsModule,
+    RequestsModule,
     IssuesModule,
     ProjectsModule,
     AiModule,

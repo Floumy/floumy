@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CreateUpdateWorkItemDto, WorkItemPatchDto } from './dtos';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Initiative } from '../../roadmap/initiatives/initiative.entity';
-import { In, Repository } from 'typeorm';
+import { Brackets, In, Repository } from 'typeorm';
 import { WorkItem } from './work-item.entity';
 import WorkItemMapper from './work-item.mapper';
 import { WorkItemStatus } from './work-item-status.enum';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 import { File } from '../../files/file.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { User } from '../../users/user.entity';
@@ -32,8 +32,8 @@ export class WorkItemsService {
     private workItemsRepository: Repository<WorkItem>,
     @InjectRepository(Initiative)
     private initiativeRepository: Repository<Initiative>,
-    @InjectRepository(Sprint)
-    private sprintRepository: Repository<Sprint>,
+    @InjectRepository(Cycle)
+    private cycleRepository: Repository<Cycle>,
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(File) private filesRepository: Repository<File>,
     @InjectRepository(WorkItemFile)
@@ -201,19 +201,51 @@ export class WorkItemsService {
     );
   }
 
-  async listOpenWorkItemsWithoutSprints(orgId: string, projectId: string) {
-    const workItems = await this.workItemsRepository
+  async listOpenWorkItemsWithoutCycles(
+    orgId: string,
+    projectId: string,
+    includeRecentCompleted = false,
+    includeWithCycles = false,
+  ) {
+    const qb = this.workItemsRepository
       .createQueryBuilder('workItem')
       .leftJoinAndSelect('workItem.initiative', 'initiative')
       .leftJoinAndSelect('workItem.assignedTo', 'assignedTo')
       .where('workItem.orgId = :orgId', { orgId })
-      .andWhere('workItem.projectId = :projectId', { projectId })
-      .andWhere('workItem.status NOT IN (:closedStatus, :doneStatus)', {
+      .andWhere('workItem.projectId = :projectId', { projectId });
+
+    if (!includeWithCycles) {
+      qb.andWhere('workItem.cycleId IS NULL');
+    }
+
+    if (includeRecentCompleted) {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      qb.andWhere(
+        new Brackets((subQb) => {
+          subQb
+            .where('workItem.status NOT IN (:closedStatus, :doneStatus)', {
+              closedStatus: WorkItemStatus.CLOSED,
+              doneStatus: WorkItemStatus.DONE,
+            })
+            .orWhere(
+              'workItem.status IN (:closedStatus, :doneStatus) AND workItem.completedAt >= :oneMonthAgo',
+              {
+                closedStatus: WorkItemStatus.CLOSED,
+                doneStatus: WorkItemStatus.DONE,
+                oneMonthAgo,
+              },
+            );
+        }),
+      );
+    } else {
+      qb.andWhere('workItem.status NOT IN (:closedStatus, :doneStatus)', {
         closedStatus: WorkItemStatus.CLOSED,
         doneStatus: WorkItemStatus.DONE,
-      })
-      .andWhere('workItem.sprintId IS NULL')
-      .getMany();
+      });
+    }
+
+    const workItems = await qb.getMany();
     return await WorkItemMapper.toListDto(workItems);
   }
 
@@ -229,9 +261,9 @@ export class WorkItemsService {
       project: { id: projectId },
     });
     const previous = await WorkItemMapper.toDto(workItem);
-    const currentSprint = await workItem.sprint;
+    const currentCycle = await workItem.cycle;
 
-    await this.updateSprint(workItem, workItemPatchDto, orgId, currentSprint);
+    await this.updateCycle(workItem, workItemPatchDto, orgId, currentCycle);
     this.updateStatusAndCompletionDate(workItem, workItemPatchDto);
     this.updatePriority(workItem, workItemPatchDto);
 
@@ -458,7 +490,7 @@ export class WorkItemsService {
       workItem.completedAt = new Date();
     }
     workItem.initiative = Promise.resolve(null);
-    workItem.sprint = Promise.resolve(null);
+    workItem.cycle = Promise.resolve(null);
     if (workItemDto.initiative) {
       const initiative = await this.initiativeRepository.findOneByOrFail({
         id: workItemDto.initiative,
@@ -466,12 +498,12 @@ export class WorkItemsService {
       });
       workItem.initiative = Promise.resolve(initiative);
     }
-    if (workItemDto.sprint) {
-      const sprint = await this.sprintRepository.findOneByOrFail({
-        id: workItemDto.sprint,
+    if (workItemDto.cycle) {
+      const cycle = await this.cycleRepository.findOneByOrFail({
+        id: workItemDto.cycle,
         org: { id: orgId },
       });
-      workItem.sprint = Promise.resolve(sprint);
+      workItem.cycle = Promise.resolve(cycle);
     }
     if (workItemDto.assignedTo) {
       const assignedTo = await this.usersRepository.findOneByOrFail({
@@ -513,20 +545,20 @@ export class WorkItemsService {
     }
   }
 
-  private async updateSprint(
+  private async updateCycle(
     workItem: WorkItem,
     workItemPatchDto: WorkItemPatchDto,
     orgId: string,
-    currentSprint: Sprint,
+    currentCycle: Cycle,
   ) {
-    if (workItemPatchDto.sprint) {
-      const sprint = await this.sprintRepository.findOneByOrFail({
-        id: workItemPatchDto.sprint,
+    if (workItemPatchDto.cycle) {
+      const cycle = await this.cycleRepository.findOneByOrFail({
+        id: workItemPatchDto.cycle,
         org: { id: orgId },
       });
-      workItem.sprint = Promise.resolve(sprint);
-    } else if (currentSprint != null && workItemPatchDto.sprint === null) {
-      workItem.sprint = Promise.resolve(null);
+      workItem.cycle = Promise.resolve(cycle);
+    } else if (currentCycle != null && workItemPatchDto.cycle === null) {
+      workItem.cycle = Promise.resolve(null);
     }
   }
 
@@ -570,74 +602,5 @@ export class WorkItemsService {
 
   private isReference(search: string) {
     return /^[Ww][Ii]-\d+$/.test(search);
-  }
-
-  private async searchWorkItemsByTitleOrDescription(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-            SELECT *
-            FROM work_item
-            WHERE work_item."orgId" = $1
-              AND work_item."projectId" = $2
-              AND (work_item.title ILIKE $3 OR work_item.description ILIKE $3)
-            ORDER BY CASE
-                         WHEN work_item."priority" = 'high' THEN 1
-                         WHEN work_item."priority" = 'medium' THEN 2
-                         WHEN work_item."priority" = 'low' THEN 3
-                         ELSE 4
-                         END,
-                     work_item."createdAt" DESC
-        `;
-    let params = [orgId, projectId, `%${search}%`] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, `%${search}%`, offset, limit];
-    }
-
-    const workItems = await this.workItemsRepository.query(query, params);
-
-    return WorkItemMapper.toSimpleListDto(workItems);
-  }
-
-  private async searchWorkItemsByReference(
-    orgId: string,
-    projectId: string,
-    search: string,
-    page: number,
-    limit: number,
-  ) {
-    let query = `
-            SELECT *
-            FROM work_item
-            WHERE work_item."orgId" = $1
-              AND work_item."projectId" = $2
-              AND LOWER(work_item."reference") = LOWER($3)
-            ORDER BY CASE
-                         WHEN work_item."priority" = 'high' THEN 1
-                         WHEN work_item."priority" = 'medium' THEN 2
-                         WHEN work_item."priority" = 'low' THEN 3
-                         ELSE 4
-                         END,
-                     work_item."createdAt" DESC
-        `;
-
-    let params = [orgId, projectId, search] as any[];
-
-    if (limit > 0) {
-      query += ' OFFSET $4 LIMIT $5';
-      const offset = (page - 1) * limit;
-      params = [orgId, projectId, search, offset, limit];
-    }
-
-    const workItems = await this.workItemsRepository.query(query, params);
-
-    return WorkItemMapper.toSimpleListDto(workItems);
   }
 }

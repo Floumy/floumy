@@ -20,10 +20,11 @@ function PublicLayout() {
   const [buildInPublicSettings, setBuildInPublicSettings] = useState({
     isObjectivesPagePublic: false,
     isRoadmapPagePublic: false,
-    isSprintsPagePublic: false,
-    isActiveSprintsPagePublic: false,
+    isCyclesPagePublic: false,
+    isActiveCyclesPagePublic: false,
+    isActiveWorkPagePublic: false,
     isIssuesPagePublic: false,
-    isFeatureRequestsPagePublic: false,
+    isRequestsPagePublic: false,
   });
 
   function isNavigationReplace() {
@@ -36,12 +37,12 @@ function PublicLayout() {
 
   useNavigationHotKey(
     'r',
-    `/public/orgs/${orgId}/projects/${projectId}/feature-requests/new`,
+    `/public/orgs/${orgId}/projects/${projectId}/requests/new`,
     isNavigationReplace(),
   );
   useNavigationHotKey(
     'f',
-    `/public/orgs/${orgId}/projects/${projectId}/feature-requests`,
+    `/public/orgs/${orgId}/projects/${projectId}/requests`,
     false,
   );
   useNavigationHotKey('left', -1);

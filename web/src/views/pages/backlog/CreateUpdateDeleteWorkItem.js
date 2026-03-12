@@ -23,11 +23,12 @@ import {
   listComments,
   updateComment,
 } from '../../../services/backlog/backlog.service';
-import { listSprints } from '../../../services/sprints/sprints.service';
+import { listCycles } from '../../../services/cycles/cycles.service';
 import FloumyDropZone from '../components/FloumyDropZone';
 import { formatHyphenatedString } from '../../../services/utils/utils';
 import DeleteWarning from '../components/DeleteWarning';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useProjects } from '../../../contexts/ProjectsContext';
 import { toast } from 'react-toastify';
 import CardHeaderDetails from '../components/CardHeaderDetails';
 import { getOrg } from '../../../services/org/orgs.service';
@@ -39,6 +40,8 @@ import AIButton from '../../../components/AI/AIButton';
 
 function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const { orgId, projectId } = useParams();
+  const { currentProject } = useProjects();
+  const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [priority, setPriority] = useState(workItem.priority || '');
@@ -53,8 +56,8 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
   const [initiative, setInitiative] = useState(
     workItem.initiative ? workItem.initiative.id : '',
   );
-  const [sprint, setSprint] = useState(
-    workItem.sprint ? workItem.sprint.id : '',
+  const [cycle, setCycle] = useState(
+    workItem.cycle?.id || workItem.sprint?.id || '',
   );
   const [deleteWarning, setDeleteWarning] = useState(false);
   const [files, setFiles] = useState([]);
@@ -89,18 +92,19 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     setInitiative(workItem.initiative ? workItem.initiative.id : '');
   }, [orgId, projectId, workItem.initiative]);
 
-  const loadAndSetSprints = useCallback(async () => {
-    const sprints = await listSprints(orgId, projectId);
-    const mappedSprints = sprints.map((sprint) => {
+  const loadAndSetCycles = useCallback(async () => {
+    if (!cyclesEnabled) return;
+    const cycles = await listCycles(orgId, projectId);
+    const mappedCycles = cycles.map((c) => {
       return {
-        id: sprint.id,
-        text: `${sprint.startDate} | ${sprint.title} [${formatHyphenatedString(sprint.status)}]`,
+        id: c.id,
+        text: `${c.startDate} | ${c.title} [${formatHyphenatedString(c.status)}]`,
       };
     });
-    mappedSprints.push({ id: '', text: 'None' });
-    setSprints(mappedSprints);
-    setSprint(workItem.sprint ? workItem.sprint.id : '');
-  }, [orgId, projectId, workItem.sprint]);
+    mappedCycles.push({ id: '', text: 'None' });
+    setSprints(mappedCycles);
+    setCycle(workItem.cycle?.id || workItem.sprint?.id || '');
+  }, [orgId, projectId, cyclesEnabled, workItem.cycle, workItem.sprint]);
 
   const loadAndSetMembers = useCallback(async () => {
     const org = await getOrg();
@@ -126,7 +130,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
       try {
         await Promise.all([
           loadAndSetInitiatives(),
-          loadAndSetSprints(),
+          loadAndSetCycles(),
           loadAndSetMembers(),
           loadAndSetIssues(),
         ]);
@@ -144,7 +148,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
     fetchData();
   }, [
     loadAndSetInitiatives,
-    loadAndSetSprints,
+    loadAndSetCycles,
     loadAndSetMembers,
     loadAndSetComments,
     workItem.id,
@@ -187,7 +191,7 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
         priority: priority,
         type: type,
         initiative: initiative,
-        sprint: sprint,
+        ...(cyclesEnabled && { cycle: cycle || null }),
         estimation: values.estimation || null,
         status: status,
         files: files,
@@ -344,14 +348,11 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                             { id: 'ready-to-start', text: 'Ready to Start' },
                             { id: 'in-progress', text: 'In Progress' },
                             { id: 'blocked', text: 'Blocked' },
-                            { id: 'code-review', text: 'Code Review' },
+                            { id: 'review', text: 'Review' },
                             { id: 'testing', text: 'Testing' },
                             { id: 'revisions', text: 'Revisions' },
-                            {
-                              id: 'ready-for-deployment',
-                              text: 'Ready for Deployment',
-                            },
-                            { id: 'deployed', text: 'Deployed' },
+                            { id: 'ready-to-ship', text: 'Ready to Ship' },
+                            { id: 'shipped', text: 'Shipped' },
                             { id: 'done', text: 'Done' },
                             { id: 'closed', text: 'Closed' },
                           ]}
@@ -370,11 +371,11 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                           defaultValue={type}
                           name="type"
                           data={[
-                            { id: 'user-story', text: 'User Story' },
+                            { id: 'deliverable', text: 'Deliverable' },
                             { id: 'task', text: 'Task' },
-                            { id: 'bug', text: 'Bug' },
-                            { id: 'spike', text: 'Spike' },
-                            { id: 'technical-debt', text: 'Technical Debt' },
+                            { id: 'defect', text: 'Defect' },
+                            { id: 'research', text: 'Research' },
+                            { id: 'improvement', text: 'Improvement' },
                           ]}
                           onChange={(e) => setType(e.target.value)}
                         ></Select2>
@@ -443,32 +444,34 @@ function CreateUpdateDeleteWorkItem({ onSubmit, workItem = defaultWorkItem }) {
                         ></Select2>
                       </Col>
                     </Row>
-                    <Row className="mb-3">
-                      <Col>
-                        <label
-                          className="form-control-label"
-                          htmlFor="validationCustom01"
-                        >
-                          {sprint ? (
-                            <Link
-                              to={`/admin/orgs/${orgId}/projects/${projectId}/sprints/edit/${sprint}`}
-                            >
-                              Sprint
-                              <i className="fa fa-link ml-2" />
-                            </Link>
-                          ) : (
-                            'Sprint'
-                          )}
-                        </label>
-                        <Select2
-                          className="react-select-container"
-                          defaultValue={sprint}
-                          placeholder="Select a sprint"
-                          data={sprints}
-                          onChange={(e) => setSprint(e.target.value)}
-                        ></Select2>
-                      </Col>
-                    </Row>
+                    {cyclesEnabled && (
+                      <Row className="mb-3">
+                        <Col>
+                          <label
+                            className="form-control-label"
+                            htmlFor="validationCustom01"
+                          >
+                            {cycle ? (
+                              <Link
+                                to={`/admin/orgs/${orgId}/projects/${projectId}/cycles/edit/${cycle}`}
+                              >
+                                Cycle
+                                <i className="fa fa-link ml-2" />
+                              </Link>
+                            ) : (
+                              'Cycle'
+                            )}
+                          </label>
+                          <Select2
+                            className="react-select-container"
+                            defaultValue={cycle}
+                            placeholder="Select a cycle"
+                            data={sprints}
+                            onChange={(e) => setCycle(e.target.value)}
+                          ></Select2>
+                        </Col>
+                      </Row>
+                    )}
                     <Row className="mb-3">
                       <Col>
                         <label
@@ -694,7 +697,7 @@ const defaultWorkItem = {
   title: '',
   description: '',
   priority: 'medium',
-  type: 'user-story',
+  type: 'deliverable',
   estimation: null,
   status: 'planned',
   initiative: { id: '' },

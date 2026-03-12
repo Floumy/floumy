@@ -14,8 +14,8 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Objective } from '../okrs/objective.entity';
 import { FeedItem } from '../feed/feed-item.entity';
-import { FeatureRequest } from '../feature-requests/feature-request.entity';
-import { FeatureRequestVote } from '../feature-requests/feature-request-vote.entity';
+import { Request } from '../requests/request.entity';
+import { RequestVote } from '../requests/request-vote.entity';
 import { Issue } from '../issues/issue.entity';
 import { Project } from '../projects/project.entity';
 import { Notification } from '../notifications/notification.entity';
@@ -68,26 +68,18 @@ export class User {
   assignedInitiatives: Promise<Initiative[]>;
   @OneToMany(() => FeedItem, (feedItem) => feedItem.user, { lazy: true })
   feedItems: Promise<FeedItem[]>;
-  @OneToMany(
-    () => FeatureRequest,
-    (featureRequest) => featureRequest.createdBy,
-    {
-      lazy: true,
-    },
-  )
-  createdFeatureRequests: Promise<FeatureRequest[]>;
+  @OneToMany(() => Request, (request) => request.createdBy, {
+    lazy: true,
+  })
+  createdRequests: Promise<Request[]>;
 
   @OneToMany(() => Issue, (issue) => issue.createdBy, { lazy: true })
   createdIssues: Promise<Issue[]>;
 
-  @OneToMany(
-    () => FeatureRequestVote,
-    (featureRequestVote) => featureRequestVote.user,
-    {
-      lazy: true,
-    },
-  )
-  featureRequestVotes: Promise<FeatureRequestVote[]>;
+  @OneToMany(() => RequestVote, (requestVote) => requestVote.user, {
+    lazy: true,
+  })
+  requestVotes: Promise<RequestVote[]>;
 
   @OneToMany(() => Objective, (objective) => objective.assignedTo, {
     lazy: true,

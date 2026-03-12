@@ -3,6 +3,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { PublicService } from './public.service';
@@ -14,6 +15,23 @@ import { CacheInterceptor } from '@nestjs/cache-manager';
 @UseInterceptors(CacheInterceptor)
 export class PublicController {
   constructor(private workItemsPublicService: PublicService) {}
+
+  @Get('open')
+  async listOpenWorkItems(
+    @Param('orgId') orgId: string,
+    @Param('projectId') projectId: string,
+    @Query('includeRecentCompleted') includeRecentCompleted?: string,
+  ) {
+    try {
+      return await this.workItemsPublicService.listOpenWorkItems(
+        orgId,
+        projectId,
+        includeRecentCompleted === 'true',
+      );
+    } catch (e) {
+      throw new NotFoundException();
+    }
+  }
 
   @Get('/:workItemId')
   async getWorkItem(

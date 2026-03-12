@@ -46,7 +46,7 @@ class BreadcrumbMapper {
 export class PublicWorkItemMapper {
   static async toDto(workItem: WorkItem) {
     const initiative = await workItem.initiative;
-    const sprint = await workItem.sprint;
+    const cycle = await workItem.cycle;
     const org = await workItem.org;
     const comments = await workItem.comments;
     const issue = await workItem.issue;
@@ -64,7 +64,7 @@ export class PublicWorkItemMapper {
       initiative: initiative
         ? { id: initiative.id, title: initiative.title }
         : null,
-      sprint: sprint ? { id: sprint.id, title: sprint.title } : null,
+      cycle: cycle ? { id: cycle.id, title: cycle.title } : null,
       issue: issue ? { id: issue.id, title: issue.title } : null,
       breadcrumbs: await BreadcrumbMapper.toDto(workItem),
       comments: await CommentMapper.toDtoList(comments),

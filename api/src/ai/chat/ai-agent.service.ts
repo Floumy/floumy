@@ -5,7 +5,7 @@ import { WorkItemsToolsService } from './tools/work-items-tools.service';
 import { InitiativesToolsService } from './tools/initiatives-tools.service';
 import { MilestonesToolsService } from './tools/milestones-tools.service';
 import { OkrsToolsService } from './tools/okrs-tools.service';
-import { SprintsToolsService } from './tools/sprints-tools.service';
+import { CyclesToolsService } from './tools/cycles-tools.service';
 import { ConfigService } from '@nestjs/config';
 import { SystemMessage } from '@langchain/core/messages';
 
@@ -18,7 +18,7 @@ export class AiAgentService {
     private initiativesToolsService: InitiativesToolsService,
     private milestonesToolsService: MilestonesToolsService,
     private okrsToolsService: OkrsToolsService,
-    private sprintsToolsService: SprintsToolsService,
+    private cyclesToolsService: CyclesToolsService,
     private configService: ConfigService,
   ) {
     this.apiKey = this.configService.get('ai.apiKey');
@@ -26,7 +26,7 @@ export class AiAgentService {
 
   getChatAgent(orgId: string, projectId: string, userId: string) {
     const model = new ChatOpenAI({
-      model: 'gpt-4o',
+      model: 'gpt-4.1-mini',
       openAIApiKey: this.apiKey,
       streaming: true,
       // callbacks: [new ConsoleCallbackHandler()],
@@ -38,7 +38,7 @@ export class AiAgentService {
         ...this.initiativesToolsService.getTools(orgId, projectId, userId),
         ...this.milestonesToolsService.getTools(orgId, projectId),
         ...this.okrsToolsService.getTools(orgId, projectId, userId),
-        ...this.sprintsToolsService.getTools(orgId, projectId),
+        ...this.cyclesToolsService.getTools(orgId, projectId),
       ],
       prompt: new SystemMessage(
         `You are a helpful project management assistant.
@@ -63,9 +63,9 @@ export class AiAgentService {
                 - Each initiative can be associated with one milestone
                 - A set of milestones with deadlines within a certain quarter are defining the roadmap for that quarter
                 - Each initiative can have work items
-                - Work items can be added to sprints
-                - There is only one active sprint at a time
-                - The work items backlog contains work items that are not closed or done and are not part of a sprint
+                - Work items can be added to cycles
+                - There is only one active cycle at a time
+                - The work items backlog contains work items that are not closed or done and are not part of a cycle
                 - The initiatives backlog contains initiatives that are not closed or completed and are not part of a milestone
                 
                 Example behavior:

@@ -3,11 +3,11 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FeedItem } from './feed-item.entity';
-import { WorkItemDto } from '../backlog/work-items/dtos';
+import type { WorkItemDto } from '../backlog/work-items/dtos';
 import { Org } from '../orgs/org.entity';
 import { User } from '../users/user.entity';
-import { KeyResultDto, OKRDto } from '../okrs/dtos';
-import { InitiativeDto } from '../roadmap/initiatives/dtos';
+import type { KeyResultDto, OKRDto } from '../okrs/dtos';
+import type { InitiativeDto } from '../roadmap/initiatives/dtos';
 import { Project } from '../projects/project.entity';
 
 @Injectable()

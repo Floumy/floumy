@@ -21,11 +21,19 @@ import LoadingSpinnerBox from '../components/LoadingSpinnerBox';
 function Code() {
   const { orgId, currentProject } = useProjects();
   const navigate = useNavigate();
+  const codeEnabled = currentProject?.codeEnabled ?? false;
 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!currentProject?.id || !orgId) return;
+    if (!codeEnabled && orgId && currentProject?.id) {
+      navigate(`/admin/orgs/${orgId}/projects/${currentProject.id}/dashboard`);
+      return;
+    }
+  }, [codeEnabled, navigate, orgId, currentProject?.id]);
+
+  useEffect(() => {
+    if (!currentProject?.id || !orgId || !codeEnabled) return;
 
     const fetchGithubData = async () => {
       setIsLoading(true);
@@ -60,7 +68,9 @@ function Code() {
     };
 
     fetchGithubData();
-  }, [currentProject?.id, orgId]);
+  }, [currentProject?.id, orgId, codeEnabled]);
+
+  if (!codeEnabled) return null;
 
   return (
     <>

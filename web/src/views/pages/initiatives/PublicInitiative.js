@@ -128,7 +128,7 @@ function PublicInitiative({ initiative }) {
                 ></Input>
               </Col>
             </Row>
-            {initiative.featureRequest !== undefined && (
+            {initiative.request !== undefined && (
               <Row className="mb-3">
                 <Col>
                   <label
@@ -136,23 +136,23 @@ function PublicInitiative({ initiative }) {
                     htmlFor="validationCustom01"
                   >
                     {initiative &&
-                    initiative.featureRequest &&
-                    initiative.featureRequest.id ? (
+                    initiative.request &&
+                    initiative.request.id ? (
                       <Link
-                        to={`/public/orgs/${orgId}/projects/${projectId}/feature-requests/${initiative.featureRequest.id}`}
+                        to={`/public/orgs/${orgId}/projects/${projectId}/requests/${initiative.request.id}`}
                       >
-                        Feature Request
+                        Request
                         <i className="fa fa-link ml-2" />
                       </Link>
                     ) : (
-                      'Feature Request'
+                      'Request'
                     )}
                   </label>
                   <Input
                     type="text"
                     disabled={true}
                     className="bg-white"
-                    defaultValue={initiative.featureRequest?.title || 'None'}
+                    defaultValue={initiative.request?.title || 'None'}
                   ></Input>
                 </Col>
               </Row>

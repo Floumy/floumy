@@ -6,10 +6,10 @@ import { Org } from '../orgs/org.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { Project } from '../projects/project.entity';
 import { Initiative } from '../roadmap/initiatives/initiative.entity';
-import { Sprint } from '../sprints/sprint.entity';
+import { Cycle } from '../cycles/cycle.entity';
 import { KeyResult } from '../okrs/key-result.entity';
 import { Objective } from '../okrs/objective.entity';
-import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Request } from '../requests/request.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
 import { Issue } from '../issues/issue.entity';
 import { User } from '../users/user.entity';
@@ -18,8 +18,8 @@ import { ProjectTool } from './tools/project.tool';
 import { BacklogModule } from '../backlog/backlog.module';
 import { InitiativeTool } from './tools/initiative.tool';
 import { RoadmapModule } from '../roadmap/roadmap.module';
-import { SprintTool } from './tools/sprint.tool';
-import { SprintsModule } from '../sprints/sprints.module';
+import { CycleTool } from './tools/cycle.tool';
+import { CyclesModule } from '../cycles/cycles.module';
 import { OkrTool } from './tools/okr.tool';
 import { OkrsModule } from '../okrs/okrs.module';
 import { RoadmapTool } from './tools/roadmap.tool';
@@ -28,7 +28,7 @@ import { RoadmapTool } from './tools/roadmap.tool';
   imports: [
     BacklogModule,
     RoadmapModule,
-    SprintsModule,
+    CyclesModule,
     OkrsModule,
     TypeOrmModule.forFeature([
       User,
@@ -36,11 +36,11 @@ import { RoadmapTool } from './tools/roadmap.tool';
       Project,
       WorkItem,
       Initiative,
-      Sprint,
+      Cycle,
       Issue,
       KeyResult,
       Objective,
-      FeatureRequest,
+      Request,
       Milestone,
     ]),
     McpModule.forRoot({
@@ -52,7 +52,7 @@ import { RoadmapTool } from './tools/roadmap.tool';
     ProjectTool,
     WorkItemsTool,
     InitiativeTool,
-    SprintTool,
+    CycleTool,
     OkrTool,
     RoadmapTool,
     McpService,

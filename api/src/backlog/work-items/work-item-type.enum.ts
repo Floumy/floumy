@@ -1,7 +1,7 @@
 export enum WorkItemType {
-  USER_STORY = 'user-story',
+  DELIVERABLE = 'deliverable',
   TASK = 'task',
-  BUG = 'bug',
-  SPIKE = 'spike',
-  TECHNICAL_DEBT = 'technical-debt',
+  DEFECT = 'defect',
+  RESEARCH = 'research',
+  IMPROVEMENT = 'improvement',
 }

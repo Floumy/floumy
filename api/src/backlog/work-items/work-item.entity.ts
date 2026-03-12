@@ -17,7 +17,7 @@ import { WorkItemStatus } from './work-item-status.enum';
 import { Org } from '../../orgs/org.entity';
 import { Initiative } from '../../roadmap/initiatives/initiative.entity';
 import { WorkItemType } from './work-item-type.enum';
-import { Sprint } from '../../sprints/sprint.entity';
+import { Cycle } from '../../cycles/cycle.entity';
 import { WorkItemFile } from './work-item-file.entity';
 import { User } from '../../users/user.entity';
 import { WorkItemsStatusStats } from './work-items-status-stats.entity';
@@ -41,7 +41,7 @@ export class WorkItem {
   @Column({
     type: 'enum',
     enum: WorkItemType,
-    default: WorkItemType.USER_STORY,
+    default: WorkItemType.DELIVERABLE,
   })
   type: WorkItemType;
   @Column({
@@ -82,10 +82,10 @@ export class WorkItem {
     lazy: false,
   })
   initiative: Promise<Initiative>;
-  @ManyToOne(() => Sprint, (sprint) => sprint.workItems, {
+  @ManyToOne(() => Cycle, (cycle) => cycle.workItems, {
     lazy: true,
   })
-  sprint: Promise<Sprint>;
+  cycle: Promise<Cycle>;
   @OneToMany(
     () => WorkItemComment,
     (workItemComment) => workItemComment.workItem,

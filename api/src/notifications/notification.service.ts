@@ -7,7 +7,7 @@ import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
 import { InitiativeComment } from '../roadmap/initiatives/initiative-comment.entity';
 import { WorkItemComment } from '../backlog/work-items/work-item-comment.entity';
-import { FeatureRequestComment } from '../feature-requests/feature-request-comment.entity';
+import { RequestComment } from '../requests/request-comment.entity';
 import { IssueComment } from '../issues/issue-comment.entity';
 import { KeyResultComment } from '../okrs/key-result-comment.entity';
 import { ObjectiveComment } from '../okrs/objective-comment.entity';
@@ -26,8 +26,8 @@ export class NotificationService {
     private workItemCommentsRepository: Repository<WorkItemComment>,
     @InjectRepository(WorkItem)
     private workItemsRepository: Repository<WorkItem>,
-    @InjectRepository(FeatureRequestComment)
-    private featureRequestCommentsRepository: Repository<FeatureRequestComment>,
+    @InjectRepository(RequestComment)
+    private requestCommentsRepository: Repository<RequestComment>,
     @InjectRepository(IssueComment)
     private issueCommentsRepository: Repository<IssueComment>,
     @InjectRepository(KeyResultComment)
@@ -137,16 +137,16 @@ export class NotificationService {
               return undefined;
             }
             break;
-          case EntityType.FEATURE_REQUEST_COMMENT:
+          case EntityType.REQUEST_COMMENT:
             try {
-              const featureRequestComment =
-                await this.featureRequestCommentsRepository.findOneOrFail({
+              const requestComment =
+                await this.requestCommentsRepository.findOneOrFail({
                   where: { id: notification.entityId },
-                  relations: ['featureRequest'],
+                  relations: ['request'],
                 });
-              const featureRequest = await featureRequestComment.featureRequest;
-              entityName = featureRequest.title;
-              entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/feature-requests/edit/${featureRequest.id}`;
+              const request = await requestComment.request;
+              entityName = request.title;
+              entityUrl = `/admin/orgs/${org.id}/projects/${project.id}/requests/edit/${request.id}`;
             } catch (e) {
               // Cleanup the notification if the entity is not found
               this.logger.error(

@@ -28,11 +28,20 @@ export async function updateProject(
   projectId,
   projectName,
   projectDescription,
+  cyclesEnabled,
+  codeEnabled,
 ) {
   try {
+    const body = { name: projectName, description: projectDescription };
+    if (cyclesEnabled !== undefined) {
+      body.cyclesEnabled = cyclesEnabled;
+    }
+    if (codeEnabled !== undefined) {
+      body.codeEnabled = codeEnabled;
+    }
     const response = await api.put(
       `${apiUrl}/orgs/${orgId}/my-projects/${projectId}`,
-      { name: projectName, description: projectDescription },
+      body,
     );
     return response.data;
   } catch (e) {

@@ -61,7 +61,13 @@ export class ProjectsController {
     @Request() request,
     @Param('orgId') orgId: string,
     @Param('id') id: string,
-    @Body() updateProjectDto: { name: string; description?: string },
+    @Body()
+    updateProjectDto: {
+      name: string;
+      description?: string;
+      cyclesEnabled?: boolean;
+      codeEnabled?: boolean;
+    },
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();

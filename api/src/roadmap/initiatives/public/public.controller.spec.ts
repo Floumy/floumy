@@ -8,7 +8,7 @@ import { Objective } from '../../../okrs/objective.entity';
 import { KeyResult } from '../../../okrs/key-result.entity';
 import { Initiative } from '../initiative.entity';
 import { Milestone } from '../../milestones/milestone.entity';
-import { Sprint } from '../../../sprints/sprint.entity';
+import { Cycle } from '../../../cycles/cycle.entity';
 import { File } from '../../../files/file.entity';
 import { InitiativeFile } from '../initiative-file.entity';
 import { WorkItem } from '../../../backlog/work-items/work-item.entity';
@@ -47,7 +47,7 @@ describe('PublicController', () => {
           KeyResult,
           Initiative,
           Milestone,
-          Sprint,
+          Cycle,
           File,
           InitiativeFile,
           WorkItem,
@@ -89,6 +89,7 @@ describe('PublicController', () => {
     project = (await org.projects)[0];
     const bipSettings = new BipSettings();
     bipSettings.isBuildInPublicEnabled = true;
+    bipSettings.isRoadmapPagePublic = true;
     bipSettings.org = Promise.resolve(org);
     bipSettings.project = Promise.resolve(project);
     await bipRepository.save(bipSettings);
@@ -120,10 +121,11 @@ describe('PublicController', () => {
         'testtesttest',
       );
       const newOrg = await orgsService.createForUser(newUser);
+      const newProject = (await newOrg.projects)[0];
       const initiative = new Initiative();
       initiative.title = 'Test Feature';
       initiative.org = Promise.resolve(newOrg);
-      initiative.project = Promise.resolve(project);
+      initiative.project = Promise.resolve(newProject);
       await initiativesRepository.save(initiative);
       await expect(
         controller.getFeature(org.id, project.id, initiative.id),

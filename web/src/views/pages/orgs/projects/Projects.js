@@ -124,7 +124,7 @@ const Projects = () => {
                         <div className="d-flex gap-2">
                           {project?.isBuildInPublicEnabled && (
                             <Link
-                              to={`/public/orgs/${orgId}/projects/${project.id}/active-sprint`}
+                              to={`/public/orgs/${orgId}/projects/${project.id}/active-cycle`}
                               target="_blank"
                             >
                               <Badge color="success" className="mr-2" pill>

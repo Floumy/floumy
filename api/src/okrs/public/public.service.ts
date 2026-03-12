@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Timeline } from '../../common/timeline.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -62,8 +62,11 @@ export class PublicService {
     });
 
     const bipSettings = await project.bipSettings;
-    if (!bipSettings?.isBuildInPublicEnabled) {
-      throw new Error('Building in public is not enabled');
+    if (
+      !bipSettings?.isBuildInPublicEnabled ||
+      !bipSettings?.isObjectivesPagePublic
+    ) {
+      throw new NotFoundException();
     }
   }
 

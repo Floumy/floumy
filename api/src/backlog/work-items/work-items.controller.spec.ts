@@ -19,8 +19,8 @@ import { MilestonesService } from '../../roadmap/milestones/milestones.service';
 import { WorkItemsService } from './work-items.service';
 import { WorkItemStatus } from './work-item-status.enum';
 import { InitiativeStatus } from '../../roadmap/initiatives/initiativestatus.enum';
-import { Sprint } from '../../sprints/sprint.entity';
-import { SprintsService } from '../../sprints/sprints.service';
+import { Cycle } from '../../cycles/cycle.entity';
+import { CyclesService } from '../../cycles/cycles.service';
 import { File } from '../../files/file.entity';
 import { Repository } from 'typeorm';
 import { WorkItemFile } from './work-item-file.entity';
@@ -38,7 +38,7 @@ describe('WorkItemsController', () => {
   let controller: WorkItemsController;
   let cleanup: () => Promise<void>;
   let featureService: InitiativesService;
-  let sprintsService: SprintsService;
+  let cyclesService: CyclesService;
   let fileRepository: Repository<File>;
   let orgsRepository: Repository<Org>;
   let usersRepository: Repository<User>;
@@ -54,7 +54,7 @@ describe('WorkItemsController', () => {
           Initiative,
           WorkItem,
           Milestone,
-          Sprint,
+          Cycle,
           File,
           InitiativeFile,
           WorkItemFile,
@@ -68,7 +68,7 @@ describe('WorkItemsController', () => {
         InitiativesService,
         MilestonesService,
         WorkItemsService,
-        SprintsService,
+        CyclesService,
         FilesService,
         FilesStorageRepository,
       ],
@@ -86,7 +86,7 @@ describe('WorkItemsController', () => {
     org = await orgsService.createForUser(user);
     project = (await org.projects)[0];
     featureService = module.get<InitiativesService>(InitiativesService);
-    sprintsService = module.get<SprintsService>(SprintsService);
+    cyclesService = module.get<CyclesService>(CyclesService);
     fileRepository = module.get<Repository<File>>(getRepositoryToken(File));
     orgsRepository = module.get<Repository<Org>>(getRepositoryToken(Org));
     usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
@@ -145,7 +145,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -155,7 +155,7 @@ describe('WorkItemsController', () => {
       expect(workItemResponse.title).toEqual('my work item');
       expect(workItemResponse.description).toEqual('my work item description');
       expect(workItemResponse.priority).toEqual('high');
-      expect(workItemResponse.type).toEqual('technical-debt');
+      expect(workItemResponse.type).toEqual('improvement');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -195,7 +195,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
           files: [
             {
@@ -212,7 +212,7 @@ describe('WorkItemsController', () => {
       expect(workItemResponse.title).toEqual('my work item');
       expect(workItemResponse.description).toEqual('my work item description');
       expect(workItemResponse.priority).toEqual('high');
-      expect(workItemResponse.type).toEqual('technical-debt');
+      expect(workItemResponse.type).toEqual('improvement');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -248,7 +248,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -264,7 +264,7 @@ describe('WorkItemsController', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual('high');
-      expect(workItems[0].type).toEqual('technical-debt');
+      expect(workItems[0].type).toEqual('improvement');
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
       expect(workItems[0].status).toEqual('planned');
@@ -296,7 +296,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -316,7 +316,7 @@ describe('WorkItemsController', () => {
       expect(workItemResponse.title).toEqual('my work item');
       expect(workItemResponse.description).toEqual('my work item description');
       expect(workItemResponse.priority).toEqual('high');
-      expect(workItemResponse.type).toEqual('technical-debt');
+      expect(workItemResponse.type).toEqual('improvement');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -351,7 +351,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -370,7 +370,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.LOW,
-          type: WorkItemType.BUG,
+          type: WorkItemType.DEFECT,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -382,7 +382,7 @@ describe('WorkItemsController', () => {
         'my work item description updated',
       );
       expect(workItemResponse.priority).toEqual('low');
-      expect(workItemResponse.type).toEqual('bug');
+      expect(workItemResponse.type).toEqual('defect');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -433,7 +433,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -452,7 +452,7 @@ describe('WorkItemsController', () => {
           description: 'my work item description updated',
           mentions: [user.id],
           priority: Priority.LOW,
-          type: WorkItemType.BUG,
+          type: WorkItemType.DEFECT,
           status: WorkItemStatus.PLANNED,
           files: [
             {
@@ -471,7 +471,7 @@ describe('WorkItemsController', () => {
         'my work item description updated',
       );
       expect(workItemResponse.priority).toEqual('low');
-      expect(workItemResponse.type).toEqual('bug');
+      expect(workItemResponse.type).toEqual('defect');
       expect(workItemResponse.createdAt).toBeDefined();
       expect(workItemResponse.updatedAt).toBeDefined();
       expect(workItemResponse.status).toEqual('planned');
@@ -504,7 +504,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -554,12 +554,12 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
       );
-      const workItems = await controller.listOpenWithoutSprints(
+      const workItems = await controller.listOpenWithoutCycles(
         org.id,
         project.id,
         {
@@ -574,7 +574,7 @@ describe('WorkItemsController', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual('high');
-      expect(workItems[0].type).toEqual('technical-debt');
+      expect(workItems[0].type).toEqual('improvement');
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
       expect(workItems[0].status).toEqual('planned');
@@ -595,12 +595,12 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
-      const sprint = await sprintsService.create(org.id, project.id, {
-        goal: 'my sprint description',
+      const cycle = await cyclesService.create(org.id, project.id, {
+        goal: 'my cycle description',
         startDate: '2019-01-01',
         duration: 2,
       });
@@ -614,11 +614,11 @@ describe('WorkItemsController', () => {
         },
         workItem.id,
         {
-          sprint: sprint.id,
+          cycle: cycle.id,
         },
       );
       expect(updatedWorkItem.id).toEqual(workItem.id);
-      expect(updatedWorkItem.sprint.id).toEqual(sprint.id);
+      expect(updatedWorkItem.cycle?.id).toEqual(cycle.id);
     });
     it('should update the status', async () => {
       const workItem = await controller.create(
@@ -634,7 +634,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -681,7 +681,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           initiative: feature.id,
           status: WorkItemStatus.PLANNED,
         },
@@ -702,7 +702,7 @@ describe('WorkItemsController', () => {
       expect(workItems[0].title).toEqual('my work item');
       expect(workItems[0].description).toEqual('my work item description');
       expect(workItems[0].priority).toEqual('high');
-      expect(workItems[0].type).toEqual('technical-debt');
+      expect(workItems[0].type).toEqual('improvement');
       expect(workItems[0].createdAt).toBeDefined();
       expect(workItems[0].updatedAt).toBeDefined();
       expect(workItems[0].status).toEqual('planned');
@@ -728,7 +728,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -784,7 +784,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -832,7 +832,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -886,7 +886,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -941,7 +941,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -995,7 +995,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -1062,7 +1062,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );
@@ -1129,7 +1129,7 @@ describe('WorkItemsController', () => {
           title: 'my work item',
           description: 'my work item description',
           priority: Priority.HIGH,
-          type: WorkItemType.TECHNICAL_DEBT,
+          type: WorkItemType.IMPROVEMENT,
           status: WorkItemStatus.PLANNED,
         },
       );

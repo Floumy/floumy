@@ -10,9 +10,13 @@ import { Issue } from './issue.entity';
 import { IssueComment } from './issue-comment.entity';
 import { Project } from '../projects/project.entity';
 import { WorkItem } from '../backlog/work-items/work-item.entity';
+import { BipModule } from '../bip/bip.module';
+import { PublicController as IssuesPublicController } from './public/public.controller';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.register(),
     TypeOrmModule.forFeature([
       User,
       Org,
@@ -23,8 +27,9 @@ import { WorkItem } from '../backlog/work-items/work-item.entity';
     ]),
     OrgsModule,
     AuthModule,
+    BipModule,
   ],
-  controllers: [IssuesController],
+  controllers: [IssuesController, IssuesPublicController],
   providers: [IssuesService],
 })
 export class IssuesModule {}

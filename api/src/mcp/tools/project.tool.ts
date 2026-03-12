@@ -4,7 +4,7 @@ import { ILike, Repository } from 'typeorm';
 import { Project } from '../../projects/project.entity';
 import { McpService } from '../services/mcp.service';
 import { REQUEST } from '@nestjs/core';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { Tool } from '@rekog/mcp-nest';
 import { z } from 'zod';
 

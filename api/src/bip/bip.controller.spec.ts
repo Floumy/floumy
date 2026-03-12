@@ -52,23 +52,25 @@ describe('BipController', () => {
           },
         },
         {
+          isActiveWorkPagePublic: false,
           isBuildInPublicEnabled: true,
           isObjectivesPagePublic: true,
           isRoadmapPagePublic: true,
-          isSprintsPagePublic: true,
-          isActiveSprintsPagePublic: true,
+          isCyclesPagePublic: true,
+          isActiveCyclesPagePublic: true,
           isIssuesPagePublic: true,
-          isFeatureRequestsPagePublic: true,
+          isRequestsPagePublic: true,
         },
       );
       expect(updatedSettings).toEqual({
+        isActiveWorkPagePublic: false,
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveCyclesPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
+        isRequestsPagePublic: true,
       });
     });
   });
@@ -84,13 +86,14 @@ describe('BipController', () => {
           },
         },
         {
+          isActiveWorkPagePublic: false,
           isBuildInPublicEnabled: true,
           isObjectivesPagePublic: true,
           isRoadmapPagePublic: true,
-          isSprintsPagePublic: true,
-          isActiveSprintsPagePublic: true,
+          isCyclesPagePublic: true,
+          isActiveCyclesPagePublic: true,
           isIssuesPagePublic: true,
-          isFeatureRequestsPagePublic: true,
+          isRequestsPagePublic: true,
         },
       );
       const settings = await controller.getSettings(org.id, project.id);
@@ -98,10 +101,11 @@ describe('BipController', () => {
         isBuildInPublicEnabled: true,
         isObjectivesPagePublic: true,
         isRoadmapPagePublic: true,
-        isSprintsPagePublic: true,
-        isActiveSprintsPagePublic: true,
+        isCyclesPagePublic: true,
+        isActiveWorkPagePublic: false,
+        isActiveCyclesPagePublic: true,
         isIssuesPagePublic: true,
-        isFeatureRequestsPagePublic: true,
+        isRequestsPagePublic: true,
       });
     });
   });

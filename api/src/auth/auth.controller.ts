@@ -15,8 +15,8 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { Public } from './public.guard';
-import { OrgSignUpDto, SignInDto, SignUpDto } from './auth.dtos';
 import * as process from 'node:process';
+import type { OrgSignUpDto, SignInDto, SignUpDto } from './auth.dtos';
 
 @Controller('auth')
 export class AuthController {

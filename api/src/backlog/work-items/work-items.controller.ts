@@ -18,8 +18,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '../../auth/auth.guard';
 import { WorkItemsService } from './work-items.service';
-import { CreateUpdateWorkItemDto, WorkItemDto, WorkItemPatchDto } from './dtos';
-import { CreateUpdateCommentDto } from '../../comments/dtos';
+import type {
+  CreateUpdateWorkItemDto,
+  WorkItemDto,
+  WorkItemPatchDto,
+} from './dtos';
+import type { CreateUpdateCommentDto } from '../../comments/dtos';
 import { Public } from '../../auth/public.guard';
 
 @Controller('/orgs/:orgId/projects/:projectId/work-items')
@@ -107,18 +111,22 @@ export class WorkItemsController {
 
   @Get('open')
   @HttpCode(HttpStatus.OK)
-  async listOpenWithoutSprints(
+  async listOpenWithoutCycles(
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Request() request,
+    @Query('includeRecentCompleted') includeRecentCompleted?: string,
+    @Query('includeWithCycles') includeWithCycles?: string,
   ) {
     if (orgId !== request.user.org) {
       throw new UnauthorizedException();
     }
 
-    return await this.workItemsService.listOpenWorkItemsWithoutSprints(
+    return await this.workItemsService.listOpenWorkItemsWithoutCycles(
       orgId,
       projectId,
+      includeRecentCompleted === 'true',
+      includeWithCycles === 'true',
     );
   }
 

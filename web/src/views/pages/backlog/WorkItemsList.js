@@ -33,6 +33,7 @@ function WorkItemsList({
   headerClassName = 'thead-light',
   onAddNewWorkItem,
   onChangeSprint,
+  onChangeCycle,
   onChangeStatus,
   onChangePriority,
   onChangeAssignee,
@@ -42,7 +43,7 @@ function WorkItemsList({
   id = 'work-items-context-menu',
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [type, setType] = useState('user-story');
+  const [type, setType] = useState('deliverable');
   const [priority, setPriority] = useState('medium');
   const [selectedWorkItems, setSelectedWorkItems] = useState([]);
   const [lastSelectedWorkItem, setLastSelectedWorkItem] = useState(null);
@@ -96,7 +97,7 @@ function WorkItemsList({
         status: 'planned',
       };
       await onAddNewWorkItem(workItem);
-      setType('user-story');
+      setType('deliverable');
       setPriority('medium');
     } catch (e) {
       toast.error('The work item could not be saved');
@@ -166,7 +167,7 @@ function WorkItemsList({
       {enableContextMenu && (
         <WorkItemsContextMenu
           menuId={id}
-          onChangeSprint={onChangeSprint}
+          onChangeSprint={onChangeSprint || onChangeCycle}
           onChangeStatus={onChangeStatus}
           onChangePriority={onChangePriority}
           onChangeAssignee={onChangeAssignee}
@@ -329,17 +330,11 @@ function WorkItemsList({
                               defaultValue={type}
                               name="type"
                               data={[
-                                { id: 'user-story', text: 'User Story' },
+                                { id: 'deliverable', text: 'Deliverable' },
                                 { id: 'task', text: 'Task' },
-                                {
-                                  id: 'bug',
-                                  text: 'Bug',
-                                },
-                                { id: 'spike', text: 'Spike' },
-                                {
-                                  id: 'technical-debt',
-                                  text: 'Technical Debt',
-                                },
+                                { id: 'defect', text: 'Defect' },
+                                { id: 'research', text: 'Research' },
+                                { id: 'improvement', text: 'Improvement' },
                               ]}
                               onChange={(e) => setType(e.target.value)}
                             ></Select2>

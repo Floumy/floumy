@@ -13,10 +13,11 @@ export const BuildInPublicProvider = ({ children, orgId, projectId }) => {
   const [settings, setSettings] = useState({
     isObjectivesPagePublic: false,
     isRoadmapPagePublic: false,
-    isSprintsPagePublic: false,
-    isActiveSprintsPagePublic: false,
+    isCyclesPagePublic: false,
+    isActiveCyclesPagePublic: false,
+    isActiveWorkPagePublic: false,
     isIssuesPagePublic: false,
-    isFeatureRequestsPagePublic: false,
+    isRequestsPagePublic: false,
     isBuildInPublicEnabled: false,
   });
 

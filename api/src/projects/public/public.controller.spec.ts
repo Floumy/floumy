@@ -61,12 +61,10 @@ describe('PublicController', () => {
       expect(projectResult.bipSettings.isBuildInPublicEnabled).toBeDefined();
       expect(projectResult.bipSettings.isObjectivesPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isRoadmapPagePublic).toBeDefined();
-      expect(projectResult.bipSettings.isSprintsPagePublic).toBeDefined();
-      expect(projectResult.bipSettings.isActiveSprintsPagePublic).toBeDefined();
+      expect(projectResult.bipSettings.isCyclesPagePublic).toBeDefined();
+      expect(projectResult.bipSettings.isActiveCyclesPagePublic).toBeDefined();
       expect(projectResult.bipSettings.isIssuesPagePublic).toBeDefined();
-      expect(
-        projectResult.bipSettings.isFeatureRequestsPagePublic,
-      ).toBeDefined();
+      expect(projectResult.bipSettings.isRequestsPagePublic).toBeDefined();
     });
   });
 });

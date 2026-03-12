@@ -24,6 +24,7 @@ import NewProjectModal from './NewProjectModal';
 import ProjectSelector from './ProjectSelector';
 import { useOrg } from '../../contexts/OrgContext';
 import { KeyShortcut, ShortcutsModal } from '../Shortcuts';
+import { getNavigationItems, getNavKey } from '../../utils/sidebarNavigation';
 
 function Sidebar({ toggleSidenav, logo, rtlActive }) {
   const [newProjectModal, setNewProjectModal] = React.useState(false);
@@ -76,19 +77,15 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
     setNewProjectModal(!newProjectModal);
   };
 
+  const cyclesEnabled = currentProject?.cyclesEnabled ?? false;
+  const codeEnabled = currentProject?.codeEnabled ?? false;
+  const navItems = getNavigationItems(cyclesEnabled, codeEnabled);
   const shortcutsItems = [
-    { description: 'Go to OKRs', keys: ['1'], id: 'okrs' },
-    { description: 'Go to Roadmap', keys: ['2'], id: 'roadmap' },
-    { description: 'Go to Active Sprint', keys: ['3'], id: 'active-sprint' },
-    { description: 'Go to Sprints', keys: ['4'], id: 'sprints' },
-    { description: 'Go to Pages', keys: ['5'], id: 'pages' },
-    { description: 'Go to Code', keys: ['6'], id: 'code' },
-    { description: 'Go to Issues', keys: ['7'], id: 'issues' },
-    {
-      description: 'Go to Feature Requests',
-      keys: ['8'],
-      id: 'feature-requests',
-    },
+    ...navItems.map((item) => ({
+      description: item.description,
+      keys: [item.key],
+      id: item.id,
+    })),
     {
       description: 'Create a Work Item',
       keys: ['w'],
@@ -104,11 +101,15 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
       keys: ['o'],
       id: 'create-initiative',
     },
-    {
-      description: 'Create a Sprint',
-      keys: ['s'],
-      id: 'create-initiative',
-    },
+    ...(cyclesEnabled
+      ? [
+          {
+            description: 'Create a Cycle',
+            keys: ['s'],
+            id: 'create-initiative',
+          },
+        ]
+      : []),
     {
       description: 'Create a Roadmap Milestone',
       keys: ['m'],
@@ -216,13 +217,16 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         role="button"
                         onClick={toggleShortcutsModal}
                       >
-                        <KeyShortcut keys={['1']} />
+                        <KeyShortcut
+                          keys={[getNavKey(cyclesEnabled, codeEnabled, 'okrs')]}
+                        />
                       </span>
                       <UncontrolledTooltip
                         target="shortcut-okrs"
                         placement="top"
                       >
-                        Press 1 to go to OKRs. Click to see all shortcuts.
+                        Press {getNavKey(cyclesEnabled, codeEnabled, 'okrs')} to
+                        go to OKRs. Click to see all shortcuts.
                       </UncontrolledTooltip>
                     </Col>
                   </Row>
@@ -276,13 +280,18 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         role="button"
                         onClick={toggleShortcutsModal}
                       >
-                        <KeyShortcut keys={['2']} />
+                        <KeyShortcut
+                          keys={[
+                            getNavKey(cyclesEnabled, codeEnabled, 'roadmap'),
+                          ]}
+                        />
                       </span>
                       <UncontrolledTooltip
                         target="shortcut-roadmap"
                         placement="top"
                       >
-                        Press 2 to go to Roadmap. Click to see all shortcuts.
+                        Press {getNavKey(cyclesEnabled, codeEnabled, 'roadmap')}{' '}
+                        to go to Roadmap. Click to see all shortcuts.
                       </UncontrolledTooltip>
                     </Col>
                   </Row>
@@ -291,12 +300,14 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                   <Row style={{ maxWidth: '100%', height: '47px' }}>
                     <Col xs={7}>
                       <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/active-sprint`}
+                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/active-cycle`}
                         onClick={closeSidenav}
                         tag={NavLinkRRD}
                       >
                         <i className="fa fa-rocket" />
-                        <span className="nav-link-text">Active Sprint</span>
+                        <span className="nav-link-text">
+                          {cyclesEnabled ? 'Active Cycle' : 'Active Work'}
+                        </span>
                       </NavLink>
                     </Col>
                     <Col
@@ -306,11 +317,15 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     >
                       <div
                         className={
-                          bipSettings.isActiveSprintsPagePublic ? '' : 'd-none'
+                          (cyclesEnabled &&
+                            bipSettings.isActiveCyclesPagePublic) ||
+                          (!cyclesEnabled && bipSettings.isActiveWorkPagePublic)
+                            ? ''
+                            : 'd-none'
                         }
                       >
                         <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/active-sprint`}
+                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/active-cycle`}
                           target="_blank"
                           role="button"
                         >
@@ -337,78 +352,97 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         role="button"
                         onClick={toggleShortcutsModal}
                       >
-                        <KeyShortcut keys={['3']} />
+                        <KeyShortcut
+                          keys={[
+                            getNavKey(
+                              cyclesEnabled,
+                              codeEnabled,
+                              'active-cycle',
+                            ),
+                          ]}
+                        />
                       </span>
                       <UncontrolledTooltip
                         target="shortcut-active-sprint"
                         placement="top"
                       >
-                        Press 3 to go to Active Sprint. Click to see all
-                        shortcuts.
+                        Press{' '}
+                        {getNavKey(cyclesEnabled, codeEnabled, 'active-cycle')}{' '}
+                        to go to{' '}
+                        {cyclesEnabled ? 'Active Cycle' : 'Active Work'}. Click
+                        to see all shortcuts.
                       </UncontrolledTooltip>
                     </Col>
                   </Row>
                 </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={7}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/sprints`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-refresh" />
-                        <span className="nav-link-text">Sprints</span>
-                      </NavLink>
-                    </Col>
-                    <Col
-                      xs={3}
-                      style={{ padding: '0.675rem 1.5rem' }}
-                      className="text-left"
-                    >
-                      <div
-                        className={
-                          bipSettings.isSprintsPagePublic ? '' : 'd-none'
-                        }
-                      >
-                        <Link
-                          to={`/public/orgs/${orgId}/projects/${currentProject.id}/sprints`}
-                          target="_blank"
-                          role="button"
+                {cyclesEnabled && (
+                  <NavItem>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={7}>
+                        <NavLink
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/cycles`}
+                          onClick={closeSidenav}
+                          tag={NavLinkRRD}
                         >
-                          <UncontrolledTooltip
-                            target="sprints-nav-item"
-                            placement="top"
-                          >
-                            This page is public and can be accessed by anyone.
-                          </UncontrolledTooltip>
-                          <Badge
-                            id="sprints-nav-item"
-                            color="success"
-                            pill={true}
-                          >
-                            PUBLIC
-                          </Badge>
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <span
-                        id="shortcut-sprints"
-                        role="button"
-                        onClick={toggleShortcutsModal}
+                          <i className="fa fa-refresh" />
+                          <span className="nav-link-text">Cycles</span>
+                        </NavLink>
+                      </Col>
+                      <Col
+                        xs={3}
+                        style={{ padding: '0.675rem 1.5rem' }}
+                        className="text-left"
                       >
-                        <KeyShortcut keys={['4']} />
-                      </span>
-                      <UncontrolledTooltip
-                        target="shortcut-sprints"
-                        placement="top"
-                      >
-                        Press 4 to go to Sprints. Click to see all shortcuts.
-                      </UncontrolledTooltip>
-                    </Col>
-                  </Row>
-                </NavItem>
+                        <div
+                          className={
+                            bipSettings.isCyclesPagePublic ? '' : 'd-none'
+                          }
+                        >
+                          <Link
+                            to={`/public/orgs/${orgId}/projects/${currentProject.id}/cycles`}
+                            target="_blank"
+                            role="button"
+                          >
+                            <UncontrolledTooltip
+                              target="sprints-nav-item"
+                              placement="top"
+                            >
+                              This page is public and can be accessed by anyone.
+                            </UncontrolledTooltip>
+                            <Badge
+                              id="sprints-nav-item"
+                              color="success"
+                              pill={true}
+                            >
+                              PUBLIC
+                            </Badge>
+                          </Link>
+                        </div>
+                      </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <span
+                          id="shortcut-sprints"
+                          role="button"
+                          onClick={toggleShortcutsModal}
+                        >
+                          <KeyShortcut
+                            keys={[
+                              getNavKey(cyclesEnabled, codeEnabled, 'cycles'),
+                            ]}
+                          />
+                        </span>
+                        <UncontrolledTooltip
+                          target="shortcut-sprints"
+                          placement="top"
+                        >
+                          Press{' '}
+                          {getNavKey(cyclesEnabled, codeEnabled, 'cycles')} to
+                          go to Cycles. Click to see all shortcuts.
+                        </UncontrolledTooltip>
+                      </Col>
+                    </Row>
+                  </NavItem>
+                )}
                 {/*<NavItem>*/}
                 {/*  <Row style={{ maxWidth: '100%' }}>*/}
                 {/*    <Col xs={10}>*/}
@@ -472,46 +506,58 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                         role="button"
                         onClick={toggleShortcutsModal}
                       >
-                        <KeyShortcut keys={['5']} />
+                        <KeyShortcut
+                          keys={[
+                            getNavKey(cyclesEnabled, codeEnabled, 'pages'),
+                          ]}
+                        />
                       </span>
                       <UncontrolledTooltip
                         target="shortcut-pages"
                         placement="top"
                       >
-                        Press 5 to go to Pages. Click to see all shortcuts.
+                        Press {getNavKey(cyclesEnabled, codeEnabled, 'pages')}{' '}
+                        to go to Pages. Click to see all shortcuts.
                       </UncontrolledTooltip>
                     </Col>
                   </Row>
                 </NavItem>
-                <NavItem>
-                  <Row style={{ maxWidth: '100%', height: '47px' }}>
-                    <Col xs={10}>
-                      <NavLink
-                        to={`/admin/orgs/${orgId}/projects/${currentProject.id}/code`}
-                        onClick={closeSidenav}
-                        tag={NavLinkRRD}
-                      >
-                        <i className="fa fa-code-pull-request" />
-                        <span className="nav-link-text">Code</span>
-                      </NavLink>
-                    </Col>
-                    <Col xs={2} className="text-right pr-2 pt-2">
-                      <span
-                        id="shortcut-code"
-                        role="button"
-                        onClick={toggleShortcutsModal}
-                      >
-                        <KeyShortcut keys={['6']} />
-                      </span>
-                      <UncontrolledTooltip
-                        target="shortcut-code"
-                        placement="top"
-                      >
-                        Press 6 to go to Code. Click to see all shortcuts.
-                      </UncontrolledTooltip>
-                    </Col>
-                  </Row>
-                </NavItem>
+                {codeEnabled && (
+                  <NavItem>
+                    <Row style={{ maxWidth: '100%', height: '47px' }}>
+                      <Col xs={10}>
+                        <NavLink
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/code`}
+                          onClick={closeSidenav}
+                          tag={NavLinkRRD}
+                        >
+                          <i className="fa fa-code-pull-request" />
+                          <span className="nav-link-text">Code</span>
+                        </NavLink>
+                      </Col>
+                      <Col xs={2} className="text-right pr-2 pt-2">
+                        <span
+                          id="shortcut-code"
+                          role="button"
+                          onClick={toggleShortcutsModal}
+                        >
+                          <KeyShortcut
+                            keys={[
+                              getNavKey(cyclesEnabled, codeEnabled, 'code'),
+                            ]}
+                          />
+                        </span>
+                        <UncontrolledTooltip
+                          target="shortcut-code"
+                          placement="top"
+                        >
+                          Press {getNavKey(cyclesEnabled, codeEnabled, 'code')}{' '}
+                          to go to Code. Click to see all shortcuts.
+                        </UncontrolledTooltip>
+                      </Col>
+                    </Row>
+                  </NavItem>
+                )}
               </Nav>
               <div className="mb-3">
                 <h6 className="navbar-heading p-0 text-muted">
@@ -572,13 +618,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           role="button"
                           onClick={toggleShortcutsModal}
                         >
-                          <KeyShortcut keys={['7']} />
+                          <KeyShortcut
+                            keys={[
+                              getNavKey(cyclesEnabled, codeEnabled, 'issues'),
+                            ]}
+                          />
                         </span>
                         <UncontrolledTooltip
                           target="shortcut-issues"
                           placement="top"
                         >
-                          Press 7 to go to Issues. Click to see all shortcuts.
+                          Press{' '}
+                          {getNavKey(cyclesEnabled, codeEnabled, 'issues')} to
+                          go to Issues. Click to see all shortcuts.
                         </UncontrolledTooltip>
                       </Col>
                     </Row>
@@ -587,14 +639,12 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                     <Row style={{ maxWidth: '100%', height: '47px' }}>
                       <Col xs={7}>
                         <NavLink
-                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/feature-requests`}
+                          to={`/admin/orgs/${orgId}/projects/${currentProject.id}/requests`}
                           onClick={closeSidenav}
                           tag={NavLinkRRD}
                         >
                           <i className="fa fa-pen-to-square" />
-                          <span className="nav-link-text">
-                            Feature Requests
-                          </span>
+                          <span className="nav-link-text">Requests</span>
                         </NavLink>
                       </Col>
                       <Col
@@ -604,9 +654,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                       >
                         <div
                           className={
-                            bipSettings.isFeatureRequestsPagePublic
-                              ? ''
-                              : 'd-none'
+                            bipSettings.isRequestsPagePublic ? '' : 'd-none'
                           }
                         >
                           <UncontrolledTooltip
@@ -616,7 +664,7 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                             This page is public and can be accessed by anyone.
                           </UncontrolledTooltip>
                           <Link
-                            to={`/public/orgs/${orgId}/projects/${currentProject.id}/feature-requests`}
+                            to={`/public/orgs/${orgId}/projects/${currentProject.id}/requests`}
                             target="_blank"
                             role="button"
                           >
@@ -636,14 +684,19 @@ function Sidebar({ toggleSidenav, logo, rtlActive }) {
                           role="button"
                           onClick={toggleShortcutsModal}
                         >
-                          <KeyShortcut keys={['8']} />
+                          <KeyShortcut
+                            keys={[
+                              getNavKey(cyclesEnabled, codeEnabled, 'requests'),
+                            ]}
+                          />
                         </span>
                         <UncontrolledTooltip
                           target="shortcut-feature-requests"
                           placement="top"
                         >
-                          Press 8 to go to Feature Requests. Click to see all
-                          shortcuts.
+                          Press{' '}
+                          {getNavKey(cyclesEnabled, codeEnabled, 'requests')} to
+                          go to Requests. Click to see all shortcuts.
                         </UncontrolledTooltip>
                       </Col>
                     </Row>

@@ -11,13 +11,13 @@ import {
   Put,
   Query,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { IssuesService } from './issues.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { IssueDto, UpdateIssueDto } from './dtos';
-import { Public } from '../auth/public.guard';
-import { CreateUpdateCommentDto } from '../comments/dtos';
+import type { CreateUpdateCommentDto } from '../comments/dtos';
 
 @Controller('/orgs/:orgId/projects/:projectId/issues')
 export class IssuesController {
@@ -46,13 +46,18 @@ export class IssuesController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @Public()
+  @UseGuards(AuthGuard)
   async listIssues(
+    @Request() request,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.issuesService.listIssues(orgId, projectId, page, limit);
     } catch (e) {
@@ -62,13 +67,19 @@ export class IssuesController {
 
   @Get('search')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
   async search(
+    @Request() request,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Query('q') query: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 0,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.issuesService.searchIssues(
         orgId,
@@ -84,12 +95,17 @@ export class IssuesController {
 
   @Get(':issueId')
   @HttpCode(HttpStatus.OK)
-  @Public()
+  @UseGuards(AuthGuard)
   async getIssueById(
+    @Request() request,
     @Param('orgId') orgId: string,
     @Param('projectId') projectId: string,
     @Param('issueId') issueId: string,
   ) {
+    if (orgId !== request.user.org) {
+      throw new UnauthorizedException();
+    }
+
     try {
       return await this.issuesService.getIssueById(orgId, projectId, issueId);
     } catch (e) {

@@ -7,7 +7,7 @@ import { Initiative } from '../roadmap/initiatives/initiative.entity';
 import { Issue } from '../issues/issue.entity';
 import { KeyResult } from '../okrs/key-result.entity';
 import { Milestone } from '../roadmap/milestones/milestone.entity';
-import { FeatureRequest } from '../feature-requests/feature-request.entity';
+import { Request } from '../requests/request.entity';
 
 @Injectable()
 export class AiService {
@@ -21,8 +21,8 @@ export class AiService {
     private keyResultRepository: Repository<KeyResult>,
     @InjectRepository(Milestone)
     private milestoneRepository: Repository<Milestone>,
-    @InjectRepository(FeatureRequest)
-    private featureRequestRepository: Repository<FeatureRequest>,
+    @InjectRepository(Request)
+    private requestRepository: Repository<Request>,
   ) {}
 
   async generateKeyResults(objective: string): Promise<KeyResultType[]> {
@@ -167,15 +167,14 @@ export class AiService {
     return response.data.initiatives;
   }
 
-  async generateInitiativesForFeatureRequest(
-    featureRequest: string,
-    featureRequestDescription: string,
+  async generateInitiativesForRequest(
+    request: string,
+    requestDescription: string,
   ) {
-    const prompt = `Generate 1-3 high-impact initiatives for this feature request:
+    const prompt = `Generate 1-3 high-impact initiatives for this request:
 
-    Copy
-    ${featureRequest}
-    ${featureRequestDescription}
+    ${request}
+    ${requestDescription}
     
     Format each initiative as:
     
@@ -262,19 +261,19 @@ export class AiService {
     Format each work item as:
     
     [Title]: 
-    - For user stories: "As a [user], I want to [action], so that [benefit]"
-    - For tasks/spikes: Clear action phrase under 6 words
-    [Type]: user-story/task/spike
+    - For deliverables: "As a [user], I want to [action], so that [benefit]"
+    - For tasks/research: Clear action phrase under 6 words
+    [Type]: deliverable/task/research
     [Priority]: high/medium/low
     [Description]: Structured HTML with sections:
     
-    For user stories:
+    For deliverables:
     • Goal: One sentence stating concrete deliverable
     • Value: Business impact and user benefit
     • Implementation: Key technical considerations and approach
     • Acceptance Criteria: Bulleted list of testable requirements
 
-    For tasks/spikes:
+    For tasks/research:
     • Goal: One sentence describing the work
     • Acceptance Criteria: Bulleted list of completion requirements
     
@@ -284,14 +283,14 @@ export class AiService {
     • Ensure items are technically feasible
     
     Work item types:
-    • user-story: User-facing functionality written from user perspective
+    • deliverable: User-facing functionality written from user perspective
     • task: Technical work with no direct user impact
-    • spike: Research/investigation activities
+    • research: Research/investigation activities
     
     Example formats:
 
     As a user, I want to customize the app's theme, so that I can make it more comfortable for my eyes
-    Type: user-story
+    Type: deliverable
     Priority: high
     <h3>Goal</h3>
     <p>Enable users to switch between light and dark themes</p>
@@ -368,19 +367,19 @@ export class AiService {
     Format each work item as:
     
     [Title]:
-    - For user stories: "As a [user], I want to [action], so that [benefit]"
-    - For tasks/bugs/spikes: Clear action phrase under 6 words
-    [Type]: task/bug/user-story/spike (prefer in this order)
+    - For deliverables: "As a [user], I want to [action], so that [benefit]"
+    - For tasks/defects/research: Clear action phrase under 6 words
+    [Type]: task/defect/deliverable/research (prefer in this order)
     [Priority]: high/medium/low
     [Description]: Structured HTML with sections:
     
-    For user stories:
+    For deliverables:
     • Goal: One sentence stating concrete deliverable
     • Value: Business impact and user benefit
     • Implementation: Key technical considerations and approach
     • Acceptance Criteria: Bulleted list of testable requirements
 
-    For tasks/bugs/spikes:
+    For tasks/defects/research:
     • Goal: One sentence describing the work
     • Acceptance Criteria: Bulleted list of completion requirements
     
@@ -391,14 +390,14 @@ export class AiService {
     
     Work item types:
     • task: Technical work with no direct user impact
-    • bug: Fix for broken functionality
-    • user-story: User-facing functionality written from user perspective
-    • spike: Research/investigation activities
+    • defect: Fix for broken functionality
+    • deliverable: User-facing functionality written from user perspective
+    • research: Research/investigation activities
     
     Example formats:
 
     Fix memory leak in theme switcher
-    Type: bug
+    Type: defect
     Priority: high
     <h3>Goal</h3>
     <p>Resolve memory leak when switching themes repeatedly</p>
@@ -410,7 +409,7 @@ export class AiService {
     </ul>
 
     As a user, I want to reset my theme to default, so that I can easily restore standard appearance
-    Type: user-story
+    Type: deliverable
     Priority: medium
     <h3>Goal</h3>
     <p>Provide option to reset theme customizations</p>
@@ -506,10 +505,11 @@ export class AiService {
     • Acceptance Criteria: Bulleted list of completion requirements
     
     Work item types:
-    • user-story: User-facing functionality written from user perspective
+    • deliverable: User-facing functionality written from user perspective
     • task: Technical work with no direct user impact
-    • bug: Fix for broken functionality
-    • spike: Research/investigation activities
+    • defect: Fix for broken functionality
+    • research: Research/investigation activities
+    • improvement: Technical debt and process improvements
     
     Requirements:
     • Focus on concrete, measurable outcomes
@@ -567,7 +567,7 @@ export class AiService {
     initiative: string,
     keyResultId: string,
     milestoneId: string,
-    featureRequestId: string,
+    requestId: string,
   ) {
     let prompt = `Generate a detailed description for this initiative:
     Initiative Title: ${initiative}
@@ -587,12 +587,12 @@ export class AiService {
       prompt += `Linked Milestone: ${milestone.title}\n`;
     }
 
-    if (featureRequestId) {
-      const featureRequest = await this.featureRequestRepository.findOneOrFail({
-        where: { id: featureRequestId },
+    if (requestId) {
+      const request = await this.requestRepository.findOneOrFail({
+        where: { id: requestId },
       });
-      prompt += `Linked Feature Request: ${featureRequest.title}
-      Description: ${featureRequest.description}\n`;
+      prompt += `Linked Request: ${request.title}
+      Description: ${request.description}\n`;
     }
 
     prompt += `
@@ -645,7 +645,7 @@ export class AiService {
   Objectives fields: title
   Key Results fields: title
   Initiatives fields: title, description, priority(high/medium/low)
-  Work Items fields: title, type(user-story/task/spike), priority(high/medium/low), description
+  Work Items fields: title, type(deliverable/task/defect/research/improvement), priority(high/medium/low), description
   
   Key Results instructions:
   Do not include any timelines or deadlines or money amounts.
@@ -662,12 +662,12 @@ export class AiService {
   - Format the description as an HTML string.
  
   Work Items general instructions:
-  - Prefer to use the following types in this order: user-story, task, spike
+  - Prefer to use the following types in this order: deliverable, task, research
   - As much as possible, slice the work items so that they are not dependent on each other. 
-  - The user story type should be used for work items that are about a job that needs to be done by a user.
-  - The task type should be used for work items that are about a task that is not a user story.
-  - The bug type should be used for work items that are about a something that is broken.
-  - The spike type should be used for work items that are about investigating an idea or a concept.
+  - The deliverable type should be used for work items that are about a job that needs to be done by a user.
+  - The task type should be used for work items that are about a task that is not a deliverable.
+  - The defect type should be used for work items that are about something that is broken.
+  - The research type should be used for work items that are about investigating an idea or a concept.
   Work Items description instructions:
   - What is the goal of the work item?
   - Why is it important?

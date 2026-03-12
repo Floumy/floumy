@@ -6,7 +6,7 @@ export interface FilterOptions {
   status?: string[];
   assigneeIds?: string[];
   priority?: ('high' | 'medium' | 'low')[];
-  type?: ('user-story' | 'task' | 'bug' | 'spike' | 'technical-debt')[];
+  type?: ('deliverable' | 'task' | 'defect' | 'research' | 'improvement')[];
   completedAt?: {
     start?: Date;
     end?: Date;

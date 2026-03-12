@@ -2,7 +2,6 @@ import { PublicController } from './public.controller';
 import { Org } from '../../../orgs/org.entity';
 import { User } from '../../../users/user.entity';
 import { InitiativesService } from '../../../roadmap/initiatives/initiatives.service';
-import { SprintsService } from '../../../sprints/sprints.service';
 import { Repository } from 'typeorm';
 import { File } from '../../../files/file.entity';
 import { setupTestingModule } from '../../../../test/test.utils';
@@ -12,7 +11,6 @@ import { KeyResult } from '../../../okrs/key-result.entity';
 import { Initiative } from '../../../roadmap/initiatives/initiative.entity';
 import { WorkItem } from '../work-item.entity';
 import { Milestone } from '../../../roadmap/milestones/milestone.entity';
-import { Sprint } from '../../../sprints/sprint.entity';
 import { InitiativeFile } from '../../../roadmap/initiatives/initiative-file.entity';
 import { WorkItemFile } from '../work-item-file.entity';
 import { UsersModule } from '../../../users/users.module';
@@ -49,7 +47,6 @@ describe('PublicController', () => {
           Initiative,
           WorkItem,
           Milestone,
-          Sprint,
           File,
           InitiativeFile,
           WorkItemFile,
@@ -65,7 +62,6 @@ describe('PublicController', () => {
         InitiativesService,
         MilestonesService,
         WorkItemsService,
-        SprintsService,
         FilesService,
         FilesStorageRepository,
         PublicService,
@@ -108,8 +104,8 @@ describe('PublicController', () => {
           title: 'Test Feature',
           description: 'Test Description',
           priority: Priority.HIGH,
-          type: WorkItemType.BUG,
-          status: WorkItemStatus.DEPLOYED,
+          type: WorkItemType.DEFECT,
+          status: WorkItemStatus.SHIPPED,
           estimation: 5,
         },
       );

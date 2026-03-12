@@ -25,9 +25,9 @@ import { CommentsService } from '../src/okrs/comments/comments.service';
 import { KeyResult } from '../src/okrs/key-result.entity';
 import { ObjectiveComment } from '../src/okrs/objective-comment.entity';
 import { Objective } from '../src/okrs/objective.entity';
-import { FeatureRequestComment } from '../src/feature-requests/feature-request-comment.entity';
-import { FeatureRequestVote } from '../src/feature-requests/feature-request-vote.entity';
-import { FeatureRequest } from '../src/feature-requests/feature-request.entity';
+import { RequestComment } from '../src/requests/request-comment.entity';
+import { RequestVote } from '../src/requests/request-vote.entity';
+import { Request } from '../src/requests/request.entity';
 import { Issue } from '../src/issues/issue.entity';
 import { IssueComment } from '../src/issues/issue-comment.entity';
 import { Project } from '../src/projects/project.entity';
@@ -35,6 +35,7 @@ import { Milestone } from '../src/roadmap/milestones/milestone.entity';
 import { WorkItem } from '../src/backlog/work-items/work-item.entity';
 import { Initiative } from '../src/roadmap/initiatives/initiative.entity';
 import { githubClientMock } from './github-client.mock';
+import { Cycle } from '../src/cycles/cycle.entity';
 
 const dataSource = new DataSource(testDbOptions);
 
@@ -98,9 +99,9 @@ export async function setupTestingModule(
         ObjectiveComment,
         KeyResult,
         Objective,
-        FeatureRequest,
-        FeatureRequestVote,
-        FeatureRequestComment,
+        Request,
+        RequestVote,
+        RequestComment,
         Issue,
         IssueComment,
         WorkItem,
@@ -108,6 +109,8 @@ export async function setupTestingModule(
         Issue,
         Milestone,
         Project,
+        BipSettings,
+        Cycle,
       ]),
       ConfigModule.forRoot({
         load: [databaseConfig, encryptionConfig, jwtConfig],
@@ -144,6 +147,12 @@ export async function setupTestingModule(
 
   return {
     module,
-    cleanup: async () => await clearDatabase(dataSource),
+    cleanup: async () => {
+      await clearDatabase(dataSource);
+      await module.close();
+      if (dataSource.isInitialized) {
+        await dataSource.destroy();
+      }
+    },
   };
 }
